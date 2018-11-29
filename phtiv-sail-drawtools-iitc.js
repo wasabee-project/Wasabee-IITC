@@ -30,16 +30,30 @@ function wrapper(plugin_info) {
         } catch (e) {
         }
 
-        alert('Hello, IITC!');
+        window.plugin.phtivsaildraw.addLeftButtons();
 
     };
 
 
+    window.plugin.phtivsaildraw.addLeftButtons = function(){
+        window.plugin.phtivsaildraw.psDrawButtons = L.Control.extend({
+                options:{
+                        position: 'topleft'
+                },
+                onAdd: function (map) {
+                        var container = L.DomUtil.create('div', 'leaflet-phtivsaildraw leaflet-bar');
+                        $(container).append('<a id="phtivsaildraw_addlinksbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Add Links">A</a>').on('click', '#phtivsaildraw_addlinksbutton' , function() {
+                                window.plugin.phtivsaildraw.tappedAddLinks();
+                            });
+                        return container;
+                }
+        });
+        map.addControl(new window.plugin.phtivsaildraw.psDrawButtons());
+    };
 
-
-
-
-
+    window.plugin.phtivsaildraw.tappedAddLinks = function() {
+        alert('Tapped Add Links');
+    };
 
     //PLUGIN END
     var setup = window.plugin.phtivsaildraw.loadExternals;
