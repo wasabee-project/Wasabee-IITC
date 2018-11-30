@@ -22,6 +22,7 @@ function wrapper(plugin_info) {
     if (typeof window.plugin !== 'function')
         window.plugin = function () {};
 
+
     //PLUGIN START
     window.plugin.phtivsaildraw = function () {};
     window.plugin.phtivsaildraw.loadExternals = function () {
@@ -29,8 +30,6 @@ function wrapper(plugin_info) {
             console.log('Loading PhtivSailDraw now');
         } catch (e) {
         }
-
-        window.plugin.phtivsaildraw.addLeftButtons();
 
     };
 
@@ -50,96 +49,541 @@ function wrapper(plugin_info) {
         }(b = s.CSS || (s.CSS = {}));
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
+    !function (scope) {
+        var Core = function () {
 
-
-    window.plugin.phtivsaildraw.addLeftButtons = function () {
-        window.plugin.phtivsaildraw.psDrawButtons = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            onAdd: function (map) {
-                var container = L.DomUtil.create('div', 'leaflet-phtivsaildraw leaflet-bar');
-                $(container).append('<a id="phtivsaildraw_addlinksbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Add Links"><img src=' + PhtivSailDraw.Images.toolbar_addlinks + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivsaildraw_addlinksbutton', function () {
-                    window.plugin.phtivsaildraw.tappedAddLinks();
+            function coreHolder(team, nickname) {
+                /** @type {!Array} */
+                this.operations = [];
+                /** @type {null} */
+                this.selectedOperation = null;
+                this._team = team;
+                this._agentName = nickname;
+            }
+            return Object.defineProperty(coreHolder.prototype, "selectedOperation", {
+                get: function () {
+                    return this._selectedOperation;
+                },
+                enumerable: true,
+                configurable: true
+            }), coreHolder.prototype.setSelectedOperation = function (id, cb) {
+                var query = this.getOperation(id, cb);
+                this._selectedOperation = query;
+            }, coreHolder.prototype.getOperation = function (type, name) {
+                var dtObj = this.operations.filter(function (rootScope) {
+                    return rootScope.data.environment === type && rootScope.getOperationName() === name;
                 });
-                return container;
-            }
-        });
-        map.addControl(new window.plugin.phtivsaildraw.psDrawButtons());
-    };
+                /** @type {null} */
+                var d = null;
+                return 1 === dtObj.length && (d = dtObj[0]), d;
+            }, coreHolder.version = "2.0", coreHolder;
+        }();
+        scope.Core = Core;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
 
-    window.plugin.phtivsaildraw.tappedAddLinks = function () {
-        var container = document.createElement("div");
-        var tr;
-        var node;
-        var button;
-        var checkbox;
-        var rdnTable = container.appendChild(document.createElement("table"));
-        [0, 1, 2].forEach(function (string) {
-            var type = 0 == string ? "src" : "dst-" + string;
-            tr = rdnTable.insertRow();
-            tr.setAttribute("data-portal", type);
-            node = tr.insertCell();
-            if (0 != string) {
-                checkbox = node.appendChild(document.createElement("input"));
-                checkbox.type = "checkbox";
-                checkbox.checked = true;
-                checkbox.value = type;
-                //self._links.push(checkbox);
+    !function (a) {
+        var dashboardDialog = function () {
+            /**
+             * @param {string} version
+             * @return {undefined}
+             */
+            function init(version) {
+                var ObjectOperation = this;
+                /** @type {!Array} */
+                this.extensions = [];
+                /** @type {string} */
+                this.selectedTab = "phtivsaildraw-section-operation";
+                /** @type {null} */
+                this.tabs = null;
+                /** @type {null} */
+                this.nav = null;
+                /** @type {null} */
+                this.selectNav = null;
+                /** @type {null} */
+                this.container = null;
+                /** @type {null} */
+                this.dialog = null;
+                /** @type {string} */
+                this._version = version;
+                if (window.useAndroidPanes()) {
+                    android.addPane("plugin-phtivsaildraw", "PHTIVSAILDRAW", "ic_action_place");
+                    window.addHook("paneChanged", function (a) {
+                        return ObjectOperation.onPaneChanged(a);
+                    });
+                }
             }
-            node = tr.insertCell();
-            node.textContent = 0 == string ? "from" : "to (#" + string + ")";
-            node = tr.insertCell();
-            button = node.appendChild(document.createElement("button"));
-            button.textContent = "set";
-            button.addEventListener("click", function (arg) {
-                if (window.selectedPortal == null)
-                    window.alert("Nothing Selected!");
-                else
-                    window.alert(window.portals[window.selectedPortal].options.data.title + " - " + arg);
-                //return self.setPortal(arg);
-            }, false);
-            node = tr.insertCell();
-            node = tr.insertCell();
-            node.className = "portal portal-" + type;
-            //self._portals[type] = node;
-            //self.updatePortal(type);
-        });
-        var element = container.appendChild(document.createElement("div"));
-        element.className = "buttonbar";
-        var div = element.appendChild(document.createElement("span"));
-        var opt = div.appendChild(document.createElement("span"));
-        opt.className = "arrow";
-        opt.textContent = "\u21b3";
-        button = div.appendChild(document.createElement("button"));
-        button.textContent = "add all";
-        button.addEventListener("click", function (a) {
-            //return self.addAllLinks();
-        }, false);
-        
-        window.dialog({
-            title: "PhtivSail: Add Links",
-            width: "auto",
-            height: "auto",
-            html: container,
-            dialogClass: "reswue-dialog reswue-dialog-links",
-            closeCallback: function (popoverName) {
-                //alert("closed");
+            return init.prototype.extend = function (id, name, callback, ext) {
+                this.extensions = this.extensions.filter(function (immigration) {
+                    return immigration.id != id;
+                });
+                this.extensions.push({
+                    id: id,
+                    isActive: callback,
+                    title: name,
+                    extension: ext
+                });
+            }, init.prototype.onPaneChanged = function (strip1) {
+                return null != this.container && (this.container.remove(), this.close()), "plugin-phtivsaildraw" == strip1 && (this.showDialog(), this.container.addClass("mobile").appendTo(document.body)), true;
+            }, init.prototype.showDialog = function (name) {
+                var self = this;
+                return void 0 === name && (name = null), window.useAndroidPanes() && "plugin-phtivsaildraw" != window.currentPane ? (null != name && (this.selectedTab = name), void window.show("plugin-phtivsaildraw")) : (null != this.dialog && this.dialog.dialog("close"), this.createExtensionMenu(), this.extensions.forEach(function (job) {
+                    if (job.isActive()) {
+                        self.buildExtension(job.id, job.title, job.extension);
+                    }
+                }), this.selectTab(this.container, null != name ? name : this.selectedTab), void(window.useAndroidPanes() || (this.dialog = window.dialog({
+                    title: "PhtivSailDraw v" + this._version,
+                    html: this.container,
+                    id: "phtivsaildraw-dashboard",
+                    width: "500px",
+                    height: "auto",
+                    closeCallback: function () {
+                        return self.close();
+                    }
+                }), this.dialog.on("dialogdragstop", function () {
+                    return self.dialog.dialog("option", "height", "auto");
+                }))));
+            }, init.prototype.close = function () {
+                if (null != this.container) {
+                    /** @type {null} */
+                    this.dialog = null;
+                    /** @type {null} */
+                    this.container = null;
+                    /** @type {null} */
+                    this.tabs = null;
+                    /** @type {null} */
+                    this.nav = null;
+                    /** @type {null} */
+                    this.selectNav = null;
+                    this.extensions.filter(function (galleryitem) {
+                        return void 0 != $(galleryitem).data("closeCallback");
+                    }).forEach(function (galleryitem) {
+                        return $(galleryitem).data("closeCallback")();
+                    });
+                }
+            }, init.prototype.buildExtension = function (path, index, isObject) {
+                var base = this;
+                var item = $("<section />");
+                item.attr("id", path);
+                item.hide();
+                this.tabs.append(item);
+                var t = $('<a href="#" />');
+                t.attr("data-section", path);
+                t.html(index);
+                var target = this.container;
+                t.on("click", function (event) {
+                    var page = $(t).data("section");
+                    base.selectTab(target, page);
+                    event.preventDefault();
+                });
+                this.nav.append(t);
+                this.selectNav.append($("<option />").prop("value", path).text(index.replace(/&nbsp;/g, ">")));
+                isObject(item);
+            }, init.prototype.selectTab = function (parent, name) {
+                parent.find("nav a").removeClass("clicked");
+                parent.find('nav a[data-section="' + name + '"]').addClass("clicked");
+                parent.find("section").hide();
+                parent.find("#" + name).show();
+                $(this.selectNav).val(name);
+                /** @type {!Object} */
+                this.selectedTab = name;
+            }, init.prototype.setProgress = function (curShift, perShift) {
+                if (0 == perShift) {
+                    $("#phtivsaildraw-menu-config").removeClass("showprogress");
+                } else {
+                    $("#phtivsaildraw-menu-config").addClass("showprogress");
+                    $("#phtivsaildraw-menu-config .progress .progress-value").css("width", 100 * curShift / perShift + "%");
+                }
+            }, init.prototype.createExtensionMenu = function () {
+                var base = this;
+                var target = $('<div id="phtivsaildraw-menu-config">');
+                this.nav = $("<nav />");
+                var filterInput = $("<select />").on("change", function () {
+                    var callback = $(filterInput).val();
+                    base.selectTab(target, callback);
+                });
+                this.selectNav = filterInput;
+                this.tabs = $('<div class="tabs" />');
+                target.append('<div class="progress"><div class="progress-value"></div></div>').append(this.nav).append($('<div id="phtivsaildraw-menu-config-select" />').append("Menu: ").append(this.selectNav).append("<hr />")).append(this.tabs);
+                this.container = target;
+            }, init;
+        }();
+        a.DashboardDialog = dashboardDialog;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+    !function (root) {
+        var Preferences = function () {
+            /**
+             * @return {undefined}
+             */
+            function MockSave() {
+                /** @type {boolean} */
+                this.agentsInAlertTargetList = true;
+                /** @type {boolean} */
+                this.showAgentSortedByDistance = true;
+                /** @type {boolean} */
+                this.showAgentNames = true;
+                /** @type {boolean} */
+                this.showPolygonLabels = true;
+                /** @type {string} */
+                this.showKeys = "false";
+                /** @type {boolean} */
+                this.targetCrossLinks = true;
+                /** @type {boolean} */
+                this.uploadDrawToolsPolygons = true;
+                /** @type {boolean} */
+                this.disablePolygonPopups = false;
+                /** @type {boolean} */
+                this.groupAgentsOnMap = false;
+                /** @type {number} */
+                this.fastSyncMode = 0;
+                /** @type {string} */
+                this.defaultAlertType = "DestroyPortalAlert";
             }
-        });
-    };
+            return MockSave.prototype.loadOrInit = function () {
+                var userConfig;
+                try {
+                    /** @type {*} */
+                    userConfig = JSON.parse(localStorage["phtivsaildraw-preferences"]);
+                } catch (b) {
+                    userConfig = {};
+                }
+                if ("showAgentSortedByDistance" in userConfig) {
+                    this.showAgentSortedByDistance = userConfig.showAgentSortedByDistance;
+                }
+                if ("agentsInAlertTargetList" in userConfig) {
+                    this.agentsInAlertTargetList = userConfig.agentsInAlertTargetList;
+                }
+                if ("showAgentNames" in userConfig) {
+                    this.showAgentNames = userConfig.showAgentNames;
+                }
+                if ("groupAgentsOnMap" in userConfig) {
+                    this.groupAgentsOnMap = userConfig.groupAgentsOnMap;
+                }
+                if ("showPolygonLabels" in userConfig) {
+                    this.showPolygonLabels = userConfig.showPolygonLabels;
+                }
+                if ("disablePolygonPopups" in userConfig) {
+                    this.disablePolygonPopups = userConfig.disablePolygonPopups;
+                }
+                if ("showKeys" in userConfig) {
+                    this.showKeys = userConfig.showKeys;
+                }
+                if ("targetCrossLinks" in userConfig) {
+                    this.targetCrossLinks = userConfig.targetCrossLinks;
+                }
+                if ("uploadDrawToolsPolygons" in userConfig) {
+                    this.uploadDrawToolsPolygons = userConfig.uploadDrawToolsPolygons;
+                }
+                if ("fastSyncMode" in userConfig) {
+                    this.fastSyncMode = userConfig.fastSyncMode;
+                }
+                if ("defaultAlertType" in userConfig) {
+                    this.defaultAlertType = userConfig.defaultAlertType;
+                }
+            }, MockSave.prototype.save = function () {
+                /** @type {number} */
+                this.fastSyncMode = Math.min(this.fastSyncMode, Date.now() + 216e5);
+                /** @type {string} */
+                localStorage["phtivsaildraw-preferences"] = JSON.stringify(this);
+            }, MockSave;
+        }();
+        root.Preferences = Preferences;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+    !function (scope) {
+        var uiHelper = function () {
+            /**
+             * @return {undefined}
+             */
+            function ref() {
+            }
+            return ref.getPortal = function (id) {
+                if (window.portals[id] && window.portals[id].options.data.title) {
+                    var data = window.portals[id].options.data;
+                    return {
+                        id: id,
+                        name: data.title,
+                        lat: (data.latE6 / 1E6).toFixed(6),
+                        lng: (data.lngE6 / 1E6).toFixed(6)
+                    };
+                }
+                return null;
+            }, ref.getSelectedPortal = function () {
+                return window.selectedPortal ? this.getPortal(window.selectedPortal) : null;
+            }, ref.formatAgentDetails = function (records, b) {
+                var o = $("<div>");
+                if (b.length > 0) {
+                    o.append(document.createTextNode("Groups: "));
+                    b.forEach(function (options) {
+                        var node = $('<div class="phtivsaildraw-group-container" />').appendTo(o).text(options.groupName).attr("title", options.description);
+                        if (options.color) {
+                            $('<div class="phtivsaildraw-group-indicator" />').css("background-color", options.color).prependTo(node);
+                            node.css("border-color", options.color);
+                        }
+                    });
+                    o.append("<br>");
+                }
+                /** @type {!Date} */
+                var time = new Date(1E3 * records.lastKnownLocation.lastSeenTimeStamp);
+                var i = time.toDateString() !== (new Date).toDateString() ? window.unixTimeToDateTimeString(time) : window.unixTimeToString(time);
+                return o.append("Last seen: " + i), o;
+            }, ref.createButtonLeafletControl = function (container, buttons) {
+                var button = new ref.EasyButtons;
+                return button.options.buttons = buttons, container && container.addControl(button), button;
+            }, ref.extendLeaflet = function () {
+                ref.ColoredDivIcon = L.DivIcon.extend({
+                    createIcon: function () {
+                        var a = L.DivIcon.prototype.createIcon.apply(this, arguments);
+                        return this.options.color && (a.style.color = this.options.color), a;
+                    }
+                });
+                ref.AgentIcon = L.Icon.extend({
+                    options: {
+                        shadowUrl: null,
+                        iconSize: [26, 42],
+                        iconAnchor: [13, 42],
+                        popupAnchor: [0, -36],
+                        groups: [],
+                        picture: null
+                    },
+                    createIcon: function (oldIcon) {
+                        var div = oldIcon && "DIV" === oldIcon.tagName ? oldIcon : document.createElement("div");
+                        var o = this.options;
+                        /** @type {!Array} */
+                        var client_ids = [];
+                        if (div.innerHTML = atob(scope.Images.marker_agent.split(/,/)[1]), client_ids = o.groups.filter(function (consideration) {
+                            return !!consideration.color;
+                        }), client_ids.length > 0) {
+                            var tilesetContainer = div.getElementsByClassName("groupColors")[0];
+                            /** @type {string} */
+                            tilesetContainer.innerHTML = "";
+                            var n = client_ids.length;
+                            client_ids.forEach(function (styles, i) {
+                                /** @type {number} */
+                                var c = 0 === i ? -.1 : i / n;
+                                /** @type {number} */
+                                var d = i === n - 1 ? 1.1 : (i + 1) / n;
+                                /** @type {!Element} */
+                                var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                                p.setAttribute("d", "M " + c + ",0 " + d + ",0 0.5,1");
+                                p.style.fill = styles.color;
+                                /** @type {string} */
+                                p.style.stroke = "none";
+                                tilesetContainer.appendChild(p);
+                            });
+                        }
+                        return o.picture && div.getElementsByClassName("avatar")[0].setAttribute("xlink:href", o.picture), this._setIconStyles(div, "icon"), div;
+                    },
+                    createShadow: function () {
+                        return null;
+                    }
+                });
+                ref.EasyButtons = L.Control.extend({
+                    options: {
+                        position: "topleft",
+                        buttons: [{
+                                btnId: "",
+                                btnTitle: "",
+                                btnIcon: "fa-circle-o",
+                                btnFunction: null
+                            }]
+                    },
+                    onAdd: function () {
+                        var me = this;
+                        var body = L.DomUtil.create("div", "leaflet-bar leaflet-control phtivsaildraw-toolbar");
+                        return this.options.buttons.forEach(function (module) {
+                            var result = L.DomUtil.create("a", "leaflet-bar-part", body);
+                            me._addImage(result, module.btnIcon, module.btnId);
+                            /** @type {string} */
+                            result.href = "#";
+                            result.title = module.btnTitle;
+                            L.DomEvent.on(result, "click", function (e) {
+                                L.DomEvent.stopPropagation(e);
+                                L.DomEvent.preventDefault(e);
+                                module.btnFunction();
+                            }, me);
+                        }), body;
+                    },
+                    _addImage: function (data, c, r) {
+                        if (null != c) {
+                            var d = L.DomUtil.create("img", "", data);
+                            /** @type {string} */
+                            d.id = r;
+                            /** @type {string} */
+                            d.src = c;
+                            /** @type {number} */
+                            d.width = 16;
+                            /** @type {number} */
+                            d.height = 16;
+                            d.setAttribute("style", "vertical-align:middle;align:center;");
+                        }
+                    }
+                });
+            }, ref.lookupEnvironmentName = function (environment) {
+                try {
+                    /** @type {*} */
+                    var config = JSON.parse(localStorage["phtivsaildraw-environment-data"]);
+                    if (config.environments[environment]) {
+                        return config.environments[environment];
+                    }
+                } catch (c) {
+                }
+                try {
+                    if (environment === localStorage["phtivsaildraw-environment-extra"]) {
+                        return "DEV Env LocalStorage";
+                    }
+                } catch (c) {
+                }
+                return "";
+            }, ref.toLatLng = function (data, angle) {
+                return void 0 === angle && "object" == typeof data && (angle = data.lng, data = data.lat), L.latLng(parseFloat(data), parseFloat(angle));
+            }, ref.getPortalLink = function (data) {
+                var pt = ref.toLatLng(data);
+                /** @type {string} */
+                var v = data.lat + "," + data.lng;
+                /** @type {!Element} */
+                var e = document.createElement("a");
+                return e.appendChild(document.createTextNode(data.name)), e.title = data.name, e.href = "/intel?ll=" + v + "&pll=" + v, e.addEventListener("click", function (event) {
+                    return window.selectedPortal !== data.id ? window.renderPortalDetails(data.id) : map.panTo(pt), event.preventDefault(), false;
+                }, false), e.addEventListener("dblclick", function (event) {
+                    return map.getBounds().contains(pt) ? (window.portals[data.id] || window.renderPortalDetails(data.id), window.zoomToAndShowPortal(data.id, pt)) : (map.panTo(pt), window.renderPortalDetails(data.id)), event.preventDefault(), false;
+                }, false), e;
+            }, ref;
+        }();
+        scope.UiHelper = uiHelper;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+    !function (scope) {
+        var pluginTemplate = function () {
+
+            function holder(core, prefs, dashDialog) {
+                this.mapBinders = [];
+                this.localConfig = null;
+                this.core = core;
+                //this.layerManager = layoutManager;
+                this.preferences = prefs;
+                this.dashboard = dashDialog;
+            }
+
+            return holder.setupAfterIitc = function (pluginVersion) {
+                scope.Core.version = pluginVersion;
+                scope.UiHelper.extendLeaflet();
+                var core = new scope.Core(window.PLAYER.team, window.PLAYER.nickname);
+                var prefs = new scope.Preferences;
+                var dashboardDialog = new scope.DashboardDialog(pluginVersion);
+                //var layoutManager = new scope.LayerManager(window.map);
+                prefs.loadOrInit();
+                var iitcPluginHolder = new holder(core, prefs, dashboardDialog);
+                iitcPluginHolder.version = pluginVersion;
+                window.plugin.phtivsaildraw = iitcPluginHolder;
+                iitcPluginHolder.publishApiToWindow();
+                holder.addCss(scope.CSS.main);
+                holder.addCss(scope.CSS.ui);
+                iitcPluginHolder.setupAddons();
+                iitcPluginHolder.loadLocalStorageOperations();
+                iitcPluginHolder.setupUi();
+            }, holder.addCss = function (url) {
+                $("head").append('<link rel="stylesheet" type="text/css" href="' + url + '" />');
+            }, holder.prototype.setupAddons = function () {
+                //this._drawToolAddon = new scope.DrawToolAddon(this.core, this.layerManager, this.preferences);
+                //this._drawToolAddon.init();
+                //this._crossLinkAddon = new scope.CrossLinksAddon(this.core, this.layerManager, this.preferences, window.map);
+                //this._crossLinkAddon.init();
+                //var BDA = new scope.LinkShowDirectionAddon(this.layerManager);
+                //BDA.init();
+                //new scope.PrivacyViewAddon(this.layerManager);
+            }, holder.prototype.setupUi = function () {
+                var basePlugin = this;
+                /*
+                this.dashboard.extend("phtivsaildraw-section-preferences", "Preferences", function () {
+                    return true;
+                }, function (expr) {
+                    //return scope.PreferencesDialog.create(basePlugin.core, basePlugin.preferences, basePlugin._crossLinkAddon, expr);
+                });
+                this.dashboard.extend("phtivsaildraw-section-drawtool-addon", "Drawtool Integration", scope.DrawToolAddon.isLoaded, function (searchDefinition) {
+                    //return scope.DrawToolAddonDialog.create(basePlugin.core, basePlugin._drawToolAddon, searchDefinition);
+                });
+                */
+                var firmList = scope.UiHelper.createButtonLeafletControl(window.map, [
+                    /*{
+                     btnId: "phtivsaildraw-btn-addportal",
+                     btnTitle: "Add/edit portal",
+                     btnIcon: scope.Images.toolbar_portal,
+                     btnFunction: function () {
+                     response.addPortalDialog();
+                     }
+                     },*/
+                    {
+                        btnId: "phtivsaildraw-btn-addlinks",
+                        btnTitle: "Add links",
+                        btnIcon: scope.Images.toolbar_addlinks,
+                        btnFunction: function () {
+                            basePlugin.addLinkDialog();
+                        }
+                    }/*,
+                     {
+                     btnId: "phtivsaildraw-btn-addalert",
+                     btnTitle: "Add alerts",
+                     btnIcon: scope.Images.toolbar_alert,
+                     btnFunction: function () {
+                     response.addAlertDialog();
+                     }
+                     }*/]);
+                var element = document.body.appendChild(document.createElement("a"));
+                /** @type {number} */
+                element.tabIndex = -1;
+                /** @type {string} */
+                element.accessKey = "r";
+                /** @type {string} */
+                element.id = "phtivsaildraw-fake-button";
+                element.addEventListener("click", function (a) {
+                    var b = firmList.getContainer().querySelector("a");
+                    b.focus();
+                }, false);
+            }, holder.prototype.addAlertDialog = function () {
+                //(new scope.AlertDialog(this.core.selectedOperation, this.preferences)).showDialog();
+            }, holder.prototype.addPortalDialog = function () {
+                //scope.PortalDialog.show(this.core.selectedOperation, this.dashboard, this.layerManager);
+            }, holder.prototype.addLinkDialog = function () {
+                alert("Tapped the thing");
+                //scope.LinkDialog.show(this.core.selectedOperation, this.dashboard, this.layerManager);
+            }, holder.prototype.loadLocalStorageOperations = function () {
+                try {
+                    /** @type {*} */
+                    this.localConfig = JSON.parse(localStorage["phtivsaildraw-data"]);
+                } catch (b) {
+                }
+                if (null === this.localConfig || this.localConfig.nickname !== window.PLAYER.nickname) {
+                    this.localConfig = {
+                        nickname: window.PLAYER.nickname,
+                        operations: [],
+                        selectedEnvironment: null,
+                        selectedOperationName: null
+                    };
+                }
+                if (0 === this.localConfig.operations.length) {
+                    console.log("PHTIVSAILDRAW: no operation in local storage to add.");
+                }
+            }, holder.prototype.publishApiToWindow = function () {
+                window.PhtivSailDraw = scope;
+            }, holder;
+        }();
+        scope.IITCPlugin = pluginTemplate;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
 
     //PLUGIN END
-    var setup = window.plugin.phtivsaildraw.loadExternals;
+    var setup = function () {
+        PhtivSailDraw.IITCPlugin.setupAfterIitc("0.0.1");
+    };
 
-    if (window.iitcLoaded && typeof setup === 'function') {
+    setup.info = plugin_info; //add the script info data to the function as a property
+    if (!window.bootPlugins)
+        window.bootPlugins = [];
+    window.bootPlugins.push(setup);
+// if IITC has already booted, immediately run the 'setup' function
+    if (window.iitcLoaded && typeof setup === 'function')
         setup();
-    } else {
-        if (window.bootPlugins)
-            window.bootPlugins.push(setup);
-        else
-            window.bootPlugins = [setup];
-    }
 } // wrapper end
 // inject code into site context
 var script = document.createElement('script');
