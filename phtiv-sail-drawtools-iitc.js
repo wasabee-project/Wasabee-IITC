@@ -453,6 +453,244 @@ function wrapper(plugin_info) {
         scope.UiHelper = uiHelper;
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
+    !function(scope) {
+      var linkDialog = function() {
+        /**
+         * @param {string} filterArray
+         * @param {?} dashboard
+         * @param {!Object} options
+         * @return {undefined}
+         */
+        function init(operation, dashboard, options) {
+          var self = this;
+          /** @type {!BroadcastChannel} */
+          this._broadcast = new BroadcastChannel("phtivsaildraw-linkdialog");
+          this._portals = {};
+          /** @type {!Array} */
+          this._links = [];
+          /** @type {string} */
+          this._operation = operation;
+          this._dashboard = dashboard;
+          /** @type {!Object} */
+          this._layerManager = options;
+          init._dialogs.push(this);
+          /** @type {!Element} */
+          var container = document.createElement("div");
+          /** @type {!Node} */
+          this._desc = container.appendChild(document.createElement("textarea"));
+          /** @type {string} */
+          this._desc.placeholder = "Description (optional)";
+          /** @type {string} */
+          this._desc.className = "desc";
+          var tr;
+          var node;
+          var o;
+          var filter;
+          /** @type {!Node} */
+          var rdnTable = container.appendChild(document.createElement("table"));
+          [0, 1, 2, 3].forEach(function(string) {
+            /** @type {string} */
+            var type = 0 == string ? "src" : "dst-" + string;
+            tr = rdnTable.insertRow();
+            tr.setAttribute("data-portal", type);
+            node = tr.insertCell();
+            if (0 != string) {
+              filter = node.appendChild(document.createElement("input"));
+              /** @type {string} */
+              filter.type = "checkbox";
+              /** @type {boolean} */
+              filter.checked = true;
+              /** @type {string} */
+              filter.value = type;
+              self._links.push(filter);
+            }
+            node = tr.insertCell();
+            /** @type {string} */
+            node.textContent = 0 == string ? "from" : "to (#" + string + ")";
+            node = tr.insertCell();
+            o = node.appendChild(document.createElement("button"));
+            /** @type {string} */
+            o.textContent = "set";
+            o.addEventListener("click", function(arg) {
+              return self.setPortal(arg);
+            }, false);
+            node = tr.insertCell();
+            if (0 != string) {
+              o = node.appendChild(document.createElement("button"));
+              /** @type {string} */
+              o.textContent = "add";
+              o.addEventListener("click", function(other) {
+                return self.addLinkTo(other);
+              }, false);
+            }
+            node = tr.insertCell();
+            /** @type {string} */
+            node.className = "portal portal-" + type;
+            self._portals[type] = node;
+            self.updatePortal(type);
+          });
+          /** @type {!Node} */
+          var element = container.appendChild(document.createElement("div"));
+          /** @type {string} */
+          element.className = "buttonbar";
+          /** @type {!Node} */
+          var div = element.appendChild(document.createElement("span"));
+          /** @type {!Node} */
+          var opt = div.appendChild(document.createElement("span"));
+          /** @type {string} */
+          opt.className = "arrow";
+          /** @type {string} */
+          opt.textContent = "\u21b3";
+          /** @type {!Node} */
+          o = div.appendChild(document.createElement("button"));
+          /** @type {string} */
+          o.textContent = "add all";
+          o.addEventListener("click", function(a) {
+            return self.addAllLinks();
+          }, false);
+          /** @type {!Node} */
+          var cardHeader = element.appendChild(document.createElement("label"));
+          /** @type {!Node} */
+          this._reversed = cardHeader.appendChild(document.createElement("input"));
+          /** @type {string} */
+          this._reversed.type = "checkbox";
+          cardHeader.appendChild(document.createTextNode(" reverse"));
+          var style = new scope.LayerSelector(this._layerManager, false);
+          /** @type {boolean} */
+          style.label = false;
+          element.appendChild(style.container);
+          /** @type {!Node} */
+          o = element.appendChild(document.createElement("button"));
+          /** @type {string} */
+          o.textContent = "close";
+          o.addEventListener("click", function(a) {
+            return self._dialog.dialog("close");
+          }, false);
+          /**
+           * @param {!Object} name
+           * @return {?}
+           */
+          var sendMessage = function(name) {
+            return self.onMessage(name);
+          };
+          this._broadcast.addEventListener("message", sendMessage, false);
+          this._dialog = window.dialog({
+            title : this._operation.data.operationName + " Links",
+            width : "auto",
+            height : "auto",
+            html : container,
+            dialogClass : "phtivsaildraw-dialog phtivsaildraw-dialog-links",
+            closeCallback : function(popoverName) {
+              self._broadcast.removeEventListener("message", sendMessage, false);
+              /** @type {number} */
+              var paneIndex = init._dialogs.indexOf(self);
+              if (-1 !== paneIndex) {
+                init._dialogs.splice(paneIndex, 1);
+              }
+            }
+          });
+          this._dialog.dialog("option", "buttons", {});
+        }
+        return init.show = function(selector, context, d) {
+          /** @type {number} */
+          var p = 0;
+          /** @type {!Array} */
+          var parameters = init._dialogs;
+          for (; p < parameters.length; p++) {
+            var page = parameters[p];
+            if (page._operation == selector) {
+              return page.focus(), page;
+            }
+          }
+          return new init(selector, context, d);
+        }, init.prototype.focus = function() {
+          this._dialog.dialog("open");
+        }, init.prototype.onMessage = function(command) {
+          if ("setPortal" === command.data.type) {
+            this.updatePortal(command.data.name);
+          }
+        }, init.prototype.setPortal = function(event) {
+          var newName = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
+          var existing_urls = scope.UiHelper.getSelectedPortal();
+          if (existing_urls) {
+            /** @type {string} */
+            localStorage["phtivsaildraw-portal-" + newName] = JSON.stringify(existing_urls);
+          } else {
+            delete localStorage["phtivsaildraw-portal-" + newName];
+          }
+          this.updatePortal(newName);
+          this._broadcast.postMessage({
+            type : "setPortal",
+            name : newName
+          });
+        }, init.prototype.getPortal = function(name) {
+          try {
+            return JSON.parse(localStorage["phtivsaildraw-portal-" + name]);
+          } catch (b) {
+            return null;
+          }
+        }, init.prototype.updatePortal = function(key) {
+          var i = this.getPortal(key);
+          var viewContainer = this._portals[key];
+          $(viewContainer).empty();
+          if (i) {
+            viewContainer.appendChild(scope.UiHelper.getPortalLink(i));
+          }
+        }, init.prototype.addLinkTo = function(instance) {
+          var item = this;
+          var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
+          var link = this.getPortal(server);
+          var m = this.getPortal("src");
+          if (!m || !link) {
+            return void alert("Please select target and destination portals first!");
+          }
+          var n = this._reversed.checked;
+          Promise.all([this.addPortal(m), this.addPortal(link)]).then(function() {
+            return n ? item.addLink(link, m) : item.addLink(m, link);
+          })["catch"](function(data) {
+            throw alert(data.message), console.log(data), data;
+          });
+        }, init.prototype.addAllLinks = function() {
+          var self = this;
+          var url = this.getPortal("src");
+          if (!url) {
+            return void alert("Please select a target portal first!");
+          }
+          var resolvedSourceMapConfigs = this._links.map(function(b) {
+            return b.checked ? self.getPortal(b.value) : null;
+          }).filter(function(a) {
+            return null != a;
+          });
+          if (0 == resolvedSourceMapConfigs.length) {
+            return void alert("Please select a destination portal first!");
+          }
+          var apiKey = this._reversed.checked;
+          var documentBodyPromise = this.addPortal(url);
+          Promise.all(resolvedSourceMapConfigs.map(function(link) {
+            return Promise.all([documentBodyPromise, self.addPortal(link)]).then(function() {
+              return apiKey ? self.addLink(link, url) : self.addLink(url, link);
+            });
+          }))["catch"](function(data) {
+            throw alert(data.message), console.log(data), data;
+          });
+        }, init.prototype.addPortal = function(a) {
+          return a ? this._operation.data.portals.some(function(b) {
+            return b.id == a.id;
+          }) ? Promise.resolve(this._operation.data.portals) : scope.UiCommands.addPortal(this._operation, this._layerManager, a, "", true) : Promise.reject("no portal given");
+        }, init.prototype.addLink = function(value, data) {
+          var selectLayersValue = this._desc.value;
+          if (!value || !data) {
+            return Promise.reject("no portal given");
+          }
+          var link = this._layerManager.activeLayer;
+          /** @type {boolean} */
+          var e = !this._operation.data.operation.isAgentOperator;
+          return this._operation.linkService.addLink(value.id, data.id, link, e, PLAYER.nickname, selectLayersValue);
+        }, init._dialogs = [], init;
+      }();
+      scope.LinkDialog = linkDialog;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
     !function (scope) {
         var pluginTemplate = function () {
 
@@ -545,22 +783,25 @@ function wrapper(plugin_info) {
             }, holder.prototype.addPortalDialog = function () {
                 //scope.PortalDialog.show(this.core.selectedOperation, this.dashboard, this.layerManager);
             }, holder.prototype.addLinkDialog = function () {
-                alert("Tapped the thing");
-                //scope.LinkDialog.show(this.core.selectedOperation, this.dashboard, this.layerManager);
+                //SELECTED PORTAL -> {"id":"ba6a057e21c549178f92e0fe6c48e1c0.16","name":"\"The Verandah\" Pool","lat":"33.052478","lng":"-96.851574"}
+                //alert("SELECTED PORTAL -> " + JSON.stringify(scope.UiHelper.getSelectedPortal()));
+                scope.LinkDialog.show(this.core.selectedOperation, this.dashboard, this.layerManager);
             }, holder.prototype.loadLocalStorageOperations = function () {
                 try {
                     /** @type {*} */
-                    this.localConfig = JSON.parse(localStorage["phtivsaildraw-data"]);
+                    this.localConfig = JSON.parse(localStorage["phtivsaildraw-operation-data"]);
                 } catch (b) {
+                    alert(JSON.stringify(b))
                 }
                 if (null === this.localConfig || this.localConfig.nickname !== window.PLAYER.nickname) {
                     this.localConfig = {
                         nickname: window.PLAYER.nickname,
-                        operations: [],
+                        operations: ["{\"portals\":[],\"links\":[],\"op_name\":\"Local PhtivSail Operation\"}"],
                         selectedEnvironment: null,
                         selectedOperationName: null
                     };
-                }
+                    localStorage["phtivsaildraw-operation-data"] = JSON.stringify(this.localConfig);
+                } 
                 if (0 === this.localConfig.operations.length) {
                     console.log("PHTIVSAILDRAW: no operation in local storage to add.");
                 }
