@@ -265,7 +265,7 @@ function wrapper(plugin_info) {
                 /** @type {!Element} */
                 this._container = document.createElement("span");
                 /** @type {string} */
-                this._container.className = "reswue-layer";
+                this._container.className = "phtivsaildraw-layer";
                 /** @type {!Node} */
                 var script = this._container.appendChild(document.createElement("label"));
                 script.appendChild(document.createTextNode("Layer: "));
@@ -276,7 +276,7 @@ function wrapper(plugin_info) {
                 /** @type {!Node} */
                 this._select = this._container.appendChild(document.createElement("select"));
                 /** @type {string} */
-                this._select.id = "reswue-layer-selector-" + init._count++;
+                this._select.id = "phtivsaildraw-layer-selector-" + init._count++;
                 /** @type {string} */
                 script.htmlFor = this._select.id;
                 p1.getAllLayerConfigs().forEach(function (args) {
@@ -294,7 +294,7 @@ function wrapper(plugin_info) {
                 /** @type {string} */
                 this._output.className = "output";
                 /** @type {!BroadcastChannel} */
-                this._broadcast = new BroadcastChannel("reswue-active-layer");
+                this._broadcast = new BroadcastChannel("phtivsaildraw-active-layer");
                 this._broadcast.addEventListener("message", function (messageData) {
                     if (that._active) {
                         that.setActiveLayer();
