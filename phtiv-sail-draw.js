@@ -1,4 +1,4 @@
-// ==UserScript==
+ // ==UserScript==
 // @name         PhtivSail Draw Tools
 // @namespace    http://tampermonkey.net/
 // @version      0.1
@@ -22,6 +22,7 @@ function wrapper(plugin_info) {
     if (typeof window.plugin !== 'function')
         window.plugin = function () {};
 
+    //adds "Add Link" button
     var PhtivSailDraw;
     !function (data) {
         var b;
@@ -38,6 +39,7 @@ function wrapper(plugin_info) {
              * @param {!Object} options
              * @return {undefined}
              */
+             //***Draws dialog box
             function init() { //op, dashboard, layerManager) {
                 var self = this;
                 //this._broadcast = new BroadcastChannel("phtivsaildraw-linkdialog");
@@ -123,7 +125,7 @@ function wrapper(plugin_info) {
                     html: container,
                     dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-links",
                     closeCallback: function (popoverName) {
-                        self._broadcast.removeEventListener("message", sendMessage, false);
+                       // self._broadcast.removeEventListener("message", sendMessage, false);
                         var paneIndex = init._dialogs.indexOf(self);
                         if (-1 !== paneIndex) {
                             init._dialogs.splice(paneIndex, 1);
@@ -137,9 +139,9 @@ function wrapper(plugin_info) {
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
                     var page = parameters[p];
-                    if (page._operation == selector) {
+                    /*if (page._operation == selector) {
                         return page.focus(), page;
-                    }
+                    }*/
                 }
                 return new init();//selector, context, d);
             }, init.prototype.focus = function () {
@@ -148,27 +150,32 @@ function wrapper(plugin_info) {
                 if ("setPortal" === command.data.type) {
                     this.updatePortal(command.data.name);
                 }
+                //***Function to set portal -- called from 'Set' Button
             }, init.prototype.setPortal = function (event) {
-                /*
                  var newName = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
+                 alert("setPortal: "+newName);
+                 /*
                  var existing_urls = scope.UiHelper.getSelectedPortal();
                  if (existing_urls) {
-                 localStorage["phtivsaildraw-portal-" + newName] = JSON.stringify(existing_urls);
+                    localStorage["phtivsaildraw-portal-" + newName] = JSON.stringify(existing_urls);
                  } else {
-                 delete localStorage["phtivsaildraw-portal-" + newName];
+                    delete localStorage["phtivsaildraw-portal-" + newName];
                  }
+                 
                  this.updatePortal(newName);
                  this._broadcast.postMessage({
                  type: "setPortal",
                  name: newName
                  });
                  */
+                //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
             }, init.prototype.getPortal = function (name) {
                 try {
                     return JSON.parse(localStorage["phtivsaildraw-portal-" + name]);
                 } catch (b) {
                     return null;
                 }
+                //***Function to update portal
             }, init.prototype.updatePortal = function (key) {
                 /*
                  var i = this.getPortal(key);
@@ -178,7 +185,9 @@ function wrapper(plugin_info) {
                  viewContainer.appendChild(scope.UiHelper.getPortalLink(i));
                  }
                  */
+                //***Function to add link between the portals -- called from 'Add' Button next to To portals
             }, init.prototype.addLinkTo = function (instance) {
+                alert("addLinkTo: "+this.getPortal(instance.currentTarget.parentNode.parentNode.getAttribute("data-portal")));
                 /*
                  var item = this;
                  var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
@@ -194,7 +203,9 @@ function wrapper(plugin_info) {
                  throw alert(data.message), console.log(data), data;
                  });
                  */
+                //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
             }, init.prototype.addAllLinks = function () {
+                alert("addAllLinks:" + this.getPortal("src"));
                 /*
                  var self = this;
                  var url = this.getPortal("src");
@@ -219,13 +230,17 @@ function wrapper(plugin_info) {
                  throw alert(data.message), console.log(data), data;
                  });
                  */
+                //***Function to add a portal -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addPortal = function (a) {
+                alert("addPortal: "+a);
                 /*
                  return a ? this._operation.data.portals.some(function (b) {
                  return b.id == a.id;
                  }) ? Promise.resolve(this._operation.data.portals) : scope.UiCommands.addPortal(this._operation, this._layerManager, a, "", true) : Promise.reject("no portal given");
                  */
+                //***Function to add a single link -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addLink = function (value, data) {
+                alert("addLink: "+value);
                 /*
                  var selectLayersValue = this._desc.value;
                  if (!value || !data) {
