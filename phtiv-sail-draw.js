@@ -56,7 +56,7 @@ function wrapper(plugin_info) {
                 this._desc.className = "desc";
                 var tr;
                 var node;
-                var o;
+                var button;
                 var filter;
                 var rdnTable = container.appendChild(document.createElement("table"));
                 [0, 1, 2, 3].forEach(function (string) {
@@ -74,16 +74,16 @@ function wrapper(plugin_info) {
                     node = tr.insertCell();
                     node.textContent = 0 == string ? "from" : "to (#" + string + ")";
                     node = tr.insertCell();
-                    o = node.appendChild(document.createElement("button"));
-                    o.textContent = "set";
-                    o.addEventListener("click", function (arg) {
+                    button = node.appendChild(document.createElement("button"));
+                    button.textContent = "set";
+                    button.addEventListener("click", function (arg) {
                         return self.setPortal(arg);
                     }, false);
                     node = tr.insertCell();
                     if (0 != string) {
-                        o = node.appendChild(document.createElement("button"));
-                        o.textContent = "add";
-                        o.addEventListener("click", function (other) {
+                        button = node.appendChild(document.createElement("button"));
+                        button.textContent = "add";
+                        button.addEventListener("click", function (other) {
                             return self.addLinkTo(other);
                         }, false);
                     }
@@ -98,9 +98,9 @@ function wrapper(plugin_info) {
                 var opt = div.appendChild(document.createElement("span"));
                 opt.className = "arrow";
                 opt.textContent = "\u21b3";
-                o = div.appendChild(document.createElement("button"));
-                o.textContent = "add all";
-                o.addEventListener("click", function (a) {
+                button = div.appendChild(document.createElement("button"));
+                button.textContent = "add all";
+                button.addEventListener("click", function (a) {
                     return self.addAllLinks();
                 }, false);
                 var cardHeader = element.appendChild(document.createElement("label"));
@@ -110,9 +110,9 @@ function wrapper(plugin_info) {
                 //var style = new scope.LayerSelector(this._layerManager, this._operation.data);
                 //style.label = false;
                 //element.appendChild(style.container);
-                o = element.appendChild(document.createElement("button"));
-                o.textContent = "close";
-                o.addEventListener("click", function (a) {
+                button = element.appendChild(document.createElement("button"));
+                button.textContent = "close";
+                button.addEventListener("click", function (a) {
                     return self._dialog.dialog("close");
                 }, false);
                 var sendMessage = function (name) {
