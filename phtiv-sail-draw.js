@@ -173,23 +173,21 @@ function wrapper(plugin_info) {
                 }
                 //***Function to set portal -- called from 'Set' Button
             }, init.prototype.setPortal = function (event) {
-                var newName = JSON.stringify(event);//.currentTarget.parentNode.parentNode.getAttribute("data-portal");
-                alert("setPortal: " + newName);
-
-                /*
+                var newName = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                 var existing_urls = scope.UiHelper.getSelectedPortal();
+                alert("Selected Portal? - " + JSON.stringify(existing_urls));
+                /*
                 if (existing_urls) {
                     localStorage["phtivsaildraw-portal-" + newName] = JSON.stringify(existing_urls);
                 } else {
                     delete localStorage["phtivsaildraw-portal-" + newName];
                 }
-
                 this.updatePortal(newName);
                 this._broadcast.postMessage({
                     type: "setPortal",
                     name: newName
                 });
-*/
+                */
                 //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
             }, init.prototype.getPortal = function (name) {
                 try {
@@ -430,6 +428,33 @@ function wrapper(plugin_info) {
         scope.LayerSelector = layerSelector;
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
+    !function (data) {
+        var uiHelper = function () {
+            /**
+             * @return {undefined}
+             */
+            function helper() {
+            }
+            return helper.getPortal = function (id) {
+                if (window.portals[id] && window.portals[id].options.data.title) {
+                    var data = window.portals[id].options.data;
+                    return {
+                        id: id,
+                        name: data.title,
+                        lat: (data.latE6 / 1E6).toFixed(6),
+                        lng: (data.lngE6 / 1E6).toFixed(6)
+                    };
+                }
+                return null;
+            }, helper.getSelectedPortal = function () {
+                return window.selectedPortal ? this.getPortal(window.selectedPortal) : null;
+            }, helper.toLatLng = function (data, angle) {
+                return void 0 === angle && "object" == typeof data && (angle = data.lng, data = data.lat), L.latLng(parseFloat(data), parseFloat(angle));
+            }, helper;
+        }();
+        data.UiHelper = uiHelper;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
     //PLUGIN START
     window.plugin.phtivsaildraw = function () { };
     window.plugin.phtivsaildraw.loadExternals = function () {
@@ -470,12 +495,15 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.phtivsaildraw.setupLocalStorage = function () {
+        //TODO do stuff here to set up a default operation if none exists
+        /*
         var opList = store.get(PhtivSailDraw.Constants.OP_LIST);
 
         if (opList == null)
             alert("oplist is null");
         else
             alert("oplist had things")
+            */
         //store.set('user', { name:'Marcus' });
 
         //var user = store.get('user');
