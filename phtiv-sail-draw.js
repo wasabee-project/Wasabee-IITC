@@ -134,9 +134,9 @@ function wrapper(plugin_info) {
                 this._reversed = cardHeader.appendChild(document.createElement("input"));
                 this._reversed.type = "checkbox";
                 cardHeader.appendChild(document.createTextNode(" reverse"));
-                //var style = new scope.LayerSelector(this._layerManager, this._operation.data);
-                //style.label = false;
-                //element.appendChild(style.container);
+                //var layerSelector = new scope.LayerSelector(this._layerManager, this._operation.data);
+                //layerSelector.label = false;
+                //element.appendChild(layerSelector.container);
                 button = element.appendChild(document.createElement("button"));
                 button.textContent = "close";
                 button.addEventListener("click", function (a) {
@@ -219,23 +219,23 @@ function wrapper(plugin_info) {
 
                 //***Function to add link between the portals -- called from 'Add' Button next to To portals
             }, init.prototype.addLinkTo = function (instance) {
-                alert("addLinkTo: " + this.getPortal(instance.currentTarget.parentNode.parentNode.getAttribute("data-portal")));
-                
                  var item = this;
                  var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
-                 var link = this.getPortal(server);
-                 var m = this.getPortal("src");
-                 if (!m || !link) {
+                 var linkTo = this.getPortal(server);
+                 var source = this.getPortal("src");
+                 //alert("Source -> " + JSON.stringify(source) + "\nlinkTo -> " + JSON.stringify(linkTo));
+
+                 if (!source || !linkTo) {
                     return void alert("Please select target and destination portals first!");
                  }
-                 /*
-                 var n = this._reversed.checked;
-                 Promise.all([this.addPortal(m), this.addPortal(link)]).then(function () {
-                 return n ? item.addLink(link, m) : item.addLink(m, link);
+                 
+                 var isReversed = this._reversed.checked;
+                 Promise.all([this.addPortal(source), this.addPortal(linkTo)]).then(function () {
+                 	//return isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo);
                  })["catch"](function (data) {
-                 throw alert(data.message), console.log(data), data;
+                 	throw alert(data.message), console.log(data), data;
                  });
-                 */
+                 
                 //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
             }, init.prototype.addAllLinks = function () {
                 alert("addAllLinks:" + this.getPortal("src"));
@@ -264,13 +264,13 @@ function wrapper(plugin_info) {
                  });
                  */
                 //***Function to add a portal -- called in addLinkTo and addAllLinks functions
-            }, init.prototype.addPortal = function (a) {
-                alert("addPortal: " + a);
-                /*
-                 return a ? this._operation.data.portals.some(function (b) {
-                 return b.id == a.id;
-                 }) ? Promise.resolve(this._operation.data.portals) : scope.UiCommands.addPortal(this._operation, this._layerManager, a, "", true) : Promise.reject("no portal given");
-                 */
+            }, init.prototype.addPortal = function (sentPortal) {
+                alert("addPortal: " + sentPortal);
+                
+                 return sentPortal ? (this._operation.data.portals.some(function (gotPortal) {
+                 	return gotPortal.id == sentPortal.id;
+                 }) ? Promise.resolve(this._operation.data.portals) : scope.UiCommands.addPortal(this._operation, this._layerManager, sentPortal, "", true)) : Promise.reject("no portal given");
+                 
                 //***Function to add a single link -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addLink = function (value, data) {
                 alert("addLink: " + value);
