@@ -230,7 +230,7 @@ function wrapper(plugin_info) {
                  }
                  
                  var isReversed = this._reversed.checked;
-                 Promise.all([this.addPortal(source), this.addPortal(linkTo)]).then(function () {
+                 Promise.all([item.addPortal(source), item.addPortal(linkTo)]).then(function () {
                  	//return isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo);
                  })["catch"](function (data) {
                  	throw alert(data.message), console.log(data), data;
@@ -267,9 +267,12 @@ function wrapper(plugin_info) {
             }, init.prototype.addPortal = function (sentPortal) {
                 alert("addPortal: " + sentPortal);
                 
+                var resolvedLocalData = Promise.resolve(this._operation.data.portals)
+
                  return sentPortal ? (this._operation.data.portals.some(function (gotPortal) {
+                     alert("didGotPortal");
                  	return gotPortal.id == sentPortal.id;
-                 }) ? Promise.resolve(this._operation.data.portals) : scope.UiCommands.addPortal(this._operation, this._layerManager, sentPortal, "", true)) : Promise.reject("no portal given");
+                 }) ? resolvedLocalData : scope.UiCommands.addPortal(this._operation, this._layerManager, sentPortal, "", true)) : Promise.reject("no portal given");
                  
                 //***Function to add a single link -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addLink = function (value, data) {
@@ -478,6 +481,108 @@ function wrapper(plugin_info) {
         }();
         data.UiHelper = uiHelper;
     }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+    !function(scope) {
+        var uiCommands = function() {
+          /**
+           * @return {undefined}
+           */
+          function self() {
+          }
+          return self.addPortal = function(operation, layerManager, sentPortal, options, anyContent) {
+              //this._operation, this._layerManager, sentPortal, "", true
+            if (void 0 === options && (options = ""), void 0 === anyContent && (anyContent = false), !sentPortal) {
+              return void alert("Please select a portal first!");
+            }
+            var data = layerManager instanceof scope.LayerManager ? layerManager.activeLayer : layerManager;
+            var isNotOperator = !operation.data.operation.isAgentOperator;
+            return operation.portalService.addPortal(sentPortal.id, sentPortal.name, data, sentPortal.lat, sentPortal.lng, isNotOperator, PLAYER.nickname, options).then(function(b) {
+              return isNotOperator && alert("Portal proposed. Thanks You."), b;
+            }, function(e) {
+              if (e instanceof scope.ApiError && 409 == e.statusCode) {
+                if (anyContent) {
+                  return operation.data.portals;
+                }
+                alert(isNotOperator ? "Portal already proposed." : "Portal already added.");
+              }
+              throw e;
+            });
+          }, self.editPortal = function(instance, obj, key, value, options) {
+            //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
+          }, self.swapPortal = function(props, value, undefined) {
+              /*
+            if (!props.data.operation.isAgentOperator) {
+              return void alert("You cannot delete a portal if you are not an operation admin.");
+            }
+            if (null == value || null == undefined) {
+              return alert("Please select the portal you want to swap with."), Promise.reject("no portal selected");
+            }
+            if (value == undefined) {
+              return alert("The source and target portal of the swap are identical."), Promise.reject("portals are identical");
+            }
+            var item = props.data.getPortal(value);
+            var err = props.data.getPortal(undefined);
+            if (null == item && (result = [err, item, undefined, value], item = result[0], err = result[1], value = result[2], undefined = result[3]), null == item) {
+              return alert("None of these portals is part of the operation."), Promise.reject("both portals not in operation");
+            }
+            if (null != err) {
+              return confirm("Do you really want to swap these two portals?\n\n" + item.name + "\n" + err.name) ? props.portalService.swapPortals(value, undefined) : Promise.reject("user cancelled");
+            }
+            var h = scope.UiHelper.getPortal(undefined);
+            if (!h) {
+              return void alert("The target portal hasn't loaded completely yet.");
+            }
+            if (!confirm('This will add the portal "' + h.name + '" to the operation and move all links of portal "' + item.name + '" to the newly added portal.\n\nDo you want to continue?')) {
+              return Promise.reject("user cancelled");
+            }
+            var isClan = confirm('Do you want to *delete* the portal "' + item.name + '" after the portals have been swapped?');
+            return self.addPortal(props, item.layerName, h, item.description, true).then(function(a) {
+              return props.portalService.swapPortals(value, undefined);
+            }).then(function(friends) {
+              return isClan ? props.portalService.deletePortal(value, PLAYER.nickname) : friends;
+            });
+            var result;
+            */
+          }, self.deletePortal = function(d, b) {
+              /*
+            if (!d.data.operation.isAgentOperator) {
+              return void alert("You cannot delete a portal if you are not an operation admin.");
+            }
+            var locB = d.data.getPortal(b);
+            if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + locB.name)) {
+              return d.portalService.deletePortal(b, PLAYER.nickname);
+            }
+            */
+          }, self.addLink = function(options, value, link, url, source) {
+            /*
+            var f = !options.data.operation.isAgentOperator;
+            if ("" == link || "" == url || null == link || null == link) {
+              alert("Either the source or the target are not set.");
+            } else {
+              if (link != url) {
+                var element = options.data.getPortal(link);
+                var html = options.data.getPortal(url);
+                if (null != element && null != html) {
+                  options.linkService.addLink(link, url, value.activeLayer, f, PLAYER.nickname, source).then(function() {
+                    if (f) {
+                      alert("Link proposed. Thanks You.");
+                    }
+                  }, function(res) {
+                    alert(res.message);
+                  });
+                } else {
+                  alert("Either the source or target portal is not a portal in the current operation (check if the portals belong to the same operation).");
+                }
+              } else {
+                alert("The source and target portal of the link are identical.");
+              }
+            }
+            */
+          }, self;
+        }();
+        scope.UiCommands = uiCommands;
+      }(PhtivSailDraw || (PhtivSailDraw = {}));
+      
 
     //PLUGIN START
     window.plugin.phtivsaildraw = function () { };
