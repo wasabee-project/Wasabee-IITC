@@ -158,6 +158,7 @@ function wrapper(plugin_info) {
                         if (-1 !== paneIndex) {
                             init._dialogs.splice(paneIndex, 1);
                         }
+                        self.clearLocalPortalSelections()
                     }
                 });
                 this._dialog.dialog("option", "buttons", {});
@@ -178,19 +179,25 @@ function wrapper(plugin_info) {
                 if ("setPortal" === command.data.type) {
                     this.updatePortal(command.data.name);
                 }
+                //***Function to clear local selections of portals for the dialog
+            }, init.prototype.clearLocalPortalSelections = function() {
+                delete localStorage["phtivsaildraw-portal-dst-1"];
+                delete localStorage["phtivsaildraw-portal-dst-2"];
+                delete localStorage["phtivsaildraw-portal-dst-3"];
+                delete localStorage["phtivsaildraw-portal-src"];
                 //***Function to set portal -- called from 'Set' Button
             }, init.prototype.setPortal = function (event) {
-                var newName = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
+                var updateID = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                 var selectedPortal = scope.UiHelper.getSelectedPortal();
                 if (selectedPortal) {
-                    localStorage["phtivsaildraw-portal-" + newName] = JSON.stringify(selectedPortal);
+                    localStorage["phtivsaildraw-portal-" + updateID] = JSON.stringify(selectedPortal);
                 } else {
-                    delete localStorage["phtivsaildraw-portal-" + newName];
+                    delete localStorage["phtivsaildraw-portal-" + updateID];
                 }
-                this.updatePortal(newName);
+                this.updatePortal(updateID);
                 this._broadcast.postMessage({
                     type: "setPortal",
-                    name: newName
+                    name: updateID
                 });
 
                 //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
@@ -213,14 +220,15 @@ function wrapper(plugin_info) {
                 //***Function to add link between the portals -- called from 'Add' Button next to To portals
             }, init.prototype.addLinkTo = function (instance) {
                 alert("addLinkTo: " + this.getPortal(instance.currentTarget.parentNode.parentNode.getAttribute("data-portal")));
-                /*
+                
                  var item = this;
                  var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                  var link = this.getPortal(server);
                  var m = this.getPortal("src");
                  if (!m || !link) {
-                 return void alert("Please select target and destination portals first!");
+                    return void alert("Please select target and destination portals first!");
                  }
+                 /*
                  var n = this._reversed.checked;
                  Promise.all([this.addPortal(m), this.addPortal(link)]).then(function () {
                  return n ? item.addLink(link, m) : item.addLink(m, link);
