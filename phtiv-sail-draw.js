@@ -551,37 +551,26 @@ function wrapper(plugin_info) {
              * @param {number} p
              * @return {undefined}
              */
-            function init(p1, p2, p) {
+            function init(layerManager, operation, p) {
                 var that = this;
                 if (void 0 === p) {
                     /** @type {boolean} */
                     p = true;
                 }
                 this.onchange = void 0;
-                /** @type {!Object} */
-                this._layerManager = p1;
-                /** @type {number} */
+                this._layerManager = layerManager;
                 this._active = p;
-                /** @type {string} */
-                this._operation = p2;
-                /** @type {!Element} */
+                this._operation = operation;
                 this._container = document.createElement("span");
-                /** @type {string} */
                 this._container.className = "phtivsaildraw-layer";
-                /** @type {!Node} */
                 var script = this._container.appendChild(document.createElement("label"));
                 script.appendChild(document.createTextNode("Layer: "));
-                /** @type {!Node} */
                 this._preview = this._container.appendChild(document.createElement("span"));
-                /** @type {string} */
                 this._preview.className = "preview";
-                /** @type {!Node} */
                 this._select = this._container.appendChild(document.createElement("select"));
-                /** @type {string} */
                 this._select.id = "phtivsaildraw-layer-selector-" + init._count++;
-                /** @type {string} */
                 script.htmlFor = this._select.id;
-                p1.getAllLayerConfigs().forEach(function (args) {
+                layerManager.getAllLayerConfigs().forEach(function (args) {
                     var t = that._select.appendChild(document.createElement("option"));
                     t.text = that.getLayerDisplayName(args);
                     t.value = args.name;
@@ -591,11 +580,8 @@ function wrapper(plugin_info) {
                 this._select.addEventListener("change", function (ids) {
                     return that._onChange(ids);
                 }, false);
-                /** @type {!Element} */
                 this._output = document.createElement("span");
-                /** @type {string} */
                 this._output.className = "output";
-                /** @type {!BroadcastChannel} */
                 this._broadcast = new BroadcastChannel("phtivsaildraw-active-layer");
                 this._broadcast.addEventListener("message", function (messageData) {
                     if (that._active) {
