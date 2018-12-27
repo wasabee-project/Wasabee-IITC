@@ -636,12 +636,11 @@ function wrapper(plugin_info) {
         var opListObj = store.get(PhtivSailDraw.Constants.OP_LIST)
         if (opListObj != null)
             opList = JSON.parse(opListObj);
-        else
-            alert("OPLISTOBJ is null");
         if (opList == null) {
-            alert("SETTING BASE OP LIST");
-            var baseOp = new Operation(PLAYER.nickname);
-            store.set(PhtivSailDraw.Constants.OP_LIST, JSON.stringify(baseOp));
+            var baseOp = new Operation(PLAYER.nickname, "Default Operation - " + PLAYER.nickname, true);
+            var listToStore = new Array();
+            listToStore.push(baseOp);
+            store.set(PhtivSailDraw.Constants.OP_LIST, JSON.stringify(listToStore));
             opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST));
         }
         //PhtivSailDraw.opList = oplist //Can I do this? I have no idea how this works.
@@ -654,10 +653,12 @@ function wrapper(plugin_info) {
         //creator <- agent who created it
         //portals <- List of Portals
 
-        constructor(creator) {
-            this.name = "Creator - Default Operation";
+        constructor(creator, name, isSelected) {
+            this.name = name;
             this.creator = creator;
-            this.portals = {};
+            this.isSelected = isSelected;
+            this.portals = Array();
+            this.links = Array();
         }
     }
     //PLUGIN END
