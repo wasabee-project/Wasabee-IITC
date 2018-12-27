@@ -57,8 +57,7 @@ function wrapper(plugin_info) {
         }(b = data.Constants || (data.Constants = {}));
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
-
-
+    //TODO make this not open duplicate link dialogs
     !function (scope) {
         var linkDialogFunc = function () {
             /**
@@ -70,6 +69,7 @@ function wrapper(plugin_info) {
             //***Draws dialog box
             function init(op) { //op, dashboard, layerManager) {
                 var self = this;
+                self.clearLocalPortalSelections()
                 this._broadcast = new BroadcastChannel("phtivsaildraw-linkdialog");
                 this._portals = {};
                 this._links = [];
@@ -265,9 +265,9 @@ function wrapper(plugin_info) {
                  */
                 //***Function to add a portal -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addPortal = function (sentPortal) {
-                var resolvedLocalData = Promise.resolve(this._operation.data.portals)
+                var resolvedLocalData = Promise.resolve(this._operation.portals)
 
-                return sentPortal ? (this._operation.data.portals.some(function (gotPortal) {
+                return sentPortal ? (this._operation.portals.some(function (gotPortal) {
                     alert("didGotPortal");
                     return gotPortal.id == sentPortal.id;
                 }) ? resolvedLocalData : scope.UiCommands.addPortal(this._operation, this._layerManager, sentPortal, "", true)) : Promise.reject("no portal given");
@@ -288,6 +288,259 @@ function wrapper(plugin_info) {
         }();
         scope.LinkDialog = linkDialogFunc;
     }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+    //TODO also figure out wtf this does
+    !function(scope) {
+        !function(layerKind) {
+          layerKind[layerKind.Portals = 0] = "Portals";
+          layerKind[layerKind.Links = 1] = "Links";
+          layerKind[layerKind.Polygons = 2] = "Polygons";
+          layerKind[layerKind.Agents = 3] = "Agents";
+          layerKind[layerKind.Alerts = 4] = "Alerts";
+        }(scope.LayerKind || (scope.LayerKind = {}));
+        var item = scope.LayerKind;
+        var LayerManager = function() {
+          function $(map) {
+            this.layerConfig = [{
+              name : "main",
+              displayName : "Main",
+              color : "#FF0000",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_main
+              }
+            }, {
+              name : "groupa",
+              displayName : "Layer A",
+              color : "#ff6600",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupa
+              }
+            }, {
+              name : "groupb",
+              displayName : "Layer B",
+              color : "#ff9900",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupb
+              }
+            }, {
+              name : "groupc",
+              displayName : "Layer C",
+              color : "#BB9900",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupc
+              }
+            }, {
+              name : "groupd",
+              displayName : "Layer D",
+              color : "#bb22cc",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupd
+              }
+            }, {
+              name : "groupe",
+              displayName : "Layer E",
+              color : "#33cccc",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupe
+              }
+            }, {
+              name : "groupf",
+              displayName : "Layer F",
+              color : "#ff55ff",
+              link : {
+                dashArray : [5, 5, 1, 5],
+                sharedKeysDashArray : [5, 5],
+                opacity : 1,
+                weight : 2
+              },
+              portal : {
+                iconUrl : scope.Images.marker_layer_groupf
+              }
+            }];
+            /** @type {!Array} */
+            this._layers = [];
+            /** @type {!Object} */
+            this._map = map;
+            /** @type {!BroadcastChannel} */
+            this._broadcast = new BroadcastChannel("reswue-active-layer");
+            this.setupPolygonCleanup();
+          }
+          return Object.defineProperty($.prototype, "activeLayer", {
+            get : function() {
+              var name = localStorage["reswue-active-layer"];
+              return this.layerConfig.some(function(opt_expectation) {
+                return opt_expectation.name == name;
+              }) || (name = "main"), name;
+            },
+            set : function(value) {
+              if (value != this.activeLayer && this.layerConfig.some(function(data) {
+                return data.name == value;
+              })) {
+                localStorage["reswue-active-layer"] = value;
+                this._broadcast.postMessage(value);
+              }
+            },
+            enumerable : true,
+            configurable : true
+          }), $.prototype.createLayers = function(params) {
+            var extUserId = L.layerGroup([]);
+            this.addOrReplaceLayer(params, "", params.operationName + " Agent Tracker", item.Agents, extUserId);
+            var _updateCycle = L.layerGroup([]);
+            this.addOrReplaceLayer(params, "", params.operationName + " Alerts", item.Alerts, _updateCycle);
+          }, $.prototype.removeLayers = function(params) {
+            var EditRoute = this;
+            this.getLayers(params, null, null).forEach(function(itemModel) {
+              return EditRoute.removeLayerInternal(itemModel);
+            });
+          }, $.prototype.removeLayer = function(layer, start, end) {
+            var l = this.getLayer(layer, start, end);
+            if (null != l) {
+              this.removeLayerInternal(l);
+            }
+          }, $.prototype.getLayer = function(name, type, value, object) {
+            if (void 0 === object) {
+              /** @type {boolean} */
+              object = true;
+            }
+            var index = this.getLayers(name, type, value);
+            /** @type {null} */
+            var layer = null;
+            return 1 == index.length ? layer = index[0] : !object || 0 != index.length || null == name || value != item.Portals && value != item.Links && value != item.Polygons || (this.addOrReplaceLayer(name, type, this.getFullLayerDisplayName(name, type, value), value, L.layerGroup([])), layer = this.getLayer(name, type, value)), layer;
+          }, $.prototype.getLayers = function(params, value, node) {
+            params = this._layers.filter(function(me) {
+              return !(null != params && (me.environment != params.environment || me.operationName != params.operationName) || null != value && me.layerName != value || null != node && me.layerKind != node);
+            });
+            return params;
+          }, $.prototype.cleanLayers = function(params, opts) {
+            if (void 0 === opts) {
+              /** @type {null} */
+              opts = null;
+            }
+            this.getLayers(params, null, opts).forEach(function(LayerManager) {
+              return LayerManager.layerGroup.clearLayers();
+            });
+          }, $.prototype.getLayerConfig = function(layerName) {
+            /** @type {null} */
+            var b = null;
+            var badBlocks = this.layerConfig.filter(function(layer) {
+              return layer.name == layerName;
+            });
+            return 1 == badBlocks.length && (b = badBlocks[0]), b;
+          }, $.prototype.getAllLayerConfigs = function() {
+            return this.layerConfig;
+          }, $.prototype.addOrReplaceLayer = function(params, page, address, uid, id) {
+            if (null == this.getLayer(params, page, uid, false)) {
+              this._layers.push({
+                environment : params.environment,
+                operationName : params.operationName,
+                layerName : page,
+                layerKind : uid,
+                layerGroup : id
+              });
+              window.addLayerGroup(address, id, true);
+              try {
+                window.layerChooser.getLayers();
+              } catch (conv_reverse_sort) {
+                console.log(conv_reverse_sort);
+              }
+            }
+          }, $.prototype.removeLayerInternal = function(value) {
+            var i = this._layers.indexOf(value);
+            if (-1 == i) {
+              console.warn("layer not found.");
+            } else {
+              this._layers.splice(i, 1);
+            }
+            window.removeLayerGroup(value.layerGroup);
+          }, $.prototype.setupPolygonCleanup = function() {
+            var layer = this;
+            var addLayer = function(layer) {
+              if (layer instanceof L.GeodesicPolygon) {
+                layer.bringToBack();
+              }
+            };
+            this._map.on("overlayadd", function(initial_board) {
+              var board = initial_board;
+              layer._layers.filter(function(session) {
+                return session.layerKind == item.Polygons;
+              }).forEach(function(event) {
+                if (event.layerGroup === board.layer) {
+                  event.layerGroup.eachLayer(addLayer);
+                }
+              });
+            });
+          }, $.prototype.getLayerDisplayName = function(a, options) {
+            var config;
+            config = options instanceof String ? options : options.layerName ? options.layerName : options.name;
+            var opt = a.operation;
+            return opt.customLayerNames && opt.customLayerNames[config] ? opt.customLayerNames[config] : options.displayName ? options.displayName : this.getLayerConfig(config).displayName;
+          }, $.prototype.getFullLayerDisplayName = function(body, config, value) {
+            var watch_el = this.getLayerDisplayName(body, this.getLayerConfig(config));
+            var type = body.operationName + " " + watch_el + " ";
+            switch(value) {
+              case item.Portals:
+                type = type + "Portals";
+                break;
+              case item.Links:
+                type = type + "Links";
+                break;
+              case item.Polygons:
+                type = type + "Polys";
+            }
+            return type;
+          }, $.prototype.hideLayers = function() {
+            this._layers.forEach(function(layer) {
+              layer.visible = map.hasLayer(layer.layerGroup);
+              if (layer.visible) {
+                map.removeLayer(layer.layerGroup);
+              }
+            });
+          }, $.prototype.restoreLayers = function() {
+            this._layers.forEach(function($scope) {
+              if ($scope.visible) {
+                map.addLayer($scope.layerGroup);
+              }
+            });
+          }, $;
+        }();
+        scope.LayerManager = LayerManager;
+      }(PhtivSailDraw || (PhtivSailDraw = {}));
 
     //TODO still need to decipher wtf this does.
     !function (scope) {
@@ -490,7 +743,6 @@ function wrapper(plugin_info) {
                     return void alert("Please select a portal first!");
                 }
                 var data = layerManager instanceof scope.LayerManager ? layerManager.activeLayer : layerManager;
-                var isNotOperator = !operation.data.operation.isAgentOperator;
                 alert('got to here!');
                 /*
                 return operation.portalService.addPortal(sentPortal.id, sentPortal.name, data, sentPortal.lat, sentPortal.lng, isNotOperator, PLAYER.nickname, options).then(function(result) {
