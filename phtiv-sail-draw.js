@@ -53,7 +53,7 @@ function wrapper(plugin_info) {
     !function (data) {
         var b;
         !function (a) {
-            a.OP_LIST = "OP_LIST_KEY";
+            a.OP_LIST_KEY = "OP_LIST_KEY";
         }(b = data.Constants || (data.Constants = {}));
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
@@ -587,15 +587,14 @@ function wrapper(plugin_info) {
     window.plugin.phtivsaildraw.loadExternals = function () {
         try {
             console.log('Loading PhtivSailDraw now');
+            window.plugin.phtivsaildraw.addButtons();
+            PhtivSailDraw.opList = Array();
+            window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
+            window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
+            window.plugin.phtivsaildraw.setupLocalStorage();
         } catch (e) {
+            alert(JSON.stringify(e))
         }
-
-
-
-        window.plugin.phtivsaildraw.addButtons();
-        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
-        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
-        window.plugin.phtivsaildraw.setupLocalStorage();
     };
 
     window.plugin.phtivsaildraw.addButtons = function () {
@@ -624,35 +623,40 @@ function wrapper(plugin_info) {
     window.plugin.phtivsaildraw.addCSS = function (content) {
         $("head").append('<link rel="stylesheet" type="text/css" href="' + content + '" />');
     }
-    window.plugin.phtivsaildraw.getSelectedOperation = function () {
-        //TODO set in here inerating through list and getting one with 'selected' = true
 
+    //*** This function iterates through the opList and returns the selected one.
+    window.plugin.phtivsaildraw.getSelectedOperation = function () {
+        PhtivSailDraw.opList.forEach(function (operation) {
+            if (operation.isSelected)
+                return operation;
+        });
         return null;
     }
-    window.plugin.phtivsaildraw.setupLocalStorage = function () {
-        //TODO do stuff here to set up a default operation if none exists
 
+    //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
+    window.plugin.phtivsaildraw.setupLocalStorage = function () {
         var opList = null;
-        var opListObj = store.get(PhtivSailDraw.Constants.OP_LIST)
+        var opListObj = store.get(PhtivSailDraw.Constants.OP_LIST_KEY)
         if (opListObj != null)
             opList = JSON.parse(opListObj);
         if (opList == null) {
             var baseOp = new Operation(PLAYER.nickname, "Default Operation - " + PLAYER.nickname, true);
             var listToStore = new Array();
             listToStore.push(baseOp);
-            store.set(PhtivSailDraw.Constants.OP_LIST, JSON.stringify(listToStore));
-            opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST));
+            store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
+            opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST_KEY));
         }
-        //PhtivSailDraw.opList = oplist //Can I do this? I have no idea how this works.
-        alert("OPLIST -> " + JSON.stringify(opList));
+        PhtivSailDraw.opList = opList; //Can I do this? I have no idea how this works.
+        //alert("OPLIST -> " + JSON.stringify(PhtivSailDraw.opList));
     }
 
 
     class Operation {
         //name <- name of operation
         //creator <- agent who created it
+        //isSelected <- if true, this operation is the one that's currently displayed
         //portals <- List of Portals
-
+        //links <- List of Links
         constructor(creator, name, isSelected) {
             this.name = name;
             this.creator = creator;
