@@ -626,10 +626,11 @@ function wrapper(plugin_info) {
 
     //*** This function iterates through the opList and returns the selected one.
     window.plugin.phtivsaildraw.getSelectedOperation = function () {
-        PhtivSailDraw.opList.forEach(function (operation) {
-            if (operation.isSelected)
+        for (let operation of PhtivSailDraw.opList) {
+            if (operation.isSelected == true) {
                 return operation;
-        });
+            }
+        }
         return null;
     }
 
