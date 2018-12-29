@@ -339,15 +339,12 @@ function wrapper(plugin_info) {
                     return void alert("Please select a portal first!");
                 }
 
-                if (operation instanceof Operation)
-                {
-                    if (!operation.containsPortal(sentPortal)) { //TODO WRITE CONTAINS PORTAL METHOD
-                        //TODO if not add portal to op array
-                        //TODO reload layer
-                        alert("RETURNED FALSE");
+                if (operation instanceof Operation) {
+                    if (!operation.containsPortal(sentPortal)) {
+                        operation.addPortal(sentPortal)
                     }
                 }
-                else{
+                else {
                     alert("Operation Invalid");
                 }
             }, self.editPortal = function (instance, obj, key, value, options) {
@@ -431,16 +428,16 @@ function wrapper(plugin_info) {
     window.plugin.phtivsaildraw = function () { };
     window.plugin.phtivsaildraw.loadExternals = function () {
         try {
-            
+
         } catch (e) {
             alert(JSON.stringify(e))
         }
         console.log('Loading PhtivSailDraw now');
-            window.plugin.phtivsaildraw.addButtons();
-            PhtivSailDraw.opList = Array();
-            window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
-            window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
-            window.plugin.phtivsaildraw.setupLocalStorage();
+        window.plugin.phtivsaildraw.addButtons();
+        PhtivSailDraw.opList = Array();
+        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
+        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
+        window.plugin.phtivsaildraw.setupLocalStorage();
     };
 
     window.plugin.phtivsaildraw.addButtons = function () {
@@ -500,7 +497,7 @@ function wrapper(plugin_info) {
     }
 
     //*** This function resets the local op list
-    window.plugin.phtivsaildraw.resetOpList = function() {
+    window.plugin.phtivsaildraw.resetOpList = function () {
         store.set(PhtivSailDraw.Constants.OP_LIST_KEY, null);
     }
 
@@ -534,8 +531,21 @@ function wrapper(plugin_info) {
         }
 
         containsPortal(portal) {
+            //TODO check if portal array has sent portal
             //alert("PORTAL: " + JSON.stringify(portal));
             return true;
+        }
+
+        addPortal(portal) {
+            //TODO add portal to portal array
+            
+            this.updateOperation();
+        }
+
+        updateOperation() {
+            //TODO update operation in storage
+            //Reload operation into memory
+            //Refreash map
         }
 
         static create(obj) {
