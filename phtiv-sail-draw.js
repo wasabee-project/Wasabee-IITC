@@ -338,21 +338,18 @@ function wrapper(plugin_info) {
                 if (void 0 === options && (options = ""), void 0 === anyContent && (anyContent = false), !sentPortal) {
                     return void alert("Please select a portal first!");
                 }
-                //var data = layerManager instanceof scope.LayerManager ? layerManager.activeLayer : layerManager;
-                //alert('got to here! -> ' + JSON.stringify(data));
-                /*
-                return operation.portalService.addPortal(sentPortal.id, sentPortal.name, data, sentPortal.lat, sentPortal.lng, isNotOperator, PLAYER.nickname, options).then(function(result) {
-                  return result;
-                }, function(exception) {
-                  if (exception instanceof scope.ApiError && 409 == exception.statusCode) {
-                    if (anyContent) {
-                      return operation.data.portals;
+
+                if (operation instanceof Operation)
+                {
+                    if (!operation.containsPortal(sentPortal)) { //TODO WRITE CONTAINS PORTAL METHOD
+                        //TODO if not add portal to op array
+                        //TODO reload layer
+                        alert("RETURNED FALSE");
                     }
-                    alert("Portal already added.");
-                  }
-                  throw exception;
-                });
-                */
+                }
+                else{
+                    alert("Operation Invalid");
+                }
             }, self.editPortal = function (instance, obj, key, value, options) {
                 //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
             }, self.swapPortal = function (props, value, undefined) {
@@ -478,7 +475,7 @@ function wrapper(plugin_info) {
     window.plugin.phtivsaildraw.getSelectedOperation = function () {
         for (let operation of PhtivSailDraw.opList) {
             if (operation.isSelected == true) {
-                return operation;
+                return Operation.create(operation); //TODO CONVERT TO OPERATION HERE
             }
         }
         return null;
@@ -534,6 +531,21 @@ function wrapper(plugin_info) {
             var arr = new Uint8Array((len || 40) / 2)
             window.crypto.getRandomValues(arr)
             return Array.from(arr, this.dec2hex).join('')
+        }
+
+        containsPortal(portal) {
+            //alert("PORTAL: " + JSON.stringify(portal));
+            return true;
+        }
+
+        static create(obj) {
+            var operation = new Operation();
+            for (var prop in obj) {
+                if (operation.hasOwnProperty(prop)) {
+                    operation[prop] = obj[prop];
+                }
+            }
+            return operation;
         }
     }
     //PLUGIN END
