@@ -147,7 +147,7 @@ function wrapper(plugin_info) {
                 };
                 this._broadcast.addEventListener("message", sendMessage, false);
                 this._dialog = window.dialog({
-                    title: "PhtivSail Draw Links", //this._operation.data.operationName + " Links",
+                    title: this._operation.name + " - PSD Links",
                     width: "auto",
                     height: "auto",
                     html: container,
@@ -168,9 +168,9 @@ function wrapper(plugin_info) {
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
                     var page = parameters[p];
-                    //if (page._operation == selector) {
-                    //    return page.focus(), page;
-                    //}
+                    if (page._operation == operation) {
+                        return page.focus(), page;
+                    }
                 }
                 return new init(operation);//selector, context, d);
             }, init.prototype.focus = function () {
@@ -878,7 +878,7 @@ function wrapper(plugin_info) {
         if (opListObj != null)
             opList = JSON.parse(opListObj);
         if (opList == null) {
-            var baseOp = new Operation(PLAYER.nickname, PLAYER.nickname + " - Default Operation", true);
+            var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
             var listToStore = new Array();
             listToStore.push(baseOp);
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
