@@ -173,7 +173,8 @@ function wrapper(plugin_info) {
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
                     var page = parameters[p];
-                    if (page._operation == operation) {
+                    //TODO this isn't working anymore.  Objects not equal? ID's not equal?
+                    if (page._operation.ID == operation.ID) {
                         return page.focus(), page;
                     }
                 }
@@ -531,14 +532,22 @@ function wrapper(plugin_info) {
         }
 
         containsPortal(portal) {
-            //TODO check if portal array has sent portal
-            //alert("PORTAL: " + JSON.stringify(portal));
-            return true;
+            if (this.portals.length == 0)
+                return false;
+            else {
+                for (let portal_ in this.portals) {
+                    if (portal.id == portal_.id) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         addPortal(portal) {
             //TODO add portal to portal array
-            
+            alert("ADDING: PORTAL: " + JSON.stringify(portal));
+            this.portal.push(portal)
             this.updateOperation();
         }
 
