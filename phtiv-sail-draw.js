@@ -64,7 +64,6 @@ function wrapper(plugin_info) {
         }(b = scope.Layers || (scope.Layers = {}));
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
-    //TODO make this not open duplicate link dialogs
     !function (scope) {
         var linkDialogFunc = function () {
             /**
@@ -197,6 +196,7 @@ function wrapper(plugin_info) {
                 if (selectedPortal) {
                     localStorage["phtivsaildraw-portal-" + updateID] = JSON.stringify(selectedPortal);
                 } else {
+                    alert("No Portal Selected.")
                     delete localStorage["phtivsaildraw-portal-" + updateID];
                 }
                 this.updatePortal(updateID);
@@ -235,12 +235,15 @@ function wrapper(plugin_info) {
                 }
 
                 var isReversed = this._reversed.checked;
-                Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
-                    //TODO update local storage operation
-                    //TODO redraw things
-                })["catch"](function (data) {
-                    throw alert(data.message), console.log(data), data;
-                });
+                if (source.id == linkTo.id) {
+                    return void alert("Target and destination portals must be different.")
+                } else
+                    Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
+                        //TODO update local storage operation
+                        //TODO redraw things
+                    })["catch"](function (data) {
+                        throw alert(data.message), console.log(data), data;
+                    });
 
                 //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
             }, init.prototype.addAllLinks = function () {
@@ -279,16 +282,13 @@ function wrapper(plugin_info) {
 
                 //***Function to add a single link -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addLink = function (fromPortal, toPortal) {
-                alert("fromPortal: " + JSON.stringify(fromPortal) + "\ntoPortal: " + JSON.stringify(toPortal));
-                /*
-                 var selectLayersValue = this._desc.value;
-                 if (!value || !data) {
-                 return Promise.reject("no portal given");
-                 }
-                 var link = this._layerManager.activeLayer;
-                 var e = !this._operation.data.operation.isAgentOperator;
-                 return this._operation.linkService.addLink(value.id, data.id, link, e, PLAYER.nickname, selectLayersValue);
-                 */
+                //alert("fromPortal: " + JSON.stringify(fromPortal) + "\ntoPortal: " + JSON.stringify(toPortal));
+                var description = this._desc.value;
+                if (!toPortal || !fromPortal) {
+                    return Promise.reject("no portal given");
+                }
+                return this._operation.addLink(fromPortal, toPortal, description);
+
             }, init._dialogs = [], init;
         }();
         scope.LinkDialog = linkDialogFunc;
@@ -500,6 +500,15 @@ function wrapper(plugin_info) {
         store.set(PhtivSailDraw.Constants.OP_LIST_KEY, null);
     }
 
+    window.plugin.phtivsaildraw.dec2hex = function (dec) {
+        return ('0' + dec.toString(16)).substr(-2)
+    }
+
+    window.plugin.phtivsaildraw.generateId = function (len) {
+        var arr = new Uint8Array((len || 40) / 2)
+        window.crypto.getRandomValues(arr)
+        return Array.from(arr, window.plugin.phtivsaildraw.dec2hex).join('')
+    }
 
     class Operation {
         //ID <- randomly generated alpha-numeric ID for the operation
@@ -509,24 +518,12 @@ function wrapper(plugin_info) {
         //portals <- List of Portals
         //links <- List of Links
         constructor(creator, name, isSelected) {
-            this.ID = this.generateId();
+            this.ID = window.plugin.phtivsaildraw.generateId();
             this.name = name;
             this.creator = creator;
             this.isSelected = isSelected;
             this.portals = Array();
             this.links = Array();
-        }
-
-        // dec2hex :: Integer -> String
-        dec2hex(dec) {
-            return ('0' + dec.toString(16)).substr(-2)
-        }
-
-        // generateId :: Integer -> String
-        generateId(len) {
-            var arr = new Uint8Array((len || 40) / 2)
-            window.crypto.getRandomValues(arr)
-            return Array.from(arr, this.dec2hex).join('')
         }
 
         containsPortal(portal) {
@@ -544,6 +541,12 @@ function wrapper(plugin_info) {
 
         addPortal(portal) {
             this.portals.push(portal)
+            console.log("ADDED PORTAL: " + JSON.stringify(this.links))
+        }
+
+        addLink(fromPortal, toPortal, description) {
+            this.links.push(new Link(fromPortal, toPortal, description))
+            console.log("ADDED LINK: " + JSON.stringify(this.links))
         }
 
         updateOperation() {
@@ -561,6 +564,30 @@ function wrapper(plugin_info) {
             }
             return operation;
         }
+    }
+
+    class Link {
+        //ID <- randomly generated alpha-numeric ID for the link
+        //fromPortal <- portal the link is from
+        //toPortal <- portal the link is to
+        //description <- user entered description of link
+        constructor(fromPortal, toPortal, description) {
+            this.ID = window.plugin.phtivsaildraw.generateId();
+            this.fromPortal = fromPortal;
+            this.toPortal = toPortal;
+            this.description = description;
+        }
+
+        static create(obj) {
+            var link = new Link();
+            for (var prop in obj) {
+                if (link.hasOwnProperty(prop)) {
+                    link[prop] = obj[prop];
+                }
+            }
+            return link;
+        }
+
     }
     //PLUGIN END
     var setup = window.plugin.phtivsaildraw.loadExternals;
