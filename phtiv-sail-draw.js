@@ -173,7 +173,6 @@ function wrapper(plugin_info) {
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
                     var page = parameters[p];
-                    //TODO this isn't working anymore.  Objects not equal? ID's not equal?
                     if (page._operation.ID == operation.ID) {
                         return page.focus(), page;
                     }
@@ -236,8 +235,9 @@ function wrapper(plugin_info) {
                 }
 
                 var isReversed = this._reversed.checked;
-                Promise.all([item.addPortal(source), item.addPortal(linkTo)]).then(function () {
-                    //return isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo);
+                Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
+                    //TODO update local storage operation
+                    //TODO redraw things
                 })["catch"](function (data) {
                     throw alert(data.message), console.log(data), data;
                 });
@@ -274,13 +274,12 @@ function wrapper(plugin_info) {
                 var resolvedLocalData = Promise.resolve(this._operation.portals)
 
                 return sentPortal ? (this._operation.portals.some(function (gotPortal) {
-                    alert("didGotPortal");
                     return gotPortal.id == sentPortal.id;
                 }) ? resolvedLocalData : scope.UiCommands.addPortal(this._operation, sentPortal, "", true)) : Promise.reject("no portal given");
 
                 //***Function to add a single link -- called in addLinkTo and addAllLinks functions
-            }, init.prototype.addLink = function (value, data) {
-                alert("addLink: " + value);
+            }, init.prototype.addLink = function (fromPortal, toPortal) {
+                alert("fromPortal: " + JSON.stringify(fromPortal) + "\ntoPortal: " + JSON.stringify(toPortal));
                 /*
                  var selectLayersValue = this._desc.value;
                  if (!value || !data) {
@@ -335,7 +334,6 @@ function wrapper(plugin_info) {
             function self() {
             }
             return self.addPortal = function (operation, sentPortal, options, anyContent) {
-                //this._operation, this._layerManager, sentPortal, "", true
                 if (void 0 === options && (options = ""), void 0 === anyContent && (anyContent = false), !sentPortal) {
                     return void alert("Please select a portal first!");
                 }
@@ -545,10 +543,7 @@ function wrapper(plugin_info) {
         }
 
         addPortal(portal) {
-            //TODO add portal to portal array
-            alert("ADDING: PORTAL: " + JSON.stringify(portal));
-            this.portal.push(portal)
-            this.updateOperation();
+            this.portals.push(portal)
         }
 
         updateOperation() {
