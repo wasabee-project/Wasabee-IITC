@@ -115,7 +115,7 @@ function wrapper(plugin_info) {
                         button = node.appendChild(document.createElement("button"));
                         button.textContent = "add";
                         button.addEventListener("click", function (other) {
-                            return self.addLinkTo(other);
+                            return self.addLinkTo(other, self._operation);
                         }, false);
                     }
                     node = tr.insertCell();
@@ -223,7 +223,7 @@ function wrapper(plugin_info) {
                 }
 
                 //***Function to add link between the portals -- called from 'Add' Button next to To portals
-            }, init.prototype.addLinkTo = function (instance) {
+            }, init.prototype.addLinkTo = function (instance, operation) {
                 var item = this;
                 var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                 var linkTo = this.getPortal(server);
@@ -239,7 +239,8 @@ function wrapper(plugin_info) {
                     return void alert("Target and destination portals must be different.")
                 } else
                     Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
-                        //TODO update local storage operation
+                        console.log("CLASS -> "  + JSON.stringify(operation.className))
+                        operation.update()
                         //TODO redraw things
                     })["catch"](function (data) {
                         throw alert(data.message), console.log(data), data;
@@ -340,8 +341,9 @@ function wrapper(plugin_info) {
 
                 if (operation instanceof Operation) {
                     if (!operation.containsPortal(sentPortal)) {
-                        operation.addPortal(sentPortal)
-                    }
+                        operation.addPortal(sentPortal);
+                    } else
+                        console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal));
                 }
                 else {
                     alert("Operation Invalid");
@@ -491,9 +493,31 @@ function wrapper(plugin_info) {
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
             opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST_KEY));
         }
-        PhtivSailDraw.opList = opList; //Can I do this? I have no idea how this works.
+        PhtivSailDraw.opList = opList; 
         //alert("OPLIST -> " + JSON.stringify(PhtivSailDraw.opList));
     }
+
+    
+    window.plugin.phtivsaildraw.updateOperationInList = function(operation) {
+        var updatedArray = new Array();
+        
+        for (let opInList of PhtivSailDraw.opList) {
+            if (opInList.ID != operation.ID)
+                updatedArray.push(opInList);
+        }
+        updatedArray.push(operation);
+        
+        if (updatedArray.length != 0) {
+            store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
+            PhtivSailDraw.opList = updatedArray;
+            console.log("LIST IS NOW: -> " + JSON.stringify(PhtivSailDraw.opList))
+
+            //TODO draw things here
+        } else
+            alert("Parse Error -> Saving Op List Failed");
+        
+    }
+    
 
     //*** This function resets the local op list
     window.plugin.phtivsaildraw.resetOpList = function () {
@@ -541,18 +565,15 @@ function wrapper(plugin_info) {
 
         addPortal(portal) {
             this.portals.push(portal)
-            console.log("ADDED PORTAL: " + JSON.stringify(this.links))
         }
 
         addLink(fromPortal, toPortal, description) {
-            this.links.push(new Link(fromPortal, toPortal, description))
-            console.log("ADDED LINK: " + JSON.stringify(this.links))
+           // this.links.push(new Link(fromPortal, toPortal, description))
+           // console.log("ADDED LINK: " + JSON.stringify(this.links))
         }
 
-        updateOperation() {
-            //TODO update operation in storage
-            //Reload operation into memory
-            //Refreash map
+        update() {
+            window.plugin.phtivsaildraw.updateOperationInList(this);
         }
 
         static create(obj) {
