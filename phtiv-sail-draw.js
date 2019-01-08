@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         PhtivSail Draw Tools
+// @name         IITC Plugin: PhtivSail Draw Tools
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  Less terrible draw tools, hopefully.
@@ -55,13 +55,6 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
         }(b = scope.Constants || (scope.Constants = {}));
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
-
-    !function (scope) {
-        var b;
-        !function (a) {
-            a.LayerGroup = new L.FeatureGroup();
-        }(b = scope.Layers || (scope.Layers = {}));
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
     !function (scope) {
@@ -239,7 +232,7 @@ function wrapper(plugin_info) {
                     return void alert("Target and destination portals must be different.")
                 } else
                     Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
-                        console.log("CLASS -> "  + JSON.stringify(operation.className))
+                        console.log("CLASS -> " + JSON.stringify(operation.className))
                         operation.update()
                         //TODO redraw things
                     })["catch"](function (data) {
@@ -427,6 +420,8 @@ function wrapper(plugin_info) {
 
     //PLUGIN START
     window.plugin.phtivsaildraw = function () { };
+    window.plugin.phtivsaildraw.portalLayers = {};
+    window.plugin.phtivsaildraw.portalLayerGroup = null;
     window.plugin.phtivsaildraw.loadExternals = function () {
         try {
 
@@ -439,6 +434,10 @@ function wrapper(plugin_info) {
         window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
         window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
         window.plugin.phtivsaildraw.setupLocalStorage();
+
+        window.plugin.phtivsaildraw.portalLayerGroup = new L.LayerGroup();
+        window.addLayerGroup('PhtivSail Draw Portals', window.plugin.phtivsaildraw.portalLayerGroup, false);
+        window.plugin.phtivsaildraw.drawThings();
     };
 
     window.plugin.phtivsaildraw.addButtons = function () {
@@ -473,7 +472,7 @@ function wrapper(plugin_info) {
     window.plugin.phtivsaildraw.getSelectedOperation = function () {
         for (let operation of PhtivSailDraw.opList) {
             if (operation.isSelected == true) {
-                return Operation.create(operation); //TODO CONVERT TO OPERATION HERE
+                return Operation.create(operation);
             }
         }
         return null;
@@ -493,41 +492,91 @@ function wrapper(plugin_info) {
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
             opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST_KEY));
         }
-        PhtivSailDraw.opList = opList; 
+        PhtivSailDraw.opList = opList;
         //alert("OPLIST -> " + JSON.stringify(PhtivSailDraw.opList));
     }
 
-    
-    window.plugin.phtivsaildraw.updateOperationInList = function(operation) {
+    //** This function takes an operation and updates the entry in the op list that matches it */
+    window.plugin.phtivsaildraw.updateOperationInList = function (operation) {
         var updatedArray = new Array();
-        
+
         for (let opInList of PhtivSailDraw.opList) {
             if (opInList.ID != operation.ID)
                 updatedArray.push(opInList);
         }
         updatedArray.push(operation);
-        
+
         if (updatedArray.length != 0) {
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
             PhtivSailDraw.opList = updatedArray;
             console.log("LIST IS NOW: -> " + JSON.stringify(PhtivSailDraw.opList))
-
-            //TODO draw things here
+            window.plugin.phtivsaildraw.drawThings();
         } else
             alert("Parse Error -> Saving Op List Failed");
-        
+
     }
-    
+
+    //** This function draws things on the layers */
+    window.plugin.phtivsaildraw.drawThings = function () {
+        window.plugin.phtivsaildraw.resetAllPortals();
+        //TODO DRAW THINGS HERE
+    }
+
+    //** This function adds all the portals to the layer */
+    window.plugin.phtivsaildraw.addAllPortals = function () {
+        var portalList = window.plugin.phtivsaildraw.getSelectedOperation().portals;
+        portalList.forEach(function (portal) {
+            //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
+            window.plugin.phtivsaildraw.addPortal(portal);
+            console.log("ADDING PORTAL: " + JSON.stringify(portal));
+        });
+    }
+
+    //** This function resets all the portals and redraws them */
+    window.plugin.phtivsaildraw.resetAllPortals = function () {
+        for (guid in window.plugin.phtivsaildraw.portalLayers) {
+            var portalInLayer = window.plugin.phtivsaildraw.portalLayers[guid];
+            window.plugin.phtivsaildraw.portalLayerGroup.removeLayer(portalInLayer);
+            delete window.plugin.phtivsaildraw.portalLayers[guid];
+        }
+        window.plugin.phtivsaildraw.addAllPortals();
+    }
+
+    /** This function adds a portal to the portal layer group */
+    window.plugin.phtivsaildraw.addPortal = function (portal) {
+        console.log("PORTAL IS: " + JSON.stringify(portal))
+        var latLng = new L.LatLng(portal.lat, portal.lng);
+        var marker = L.marker(latLng, {
+            title: portal["name"],
+            icon: L.icon({
+                iconUrl: PhtivSailDraw.Images.marker_layer_groupa,
+                iconAnchor: [12, 41],
+                iconSize: [25, 41],
+                popupAnchor: [0, -35]
+            })
+        });
+        window.registerMarkerForOMS(marker);
+        marker.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ alert("tapped: " + JSON.stringify(portal.id)) });
+
+        window.plugin.phtivsaildraw.portalLayers[portal["id"]] = marker;
+        marker.addTo(window.plugin.phtivsaildraw.portalLayerGroup);
+        if (marker == null)
+            console.log("MARKER NULL")
+        else
+            console.log("MARKER NOT NULL ->" + latLng);
+    }
 
     //*** This function resets the local op list
     window.plugin.phtivsaildraw.resetOpList = function () {
         store.set(PhtivSailDraw.Constants.OP_LIST_KEY, null);
     }
 
+    //** This function does something for the generate ID function */
     window.plugin.phtivsaildraw.dec2hex = function (dec) {
         return ('0' + dec.toString(16)).substr(-2)
     }
 
+    //** This function generates a unique ID for an object */
     window.plugin.phtivsaildraw.generateId = function (len) {
         var arr = new Uint8Array((len || 40) / 2)
         window.crypto.getRandomValues(arr)
@@ -568,8 +617,8 @@ function wrapper(plugin_info) {
         }
 
         addLink(fromPortal, toPortal, description) {
-           // this.links.push(new Link(fromPortal, toPortal, description))
-           // console.log("ADDED LINK: " + JSON.stringify(this.links))
+            // this.links.push(new Link(fromPortal, toPortal, description))
+            // console.log("ADDED LINK: " + JSON.stringify(this.links))
         }
 
         update() {
