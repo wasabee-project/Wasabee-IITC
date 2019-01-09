@@ -561,8 +561,8 @@ function wrapper(plugin_info) {
             //console.log("ADDING LINK: " + JSON.stringify(link));
             //console.log("latLngs: " + JSON.stringify(latLngs));
             var link_ = L.polyline(latLngs, options);
-            window.registerMarkerForOMS(link_);
-            link_.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ alert("tapped: " + JSON.stringify(link.ID)) });
+            //window.registerMarkerForOMS(link_);
+            //link_.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ alert("tapped: " + JSON.stringify(link.ID)) });
 
             window.plugin.phtivsaildraw.linkLayers[link["ID"]] = link_;
             link_.addTo(window.plugin.phtivsaildraw.linkLayerGroup);
@@ -593,6 +593,7 @@ function wrapper(plugin_info) {
     /** This function adds a portal to the portal layer group */
     window.plugin.phtivsaildraw.addPortal = function (portal) {
         //console.log("PORTAL IS: " + JSON.stringify(portal))
+        var op = window.plugin.phtivsaildraw.getSelectedOperation();
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal["name"],
@@ -604,10 +605,15 @@ function wrapper(plugin_info) {
             })
         });
         window.registerMarkerForOMS(marker);
-        marker.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ alert("tapped: " + JSON.stringify(portal.id)) });
+        marker.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ op.removePortal(portal); });
 
         window.plugin.phtivsaildraw.portalLayers[portal["id"]] = marker;
         marker.addTo(window.plugin.phtivsaildraw.portalLayerGroup);
+    }
+
+    //** This function gets the portal popup content */
+    window.plugin.phtivsaildraw.getPortalPopup = function() {
+
     }
 
     //*** This function resets the local op list
@@ -671,6 +677,16 @@ function wrapper(plugin_info) {
                 }
             }
             return false;
+        }
+
+        removePortal(portal) {
+            this.portals = this.portals.filter(function (listPortal) {
+                return listPortal.id !== portal.id;
+            });
+            this.links = this.links.filter(function (listLink) {
+                return listLink.fromPortal.id !== portal.id && listLink.toPortal.id !== portal.id; //TODO remove links with this portal.
+            });
+            this.update();
         }
 
         addPortal(portal) {
