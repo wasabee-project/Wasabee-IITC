@@ -416,8 +416,13 @@ function wrapper(plugin_info) {
 
     //PLUGIN START
     window.plugin.phtivsaildraw = function () { };
+
+    //** LAYER DEFINITIONS */
     window.plugin.phtivsaildraw.portalLayers = {};
     window.plugin.phtivsaildraw.portalLayerGroup = null;
+    window.plugin.phtivsaildraw.linkLayers = {};
+    window.plugin.phtivsaildraw.linkLayerGroup = null;
+
     window.plugin.phtivsaildraw.loadExternals = function () {
         try {
 
@@ -432,7 +437,9 @@ function wrapper(plugin_info) {
         window.plugin.phtivsaildraw.setupLocalStorage();
 
         window.plugin.phtivsaildraw.portalLayerGroup = new L.LayerGroup();
+        window.plugin.phtivsaildraw.linkLayerGroup = new L.LayerGroup();
         window.addLayerGroup('PhtivSail Draw Portals', window.plugin.phtivsaildraw.portalLayerGroup, false);
+        window.addLayerGroup('PhtivSail Draw Links', window.plugin.phtivsaildraw.linkLayerGroup, false);
         window.plugin.phtivsaildraw.drawThings();
     };
 
@@ -519,16 +526,48 @@ function wrapper(plugin_info) {
         //TODO DRAW THINGS HERE
     }
 
-    //** This function resets all the Links and redraws them */
+    //** This function adds all the Links to the layer */
+    window.plugin.phtivsaildraw.addAllLinks = function () {
+        var linkList = window.plugin.phtivsaildraw.getSelectedOperation().links;
+        linkList.forEach(function (link) {
+            //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
+            window.plugin.phtivsaildraw.addLink(link);
+        });
+    }
+
+    //** This function resets all the Links and calls addAllLinks to add them */
     window.plugin.phtivsaildraw.resetAllLinks = function () {
-        /*
-        for (guid in window.plugin.phtivsaildraw.portalLayers) {
-            var portalInLayer = window.plugin.phtivsaildraw.portalLayers[guid];
-            window.plugin.phtivsaildraw.portalLayerGroup.removeLayer(portalInLayer);
-            delete window.plugin.phtivsaildraw.portalLayers[guid];
+        for (guid in window.plugin.phtivsaildraw.linkLayers) {
+            var linkInLayer = window.plugin.phtivsaildraw.linkLayers[guid];
+            window.plugin.phtivsaildraw.linkLayerGroup.removeLayer(linkInLayer);
+            delete window.plugin.phtivsaildraw.linkLayers[guid];
         }
-        window.plugin.phtivsaildraw.addAllPortals();
-        */
+        window.plugin.phtivsaildraw.addAllLinks();
+    }
+
+    /** This function adds a portal to the portal layer group */
+    window.plugin.phtivsaildraw.addLink = function (link) {
+        //console.log("Link IS: " + JSON.stringify(portal))
+        var options = {
+            geodesic: true,
+            clickable: true,
+            dashArray: [5, 5, 1, 5],
+            color: "#ff6600",
+            opacity: 1,
+            weight: 2
+        };
+        var latLngs = link.getLatLngs();
+        if (latLngs != null) {
+            //console.log("ADDING LINK: " + JSON.stringify(link));
+            //console.log("latLngs: " + JSON.stringify(latLngs));
+            var link_ = L.polyline(latLngs, options);
+            window.registerMarkerForOMS(link_);
+            link_.on('spiderfiedclick', function () { /*renderPortalDetails(guid);*/ alert("tapped: " + JSON.stringify(link.ID)) });
+
+            window.plugin.phtivsaildraw.linkLayers[link["ID"]] = link_;
+            link_.addTo(window.plugin.phtivsaildraw.linkLayerGroup);
+        } else
+            console.log("LATLNGS WAS NULL?!")
     }
 
     //** This function adds all the portals to the layer */
@@ -541,7 +580,7 @@ function wrapper(plugin_info) {
         });
     }
 
-    //** This function resets all the portals and redraws them */
+    //** This function resets all the portals and calls addAllPortals to add them */
     window.plugin.phtivsaildraw.resetAllPortals = function () {
         for (guid in window.plugin.phtivsaildraw.portalLayers) {
             var portalInLayer = window.plugin.phtivsaildraw.portalLayers[guid];
@@ -624,8 +663,9 @@ function wrapper(plugin_info) {
                 //console.log("CHECKING LINK -> " + link.className + " - " + JSON.stringify(link))
                 for (let link_ in this.links) {
                     //console.log("CHECKING link_ -> " + link_.className + " - " + JSON.stringify(this.links[link_]))
-                    if ((this.links[link_].fromPortal["ID"] == link.fromPortal["ID"] && this.links[link_].toPortal["ID"] == link.toPortal["ID"]) ||
-                        ((this.links[link_].toPortal["ID"] == link.fromPortal["ID"] && this.links[link_].fromPortal["ID"] == link.toPortal["ID"]))) {
+                    //THIS TESTS IF ITS THE SAME LINK
+                    if ((this.links[link_].fromPortal["id"] == link.fromPortal["id"] && this.links[link_].toPortal["id"] == link.toPortal["id"]) ||
+                        ((this.links[link_].toPortal["id"] == link.fromPortal["id"] && this.links[link_].fromPortal["id"] == link.toPortal["id"]))) {
                         return true;
                     }
                 }
@@ -691,6 +731,16 @@ function wrapper(plugin_info) {
             this.fromPortal = fromPortal;
             this.toPortal = toPortal;
             this.description = description;
+        }
+
+        getLatLngs() {
+            if (this.fromPortal != null && this.toPortal != null) {
+                var returnArray = Array();
+                returnArray.push(new L.LatLng(this.fromPortal.lat, this.fromPortal.lng))
+                returnArray.push(new L.LatLng(this.toPortal.lat, this.toPortal.lng))
+                return returnArray
+            } else
+                return null;
         }
 
         static create(obj) {
