@@ -232,7 +232,6 @@ function wrapper(plugin_info) {
                     return void alert("Target and destination portals must be different.")
                 } else
                     Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
-                        console.log("CLASS -> " + JSON.stringify(operation.className))
                         operation.update()
                         //TODO redraw things
                     })["catch"](function (data) {
@@ -333,10 +332,7 @@ function wrapper(plugin_info) {
                 }
 
                 if (operation instanceof Operation) {
-                    if (!operation.containsPortal(sentPortal)) {
-                        operation.addPortal(sentPortal);
-                    } else
-                        console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal));
+                    operation.addPortal(sentPortal);
                 }
                 else {
                     alert("Operation Invalid");
@@ -519,7 +515,20 @@ function wrapper(plugin_info) {
     //** This function draws things on the layers */
     window.plugin.phtivsaildraw.drawThings = function () {
         window.plugin.phtivsaildraw.resetAllPortals();
+        window.plugin.phtivsaildraw.resetAllLinks();
         //TODO DRAW THINGS HERE
+    }
+
+    //** This function resets all the Links and redraws them */
+    window.plugin.phtivsaildraw.resetAllLinks = function () {
+        /*
+        for (guid in window.plugin.phtivsaildraw.portalLayers) {
+            var portalInLayer = window.plugin.phtivsaildraw.portalLayers[guid];
+            window.plugin.phtivsaildraw.portalLayerGroup.removeLayer(portalInLayer);
+            delete window.plugin.phtivsaildraw.portalLayers[guid];
+        }
+        window.plugin.phtivsaildraw.addAllPortals();
+        */
     }
 
     //** This function adds all the portals to the layer */
@@ -528,7 +537,7 @@ function wrapper(plugin_info) {
         portalList.forEach(function (portal) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
             window.plugin.phtivsaildraw.addPortal(portal);
-            console.log("ADDING PORTAL: " + JSON.stringify(portal));
+            //console.log("ADDING PORTAL: " + JSON.stringify(portal));
         });
     }
 
@@ -544,7 +553,7 @@ function wrapper(plugin_info) {
 
     /** This function adds a portal to the portal layer group */
     window.plugin.phtivsaildraw.addPortal = function (portal) {
-        console.log("PORTAL IS: " + JSON.stringify(portal))
+        //console.log("PORTAL IS: " + JSON.stringify(portal))
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal["name"],
@@ -560,10 +569,6 @@ function wrapper(plugin_info) {
 
         window.plugin.phtivsaildraw.portalLayers[portal["id"]] = marker;
         marker.addTo(window.plugin.phtivsaildraw.portalLayerGroup);
-        if (marker == null)
-            console.log("MARKER NULL")
-        else
-            console.log("MARKER NOT NULL ->" + latLng);
     }
 
     //*** This function resets the local op list
@@ -612,24 +617,64 @@ function wrapper(plugin_info) {
             return false;
         }
 
+        containsLink(link) {
+            if (this.links.length == 0)
+                return false;
+            else {
+                //console.log("CHECKING LINK -> " + link.className + " - " + JSON.stringify(link))
+                for (let link_ in this.links) {
+                    //console.log("CHECKING link_ -> " + link_.className + " - " + JSON.stringify(this.links[link_]))
+                    if ((this.links[link_].fromPortal["ID"] == link.fromPortal["ID"] && this.links[link_].toPortal["ID"] == link.toPortal["ID"]) ||
+                        ((this.links[link_].toPortal["ID"] == link.fromPortal["ID"] && this.links[link_].fromPortal["ID"] == link.toPortal["ID"]))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         addPortal(portal) {
-            this.portals.push(portal)
+            if (!this.containsPortal(portal)) {
+                this.portals.push(portal)
+            } else
+                console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal));
         }
 
         addLink(fromPortal, toPortal, description) {
-            // this.links.push(new Link(fromPortal, toPortal, description))
-            // console.log("ADDED LINK: " + JSON.stringify(this.links))
+            var link = new Link(fromPortal, toPortal, description)
+            if (!this.containsLink(link)) {
+                this.links.push(link)
+                //console.log("ADDED LINK: " + JSON.stringify(this.links))
+            } else
+                console.log("Link Already Exists In Operation -> " + JSON.stringify(link));
         }
 
         update() {
             window.plugin.phtivsaildraw.updateOperationInList(this);
         }
 
+        static convertLinksToObjs(links) {
+            var tempLinks = Array();
+            for (let link_ in links) {
+                if (links[link_] instanceof Link) {
+                    //console.log("thing is link -> " + JSON.stringify(links[link_]))
+                    tempLinks.push(links[link_]);
+                } else {
+                    //console.log("thing is NOT link -> " + JSON.stringify(links[link_]))
+                    tempLinks.push(Link.create(links[link_]));
+                }
+            }
+            return tempLinks;
+        }
+
         static create(obj) {
             var operation = new Operation();
             for (var prop in obj) {
                 if (operation.hasOwnProperty(prop)) {
-                    operation[prop] = obj[prop];
+                    if (prop == "links")
+                        operation[prop] = Operation.convertLinksToObjs(obj[prop]);
+                    else
+                        operation[prop] = obj[prop];
                 }
             }
             return operation;
