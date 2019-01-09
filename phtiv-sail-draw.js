@@ -125,7 +125,7 @@ function wrapper(plugin_info) {
                 button = div.appendChild(document.createElement("button"));
                 button.textContent = "add all";
                 button.addEventListener("click", function (a) {
-                    return self.addAllLinks();
+                    return self.addAllLinks(self._operation);
                 }, false);
                 var cardHeader = element.appendChild(document.createElement("label"));
                 this._reversed = cardHeader.appendChild(document.createElement("input"));
@@ -239,32 +239,31 @@ function wrapper(plugin_info) {
                     });
 
                 //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
-            }, init.prototype.addAllLinks = function () {
-                alert("addAllLinks:" + this.getPortal("src"));
-                /*
-                 var self = this;
-                 var url = this.getPortal("src");
-                 if (!url) {
-                 return void alert("Please select a target portal first!");
-                 }
-                 var resolvedSourceMapConfigs = this._links.map(function (b) {
-                 return b.checked ? self.getPortal(b.value) : null;
-                 }).filter(function (a) {
-                 return null != a;
-                 });
-                 if (0 == resolvedSourceMapConfigs.length) {
-                 return void alert("Please select a destination portal first!");
-                 }
-                 var apiKey = this._reversed.checked;
-                 var documentBodyPromise = this.addPortal(url);
-                 Promise.all(resolvedSourceMapConfigs.map(function (link) {
-                 return Promise.all([documentBodyPromise, self.addPortal(link)]).then(function () {
-                 return apiKey ? self.addLink(link, url) : self.addLink(url, link);
-                 });
-                 }))["catch"](function (data) {
-                 throw alert(data.message), console.log(data), data;
-                 });
-                 */
+            }, init.prototype.addAllLinks = function (operation) {
+                var item = this;
+                var source = this.getPortal("src");
+                console.log("SOURCE: " + JSON.stringify(source));
+                if (!source) {
+                    return void alert("Please select a target portal first!");
+                }
+                var resolvedSourceMapConfigs = this._links.map(function (b) {
+                    return b.checked ? item.getPortal(b.value) : null;
+                }).filter(function (a) {
+                    return null != a;
+                });
+                if (0 == resolvedSourceMapConfigs.length) {
+                    return void alert("Please select a destination portal first!");
+                }
+                var isReversedChecked = this._reversed.checked;
+                var documentBodyPromise = this.addPortal(source);
+                Promise.all(resolvedSourceMapConfigs.map(function (linkTo) {
+                    return Promise.all([documentBodyPromise, item.addPortal(linkTo), isReversedChecked ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
+                        operation.update()
+                    });
+                }))["catch"](function (data) {
+                    throw alert(data.message), console.log(data), data;
+                });
+
                 //***Function to add a portal -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addPortal = function (sentPortal) {
                 var resolvedLocalData = Promise.resolve(this._operation.portals)
@@ -612,7 +611,7 @@ function wrapper(plugin_info) {
     }
 
     //** This function gets the portal popup content */
-    window.plugin.phtivsaildraw.getPortalPopup = function() {
+    window.plugin.phtivsaildraw.getPortalPopup = function () {
 
     }
 
