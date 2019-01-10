@@ -1031,8 +1031,7 @@ function wrapper(plugin_info) {
         for (i = 0; i < drawnLinks.length; i++) {
             if (plugin.phtivsaildraw.testPolyLine(drawnLinks[i], link, true)) {
                 plugin.phtivsaildraw.showCrossLink(link);
-                // blocker recorder
-                //window.plugin.phtivsaildraw.addBlocker(link.options.guid, link);
+                break;
             }
         }
     };
