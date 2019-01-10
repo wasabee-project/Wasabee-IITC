@@ -172,6 +172,7 @@ function wrapper(plugin_info) {
                 for (; p < parameters.length; p++) {
                     var page = parameters[p];
                     if (page._operation.ID == operation.ID) {
+                        page._operation = operation;
                         return page.focus(), page;
                     }
                 }
@@ -245,7 +246,6 @@ function wrapper(plugin_info) {
             }, init.prototype.addAllLinks = function (operation) {
                 var item = this;
                 var source = this.getPortal("src");
-                console.log("SOURCE: " + JSON.stringify(source));
                 if (!source) {
                     return void alert("Please select a target portal first!");
                 }
@@ -283,7 +283,6 @@ function wrapper(plugin_info) {
                     return Promise.reject("no portal given");
                 }
                 return this._operation.addLink(fromPortal, toPortal, description);
-
             }, init._dialogs = [], init;
         }();
         scope.LinkDialog = linkDialogFunc;
@@ -476,7 +475,7 @@ function wrapper(plugin_info) {
     //** This function takes an operation and updates the entry in the op list that matches it */
     window.plugin.phtivsaildraw.updateOperationInList = function (operation) {
         var updatedArray = new Array();
-
+    
         for (let opInList of PhtivSailDraw.opList) {
             if (opInList.ID != operation.ID)
                 updatedArray.push(opInList);
@@ -486,6 +485,7 @@ function wrapper(plugin_info) {
         if (updatedArray.length != 0) {
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
             PhtivSailDraw.opList = updatedArray;
+            PhtivSailDraw.LinkDialog.show(window.plugin.phtivsaildraw.getSelectedOperation())
             //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivSailDraw.opList))
             window.plugin.phtivsaildraw.drawThings();
         } else
