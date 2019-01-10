@@ -224,8 +224,6 @@ function wrapper(plugin_info) {
                 var server = instance.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                 var linkTo = this.getPortal(server);
                 var source = this.getPortal("src");
-                //alert("Source -> " + JSON.stringify(source) + "\nlinkTo -> " + JSON.stringify(linkTo));
-
                 if (!source || !linkTo) {
                     return void alert("Please select target and destination portals first!");
                 }
@@ -236,7 +234,6 @@ function wrapper(plugin_info) {
                 } else
                     Promise.all([item.addPortal(source), item.addPortal(linkTo), isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)]).then(function () {
                         operation.update()
-                        //TODO redraw things
                     })["catch"](function (data) {
                         throw alert(data.message), console.log(data), data;
                     });
@@ -341,69 +338,22 @@ function wrapper(plugin_info) {
                 }
             }, self.editPortal = function (instance, obj, key, value, options) {
                 //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
-            }, self.swapPortal = function (props, value, undefined) {
-                /*
-              if (!props.data.operation.isAgentOperator) {
-                return void alert("You cannot delete a portal if you are not an operation admin.");
-              }
-              if (null == value || null == undefined) {
-                return alert("Please select the portal you want to swap with."), Promise.reject("no portal selected");
-              }
-              if (value == undefined) {
-                return alert("The source and target portal of the swap are identical."), Promise.reject("portals are identical");
-              }
-              var item = props.data.getPortal(value);
-              var err = props.data.getPortal(undefined);
-              if (null == item && (result = [err, item, undefined, value], item = result[0], err = result[1], value = result[2], undefined = result[3]), null == item) {
-                return alert("None of these portals is part of the operation."), Promise.reject("both portals not in operation");
-              }
-              if (null != err) {
-                return confirm("Do you really want to swap these two portals?\n\n" + item.name + "\n" + err.name) ? props.portalService.swapPortals(value, undefined) : Promise.reject("user cancelled");
-              }
-              var h = scope.UiHelper.getPortal(undefined);
-              if (!h) {
-                return void alert("The target portal hasn't loaded completely yet.");
-              }
-              if (!confirm('This will add the portal "' + h.name + '" to the operation and move all links of portal "' + item.name + '" to the newly added portal.\n\nDo you want to continue?')) {
-                return Promise.reject("user cancelled");
-              }
-              var isClan = confirm('Do you want to *delete* the portal "' + item.name + '" after the portals have been swapped?');
-              return self.addPortal(props, item.layerName, h, item.description, true).then(function(a) {
-                return props.portalService.swapPortals(value, undefined);
-              }).then(function(friends) {
-                return isClan ? props.portalService.deletePortal(value, PLAYER.nickname) : friends;
-              });
-              var result;
-              */
+            }, self.swapPortal = function (operation, portal) {
+                var selectedPortal = PhtivSailDraw.UiHelper.getSelectedPortal();
+                if (selectedPortal != undefined) {
+                    if (confirm("Do you really want to swap these two portals?\n\n" + portal.name + "\n" + selectedPortal.name)) {
+                        Promise.all([operation.swapPortal(portal, selectedPortal)]).then(function () {
+                            operation.update()
+                        })["catch"](function (data) {
+                            throw alert(data.message), console.log(data), data;
+                        });
+                    }
+                } else
+                    alert("You must select a new portal!")
             }, self.deletePortal = function (operation, portal) {
                 if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + portal.name)) {
-                    operation.removePortal(portal)
+                    operation.removePortal(portal);
                 }
-            }, self.addLink = function (options, value, link, url, source) {
-                /*
-                var f = !options.data.operation.isAgentOperator;
-                if ("" == link || "" == url || null == link || null == link) {
-                  alert("Either the source or the target are not set.");
-                } else {
-                  if (link != url) {
-                    var element = options.data.getPortal(link);
-                    var html = options.data.getPortal(url);
-                    if (null != element && null != html) {
-                      options.linkService.addLink(link, url, value.activeLayer, f, PLAYER.nickname, source).then(function() {
-                        if (f) {
-                          alert("Link proposed. Thanks You.");
-                        }
-                      }, function(res) {
-                        alert(res.message);
-                      });
-                    } else {
-                      alert("Either the source or target portal is not a portal in the current operation (check if the portals belong to the same operation).");
-                    }
-                  } else {
-                    alert("The source and target portal of the link are identical.");
-                  }
-                }
-                */
             }, self;
         }();
         scope.UiCommands = uiCommands;
@@ -574,8 +524,6 @@ function wrapper(plugin_info) {
             var distance = window.plugin.phtivsaildraw.distance(link);
             var geojson_feature = gc.Arc(Math.round(distance)).json();
             var link_ = new L.geoJson(geojson_feature, options);
-        
-            //var link_ = L.polyline(latLngs, options);
             
             window.plugin.phtivsaildraw.linkLayers[link["ID"]] = link_;
             link_.addTo(window.plugin.phtivsaildraw.linkLayerGroup);
@@ -634,6 +582,12 @@ function wrapper(plugin_info) {
         title.innerHTML = window.markdown.toHTML(portal.name);
         buttonSet = content.appendChild(document.createElement("p"));
         buttonSet.className = "ui-dialog-buttonset";
+        var swapButton = buttonSet.appendChild(document.createElement("button"));
+        swapButton.textContent = "Swap";
+        swapButton.addEventListener("click", function () {
+            PhtivSailDraw.UiCommands.swapPortal(window.plugin.phtivsaildraw.getSelectedOperation(), portal)
+            marker.closePopup();
+        }, false);
         var deleteButton = buttonSet.appendChild(document.createElement("button"));
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", function () {
@@ -730,6 +684,22 @@ function wrapper(plugin_info) {
                 //console.log("ADDED LINK: " + JSON.stringify(this.links))
             } else
                 console.log("Link Already Exists In Operation -> " + JSON.stringify(link));
+        }
+
+        swapPortal(originalPortal, newPortal) {
+            this.portals = this.portals.filter(function (listPortal) {
+                return listPortal.id !== originalPortal.id;
+            });
+            this.addPortal(newPortal)
+            for (let link_ in this.links) {
+                //console.log("CHECKING link_ -> " + link_.className + " - " + JSON.stringify(this.links[link_]))
+                //THIS TESTS IF ITS THE SAME LINK
+                if (this.links[link_].fromPortal["id"] == originalPortal["id"]) {
+                    this.links[link_].fromPortal = newPortal;
+                } else if (this.links[link_].toPortal["id"] == originalPortal["id"]) {
+                    this.links[link_].toPortal = newPortal;
+                }
+            }
         }
 
         update() {
