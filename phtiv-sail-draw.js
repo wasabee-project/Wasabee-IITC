@@ -1,7 +1,10 @@
 // ==UserScript==
+// @id           phtivsaildraw
 // @name         IITC Plugin: PhtivSail Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
+// @updateURL    http://phtiv.com/phtivsaildrawtools/phtivsaildraw.meta.js
+// @downloadURL  http://phtiv.com/phtivsaildrawtools/phtivsaildraw.user.js
 // @description  Less terrible draw tools, hopefully.
 // @author       PhtivSail
 // @include      https://*.ingress.com/*
@@ -692,8 +695,6 @@ function wrapper(plugin_info) {
             });
             this.addPortal(newPortal)
             for (let link_ in this.links) {
-                //console.log("CHECKING link_ -> " + link_.className + " - " + JSON.stringify(this.links[link_]))
-                //THIS TESTS IF ITS THE SAME LINK
                 if (this.links[link_].fromPortal["id"] == originalPortal["id"]) {
                     this.links[link_].fromPortal = newPortal;
                 } else if (this.links[link_].toPortal["id"] == originalPortal["id"]) {
@@ -710,10 +711,8 @@ function wrapper(plugin_info) {
             var tempLinks = Array();
             for (let link_ in links) {
                 if (links[link_] instanceof Link) {
-                    //console.log("thing is link -> " + JSON.stringify(links[link_]))
                     tempLinks.push(links[link_]);
                 } else {
-                    //console.log("thing is NOT link -> " + JSON.stringify(links[link_]))
                     tempLinks.push(Link.create(links[link_]));
                 }
             }
