@@ -166,7 +166,7 @@ function wrapper(plugin_info) {
                 });
                 this._dialog.dialog("option", "buttons", {});
             }
-            return init.show = function (operation) {
+            return init.update = function (operation, show) {
                 var p = 0;
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
@@ -176,7 +176,10 @@ function wrapper(plugin_info) {
                         return page.focus(), page;
                     }
                 }
-                return new init(operation);
+                if (show)
+                    return new init(operation);
+                else
+                    return;
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
             }, init.prototype.onMessage = function (command) {
@@ -286,6 +289,63 @@ function wrapper(plugin_info) {
             }, init._dialogs = [], init;
         }();
         scope.LinkDialog = linkDialogFunc;
+    }(PhtivSailDraw || (PhtivSailDraw = {}));
+
+
+    !function (scope) {
+        var opsDialogFunction = function () {
+            //***Draws dialog box
+            function init() {
+                var self = this;
+                this._broadcast = new BroadcastChannel("phtivsaildraw-opsdialog");
+                this._showing = true;
+                init._dialogs.push(this);
+                var container = document.createElement("div");
+                var button;
+                var element = container.appendChild(document.createElement("div"));
+
+                button = element.appendChild(document.createElement("button"));
+                button.textContent = "close";
+                button.addEventListener("click", function (a) {
+                    return self._dialog.dialog("close");
+                }, false);
+                var sendMessage = function (name) {
+                    return self.onMessage(name);
+                };
+                this._broadcast.addEventListener("message", sendMessage, false);
+                this._dialog = window.dialog({
+                    title: "PSD Operations",
+                    width: "auto",
+                    height: "auto",
+                    html: container,
+                    dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-ops",
+                    closeCallback: function (popoverName) {
+                        self._broadcast.removeEventListener("message", sendMessage, false);
+                        var paneIndex = init._dialogs.indexOf(self);
+                        if (-1 !== paneIndex) {
+                            init._dialogs.splice(paneIndex, 1);
+                        }
+                        this._showing = false;
+                    }
+                });
+                this._dialog.dialog("option", "buttons", {});
+            }
+            return init.show = function () {
+                var p = 0;
+                var parameters = init._dialogs;
+                for (; p < parameters.length; p++) {
+                    var page = parameters[p];
+                    alert(JSON.stringify(parameters));
+                    if (page._showing == true) {
+                        this._dialog.dialog("open");
+                    }
+                }
+                return new init();
+            }, init.prototype.focus = function () {
+                this._dialog.dialog("open");
+            }, init._dialogs = [], init;
+        }();
+        scope.OpsDialog = opsDialogFunction;
     }(PhtivSailDraw || (PhtivSailDraw = {}));
 
     //This function helps with commonly used UI data getting functions
@@ -425,12 +485,12 @@ function wrapper(plugin_info) {
             onAdd: function (map) {
                 var container = L.DomUtil.create('div', 'leaflet-arcs leaflet-bar');
                 $(container).append('<a id="phtivsaildraw_viewopsbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Manage Operations"><img src=' + PhtivSailDraw.Images.toolbar_viewOps + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivsaildraw_viewopsbutton', function () {
-                    alert("Eventually a list of operations will go here!");
+                    PhtivSailDraw.OpsDialog.show();
                 });
                 $(container).append('<a id="phtivsaildraw_addlinksbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Add Links"><img src=' + PhtivSailDraw.Images.toolbar_addlinks + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivsaildraw_addlinksbutton', function () {
                     var selectedOp = window.plugin.phtivsaildraw.getSelectedOperation();
                     if (selectedOp != null)
-                        PhtivSailDraw.LinkDialog.show(selectedOp);
+                        PhtivSailDraw.LinkDialog.update(selectedOp, true);
                     else
                         alert("No selected Operation found.");
                 });
@@ -485,7 +545,7 @@ function wrapper(plugin_info) {
         if (updatedArray.length != 0) {
             store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
             PhtivSailDraw.opList = updatedArray;
-            PhtivSailDraw.LinkDialog.show(window.plugin.phtivsaildraw.getSelectedOperation())
+            PhtivSailDraw.LinkDialog.update(window.plugin.phtivsaildraw.getSelectedOperation(), false)
             //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivSailDraw.opList))
             window.plugin.phtivsaildraw.drawThings();
         } else
