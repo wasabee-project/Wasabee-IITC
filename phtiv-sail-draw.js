@@ -402,7 +402,6 @@ function wrapper(plugin_info) {
         /* jshint ignore:end */
 
         window.plugin.phtivsaildraw.arc = arc;
-        window.plugin.phtivsaildraw.initCrossLinks();
         window.plugin.phtivsaildraw.addButtons();
         PhtivSailDraw.opList = Array();
         window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
@@ -413,6 +412,7 @@ function wrapper(plugin_info) {
         window.plugin.phtivsaildraw.linkLayerGroup = new L.LayerGroup();
         window.addLayerGroup('PhtivSail Draw Portals', window.plugin.phtivsaildraw.portalLayerGroup, true);
         window.addLayerGroup('PhtivSail Draw Links', window.plugin.phtivsaildraw.linkLayerGroup, true);
+        window.plugin.phtivsaildraw.initCrossLinks();
         window.plugin.phtivsaildraw.drawThings();
     };
 
@@ -1043,7 +1043,6 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.phtivsaildraw.checkAllLinks = function () {
-        if (window.plugin.crossLinks.disabled) return;
         window.plugin.phtivsaildraw.crossLinkLayers.clearLayers();
         plugin.phtivsaildraw.crossLinkLayerGroup = {};
 
@@ -1055,7 +1054,6 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.phtivsaildraw.onLinkAdded = function (data) {
-        if (window.plugin.crossLinks.disabled) return;
         var drawnLinks = window.plugin.phtivsaildraw.getSelectedOperation().links;
         plugin.phtivsaildraw.testLink(drawnLinks, data.link);
     }
@@ -1082,22 +1080,16 @@ function wrapper(plugin_info) {
 
         map.on('layeradd', function (obj) {
             if (obj.layer === window.plugin.phtivsaildraw.crossLinkLayers) {
-                delete window.plugin.phtivsaildraw.disabled;
                 window.plugin.phtivsaildraw.checkAllLinks();
             }
         });
         map.on('layerremove', function (obj) {
             if (obj.layer === window.plugin.phtivsaildraw.crossLinkLayers) {
-                window.plugin.phtivsaildraw.disabled = true;
                 window.plugin.phtivsaildraw.crossLinkLayers.clearLayers();
                 window.plugin.phtivsaildraw.crossLinkLayerGroup = {};
             }
         });
 
-        // ensure 'disabled' flag is initialised
-        if (!map.hasLayer(window.plugin.phtivsaildraw.linkLayer)) {
-            window.plugin.phtivsaildraw.disabled = true;
-        }
         window.addHook('linkAdded', window.plugin.phtivsaildraw.onLinkAdded);
         window.addHook('mapDataRefreshEnd', window.plugin.phtivsaildraw.onMapDataRefreshEnd);
     }
