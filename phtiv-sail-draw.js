@@ -446,17 +446,17 @@ function wrapper(plugin_info) {
         Arc.prototype.json = function () { if (0 >= this.geometries.length) return { geometry: { type: "LineString", coordinates: null }, type: "Feature", properties: this.properties }; if (1 == this.geometries.length) return { geometry: { type: "LineString", coordinates: this.geometries[0].coords }, type: "Feature", properties: this.properties }; var c = []; for (i = 0; i < this.geometries.length; i++)c.push(this.geometries[i].coords); return { geometry: { type: "MultiLineString", coordinates: c }, type: "Feature", properties: this.properties }; };
         Arc.prototype.wkt = function () { var c = ""; for (i = 0; i < this.geometries.length; i++) { if (0 === this.geometries[i].coords.length) return "LINESTRING(empty)"; var e = "LINESTRING("; this.geometries[i].coords.forEach(function (a, c) { e += a[0] + " " + a[1] + ","; }); c += e.substring(0, e.length - 1) + ")"; } return c; };
         var GreatCircle = function (c, e, a) {
-        this.start = c; this.end = e; this.properties = a || {}; a = this.start.x - this.end.x; a = Math.pow(Math.sin((this.start.y - this.end.y) / 2), 2) + Math.cos(this.start.y) * Math.cos(this.end.y) * Math.pow(Math.sin(a / 2), 2); this.g = 2 * Math.asin(Math.sqrt(a)); if (this.g == Math.PI) throw Error("it appears " + c.view() + " and " + e.view() + " are 'antipodal', e.g diametrically opposite, thus there is no single route but rather infinite"); if (isNaN(this.g)) throw Error("could not calculate great circle between " +
-            c + " and " + e);
+            this.start = c; this.end = e; this.properties = a || {}; a = this.start.x - this.end.x; a = Math.pow(Math.sin((this.start.y - this.end.y) / 2), 2) + Math.cos(this.start.y) * Math.cos(this.end.y) * Math.pow(Math.sin(a / 2), 2); this.g = 2 * Math.asin(Math.sqrt(a)); if (this.g == Math.PI) throw Error("it appears " + c.view() + " and " + e.view() + " are 'antipodal', e.g diametrically opposite, thus there is no single route but rather infinite"); if (isNaN(this.g)) throw Error("could not calculate great circle between " +
+                c + " and " + e);
         };
         GreatCircle.prototype.interpolate = function (c) { var e = Math.sin((1 - c) * this.g) / Math.sin(this.g), a = Math.sin(c * this.g) / Math.sin(this.g); c = e * Math.cos(this.start.y) * Math.cos(this.start.x) + a * Math.cos(this.end.y) * Math.cos(this.end.x); var g = e * Math.cos(this.start.y) * Math.sin(this.start.x) + a * Math.cos(this.end.y) * Math.sin(this.end.x), e = e * Math.sin(this.start.y) + a * Math.sin(this.end.y), e = R2D * Math.atan2(e, Math.sqrt(Math.pow(c, 2) + Math.pow(g, 2))); return [R2D * Math.atan2(g, c), e]; };
         GreatCircle.prototype.Arc = function (c, e) {
             var a = []; if (2 >= c) a.push([this.start.lon, this.start.lat]), a.push([this.end.lon, this.end.lat]); else for (var g = 1 / (c - 1), b = 0; b < c; b++) { var k = this.interpolate(g * b); a.push(k) } for (var d = !1, h = 0, b = 1; b < a.length; b++) { var g = a[b - 1][0], k = a[b][0], m = Math.abs(k - g); 350 < m && (170 < k && -170 > g || 170 < g && -170 > k) ? d = !0 : m > h && (h = m) } g = []; if (d && 10 > h) for (d = [], g.push(d), b = 0; b < a.length; b++)if (k = parseFloat(a[b][0]), 0 < b && 350 < Math.abs(k - a[b - 1][0])) {
                 var f = parseFloat(a[b - 1][0]), h = parseFloat(a[b - 1][1]),
-                l = parseFloat(a[b][0]), m = parseFloat(a[b][1]); if (-180 < f && -170 > f && 180 == l && b + 1 < a.length && -180 < a[b - 1][0] && -170 > a[b - 1][0]) d.push([-180, a[b][1]]), b++ , d.push([a[b][0], a[b][1]]); else if (170 < f && 180 > f && -180 == l && b + 1 < a.length && 170 < a[b - 1][0] && 180 > a[b - 1][0]) d.push([180, a[b][1]]), b++ , d.push([a[b][0], a[b][1]]); else {
-                    if (-170 > f && 170 < l) var n = f, f = l, l = n, n = h, h = m, m = n; 170 < f && -170 > l && (l += 360); 180 >= f && 180 <= l && f < l ? (f = (180 - f) / (l - f), h = f * m + (1 - f) * h, d.push([170 < a[b - 1][0] ? 180 : -180, h]), d = [], d.push([170 < a[b - 1][0] ? -180 : 180, h])) : d = [];
-                    g.push(d); d.push([k, a[b][1]])
-                }
+                    l = parseFloat(a[b][0]), m = parseFloat(a[b][1]); if (-180 < f && -170 > f && 180 == l && b + 1 < a.length && -180 < a[b - 1][0] && -170 > a[b - 1][0]) d.push([-180, a[b][1]]), b++ , d.push([a[b][0], a[b][1]]); else if (170 < f && 180 > f && -180 == l && b + 1 < a.length && 170 < a[b - 1][0] && 180 > a[b - 1][0]) d.push([180, a[b][1]]), b++ , d.push([a[b][0], a[b][1]]); else {
+                        if (-170 > f && 170 < l) var n = f, f = l, l = n, n = h, h = m, m = n; 170 < f && -170 > l && (l += 360); 180 >= f && 180 <= l && f < l ? (f = (180 - f) / (l - f), h = f * m + (1 - f) * h, d.push([170 < a[b - 1][0] ? 180 : -180, h]), d = [], d.push([170 < a[b - 1][0] ? -180 : 180, h])) : d = [];
+                        g.push(d); d.push([k, a[b][1]])
+                    }
             } else d.push([a[b][0], a[b][1]]); else for (d = [], g.push(d), b = 0; b < a.length; b++)d.push([a[b][0], a[b][1]]); a = new Arc(this.properties); for (b = 0; b < g.length; b++)for (k = new LineString, a.geometries.push(k), d = g[b], h = 0; h < d.length; h++)k.move_to(d[h]); return a
         }; if ("undefined" === typeof window) module.exports.Coord = Coord, module.exports.Arc = Arc, module.exports.GreatCircle = GreatCircle; else { var arc = {}; arc.Coord = Coord; arc.Arc = Arc; arc.GreatCircle = GreatCircle };
         /* jshint ignore:end */
@@ -476,6 +476,7 @@ function wrapper(plugin_info) {
         window.plugin.phtivsaildraw.drawThings();
     };
 
+    //** This function adds the plugin buttons on the left side of the screen */
     window.plugin.phtivsaildraw.addButtons = function () {
 
         window.plugin.phtivsaildraw.buttons = L.Control.extend({
@@ -534,13 +535,18 @@ function wrapper(plugin_info) {
     }
 
     //** This function takes an operation and updates the entry in the op list that matches it */
-    window.plugin.phtivsaildraw.updateOperationInList = function (operation) {
+    window.plugin.phtivsaildraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false) {
         var updatedArray = new Array();
-    
+
         for (let opInList of PhtivSailDraw.opList) {
-            if (opInList.ID != operation.ID)
+            if (opInList.ID != operation.ID && clearAllBut != true) {
+                if (makeSelected)
+                    opInList.isSelected = false;
                 updatedArray.push(opInList);
+            }
         }
+        if (makeSelected)
+            operation.isSelected = true;
         updatedArray.push(operation);
 
         if (updatedArray.length != 0) {
@@ -671,7 +677,7 @@ function wrapper(plugin_info) {
     }
 
     //** This function is a temp placeholder to allow folks to import and export simply */
-    window.plugin.phtivsaildraw.getTempOpDialog = function(operation) {
+    window.plugin.phtivsaildraw.getTempOpDialog = function (operation) {
         var content = document.createElement("div");
         content.className = "phtivsaildraw-popup portal";
         buttonSet = content.appendChild(document.createElement("p"));
@@ -679,7 +685,7 @@ function wrapper(plugin_info) {
         var swapButton = buttonSet.appendChild(document.createElement("button"));
         swapButton.textContent = "Import";
         swapButton.addEventListener("click", function () {
-
+            window.plugin.phtivsaildraw.importString();
         }, false);
         var deleteButton = buttonSet.appendChild(document.createElement("button"));
         deleteButton.textContent = "Export";
@@ -692,32 +698,56 @@ function wrapper(plugin_info) {
             height: "auto",
             html: content,
             dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-ops",
-        
+
         });
     }
 
     //** This function opens a dialog with a text field to copy */
-    window.plugin.phtivsaildraw.exportString = function(title, string) {
+    window.plugin.phtivsaildraw.importString = function () {
+        var promptAction = prompt('Press CTRL+V to paste (PhtivSailDraw data only).', '');
+        if (promptAction !== null && promptAction !== '') {
+            try {
+                if (promptAction.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*"))) {
+                    alert('PhtivSailDraw doesn\'t support stock intel draw imports')
+                } else {
+                    var data = JSON.parse(promptAction);
+                    var importedOp = Operation.create(data);
+                    window.plugin.phtivsaildraw.updateOperationInList(importedOp, true, true)
+                    console.log('PhtivSailDrawtools: reset and imported drawn items');
+                    alert('Import Successful.');
+                }
+
+                // to write back the data to localStorage
+
+            } catch (e) {
+                console.warn('PhtivSailDrawtools: failed to import data: ' + e);
+                alert('Import Failed.');
+            }
+        } 
+    }
+
+    //** This function opens a dialog with a text field to copy */
+    window.plugin.phtivsaildraw.exportString = function (title, string) {
         var html = '<p><a onclick="$(\'.ui-dialog-phtivsaildraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-        +'<textarea readonly onclick="$(\'.ui-dialog-phtivsaildraw-copy textarea\').select();">'+ string +'</textarea>';
+            + '<textarea readonly onclick="$(\'.ui-dialog-phtivsaildraw-copy textarea\').select();">' + string + '</textarea>';
         window.dialog({
             title: title + " - Export",
             width: "auto",
             height: "auto",
             html: html,
             dialogClass: "ui-dialog-phtivsaildraw-copy",
-        
+
         });
     }
 
     //** This function copies whatever value is sent into the function to the clipboard */
     //** Also, this is very hacky, find some better way? (ALSO IT DOESN'T WORK!? */
-    window.plugin.phtivsaildraw.copyToClipboard = function (val){
+    window.plugin.phtivsaildraw.copyToClipboard = function (val) {
         var dummy = document.createElement("input");
         document.body.appendChild(dummy);
-        $(dummy).css('display','none');
+        $(dummy).css('display', 'none');
         dummy.setAttribute("id", "dummy_id");
-        document.getElementById("dummy_id").value=val;
+        document.getElementById("dummy_id").value = val;
         dummy.select();
         document.execCommand("copy");
         document.body.removeChild(dummy);
@@ -912,7 +942,6 @@ function wrapper(plugin_info) {
         d = Math.round(d * 1000) / 1000;
         return d;
     };
-
     //*** END ARC THINGS */
 
     //*** CROSSLINK THINGS */
