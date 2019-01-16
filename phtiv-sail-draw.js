@@ -2,7 +2,7 @@
 // @id           phtivsaildraw
 // @name         IITC Plugin: PhtivSail Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @updateURL    http://phtiv.com/phtivsaildrawtools/phtivsaildraw.meta.js
 // @downloadURL  http://phtiv.com/phtivsaildrawtools/phtivsaildraw.user.js
 // @description  Less terrible draw tools, hopefully.
