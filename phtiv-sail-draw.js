@@ -89,7 +89,7 @@ function wrapper(plugin_info) {
                 var button;
                 var filter;
                 var rdnTable = container.appendChild(document.createElement("table"));
-                [0, 1, 2, 3].forEach(function (string) {
+                [0, 1, 2].forEach(function (string) {
                     var type = 0 == string ? "src" : "dst-" + string;
                     tr = rdnTable.insertRow();
                     tr.setAttribute("data-portal", type);
@@ -692,6 +692,15 @@ function wrapper(plugin_info) {
         deleteButton.addEventListener("click", function () {
             window.plugin.phtivsaildraw.exportString(operation.name, JSON.stringify(operation));
         }, false);
+
+        var clearOpButton = buttonSet.appendChild(document.createElement("button"));
+        clearOpButton.textContent = "Clear Portals/Links/Markers";
+        clearOpButton.addEventListener("click", function () {
+            var confirmClear = confirm("Are you sure you want to clear all portals, links, and markers from this operation?");
+            if (confirmClear == true) {
+                operation.clearAllItems()
+            } 
+        }, false);
         window.dialog({
             title: operation.name + " - Details",
             width: "auto",
@@ -723,7 +732,7 @@ function wrapper(plugin_info) {
                 console.warn('PhtivSailDrawtools: failed to import data: ' + e);
                 alert('Import Failed.');
             }
-        } 
+        }
     }
 
     //** This function opens a dialog with a text field to copy */
@@ -785,6 +794,7 @@ function wrapper(plugin_info) {
             this.isSelected = isSelected;
             this.portals = Array();
             this.links = Array();
+            this.markers = Array();
         }
 
         containsPortal(portal) {
@@ -854,6 +864,13 @@ function wrapper(plugin_info) {
                     this.links[link_].toPortal = newPortal;
                 }
             }
+        }
+
+        clearAllItems() {
+            this.portals = Array();
+            this.links = Array();
+            this.markers = Array();
+            this.update();
         }
 
         update() {
