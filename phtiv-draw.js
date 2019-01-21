@@ -1,12 +1,12 @@
 // ==UserScript==
-// @id           phtivsaildraw
-// @name         IITC Plugin: PhtivSail Draw Tools
+// @id           phtivdraw
+// @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
 // @version      0.4
-// @updateURL    http://phtiv.com/phtivsaildrawtools/phtivsaildraw.meta.js
-// @downloadURL  http://phtiv.com/phtivsaildrawtools/phtivsaildraw.user.js
+// @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
+// @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
-// @author       PhtivSail
+// @author       Phtiv
 // @include      https://*.ingress.com/*
 // @include      http://*.ingress.com/*
 // @match        https://*.ingress.com/*
@@ -32,7 +32,7 @@ function wrapper(plugin_info) {
     !function (b) { function c() { return "Markdown.mk_block( " + uneval(this.toString()) + ", " + uneval(this.trailing) + ", " + uneval(this.lineNumber) + " )" } function d() { var a = require("util"); return "Markdown.mk_block( " + a.inspect(this.toString()) + ", " + a.inspect(this.trailing) + ", " + a.inspect(this.lineNumber) + " )" } function e(a) { for (var b = 0, c = -1; -1 !== (c = a.indexOf("\n", c + 1));)b++; return b } function f(a, b) { function c(a) { this.len_after = a, this.name = "close_" + b } var d = a + "_state", e = "strong" == a ? "em_state" : "strong_state"; return function (f, g) { if (this[d][0] == b) return this[d].shift(), [f.length, new c(f.length - b.length)]; var h = this[e].slice(), i = this[d].slice(); this[d].unshift(b); { var j = this.processInline(f.substr(b.length)), k = j[j.length - 1]; this[d].shift() } if (k instanceof c) { j.pop(); var l = f.length - k.len_after; return [l, [a].concat(j)] } return this[e] = h, this[d] = i, [b.length, b] } } function g(a) { for (var b = a.split(""), c = [""], d = !1; b.length;) { var e = b.shift(); switch (e) { case " ": d ? c[c.length - 1] += e : c.push(""); break; case "'": case '"': d = !d; break; case "\\": e = b.shift(); default: c[c.length - 1] += e } } return c } function h(a) { return q(a) && a.length > 1 && "object" == typeof a[1] && !q(a[1]) ? a[1] : void 0 } function i(a) { return a.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") } function j(a) { if ("string" == typeof a) return i(a); var b = a.shift(), c = {}, d = []; for (!a.length || "object" != typeof a[0] || a[0] instanceof Array || (c = a.shift()); a.length;)d.push(j(a.shift())); var e = ""; for (var f in c) e += " " + f + '="' + i(c[f]) + '"'; return "img" == b || "br" == b || "hr" == b ? "<" + b + e + "/>" : "<" + b + e + ">" + d.join("") + "</" + b + ">" } function k(a, b, c) { var d; c = c || {}; var e = a.slice(0); "function" == typeof c.preprocessTreeNode && (e = c.preprocessTreeNode(e, b)); var f = h(e); if (f) { e[1] = {}; for (d in f) e[1][d] = f[d]; f = e[1] } if ("string" == typeof e) return e; switch (e[0]) { case "header": e[0] = "h" + e[1].level, delete e[1].level; break; case "bulletlist": e[0] = "ul"; break; case "numberlist": e[0] = "ol"; break; case "listitem": e[0] = "li"; break; case "para": e[0] = "p"; break; case "markdown": e[0] = "html", f && delete f.references; break; case "code_block": e[0] = "pre", d = f ? 2 : 1; var g = ["code"]; g.push.apply(g, e.splice(d, e.length - d)), e[d] = g; break; case "inlinecode": e[0] = "code"; break; case "img": e[1].src = e[1].href, delete e[1].href; break; case "linebreak": e[0] = "br"; break; case "link": e[0] = "a"; break; case "link_ref": e[0] = "a"; var i = b[f.ref]; if (!i) return f.original; delete f.ref, f.href = i.href, i.title && (f.title = i.title), delete f.original; break; case "img_ref": e[0] = "img"; var i = b[f.ref]; if (!i) return f.original; delete f.ref, f.src = i.href, i.title && (f.title = i.title), delete f.original }if (d = 1, f) { for (var j in e[1]) { d = 2; break } 1 === d && e.splice(d, 1) } for (; d < e.length; ++d)e[d] = k(e[d], b, c); return e } function l(a) { for (var b = h(a) ? 2 : 1; b < a.length;)"string" == typeof a[b] ? b + 1 < a.length && "string" == typeof a[b + 1] ? a[b] += a.splice(b + 1, 1)[0] : ++b : (l(a[b]), ++b) } var m = b.Markdown = function (a) { switch (typeof a) { case "undefined": this.dialect = m.dialects.Gruber; break; case "object": this.dialect = a; break; default: if (!(a in m.dialects)) throw new Error("Unknown Markdown dialect '" + String(a) + "'"); this.dialect = m.dialects[a] }this.em_state = [], this.strong_state = [], this.debug_indent = "" }; b.parse = function (a, b) { var c = new m(b); return c.toTree(a) }, b.toHTML = function (a, c, d) { var e = b.toHTMLTree(a, c, d); return b.renderJsonML(e) }, b.toHTMLTree = function (a, b, c) { "string" == typeof a && (a = this.parse(a, b)); var d = h(a), e = {}; d && d.references && (e = d.references); var f = k(a, e, c); return l(f), f }; var n = m.mk_block = function (a, b, e) { 1 == arguments.length && (b = "\n\n"); var f = new String(a); return f.trailing = b, f.inspect = d, f.toSource = c, void 0 != e && (f.lineNumber = e), f }; m.prototype.split_blocks = function (a, b) { a = a.replace(/(\r\n|\n|\r)/g, "\n"); var c, d = /([\s\S]+?)($|\n#|\n(?:\s*\n|$)+)/g, f = [], g = 1; for (null != (c = /^(\s*\n)/.exec(a)) && (g += e(c[0]), d.lastIndex = c[0].length); null !== (c = d.exec(a));)"\n#" == c[2] && (c[2] = "\n", d.lastIndex--), f.push(n(c[1], c[2], g)), g += e(c[0]); return f }, m.prototype.processBlock = function (a, b) { var c = this.dialect.block, d = c.__order__; if ("__call__" in c) return c.__call__.call(this, a, b); for (var e = 0; e < d.length; e++) { var f = c[d[e]].call(this, a, b); if (f) return (!q(f) || f.length > 0 && !q(f[0])) && this.debug(d[e], "didn't return a proper array"), f } return [] }, m.prototype.processInline = function (a) { return this.dialect.inline.__call__.call(this, String(a)) }, m.prototype.toTree = function (a, b) { var c = a instanceof Array ? a : this.split_blocks(a), d = this.tree; try { for (this.tree = b || this.tree || ["markdown"]; c.length;) { var e = this.processBlock(c.shift(), c); e.length && this.tree.push.apply(this.tree, e) } return this.tree } finally { b && (this.tree = d) } }, m.prototype.debug = function () { var a = Array.prototype.slice.call(arguments); a.unshift(this.debug_indent), "undefined" != typeof print && print.apply(print, a), "undefined" != typeof console && "undefined" != typeof console.log && console.log.apply(null, a) }, m.prototype.loop_re_over_block = function (a, b, c) { for (var d, e = b.valueOf(); e.length && null != (d = a.exec(e));)e = e.substr(d[0].length), c.call(this, d); return e }, m.dialects = {}, m.dialects.Gruber = { block: { atxHeader: function (a, b) { var c = a.match(/^(#{1,6})\s*(.*?)\s*#*\s*(?:\n|$)/); if (!c) return void 0; var d = ["header", { level: c[1].length }]; return Array.prototype.push.apply(d, this.processInline(c[2])), c[0].length < a.length && b.unshift(n(a.substr(c[0].length), a.trailing, a.lineNumber + 2)), [d] }, setextHeader: function (a, b) { var c = a.match(/^(.*)\n([-=])\2\2+(?:\n|$)/); if (!c) return void 0; var d = "=" === c[2] ? 1 : 2, e = ["header", { level: d }, c[1]]; return c[0].length < a.length && b.unshift(n(a.substr(c[0].length), a.trailing, a.lineNumber + 2)), [e] }, code: function (a, b) { var c = [], d = /^(?: {0,3}\t| {4})(.*)\n?/; if (!a.match(d)) return void 0; a: for (; ;) { var e = this.loop_re_over_block(d, a.valueOf(), function (a) { c.push(a[1]) }); if (e.length) { b.unshift(n(e, a.trailing)); break a } if (!b.length) break a; if (!b[0].match(d)) break a; c.push(a.trailing.replace(/[^\n]/g, "").substring(2)), a = b.shift() } return [["code_block", c.join("\n")]] }, horizRule: function (a, b) { var c = a.match(/^(?:([\s\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\2){2,}[ \t]*(?:\n([\s\S]*))?$/); if (!c) return void 0; var d = [["hr"]]; return c[1] && d.unshift.apply(d, this.processBlock(c[1], [])), c[3] && b.unshift(n(c[3])), d }, lists: function () { function a(a) { return new RegExp("(?:^(" + i + "{0," + a + "} {0,3})(" + f + ")\\s+)|(^" + i + "{0," + (a - 1) + "}[ ]{0,4})") } function b(a) { return a.replace(/ {0,3}\t/g, "    ") } function c(a, b, c, d) { if (b) return void a.push(["para"].concat(c)); var e = a[a.length - 1] instanceof Array && "para" == a[a.length - 1][0] ? a[a.length - 1] : a; d && a.length > 1 && c.unshift(d); for (var f = 0; f < c.length; f++) { var g = c[f], h = "string" == typeof g; h && e.length > 1 && "string" == typeof e[e.length - 1] ? e[e.length - 1] += g : e.push(g) } } function d(a, b) { for (var c = new RegExp("^(" + i + "{" + a + "}.*?\\n?)*$"), d = new RegExp("^" + i + "{" + a + "}", "gm"), e = []; b.length > 0 && c.exec(b[0]);) { var f = b.shift(), g = f.replace(d, ""); e.push(n(g, f.trailing, f.lineNumber)) } return e } function e(a, b, c) { var d = a.list, e = d[d.length - 1]; if (!(e[1] instanceof Array && "para" == e[1][0])) if (b + 1 == c.length) e.push(["para"].concat(e.splice(1, e.length - 1))); else { var f = e.pop(); e.push(["para"].concat(e.splice(1, e.length - 1)), f) } } var f = "[*+-]|\\d+\\.", g = /[*+-]/, h = new RegExp("^( {0,3})(" + f + ")[ 	]+"), i = "(?: {0,3}\\t| {4})"; return function (f, i) { function j(a) { var b = g.exec(a[2]) ? ["bulletlist"] : ["numberlist"]; return n.push({ list: b, indent: a[1] }), b } var k = f.match(h); if (!k) return void 0; for (var l, m, n = [], p = j(k), q = !1, r = [n[0].list]; ;) { for (var s = f.split(/(?=\n)/), t = "", u = 0; u < s.length; u++) { var v = "", w = s[u].replace(/^\n/, function (a) { return v = a, "" }), x = a(n.length); if (k = w.match(x), void 0 !== k[1]) { t.length && (c(l, q, this.processInline(t), v), q = !1, t = ""), k[1] = b(k[1]); var y = Math.floor(k[1].length / 4) + 1; if (y > n.length) p = j(k), l.push(p), l = p[1] = ["listitem"]; else { var z = !1; for (m = 0; m < n.length; m++)if (n[m].indent == k[1]) { p = n[m].list, n.splice(m + 1, n.length - (m + 1)), z = !0; break } z || (y++ , y <= n.length ? (n.splice(y, n.length - y), p = n[y - 1].list) : (p = j(k), l.push(p))), l = ["listitem"], p.push(l) } v = "" } w.length > k[0].length && (t += v + w.substr(k[0].length)) } t.length && (c(l, q, this.processInline(t), v), q = !1, t = ""); var A = d(n.length, i); A.length > 0 && (o(n, e, this), l.push.apply(l, this.toTree(A, []))); var B = i[0] && i[0].valueOf() || ""; if (!B.match(h) && !B.match(/^ /)) break; f = i.shift(); var C = this.dialect.block.horizRule(f, i); if (C) { r.push.apply(r, C); break } o(n, e, this), q = !0 } return r } }(), blockquote: function (a, b) { if (!a.match(/^>/m)) return void 0; var c = []; if (">" != a[0]) { for (var d = a.split(/\n/), e = [], f = a.lineNumber; d.length && ">" != d[0][0];)e.push(d.shift()), f++; var g = n(e.join("\n"), "\n", a.lineNumber); c.push.apply(c, this.processBlock(g, [])), a = n(d.join("\n"), a.trailing, f) } for (; b.length && ">" == b[0][0];) { var i = b.shift(); a = n(a + a.trailing + i, i.trailing, a.lineNumber) } var j = a.replace(/^> ?/gm, ""), k = (this.tree, this.toTree(j, ["blockquote"])), l = h(k); return l && l.references && (delete l.references, r(l) && k.splice(1, 1)), c.push(k), c }, referenceDefn: function (a, b) { var c = /^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*?)\3|\((.*?)\)))?\n?/; if (!a.match(c)) return void 0; h(this.tree) || this.tree.splice(1, 0, {}); var d = h(this.tree); void 0 === d.references && (d.references = {}); var e = this.loop_re_over_block(c, a, function (a) { a[2] && "<" == a[2][0] && ">" == a[2][a[2].length - 1] && (a[2] = a[2].substring(1, a[2].length - 1)); var b = d.references[a[1].toLowerCase()] = { href: a[2] }; void 0 !== a[4] ? b.title = a[4] : void 0 !== a[5] && (b.title = a[5]) }); return e.length && b.unshift(n(e, a.trailing)), [] }, para: function (a, b) { return [["para"].concat(this.processInline(a))] } } }, m.dialects.Gruber.inline = { __oneElement__: function (a, b, c) { var d, e; b = b || this.dialect.inline.__patterns__; var f = new RegExp("([\\s\\S]*?)(" + (b.source || b) + ")"); if (d = f.exec(a), !d) return [a.length, a]; if (d[1]) return [d[1].length, d[1]]; var e; return d[2] in this.dialect.inline && (e = this.dialect.inline[d[2]].call(this, a.substr(d.index), d, c || [])), e = e || [d[2].length, d[2]] }, __call__: function (a, b) { function c(a) { "string" == typeof a && "string" == typeof e[e.length - 1] ? e[e.length - 1] += a : e.push(a) } for (var d, e = []; a.length > 0;)d = this.dialect.inline.__oneElement__.call(this, a, b, e), a = a.substr(d.shift()), o(d, c); return e }, "]": function () { }, "}": function () { }, __escape__: /^\\[\\`\*_{}\[\]()#\+.!\-]/, "\\": function (a) { return this.dialect.inline.__escape__.exec(a) ? [2, a.charAt(1)] : [1, "\\"] }, "![": function (a) { var b = a.match(/^!\[(.*?)\][ \t]*\([ \t]*([^")]*?)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/); if (b) { b[2] && "<" == b[2][0] && ">" == b[2][b[2].length - 1] && (b[2] = b[2].substring(1, b[2].length - 1)), b[2] = this.dialect.inline.__call__.call(this, b[2], /\\/)[0]; var c = { alt: b[1], href: b[2] || "" }; return void 0 !== b[4] && (c.title = b[4]), [b[0].length, ["img", c]] } return b = a.match(/^!\[(.*?)\][ \t]*\[(.*?)\]/), b ? [b[0].length, ["img_ref", { alt: b[1], ref: b[2].toLowerCase(), original: b[0] }]] : [2, "!["] }, "[": function s(a) { var b = String(a), c = m.DialectHelpers.inline_until_char.call(this, a.substr(1), "]"); if (!c) return [1, "["]; var s, d, e = 1 + c[0], f = c[1]; a = a.substr(e); var g = a.match(/^\s*\([ \t]*([^"']*)(?:[ \t]+(["'])(.*?)\2)?[ \t]*\)/); if (g) { var h = g[1]; if (e += g[0].length, h && "<" == h[0] && ">" == h[h.length - 1] && (h = h.substring(1, h.length - 1)), !g[3]) for (var i = 1, j = 0; j < h.length; j++)switch (h[j]) { case "(": i++; break; case ")": 0 == --i && (e -= h.length - j, h = h.substring(0, j)) }return h = this.dialect.inline.__call__.call(this, h, /\\/)[0], d = { href: h || "" }, void 0 !== g[3] && (d.title = g[3]), s = ["link", d].concat(f), [e, s] } return g = a.match(/^\s*\[(.*?)\]/), g ? (e += g[0].length, d = { ref: (g[1] || String(f)).toLowerCase(), original: b.substr(0, e) }, s = ["link_ref", d].concat(f), [e, s]) : 1 == f.length && "string" == typeof f[0] ? (d = { ref: f[0].toLowerCase(), original: b.substr(0, e) }, s = ["link_ref", d, f[0]], [e, s]) : [1, "["] }, "<": function (a) { var b; return null != (b = a.match(/^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\.[a-zA-Z]+))>/)) ? b[3] ? [b[0].length, ["link", { href: "mailto:" + b[3] }, b[3]]] : "mailto" == b[2] ? [b[0].length, ["link", { href: b[1] }, b[1].substr("mailto:".length)]] : [b[0].length, ["link", { href: b[1] }, b[1]]] : [1, "<"] }, "`": function (a) { var b = a.match(/(`+)(([\s\S]*?)\1)/); return b && b[2] ? [b[1].length + b[2].length, ["inlinecode", b[3]]] : [1, "`"] }, "  \n": function (a) { return [3, ["linebreak"]] } }, m.dialects.Gruber.inline["**"] = f("strong", "**"), m.dialects.Gruber.inline.__ = f("strong", "__"), m.dialects.Gruber.inline["*"] = f("em", "*"), m.dialects.Gruber.inline._ = f("em", "_"), m.buildBlockOrder = function (a) { var b = []; for (var c in a) "__order__" != c && "__call__" != c && b.push(c); a.__order__ = b }, m.buildInlinePatterns = function (a) { var b = []; for (var c in a) if (!c.match(/^__.*__$/)) { var d = c.replace(/([\\.*+?|()\[\]{}])/g, "\\$1").replace(/\n/, "\\n"); b.push(1 == c.length ? d : "(?:" + d + ")") } b = b.join("|"), a.__patterns__ = b; var e = a.__call__; a.__call__ = function (a, c) { return void 0 != c ? e.call(this, a, c) : e.call(this, a, b) } }, m.DialectHelpers = {}, m.DialectHelpers.inline_until_char = function (a, b) { for (var c = 0, d = []; ;) { if (a.charAt(c) == b) return c++ , [c, d]; if (c >= a.length) return null; var e = this.dialect.inline.__oneElement__.call(this, a.substr(c)); c += e[0], d.push.apply(d, e.slice(1)) } }, m.subclassDialect = function (a) { function b() { } function c() { } return b.prototype = a.block, c.prototype = a.inline, { block: new b, inline: new c } }, m.buildBlockOrder(m.dialects.Gruber.block), m.buildInlinePatterns(m.dialects.Gruber.inline), m.dialects.Maruku = m.subclassDialect(m.dialects.Gruber), m.dialects.Maruku.processMetaHash = function (a) { for (var b = g(a), c = {}, d = 0; d < b.length; ++d)if (/^#/.test(b[d])) c.id = b[d].substring(1); else if (/^\./.test(b[d])) c["class"] ? c["class"] = c["class"] + b[d].replace(/./, " ") : c["class"] = b[d].substring(1); else if (/\=/.test(b[d])) { var e = b[d].split(/\=/); c[e[0]] = e[1] } return c }, m.dialects.Maruku.block.document_meta = function (a, b) { if (a.lineNumber > 1) return void 0; if (!a.match(/^(?:\w+:.*\n)*\w+:.*$/)) return void 0; h(this.tree) || this.tree.splice(1, 0, {}); var c = a.split(/\n/); for (p in c) { var d = c[p].match(/(\w+):\s*(.*)$/), e = d[1].toLowerCase(), f = d[2]; this.tree[1][e] = f } return [] }, m.dialects.Maruku.block.block_meta = function (b, c) { var d = b.match(/(^|\n) {0,3}\{:\s*((?:\\\}|[^\}])*)\s*\}$/); if (!d) return void 0; var e, f = this.dialect.processMetaHash(d[2]); if ("" === d[1]) { var g = this.tree[this.tree.length - 1]; if (e = h(g), "string" == typeof g) return void 0; e || (e = {}, g.splice(1, 0, e)); for (a in f) e[a] = f[a]; return [] } var i = b.replace(/\n.*$/, ""), j = this.processBlock(i, []); e = h(j[0]), e || (e = {}, j[0].splice(1, 0, e)); for (a in f) e[a] = f[a]; return j }, m.dialects.Maruku.block.definition_list = function (a, b) { var c, d, e = /^((?:[^\s:].*\n)+):\s+([\s\S]+)$/, f = ["dl"]; if (!(d = a.match(e))) return void 0; for (var g = [a]; b.length && e.exec(b[0]);)g.push(b.shift()); for (var h = 0; h < g.length; ++h) { var d = g[h].match(e), i = d[1].replace(/\n$/, "").split(/\n/), j = d[2].split(/\n:\s+/); for (c = 0; c < i.length; ++c)f.push(["dt", i[c]]); for (c = 0; c < j.length; ++c)f.push(["dd"].concat(this.processInline(j[c].replace(/(\n)\s+/, "$1")))) } return [f] }, m.dialects.Maruku.block.table = function t(a, b) { var c, d, e = function (a, b) { b = b || "\\s", b.match(/^[\\|\[\]{}?*.+^$]$/) && (b = "\\" + b); for (var c, d = [], e = new RegExp("^((?:\\\\.|[^\\\\" + b + "])*)" + b + "(.*)"); c = a.match(e);)d.push(c[1]), a = c[2]; return d.push(a), d }, f = /^ {0,3}\|(.+)\n {0,3}\|\s*([\-:]+[\-| :]*)\n((?:\s*\|.*(?:\n|$))*)(?=\n|$)/, g = /^ {0,3}(\S(?:\\.|[^\\|])*\|.*)\n {0,3}([\-:]+\s*\|[\-| :]*)\n((?:(?:\\.|[^\\|])*\|.*(?:\n|$))*)(?=\n|$)/; if (d = a.match(f)) d[3] = d[3].replace(/^\s*\|/gm, ""); else if (!(d = a.match(g))) return void 0; var t = ["table", ["thead", ["tr"]], ["tbody"]]; d[2] = d[2].replace(/\|\s*$/, "").split("|"); var h = []; for (o(d[2], function (a) { h.push(a.match(/^\s*-+:\s*$/) ? { align: "right" } : a.match(/^\s*:-+\s*$/) ? { align: "left" } : a.match(/^\s*:-+:\s*$/) ? { align: "center" } : {}) }), d[1] = e(d[1].replace(/\|\s*$/, ""), "|"), c = 0; c < d[1].length; c++)t[1][1].push(["th", h[c] || {}].concat(this.processInline(d[1][c].trim()))); return o(d[3].replace(/\|\s*$/gm, "").split("\n"), function (a) { var b = ["tr"]; for (a = e(a, "|"), c = 0; c < a.length; c++)b.push(["td", h[c] || {}].concat(this.processInline(a[c].trim()))); t[2].push(b) }, this), [t] }, m.dialects.Maruku.inline["{:"] = function (a, b, c) { if (!c.length) return [2, "{:"]; var d = c[c.length - 1]; if ("string" == typeof d) return [2, "{:"]; var e = a.match(/^\{:\s*((?:\\\}|[^\}])*)\s*\}/); if (!e) return [2, "{:"]; var f = this.dialect.processMetaHash(e[1]), g = h(d); g || (g = {}, d.splice(1, 0, g)); for (var i in f) g[i] = f[i]; return [e[0].length, ""] }, m.dialects.Maruku.inline.__escape__ = /^\\[\\`\*_{}\[\]()#\+.!\-|:]/, m.buildBlockOrder(m.dialects.Maruku.block), m.buildInlinePatterns(m.dialects.Maruku.inline); var o, q = Array.isArray || function (a) { return "[object Array]" == Object.prototype.toString.call(a) }; o = Array.prototype.forEach ? function (a, b, c) { return a.forEach(b, c) } : function (a, b, c) { for (var d = 0; d < a.length; d++)b.call(c || a, a[d], d, a) }; var r = function (a) { for (var b in a) if (hasOwnProperty.call(a, b)) return !1; return !0 }; b.renderJsonML = function (a, b) { b = b || {}, b.root = b.root || !1; var c = []; if (b.root) c.push(j(a)); else for (a.shift(), !a.length || "object" != typeof a[0] || a[0] instanceof Array || a.shift(); a.length;)c.push(j(a.shift())); return c.join("\n\n") } }(function () { return "undefined" == typeof exports ? (window.markdown = {}, window.markdown) : exports }());
 
     //adds Base64 Strings for images used in the script
-    var PhtivSailDraw;
+    var PhtivDraw;
     !function (scope) {
         var b;
         !function (a) {
@@ -46,22 +46,22 @@ function wrapper(plugin_info) {
             a.marker_layer_groupf = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAArlSURBVHjaDMwxCsJAEEDRP+OaRixdsNouhBxEsBTSpPWqOUFqGy9gsYSAJO6MW/3m82RMT9bfyhAf3M53NvuCC46hF0VapUyl1yMdkByPtR8J+pYTL8s2i9R/h3BVbIGSDTlUpnG0Wn8BxMIABowM6ACkkeHbfxPGB/+CGVj+ezCyMKr+Z2XgYGJhYmb4A3TB7/8//n7+/xDomu1AlWuBWo4x4AAAAcSCQ1wBaEwV40/GeIZfDGysakBlXECXMf+HWM7wn+n/P0Yu1q+Mmv8+/NNkePc//++v/0v+MfxvATrvDrphAAGEacl/Rrt//xkWsIgwKTJJMzEwsAOFfv9j+PedkYHxD5D/H6QEaBGIyQEMDhlmhv/iDMysT//F/379z5np3/8UBmaGnchGAgQQ09//fxlA8B8oiP4yBgK1b2FTYFRkUgYaCgxnxtdA178HhvdvYLh7MTDwNHMyMASAghNoz4f/YPn/v4C0IiMDqyyzDNAF64EOiUK2BCCAWHiZeRiYGJkYWP+zmDH+/zefWZmJ9z8/0IBXIB/8B7v4rxkjA18oFwMrJxMDGy8LA6sNM1DsP8OntV8YGI4ClXwEqv0GNE2QgYGZhZnzz60/s4C8R8BIP8L4n4kBIIAYr5s8BFnGx87IfIJDnl3zvwTQiW+BhgO99h/oG84odgZuOQ6G1zs+MTAd+88gUMXD8KHnK8N/XQYGYR9ehu8vfjJ8XfGTgekGxEGMQsAU9vovw58H/24DzTX99f/XR4AAYuIGxijXP85cNj52TQZxYJJ9BwxnXiCdwsIgXiPA8OfTP4Z31R8ZmFYDk+V3BgZWbmA0An3IuOkfw4eazww/X/1hkCgXYGDMYGZgFGBi+P8OlPSZGdj4mFV//vmZ3/amnQEggBgfmLwUBdp4hU2TWewfUD+jASODQCQPw8/3vxm+LP/OwHQFlNaZIWmCDxjueSwMv2f+Zvj/5h8kqYPylDoDA2cMGwOnGDvDu1XAjHIa6Km/jAzfrv54c/THUV2AAGJ8YPwihpmHaTGzBiPDP2Aw8U3gZfhy6TvD/4V/GRj+AF3MAklJTNCs9I+ZEWjAfwj7P8SSP8DUxwRSF8HMwGvKyfCpAGiRMFDTTaD4J5Z4gABiYfjzzx3kzX+/gIp+ASP5OzClXQQaLsvAIFDGxwBMfAz/gIb++wXUwAZJwqC8C0rWwFwPNpyRlZHhQ+8XBsZz/xn+6AA1QM1iBCagX+9/uAEEEAvQ06qMbECFP4FJ8T/EuYycQEvuMjB8f/mbQViHh+Ef0EfP1r9nYDkLNPw/JEP+0f3PIBEiyMDCzsTw/s5XoKuBtpsCzYH6jvEH0Dw2UPH0Xw0ggIBOYZBgYGEAlz1MIFcCMTMofP4wMvye/4vhN9Bnb05/ZhC05WZg9GYCZS2G/66MDEKuvAxvz35m+PPjL8OPub8Y/gMdAs6kDBBz/v+BZPX/TIziAAEE0sUKkmIEeunPv3+gspHh7/9/YBf/u/WP4c3Rz2DFH6q/MjCxAl3ULsDAIsjC8Kn2C9jgd2eA9BVgEP1lABeqIP0gc0DmQaORBSCAmIDh/RRY7jD8A/oTJMHwD5pNgbEKitj/c38zCGhyMfwHlr+/238x/Pz0h+FP9y+GfwLAuDXlZfgz5y9E3X+EfhAN5AHjERyfzwACCJhQ/txjBAYpsHQFKwaFFCjigJ5hYNEBigEz16uVHxkEUrgZ/gszMvz98Q+clLkzOBherv8AClsGJmCyB7scFOGM0FTHCjTnKzAh/Pv7ECCAmJhYmY/8+vIHHJngZAqMGwZRYN7IYWEQbQQ6F1iLMK75B458plAmBpBaJj+g2cCUxrgM6F5VoPJqAQamYlaG/xJAvX+gyR3oWJBaZg6mwwABxPT376+9v78AU/ofkNMZwS6QShRmYBZjZnhV+IGBcQsoGBgZvs75ziDhLsDAI83BIOEtxPBp0VdwPvq3/x/D2wJgicDFyCCVJsTAxMkIMQdYKvz6+uv3n19/9gAEIKkMVgCEYRjanvz/HxpelN28id8gDGQeZHbdfMN7m5SEpDRzP6yW2dFaJ8DWIo0M2MVnSsNNgEZWossZMyUJ+ZalBzRx/TsuNXFmhy/38nC9yst+LRZU2/4JIKCfGYHZ49/8b+9+MjCC/LnkL8PzgvcMbGIsDEIz+BkYI4FKOBjAmfLvPGBy/fib4c+832ADgTUmA0MosBiaycfArsjG8Dz/HQPDIqBlwKD68QHoWKb/s38BkyBAADFe0L0Oyho8rP+ZL/LLCygBS32Gfx//g+sLRidgMZHIBfIMw+d53xj+H/rLwCIHTAyPgLnfkomBK4mLgRlY/H9a+JXh346/4MKACVRIAoPx/aMPN/4x/TMECv0ACCAWRiYmUIL48ufvvyU/3v+o45IEGsr0B1Lw7fvL8Pk4sM4IZ2YQKeBj+OzzneH3mj8MLGmsDAI6XAxvtnxmYFoGTBRfIOkeWCkzsADz0ufXoMoFWLsysPwAMQACiPGK/l1otftfHqj8nKCsgBAjKA6+/UeplZmlgJGZysogaMzN8OES0OWzwXUGOMX/Z/wPzl4svIxgX394/P4FMMhAvngB0gsQQCzMoACEgIf//v2b9ePdzwpuCU6gJX/BEQvKpCAVf58Ag7DuN8Mbhg+IuhskDpIHpj4mUCMDWI59e/oNVAZOZfrP9AKmDiCAmH4zAssnKGZg/j/px5dvr/58/wdOiv//gQyAlgL/ILkaHYPkweqA6v99/cvw89v3J0xMTDOQQwEggJj+gxXB8fO///9PBcYNsJXCCC7p/oOLDPwYnMqA6r8B9QHjciJQ5A2yJQABxISlUTcN6Jqn/4HFBzMwT4BKZ1BqYUDCKHygPEjdP2Bp/ev7r/v/mP/PAcYtCgQIICZmYHsSDb8Buebbux/g/AENeHDTFdx8RaL/A8VBNTOwCcvw7QM4IfUD2zIfWBiB6QoJAwQQMM6ApSg6Zv4/+/ePn/f/AF3Hyg1qgiDiADmcQKmKmRuYu7+BfXHrD7AG+vnvJwM6BgggJpgL0fAHYKrp/Q503X92YKphghTfKMEKKnWBvmBkA/ri0w+gZ//2AIW/QOpnVAwQQEysQFXYMBsz24JfP3/d/PMNGDdcwFz+D1yrwTGIzwLM7b+/Ad3/6+dVYBW7hAlcp2JigABi+QX0Dg4ArA3+d3//8m0OrxAvuNHw//dfSPsUXF8wgevUr2+/M7AxsnSxM7B/B+UpbL0EgABiYWRkxGUJKKUt/f3rTx7QR3qsXKwMPz/+gdgBSrFA3wHFgSX23/O/Gf8C25C/IKGDBQAEEKhmZMCDfwATQuePLz8g7Sqgy//+AfqGlQHMB4kDM3AHMPP9ApeBODBAALEwMTEzEACr//75Uwh0tQkrBzPDj19/GED0T6Av/vz9e5KPi38dnsAAA4AAYuHn5MOrABhkv7//+tH29eu3dXz8fAxs7KzAVMXI8P3Td4bP/7+0f/r2+Q+ib4MWHVA+QACx/Pj+k4EIsOnvv39Hfv/4ZcPBywHMF78Zvv79emjWl9lbvv/9Ak5B/8HtE3BjDtWRQAgQQCzApj0xlvwFZsi2H79+bmNhZWX4/vMH0FjWdisOC2Br6jcDEwP+8AIIIMaLujcZiASMwEy5C1hsuABzxm5gYerOxsj2n5AFIAAQQCyMTMTaAQ6HTqAF9kC6ixGUbRiICgUGgAAi3goIOATEWVCaaAAQYAA2AOFP3j2UaAAAAABJRU5ErkJggg==";
 
         }(b = scope.Images || (scope.Images = {}));
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
     !function (scope) {
         var b;
         !function (es) {
             es.main = "data:text/css;base64,LnBodGl2c2FpbGRyYXctdGFibGUgewoJYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsKCWVtcHR5LWNlbGxzOiBzaG93OwoJd2lkdGg6IDEwMCU7CgljbGVhcjogYm90aDsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0ZCwgLnBodGl2c2FpbGRyYXctdGFibGUgdGggewoJYm9yZGVyLXdpZHRoOiAwIDFweDsKCWJvcmRlci1zdHlsZTogc29saWQ7Cglib3JkZXItY29sb3I6IHJnYmEoOCwgNDgsIDc4LCAwLjc1KTsKCXBhZGRpbmc6IDNweCA0cHg7Cgl0ZXh0LWFsaWduOiBsZWZ0Owp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRkOmZpcnN0LWNoaWxkLCAucGh0aXZzYWlsZHJhdy10YWJsZSB0aDpmaXJzdC1jaGlsZCB7IGJvcmRlci1sZWZ0LXdpZHRoOiAwOyB9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRkOmxhc3QtY2hpbGQsICAucGh0aXZzYWlsZHJhdy10YWJsZSB0aDpsYXN0LWNoaWxkIHsgYm9yZGVyLXJpZ2h0LXdpZHRoOiAwOyB9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZCgybisxKSB0ZCB7Cglib3JkZXItY29sb3I6IHJnYmEoMjUsIDYzLCA5NSwgMC43NSk7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgdHIgewoJYmFja2dyb3VuZDogcmdiYSgyNSwgNjMsIDk1LCAwLjc1KTsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQoMm4rMSkgewoJYmFja2dyb3VuZDogcmdiYSg4LCA0OCwgNzgsIDAuNzUpOwp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlID4gdGhlYWQgLnNvcnRhYmxlIHsKCWN1cnNvcjogcG9pbnRlcjsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSA+IHRoZWFkIC5zb3J0ZWQgewoJY29sb3I6ICNmZmNlMDA7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgPiB0aGVhZCAuc29ydGFibGU6YmVmb3JlIHsKCWNvbnRlbnQ6ICIgIjsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWZsb2F0OiByaWdodDsKCW1pbi13aWR0aDogMWVtOwoJdGV4dC1hbGlnbjogcmlnaHQ7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgPiB0aGVhZCAuc29ydGFibGUuYXNjOmJlZm9yZSB7Cgljb250ZW50OiAiXDI1YjIiOwp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlID4gdGhlYWQgLnNvcnRhYmxlLmRlc2M6YmVmb3JlIHsKCWNvbnRlbnQ6ICJcMjViYyI7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgdGQubWVudSB7Cglwb3NpdGlvbjogcmVsYXRpdmU7CgltaW4taGVpZ2h0OiAyMHB4OwoJbWluLXdpZHRoOiAyNHB4Owp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRkLm1lbnUgPiAucGh0aXZzYWlsZHJhdy1vdmVyZmxvdy1idXR0b24gewoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogMDsKCXJpZ2h0OiAwOwoJYm90dG9tOiAwOwoJZGlzcGxheTogZmxleDsKfQoKLnBodGl2c2FpbGRyYXctZGlhbG9nLXBvcnRhbGxpc3QgLmtleXMsCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxsaXN0IC5saW5rcyB7Cgl3aWR0aDogMy41ZW07IC8qIHdpbGwgZXhwYW5kIHRvIGZpdCBjb250ZW50ICovCgl0ZXh0LWFsaWduOiByaWdodDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFsbGlzdCAud2FybiB7Cgljb2xvcjogI2ZmMDsKCWZsb2F0OiBsZWZ0OwoJZm9udC1zaXplOiAxLjVlbTsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxsaXN0IC53YXJuLmVycm9yIHsKCWNvbG9yOiAjZjAwOwp9CgovKiBzdHlsZS5jc3Mgc2V0cyBkaWFsb2cgbWF4LXdpZHRoIHRvIDcwMHB4IC0gb3ZlcnJpZGUgdGhhdCBoZXJlICovCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rbGlzdCB7CgltYXgtd2lkdGg6IDEwMDBweCAhaW1wb3J0YW50Owp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxsaXN0ID4gLnVpLWRpYWxvZy1jb250ZW50LAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua2xpc3QgPiAudWktZGlhbG9nLWNvbnRlbnQsCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1hbGVydGxpc3QgPiAudWktZGlhbG9nLWNvbnRlbnQgewoJcGFkZGluZzogMDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua2xpc3QgLnBodGl2c2FpbGRyYXctbGF5ZXIgewoJbWFyZ2luOiAtNHB4IDAgLTRweCAtNHB4Owp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rbGlzdCB0ZC5rZXlzLAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua2xpc3QgdGQubGVuZ3RoIHsKCXRleHQtYWxpZ246IHJpZ2h0Owp9CgoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRsaXN0IHRkIHsKCXZlcnRpY2FsLWFsaWduOiBiYXNlbGluZTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRsaXN0IC5hc3NpZ25lZSB7Cgl3aGl0ZS1zcGFjZTogbm93cmFwOwoJb3ZlcmZsb3c6IGhpZGRlbjsKCXRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzOwoJbWF4LXdpZHRoOiAxMGVtOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1hbGVydGxpc3QgLnJlc29sdmVkIGJ1dHRvbiB7CgltYXJnaW46IC0zcHggMDsKCXBhZGRpbmc6IDAgMC41ZW0gMXB4Owp9CgojcGh0aXZzYWlsZHJhdy1mYWtlLWJ1dHRvbiB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cgl0b3A6IC05OTk5ZW07CglsZWZ0OiAtOTk5OWVtOwp9CgoucGh0aXZzYWlsZHJhdy1hbGVydHMtbnVtIHsKCWNvbG9yOiAjMDBGRjAwOwp9Ci5waHRpdnNhaWxkcmF3LWFsZXJ0cy1udW0ubmV3IHsKCWNvbG9yOiAjZmYwMDAwOwoJZm9udC13ZWlnaHQ6IGJvbGQ7Cn0KCi5waHRpdnNhaWxkcmF3LWFnZW50c2VsZWN0IC5waHRpdnNhaWxkcmF3LWdyb3VwLWluZGljYXRvciB7CglmbG9hdDogcmlnaHQ7CgltYXJnaW4tbGVmdDogMC4yNWVtOwp9CgoucGh0aXZzYWlsZHJhdy1ncm91cC1jb250YWluZXIgewoJYm9yZGVyOiAxcHggc29saWQgY3VycmVudENvbG9yOwoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJaGVpZ2h0OiAxLjJlbTsKCWxpbmUtaGVpZ2h0OiAxLjJlbTsKCW1hcmdpbjogMXB4IDAuMjVlbSAxcHggMDsKCXBhZGRpbmc6IDAgMC4yNWVtOwp9Ci5waHRpdnNhaWxkcmF3LWdyb3VwLWNvbnRhaW5lciA+IC5waHRpdnNhaWxkcmF3LWdyb3VwLWluZGljYXRvciB7CgltYXJnaW4tbGVmdDogLTAuMjVlbTsKCW1hcmdpbi1yaWdodDogMC4yNWVtOwoJaGVpZ2h0OiAxLjJlbTsKCXdpZHRoOiAxLjJlbTsKfQoKLnBodGl2c2FpbGRyYXctZ3JvdXAtaW5kaWNhdG9yIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCXBvc2l0aW9uOiByZWxhdGl2ZTsKCXdpZHRoOiAxZW07CgloZWlnaHQ6IDFlbTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLnBodGl2c2FpbGRyYXctZ3JvdXAtaW5kaWNhdG9yID4gZGl2IHsKCWhlaWdodDogMWVtOwoJZmxvYXQ6IGxlZnQ7Cn0KCi5waHRpdnNhaWxkcmF3LXBvcHVwIHsKCW1heC13aWR0aDogMzAwcHg7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nIC5kZXNjIHAsCi5waHRpdnNhaWxkcmF3LWRpYWxvZyAuZGVzYyB1bCwKLnBodGl2c2FpbGRyYXctcG9wdXAgcCwKLnBodGl2c2FpbGRyYXctcG9wdXAgdWwgewoJbWFyZ2luOiAwOwp9Ci5waHRpdnNhaWxkcmF3LXBvcHVwIGEgewoJY29sb3I6ICMwMDk5Q0M7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nIC5kZXNjIHVsLAoucGh0aXZzYWlsZHJhdy1wb2x5Z29uLWxhYmVsIHVsLAoucGh0aXZzYWlsZHJhdy1wb3B1cCAuZGVzYyB1bCB7CglwYWRkaW5nLWxlZnQ6IDEuNWVtOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZyAuZGVzYyBlbSwKLnBodGl2c2FpbGRyYXctcG9seWdvbi1sYWJlbCBlbSwKLnBodGl2c2FpbGRyYXctcG9wdXAgLmRlc2MgZW0gewoJY29sb3I6IGluaGVyaXQ7Cglmb250LXN0eWxlOiBpdGFsaWM7Cn0KLnBodGl2c2FpbGRyYXctcG9wdXAucG9ydGFsIC51aS1kaWFsb2ctYnV0dG9uc2V0IHsKCWRpc3BsYXk6IGJveDsKCWRpc3BsYXk6IGZsZXg7CgltYXJnaW4tdG9wOiA2cHg7Cn0KLnBodGl2c2FpbGRyYXctcG9wdXAucG9ydGFsIC51aS1kaWFsb2ctYnV0dG9uc2V0IGJ1dHRvbiB7CglmbGV4LWdyb3c6IDE7Cglib3gtZ3JvdzogMTsKfQoucGh0aXZzYWlsZHJhdy1wb3B1cCBpbWcuYXZhdGFyIHsKCW1heC13aWR0aDogOTZweDsKCW1heC1oZWlnaHQ6IDk2cHg7CgltYXJnaW4tbGVmdDogNHB4OwoJZmxvYXQ6IHJpZ2h0Owp9CgoucGh0aXZzYWlsZHJhdy1rZXlzLW92ZXJsYXksIC5waHRpdnNhaWxkcmF3LWFnZW50LWxhYmVsLCAucGh0aXZzYWlsZHJhdy1wb2x5Z29uLWxhYmVsIHsKCWNvbG9yOiAjRkZGRkJCOwoJZm9udC1zaXplOiAxMnB4OwoJbGluZS1oZWlnaHQ6IDE2cHg7Cgl0ZXh0LWFsaWduOiBjZW50ZXI7CglwYWRkaW5nOiAycHg7CglvdmVyZmxvdzogaGlkZGVuOwoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKCXRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzOwoJdGV4dC1zaGFkb3c6IDFweCAxcHggIzAwMCwgMXB4IC0xcHggIzAwMCwgLTFweCAxcHggIzAwMCwgLTFweCAtMXB4ICMwMDAsIDAgMCA1cHggIzAwMDsKCXBvaW50ZXItZXZlbnRzOm5vbmU7Cn0KLnBodGl2c2FpbGRyYXcta2V5cy1vdmVybGF5IHsKCWxpbmUtaGVpZ2h0OiAyMXB4OwoJdmVydGljYWwtYWxpZ246IG1pZGRsZTsKCWZvbnQtc2l6ZTogMTRweDsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9Ci5waHRpdnNhaWxkcmF3LXBvbHlnb24tbGFiZWwgewoJdmVydGljYWwtYWxpZ246IG1pZGRsZTsKCWZvbnQtd2VpZ2h0OiBib2xkZXI7Cgl0ZXh0LXNoYWRvdzogMCAwIDFweCB3aGl0ZTsKfQoucGh0aXZzYWlsZHJhdy1wb2x5Z29uLWxhYmVsIHAsCi5waHRpdnNhaWxkcmF3LXBvbHlnb24tbGFiZWwgdWwgewoJbWFyZ2luOiAwOwoJb3ZlcmZsb3c6IGhpZGRlbjsKCXRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzOwp9CgoucGh0aXZzYWlsZHJhdy1vdmVyZmxvdy1idXR0b24gewoJZGlzcGxheTogaW5saW5lLWJveDsKCWRpc3BsYXk6IGlubGluZS1mbGV4OwoJbWluLXdpZHRoOiAyNHB4OwoJbWluLWhlaWdodDogMjBweDsKCXRleHQtYWxpZ246IGNlbnRlcjsKCXZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Cglmb250LXdlaWdodDogYm9sZDsKCXRleHQtZGVjb3JhdGlvbjogbm9uZSAhaW1wb3J0YW50OwoJY29sb3I6ICNmZmNlMDA7CgljdXJzb3I6IHBvaW50ZXI7CglhbGlnbi1pdGVtczogY2VudGVyOwoJanVzdGlmeS1jb250ZW50OiBjZW50ZXI7Cn0KLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctYnV0dG9uIHNwYW4gewoJZmxleDogMCAwIGF1dG87Cglib3g6IDAgMCBhdXRvOwp9Ci5waHRpdnNhaWxkcmF3LW92ZXJmbG93LW1lbnUgewoJYm9yZGVyOiAxcHggc29saWQgIzIwYThiMTsKCWJhY2tncm91bmQ6IHJnYmEoOCwgNDgsIDc4LCAwLjkpOwoJY29sb3I6ICNmZmNlMDA7CglwYWRkaW5nOiAwOwoJbWFyZ2luOiAwOwoJcG9zaXRpb246IGFic29sdXRlOwoJbGlzdC1zdHlsZTogbm9uZTsKCXotaW5kZXg6IDMwMDAwOwoJbWF4LWhlaWdodDogNzAlOwoJbWF4LXdpZHRoOiAyNWVtOwoJb3ZlcmZsb3cteTogYXV0bzsKCW92ZXJmbG93LXg6IGhpZGRlbjsKfQoucGh0aXZzYWlsZHJhdy1vdmVyZmxvdy1tZW51IGEgewoJZGlzcGxheTogYmxvY2s7CglwYWRkaW5nOiAwLjVlbTsKCW1pbi13aWR0aDogOGVtOwoJdGV4dC1kZWNvcmF0aW9uOiBub25lOwoJb3V0bGluZTogMCB0cmFuc3BhcmVudCBub25lICFpbXBvcnRhbnQ7Cn0KLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctbWVudSBhOmhvdmVyIHsKCXRleHQtZGVjb3JhdGlvbjogbm9uZTsKCWJhY2tncm91bmQtY29sb3I6IHJnYmEoMzIsIDE2OCwgMTc3LCAwLjcpOwp9Ci5waHRpdnNhaWxkcmF3LW92ZXJmbG93LW1lbnUgYTpmb2N1cywKLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctbWVudSBhOmFjdGl2ZSB7Cgl0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKfQoKesmad1pe3LLasS5waHRpdnNhaWxkcmF3LXRhYmxlIHsKCWJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7CgllbXB0eS1jZWxsczogc2hvdzsKCXdpZHRoOiAxMDAlOwoJY2xlYXI6IGJvdGg7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgdGQsIC5waHRpdnNhaWxkcmF3LXRhYmxlIHRoIHsKCWJvcmRlci13aWR0aDogMCAxcHg7Cglib3JkZXItc3R5bGU6IHNvbGlkOwoJYm9yZGVyLWNvbG9yOiByZ2JhKDgsIDQ4LCA3OCwgMC43NSk7CglwYWRkaW5nOiAzcHggNHB4OwoJdGV4dC1hbGlnbjogbGVmdDsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0ZDpmaXJzdC1jaGlsZCwgLnBodGl2c2FpbGRyYXctdGFibGUgdGg6Zmlyc3QtY2hpbGQgeyBib3JkZXItbGVmdC13aWR0aDogMDsgfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0ZDpsYXN0LWNoaWxkLCAgLnBodGl2c2FpbGRyYXctdGFibGUgdGg6bGFzdC1jaGlsZCB7IGJvcmRlci1yaWdodC13aWR0aDogMDsgfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQoMm4rMSkgdGQgewoJYm9yZGVyLWNvbG9yOiByZ2JhKDI1LCA2MywgOTUsIDAuNzUpOwp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRyIHsKCWJhY2tncm91bmQ6IHJnYmEoMjUsIDYzLCA5NSwgMC43NSk7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgdGJvZHkgdHI6bnRoLWNoaWxkKDJuKzEpIHsKCWJhY2tncm91bmQ6IHJnYmEoOCwgNDgsIDc4LCAwLjc1KTsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSA+IHRoZWFkIC5zb3J0YWJsZSB7CgljdXJzb3I6IHBvaW50ZXI7Cn0KLnBodGl2c2FpbGRyYXctdGFibGUgPiB0aGVhZCAuc29ydGVkIHsKCWNvbG9yOiAjZmZjZTAwOwp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlID4gdGhlYWQgLnNvcnRhYmxlOmJlZm9yZSB7Cgljb250ZW50OiAiICI7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CglmbG9hdDogcmlnaHQ7CgltaW4td2lkdGg6IDFlbTsKCXRleHQtYWxpZ246IHJpZ2h0Owp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlID4gdGhlYWQgLnNvcnRhYmxlLmFzYzpiZWZvcmUgewoJY29udGVudDogIlwyNWIyIjsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSA+IHRoZWFkIC5zb3J0YWJsZS5kZXNjOmJlZm9yZSB7Cgljb250ZW50OiAiXDI1YmMiOwp9Ci5waHRpdnNhaWxkcmF3LXRhYmxlIHRkLm1lbnUgewoJcG9zaXRpb246IHJlbGF0aXZlOwoJbWluLWhlaWdodDogMjBweDsKCW1pbi13aWR0aDogMjRweDsKfQoucGh0aXZzYWlsZHJhdy10YWJsZSB0ZC5tZW51ID4gLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctYnV0dG9uIHsKCXBvc2l0aW9uOiBhYnNvbHV0ZTsKCXRvcDogMDsKCWxlZnQ6IDA7CglyaWdodDogMDsKCWJvdHRvbTogMDsKCWRpc3BsYXk6IGZsZXg7Cn0KCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxsaXN0IC5rZXlzLAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFsbGlzdCAubGlua3MgewoJd2lkdGg6IDMuNWVtOyAvKiB3aWxsIGV4cGFuZCB0byBmaXQgY29udGVudCAqLwoJdGV4dC1hbGlnbjogcmlnaHQ7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLXBvcnRhbGxpc3QgLndhcm4gewoJY29sb3I6ICNmZjA7CglmbG9hdDogbGVmdDsKCWZvbnQtc2l6ZTogMS41ZW07Cglmb250LXdlaWdodDogYm9sZDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFsbGlzdCAud2Fybi5lcnJvciB7Cgljb2xvcjogI2YwMDsKfQoKLyogc3R5bGUuY3NzIHNldHMgZGlhbG9nIG1heC13aWR0aCB0byA3MDBweCAtIG92ZXJyaWRlIHRoYXQgaGVyZSAqLwoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua2xpc3QgewoJbWF4LXdpZHRoOiAxMDAwcHggIWltcG9ydGFudDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFsbGlzdCA+IC51aS1kaWFsb2ctY29udGVudCwKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtsaXN0ID4gLnVpLWRpYWxvZy1jb250ZW50LAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRsaXN0ID4gLnVpLWRpYWxvZy1jb250ZW50IHsKCXBhZGRpbmc6IDA7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtsaXN0IC5waHRpdnNhaWxkcmF3LWxheWVyIHsKCW1hcmdpbjogLTRweCAwIC00cHggLTRweDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua2xpc3QgdGQua2V5cywKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtsaXN0IHRkLmxlbmd0aCB7Cgl0ZXh0LWFsaWduOiByaWdodDsKfQoKLnBodGl2c2FpbGRyYXctZGlhbG9nLWFsZXJ0bGlzdCB0ZCB7Cgl2ZXJ0aWNhbC1hbGlnbjogYmFzZWxpbmU7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWFsZXJ0bGlzdCAuYXNzaWduZWUgewoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKCW92ZXJmbG93OiBoaWRkZW47Cgl0ZXh0LW92ZXJmbG93OiBlbGxpcHNpczsKCW1heC13aWR0aDogMTBlbTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRsaXN0IC5yZXNvbHZlZCBidXR0b24gewoJbWFyZ2luOiAtM3B4IDA7CglwYWRkaW5nOiAwIDAuNWVtIDFweDsKfQoKI3BodGl2c2FpbGRyYXctZmFrZS1idXR0b24gewoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAtOTk5OWVtOwoJbGVmdDogLTk5OTllbTsKfQoKLnBodGl2c2FpbGRyYXctYWxlcnRzLW51bSB7Cgljb2xvcjogIzAwRkYwMDsKfQoucGh0aXZzYWlsZHJhdy1hbGVydHMtbnVtLm5ldyB7Cgljb2xvcjogI2ZmMDAwMDsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9CgoucGh0aXZzYWlsZHJhdy1hZ2VudHNlbGVjdCAucGh0aXZzYWlsZHJhdy1ncm91cC1pbmRpY2F0b3IgewoJZmxvYXQ6IHJpZ2h0OwoJbWFyZ2luLWxlZnQ6IDAuMjVlbTsKfQoKLnBodGl2c2FpbGRyYXctZ3JvdXAtY29udGFpbmVyIHsKCWJvcmRlcjogMXB4IHNvbGlkIGN1cnJlbnRDb2xvcjsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMS4yZW07CglsaW5lLWhlaWdodDogMS4yZW07CgltYXJnaW46IDFweCAwLjI1ZW0gMXB4IDA7CglwYWRkaW5nOiAwIDAuMjVlbTsKfQoucGh0aXZzYWlsZHJhdy1ncm91cC1jb250YWluZXIgPiAucGh0aXZzYWlsZHJhdy1ncm91cC1pbmRpY2F0b3IgewoJbWFyZ2luLWxlZnQ6IC0wLjI1ZW07CgltYXJnaW4tcmlnaHQ6IDAuMjVlbTsKCWhlaWdodDogMS4yZW07Cgl3aWR0aDogMS4yZW07Cn0KCi5waHRpdnNhaWxkcmF3LWdyb3VwLWluZGljYXRvciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cglwb3NpdGlvbjogcmVsYXRpdmU7Cgl3aWR0aDogMWVtOwoJaGVpZ2h0OiAxZW07Cgl2ZXJ0aWNhbC1hbGlnbjogdG9wOwp9Ci5waHRpdnNhaWxkcmF3LWdyb3VwLWluZGljYXRvciA+IGRpdiB7CgloZWlnaHQ6IDFlbTsKCWZsb2F0OiBsZWZ0Owp9CgoucGh0aXZzYWlsZHJhdy1wb3B1cCB7CgltYXgtd2lkdGg6IDMwMHB4Owp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZyAuZGVzYyBwLAoucGh0aXZzYWlsZHJhdy1kaWFsb2cgLmRlc2MgdWwsCi5waHRpdnNhaWxkcmF3LXBvcHVwIHAsCi5waHRpdnNhaWxkcmF3LXBvcHVwIHVsIHsKCW1hcmdpbjogMDsKfQoucGh0aXZzYWlsZHJhdy1wb3B1cCBhIHsKCWNvbG9yOiAjMDA5OUNDOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZyAuZGVzYyB1bCwKLnBodGl2c2FpbGRyYXctcG9seWdvbi1sYWJlbCB1bCwKLnBodGl2c2FpbGRyYXctcG9wdXAgLmRlc2MgdWwgewoJcGFkZGluZy1sZWZ0OiAxLjVlbTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2cgLmRlc2MgZW0sCi5waHRpdnNhaWxkcmF3LXBvbHlnb24tbGFiZWwgZW0sCi5waHRpdnNhaWxkcmF3LXBvcHVwIC5kZXNjIGVtIHsKCWNvbG9yOiBpbmhlcml0OwoJZm9udC1zdHlsZTogaXRhbGljOwp9Ci5waHRpdnNhaWxkcmF3LXBvcHVwLnBvcnRhbCAudWktZGlhbG9nLWJ1dHRvbnNldCB7CglkaXNwbGF5OiBib3g7CglkaXNwbGF5OiBmbGV4OwoJbWFyZ2luLXRvcDogNnB4Owp9Ci5waHRpdnNhaWxkcmF3LXBvcHVwLnBvcnRhbCAudWktZGlhbG9nLWJ1dHRvbnNldCBidXR0b24gewoJZmxleC1ncm93OiAxOwoJYm94LWdyb3c6IDE7Cn0KLnBodGl2c2FpbGRyYXctcG9wdXAgaW1nLmF2YXRhciB7CgltYXgtd2lkdGg6IDk2cHg7CgltYXgtaGVpZ2h0OiA5NnB4OwoJbWFyZ2luLWxlZnQ6IDRweDsKCWZsb2F0OiByaWdodDsKfQoKLnBodGl2c2FpbGRyYXcta2V5cy1vdmVybGF5LCAucGh0aXZzYWlsZHJhdy1hZ2VudC1sYWJlbCwgLnBodGl2c2FpbGRyYXctcG9seWdvbi1sYWJlbCB7Cgljb2xvcjogI0ZGRkZCQjsKCWZvbnQtc2l6ZTogMTJweDsKCWxpbmUtaGVpZ2h0OiAxNnB4OwoJdGV4dC1hbGlnbjogY2VudGVyOwoJcGFkZGluZzogMnB4OwoJb3ZlcmZsb3c6IGhpZGRlbjsKCXdoaXRlLXNwYWNlOiBub3dyYXA7Cgl0ZXh0LW92ZXJmbG93OiBlbGxpcHNpczsKCXRleHQtc2hhZG93OiAxcHggMXB4ICMwMDAsIDFweCAtMXB4ICMwMDAsIC0xcHggMXB4ICMwMDAsIC0xcHggLTFweCAjMDAwLCAwIDAgNXB4ICMwMDA7Cglwb2ludGVyLWV2ZW50czpub25lOwp9Ci5waHRpdnNhaWxkcmF3LWtleXMtb3ZlcmxheSB7CglsaW5lLWhlaWdodDogMjFweDsKCXZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Cglmb250LXNpemU6IDE0cHg7Cglmb250LXdlaWdodDogYm9sZDsKfQoucGh0aXZzYWlsZHJhdy1wb2x5Z29uLWxhYmVsIHsKCXZlcnRpY2FsLWFsaWduOiBtaWRkbGU7Cglmb250LXdlaWdodDogYm9sZGVyOwoJdGV4dC1zaGFkb3c6IDAgMCAxcHggd2hpdGU7Cn0KLnBodGl2c2FpbGRyYXctcG9seWdvbi1sYWJlbCBwLAoucGh0aXZzYWlsZHJhdy1wb2x5Z29uLWxhYmVsIHVsIHsKCW1hcmdpbjogMDsKCW92ZXJmbG93OiBoaWRkZW47Cgl0ZXh0LW92ZXJmbG93OiBlbGxpcHNpczsKfQoKLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctYnV0dG9uIHsKCWRpc3BsYXk6IGlubGluZS1ib3g7CglkaXNwbGF5OiBpbmxpbmUtZmxleDsKCW1pbi13aWR0aDogMjRweDsKCW1pbi1oZWlnaHQ6IDIwcHg7Cgl0ZXh0LWFsaWduOiBjZW50ZXI7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwoJZm9udC13ZWlnaHQ6IGJvbGQ7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmUgIWltcG9ydGFudDsKCWNvbG9yOiAjZmZjZTAwOwoJY3Vyc29yOiBwb2ludGVyOwoJYWxpZ24taXRlbXM6IGNlbnRlcjsKCWp1c3RpZnktY29udGVudDogY2VudGVyOwp9Ci5waHRpdnNhaWxkcmF3LW92ZXJmbG93LWJ1dHRvbiBzcGFuIHsKCWZsZXg6IDAgMCBhdXRvOwoJYm94OiAwIDAgYXV0bzsKfQoucGh0aXZzYWlsZHJhdy1vdmVyZmxvdy1tZW51IHsKCWJvcmRlcjogMXB4IHNvbGlkICMyMGE4YjE7CgliYWNrZ3JvdW5kOiByZ2JhKDgsIDQ4LCA3OCwgMC45KTsKCWNvbG9yOiAjZmZjZTAwOwoJcGFkZGluZzogMDsKCW1hcmdpbjogMDsKCXBvc2l0aW9uOiBhYnNvbHV0ZTsKCWxpc3Qtc3R5bGU6IG5vbmU7Cgl6LWluZGV4OiAzMDAwMDsKCW1heC1oZWlnaHQ6IDcwJTsKCW1heC13aWR0aDogMjVlbTsKCW92ZXJmbG93LXk6IGF1dG87CglvdmVyZmxvdy14OiBoaWRkZW47Cn0KLnBodGl2c2FpbGRyYXctb3ZlcmZsb3ctbWVudSBhIHsKCWRpc3BsYXk6IGJsb2NrOwoJcGFkZGluZzogMC41ZW07CgltaW4td2lkdGg6IDhlbTsKCXRleHQtZGVjb3JhdGlvbjogbm9uZTsKCW91dGxpbmU6IDAgdHJhbnNwYXJlbnQgbm9uZSAhaW1wb3J0YW50Owp9Ci5waHRpdnNhaWxkcmF3LW92ZXJmbG93LW1lbnUgYTpob3ZlciB7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmU7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDMyLCAxNjgsIDE3NywgMC43KTsKfQoucGh0aXZzYWlsZHJhdy1vdmVyZmxvdy1tZW51IGE6Zm9jdXMsCi5waHRpdnNhaWxkcmF3LW92ZXJmbG93LW1lbnUgYTphY3RpdmUgewoJdGV4dC1kZWNvcmF0aW9uOiB1bmRlcmxpbmU7Cn0KCg==";
-            es.ui = "data:text/css;base64,Ym9keS5wcml2YWN5X2FjdGl2ZSAucGh0aXZzYWlsZHJhdy10b29sYmFyIHsKCWRpc3BsYXk6IG5vbmU7Cn0KCiNwaHRpdnNhaWxkcmF3LWJ0bi1zeW5jLnJ1bm5pbmcgewoJLXdlYmtpdC1hbmltYXRpb24tZHVyYXRpb246IDFzOwoJICAgICAgICBhbmltYXRpb24tZHVyYXRpb246IDFzOwoJLXdlYmtpdC1hbmltYXRpb24tbmFtZTogcGh0aXZzYWlsZHJhdy1zeW5jLXJ1bm5pbmc7CgkgICAgICAgIGFuaW1hdGlvbi1uYW1lOiBwaHRpdnNhaWxkcmF3LXN5bmMtcnVubmluZzsKCS13ZWJraXQtYW5pbWF0aW9uLXRpbWluZy1mdW5jdGlvbjogbGluZWFyOwoJICAgICAgICBhbmltYXRpb24tdGltaW5nLWZ1bmN0aW9uOiBsaW5lYXI7Cgktd2Via2l0LWFuaW1hdGlvbi1pdGVyYXRpb24tY291bnQ6IGluZmluaXRlOwoJICAgICAgICBhbmltYXRpb24taXRlcmF0aW9uLWNvdW50OiBpbmZpbml0ZTsKfQpALXdlYmtpdC1rZXlmcmFtZXMgcGh0aXZzYWlsZHJhdy1zeW5jLXJ1bm5pbmcgewoJMCUgewoJCS13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7CgkJICAgICAgICB0cmFuc2Zvcm06IHJvdGF0ZSgwZGVnKTsKCX0KCTEwMCUgewoJCS13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoMzYwZGVnKTsKCQkgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDM2MGRlZyk7Cgl9Cn0KQGtleWZyYW1lcyBwaHRpdnNhaWxkcmF3LXN5bmMtcnVubmluZyB7CgkwJSB7CgkJLXdlYmtpdC10cmFuc2Zvcm06IHJvdGF0ZSgwZGVnKTsKCQkgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpOwoJfQoJMTAwJSB7CgkJLXdlYmtpdC10cmFuc2Zvcm06IHJvdGF0ZSgzNjBkZWcpOwoJCSAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoMzYwZGVnKTsKCX0KfQoKI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgewoJZGlzcGxheTogYm94OyAvKiBvbGQgdmFsdWUsIGZvciBBbmRyb2lkICovCglkaXNwbGF5OiBmbGV4OwoJbWFyZ2luOiAtMTJweDsKCXBvc2l0aW9uOiByZWxhdGl2ZTsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZy5tb2JpbGUgewoJYmFja2dyb3VuZDogdHJhbnNwYXJlbnQ7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwIG5vbmU7CgltYXJnaW46IDA7CgloZWlnaHQ6IDEwMCU7Cgl3aWR0aDogMTAwJTsKCWxlZnQ6IDA7Cgl0b3A6IDA7Cglwb3NpdGlvbjogYWJzb2x1dGU7CglvdmVyZmxvdzogYXV0bzsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZyAucHJvZ3Jlc3MgewoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogMDsKCXJpZ2h0OiAwOwoJaGVpZ2h0OiAzcHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjRUVFRUVFOwoJZGlzcGxheTogbm9uZTsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZy5zaG93cHJvZ3Jlc3MgLnByb2dyZXNzIHsKCWRpc3BsYXk6IGJsb2NrOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnIC5wcm9ncmVzcyAucHJvZ3Jlc3MtdmFsdWUgewoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogMDsKCWhlaWdodDogMTAwJTsKCWJhY2tncm91bmQtY29sb3I6ICNGRkNFMDA7Cgl3aWR0aDogMCU7Cn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgbmF2IHsKCWRpc3BsYXk6IGJsb2NrOwoJbWluLWhlaWdodDogMTUwcHg7Cgl3aWR0aDogMTUwcHg7Cglib3JkZXItcmlnaHQ6IDFweCBzb2xpZCAjMjBBOEIxOwoJdmVydGljYWwtYWxpZ246IHRvcDsKCWZsZXgtc2hyaW5rOiAwOwoJZmxleC1ncm93OiAwOwoJYm94LXNocmluazogMDsKCWJveC1ncm93OiAwOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnIC50YWJzIHsKCXBvc2l0aW9uOiByZWxhdGl2ZTsKCXBhZGRpbmc6IDEwcHg7CglmbGV4LXNocmluazogMTsKCWZsZXgtZ3JvdzogMTsKCWJveC1zaHJpbms6IDE7Cglib3gtZ3JvdzogMTsKCS8qIG1heC13aWR0aDogMzIwcHg7ICovCn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgbmF2IGEgewoJY29sb3I6IHdoaXRlOwoJcGFkZGluZzogMC41ZW07CglkaXNwbGF5OiBibG9jazsKCXRleHQtd2VpZ2h0OiBib2xkOwoJYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkICMyMEE4QjE7Cgl0ZXh0LWRlY29yYXRpb246IG5vbmU7Cn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgbmF2IGE6bGFzdC1jaGlsZCB7Cglib3JkZXItYm90dG9tLXdpZHRoOiAwOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnIG5hdiBhOmhvdmVyIHsKCWJhY2tncm91bmQtY29sb3I6ICMwODNDNEU7Cn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgbmF2IGEuY2xpY2tlZCB7CgliYWNrZ3JvdW5kLWNvbG9yOiAjMjBBOEIxOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnIHNlY3Rpb24gaDIgewoJZm9udC1zaXplOiAxOHB4OwoJbWFyZ2luOiAwIDAgMC40ZW0gMDsKCXBhZGRpbmc6IDA7Cn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgc2VjdGlvbiBoMiBzbWFsbCB7Cgljb2xvcjogI0NDQ0NDQzsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgaHIgewoJYm9yZGVyOiAwOwoJaGVpZ2h0OiAxcHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjMjBBOEIxCn0KI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgZmllbGRzZXQgewoJYm9yZGVyOiAxcHggc29saWQgIzIwYThiMTsKCXBhZGRpbmc6IDAgMC42MjVlbTsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZyBsZWdlbmQgewoJY29sb3I6ICNmZmNlMDA7Cglmb250LXdlaWdodDogYm9sZDsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZyBwIHsKCW1hcmdpbjogMC41ZW0gMDsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZyBsYWJlbCB7CglkaXNwbGF5OiBibG9jazsKfQojcGh0aXZzYWlsZHJhdy1tZW51LWNvbmZpZyBsYWJlbCBpbnB1dCB7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwoJbWFyZ2luOiAwIDAuMmVtOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnLXNlbGVjdCB7CglkaXNwbGF5OiBub25lOwoJZmxleC1zaHJpbms6IDA7CglmbGV4LWdyb3c6IDA7Cglib3gtc2hyaW5rOiAwOwoJYm94LWdyb3c6IDA7CglwYWRkaW5nOiA1cHggMTBweCAwOwp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnLXNlbGVjdCBzZWxlY3QgewoJcGFkZGluZzogN3B4Owp9CiNwaHRpdnNhaWxkcmF3LW1lbnUtY29uZmlnLXNlbGVjdCBociB7CgltYXJnaW46IDVweCAtMTBweCAwOwp9CkBtZWRpYSAobWF4LXdpZHRoOiA5NTlweCkgewoJI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgewoJCWZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CgkJYm94LWRpcmVjdGlvbjogY29sdW1uOwoJfQoJI3BodGl2c2FpbGRyYXctbWVudS1jb25maWcgbmF2IHsKCQlkaXNwbGF5OiBub25lOwoJfQoJI3BodGl2c2FpbGRyYXctbWVudS1jb25maWctc2VsZWN0IHsKCQlkaXNwbGF5OiBibG9jazsKCX0KfQoKLnBodGl2c2FpbGRyYXctZGlhbG9nIC51aS1kaWFsb2ctY29udGVudCBpbnB1dCwKLnBodGl2c2FpbGRyYXctZGlhbG9nIC51aS1kaWFsb2ctY29udGVudCB0ZXh0YXJlYSB7Cglib3JkZXI6IDFweCBzb2xpZCAjMjBhOGIxOwoJY29sb3I6ICNmZmNlMDA7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMyk7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nIHAgewoJbWFyZ2luOiAwIDAgNnB4Owp9CgoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFscyA+IC51aS1kaWFsb2ctY29udGVudCwKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmsgPiAudWktZGlhbG9nLWNvbnRlbnQsCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb2x5Z29uID4gLnVpLWRpYWxvZy1jb250ZW50IHsKCXBhZGRpbmc6IDZweCA2cHggMDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFscyAubmFtZSBsYWJlbCB7CglhbGlnbi1pdGVtczogYmFzZWxpbmU7CglkaXNwbGF5OiBmbGV4Owp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxzIC5uYW1lIGxhYmVsID4gKnsKCWZsZXgtZ3JvdzogMTsKCW1hcmdpbi1sZWZ0OiAwLjVlbTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2cgdGV4dGFyZWEuZGVzYywKLnBodGl2c2FpbGRyYXctZGlhbG9nIC5kZXNjIHRleHRhcmVhIHsKCWJveC1zaXppbmc6IGJvcmRlci1ib3g7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogNC41ZW07CglwYWRkaW5nOiAzcHg7CglyZXNpemU6IHZlcnRpY2FsOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxzIC5rZXlzIGlucHV0LAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGluayAua2V5cyBpbnB1dCB7Cgl3aWR0aDogNmVtOwoJcGFkZGluZy1yaWdodDogMDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFscyAua2V5cyBpbnB1dCwKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmsgLmtleXMgaW5wdXQgewoJbWFyZ2luLWxlZnQ6IDZweDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFscyAuZGV0YWlscywKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmsgLmRldGFpbHMsCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzIHsKCWRpc3BsYXk6IGJveDsKCWRpc3BsYXk6IGZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb3J0YWxzIC5waHRpdnNhaWxkcmF3LWxheWVyLAoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGluayAucGh0aXZzYWlsZHJhdy1sYXllciwKLnBodGl2c2FpbGRyYXctZGlhbG9nLXBvbHlnb24gLnBodGl2c2FpbGRyYXctbGF5ZXIgewoJbWFyZ2luLWxlZnQ6IDEycHg7CglmbGV4OiAxIDEgYXV0bzsKCWJveDogMSAxIGF1dG87Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLXBvcnRhbHMgLnBvc2l0aW9ud2FybmluZy5oaWRkZW4gewoJZGlzcGxheTogbm9uZTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctcG9ydGFscyAucG9zaXRpb253YXJuaW5nIHsKCWJhY2tncm91bmQtY29sb3I6IHllbGxvdzsKCWJvcmRlcjogMnB4IHNvbGlkIHJlZDsKCWNvbG9yOiByZWQ7Cglmb250LXdlaWdodDogYm9sZDsKCXBhZGRpbmc6IDAuM2VtOwp9CgoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGluayAubGlua3BvcnRhbHMgewoJZGlzcGxheTogYm94OwoJZGlzcGxheTogZmxleDsKCW1hcmdpbjogMCAtNnB4IDZweDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGluayAubGlua3BvcnRhbHMgPiBzcGFuIHsKCWZsZXg6IDEgMSA1MCU7Cglib3g6IDEgMSA1MCU7CgltYXJnaW46IDAgNnB4Owp9CgoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua3MgPiAudWktZGlhbG9nLWNvbnRlbnQgewoJcGFkZGluZzogMDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua3MgPiAudWktZGlhbG9nLWNvbnRlbnQgPiBkaXYgewoJZGlzcGxheTogZmxleDsKCWZsZXgtZGlyZWN0aW9uOiBjb2x1bW47Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtzIHRleHRhcmVhLmRlc2MgewoJbWFyZ2luOiA2cHggNnB4IDNweDsKCWhlaWdodDogMmVtOwoJd2lkdGg6IGF1dG87CglwYWRkaW5nOiA0cHg7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtzIHRhYmxlIHsKCWJvcmRlci1zcGFjaW5nOiAwOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rcyB0ZCB7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKCXBhZGRpbmc6IDFweCAxcHggMCAwOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rcyB0ZDpmaXJzdC1jaGlsZCwKLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtzIC5hcnJvdyB7Cgl0ZXh0LWFsaWduOiBjZW50ZXI7Cgl3aWR0aDogMjBweDsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua3MgaW5wdXRbdHlwZT0iY2hlY2tib3giXSB7CgltYXJnaW46IDA7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rcyB0YWJsZSBidXR0b24gewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJcGFkZGluZzogMXB4IDRweDsKCWZvbnQtc2l6ZTogMWVtOwoJbGluZS1oZWlnaHQ6IDEuMjVlbTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua3MgYnV0dG9uLnBvcnRhbC1kcm9wZG93biB7CglwYWRkaW5nOiAxcHggMHB4OwoJbWluLXdpZHRoOiAwOwoJYm9yZGVyLWxlZnQtd2lkdGg6IDA7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWxpbmtzIC5wb3J0YWwgewoJcGFkZGluZy1yaWdodDogNnB4OwoJcGFkZGluZy1sZWZ0OiAycHg7CgltYXgtd2lkdGg6IDE1MHB4OwoJb3ZlcmZsb3c6IGhpZGRlbjsKCXRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1saW5rcyAuYnV0dG9uYmFyIHsKCWRpc3BsYXk6IGJveDsKCWRpc3BsYXk6IGZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwoJanVzdGlmeS1jb250ZW50OiBzcGFjZS1iZXR3ZWVuOwoJYm9yZGVyLXRvcDogMXB4IHNvbGlkICMyMGE4YjE7CgltYXJnaW46IDZweCAwIDAgLTZweDsKCXBhZGRpbmc6IDZweDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctbGlua3MgLmJ1dHRvbmJhciA+IGxhYmVsIHsKCXdpZHRoOiA1ZW07Cn0KCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1hbGVydHMgLnVpLWRpYWxvZy1jb250ZW50IHsKCW1pbi1oZWlnaHQ6IDAgIWltcG9ydGFudDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRzIC51aS1kaWFsb2ctY29udGVudCA+IGRpdiB7CgltYXJnaW46IC02cHg7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLWFsZXJ0cyAuZmxleCB7CglkaXNwbGF5OiBib3g7IC8qIG9sZCB2YWx1ZSwgZm9yIEFuZHJvaWQgKi8KCWRpc3BsYXk6IGZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRzIC5mbGV4ICogewoJZmxleDogMSAwIDA7Cglib3g6IDEgMCAwOwp9Ci5waHRpdnNhaWxkcmF3LWRpYWxvZy1hbGVydHMgLmZsZXggaW5wdXQgewoJYm9yZGVyOiAxcHggc29saWQgIzIwYThiMTsKCW1hcmdpbi1sZWZ0OiAwLjJlbTsKfQoucGh0aXZzYWlsZHJhdy1kaWFsb2ctYWxlcnRzIC5mbGV4IHNlbGVjdCB7Cgl3aWR0aDogMDsgLyogQ2hyb21lIHdvdWxkIGV4cGFuZCB0byBmaXQgdGhlIGNvbnRlbnRzIG90aGVyd2lzZSAqLwp9Ci5waHRpdnNhaWxkcmF3LXRhcmdldHNlbGVjdCB7CglkaXNwbGF5OiBmbGV4OwoJYWxpZ24taXRlbXM6IGJhc2VsaW5lOwp9Ci5waHRpdnNhaWxkcmF3LXRhcmdldHNlbGVjdCA+IHN0cm9uZyB7CglmbGV4OiAxIDAgMDsKCWJveDogMSAwIDA7CgltYXJnaW46IDAgMC4yZW07CglvdmVyZmxvdzogaGlkZGVuOwoJdGV4dC1vdmVyZmxvdzogZWxsaXBzaXM7Cgl3aGl0ZS1zcGFjZTogbm93cmFwOwp9Ci5waHRpdnNhaWxkcmF3LXRhcmdldHNlbGVjdCA+IC5waHRpdnNhaWxkcmF3LW92ZXJmbG93LWJ1dHRvbiB7CglhbGlnbi1zZWxmOiBzdHJldGNoOwoJYmFja2dyb3VuZC1jb2xvcjogcmdiYSg4LCA0OCwgNzgsIDAuOSk7Cglib3JkZXI6IDFweCBzb2xpZCAjZmZjZTAwOwoJY29sb3I6ICNmZmNlMDA7CglwYWRkaW5nOiAycHg7Cn0KCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzID4gLmNvbG9yIHsKCWRpc3BsYXk6IGlubGluZS1ib3g7CglkaXNwbGF5OiBpbmxpbmUtZmxleDsKCWFsaWduLWl0ZW1zOiBjZW50ZXI7Cn0KLnBodGl2c2FpbGRyYXctZGlhbG9nLXBvbHlnb24gLmRldGFpbHMgPiAuY29sb3IgaW5wdXQsCi5waHRpdnNhaWxkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzID4gLmNvbG9yIC5zcC1yZXBsYWNlciB7CgltYXJnaW4tbGVmdDogMC41ZW07Cn0KCi5waHRpdnNhaWxkcmF3LWNvbG9yLXBpY2tlciAuc3AtaW5wdXQgewoJYm9yZGVyOiAxcHggc29saWQgIzY2NjsKCWJhY2tncm91bmQtY29sb3I6IHRyYW5zcGFyZW50OwoJY29sb3I6ICMyMjI7Cn0KLnBodGl2c2FpbGRyYXctY29sb3ItcGlja2VyIC5zcC1jZiB7CgltaW4taGVpZ2h0OiAwLjVlbTsKfQoKLnBodGl2c2FpbGRyYXctbGF5ZXIgewoJZGlzcGxheTogaW5saW5lLWJveDsgLyogb2xkIHZhbHVlLCBmb3IgQW5kcm9pZCAqLwoJZGlzcGxheTogaW5saW5lLWZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwp9Ci5waHRpdnNhaWxkcmF3LWxheWVyIGxhYmVsIHsKCW1hcmdpbi1yaWdodDogMC41ZW07Cn0KLnBodGl2c2FpbGRyYXctbGF5ZXIubm9sYWJlbCBsYWJlbCB7CglkaXNwbGF5OiBub25lOwp9Ci5waHRpdnNhaWxkcmF3LWxheWVyIC5wcmV2aWV3IHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCXdpZHRoOiAwLjVyZW07CgltaW4taGVpZ2h0OiAyMHB4OwoJYWxpZ24tc2VsZjogc3RyZXRjaDsKfQoucGh0aXZzYWlsZHJhdy1sYXllciBzZWxlY3QsCi5waHRpdnNhaWxkcmF3LWxheWVyIC5vdXRwdXQgewoJZmxleDogMSAxIGF1dG87Cglib3g6IDEgMSBhdXRvOwoJLyogdGhlIHNlbGVjdCBoYXMgYSBkZWZhdWx0IHdpZHRoIHdoaWNoIHdlIHdhbnQgdG8gdW5zZXQgKi8KCW1pbi13aWR0aDogNmVtOwoJd2lkdGg6IDA7Cn0KLnBodGl2c2FpbGRyYXctbGF5ZXIgLm91dHB1dCB7CgltaW4td2lkdGg6IDRlbTsKfQoucGh0aXZzYWlsZHJhdy1sYXllciBvcHRpb24gc3BhbiB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CglmbG9hdDogbGVmdDsKCXZlcnRpY2FsLWFsaWduOiB0b3A7CgloZWlnaHQ6IDFlbTsKCXdpZHRoOiAxZW07CgltYXJnaW4tcmlnaHQ6IDAuMjVlbTsKfQoucGh0aXZzYWlsZHJhdy1sYXllciAub3V0cHV0IHsKCW1hcmdpbi1sZWZ0OiA0cHg7Cn0KCi51aS1kaWFsb2ctcGh0aXZzYWlsZHJhdy1jb3B5IHRleHRhcmVhIHsgd2lkdGg6OTYlOyBoZWlnaHQ6MjUwcHg7IHJlc2l6ZTp2ZXJ0aWNhbDsgfQoKLnRlbXAtb3AtZGlhbG9nID4gYSB7IGRpc3BsYXk6YmxvY2s7IGNvbG9yOiNmZmNlMDA7IGJvcmRlcjoxcHggc29saWQgI2ZmY2UwMDsgcGFkZGluZzozcHggMDsgbWFyZ2luOjEwcHggYXV0bzsgd2lkdGg6ODAlOyB0ZXh0LWFsaWduOmNlbnRlcjsgYmFja2dyb3VuZDpyZ2JhKDgsNDgsNzgsLjkpOyB9Cg=="
+            es.ui = "data:text/css;base64,Ym9keS5wcml2YWN5X2FjdGl2ZSAucGh0aXZkcmF3LXRvb2xiYXIgewoJZGlzcGxheTogbm9uZTsKfQoKI3BodGl2ZHJhdy1idG4tc3luYy5ydW5uaW5nIHsKCS13ZWJraXQtYW5pbWF0aW9uLWR1cmF0aW9uOiAxczsKCSAgICAgICAgYW5pbWF0aW9uLWR1cmF0aW9uOiAxczsKCS13ZWJraXQtYW5pbWF0aW9uLW5hbWU6IHBodGl2ZHJhdy1zeW5jLXJ1bm5pbmc7CgkgICAgICAgIGFuaW1hdGlvbi1uYW1lOiBwaHRpdmRyYXctc3luYy1ydW5uaW5nOwoJLXdlYmtpdC1hbmltYXRpb24tdGltaW5nLWZ1bmN0aW9uOiBsaW5lYXI7CgkgICAgICAgIGFuaW1hdGlvbi10aW1pbmctZnVuY3Rpb246IGxpbmVhcjsKCS13ZWJraXQtYW5pbWF0aW9uLWl0ZXJhdGlvbi1jb3VudDogaW5maW5pdGU7CgkgICAgICAgIGFuaW1hdGlvbi1pdGVyYXRpb24tY291bnQ6IGluZmluaXRlOwp9CkAtd2Via2l0LWtleWZyYW1lcyBwaHRpdmRyYXctc3luYy1ydW5uaW5nIHsKCTAlIHsKCQktd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDBkZWcpOwoJCSAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7Cgl9CgkxMDAlIHsKCQktd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDM2MGRlZyk7CgkJICAgICAgICB0cmFuc2Zvcm06IHJvdGF0ZSgzNjBkZWcpOwoJfQp9CkBrZXlmcmFtZXMgcGh0aXZkcmF3LXN5bmMtcnVubmluZyB7CgkwJSB7CgkJLXdlYmtpdC10cmFuc2Zvcm06IHJvdGF0ZSgwZGVnKTsKCQkgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpOwoJfQoJMTAwJSB7CgkJLXdlYmtpdC10cmFuc2Zvcm06IHJvdGF0ZSgzNjBkZWcpOwoJCSAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoMzYwZGVnKTsKCX0KfQoKI3BodGl2ZHJhdy1tZW51LWNvbmZpZyB7CglkaXNwbGF5OiBib3g7IC8qIG9sZCB2YWx1ZSwgZm9yIEFuZHJvaWQgKi8KCWRpc3BsYXk6IGZsZXg7CgltYXJnaW46IC0xMnB4OwoJcG9zaXRpb246IHJlbGF0aXZlOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcubW9iaWxlIHsKCWJhY2tncm91bmQ6IHRyYW5zcGFyZW50OwoJcGFkZGluZzogMDsKCWJvcmRlcjogMCBub25lOwoJbWFyZ2luOiAwOwoJaGVpZ2h0OiAxMDAlOwoJd2lkdGg6IDEwMCU7CglsZWZ0OiAwOwoJdG9wOiAwOwoJcG9zaXRpb246IGFic29sdXRlOwoJb3ZlcmZsb3c6IGF1dG87Cn0KI3BodGl2ZHJhdy1tZW51LWNvbmZpZyAucHJvZ3Jlc3MgewoJcG9zaXRpb246IGFic29sdXRlOwoJdG9wOiAwOwoJbGVmdDogMDsKCXJpZ2h0OiAwOwoJaGVpZ2h0OiAzcHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjRUVFRUVFOwoJZGlzcGxheTogbm9uZTsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnLnNob3dwcm9ncmVzcyAucHJvZ3Jlc3MgewoJZGlzcGxheTogYmxvY2s7Cn0KI3BodGl2ZHJhdy1tZW51LWNvbmZpZyAucHJvZ3Jlc3MgLnByb2dyZXNzLXZhbHVlIHsKCXBvc2l0aW9uOiBhYnNvbHV0ZTsKCXRvcDogMDsKCWxlZnQ6IDA7CgloZWlnaHQ6IDEwMCU7CgliYWNrZ3JvdW5kLWNvbG9yOiAjRkZDRTAwOwoJd2lkdGg6IDAlOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgbmF2IHsKCWRpc3BsYXk6IGJsb2NrOwoJbWluLWhlaWdodDogMTUwcHg7Cgl3aWR0aDogMTUwcHg7Cglib3JkZXItcmlnaHQ6IDFweCBzb2xpZCAjMjBBOEIxOwoJdmVydGljYWwtYWxpZ246IHRvcDsKCWZsZXgtc2hyaW5rOiAwOwoJZmxleC1ncm93OiAwOwoJYm94LXNocmluazogMDsKCWJveC1ncm93OiAwOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgLnRhYnMgewoJcG9zaXRpb246IHJlbGF0aXZlOwoJcGFkZGluZzogMTBweDsKCWZsZXgtc2hyaW5rOiAxOwoJZmxleC1ncm93OiAxOwoJYm94LXNocmluazogMTsKCWJveC1ncm93OiAxOwoJLyogbWF4LXdpZHRoOiAzMjBweDsgKi8KfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIG5hdiBhIHsKCWNvbG9yOiB3aGl0ZTsKCXBhZGRpbmc6IDAuNWVtOwoJZGlzcGxheTogYmxvY2s7Cgl0ZXh0LXdlaWdodDogYm9sZDsKCWJvcmRlci1ib3R0b206IDFweCBzb2xpZCAjMjBBOEIxOwoJdGV4dC1kZWNvcmF0aW9uOiBub25lOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgbmF2IGE6bGFzdC1jaGlsZCB7Cglib3JkZXItYm90dG9tLXdpZHRoOiAwOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgbmF2IGE6aG92ZXIgewoJYmFja2dyb3VuZC1jb2xvcjogIzA4M0M0RTsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIG5hdiBhLmNsaWNrZWQgewoJYmFja2dyb3VuZC1jb2xvcjogIzIwQThCMTsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIHNlY3Rpb24gaDIgewoJZm9udC1zaXplOiAxOHB4OwoJbWFyZ2luOiAwIDAgMC40ZW0gMDsKCXBhZGRpbmc6IDA7Cn0KI3BodGl2ZHJhdy1tZW51LWNvbmZpZyBzZWN0aW9uIGgyIHNtYWxsIHsKCWNvbG9yOiAjQ0NDQ0NDOwoJdmVydGljYWwtYWxpZ246IHRvcDsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIGhyIHsKCWJvcmRlcjogMDsKCWhlaWdodDogMXB4OwoJYmFja2dyb3VuZC1jb2xvcjogIzIwQThCMQp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgZmllbGRzZXQgewoJYm9yZGVyOiAxcHggc29saWQgIzIwYThiMTsKCXBhZGRpbmc6IDAgMC42MjVlbTsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIGxlZ2VuZCB7Cgljb2xvcjogI2ZmY2UwMDsKCWZvbnQtd2VpZ2h0OiBib2xkOwp9CiNwaHRpdmRyYXctbWVudS1jb25maWcgcCB7CgltYXJnaW46IDAuNWVtIDA7Cn0KI3BodGl2ZHJhdy1tZW51LWNvbmZpZyBsYWJlbCB7CglkaXNwbGF5OiBibG9jazsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnIGxhYmVsIGlucHV0IHsKCXZlcnRpY2FsLWFsaWduOiBtaWRkbGU7CgltYXJnaW46IDAgMC4yZW07Cn0KI3BodGl2ZHJhdy1tZW51LWNvbmZpZy1zZWxlY3QgewoJZGlzcGxheTogbm9uZTsKCWZsZXgtc2hyaW5rOiAwOwoJZmxleC1ncm93OiAwOwoJYm94LXNocmluazogMDsKCWJveC1ncm93OiAwOwoJcGFkZGluZzogNXB4IDEwcHggMDsKfQojcGh0aXZkcmF3LW1lbnUtY29uZmlnLXNlbGVjdCBzZWxlY3QgewoJcGFkZGluZzogN3B4Owp9CiNwaHRpdmRyYXctbWVudS1jb25maWctc2VsZWN0IGhyIHsKCW1hcmdpbjogNXB4IC0xMHB4IDA7Cn0KQG1lZGlhIChtYXgtd2lkdGg6IDk1OXB4KSB7CgkjcGh0aXZkcmF3LW1lbnUtY29uZmlnIHsKCQlmbGV4LWRpcmVjdGlvbjogY29sdW1uOwoJCWJveC1kaXJlY3Rpb246IGNvbHVtbjsKCX0KCSNwaHRpdmRyYXctbWVudS1jb25maWcgbmF2IHsKCQlkaXNwbGF5OiBub25lOwoJfQoJI3BodGl2ZHJhdy1tZW51LWNvbmZpZy1zZWxlY3QgewoJCWRpc3BsYXk6IGJsb2NrOwoJfQp9CgoucGh0aXZkcmF3LWRpYWxvZyAudWktZGlhbG9nLWNvbnRlbnQgaW5wdXQsCi5waHRpdmRyYXctZGlhbG9nIC51aS1kaWFsb2ctY29udGVudCB0ZXh0YXJlYSB7Cglib3JkZXI6IDFweCBzb2xpZCAjMjBhOGIxOwoJY29sb3I6ICNmZmNlMDA7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMyk7Cn0KLnBodGl2ZHJhdy1kaWFsb2cgcCB7CgltYXJnaW46IDAgMCA2cHg7Cn0KCi5waHRpdmRyYXctZGlhbG9nLXBvcnRhbHMgPiAudWktZGlhbG9nLWNvbnRlbnQsCi5waHRpdmRyYXctZGlhbG9nLWxpbmsgPiAudWktZGlhbG9nLWNvbnRlbnQsCi5waHRpdmRyYXctZGlhbG9nLXBvbHlnb24gPiAudWktZGlhbG9nLWNvbnRlbnQgewoJcGFkZGluZzogNnB4IDZweCAwOwp9Ci5waHRpdmRyYXctZGlhbG9nLXBvcnRhbHMgLm5hbWUgbGFiZWwgewoJYWxpZ24taXRlbXM6IGJhc2VsaW5lOwoJZGlzcGxheTogZmxleDsKfQoucGh0aXZkcmF3LWRpYWxvZy1wb3J0YWxzIC5uYW1lIGxhYmVsID4gKnsKCWZsZXgtZ3JvdzogMTsKCW1hcmdpbi1sZWZ0OiAwLjVlbTsKfQoucGh0aXZkcmF3LWRpYWxvZyB0ZXh0YXJlYS5kZXNjLAoucGh0aXZkcmF3LWRpYWxvZyAuZGVzYyB0ZXh0YXJlYSB7Cglib3gtc2l6aW5nOiBib3JkZXItYm94OwoJd2lkdGg6IDEwMCU7CgloZWlnaHQ6IDQuNWVtOwoJcGFkZGluZzogM3B4OwoJcmVzaXplOiB2ZXJ0aWNhbDsKfQoucGh0aXZkcmF3LWRpYWxvZy1wb3J0YWxzIC5rZXlzIGlucHV0LAoucGh0aXZkcmF3LWRpYWxvZy1saW5rIC5rZXlzIGlucHV0IHsKCXdpZHRoOiA2ZW07CglwYWRkaW5nLXJpZ2h0OiAwOwp9Ci5waHRpdmRyYXctZGlhbG9nLXBvcnRhbHMgLmtleXMgaW5wdXQsCi5waHRpdmRyYXctZGlhbG9nLWxpbmsgLmtleXMgaW5wdXQgewoJbWFyZ2luLWxlZnQ6IDZweDsKfQoucGh0aXZkcmF3LWRpYWxvZy1wb3J0YWxzIC5kZXRhaWxzLAoucGh0aXZkcmF3LWRpYWxvZy1saW5rIC5kZXRhaWxzLAoucGh0aXZkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzIHsKCWRpc3BsYXk6IGJveDsKCWRpc3BsYXk6IGZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwp9Ci5waHRpdmRyYXctZGlhbG9nLXBvcnRhbHMgLnBodGl2ZHJhdy1sYXllciwKLnBodGl2ZHJhdy1kaWFsb2ctbGluayAucGh0aXZkcmF3LWxheWVyLAoucGh0aXZkcmF3LWRpYWxvZy1wb2x5Z29uIC5waHRpdmRyYXctbGF5ZXIgewoJbWFyZ2luLWxlZnQ6IDEycHg7CglmbGV4OiAxIDEgYXV0bzsKCWJveDogMSAxIGF1dG87Cn0KLnBodGl2ZHJhdy1kaWFsb2ctcG9ydGFscyAucG9zaXRpb253YXJuaW5nLmhpZGRlbiB7CglkaXNwbGF5OiBub25lOwp9Ci5waHRpdmRyYXctZGlhbG9nLXBvcnRhbHMgLnBvc2l0aW9ud2FybmluZyB7CgliYWNrZ3JvdW5kLWNvbG9yOiB5ZWxsb3c7Cglib3JkZXI6IDJweCBzb2xpZCByZWQ7Cgljb2xvcjogcmVkOwoJZm9udC13ZWlnaHQ6IGJvbGQ7CglwYWRkaW5nOiAwLjNlbTsKfQoKLnBodGl2ZHJhdy1kaWFsb2ctbGluayAubGlua3BvcnRhbHMgewoJZGlzcGxheTogYm94OwoJZGlzcGxheTogZmxleDsKCW1hcmdpbjogMCAtNnB4IDZweDsKfQoucGh0aXZkcmF3LWRpYWxvZy1saW5rIC5saW5rcG9ydGFscyA+IHNwYW4gewoJZmxleDogMSAxIDUwJTsKCWJveDogMSAxIDUwJTsKCW1hcmdpbjogMCA2cHg7Cn0KCi5waHRpdmRyYXctZGlhbG9nLWxpbmtzID4gLnVpLWRpYWxvZy1jb250ZW50IHsKCXBhZGRpbmc6IDA7Cn0KLnBodGl2ZHJhdy1kaWFsb2ctbGlua3MgPiAudWktZGlhbG9nLWNvbnRlbnQgPiBkaXYgewoJZGlzcGxheTogZmxleDsKCWZsZXgtZGlyZWN0aW9uOiBjb2x1bW47Cn0KLnBodGl2ZHJhdy1kaWFsb2ctbGlua3MgdGV4dGFyZWEuZGVzYyB7CgltYXJnaW46IDZweCA2cHggM3B4OwoJaGVpZ2h0OiAyZW07Cgl3aWR0aDogYXV0bzsKCXBhZGRpbmc6IDRweDsKfQoucGh0aXZkcmF3LWRpYWxvZy1saW5rcyB0YWJsZSB7Cglib3JkZXItc3BhY2luZzogMDsKfQoucGh0aXZkcmF3LWRpYWxvZy1saW5rcyB0ZCB7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKCXBhZGRpbmc6IDFweCAxcHggMCAwOwp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIHRkOmZpcnN0LWNoaWxkLAoucGh0aXZkcmF3LWRpYWxvZy1saW5rcyAuYXJyb3cgewoJdGV4dC1hbGlnbjogY2VudGVyOwoJd2lkdGg6IDIwcHg7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cn0KLnBodGl2ZHJhdy1kaWFsb2ctbGlua3MgaW5wdXRbdHlwZT0iY2hlY2tib3giXSB7CgltYXJnaW46IDA7Cgl2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOwp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIHRhYmxlIGJ1dHRvbiB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CglwYWRkaW5nOiAxcHggNHB4OwoJZm9udC1zaXplOiAxZW07CglsaW5lLWhlaWdodDogMS4yNWVtOwp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIGJ1dHRvbi5wb3J0YWwtZHJvcGRvd24gewoJcGFkZGluZzogMXB4IDBweDsKCW1pbi13aWR0aDogMDsKCWJvcmRlci1sZWZ0LXdpZHRoOiAwOwp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIC5wb3J0YWwgewoJcGFkZGluZy1yaWdodDogNnB4OwoJcGFkZGluZy1sZWZ0OiAycHg7CgltYXgtd2lkdGg6IDE1MHB4OwoJb3ZlcmZsb3c6IGhpZGRlbjsKCXRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzOwp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIC5idXR0b25iYXIgewoJZGlzcGxheTogYm94OwoJZGlzcGxheTogZmxleDsKCWFsaWduLWl0ZW1zOiBjZW50ZXI7CglqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47Cglib3JkZXItdG9wOiAxcHggc29saWQgIzIwYThiMTsKCW1hcmdpbjogNnB4IDAgMCAtNnB4OwoJcGFkZGluZzogNnB4Owp9Ci5waHRpdmRyYXctZGlhbG9nLWxpbmtzIC5idXR0b25iYXIgPiBsYWJlbCB7Cgl3aWR0aDogNWVtOwp9CgoucGh0aXZkcmF3LWRpYWxvZy1hbGVydHMgLnVpLWRpYWxvZy1jb250ZW50IHsKCW1pbi1oZWlnaHQ6IDAgIWltcG9ydGFudDsKfQoucGh0aXZkcmF3LWRpYWxvZy1hbGVydHMgLnVpLWRpYWxvZy1jb250ZW50ID4gZGl2IHsKCW1hcmdpbjogLTZweDsKfQoucGh0aXZkcmF3LWRpYWxvZy1hbGVydHMgLmZsZXggewoJZGlzcGxheTogYm94OyAvKiBvbGQgdmFsdWUsIGZvciBBbmRyb2lkICovCglkaXNwbGF5OiBmbGV4OwoJYWxpZ24taXRlbXM6IGNlbnRlcjsKCXdoaXRlLXNwYWNlOiBub3dyYXA7Cn0KLnBodGl2ZHJhdy1kaWFsb2ctYWxlcnRzIC5mbGV4ICogewoJZmxleDogMSAwIDA7Cglib3g6IDEgMCAwOwp9Ci5waHRpdmRyYXctZGlhbG9nLWFsZXJ0cyAuZmxleCBpbnB1dCB7Cglib3JkZXI6IDFweCBzb2xpZCAjMjBhOGIxOwoJbWFyZ2luLWxlZnQ6IDAuMmVtOwp9Ci5waHRpdmRyYXctZGlhbG9nLWFsZXJ0cyAuZmxleCBzZWxlY3QgewoJd2lkdGg6IDA7IC8qIENocm9tZSB3b3VsZCBleHBhbmQgdG8gZml0IHRoZSBjb250ZW50cyBvdGhlcndpc2UgKi8KfQoucGh0aXZkcmF3LXRhcmdldHNlbGVjdCB7CglkaXNwbGF5OiBmbGV4OwoJYWxpZ24taXRlbXM6IGJhc2VsaW5lOwp9Ci5waHRpdmRyYXctdGFyZ2V0c2VsZWN0ID4gc3Ryb25nIHsKCWZsZXg6IDEgMCAwOwoJYm94OiAxIDAgMDsKCW1hcmdpbjogMCAwLjJlbTsKCW92ZXJmbG93OiBoaWRkZW47Cgl0ZXh0LW92ZXJmbG93OiBlbGxpcHNpczsKCXdoaXRlLXNwYWNlOiBub3dyYXA7Cn0KLnBodGl2ZHJhdy10YXJnZXRzZWxlY3QgPiAucGh0aXZkcmF3LW92ZXJmbG93LWJ1dHRvbiB7CglhbGlnbi1zZWxmOiBzdHJldGNoOwoJYmFja2dyb3VuZC1jb2xvcjogcmdiYSg4LCA0OCwgNzgsIDAuOSk7Cglib3JkZXI6IDFweCBzb2xpZCAjZmZjZTAwOwoJY29sb3I6ICNmZmNlMDA7CglwYWRkaW5nOiAycHg7Cn0KCi5waHRpdmRyYXctZGlhbG9nLXBvbHlnb24gLmRldGFpbHMgPiAuY29sb3IgewoJZGlzcGxheTogaW5saW5lLWJveDsKCWRpc3BsYXk6IGlubGluZS1mbGV4OwoJYWxpZ24taXRlbXM6IGNlbnRlcjsKfQoucGh0aXZkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzID4gLmNvbG9yIGlucHV0LAoucGh0aXZkcmF3LWRpYWxvZy1wb2x5Z29uIC5kZXRhaWxzID4gLmNvbG9yIC5zcC1yZXBsYWNlciB7CgltYXJnaW4tbGVmdDogMC41ZW07Cn0KCi5waHRpdmRyYXctY29sb3ItcGlja2VyIC5zcC1pbnB1dCB7Cglib3JkZXI6IDFweCBzb2xpZCAjNjY2OwoJYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7Cgljb2xvcjogIzIyMjsKfQoucGh0aXZkcmF3LWNvbG9yLXBpY2tlciAuc3AtY2YgewoJbWluLWhlaWdodDogMC41ZW07Cn0KCi5waHRpdmRyYXctbGF5ZXIgewoJZGlzcGxheTogaW5saW5lLWJveDsgLyogb2xkIHZhbHVlLCBmb3IgQW5kcm9pZCAqLwoJZGlzcGxheTogaW5saW5lLWZsZXg7CglhbGlnbi1pdGVtczogY2VudGVyOwp9Ci5waHRpdmRyYXctbGF5ZXIgbGFiZWwgewoJbWFyZ2luLXJpZ2h0OiAwLjVlbTsKfQoucGh0aXZkcmF3LWxheWVyLm5vbGFiZWwgbGFiZWwgewoJZGlzcGxheTogbm9uZTsKfQoucGh0aXZkcmF3LWxheWVyIC5wcmV2aWV3IHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCXdpZHRoOiAwLjVyZW07CgltaW4taGVpZ2h0OiAyMHB4OwoJYWxpZ24tc2VsZjogc3RyZXRjaDsKfQoucGh0aXZkcmF3LWxheWVyIHNlbGVjdCwKLnBodGl2ZHJhdy1sYXllciAub3V0cHV0IHsKCWZsZXg6IDEgMSBhdXRvOwoJYm94OiAxIDEgYXV0bzsKCS8qIHRoZSBzZWxlY3QgaGFzIGEgZGVmYXVsdCB3aWR0aCB3aGljaCB3ZSB3YW50IHRvIHVuc2V0ICovCgltaW4td2lkdGg6IDZlbTsKCXdpZHRoOiAwOwp9Ci5waHRpdmRyYXctbGF5ZXIgLm91dHB1dCB7CgltaW4td2lkdGg6IDRlbTsKfQoucGh0aXZkcmF3LWxheWVyIG9wdGlvbiBzcGFuIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWZsb2F0OiBsZWZ0OwoJdmVydGljYWwtYWxpZ246IHRvcDsKCWhlaWdodDogMWVtOwoJd2lkdGg6IDFlbTsKCW1hcmdpbi1yaWdodDogMC4yNWVtOwp9Ci5waHRpdmRyYXctbGF5ZXIgLm91dHB1dCB7CgltYXJnaW4tbGVmdDogNHB4Owp9CgoudWktZGlhbG9nLXBodGl2ZHJhdy1jb3B5IHRleHRhcmVhIHsgd2lkdGg6OTYlOyBoZWlnaHQ6MjUwcHg7IHJlc2l6ZTp2ZXJ0aWNhbDsgfQoKLnRlbXAtb3AtZGlhbG9nID4gYSB7IGRpc3BsYXk6YmxvY2s7IGNvbG9yOiNmZmNlMDA7IGJvcmRlcjoxcHggc29saWQgI2ZmY2UwMDsgcGFkZGluZzozcHggMDsgbWFyZ2luOjEwcHggYXV0bzsgd2lkdGg6ODAlOyB0ZXh0LWFsaWduOmNlbnRlcjsgYmFja2dyb3VuZDpyZ2JhKDgsNDgsNzgsLjkpOyB9Cg=="
         }(b = scope.CSS || (scope.CSS = {}));
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
     !function (scope) {
         var b;
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
         }(b = scope.Constants || (scope.Constants = {}));
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
     !function (scope) {
         var linkDialogFunc = function () {
@@ -75,7 +75,7 @@ function wrapper(plugin_info) {
             function init(op) {
                 var self = this;
                 self.clearLocalPortalSelections()
-                this._broadcast = new BroadcastChannel("phtivsaildraw-linkdialog");
+                this._broadcast = new BroadcastChannel("phtivdraw-linkdialog");
                 this._portals = {};
                 this._links = [];
                 this._operation = op;
@@ -150,11 +150,11 @@ function wrapper(plugin_info) {
                 };
                 this._broadcast.addEventListener("message", sendMessage, false);
                 this._dialog = window.dialog({
-                    title: this._operation.name + " - PSD Links",
+                    title: this._operation.name + " - PD Links",
                     width: "auto",
                     height: "auto",
                     html: container,
-                    dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-links",
+                    dialogClass: "phtivdraw-dialog phtivdraw-dialog-links",
                     closeCallback: function (popoverName) {
                         self._broadcast.removeEventListener("message", sendMessage, false);
                         var paneIndex = init._dialogs.indexOf(self);
@@ -188,19 +188,19 @@ function wrapper(plugin_info) {
                 }
                 //***Function to clear local selections of portals for the dialog
             }, init.prototype.clearLocalPortalSelections = function () {
-                delete localStorage["phtivsaildraw-portal-dst-1"];
-                delete localStorage["phtivsaildraw-portal-dst-2"];
-                delete localStorage["phtivsaildraw-portal-dst-3"];
-                delete localStorage["phtivsaildraw-portal-src"];
+                delete localStorage["phtivdraw-portal-dst-1"];
+                delete localStorage["phtivdraw-portal-dst-2"];
+                delete localStorage["phtivdraw-portal-dst-3"];
+                delete localStorage["phtivdraw-portal-src"];
                 //***Function to set portal -- called from 'Set' Button
             }, init.prototype.setPortal = function (event) {
                 var updateID = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
                 var selectedPortal = scope.UiHelper.getSelectedPortal();
                 if (selectedPortal) {
-                    localStorage["phtivsaildraw-portal-" + updateID] = JSON.stringify(selectedPortal);
+                    localStorage["phtivdraw-portal-" + updateID] = JSON.stringify(selectedPortal);
                 } else {
                     alert("No Portal Selected.")
-                    delete localStorage["phtivsaildraw-portal-" + updateID];
+                    delete localStorage["phtivdraw-portal-" + updateID];
                 }
                 this.updatePortal(updateID);
                 this._broadcast.postMessage({
@@ -211,7 +211,7 @@ function wrapper(plugin_info) {
                 //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
             }, init.prototype.getPortal = function (name) {
                 try {
-                    return JSON.parse(localStorage["phtivsaildraw-portal-" + name]);
+                    return JSON.parse(localStorage["phtivdraw-portal-" + name]);
                 } catch (b) {
                     return null;
                 }
@@ -289,7 +289,7 @@ function wrapper(plugin_info) {
             }, init._dialogs = [], init;
         }();
         scope.LinkDialog = linkDialogFunc;
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
 
     !function (scope) {
@@ -297,7 +297,7 @@ function wrapper(plugin_info) {
             //***Draws dialog box
             function init() {
                 var self = this;
-                this._broadcast = new BroadcastChannel("phtivsaildraw-opsdialog");
+                this._broadcast = new BroadcastChannel("phtivdraw-opsdialog");
                 this._showing = true;
                 init._dialogs.push(this);
                 var container = document.createElement("div");
@@ -318,7 +318,7 @@ function wrapper(plugin_info) {
                     width: "auto",
                     height: "auto",
                     html: container,
-                    dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-ops",
+                    dialogClass: "phtivdraw-dialog phtivdraw-dialog-ops",
                     closeCallback: function (popoverName) {
                         self._broadcast.removeEventListener("message", sendMessage, false);
                         var paneIndex = init._dialogs.indexOf(self);
@@ -346,7 +346,7 @@ function wrapper(plugin_info) {
             }, init._dialogs = [], init;
         }();
         scope.OpsDialog = opsDialogFunction;
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
     //This function helps with commonly used UI data getting functions
     !function (data) {
@@ -380,7 +380,7 @@ function wrapper(plugin_info) {
             }, helper;
         }();
         data.UiHelper = uiHelper;
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
     //This function deals with modifying objects on map layers
     !function (scope) {
@@ -401,7 +401,7 @@ function wrapper(plugin_info) {
             }, self.editPortal = function (instance, obj, key, value, options) {
                 //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
             }, self.swapPortal = function (operation, portal) {
-                var selectedPortal = PhtivSailDraw.UiHelper.getSelectedPortal();
+                var selectedPortal = PhtivDraw.UiHelper.getSelectedPortal();
                 if (selectedPortal != undefined) {
                     if (confirm("Do you really want to swap these two portals?\n\n" + portal.name + "\n" + selectedPortal.name)) {
                         Promise.all([operation.swapPortal(portal, selectedPortal)]).then(function () {
@@ -419,25 +419,25 @@ function wrapper(plugin_info) {
             }, self;
         }();
         scope.UiCommands = uiCommands;
-    }(PhtivSailDraw || (PhtivSailDraw = {}));
+    }(PhtivDraw || (PhtivDraw = {}));
 
 
     //PLUGIN START
-    window.plugin.phtivsaildraw = function () { };
+    window.plugin.phtivdraw = function () { };
 
     //** LAYER DEFINITIONS */
-    window.plugin.phtivsaildraw.portalLayers = {};
-    window.plugin.phtivsaildraw.portalLayerGroup = null;
-    window.plugin.phtivsaildraw.linkLayers = {};
-    window.plugin.phtivsaildraw.linkLayerGroup = null;
+    window.plugin.phtivdraw.portalLayers = {};
+    window.plugin.phtivdraw.portalLayerGroup = null;
+    window.plugin.phtivdraw.linkLayers = {};
+    window.plugin.phtivdraw.linkLayerGroup = null;
 
-    window.plugin.phtivsaildraw.loadExternals = function () {
+    window.plugin.phtivdraw.loadExternals = function () {
         try {
 
         } catch (e) {
             alert(JSON.stringify(e))
         }
-        console.log('Loading PhtivSailDraw now');
+        console.log('Loading PhtivDraw now');
 
         /* jshint ignore:start */
         /* arc.js by Dane Springmeyer, https://github.com/springmeyer/arc.js */
@@ -461,54 +461,54 @@ function wrapper(plugin_info) {
         }; if ("undefined" === typeof window) module.exports.Coord = Coord, module.exports.Arc = Arc, module.exports.GreatCircle = GreatCircle; else { var arc = {}; arc.Coord = Coord; arc.Arc = Arc; arc.GreatCircle = GreatCircle };
         /* jshint ignore:end */
 
-        window.plugin.phtivsaildraw.arc = arc;
-        window.plugin.phtivsaildraw.addButtons();
-        PhtivSailDraw.opList = Array();
-        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.ui);
-        window.plugin.phtivsaildraw.addCSS(PhtivSailDraw.CSS.main);
-        window.plugin.phtivsaildraw.setupLocalStorage();
+        window.plugin.phtivdraw.arc = arc;
+        window.plugin.phtivdraw.addButtons();
+        PhtivDraw.opList = Array();
+        window.plugin.phtivdraw.addCSS(PhtivDraw.CSS.ui);
+        window.plugin.phtivdraw.addCSS(PhtivDraw.CSS.main);
+        window.plugin.phtivdraw.setupLocalStorage();
 
-        window.plugin.phtivsaildraw.portalLayerGroup = new L.LayerGroup();
-        window.plugin.phtivsaildraw.linkLayerGroup = new L.LayerGroup();
-        window.addLayerGroup('PhtivSail Draw Portals', window.plugin.phtivsaildraw.portalLayerGroup, true);
-        window.addLayerGroup('PhtivSail Draw Links', window.plugin.phtivsaildraw.linkLayerGroup, true);
-        window.plugin.phtivsaildraw.initCrossLinks();
-        window.plugin.phtivsaildraw.drawThings();
+        window.plugin.phtivdraw.portalLayerGroup = new L.LayerGroup();
+        window.plugin.phtivdraw.linkLayerGroup = new L.LayerGroup();
+        window.addLayerGroup('Phtiv Draw Portals', window.plugin.phtivdraw.portalLayerGroup, true);
+        window.addLayerGroup('Phtiv Draw Links', window.plugin.phtivdraw.linkLayerGroup, true);
+        window.plugin.phtivdraw.initCrossLinks();
+        window.plugin.phtivdraw.drawThings();
     };
 
     //** This function adds the plugin buttons on the left side of the screen */
-    window.plugin.phtivsaildraw.addButtons = function () {
+    window.plugin.phtivdraw.addButtons = function () {
 
-        window.plugin.phtivsaildraw.buttons = L.Control.extend({
+        window.plugin.phtivdraw.buttons = L.Control.extend({
             options: {
                 position: 'topleft'
             },
             onAdd: function (map) {
                 var container = L.DomUtil.create('div', 'leaflet-arcs leaflet-bar');
-                $(container).append('<a id="phtivsaildraw_viewopsbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Manage Operations"><img src=' + PhtivSailDraw.Images.toolbar_viewOps + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivsaildraw_viewopsbutton', function () {
-                    window.plugin.phtivsaildraw.getTempOpDialog(window.plugin.phtivsaildraw.getSelectedOperation());
-                    //PhtivSailDraw.OpsDialog.show();
+                $(container).append('<a id="phtivdraw_viewopsbutton" href="javascript: void(0);" class="phtivdraw-control" title="Manage Operations"><img src=' + PhtivDraw.Images.toolbar_viewOps + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivdraw_viewopsbutton', function () {
+                    window.plugin.phtivdraw.getTempOpDialog(window.plugin.phtivdraw.getSelectedOperation());
+                    //PhtivDraw.OpsDialog.show();
                 });
-                $(container).append('<a id="phtivsaildraw_addlinksbutton" href="javascript: void(0);" class="phtivsaildraw-control" title="Add Links"><img src=' + PhtivSailDraw.Images.toolbar_addlinks + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivsaildraw_addlinksbutton', function () {
-                    var selectedOp = window.plugin.phtivsaildraw.getSelectedOperation();
+                $(container).append('<a id="phtivdraw_addlinksbutton" href="javascript: void(0);" class="phtivdraw-control" title="Add Links"><img src=' + PhtivDraw.Images.toolbar_addlinks + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivdraw_addlinksbutton', function () {
+                    var selectedOp = window.plugin.phtivdraw.getSelectedOperation();
                     if (selectedOp != null)
-                        PhtivSailDraw.LinkDialog.update(selectedOp, true);
+                        PhtivDraw.LinkDialog.update(selectedOp, true);
                     else
                         alert("No selected Operation found.");
                 });
                 return container;
             }
         });
-        map.addControl(new window.plugin.phtivsaildraw.buttons());
+        map.addControl(new window.plugin.phtivdraw.buttons());
     };
 
-    window.plugin.phtivsaildraw.addCSS = function (content) {
+    window.plugin.phtivdraw.addCSS = function (content) {
         $("head").append('<link rel="stylesheet" type="text/css" href="' + content + '" />');
     }
 
     //*** This function iterates through the opList and returns the selected one.
-    window.plugin.phtivsaildraw.getSelectedOperation = function () {
-        for (let operation of PhtivSailDraw.opList) {
+    window.plugin.phtivdraw.getSelectedOperation = function () {
+        for (let operation of PhtivDraw.opList) {
             if (operation.isSelected == true) {
                 return Operation.create(operation);
             }
@@ -517,28 +517,28 @@ function wrapper(plugin_info) {
     }
 
     //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
-    window.plugin.phtivsaildraw.setupLocalStorage = function () {
-        //window.plugin.phtivsaildraw.resetOpList();
+    window.plugin.phtivdraw.setupLocalStorage = function () {
+        //window.plugin.phtivdraw.resetOpList();
         var opList = null;
-        var opListObj = store.get(PhtivSailDraw.Constants.OP_LIST_KEY)
+        var opListObj = store.get(PhtivDraw.Constants.OP_LIST_KEY)
         if (opListObj != null)
             opList = JSON.parse(opListObj);
         if (opList == null) {
             var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
             var listToStore = new Array();
             listToStore.push(baseOp);
-            store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
-            opList = JSON.parse(store.get(PhtivSailDraw.Constants.OP_LIST_KEY));
+            store.set(PhtivDraw.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
+            opList = JSON.parse(store.get(PhtivDraw.Constants.OP_LIST_KEY));
         }
-        PhtivSailDraw.opList = opList;
-        //alert("OPLIST -> " + JSON.stringify(PhtivSailDraw.opList));
+        PhtivDraw.opList = opList;
+        //alert("OPLIST -> " + JSON.stringify(PhtivDraw.opList));
     }
 
     //** This function takes an operation and updates the entry in the op list that matches it */
-    window.plugin.phtivsaildraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false) {
+    window.plugin.phtivdraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false) {
         var updatedArray = new Array();
 
-        for (let opInList of PhtivSailDraw.opList) {
+        for (let opInList of PhtivDraw.opList) {
             if (opInList.ID != operation.ID && clearAllBut != true) {
                 if (makeSelected)
                     opInList.isSelected = false;
@@ -550,44 +550,44 @@ function wrapper(plugin_info) {
         updatedArray.push(operation);
 
         if (updatedArray.length != 0) {
-            store.set(PhtivSailDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
-            PhtivSailDraw.opList = updatedArray;
-            PhtivSailDraw.LinkDialog.update(window.plugin.phtivsaildraw.getSelectedOperation(), false)
-            //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivSailDraw.opList))
-            window.plugin.phtivsaildraw.drawThings();
+            store.set(PhtivDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
+            PhtivDraw.opList = updatedArray;
+            PhtivDraw.LinkDialog.update(window.plugin.phtivdraw.getSelectedOperation(), false)
+            //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivDraw.opList))
+            window.plugin.phtivdraw.drawThings();
         } else
             alert("Parse Error -> Saving Op List Failed");
 
     }
 
     //** This function draws things on the layers */
-    window.plugin.phtivsaildraw.drawThings = function () {
-        window.plugin.phtivsaildraw.resetAllPortals();
-        window.plugin.phtivsaildraw.resetAllLinks();
-        window.plugin.phtivsaildraw.checkAllLinks();
+    window.plugin.phtivdraw.drawThings = function () {
+        window.plugin.phtivdraw.resetAllPortals();
+        window.plugin.phtivdraw.resetAllLinks();
+        window.plugin.phtivdraw.checkAllLinks();
     }
 
     //** This function adds all the Links to the layer */
-    window.plugin.phtivsaildraw.addAllLinks = function () {
-        var linkList = window.plugin.phtivsaildraw.getSelectedOperation().links;
+    window.plugin.phtivdraw.addAllLinks = function () {
+        var linkList = window.plugin.phtivdraw.getSelectedOperation().links;
         linkList.forEach(function (link) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.phtivsaildraw.addLink(link);
+            window.plugin.phtivdraw.addLink(link);
         });
     }
 
     //** This function resets all the Links and calls addAllLinks to add them */
-    window.plugin.phtivsaildraw.resetAllLinks = function () {
-        for (guid in window.plugin.phtivsaildraw.linkLayers) {
-            var linkInLayer = window.plugin.phtivsaildraw.linkLayers[guid];
-            window.plugin.phtivsaildraw.linkLayerGroup.removeLayer(linkInLayer);
-            delete window.plugin.phtivsaildraw.linkLayers[guid];
+    window.plugin.phtivdraw.resetAllLinks = function () {
+        for (guid in window.plugin.phtivdraw.linkLayers) {
+            var linkInLayer = window.plugin.phtivdraw.linkLayers[guid];
+            window.plugin.phtivdraw.linkLayerGroup.removeLayer(linkInLayer);
+            delete window.plugin.phtivdraw.linkLayers[guid];
         }
-        window.plugin.phtivsaildraw.addAllLinks();
+        window.plugin.phtivdraw.addAllLinks();
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.phtivsaildraw.addLink = function (link) {
+    window.plugin.phtivdraw.addLink = function (link) {
         //console.log("Link IS: " + JSON.stringify(portal))
         var options = {
             dashArray: [5, 5, 1, 5],
@@ -597,65 +597,65 @@ function wrapper(plugin_info) {
         };
         var latLngs = link.getLatLngs();
         if (latLngs != null) {
-            var startCoord = new window.plugin.phtivsaildraw.arc.Coord(latLngs[0].lng, latLngs[0].lat);
-            var endCoord = new window.plugin.phtivsaildraw.arc.Coord(latLngs[1].lng, latLngs[1].lat);
-            var gc = new window.plugin.phtivsaildraw.arc.GreatCircle(startCoord, endCoord);
-            var distance = window.plugin.phtivsaildraw.distance(link);
+            var startCoord = new window.plugin.phtivdraw.arc.Coord(latLngs[0].lng, latLngs[0].lat);
+            var endCoord = new window.plugin.phtivdraw.arc.Coord(latLngs[1].lng, latLngs[1].lat);
+            var gc = new window.plugin.phtivdraw.arc.GreatCircle(startCoord, endCoord);
+            var distance = window.plugin.phtivdraw.distance(link);
             var geojson_feature = gc.Arc(Math.round(distance)).json();
             var link_ = new L.geoJson(geojson_feature, options);
 
-            window.plugin.phtivsaildraw.linkLayers[link["ID"]] = link_;
-            link_.addTo(window.plugin.phtivsaildraw.linkLayerGroup);
+            window.plugin.phtivdraw.linkLayers[link["ID"]] = link_;
+            link_.addTo(window.plugin.phtivdraw.linkLayerGroup);
         } else
             console.log("LATLNGS WAS NULL?!")
     }
 
     //** This function adds all the portals to the layer */
-    window.plugin.phtivsaildraw.addAllPortals = function () {
-        var portalList = window.plugin.phtivsaildraw.getSelectedOperation().portals;
+    window.plugin.phtivdraw.addAllPortals = function () {
+        var portalList = window.plugin.phtivdraw.getSelectedOperation().portals;
         portalList.forEach(function (portal) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.phtivsaildraw.addPortal(portal);
+            window.plugin.phtivdraw.addPortal(portal);
             //console.log("ADDING PORTAL: " + JSON.stringify(portal));
         });
     }
 
     //** This function resets all the portals and calls addAllPortals to add them */
-    window.plugin.phtivsaildraw.resetAllPortals = function () {
-        for (guid in window.plugin.phtivsaildraw.portalLayers) {
-            var portalInLayer = window.plugin.phtivsaildraw.portalLayers[guid];
-            window.plugin.phtivsaildraw.portalLayerGroup.removeLayer(portalInLayer);
-            delete window.plugin.phtivsaildraw.portalLayers[guid];
+    window.plugin.phtivdraw.resetAllPortals = function () {
+        for (guid in window.plugin.phtivdraw.portalLayers) {
+            var portalInLayer = window.plugin.phtivdraw.portalLayers[guid];
+            window.plugin.phtivdraw.portalLayerGroup.removeLayer(portalInLayer);
+            delete window.plugin.phtivdraw.portalLayers[guid];
         }
-        window.plugin.phtivsaildraw.addAllPortals();
+        window.plugin.phtivdraw.addAllPortals();
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.phtivsaildraw.addPortal = function (portal) {
+    window.plugin.phtivdraw.addPortal = function (portal) {
         //console.log("PORTAL IS: " + JSON.stringify(portal))
-        var op = window.plugin.phtivsaildraw.getSelectedOperation();
+        var op = window.plugin.phtivdraw.getSelectedOperation();
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal["name"],
             icon: L.icon({
-                iconUrl: PhtivSailDraw.Images.marker_layer_groupa,
+                iconUrl: PhtivDraw.Images.marker_layer_groupa,
                 iconAnchor: [12, 41],
                 iconSize: [25, 41],
                 popupAnchor: [0, -35]
             })
         });
         window.registerMarkerForOMS(marker);
-        marker.bindPopup(window.plugin.phtivsaildraw.getPortalPopup(marker, portal));
+        marker.bindPopup(window.plugin.phtivdraw.getPortalPopup(marker, portal));
         marker.off("click", marker.togglePopup, marker);
         marker.on('spiderfiedclick', marker.togglePopup, marker);
-        window.plugin.phtivsaildraw.portalLayers[portal["id"]] = marker;
-        marker.addTo(window.plugin.phtivsaildraw.portalLayerGroup);
+        window.plugin.phtivdraw.portalLayers[portal["id"]] = marker;
+        marker.addTo(window.plugin.phtivdraw.portalLayerGroup);
     }
 
     //** This function gets the portal popup content */
-    window.plugin.phtivsaildraw.getPortalPopup = function (marker, portal) {
+    window.plugin.phtivdraw.getPortalPopup = function (marker, portal) {
         var content = document.createElement("div");
-        content.className = "phtivsaildraw-popup portal";
+        content.className = "phtivdraw-popup portal";
         var title = content.appendChild(document.createElement("div"));
         title.className = "desc";
         title.innerHTML = window.markdown.toHTML(portal.name);
@@ -664,32 +664,32 @@ function wrapper(plugin_info) {
         var swapButton = buttonSet.appendChild(document.createElement("button"));
         swapButton.textContent = "Swap";
         swapButton.addEventListener("click", function () {
-            PhtivSailDraw.UiCommands.swapPortal(window.plugin.phtivsaildraw.getSelectedOperation(), portal)
+            PhtivDraw.UiCommands.swapPortal(window.plugin.phtivdraw.getSelectedOperation(), portal)
             marker.closePopup();
         }, false);
         var deleteButton = buttonSet.appendChild(document.createElement("button"));
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", function () {
-            PhtivSailDraw.UiCommands.deletePortal(window.plugin.phtivsaildraw.getSelectedOperation(), portal)
+            PhtivDraw.UiCommands.deletePortal(window.plugin.phtivdraw.getSelectedOperation(), portal)
             marker.closePopup();
         }, false);
         return content;
     }
 
     //** This function is a temp placeholder to allow folks to import and export simply */
-    window.plugin.phtivsaildraw.getTempOpDialog = function (operation) {
+    window.plugin.phtivdraw.getTempOpDialog = function (operation) {
         var content = document.createElement("div");
         buttonSet = content.appendChild(document.createElement("div"));
         buttonSet.className = "temp-op-dialog";
         var swapButton = buttonSet.appendChild(document.createElement("a"));
         swapButton.textContent = "Import";
         swapButton.addEventListener("click", function () {
-            window.plugin.phtivsaildraw.importString();
+            window.plugin.phtivdraw.importString();
         }, false);
         var deleteButton = buttonSet.appendChild(document.createElement("a"));
         deleteButton.textContent = "Export";
         deleteButton.addEventListener("click", function () {
-            window.plugin.phtivsaildraw.exportString(operation.name, JSON.stringify(operation));
+            window.plugin.phtivdraw.exportString(operation.name, JSON.stringify(operation));
         }, false);
 
         var clearOpButton = buttonSet.appendChild(document.createElement("a"));
@@ -705,52 +705,52 @@ function wrapper(plugin_info) {
             width: "auto",
             height: "auto",
             html: content,
-            dialogClass: "phtivsaildraw-dialog phtivsaildraw-dialog-ops",
+            dialogClass: "phtivdraw-dialog phtivdraw-dialog-ops",
 
         });
     }
 
     //** This function opens a dialog with a text field to copy */
-    window.plugin.phtivsaildraw.importString = function () {
-        var promptAction = prompt('Press CTRL+V to paste (PhtivSailDraw data only).', '');
+    window.plugin.phtivdraw.importString = function () {
+        var promptAction = prompt('Press CTRL+V to paste (PhtivDraw data only).', '');
         if (promptAction !== null && promptAction !== '') {
             try {
                 if (promptAction.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*"))) {
-                    alert('PhtivSailDraw doesn\'t support stock intel draw imports')
+                    alert('PhtivDraw doesn\'t support stock intel draw imports')
                 } else {
                     var data = JSON.parse(promptAction);
                     var importedOp = Operation.create(data);
-                    window.plugin.phtivsaildraw.updateOperationInList(importedOp, true, true)
-                    console.log('PhtivSailDrawtools: reset and imported drawn items');
+                    window.plugin.phtivdraw.updateOperationInList(importedOp, true, true)
+                    console.log('PhtivDrawTools: reset and imported drawn items');
                     alert('Import Successful.');
                 }
 
                 // to write back the data to localStorage
 
             } catch (e) {
-                console.warn('PhtivSailDrawtools: failed to import data: ' + e);
+                console.warn('PhtivDrawTools: failed to import data: ' + e);
                 alert('Import Failed.');
             }
         }
     }
 
     //** This function opens a dialog with a text field to copy */
-    window.plugin.phtivsaildraw.exportString = function (title, string) {
-        var html = '<p><a onclick="$(\'.ui-dialog-phtivsaildraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-            + '<textarea readonly onclick="$(\'.ui-dialog-phtivsaildraw-copy textarea\').select();">' + string + '</textarea>';
+    window.plugin.phtivdraw.exportString = function (title, string) {
+        var html = '<p><a onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+            + '<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + string + '</textarea>';
         window.dialog({
             title: title + " - Export",
             width: "auto",
             height: "auto",
             html: html,
-            dialogClass: "ui-dialog-phtivsaildraw-copy",
+            dialogClass: "ui-dialog-phtivdraw-copy",
 
         });
     }
 
     //** This function copies whatever value is sent into the function to the clipboard */
     //** Also, this is very hacky, find some better way? (ALSO IT DOESN'T WORK!? */
-    window.plugin.phtivsaildraw.copyToClipboard = function (val) {
+    window.plugin.phtivdraw.copyToClipboard = function (val) {
         var dummy = document.createElement("input");
         document.body.appendChild(dummy);
         $(dummy).css('display', 'none');
@@ -763,20 +763,20 @@ function wrapper(plugin_info) {
     }
 
     //*** This function resets the local op list
-    window.plugin.phtivsaildraw.resetOpList = function () {
-        store.set(PhtivSailDraw.Constants.OP_LIST_KEY, null);
+    window.plugin.phtivdraw.resetOpList = function () {
+        store.set(PhtivDraw.Constants.OP_LIST_KEY, null);
     }
 
     //** This function does something for the generate ID function */
-    window.plugin.phtivsaildraw.dec2hex = function (dec) {
+    window.plugin.phtivdraw.dec2hex = function (dec) {
         return ('0' + dec.toString(16)).substr(-2)
     }
 
     //** This function generates a unique ID for an object */
-    window.plugin.phtivsaildraw.generateId = function (len) {
+    window.plugin.phtivdraw.generateId = function (len) {
         var arr = new Uint8Array((len || 40) / 2)
         window.crypto.getRandomValues(arr)
-        return Array.from(arr, window.plugin.phtivsaildraw.dec2hex).join('')
+        return Array.from(arr, window.plugin.phtivdraw.dec2hex).join('')
     }
 
     class Operation {
@@ -787,7 +787,7 @@ function wrapper(plugin_info) {
         //portals <- List of Portals
         //links <- List of Links
         constructor(creator, name, isSelected) {
-            this.ID = window.plugin.phtivsaildraw.generateId();
+            this.ID = window.plugin.phtivdraw.generateId();
             this.name = name;
             this.creator = creator;
             this.isSelected = isSelected;
@@ -873,7 +873,7 @@ function wrapper(plugin_info) {
         }
 
         update() {
-            window.plugin.phtivsaildraw.updateOperationInList(this);
+            window.plugin.phtivdraw.updateOperationInList(this);
         }
 
         static convertLinksToObjs(links) {
@@ -908,7 +908,7 @@ function wrapper(plugin_info) {
         //toPortal <- portal the link is to
         //description <- user entered description of link
         constructor(fromPortal, toPortal, description) {
-            this.ID = window.plugin.phtivsaildraw.generateId();
+            this.ID = window.plugin.phtivdraw.generateId();
             this.fromPortal = fromPortal;
             this.toPortal = toPortal;
             this.description = description;
@@ -938,7 +938,7 @@ function wrapper(plugin_info) {
 
 
     /*** ARC THINGS */
-    window.plugin.phtivsaildraw.distance = function (link) {
+    window.plugin.phtivdraw.distance = function (link) {
         //How far between portals.
         var R = 6367; // km
 
@@ -961,7 +961,7 @@ function wrapper(plugin_info) {
     //*** END ARC THINGS */
 
     //*** CROSSLINK THINGS */
-    window.plugin.phtivsaildraw.greatCircleArcIntersect = function (ta0, ta1, tb0, tb1) {
+    window.plugin.phtivdraw.greatCircleArcIntersect = function (ta0, ta1, tb0, tb1) {
         // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
         // method:
@@ -1163,7 +1163,7 @@ function wrapper(plugin_info) {
         return true;
     };
 
-    window.plugin.phtivsaildraw.testPolyLine = function (drawnLink, link) {
+    window.plugin.phtivdraw.testPolyLine = function (drawnLink, link) {
         var a = link.getLatLngs();
         var start = {};
         var end = {};
@@ -1172,12 +1172,12 @@ function wrapper(plugin_info) {
         end.lat = drawnLink.toPortal.lat;
         end.lng = drawnLink.toPortal.lng;
 
-        if (window.plugin.phtivsaildraw.greatCircleArcIntersect(a[0], a[1], start, end)) return true;
+        if (window.plugin.phtivdraw.greatCircleArcIntersect(a[0], a[1], start, end)) return true;
 
         return false;
     };
 
-    window.plugin.phtivsaildraw.showCrossLink = function (link) {
+    window.plugin.phtivdraw.showCrossLink = function (link) {
 
         var blocked = L.geodesicPolyline(link.getLatLngs(), {
             color: '#d22',
@@ -1188,76 +1188,76 @@ function wrapper(plugin_info) {
             guid: link.options.guid
         });
 
-        blocked.addTo(window.plugin.phtivsaildraw.crossLinkLayers);
-        window.plugin.phtivsaildraw.crossLinkLayerGroup[link.options.guid] = blocked;
+        blocked.addTo(window.plugin.phtivdraw.crossLinkLayers);
+        window.plugin.phtivdraw.crossLinkLayerGroup[link.options.guid] = blocked;
     }
 
-    window.plugin.phtivsaildraw.testLink = function (drawnLinks, link) {
-        if (window.plugin.phtivsaildraw.crossLinkLayerGroup[link.options.guid]) return;
+    window.plugin.phtivdraw.testLink = function (drawnLinks, link) {
+        if (window.plugin.phtivdraw.crossLinkLayerGroup[link.options.guid]) return;
         for (i = 0; i < drawnLinks.length; i++) {
-            if (plugin.phtivsaildraw.testPolyLine(drawnLinks[i], link, true)) {
-                plugin.phtivsaildraw.showCrossLink(link);
+            if (plugin.phtivdraw.testPolyLine(drawnLinks[i], link, true)) {
+                plugin.phtivdraw.showCrossLink(link);
                 break;
             }
         }
     };
 
-    window.plugin.phtivsaildraw.checkAllLinks = function () {
-        window.plugin.phtivsaildraw.crossLinkLayers.clearLayers();
-        plugin.phtivsaildraw.crossLinkLayerGroup = {};
+    window.plugin.phtivdraw.checkAllLinks = function () {
+        window.plugin.phtivdraw.crossLinkLayers.clearLayers();
+        plugin.phtivdraw.crossLinkLayerGroup = {};
 
-        var drawnLinks = window.plugin.phtivsaildraw.getSelectedOperation().links;
+        var drawnLinks = window.plugin.phtivdraw.getSelectedOperation().links;
 
         $.each(window.links, function (guid, link) {
-            window.plugin.phtivsaildraw.testLink(drawnLinks, link);
+            window.plugin.phtivdraw.testLink(drawnLinks, link);
         });
     }
 
-    window.plugin.phtivsaildraw.onLinkAdded = function (data) {
-        var drawnLinks = window.plugin.phtivsaildraw.getSelectedOperation().links;
-        plugin.phtivsaildraw.testLink(drawnLinks, data.link);
+    window.plugin.phtivdraw.onLinkAdded = function (data) {
+        var drawnLinks = window.plugin.phtivdraw.getSelectedOperation().links;
+        plugin.phtivdraw.testLink(drawnLinks, data.link);
     }
 
-    window.plugin.phtivsaildraw.testForDeletedLinks = function () {
-        window.plugin.phtivsaildraw.crossLinkLayers.eachLayer(function (layer) {
+    window.plugin.phtivdraw.testForDeletedLinks = function () {
+        window.plugin.phtivdraw.crossLinkLayers.eachLayer(function (layer) {
             var guid = layer.options.guid;
             if (!window.links[guid]) {
-                plugin.phtivsaildraw.crossLinkLayers.removeLayer(layer);
-                delete plugin.phtivsaildraw.crossLinkLayerGroup[guid];
+                plugin.phtivdraw.crossLinkLayers.removeLayer(layer);
+                delete plugin.phtivdraw.crossLinkLayerGroup[guid];
             }
         });
     }
 
-    window.plugin.phtivsaildraw.onMapDataRefreshEnd = function () {
-        window.plugin.phtivsaildraw.crossLinkLayers.bringToFront();
-        window.plugin.phtivsaildraw.testForDeletedLinks();
+    window.plugin.phtivdraw.onMapDataRefreshEnd = function () {
+        window.plugin.phtivdraw.crossLinkLayers.bringToFront();
+        window.plugin.phtivdraw.testForDeletedLinks();
     }
 
-    window.plugin.phtivsaildraw.initCrossLinks = function () {
-        window.plugin.phtivsaildraw.crossLinkLayers = new L.FeatureGroup();
-        window.plugin.phtivsaildraw.crossLinkLayerGroup = {};
-        window.addLayerGroup('PhtivSail Cross Links', window.plugin.phtivsaildraw.crossLinkLayers, true);
+    window.plugin.phtivdraw.initCrossLinks = function () {
+        window.plugin.phtivdraw.crossLinkLayers = new L.FeatureGroup();
+        window.plugin.phtivdraw.crossLinkLayerGroup = {};
+        window.addLayerGroup('Phtiv Cross Links', window.plugin.phtivdraw.crossLinkLayers, true);
 
         map.on('layeradd', function (obj) {
-            if (obj.layer === window.plugin.phtivsaildraw.crossLinkLayers) {
-                window.plugin.phtivsaildraw.checkAllLinks();
+            if (obj.layer === window.plugin.phtivdraw.crossLinkLayers) {
+                window.plugin.phtivdraw.checkAllLinks();
             }
         });
         map.on('layerremove', function (obj) {
-            if (obj.layer === window.plugin.phtivsaildraw.crossLinkLayers) {
-                window.plugin.phtivsaildraw.crossLinkLayers.clearLayers();
-                window.plugin.phtivsaildraw.crossLinkLayerGroup = {};
+            if (obj.layer === window.plugin.phtivdraw.crossLinkLayers) {
+                window.plugin.phtivdraw.crossLinkLayers.clearLayers();
+                window.plugin.phtivdraw.crossLinkLayerGroup = {};
             }
         });
 
-        window.addHook('linkAdded', window.plugin.phtivsaildraw.onLinkAdded);
-        window.addHook('mapDataRefreshEnd', window.plugin.phtivsaildraw.onMapDataRefreshEnd);
+        window.addHook('linkAdded', window.plugin.phtivdraw.onLinkAdded);
+        window.addHook('mapDataRefreshEnd', window.plugin.phtivdraw.onMapDataRefreshEnd);
     }
 
     //*** END CROSSLINK THINGS */
 
     //PLUGIN END
-    var setup = window.plugin.phtivsaildraw.loadExternals;
+    var setup = window.plugin.phtivdraw.loadExternals;
 
     setup.info = plugin_info; //add the script info data to the function as a property
     if (!window.bootPlugins)
