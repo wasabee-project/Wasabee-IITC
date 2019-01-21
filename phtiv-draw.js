@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
