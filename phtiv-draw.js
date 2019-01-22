@@ -594,7 +594,6 @@ function wrapper(plugin_info) {
                         return that._operation.getPortal(link.fromPortal.id);
                     },
                     sortValue: function (b) {
-                        console.log("B IS: " + JSON.stringify(b))
                         return b.name;
                     },
                     sort: function (a, b) {
@@ -647,7 +646,7 @@ function wrapper(plugin_info) {
                         return that._operation.getPortal(link.toPortal.id);
                     },
                     sortValue: function (b) {
-                        return b.description;
+                        return "";
                     },
                     sort: function (a, b) {
                         return a.localeCompare(b);
@@ -719,7 +718,7 @@ function wrapper(plugin_info) {
                     var addedDialog = window.dialog({
                         html: this._table.table,
                         dialogClass: "phtivdraw-dialog phtivdraw-dialog-linklist",
-                        title: this._operation.name + " Links",
+                        title: this._portal.name + ": Links",
                         width: "auto",
                     });
                     var buttons = addedDialog.dialog("option", "buttons");
@@ -741,9 +740,9 @@ function wrapper(plugin_info) {
             }, init.prototype.getLinkLength = function (link) {
                 var latlngs = link.getLatLngs();
                 return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
-            }, init.prototype.deleteLink = function (log) {
-                var p = this;
-                if (confirm("Do you really want to delete the link?")) {
+            }, init.prototype.deleteLink = function (link) {
+                var that = this;
+                if (confirm("Do you really want to delete the link: " + link.fromPortal.name + " -> " + link.toPortal.name)) {
                     /*
                   this._operation.linkService.deleteLink(log.portalFrom.id, log.portalTo.id, PLAYER.nickname).then(function() {
                     p._operation.portalService.getPortals();
@@ -770,25 +769,15 @@ function wrapper(plugin_info) {
 
                 var $scope = this;
                 var state = new scope.OverflowMenu;
-                state.items = [{
-                    label: "Add alert",
-                    onclick: function () {
-                        //return $scope.addAlert(data);
-                    }
-                }, {
-                    label: "Edit",
-                    onclick: function () {
-                        //return $scope.editLink(data);
-                    }
-                }, {
+                state.items = [, {
                     label: "Reverse",
                     onclick: function () {
-                        //return $scope.reverseLink(data);
+                        alert('Not Yet Implemented.');//return $scope.reverseLink(data);
                     }
                 }, {
                     label: "Delete",
                     onclick: function () {
-                        //return $scope.deleteLink(data);
+                        return $scope.deleteLink(data);
                     }
                 }];
                 list.className = "menu";
