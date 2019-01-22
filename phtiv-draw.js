@@ -500,7 +500,7 @@ function wrapper(plugin_info) {
                 this._button.addEventListener("click", function (type) {
                     _this.onButtonClick(type);
                 }, false);
-                this._button.className = "reswue-overflow-button";
+                this._button.className = "phtivdraw-overflow-button";
                 this._button.appendChild(document.createElement("span")).textContent = "\u22ee";
                 this._handler = function (e) {
                     if ("mousedown" == e.type) {
@@ -525,7 +525,7 @@ function wrapper(plugin_info) {
             }), Object.defineProperty(init.prototype, "items", {
                 set: function (object) {
                     var scene = this;
-                    return this.hide(), object instanceof HTMLElement ? (this._menu = object, void (this._menu.tabIndex = 0)) : (this._menu = document.createElement("ul"), this._menu.tabIndex = 0, this._menu.className = "reswue-overflow-menu", void object.forEach(function (button) {
+                    return this.hide(), object instanceof HTMLElement ? (this._menu = object, void (this._menu.tabIndex = 0)) : (this._menu = document.createElement("ul"), this._menu.tabIndex = 0, this._menu.className = "phtivdraw-overflow-menu", void object.forEach(function (button) {
                         var content = scene._menu.appendChild(document.createElement("li"));
                         if ("string" == typeof button.label) {
                             var btn = content.appendChild(document.createElement("a"));
