@@ -348,6 +348,284 @@ function wrapper(plugin_info) {
         scope.OpsDialog = opsDialogFunction;
     }(PhtivDraw || (PhtivDraw = {}));
 
+    /*
+    !function(scope) {
+        var linkListDialog = function() {
+          function init(operation, dashboard, layerManager, portal) {
+            var that = this;
+            this._portal = null;
+            this._operation = operation;
+            this._dashboard = dashboard;
+            this._layerManager = layerManager;
+            this._portal = layerManager;
+            this._table = new scope.Sortable;
+            this._table.fields = [{
+              name : "Layer",
+              value : function(obj) {
+                return obj.layerName;
+              },
+              sortValue : function(b) {
+                var outputParameterFields = that._layerManager.getAllLayerConfigs();
+                var j = 0;
+                for (; j < outputParameterFields.length; j++) {
+                  if (outputParameterFields[j].name == b) {
+                    return j;
+                  }
+                }
+              },
+              format : function(template, id) {
+                var options = new scope.LayerSelector(that._layerManager, that._operation.data, false);
+                options.layerName = id;
+                options.disabled = true;
+                options.label = false;
+                template.appendChild(options.container);
+              }
+            }, {
+              name : "Description",
+              value : function(prop) {
+                return prop.description;
+              },
+              sort : function(a, b) {
+                return a.localeCompare(b);
+              },
+              format : function(row, obj) {
+                row.className = "desc";
+                row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+              }
+            }, {
+              name : "From",
+              value : function(prop) {
+                return that._operation.data.getPortal(prop.portalFrom.id);
+              },
+              sortValue : function(b) {
+                return b.name;
+              },
+              sort : function(a, b) {
+                return a.localeCompare(b);
+              },
+              format : function(d, data) {
+                if (d.colSpan = 2, d.appendChild(scope.UiHelper.getPortalLink(data)), data.description) {
+                  var row = d.appendChild(document.createElement("div"));
+                  row.className = "desc";
+                  row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(data.description));
+                }
+              }
+            }, {
+              name : "Desc.",
+              title : "From Portal Description",
+              value : function(prop) {
+                return that._operation.data.getPortal(prop.portalFrom.id);
+              },
+              sortValue : function(b) {
+                return b.description;
+              },
+              sort : function(a, b) {
+                return a.localeCompare(b);
+              },
+              format : function(a, b) {
+                a.style.display = "none";
+              }
+            }, {
+              name : "To",
+              value : function(prop) {
+                return that._operation.data.getPortal(prop.portalTo.id);
+              },
+              sortValue : function(b) {
+                return b.name;
+              },
+              sort : function(a, b) {
+                return a.localeCompare(b);
+              },
+              format : function(d, data) {
+                if (d.colSpan = 2, d.appendChild(scope.UiHelper.getPortalLink(data)), data.description) {
+                  var row = d.appendChild(document.createElement("div"));
+                  row.className = "desc";
+                  row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(data.description));
+                }
+              }
+            }, {
+              name : "Desc",
+              title : "To Portal Description",
+              value : function(prop) {
+                return that._operation.data.getPortal(prop.portalTo.id);
+              },
+              sortValue : function(b) {
+                return b.description;
+              },
+              sort : function(a, b) {
+                return a.localeCompare(b);
+              },
+              format : function(a, b) {
+                a.style.display = "none";
+              }
+            }, {
+              name : "Keys",
+              value : function(prop) {
+                return prop.keysShared;
+              },
+              format : function(a, b) {
+                a.classList.add("keys");
+                a.textContent = b;
+              }
+            }, {
+              name : "Length",
+              value : function(obj) {
+                return that.getLinkLength(obj);
+              },
+              format : function(a, m) {
+                a.classList.add("length");
+                a.textContent = m > 1E3 ? (m / 1E3).toFixed(1) + "km" : m.toFixed(1) + "m";
+              }
+            }, {
+              name : "Min Lvl",
+              title : "Minimum level required on source portal",
+              value : function(obj) {
+                return that.getLinkLength(obj);
+              },
+              format : function(a, b) {
+                var s;
+                if (b > 6881280) {
+                  s = "impossible";
+                } else {
+                  if (b > 1966080) {
+                    s = "L8+some VRLA";
+                    a.title = "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+                    a.classList.add("help");
+                  } else {
+                    if (b > 655360) {
+                      s = "L8+some LA";
+                      a.title = "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+                      a.classList.add("help");
+                    } else {
+                      var d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, .25)) / 8);
+                      var msd = 8 * (d - Math.floor(d));
+                      s = "L" + d;
+                      if (0 != msd) {
+                        if (!(1 & msd)) {
+                          s = s + "\u2007";
+                        }
+                        if (!(1 & msd || 2 & msd)) {
+                          s = s + "\u2007";
+                        }
+                        s = s + (" = L" + Math.floor(d) + "0\u215b\u00bc\u215c\u00bd\u215d\u00be\u215e".charAt(msd));
+                      }
+                    }
+                  }
+                }
+                a.textContent = s;
+              }
+            }, {
+              name : "",
+              sort : null,
+              value : function(prop) {
+                return prop;
+              },
+              format : function(o, e) {
+                return that.makeMenu(o, e);
+              }
+            }];
+            this._table.sortBy = 1;
+            this._setLinks();
+            var extUserId = this._operation.data.addUpdateNotificationHandler({
+              updateOperation : function(name, operation) {
+              },
+              updatePortals : function(a, b) {
+                that._setLinks();
+              },
+              updateLinks : function(data, type) {
+                that._setLinks();
+              },
+              updatePolygons : function(p, p0) {
+              },
+              updateAlerts : function(response, method) {
+              },
+              updateAgents : function(node, agents) {
+              },
+              updateGroups : function(connection, items) {
+              }
+            });
+            var addedDialog = window.dialog({
+              html : this._table.table,
+              dialogClass : "phtivdraw-dialog phtivdraw-dialog-linklist",
+              title : this._operation.getDisplayName() + " Links",
+              width : "auto",
+              closeCallback : function() {
+                that._operation.data.removeUpdateNotificationHandler(extUserId);
+              }
+            });
+            var buttons = addedDialog.dialog("option", "buttons");
+            addedDialog.dialog("option", "buttons", $.extend({}, {
+              "Add links" : function(b) {
+                if (that._portal) {
+                  window.renderPortalDetails(guid);
+                }
+                scope.LinkDialog.show(that._operation, that._dashboard, that._layerManager);
+              }
+            }, buttons));
+          }
+          return init.prototype._setLinks = function() {
+            var _self = this;
+            var wrapped = this._operation.data.links;
+            if (this._portal) {
+              wrapped = wrapped.filter(function(sentRawMessage) {
+                return sentRawMessage.portalFrom.id == _self._portal || sentRawMessage.portalTo.id == _self._portal;
+              });
+            }
+            this._table.items = wrapped;
+          }, init.prototype.getLinkLength = function(instance) {
+            var latlngs = scope.Analyzer.getLinkCoordinates(this._operation.data, instance);
+            return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
+          }, init.prototype.deleteLink = function(log) {
+            var p = this;
+            if (confirm("Do you really want to delete the link?")) {
+              this._operation.linkService.deleteLink(log.portalFrom.id, log.portalTo.id, PLAYER.nickname).then(function() {
+                p._operation.portalService.getPortals();
+              });
+            }
+          }, init.prototype.reverseLink = function(bmLayers) {
+            var p = this;
+            this._operation.linkService.reverseLink(bmLayers.portalFrom.id, bmLayers.portalTo.id, PLAYER.nickname).then(function() {
+              p._operation.portalService.getPortals();
+            });
+          }, init.prototype.editLink = function(aliases) {
+            new scope.LinkEditDialog(this._operation, this._layerManager, aliases);
+          }, init.prototype.addAlert = function(message) {
+            window.renderPortalDetails(message.portalFrom.id);
+            var s = new scope.AlertDialog(this._operation, new scope.Preferences);
+            s.showDialog();
+            s.setTarget(this._operation.data.getPortal(message.portalTo.id));
+          }, init.prototype.makeMenu = function(list, data) {
+            var $scope = this;
+            var state = new scope.OverflowMenu;
+            state.items = [{
+              label : "Add alert",
+              onclick : function() {
+                return $scope.addAlert(data);
+              }
+            }, {
+              label : "Edit",
+              onclick : function() {
+                return $scope.editLink(data);
+              }
+            }, {
+              label : "Reverse",
+              onclick : function() {
+                return $scope.reverseLink(data);
+              }
+            }, {
+              label : "Delete",
+              onclick : function() {
+                return $scope.deleteLink(data);
+              }
+            }];
+            list.className = "menu";
+            list.appendChild(state.button);
+          }, init;
+        }();
+        scope.LinkListDialog = linkListDialog;
+      }(PhtivDraw || (PhtivDraw = {}));
+*/
+
     //This function helps with commonly used UI data getting functions
     !function (data) {
         var uiHelper = function () {
@@ -654,20 +932,20 @@ function wrapper(plugin_info) {
 
     //** This function gets the portal popup content */
     window.plugin.phtivdraw.getPortalPopup = function (marker, portal) {
+        marker.className = "phtivdraw-dialog phtivdraw-dialog-ops"
         var content = document.createElement("div");
-        content.className = "phtivdraw-popup portal";
         var title = content.appendChild(document.createElement("div"));
         title.className = "desc";
         title.innerHTML = window.markdown.toHTML(portal.name);
-        buttonSet = content.appendChild(document.createElement("p"));
-        buttonSet.className = "ui-dialog-buttonset";
-        var swapButton = buttonSet.appendChild(document.createElement("button"));
+        buttonSet = content.appendChild(document.createElement("div"));
+        buttonSet.className = "temp-op-dialog";
+        var swapButton = buttonSet.appendChild(document.createElement("a"));
         swapButton.textContent = "Swap";
         swapButton.addEventListener("click", function () {
             PhtivDraw.UiCommands.swapPortal(window.plugin.phtivdraw.getSelectedOperation(), portal)
             marker.closePopup();
         }, false);
-        var deleteButton = buttonSet.appendChild(document.createElement("button"));
+        var deleteButton = buttonSet.appendChild(document.createElement("a"));
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", function () {
             PhtivDraw.UiCommands.deletePortal(window.plugin.phtivdraw.getSelectedOperation(), portal)
