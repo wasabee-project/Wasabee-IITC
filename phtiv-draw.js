@@ -65,13 +65,6 @@ function wrapper(plugin_info) {
 
     !function (scope) {
         var linkDialogFunc = function () {
-            /**
-             * @param {string} filterArray
-             * @param {?} dashboard
-             * @param {!Object} options
-             * @return {undefined}
-             */
-            //***Draws dialog box
             function init(op) {
                 var self = this;
                 self.clearLocalPortalSelections()
@@ -513,7 +506,6 @@ function wrapper(plugin_info) {
                     }
                     _this.hide();
                 };
-                /** @type {!Array} */
                 this.items = [];
             }
             return Object.defineProperty(init.prototype, "button", {
@@ -725,11 +717,13 @@ function wrapper(plugin_info) {
                     addedDialog.dialog("option", "buttons", $.extend({}, {
                         "Add links": function (b) {
                             if (that._portal) {
-                                window.renderPortalDetails(guid);
+                                window.renderPortalDetails(that._portal.id);
                             }
-                            scope.LinkDialog.show(that._operation, that._portal);
+                            scope.LinkDialog.update(that._operation, that._portal);
                         }
                     }, buttons));
+                    window.plugin.phtivdraw.addLinkDialog(that);
+                    //TODO add removing link dialog from list on close
                 } else {
                     alert('No links found.')
                 }
@@ -866,6 +860,12 @@ function wrapper(plugin_info) {
 
     //PLUGIN START
     window.plugin.phtivdraw = function () { };
+
+    //** DIALOG MANAGEMENT */
+    window.plugin.phtivdraw.linkDialogs = {};
+    window.plugin.phtivdraw.addLinkDialog = function (dialog) {
+        console.log("linkListDialog: " + JSON.stringify(dialog));
+    }
 
     //** LAYER DEFINITIONS */
     window.plugin.phtivdraw.portalLayers = {};
