@@ -737,6 +737,8 @@ function wrapper(plugin_info) {
             }, init.prototype.deleteLink = function (link) {
                 var that = this;
                 if (confirm("Do you really want to delete the link: " + link.fromPortal.name + " -> " + link.toPortal.name)) {
+                    this._operation.removeLink(link.fromPortal, link.toPortal)
+                    this._setLinks();
                     /*
                   this._operation.linkService.deleteLink(log.portalFrom.id, log.portalTo.id, PLAYER.nickname).then(function() {
                     p._operation.portalService.getPortals();
@@ -769,11 +771,11 @@ function wrapper(plugin_info) {
                         alert('Not Yet Implemented.');//return $scope.reverseLink(data);
                     }
                 }, {
-                    label: "Delete",
-                    onclick: function () {
-                        return $scope.deleteLink(data);
-                    }
-                }];
+                        label: "Delete",
+                        onclick: function () {
+                            return $scope.deleteLink(data);
+                        }
+                    }];
                 list.className = "menu";
                 list.appendChild(state.button);
 
@@ -1297,8 +1299,39 @@ function wrapper(plugin_info) {
             this.links = this.links.filter(function (listLink) {
                 return listLink.fromPortal.id !== portal.id && listLink.toPortal.id !== portal.id;
             });
-            //Check if portals have any links? and delete ones without links?
-            this.update();
+            this.cleanPortalList()
+            this.update()
+        }
+
+        //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
+        removeLink(startPortal, endPortal, linkPortal) {
+            console.log("REMOVING LINK!")
+            var newLinks = [];
+            for (let link_ in this.links) {
+                if (!(this.links[link_].fromPortal["id"] == startPortal["id"] && this.links[link_].toPortal["id"] == endPortal["id"])) {
+                    newLinks.push(this.links[link_])
+                }
+            }
+            this.links = newLinks;
+            this.cleanPortalList()
+            this.update()
+        }
+
+        //This removes portals with no links
+        cleanPortalList() {
+            var newPortals = [];
+            for (let portal_ in this.portals) {
+                var foundPortal = false;
+                for (let link_ in this.links) {
+                    if (this.portals[portal_]["id"] == this.links[link_].fromPortal["id"] || this.portals[portal_]["id"] == this.links[link_].toPortal["id"] ) {
+                        foundPortal = true;
+                    }
+                }
+                if (foundPortal) {
+                    newPortals.push(this.portals[portal_])
+                }
+            }
+            this.portals = newPortals;
         }
 
         addPortal(portal) {
