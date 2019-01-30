@@ -716,7 +716,6 @@ function wrapper(plugin_info) {
                         width: "auto",
                         closeCallback: function (popoverName) {
                             init._dialogs = [];
-                            console.log("DIALOGS IS: " + JSON.stringify(init._dialogs))
                         }
                     });
                     var buttons = this._dialog.dialog("option", "buttons");
@@ -739,6 +738,11 @@ function wrapper(plugin_info) {
                     var page = parameters[p];
                     if (page._operation.ID == operation.ID) {
                         page._operation = operation;
+                    } else {
+                        return page._dialog.dialog('close');
+                    }
+                    if (!page._operation.containsPortal(page._portal)) {
+                        return page._dialog.dialog('close');
                     }
                     page._setLinks();
                     if (portal != null) {
