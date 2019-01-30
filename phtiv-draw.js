@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -715,11 +715,8 @@ function wrapper(plugin_info) {
                         title: this._portal.name + ": Links",
                         width: "auto",
                         closeCallback: function (popoverName) {
-                            var paneIndex = init._dialogs.indexOf(that);
-                            console.log("PANE INDEX: " + paneIndex)
-                            if (-1 !== paneIndex) {
-                                init._dialogs.splice(paneIndex, 1);
-                            }
+                            init._dialogs = [];
+                            console.log("DIALOGS IS: " + JSON.stringify(init._dialogs))
                         }
                     });
                     var buttons = this._dialog.dialog("option", "buttons");
@@ -731,7 +728,6 @@ function wrapper(plugin_info) {
                             scope.LinkDialog.update(that._operation, that._portal);
                         }
                     }, buttons));
-                    //TODO add removing link dialog from list on close
                 } else {
                     alert('No links found.')
                 }
@@ -739,12 +735,16 @@ function wrapper(plugin_info) {
             return init.update = function (operation, portal, show) {
                 var p = 0;
                 var parameters = init._dialogs;
-                if (parameters.length != 0) {
-                    for (; p < parameters.length; p++) {
-                        var page = parameters[p];
+                for (; p < parameters.length; p++) {
+                    var page = parameters[p];
+                    if (page._operation.ID == operation.ID) {
+                        page._operation = operation;
+                    }
+                    page._setLinks();
+                    if (portal != null) {
+                        page._portal = portal;
                         page._setLinks();
-                        if (portal != null)
-                            page._dialog.title = portal.name + ": Links"
+                        page._dialog.dialog('option', 'title', portal.name + ": Links");
                         return page._dialog.focus(), page._dialog;
                     }
                 }
@@ -754,7 +754,6 @@ function wrapper(plugin_info) {
                     return;
             }, init.prototype._setLinks = function () {
                 this._table.items = this._operation.getLinkListFromPortal(this._portal);
-                //alert('items -> ' + JSON.stringify(this._table.items))
             }, init.prototype.getLinkLength = function (link) {
                 var latlngs = link.getLatLngs();
                 return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
@@ -762,18 +761,9 @@ function wrapper(plugin_info) {
                 var that = this;
                 if (confirm("Do you really want to delete the link: " + link.fromPortal.name + " -> " + link.toPortal.name)) {
                     this._operation.removeLink(link.fromPortal, link.toPortal)
-                    this._operation.update();
-
                 }
-            }, init.prototype.reverseLink = function (bmLayers) {
-                /*
-              var p = this;
-              this._operation.linkService.reverseLink(bmLayers.portalFrom.id, bmLayers.portalTo.id, PLAYER.nickname).then(function() {
-                p._operation.portalService.getPortals();
-              });
-              */
-            }, init.prototype.editLink = function (aliases) {
-                //new scope.LinkEditDialog(this._operation, this._layerManager, aliases);
+            }, init.prototype.reverseLink = function (link) {
+                this._operation.reverseLink(link.fromPortal, link.toPortal)
             }, init.prototype.addAlert = function (message) {
                 /*
               window.renderPortalDetails(message.portalFrom.id);
@@ -788,7 +778,7 @@ function wrapper(plugin_info) {
                 state.items = [, {
                     label: "Reverse",
                     onclick: function () {
-                        alert('Not Yet Implemented.');//return $scope.reverseLink(data);
+                        return $scope.reverseLink(data);
                     }
                 }, {
                         label: "Delete",
@@ -1320,8 +1310,7 @@ function wrapper(plugin_info) {
         }
 
         //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
-        removeLink(startPortal, endPortal, linkPortal) {
-            console.log("REMOVING LINK!")
+        removeLink(startPortal, endPortal) {
             var newLinks = [];
             for (let link_ in this.links) {
                 if (!(this.links[link_].fromPortal["id"] == startPortal["id"] && this.links[link_].toPortal["id"] == endPortal["id"])) {
@@ -1333,13 +1322,26 @@ function wrapper(plugin_info) {
             this.update()
         }
 
+        reverseLink(startPortal, endPortal) {
+            var newLinks = [];
+            for (let link_ in this.links) {
+                if (this.links[link_].fromPortal["id"] == startPortal["id"] && this.links[link_].toPortal["id"] == endPortal["id"]) {
+                    this.links[link_].fromPortal = endPortal;
+                    this.links[link_].toPortal = startPortal;
+                }
+                newLinks.push(this.links[link_])
+            }
+            this.links = newLinks;
+            this.update()
+        }
+
         //This removes portals with no links
         cleanPortalList() {
             var newPortals = [];
             for (let portal_ in this.portals) {
                 var foundPortal = false;
                 for (let link_ in this.links) {
-                    if (this.portals[portal_]["id"] == this.links[link_].fromPortal["id"] || this.portals[portal_]["id"] == this.links[link_].toPortal["id"] ) {
+                    if (this.portals[portal_]["id"] == this.links[link_].fromPortal["id"] || this.portals[portal_]["id"] == this.links[link_].toPortal["id"]) {
                         foundPortal = true;
                     }
                 }
