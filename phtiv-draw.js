@@ -564,10 +564,10 @@ function wrapper(plugin_info) {
         var linkListDialog = function () {
             function init(operation, portal) {
                 var that = this;
-                this._portal = null;
                 this._operation = operation;
                 this._portal = portal;
                 this._table = new scope.Sortable;
+                this._dialog = null;
                 this._table.fields = [{
                     name: "Description",
                     value: function (link) {
@@ -705,16 +705,25 @@ function wrapper(plugin_info) {
                 }];
                 this._table.sortBy = 1;
                 this._setLinks();
+                init._dialogs.push(this);
 
                 if (this._table.items.length > 0) {
-                    var addedDialog = window.dialog({
+                    var that = this
+                    this._dialog = window.dialog({
                         html: this._table.table,
                         dialogClass: "phtivdraw-dialog phtivdraw-dialog-linklist",
                         title: this._portal.name + ": Links",
                         width: "auto",
+                        closeCallback: function (popoverName) {
+                            var paneIndex = init._dialogs.indexOf(that);
+                            console.log("PANE INDEX: " + paneIndex)
+                            if (-1 !== paneIndex) {
+                                init._dialogs.splice(paneIndex, 1);
+                            }
+                        }
                     });
-                    var buttons = addedDialog.dialog("option", "buttons");
-                    addedDialog.dialog("option", "buttons", $.extend({}, {
+                    var buttons = this._dialog.dialog("option", "buttons");
+                    this._dialog.dialog("option", "buttons", $.extend({}, {
                         "Add links": function (b) {
                             if (that._portal) {
                                 window.renderPortalDetails(that._portal.id);
@@ -722,13 +731,28 @@ function wrapper(plugin_info) {
                             scope.LinkDialog.update(that._operation, that._portal);
                         }
                     }, buttons));
-                    window.plugin.phtivdraw.addLinkDialog(that);
                     //TODO add removing link dialog from list on close
                 } else {
                     alert('No links found.')
                 }
             }
-            return init.prototype._setLinks = function () {
+            return init.update = function (operation, portal, show) {
+                var p = 0;
+                var parameters = init._dialogs;
+                if (parameters.length != 0) {
+                    for (; p < parameters.length; p++) {
+                        var page = parameters[p];
+                        page._setLinks();
+                        if (portal != null)
+                            page._dialog.title = portal.name + ": Links"
+                        return page._dialog.focus(), page._dialog;
+                    }
+                }
+                if (show)
+                    return new init(operation, portal);
+                else
+                    return;
+            }, init.prototype._setLinks = function () {
                 this._table.items = this._operation.getLinkListFromPortal(this._portal);
                 //alert('items -> ' + JSON.stringify(this._table.items))
             }, init.prototype.getLinkLength = function (link) {
@@ -738,12 +762,8 @@ function wrapper(plugin_info) {
                 var that = this;
                 if (confirm("Do you really want to delete the link: " + link.fromPortal.name + " -> " + link.toPortal.name)) {
                     this._operation.removeLink(link.fromPortal, link.toPortal)
-                    this._setLinks();
-                    /*
-                  this._operation.linkService.deleteLink(log.portalFrom.id, log.portalTo.id, PLAYER.nickname).then(function() {
-                    p._operation.portalService.getPortals();
-                  });
-                  */
+                    this._operation.update();
+
                 }
             }, init.prototype.reverseLink = function (bmLayers) {
                 /*
@@ -779,7 +799,7 @@ function wrapper(plugin_info) {
                 list.className = "menu";
                 list.appendChild(state.button);
 
-            }, init;
+            }, init._dialogs = [], init;
         }();
         scope.LinkListDialog = linkListDialog;
     }(PhtivDraw || (PhtivDraw = {}));
@@ -853,7 +873,7 @@ function wrapper(plugin_info) {
                     operation.removePortal(portal);
                 }
             }, self.showLinksDialog = function (operation, portal) {
-                new PhtivDraw.LinkListDialog(operation, portal);
+                PhtivDraw.LinkListDialog.update(operation, portal, true);
             }, self;
         }();
         scope.UiCommands = uiCommands;
@@ -862,12 +882,6 @@ function wrapper(plugin_info) {
 
     //PLUGIN START
     window.plugin.phtivdraw = function () { };
-
-    //** DIALOG MANAGEMENT */
-    window.plugin.phtivdraw.linkDialogs = {};
-    window.plugin.phtivdraw.addLinkDialog = function (dialog) {
-        console.log("linkListDialog: " + JSON.stringify(dialog));
-    }
 
     //** LAYER DEFINITIONS */
     window.plugin.phtivdraw.portalLayers = {};
@@ -997,6 +1011,8 @@ function wrapper(plugin_info) {
             store.set(PhtivDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
             PhtivDraw.opList = updatedArray;
             PhtivDraw.LinkDialog.update(window.plugin.phtivdraw.getSelectedOperation(), false)
+            PhtivDraw.LinkListDialog.update(window.plugin.phtivdraw.getSelectedOperation(), null, false);
+
             //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivDraw.opList))
             window.plugin.phtivdraw.drawThings();
         } else
