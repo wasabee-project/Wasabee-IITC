@@ -989,6 +989,7 @@ function wrapper(plugin_info) {
     //** This function takes an operation and updates the entry in the op list that matches it */
     window.plugin.phtivdraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false) {
         var updatedArray = new Array();
+        operation.cleanPortalList();
 
         for (let opInList of PhtivDraw.opList) {
             if (opInList.ID != operation.ID && clearAllBut != true) {
@@ -1339,7 +1340,7 @@ function wrapper(plugin_info) {
             this.update()
         }
 
-        //This removes portals with no links
+        //This removes portals with no links and removes duplicates
         cleanPortalList() {
             var newPortals = [];
             for (let portal_ in this.portals) {
@@ -1353,7 +1354,24 @@ function wrapper(plugin_info) {
                     newPortals.push(this.portals[portal_])
                 }
             }
-            this.portals = newPortals;
+
+            var finalPortals = [];
+            for (let portal_ in newPortals) {
+                if (finalPortals.length == 0) {
+                    finalPortals.push(newPortals[portal_])
+                } else {
+                    var foundFinalPortal = false;
+                    for (let finalPortal_ in finalPortals) {
+                        if (newPortals[portal_]["id"] == finalPortals[finalPortal_]["id"]) {
+                            foundFinalPortal = true;
+                        }
+                    }
+                    if (foundFinalPortal == false) {
+                        finalPortals.push(newPortals[portal_]);
+                    }
+                }
+            }
+            this.portals = finalPortals;
         }
 
         addPortal(portal) {
