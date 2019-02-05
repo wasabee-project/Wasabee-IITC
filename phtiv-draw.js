@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -323,10 +323,10 @@ function wrapper(plugin_info) {
                 console.log("Show OpsDialog PARAMETERS: " + parameters.length)
                 if (parameters.length != 0) {
                     show = false;
-                    for (; p < parameters.length; p++) {
-                        var page = parameters[p];
+                    for (index in parameters) {
+                        var page = parameters[index]
                         page._operationList = operationList; //doesn't update, need to manually?
-                        console.log("inside param iterator")
+                        console.log("inside param iterator -> " + typeof page)
                         page.setupTabs()
                         return page.focus(), page;
                     }
