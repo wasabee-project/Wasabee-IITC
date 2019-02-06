@@ -386,21 +386,8 @@ function wrapper(plugin_info) {
                 input.value = operation.name
                 var buttonSection = tabContent.appendChild(document.createElement("div"))
                 buttonSection.className = "temp-op-dialog";
-                var exportButton = buttonSection.appendChild(document.createElement("a"));
-                exportButton.innerHTML = "Export";
-                exportButton.addEventListener("click", function () {
-                    window.plugin.phtivdraw.exportString(operation.name, JSON.stringify(operation));
-                }, false);                
-                var clearOpButton = buttonSection.appendChild(document.createElement("a"));
-                clearOpButton.innerHTML = "Clear Portals/Links/Markers";
-                clearOpButton.addEventListener("click", function (arg) {
-                    var confirmClear = confirm("Are you sure you want to clear all portals, links, and markers from this operation?");
-                    if (confirmClear == true) {
-                        Operation.create(operation).clearAllItems()
-                    }
-                }, false);
                 var saveButton = buttonSection.appendChild(document.createElement("a"))
-                saveButton.innerHTML = "Save"
+                saveButton.innerHTML = "Save Operation Name"
                 saveButton.addEventListener("click", function (arg) {
                     if (input.value == null || input.value == '') {
                         alert("That is an invalid operation name")
@@ -409,19 +396,31 @@ function wrapper(plugin_info) {
                         window.plugin.phtivdraw.updateOperationInList(Operation.create(operation))
                     }
                 }, false);
-                var selectedButton = buttonSection.appendChild(document.createElement("a"))
-                var selectedText = "Set Selected"
-                if (operation.isSelected == true)
-                    selectedText = "Selected"
-                selectedButton.innerHTML = selectedText
-                selectedButton.addEventListener("click", function (arg) {
-                    if (!operation.isSelected) {
+                if (!operation.isSelected) {
+                    var selectedButton = buttonSection.appendChild(document.createElement("a"))
+                    selectedButton.innerHTML = "Set Selected"
+                    selectedButton.addEventListener("click", function (arg) {
                         var confirmed = confirm("Are you sure you want to select this operation?")
                         if (confirmed) {
                             window.plugin.phtivdraw.updateOperationInList(Operation.create(operation), true)
+
                         }
+                    }, false);
+                }
+                var exportButton = buttonSection.appendChild(document.createElement("a"));
+                exportButton.innerHTML = "Export";
+                exportButton.addEventListener("click", function () {
+                    window.plugin.phtivdraw.exportString(operation.name, JSON.stringify(operation));
+                }, false);
+                var clearOpButton = buttonSection.appendChild(document.createElement("a"));
+                clearOpButton.innerHTML = "Clear Portals/Links/Markers";
+                clearOpButton.addEventListener("click", function (arg) {
+                    var confirmClear = confirm("Are you sure you want to clear all portals, links, and markers from this operation?");
+                    if (confirmClear == true) {
+                        Operation.create(operation).clearAllItems()
                     }
                 }, false);
+
                 var deleteButton = buttonSection.appendChild(document.createElement("a"))
                 deleteButton.innerHTML = "Delete"
                 deleteButton.disabled = opListSize == 0
@@ -692,26 +691,7 @@ function wrapper(plugin_info) {
                         return a.localeCompare(b);
                     },
                     format: function (d, data) {
-                        if (d.colSpan = 2, d.appendChild(scope.UiHelper.getPortalLink(data)), data.description) {
-                            var row = d.appendChild(document.createElement("div"));
-                            row.className = "desc";
-                            row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(data.description));
-                        }
-                    }
-                }, {
-                    name: "Desc.",
-                    title: "From Portal Description",
-                    value: function (link) {
-                        return that._operation.getPortal(link.fromPortal.id);
-                    },
-                    sortValue: function (b) {
-                        return b.description;
-                    },
-                    sort: function (a, b) {
-                        return a.localeCompare(b);
-                    },
-                    format: function (a, b) {
-                        a.style.display = "none";
+                       d.appendChild(scope.UiHelper.getPortalLink(data))
                     }
                 }, {
                     name: "To",
@@ -725,26 +705,7 @@ function wrapper(plugin_info) {
                         return a.localeCompare(b);
                     },
                     format: function (d, data) {
-                        if (d.colSpan = 2, d.appendChild(scope.UiHelper.getPortalLink(data)), data.description) {
-                            var row = d.appendChild(document.createElement("div"));
-                            row.className = "desc";
-                            row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(data.description));
-                        }
-                    }
-                }, {
-                    name: "Desc",
-                    title: "To Portal Description",
-                    value: function (link) {
-                        return that._operation.getPortal(link.toPortal.id);
-                    },
-                    sortValue: function (b) {
-                        return "";
-                    },
-                    sort: function (a, b) {
-                        return a.localeCompare(b);
-                    },
-                    format: function (a, b) {
-                        a.style.display = "none";
+                        d.appendChild(scope.UiHelper.getPortalLink(data))
                     }
                 }, {
                     name: "Length",
@@ -1105,6 +1066,11 @@ function wrapper(plugin_info) {
         updatedArray.push(operation);
 
         if (updatedArray.length != 0) {
+            updatedArray.sort(function(a, b){
+                if(a.name.toLowerCase() < b.name.toLowerCase()) { return -1; }
+                if(a.name.toLowerCase() > b.name.toLowerCase()) { return 1; }
+                return 0;
+            })
             store.set(PhtivDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
             PhtivDraw.opList = updatedArray;
             PhtivDraw.LinkDialog.update(window.plugin.phtivdraw.getSelectedOperation(), false)
