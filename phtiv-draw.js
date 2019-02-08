@@ -60,6 +60,7 @@ function wrapper(plugin_info) {
         var b;
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
+            a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
         }(b = scope.Constants || (scope.Constants = {}));
     }(PhtivDraw || (PhtivDraw = {}));
 
@@ -323,13 +324,16 @@ function wrapper(plugin_info) {
                     }
                 }, buttons));
             }
-            return init.show = function (operationList, show = true) {
+            return init.update = function (operationList, show = true, close = false) {
                 var parameters = init._dialogs;
                 console.log("Show OpsDialog PARAMETERS: " + parameters.length)
                 if (parameters.length != 0) {
                     show = false;
                     for (index in parameters) {
                         var page = parameters[index]
+                        if (close) {
+                            return page._dialog.dialog('close');
+                        }
                         page._operationList = operationList; //doesn't update, need to manually?
                         console.log("inside param iterator -> " + typeof page)
                         page.setupTabs()
@@ -410,7 +414,8 @@ function wrapper(plugin_info) {
                 var exportButton = buttonSection.appendChild(document.createElement("a"));
                 exportButton.innerHTML = "Export";
                 exportButton.addEventListener("click", function () {
-                    window.plugin.phtivdraw.exportString(operation.name, JSON.stringify(operation));
+                    PhtivDraw.OpsDialog.update(Array(), false, true);
+                    PhtivDraw.ExportDialog.show(operation);
                 }, false);
                 var clearOpButton = buttonSection.appendChild(document.createElement("a"));
                 clearOpButton.innerHTML = "Clear Portals/Links/Markers";
@@ -977,6 +982,7 @@ function wrapper(plugin_info) {
         window.plugin.phtivdraw.arc = arc;
         window.plugin.phtivdraw.addButtons();
         PhtivDraw.opList = Array();
+        PhtivDraw.pasteList = Array();
         window.plugin.phtivdraw.addCSS(PhtivDraw.CSS.ui);
         window.plugin.phtivdraw.addCSS(PhtivDraw.CSS.main);
         window.plugin.phtivdraw.setupLocalStorage();
@@ -987,7 +993,134 @@ function wrapper(plugin_info) {
         window.addLayerGroup('Phtiv Draw Links', window.plugin.phtivdraw.linkLayerGroup, true);
         window.plugin.phtivdraw.initCrossLinks();
         window.plugin.phtivdraw.drawThings();
+        var shareKey = window.plugin.phtivdraw.getUrlParams("phtivShareKey", "none")
+        console.log("SHARE KEY IS: " + shareKey)
     };
+
+
+    !function (scope) {
+        var exportDialogFunction = function () {
+            function init(operation) {
+                init._dialogs.push(this);
+                this._operation = operation
+                this._mainContent = document.createElement("div")
+                var textArea = this._mainContent.appendChild(document.createElement("div"))
+                textArea.className = "ui-dialog-phtivdraw-copy"
+                textArea.innerHTML = '<p><a onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>'
+                var linkArea = this._mainContent.appendChild(document.createElement("div"))
+                var pasteLink = window.plugin.phtivdraw.getPasteLink(operation.ID)
+                if (pasteLink == null) {
+                    window.plugin.phtivdraw.qbin(JSON.stringify(operation), "3n", "json").then(link => window.plugin.phtivdraw.gotQbinLink(link));
+                } else {
+                    //TODO show paste link here. make things in link area
+                }
+                var self = this
+                this._dialog = window.dialog({
+                    title: this._operation.name + " - Export",
+                    width: "auto",
+                    height: "auto",
+                    html: this._mainContent,
+                    dialogClass: "phtivdraw-dialog phtivdraw-dialog-ops",
+                    closeCallback: function (popoverName) {
+                        var paneIndex = init._dialogs.indexOf(self);
+                        if (-1 !== paneIndex) {
+                            init._dialogs.splice(paneIndex, 1);
+                        }
+                    }
+                });
+            }
+            return init.show = function (operation) {
+                var parameters = init._dialogs;
+                if (parameters.length != 0) {
+                    show = false;
+                    for (index in parameters) {
+                        var page = parameters[index]
+                        page._operation = operation
+                        page.updateContentPane()
+                        return page.focus(), page;
+                    }
+                }
+                if (show)
+                    return new init(operation);
+                else
+                    return;
+            }, init.prototype.updateContentPane = function () {
+                var mainContent = this._mainContent
+                mainContent.innerHTML = "";
+                var nameSection = mainContent.appendChild(document.createElement("p"))
+                nameSection.innerHTML = "Op Name -> "
+                var input = nameSection.appendChild(document.createElement("input"))
+                input.type = "text"
+                input.id = "op-dialog-content-nameinput"
+                input.value = operation.name
+                var buttonSection = mainContent.appendChild(document.createElement("div"))
+                buttonSection.className = "temp-op-dialog";
+                var saveButton = buttonSection.appendChild(document.createElement("a"))
+                saveButton.innerHTML = "Save Operation Name"
+                saveButton.addEventListener("click", function (arg) {
+                    if (input.value == null || input.value == '') {
+                        alert("That is an invalid operation name")
+                    } else {
+                        operation.name = input.value
+                        window.plugin.phtivdraw.updateOperationInList(Operation.create(operation))
+                    }
+                }, false);
+            }, init.prototype.focus = function () {
+                this._dialog.dialog("open");
+            }, init._dialogs = [], init;
+        }();
+        scope.ExportDialog = exportDialogFunction;
+    }(PhtivDraw || (PhtivDraw = {}));
+
+    //** This function gets a pastelink if one exists for this operation */
+    window.plugin.phtivdraw.getPasteLink = function(operationID) {
+        var pasteLinks = PhtivDraw.pasteList
+        if (pasteLinks == null)
+            return null;
+        else {
+            for (let paste of pasteLinks) {
+                if (paste.ID == operationID) {
+                    if (window.plugin.phtivdraw.isPasteLinkExpired(paste.expireDate))
+                        return null
+                    else
+                        return Paste.create(paste);
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
+    /** this checks the expiration on a paste link and returns a boolean */
+    window.plugin.phtivdraw.isPasteLinkExpired = function(expireDate) {
+        return false //TODO check timestamp
+    }
+
+    /** this processes a qbin link */
+    window.plugin.phtivdraw.gotQbinLink = function(link) {
+        console.log("GOT QBIN LINK! -> " + link)
+    }
+
+    //** this saves a paste and returns a link */
+    window.plugin.phtivdraw.qbin = ((q,e,s) => fetch("https://qbin.io", { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
+
+
+    window.plugin.phtivdraw.getUrlParams = function (parameter, defaultvalue){
+        var urlparameter = defaultvalue;
+        if(window.location.href.indexOf(parameter) > -1){
+            urlparameter = window.plugin.phtivdraw.getUrlVars()[parameter];
+            }
+        return urlparameter;
+    }
+
+    window.plugin.phtivdraw.getUrlVars = function () {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+    }
 
     //** This function adds the plugin buttons on the left side of the screen */
     window.plugin.phtivdraw.addButtons = function () {
@@ -999,7 +1132,7 @@ function wrapper(plugin_info) {
             onAdd: function (map) {
                 var container = L.DomUtil.create('div', 'leaflet-arcs leaflet-bar');
                 $(container).append('<a id="phtivdraw_viewopsbutton" href="javascript: void(0);" class="phtivdraw-control" title="Manage Operations"><img src=' + PhtivDraw.Images.toolbar_viewOps + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivdraw_viewopsbutton', function () {
-                    PhtivDraw.OpsDialog.show(PhtivDraw.opList);
+                    PhtivDraw.OpsDialog.update(PhtivDraw.opList);
                 });
                 $(container).append('<a id="phtivdraw_addlinksbutton" href="javascript: void(0);" class="phtivdraw-control" title="Add Links"><img src=' + PhtivDraw.Images.toolbar_addlinks + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#phtivdraw_addlinksbutton', function () {
                     var selectedOp = window.plugin.phtivdraw.getSelectedOperation();
@@ -1031,6 +1164,7 @@ function wrapper(plugin_info) {
     //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
     window.plugin.phtivdraw.setupLocalStorage = function () {
         //window.plugin.phtivdraw.resetOpList();
+        //This sets up the op list
         var opList = null;
         var opListObj = store.get(PhtivDraw.Constants.OP_LIST_KEY)
         if (opListObj != null)
@@ -1043,7 +1177,38 @@ function wrapper(plugin_info) {
             opList = JSON.parse(store.get(PhtivDraw.Constants.OP_LIST_KEY));
         }
         PhtivDraw.opList = opList;
-        //alert("OPLIST -> " + JSON.stringify(PhtivDraw.opList));
+
+        //This sets up the paste list
+        var pasteList = null;
+        var pasteListObj = store.get(PhtivDraw.Constants.PASTE_LIST_KEY)
+        if (pasteListObj != null)
+            pasteList = JSON.parse(pasteListObj);
+        if (pasteList == null) {
+            var emptyList = Array();
+            store.set(PhtivDraw.Constants.PASTE_LIST_KEY, JSON.stringify(emptyList))
+            pasteList = JSON.parse(store.get(PhtivDraw.Constants.PASTE_LIST_KEY))
+        }
+        PhtivDraw.pasteList = pasteList;
+    }
+
+    //** This function takes a paste and updates the entry in the paste list that matches it */
+    window.plugin.phtivdraw.updatePasteInList = function(paste) {
+        var updatedArray = new Array();
+        if (!(paste instanceof Paste)) {
+            paste = Paste.create(paste)
+        }
+
+        for (let pasteInList of PhtivDraw.pasteList) {
+            if (pasteInList.ID != paste.ID) {
+                updatedArray.push(pasteInList);
+            }
+        }
+        updatedArray.push(paste);
+        if (updatedArray.length != 0) {
+            store.set(PhtivDraw.Constants.PASTE_LIST_KEY, JSON.stringify(updatedArray));
+            PhtivDraw.pasteList = updatedArray;
+            //PhtivDraw.ExportDialog.show()
+        }
     }
 
     //** This function takes an operation and updates the entry in the op list that matches it */
@@ -1075,7 +1240,7 @@ function wrapper(plugin_info) {
             PhtivDraw.opList = updatedArray;
             PhtivDraw.LinkDialog.update(window.plugin.phtivdraw.getSelectedOperation(), false)
             PhtivDraw.LinkListDialog.update(window.plugin.phtivdraw.getSelectedOperation(), null, false);
-            PhtivDraw.OpsDialog.show(PhtivDraw.opList, false);
+            PhtivDraw.OpsDialog.update(PhtivDraw.opList, false);
 
             //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivDraw.opList))
             window.plugin.phtivdraw.drawThings();
@@ -1243,20 +1408,6 @@ function wrapper(plugin_info) {
                 alert('Import Failed.');
             }
         }
-    }
-
-    //** This function opens a dialog with a text field to copy */
-    window.plugin.phtivdraw.exportString = function (title, string) {
-        var html = '<p><a onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-            + '<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + string + '</textarea>';
-        window.dialog({
-            title: title + " - Export",
-            width: "auto",
-            height: "auto",
-            html: html,
-            dialogClass: "ui-dialog-phtivdraw-copy",
-
-        });
     }
 
     //** This function copies whatever value is sent into the function to the clipboard */
@@ -1524,7 +1675,23 @@ function wrapper(plugin_info) {
 
     }
 
+    class Paste {
+        constructor(ID, expireDate, link) {
+            this.ID = ID;
+            this.expireDate = expireDate;
+            this.link = link;
+        }
 
+        static create(obj) {
+            var link = new Paste();
+            for (var prop in obj) {
+                if (link.hasOwnProperty(prop)) {
+                    link[prop] = obj[prop];
+                }
+            }
+            return link;
+        }
+    }
     /*** ARC THINGS */
     window.plugin.phtivdraw.distance = function (link) {
         //How far between portals.
