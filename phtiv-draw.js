@@ -61,6 +61,7 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
             a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
+            a.QBIN_BASE_KEY = "urlhere"
         }(b = scope.Constants || (scope.Constants = {}));
     }(PhtivDraw || (PhtivDraw = {}));
 
@@ -696,7 +697,7 @@ function wrapper(plugin_info) {
                         return a.localeCompare(b);
                     },
                     format: function (d, data) {
-                       d.appendChild(scope.UiHelper.getPortalLink(data))
+                        d.appendChild(scope.UiHelper.getPortalLink(data))
                     }
                 }, {
                     name: "To",
@@ -1007,11 +1008,12 @@ function wrapper(plugin_info) {
                 var textArea = this._mainContent.appendChild(document.createElement("div"))
                 textArea.className = "ui-dialog-phtivdraw-copy"
                 textArea.innerHTML = '<p><a onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>'
+                    + '<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>'
                 var linkArea = this._mainContent.appendChild(document.createElement("div"))
                 var pasteLink = window.plugin.phtivdraw.getPasteLink(operation.ID)
                 if (pasteLink == null) {
-                    window.plugin.phtivdraw.qbin(JSON.stringify(operation), "3n", "json").then(link => window.plugin.phtivdraw.gotQbinLink(link));
+
+                    window.plugin.phtivdraw.qbin_put(JSON.stringify(operation), "3n", "json").then(link => window.plugin.phtivdraw.gotQbinLink(link));
                 } else {
                     //TODO show paste link here. make things in link area
                 }
@@ -1074,7 +1076,7 @@ function wrapper(plugin_info) {
     }(PhtivDraw || (PhtivDraw = {}));
 
     //** This function gets a pastelink if one exists for this operation */
-    window.plugin.phtivdraw.getPasteLink = function(operationID) {
+    window.plugin.phtivdraw.getPasteLink = function (operationID) {
         var pasteLinks = PhtivDraw.pasteList
         if (pasteLinks == null)
             return null;
@@ -1093,30 +1095,40 @@ function wrapper(plugin_info) {
     }
 
     /** this checks the expiration on a paste link and returns a boolean */
-    window.plugin.phtivdraw.isPasteLinkExpired = function(expireDate) {
+    window.plugin.phtivdraw.isPasteLinkExpired = function (expireDate) {
         return false //TODO check timestamp
     }
 
     /** this processes a qbin link */
-    window.plugin.phtivdraw.gotQbinLink = function(link) {
+    window.plugin.phtivdraw.gotQbinLink = function (link) {
         console.log("GOT QBIN LINK! -> " + link)
     }
 
     //** this saves a paste and returns a link */
-    window.plugin.phtivdraw.qbin = ((q,e,s) => fetch("https://qbin.io", { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
+    window.plugin.phtivdraw.qbin_put = ((q,e,s) => fetch(PhtivDraw.Constants.QBIN_BASE_KEY, { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
+    
+    //** this gets paste json raw */
+    window.plugin.phtivdraw.qbin_get = ((pasteID) => $.ajax({
+        url: "https://qbin.io/" + pasteID +"/raw",
+        crossDomain : true,
+        method: "GET",
+    }).done(function (response) {
+        console.log("response -> " + JSON.stringify(response))
+    }).fail(function (jqXHR, textStatus) {
+        alert('Paste Creation Failed -> ' + textStatus)
+    }));
 
-
-    window.plugin.phtivdraw.getUrlParams = function (parameter, defaultvalue){
+    window.plugin.phtivdraw.getUrlParams = function (parameter, defaultvalue) {
         var urlparameter = defaultvalue;
-        if(window.location.href.indexOf(parameter) > -1){
+        if (window.location.href.indexOf(parameter) > -1) {
             urlparameter = window.plugin.phtivdraw.getUrlVars()[parameter];
-            }
+        }
         return urlparameter;
     }
 
     window.plugin.phtivdraw.getUrlVars = function () {
         var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
             vars[key] = value;
         });
         return vars;
@@ -1192,7 +1204,7 @@ function wrapper(plugin_info) {
     }
 
     //** This function takes a paste and updates the entry in the paste list that matches it */
-    window.plugin.phtivdraw.updatePasteInList = function(paste) {
+    window.plugin.phtivdraw.updatePasteInList = function (paste) {
         var updatedArray = new Array();
         if (!(paste instanceof Paste)) {
             paste = Paste.create(paste)
@@ -1231,9 +1243,9 @@ function wrapper(plugin_info) {
         updatedArray.push(operation);
 
         if (updatedArray.length != 0) {
-            updatedArray.sort(function(a, b){
-                if(a.name.toLowerCase() < b.name.toLowerCase()) { return -1; }
-                if(a.name.toLowerCase() > b.name.toLowerCase()) { return 1; }
+            updatedArray.sort(function (a, b) {
+                if (a.name.toLowerCase() < b.name.toLowerCase()) { return -1; }
+                if (a.name.toLowerCase() > b.name.toLowerCase()) { return 1; }
                 return 0;
             })
             store.set(PhtivDraw.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
