@@ -61,7 +61,7 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
             a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
-            a.QBIN_BASE_KEY = "urlhere"
+            a.QBIN_BASE_KEY = "https://qbin.phtiv.com:8000"
         }(b = scope.Constants || (scope.Constants = {}));
     }(PhtivDraw || (PhtivDraw = {}));
 
@@ -1105,11 +1105,22 @@ function wrapper(plugin_info) {
     }
 
     //** this saves a paste and returns a link */
-    window.plugin.phtivdraw.qbin_put = ((q,e,s) => fetch(PhtivDraw.Constants.QBIN_BASE_KEY, { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
+    window.plugin.phtivdraw.qbin_put = ((q,e,s) => $.ajax({
+        url: PhtivDraw.Constants.QBIN_BASE_KEY,
+        body: q, 
+        headers: {e,s},
+        crossDomain : true,
+        method: "PUT",
+    }).done(function (response) {
+        console.log("response -> " + JSON.stringify(response))
+    }).fail(function (jqXHR, textStatus) {
+        alert('Paste Creation Failed -> ' + textStatus)
+    }));
+    //fetch(PhtivDraw.Constants.QBIN_BASE_KEY, { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
     
     //** this gets paste json raw */
     window.plugin.phtivdraw.qbin_get = ((pasteID) => $.ajax({
-        url: "https://qbin.io/" + pasteID +"/raw",
+        url: PhtivDraw.Constants.QBIN_BASE_KEY + pasteID +"/raw",
         crossDomain : true,
         method: "GET",
     }).done(function (response) {
