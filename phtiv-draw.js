@@ -1013,7 +1013,7 @@ function wrapper(plugin_info) {
                 var pasteLink = window.plugin.phtivdraw.getPasteLink(operation.ID)
                 if (pasteLink == null) {
 
-                    window.plugin.phtivdraw.qbin_put(JSON.stringify(operation), "3n", "json").then(link => window.plugin.phtivdraw.gotQbinLink(link));
+                    window.plugin.phtivdraw.qbin_put(JSON.stringify(operation), "3n", "none").then(link => window.plugin.phtivdraw.gotQbinLink(link));
                 } else {
                     //TODO show paste link here. make things in link area
                 }
@@ -1107,14 +1107,20 @@ function wrapper(plugin_info) {
     //** this saves a paste and returns a link */
     window.plugin.phtivdraw.qbin_put = ((q,e,s) => $.ajax({
         url: PhtivDraw.Constants.QBIN_BASE_KEY,
-        body: q, 
-        headers: {e,s},
+        type: "PUT",
+        body : {E: e, S: s, Q: q, R: 0},
         crossDomain : true,
-        method: "PUT",
+        async : true,
+        cache : false,
+        contentType : "text/plain",
+        //dataType: 'jsonp', // Notice! JSONP <-- P (lowercase)
+        // xhrFields : {
+        //   withCredentials : true
+        // }
     }).done(function (response) {
         console.log("response -> " + JSON.stringify(response))
     }).fail(function (jqXHR, textStatus) {
-        alert('Paste Creation Failed -> ' + textStatus)
+        alert('Paste Creation Failed -> ' + textStatus + " - jqXHR -> " + JSON.stringify(jqXHR))
     }));
     //fetch(PhtivDraw.Constants.QBIN_BASE_KEY, { method: "PUT", body: q, headers: {e,s} }).then(y => y.text()).then(z => console.info(z) || z));
     
