@@ -328,6 +328,7 @@ function wrapper(plugin_info) {
             return init.update = function (operationList, show = true, close = false) {
                 var parameters = init._dialogs;
                 console.log("Show OpsDialog PARAMETERS: " + parameters.length)
+                //scope.ExportDialog.closeDialog() TODO close the export dialog any time the ops dialog is updated. -> _dialog.dialog('close')
                 if (parameters.length != 0) {
                     show = false;
                     for (index in parameters) {
@@ -1108,15 +1109,16 @@ function wrapper(plugin_info) {
     window.plugin.phtivdraw.qbin_put = ((q,e,s) => $.ajax({
         url: PhtivDraw.Constants.QBIN_BASE_KEY,
         type: "PUT",
-        body : {E: e, S: s, Q: q, R: 0},
+        data : q,
+        //headers: {e,s},
         crossDomain : true,
         async : true,
         cache : false,
         contentType : "text/plain",
         //dataType: 'jsonp', // Notice! JSONP <-- P (lowercase)
-        // xhrFields : {
-        //   withCredentials : true
-        // }
+         xhrFields : {
+           withCredentials : true
+         }
     }).done(function (response) {
         console.log("response -> " + JSON.stringify(response))
     }).fail(function (jqXHR, textStatus) {
