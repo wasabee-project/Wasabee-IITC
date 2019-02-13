@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -997,7 +997,6 @@ function wrapper(plugin_info) {
         window.plugin.phtivdraw.drawThings();
         var shareKey = window.plugin.phtivdraw.getUrlParams("phtivShareKey", null)
         if (shareKey != null) {
-            console.log("SHARE KEY IS: " + shareKey)
             window.plugin.phtivdraw.qbin_get(shareKey)
         }
     };
@@ -1200,7 +1199,7 @@ function wrapper(plugin_info) {
     //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
     window.plugin.phtivdraw.setupLocalStorage = function () {
         //window.plugin.phtivdraw.resetOpList();
-        //window.plugin.phtivdraw.resetPasteList();
+        window.plugin.phtivdraw.resetPasteList();
         //This sets up the op list
         var opList = null;
         var opListObj = store.get(PhtivDraw.Constants.OP_LIST_KEY)
@@ -1434,7 +1433,13 @@ function wrapper(plugin_info) {
 
     window.plugin.phtivdraw.saveImportString = function (string) {
         try {
-            if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*"))) {
+            var keyIdentifier = "phtivShareKey="
+            if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*")) && string.includes(keyIdentifier) ) {
+                var key = string.substring(string.lastIndexOf(keyIdentifier) + keyIdentifier.length)
+                console.log("KEY IS: " + key)
+                window.plugin.phtivdraw.qbin_get(key)
+
+            } else if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*"))) {
                 alert('PhtivDraw doesn\'t support stock intel draw imports')
             } else {
                 var data = JSON.parse(string);
