@@ -392,6 +392,11 @@ function wrapper(plugin_info) {
                 input.value = operation.name
                 var buttonSection = tabContent.appendChild(document.createElement("div"))
                 buttonSection.className = "temp-op-dialog";
+                var viewOpSummaryButton = buttonSection.appendChild(document.createElement("a"))
+                viewOpSummaryButton.innerHTML = "View Op Summary"
+                viewOpSummaryButton.addEventListener("click", function (arg) {
+                    window.plugin.phtivdraw.viewOpSummary(operation);
+                }, false);
                 var saveButton = buttonSection.appendChild(document.createElement("a"))
                 saveButton.innerHTML = "Save Operation Name"
                 saveButton.addEventListener("click", function (arg) {
@@ -1017,10 +1022,7 @@ function wrapper(plugin_info) {
                     html: this._mainContent,
                     dialogClass: "phtivdraw-dialog phtivdraw-dialog-ops",
                     closeCallback: function (popoverName) {
-                        var paneIndex = init._dialogs.indexOf(self);
-                        if (-1 !== paneIndex) {
-                            init._dialogs.splice(paneIndex, 1);
-                        }
+                        init._dialogs = Array()
                     }
                 });
             }
@@ -1049,9 +1051,9 @@ function wrapper(plugin_info) {
                     + '<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>'
                 
                 var linkArea = mainContent.appendChild(document.createElement("div"))
-                var pasteLink = window.plugin.phtivdraw.getPasteLink(operation.ID)
-                if (pasteLink == null) {
-                    linkArea.className = "temp-op-dialog";
+                linkArea.className = "temp-op-dialog";
+
+                if (operation.pasteLink == null) {
                     var createLinkButton = linkArea.appendChild(document.createElement("a"))
                     createLinkButton.innerHTML = "Create Sharing Link"
                     createLinkButton.addEventListener("click", function (arg) {
@@ -1064,12 +1066,19 @@ function wrapper(plugin_info) {
                     linkArea.appendChild(document.createElement("p"))
                     var paragraph = linkArea.appendChild(document.createElement("p"))
                     paragraph.innerHTML = "<b>Operation Share Link</b>"
-                    var urlInputBox = linkArea.appendChild(document.createElement("INPUT"));
-                    urlInputBox.setAttribute("type", "text");
-                    urlInputBox.setAttribute("disabled", true)
-                    urlInputBox.setAttribute("value", pasteLink.link);
+                    var urlInputBox = linkArea.appendChild(document.createElement("textarea"));
+                    urlInputBox.setAttribute("readonly", true)
+                    urlInputBox.innerHTML = operation.pasteLink;
                     $(urlInputBox).css("max-width", "100%");
                     $(urlInputBox).css("min-width", "100%");
+                    var createLinkButton = linkArea.appendChild(document.createElement("a"))
+                    createLinkButton.innerHTML = "Re-create Sharing Link"
+                    createLinkButton.addEventListener("click", function (arg) {
+                        var confirmedCreate = confirm("Are you sure you want to re-create a share link? The URL will differ from the original link, and the original link will still function until it expires.")
+                        if (confirmedCreate) {
+                            window.plugin.phtivdraw.qbin_put(btoa(JSON.stringify(operation))).then(link => window.plugin.phtivdraw.gotQbinLink(link, operation));
+                        }
+                    }, false);
                 }
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
@@ -1105,8 +1114,34 @@ function wrapper(plugin_info) {
     window.plugin.phtivdraw.gotQbinLink = function (link, operation) {
         var key = link.substring(link.lastIndexOf("/")).replace("/", "");
         var newLink = PhtivDraw.Constants.INTEL_BASE_KEY + "?phtivShareKey=" + key 
-        window.plugin.phtivdraw.updatePasteInList(new Paste(operation.ID, Date.now() + PhtivDraw.Constants.CURRENT_EXPIRE_NUMERIC, newLink, key), operation)
-        console.log("GOT QBIN LINK! -> " + link)
+        operation.pasteLink = newLink
+        operation.pasteKey = key
+        operation.pasteExpireDate = Date.now() + PhtivDraw.Constants.CURRENT_EXPIRE_NUMERIC
+        window.plugin.phtivdraw.updateOperationInList(operation, false, false, true)
+    }
+
+    window.plugin.phtivdraw.viewOpSummary = function (operation) {
+            //make form
+            var arcForm = document.createElement("form");
+            arcForm.target = "_blank";
+            arcForm.method = "POST";
+            arcForm.name = "form1";
+            arcForm.action = "http://phtiv.com?drawKey=" + operation.pasteKey;
+            /*
+            //add data
+            var arcInput = document.createElement("input");
+            arcInput.type = "text";
+            arcInput.name = "arcslist";
+            arcInput.value = localStorage.getItem('arc_list');
+            arcForm.appendChild(arcInput);
+            var arcInput = document.createElement("input");
+            arcInput.type = "text";
+            arcInput.name = "Submit";
+            arcInput.value = 'Submit';
+            arcForm.appendChild(arcInput);
+            */
+            document.body.appendChild(arcForm);
+            arcForm.submit();
     }
 
     //** this saves a paste and returns a link */
@@ -1227,29 +1262,10 @@ function wrapper(plugin_info) {
         PhtivDraw.pasteList = pasteList;
     }
 
-    //** This function takes a paste and updates the entry in the paste list that matches it */
-    window.plugin.phtivdraw.updatePasteInList = function (paste, operation) {
-        console.log("Updating Paste -> " + JSON.stringify(paste))
-        var updatedArray = new Array();
-        if (!(paste instanceof Paste)) {
-            paste = Paste.create(paste)
-        }
 
-        for (let pasteInList of PhtivDraw.pasteList) {
-            if (pasteInList.ID != paste.ID) {
-                updatedArray.push(pasteInList);
-            }
-        }
-        updatedArray.push(paste);
-        if (updatedArray.length != 0) {
-            store.set(PhtivDraw.Constants.PASTE_LIST_KEY, JSON.stringify(updatedArray));
-            PhtivDraw.pasteList = updatedArray;
-            PhtivDraw.ExportDialog.show(operation)
-        }
-    }
 
     //** This function takes an operation and updates the entry in the op list that matches it */
-    window.plugin.phtivdraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false) {
+    window.plugin.phtivdraw.updateOperationInList = function (operation, makeSelected = false, clearAllBut = false, showExportDialog = false) {
         var updatedArray = new Array();
         if (!(operation instanceof Operation)) {
             operation = Operation.create(operation)
@@ -1284,6 +1300,8 @@ function wrapper(plugin_info) {
         } else
             alert("Parse Error -> Saving Op List Failed");
 
+        if (showExportDialog)
+            PhtivDraw.ExportDialog.show(operation)
     }
 
     //** This function removes an operation from the main list */
@@ -1505,6 +1523,9 @@ function wrapper(plugin_info) {
             this.portals = Array();
             this.links = Array();
             this.markers = Array();
+            this.pasteLink = null;
+            this.pasteKey = null;
+            this.pasteExpireDate = 0;
         }
 
         containsPortal(portal) {
@@ -1724,24 +1745,6 @@ function wrapper(plugin_info) {
 
     }
 
-    class Paste {
-        constructor(ID, expireDate, link, key) {
-            this.ID = ID;
-            this.expireDate = expireDate;
-            this.link = link;
-            this.key = key
-        }
-
-        static create(obj) {
-            var link = new Paste();
-            for (var prop in obj) {
-                if (link.hasOwnProperty(prop)) {
-                    link[prop] = obj[prop];
-                }
-            }
-            return link;
-        }
-    }
     /*** ARC THINGS */
     window.plugin.phtivdraw.distance = function (link) {
         //How far between portals.
