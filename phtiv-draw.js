@@ -392,11 +392,13 @@ function wrapper(plugin_info) {
                 input.value = operation.name
                 var buttonSection = tabContent.appendChild(document.createElement("div"))
                 buttonSection.className = "temp-op-dialog";
+                /*
                 var viewOpSummaryButton = buttonSection.appendChild(document.createElement("a"))
                 viewOpSummaryButton.innerHTML = "View Op Summary"
                 viewOpSummaryButton.addEventListener("click", function (arg) {
                     window.plugin.phtivdraw.viewOpSummary(operation);
                 }, false);
+                */
                 var saveButton = buttonSection.appendChild(document.createElement("a"))
                 saveButton.innerHTML = "Save Operation Name"
                 saveButton.addEventListener("click", function (arg) {
@@ -1121,25 +1123,11 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.phtivdraw.viewOpSummary = function (operation) {
-            //make form
             var arcForm = document.createElement("form");
             arcForm.target = "_blank";
             arcForm.method = "POST";
             arcForm.name = "form1";
-            arcForm.action = "http://phtiv.com?drawKey=" + operation.pasteKey;
-            /*
-            //add data
-            var arcInput = document.createElement("input");
-            arcInput.type = "text";
-            arcInput.name = "arcslist";
-            arcInput.value = localStorage.getItem('arc_list');
-            arcForm.appendChild(arcInput);
-            var arcInput = document.createElement("input");
-            arcInput.type = "text";
-            arcInput.name = "Submit";
-            arcInput.value = 'Submit';
-            arcForm.appendChild(arcInput);
-            */
+            arcForm.action = "http://phtiv.com/opsummary?drawKey=" + operation.pasteKey;
             document.body.appendChild(arcForm);
             arcForm.submit();
     }
