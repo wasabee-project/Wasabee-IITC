@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.9.1
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -1055,7 +1055,8 @@ function wrapper(plugin_info) {
                 var linkArea = mainContent.appendChild(document.createElement("div"))
                 linkArea.className = "temp-op-dialog";
 
-                if (operation.pasteLink == null) {
+                var pasteLink = window.plugin.phtivdraw.getPasteLink(operation);
+                if (pasteLink == null) {
                     var createLinkButton = linkArea.appendChild(document.createElement("a"))
                     createLinkButton.innerHTML = "Create Sharing Link"
                     createLinkButton.addEventListener("click", function (arg) {
@@ -1070,7 +1071,7 @@ function wrapper(plugin_info) {
                     paragraph.innerHTML = "<b>Operation Share Link</b>"
                     var urlInputBox = linkArea.appendChild(document.createElement("textarea"));
                     urlInputBox.setAttribute("readonly", true)
-                    urlInputBox.innerHTML = operation.pasteLink;
+                    urlInputBox.innerHTML = pasteLink;
                     $(urlInputBox).css("max-width", "100%");
                     $(urlInputBox).css("min-width", "100%");
                     var createLinkButton = linkArea.appendChild(document.createElement("a"))
@@ -1089,24 +1090,6 @@ function wrapper(plugin_info) {
         scope.ExportDialog = exportDialogFunction;
     }(PhtivDraw || (PhtivDraw = {}));
 
-    //** This function gets a pastelink if one exists for this operation */
-    window.plugin.phtivdraw.getPasteLink = function (operationID) {
-        var pasteLinks = PhtivDraw.pasteList
-        if (pasteLinks == null)
-            return null;
-        else {
-            for (let paste of pasteLinks) {
-                if (paste.ID == operationID) {
-                    if (window.plugin.phtivdraw.isPasteLinkExpired(paste.expireDate))
-                        return null
-                    else
-                        return Paste.create(paste);
-                }
-            }
-            return null;
-        }
-    }
-
     /** this checks the expiration on a paste link and returns a boolean */
     window.plugin.phtivdraw.isPasteLinkExpired = function (expireDate) {
         return Date.now() > expireDate
@@ -1115,8 +1098,6 @@ function wrapper(plugin_info) {
     /** this processes a qbin link */
     window.plugin.phtivdraw.gotQbinLink = function (link, operation) {
         var key = link.substring(link.lastIndexOf("/")).replace("/", "");
-        var newLink = PhtivDraw.Constants.INTEL_BASE_KEY + "?phtivShareKey=" + key 
-        operation.pasteLink = newLink
         operation.pasteKey = key
         operation.pasteExpireDate = Date.now() + PhtivDraw.Constants.CURRENT_EXPIRE_NUMERIC
         window.plugin.phtivdraw.updateOperationInList(operation, false, false, true)
@@ -1496,6 +1477,14 @@ function wrapper(plugin_info) {
         return Array.from(arr, window.plugin.phtivdraw.dec2hex).join('')
     }
 
+    /** This function gets a usable paste link from an operation */
+    window.plugin.phtivdraw.getPasteLink = function(operation) {
+        if (operation.pasteKey != null) {
+            return PhtivDraw.Constants.INTEL_BASE_KEY + "?phtivShareKey=" + operation.pasteKey 
+        } else {
+            return null
+        }
+    }
     class Operation {
         //ID <- randomly generated alpha-numeric ID for the operation
         //name <- name of operation
@@ -1511,7 +1500,6 @@ function wrapper(plugin_info) {
             this.portals = Array();
             this.links = Array();
             this.markers = Array();
-            this.pasteLink = null;
             this.pasteKey = null;
             this.pasteExpireDate = 0;
         }
