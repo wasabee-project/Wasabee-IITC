@@ -1002,7 +1002,7 @@ function wrapper(plugin_info) {
                     operation.removePortal(portal);
                 }
             }, self.deleteMarker = function(operation, marker) {
-                if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.phtivdraw.getPopupTitleWithType(marker))) {
+                if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.phtivdraw.getPopupBodyWithType(marker))) {
                     operation.removeMarker(marker);
                 }
             }, self.showLinksDialog = function (operation, portal) {
@@ -1295,7 +1295,7 @@ function wrapper(plugin_info) {
 
     //** this gets paste json raw */
     window.plugin.phtivdraw.qbin_get = ((pasteID) => $.ajax({
-        url: PhtivDraw.Constants.QBIN_BASE_KEY + "/" + pasteID,
+        url: PhtivDraw.Constants.QBIN_BASE_KEY + "/simple/" + pasteID,
         crossDomain: true,
         method: "GET",
     }).done(function (response) {
