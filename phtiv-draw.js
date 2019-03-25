@@ -76,6 +76,9 @@ function wrapper(plugin_info) {
             a.MARKER_TYPE_DESTROY = "DestroyPortalAlert"
             a.MARKER_TYPE_VIRUS = "UseVirusPortalAlert"
             a.MARKER_TYPE_DECAY = "LetDecayPortalAlert"
+            a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert"
+            a.BREAK_EXCEPTION = {};
+
         }(b = scope.Constants || (scope.Constants = {}));
     }(PhtivDraw || (PhtivDraw = {}));
 
@@ -998,6 +1001,10 @@ function wrapper(plugin_info) {
                 if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + portal.name)) {
                     operation.removePortal(portal);
                 }
+            }, self.deleteMarker = function(operation, marker) {
+                if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.phtivdraw.getPopupTitleWithType(marker))) {
+                    operation.removeMarker(marker);
+                }
             }, self.showLinksDialog = function (operation, portal) {
                 PhtivDraw.LinkListDialog.update(operation, portal, true);
             }, self;
@@ -1103,7 +1110,6 @@ function wrapper(plugin_info) {
                 $element.hide(); //TODO remove this when create link alert added
 
                 this._type.change(function () {
-                    PhtivDraw.Constants.defaultAlertType = self._type.val();
                     /*
                     self._preferences.save();
                     if ("CreateLinkAlert" == self._type.val()) {
@@ -1130,7 +1136,7 @@ function wrapper(plugin_info) {
                 });
                 this._dialog.dialog("option", "buttons", {
                     "add marker": function () {
-                        self.sendAlert(self._type.val(), self._operation);
+                        self.sendAlert(self._type.val(), self._operation, self._comment.val());
                     },
                     close: function () {
                         init._dialogs = Array()
@@ -1138,9 +1144,8 @@ function wrapper(plugin_info) {
                     }
                 });
             }
-            return init.update = function (operation, close = false) {
+            return init.update = function (operation, close = false, show = true) {
                 var parameters = init._dialogs;
-                console.log("Params Length -> " + parameters.length)
                 if (parameters.length != 0) {
                     show = false;
                     for (index in parameters) {
@@ -1149,7 +1154,6 @@ function wrapper(plugin_info) {
                             return page._dialog.dialog('close');
                         } else {
                             page._operation = operation
-                            console.log("Operation Updated: " + JSON.stringify(operation))
                             return page.focus(), page;
                     }
                     }
@@ -1160,8 +1164,8 @@ function wrapper(plugin_info) {
                     return;
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
-            }, init.prototype.sendAlert = function(selectedType, operation) {
-                operation.addMarker(selectedType, scope.UiHelper.getSelectedPortal())
+            }, init.prototype.sendAlert = function(selectedType, operation, comment) {
+                operation.addMarker(selectedType, scope.UiHelper.getSelectedPortal(), comment)
             }, init._dialogs = [], init;
         }();
         scope.MarkerDialog = markerDialogFunction;
@@ -1273,7 +1277,7 @@ function wrapper(plugin_info) {
 
     //** this saves a paste and returns a link */
     window.plugin.phtivdraw.qbin_put = ((Q) => $.ajax({
-        url: PhtivDraw.Constants.QBIN_BASE_KEY,
+        url: PhtivDraw.Constants.QBIN_BASE_KEY + "/simple",
         type: "POST",
         data: Q,
         crossDomain: true,
@@ -1429,7 +1433,7 @@ function wrapper(plugin_info) {
             PhtivDraw.LinkDialog.update(selectedOp, false)
             PhtivDraw.LinkListDialog.update(selectedOp, null, false);
             PhtivDraw.OpsDialog.update(PhtivDraw.opList, false);
-            PhtivDraw.MarkerDialog.update(selectedOp, false)
+            PhtivDraw.MarkerDialog.update(selectedOp, false, false)
 
             //console.log("LIST IS NOW: -> " + JSON.stringify(PhtivDraw.opList))
             window.plugin.phtivdraw.drawThings();
@@ -1495,14 +1499,52 @@ function wrapper(plugin_info) {
             })
         });
 
-        //TODO eventually add a 'target links' layer for targets that are assigned links
-        //TODO get popup working, to mark resolved
         window.registerMarkerForOMS(marker);
-        //marker.bindPopup(window.plugin.phtivdraw.getPortalPopup(marker, target));
-        //marker.off("click", marker.togglePopup, marker);
-        //marker.on('spiderfiedclick', marker.togglePopup, marker);
+        marker.bindPopup(window.plugin.phtivdraw.getMarkerPopup(marker, target));
+        marker.off("click", marker.togglePopup, marker);
+        marker.on('spiderfiedclick', marker.togglePopup, marker);
         window.plugin.phtivdraw.targetLayers[target["ID"]] = marker;
         marker.addTo(window.plugin.phtivdraw.targetLayerGroup);
+    }
+
+    window.plugin.phtivdraw.getMarkerPopup = function (marker, target) {
+        marker.className = "phtivdraw-dialog phtivdraw-dialog-ops"
+        var content = document.createElement("div");
+        var title = content.appendChild(document.createElement("div"));
+        title.className = "desc";
+        title.innerHTML = window.markdown.toHTML(window.plugin.phtivdraw.getPopupBodyWithType(target));
+        buttonSet = content.appendChild(document.createElement("div"));
+        buttonSet.className = "temp-op-dialog";
+        var deleteButton = buttonSet.appendChild(document.createElement("a"));
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", function () {
+            PhtivDraw.UiCommands.deleteMarker(window.plugin.phtivdraw.getSelectedOperation(), target)
+            marker.closePopup();
+        }, false);
+        return content;
+    }
+
+    window.plugin.phtivdraw.getPopupBodyWithType = function (target) {
+        var title = ""
+        var comment = target.comment
+        switch (target.type) {
+            case PhtivDraw.Constants.MARKER_TYPE_DESTROY:
+                title = "Destroy"
+                break;
+            case PhtivDraw.Constants.MARKER_TYPE_DECAY:
+                title = "Let Decay"
+                break;
+            case PhtivDraw.Constants.MARKER_TYPE_VIRUS:
+                title = "Virus"
+                break;
+            default:
+                title = "Unknown"
+        }
+        title = title + " - " + target.portal.name
+        if (!comment)
+            return title
+        else
+            return title + "\n\n" + comment
     }
 
     //** This function returns the appropriate image for a marker type */
@@ -1744,9 +1786,7 @@ function wrapper(plugin_info) {
             if (this.links.length == 0)
                 return false;
             else {
-                //console.log("CHECKING LINK -> " + link.className + " - " + JSON.stringify(link))
                 for (let link_ in this.links) {
-                    //console.log("CHECKING link_ -> " + link_.className + " - " + JSON.stringify(this.links[link_]))
                     //THIS TESTS IF ITS THE SAME LINK
                     if ((this.links[link_].fromPortal["id"] == link.fromPortal["id"] && this.links[link_].toPortal["id"] == link.toPortal["id"]) ||
                         ((this.links[link_].toPortal["id"] == link.fromPortal["id"] && this.links[link_].fromPortal["id"] == link.toPortal["id"]))) {
@@ -1762,7 +1802,7 @@ function wrapper(plugin_info) {
                 return false;
             else {
                 for (let marker in this.markers) {
-                    if (marker.portal.id == portal_.id) {
+                    if (this.markers[marker].portal.id == portal.id) {
                         return true;
                     }
                 }
@@ -1795,6 +1835,13 @@ function wrapper(plugin_info) {
             });
             this.cleanPortalList()
             this.update()
+        }
+
+        removeMarker(marker) {
+            this.markers = this.markers.filter(function (listMarker) {
+                return listMarker.ID !== marker.ID;
+            });
+            this.update();
         }
 
         //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
@@ -1886,9 +1933,9 @@ function wrapper(plugin_info) {
             }
         }
 
-        addMarker(markerType, portal) {
+        addMarker(markerType, portal, comment) {
             if (!this.containsMarker(portal)) {
-                var marker = new Marker(markerType, portal);
+                var marker = new Marker(markerType, portal, comment);
                 this.markers.push(marker);
                 this.update();
             } else {
@@ -1934,10 +1981,11 @@ function wrapper(plugin_info) {
     }
 
     class Marker {
-        constructor(type, portal) {
+        constructor(type, portal, comment) {
             this.ID = window.plugin.phtivdraw.generateId();
             this.portal = portal;
             this.type = type;
+            this.comment = comment;
         }
 
         static create(obj) {
@@ -2219,15 +2267,12 @@ function wrapper(plugin_info) {
         start.lng = drawnLink.fromPortal.lng;
         end.lat = drawnLink.toPortal.lat;
         end.lng = drawnLink.toPortal.lng;
-
         
         if (window.plugin.phtivdraw.greatCircleArcIntersect(a[0], a[1], start, end)) {
             for (i = 0; i < markers.length; i++) {
                 var marker = markers[i];
-                console.log("marker type -> " + marker.type)
                 if (marker.type == PhtivDraw.Constants.MARKER_TYPE_DESTROY || marker.type == PhtivDraw.Constants.MARKER_TYPE_VIRUS || marker.type == PhtivDraw.Constants.MARKER_TYPE_DECAY) {
                     //The marker is of a destroy type.
-                    console.log("marker is of destroy type! Portal ID -> " + marker.portal.name + " - " + marker.portal.id)
                     if (window.plugin.phtivdraw.checkMarkerAgainstLink(marker, link)) {
                         console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID)
                         return false;
@@ -2240,23 +2285,12 @@ function wrapper(plugin_info) {
     };
 
     /** This checks if a marker is on either side of a link */
-    window.plugin.phtivdraw.checkMarkerAgainstLink = function(marker, link) {
-        return false;
-        var latLonArray = link._latlngs
-        console.log("size of latlonarray -> " + latLonArray.length)
-        if (latLonArray.length == 2) {
-            var firstPortal = latLonArray[0]
-            var secondPortal = latLonArray[1]
-            console.log("Marker -> " + JSON.stringify(marker))
-            console.log("first portal -> " + JSON.stringify(firstPortal))
-            console.log("secondportal portal -> " + JSON.stringify(secondPortal))
-
-            if (firstPortal[0] == marker.portal.lat || firstPortal[1] == marker.portal.lon)
-                return true;
-            if (secondPortal[0] == marker.portal.lat || secondPortal[1] == marker.portal.lon)
-                return true;
-        }
-        return false;
+    window.plugin.phtivdraw.checkMarkerAgainstLink = function (marker, link) {
+        var latlngs = link.getLatLngs();
+        var v = latlngs[0];
+        var center = latlngs[1];
+        var view = marker.portal;
+        return view ? view.lng == v.lng && view.lat == v.lat ? true : view.lng == center.lng && view.lat == center.lat ? true : false : false;
     }
 
     window.plugin.phtivdraw.showCrossLink = function (link) {
@@ -2276,11 +2310,16 @@ function wrapper(plugin_info) {
 
     window.plugin.phtivdraw.testLink = function (drawnLinks, drawnMarkers, link) {
         if (window.plugin.phtivdraw.crossLinkLayerGroup[link.options.guid]) return;
-        for (i = 0; i < drawnLinks.length; i++) {
-            if (plugin.phtivdraw.testPolyLine(drawnLinks[i], link, drawnMarkers)) {
-                plugin.phtivdraw.showCrossLink(link);
-                break;
-            }
+        try {
+            drawnLinks.forEach(function (drawnLink) {
+                var shouldShowCrosslink = plugin.phtivdraw.testPolyLine(drawnLink, link, drawnMarkers);
+                if (shouldShowCrosslink) {
+                    plugin.phtivdraw.showCrossLink(link);
+                    throw PhtivDraw.Constants.BREAK_EXCEPTION;
+                }
+            });
+        } catch (e) {
+            if (e !== PhtivDraw.Constants.BREAK_EXCEPTION) throw e;
         }
     };
 
@@ -2288,17 +2327,24 @@ function wrapper(plugin_info) {
         window.plugin.phtivdraw.crossLinkLayers.clearLayers();
         plugin.phtivdraw.crossLinkLayerGroup = {};
 
-        $.each(window.links, function (guid, link) {
-            window.plugin.phtivdraw.testLink(link);
-        });
-    }
-
-    window.plugin.phtivdraw.onLinkAdded = function (data, finalLink = null) {
         var operation = window.plugin.phtivdraw.getSelectedOperation();
         var drawnLinks = operation.links;
         var drawnMarkers = operation.markers;
-        var link = (finalLink != null) ? finalLink : data.link
-        plugin.phtivdraw.testLink(drawnLinks, drawnMarkers, link);
+
+        $.each(window.links, function (guid, link) {
+            window.plugin.phtivdraw.doLinkTest(link, drawnLinks, drawnMarkers);
+        });
+    }
+
+    window.plugin.phtivdraw.onLinkAdded = function (data) {
+        var operation = window.plugin.phtivdraw.getSelectedOperation();
+        var drawnLinks = operation.links;
+        var drawnMarkers = operation.markers;
+        plugin.phtivdraw.doLinkTest(data.link, drawnLinks, drawnMarkers);
+    }
+
+    window.plugin.phtivdraw.doLinkTest = function (finalLink, drawnLinks, drawnMarkers) {
+        plugin.phtivdraw.testLink(drawnLinks, drawnMarkers, finalLink);
     }
 
     window.plugin.phtivdraw.testForDeletedLinks = function () {
