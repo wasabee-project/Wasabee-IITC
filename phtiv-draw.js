@@ -2,7 +2,7 @@
 // @id           phtivdraw
 // @name         IITC Plugin: Phtiv Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.11
 // @updateURL    http://phtiv.com/phtivdrawtools/phtivdraw.meta.js
 // @downloadURL  http://phtiv.com/phtivdrawtools/phtivdraw.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -77,28 +77,29 @@ function wrapper(plugin_info) {
             a.MARKER_TYPE_VIRUS = "UseVirusPortalAlert"
             a.MARKER_TYPE_DECAY = "LetDecayPortalAlert"
             a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert"
+            a.DEFAULT_OPERATION_COLOR = "groupa"
             a.BREAK_EXCEPTION = {};
 
         }(b = scope.Constants || (scope.Constants = {}));
     }(PhtivDraw || (PhtivDraw = {}));
 
     !function (scope) {
-       scope.alertTypes = [{
-        name : PhtivDraw.Constants.MARKER_TYPE_DESTROY,
-        label : "destroy",
-        color : "#CE3B37",
-        markerIcon : scope.Images.marker_alert_destroy,
-      }, {
-        name : PhtivDraw.Constants.MARKER_TYPE_VIRUS,
-        label : "use virus",
-        color : "#8920C3",
-        markerIcon : scope.Images.marker_alert_virus,
-      }, {
-        name : PhtivDraw.Constants.MARKER_TYPE_DECAY,
-        label : "let decay",
-        color : "#7D7D7D",
-        markerIcon : scope.Images.marker_alert_decay
-      }
+        scope.alertTypes = [{
+            name: PhtivDraw.Constants.MARKER_TYPE_DESTROY,
+            label: "destroy",
+            color: "#CE3B37",
+            markerIcon: scope.Images.marker_alert_destroy,
+        }, {
+            name: PhtivDraw.Constants.MARKER_TYPE_VIRUS,
+            label: "use virus",
+            color: "#8920C3",
+            markerIcon: scope.Images.marker_alert_virus,
+        }, {
+            name: PhtivDraw.Constants.MARKER_TYPE_DECAY,
+            label: "let decay",
+            color: "#7D7D7D",
+            markerIcon: scope.Images.marker_alert_decay
+        }
       /*, {
         name : "CreateLinkAlert",
         label : "link",
@@ -125,6 +126,101 @@ function wrapper(plugin_info) {
         color : "transparent",
         markerIcon : data.Images.marker_alert_unknown,
       }*/]
+    }(PhtivDraw || (PhtivDraw = {}));
+
+    !function (scope) {
+        scope.layerTypes = [{
+            name: "main",
+            displayName: "Red",
+            color: "#FF0000",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_main
+            }
+        }, {
+            name: "groupa",
+            displayName: "Orange",
+            color: "#ff6600",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupa
+            }
+        }, {
+            name: "groupb",
+            displayName: "Light Orange",
+            color: "#ff9900",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupb
+            }
+        }, {
+            name: "groupc",
+            displayName: "Tan",
+            color: "#BB9900",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupc
+            }
+        }, {
+            name: "groupd",
+            displayName: "Purple",
+            color: "#bb22cc",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupd
+            }
+        }, {
+            name: "groupe",
+            displayName: "Teal",
+            color: "#33cccc",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupe
+            }
+        }, {
+            name: "groupf",
+            displayName: "Pink",
+            color: "#ff55ff",
+            link: {
+                dashArray: [5, 5, 1, 5],
+                sharedKeysDashArray: [5, 5],
+                opacity: 1,
+                weight: 2
+            },
+            portal: {
+                iconUrl: scope.Images.marker_layer_groupf
+            }
+        }]
     }(PhtivDraw || (PhtivDraw = {}));
 
     !function (scope) {
@@ -450,6 +546,25 @@ function wrapper(plugin_info) {
                 input.type = "text"
                 input.id = "op-dialog-content-nameinput"
                 input.value = operation.name
+
+                var colorSection = tabContent.appendChild(document.createElement("p"))
+                colorSection.innerHTML = "Op Color -> "
+                var operationColor = PhtivDraw.Constants.DEFAULT_OPERATION_COLOR
+                if (operation.color != null)
+                    operationColor = operation.color
+                var opColor = colorSection.appendChild(document.createElement("select"));
+                scope.layerTypes.forEach(function (a) {
+                    var option = document.createElement("option")
+                    if (a.name == operationColor)
+                        option.setAttribute("selected", true)
+                    option.setAttribute("value", a.name)
+                    option.innerHTML = a.displayName
+                    opColor.append(option);
+                });
+                $(opColor).change(function () {
+                    Operation.create(operation).updateColor($(opColor).val())
+                });
+
                 var buttonSection = tabContent.appendChild(document.createElement("div"))
                 buttonSection.className = "temp-op-dialog";
                 /*
@@ -1001,7 +1116,7 @@ function wrapper(plugin_info) {
                 if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + portal.name)) {
                     operation.removePortal(portal);
                 }
-            }, self.deleteMarker = function(operation, marker) {
+            }, self.deleteMarker = function (operation, marker) {
                 if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.phtivdraw.getPopupBodyWithType(marker))) {
                     operation.removeMarker(marker);
                 }
@@ -1075,6 +1190,32 @@ function wrapper(plugin_info) {
             window.plugin.phtivdraw.qbin_get(shareKey)
         }
     };
+
+    window.plugin.phtivdraw.getColorMarker = function (color) {
+        console.log("marker color is -> " + color)
+        var marker = null
+        PhtivDraw.layerTypes.forEach(function (type) {
+            console.log("layer color is -> " + color)
+            if (type.name == color) {
+                console.log("Returning portal icon -> " + JSON.stringify(type.portal))
+                marker = type.portal["iconUrl"];
+            }
+        });
+        return marker
+    }
+
+    window.plugin.phtivdraw.getColorHex = function (color) {
+        console.log("link color is -> " + color)
+        var hex = null
+        PhtivDraw.layerTypes.forEach(function (type) {
+            console.log("layer color is -> " + color)
+            if (type.name == color) {
+                console.log("Returning link color -> " + JSON.stringify(type.color))
+                hex = type.color;
+            }
+        });
+        return hex
+    }
 
     !function (scope) {
         var markerDialogFunction = function () {
@@ -1155,7 +1296,7 @@ function wrapper(plugin_info) {
                         } else {
                             page._operation = operation
                             return page.focus(), page;
-                    }
+                        }
                     }
                 }
                 if (show)
@@ -1164,7 +1305,7 @@ function wrapper(plugin_info) {
                     return;
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
-            }, init.prototype.sendAlert = function(selectedType, operation, comment) {
+            }, init.prototype.sendAlert = function (selectedType, operation, comment) {
                 operation.addMarker(selectedType, scope.UiHelper.getSelectedPortal(), comment)
             }, init._dialogs = [], init;
         }();
@@ -1213,7 +1354,7 @@ function wrapper(plugin_info) {
                 textArea.className = "ui-dialog-phtivdraw-copy"
                 textArea.innerHTML = '<p><a onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
                     + '<textarea readonly onclick="$(\'.ui-dialog-phtivdraw-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>'
-                
+
                 var linkArea = mainContent.appendChild(document.createElement("div"))
                 linkArea.className = "temp-op-dialog";
 
@@ -1266,13 +1407,13 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.phtivdraw.viewOpSummary = function (operation) {
-            var arcForm = document.createElement("form");
-            arcForm.target = "_blank";
-            arcForm.method = "POST";
-            arcForm.name = "form1";
-            arcForm.action = "http://phtiv.com/opsummary?drawKey=" + operation.pasteKey;
-            document.body.appendChild(arcForm);
-            arcForm.submit();
+        var arcForm = document.createElement("form");
+        arcForm.target = "_blank";
+        arcForm.method = "POST";
+        arcForm.name = "form1";
+        arcForm.action = "http://phtiv.com/opsummary?drawKey=" + operation.pasteKey;
+        document.body.appendChild(arcForm);
+        arcForm.submit();
     }
 
     //** this saves a paste and returns a link */
@@ -1492,10 +1633,10 @@ function wrapper(plugin_info) {
             title: target["name"],
             icon: L.icon({
                 iconUrl: window.plugin.phtivdraw.getImageFromMarkerType(target.type),
-                shadowUrl : null,
-                iconSize : L.point(25, 41),
-                iconAnchor : L.point(25, 41),
-                popupAnchor : L.point(-1, -48)
+                shadowUrl: null,
+                iconSize: L.point(25, 41),
+                iconAnchor: L.point(25, 41),
+                popupAnchor: L.point(-1, -48)
             })
         });
 
@@ -1557,16 +1698,17 @@ function wrapper(plugin_info) {
             case PhtivDraw.Constants.MARKER_TYPE_DECAY:
                 return PhtivDraw.Images.marker_alert_decay;
             default:
-              return PhtivDraw.Images.marker_alert_unknown;
-          }
+                return PhtivDraw.Images.marker_alert_unknown;
+        }
     }
 
     //** This function adds all the Links to the layer */
     window.plugin.phtivdraw.addAllLinks = function () {
-        var linkList = window.plugin.phtivdraw.getSelectedOperation().links;
+        var operation = window.plugin.phtivdraw.getSelectedOperation()
+        var linkList = operation.links;
         linkList.forEach(function (link) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.phtivdraw.addLink(link);
+            window.plugin.phtivdraw.addLink(link, operation.color);
         });
     }
 
@@ -1581,11 +1723,13 @@ function wrapper(plugin_info) {
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.phtivdraw.addLink = function (link) {
+    window.plugin.phtivdraw.addLink = function (link, color) {
         //console.log("Link IS: " + JSON.stringify(portal))
+        var color = window.plugin.phtivdraw.getColorHex(color)
+        console.log("color link -> " + color)
         var options = {
             dashArray: [5, 5, 1, 5],
-            color: "#ff6600",
+            color: color ? color : "#ff6600",
             opacity: 1,
             weight: 2
         };
@@ -1606,10 +1750,11 @@ function wrapper(plugin_info) {
 
     //** This function adds all the portals to the layer */
     window.plugin.phtivdraw.addAllPortals = function () {
-        var portalList = window.plugin.phtivdraw.getSelectedOperation().portals;
+        var operation = window.plugin.phtivdraw.getSelectedOperation()
+        var portalList = operation.portals;
         portalList.forEach(function (portal) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.phtivdraw.addPortal(portal);
+            window.plugin.phtivdraw.addPortal(portal, operation.color);
             //console.log("ADDING PORTAL: " + JSON.stringify(portal));
         });
     }
@@ -1625,13 +1770,15 @@ function wrapper(plugin_info) {
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.phtivdraw.addPortal = function (portal) {
+    window.plugin.phtivdraw.addPortal = function (portal, color) {
         //console.log("PORTAL IS: " + JSON.stringify(portal))
+        var colorMarker = window.plugin.phtivdraw.getColorMarker(color)
+        console.log("adding portal -> " + colorMarker)
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal["name"],
             icon: L.icon({
-                iconUrl: PhtivDraw.Images.marker_layer_groupa,
+                iconUrl: colorMarker ? colorMarker : PhtivDraw.Images.marker_layer_groupa,
                 iconAnchor: [12, 41],
                 iconSize: [25, 41],
                 popupAnchor: [0, -35]
@@ -1686,7 +1833,7 @@ function wrapper(plugin_info) {
     window.plugin.phtivdraw.saveImportString = function (string) {
         try {
             var keyIdentifier = "phtivShareKey="
-            if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*")) && string.includes(keyIdentifier) ) {
+            if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*")) && string.includes(keyIdentifier)) {
                 var key = string.substring(string.lastIndexOf(keyIdentifier) + keyIdentifier.length)
                 console.log("KEY IS: " + key)
                 window.plugin.phtivdraw.qbin_get(key)
@@ -1725,8 +1872,8 @@ function wrapper(plugin_info) {
         store.set(PhtivDraw.Constants.OP_LIST_KEY, null);
     }
 
-     //*** This function resets the local op list
-     window.plugin.phtivdraw.resetPasteList = function () {
+    //*** This function resets the local op list
+    window.plugin.phtivdraw.resetPasteList = function () {
         store.set(PhtivDraw.Constants.PASTE_LIST_KEY, null);
     }
 
@@ -1743,9 +1890,9 @@ function wrapper(plugin_info) {
     }
 
     /** This function gets a usable paste link from an operation */
-    window.plugin.phtivdraw.getPasteLink = function(operation) {
+    window.plugin.phtivdraw.getPasteLink = function (operation) {
         if (operation.pasteKey != null) {
-            return PhtivDraw.Constants.INTEL_BASE_KEY + "?phtivShareKey=" + operation.pasteKey 
+            return PhtivDraw.Constants.INTEL_BASE_KEY + "?phtivShareKey=" + operation.pasteKey
         } else {
             return null
         }
@@ -1767,6 +1914,21 @@ function wrapper(plugin_info) {
             this.markers = Array();
             this.pasteKey = null;
             this.pasteExpireDate = 0;
+            this.color = PhtivDraw.Constants.DEFAULT_OPERATION_COLOR
+        }
+
+        getColor() {
+            if (this.color == null) return PhtivDraw.Constants.DEFAULT_OPERATION_COLOR
+            else {
+                return this.color
+            }
+        }
+
+        updateColor(color) {
+            if (this.color != color) {
+                this.color = color
+                this.update()
+            }
         }
 
         containsPortal(portal) {
@@ -2267,7 +2429,7 @@ function wrapper(plugin_info) {
         start.lng = drawnLink.fromPortal.lng;
         end.lat = drawnLink.toPortal.lat;
         end.lng = drawnLink.toPortal.lng;
-        
+
         if (window.plugin.phtivdraw.greatCircleArcIntersect(a[0], a[1], start, end)) {
             for (i = 0; i < markers.length; i++) {
                 var marker = markers[i];
