@@ -2,7 +2,7 @@
 // @id           wasabee
 // @name         IITC Plugin: Wasabee Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.11
+// @version      0.11.1
 // @updateURL    http://wasabee.rocks/wasabee.meta.js
 // @downloadURL  http:/wasabee.rocks/wasabee.user.js
 // @description  Less terrible draw tools, hopefully.
@@ -71,7 +71,7 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
             a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
-            a.QBIN_BASE_KEY = "https://server.wasabee.rocks:8000";
+            a.QBIN_BASE_KEY = "https://server.wasabee.rocks:8443";
             a.INTEL_BASE_KEY = "https://intel.ingress.com/intel"
             a.CURRENT_EXPIRE_NUMERIC = 1209600000
             a.MARKER_TYPE_DESTROY = "DestroyPortalAlert"
@@ -1193,12 +1193,9 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.wasabee.getColorMarker = function (color) {
-        console.log("marker color is -> " + color)
         var marker = null
         Wasabee.layerTypes.forEach(function (type) {
-            console.log("layer color is -> " + color)
             if (type.name == color) {
-                console.log("Returning portal icon -> " + JSON.stringify(type.portal))
                 marker = type.portal["iconUrl"];
             }
         });
@@ -1206,12 +1203,9 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wasabee.getColorHex = function (color) {
-        console.log("link color is -> " + color)
         var hex = null
         Wasabee.layerTypes.forEach(function (type) {
-            console.log("layer color is -> " + color)
             if (type.name == color) {
-                console.log("Returning link color -> " + JSON.stringify(type.color))
                 hex = type.color;
             }
         });
@@ -1772,9 +1766,7 @@ function wrapper(plugin_info) {
 
     /** This function adds a portal to the portal layer group */
     window.plugin.wasabee.addPortal = function (portal, color) {
-        //console.log("PORTAL IS: " + JSON.stringify(portal))
         var colorMarker = window.plugin.wasabee.getColorMarker(color)
-        console.log("adding portal -> " + colorMarker)
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal["name"],
@@ -1785,8 +1777,9 @@ function wrapper(plugin_info) {
                 popupAnchor: [0, -35]
             })
         });
+
         window.registerMarkerForOMS(marker);
-        marker.bindPopup(window.plugin.wasabee.getPortalPopup(marker, portal));
+        marker.bindPopup(window.plugin.wasabee.getPortalPopup(marker, portal, latLng));
         marker.off("click", marker.togglePopup, marker);
         marker.on('spiderfiedclick', marker.togglePopup, marker);
         window.plugin.wasabee.portalLayers[portal["id"]] = marker;
@@ -1794,7 +1787,7 @@ function wrapper(plugin_info) {
     }
 
     //** This function gets the portal popup content */
-    window.plugin.wasabee.getPortalPopup = function (marker, portal) {
+    window.plugin.wasabee.getPortalPopup = function (marker, portal, latLng) {
         marker.className = "wasabee-dialog wasabee-dialog-ops"
         var content = document.createElement("div");
         var title = content.appendChild(document.createElement("div"));
@@ -1820,7 +1813,8 @@ function wrapper(plugin_info) {
             Wasabee.UiCommands.deletePortal(window.plugin.wasabee.getSelectedOperation(), portal)
             marker.closePopup();
         }, false);
-        return content;
+        var popup = L.popup().setLatLng(latLng).setContent(content)
+        return popup;
     }
 
     //** This function opens a dialog with a text field to copy */
