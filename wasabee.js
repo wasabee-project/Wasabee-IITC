@@ -71,7 +71,8 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
             a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
-            a.QBIN_BASE_KEY = "https://server.wasabee.rocks:8443";
+            a.SERVER_BASE_KEY = "https://server.wasabee.rocks:8443";
+            a.SERVER_BASE_TEST_KEY = "https://server.wasabee.rocks:8444";
             a.INTEL_BASE_KEY = "https://intel.ingress.com/intel"
             a.CURRENT_EXPIRE_NUMERIC = 1209600000
             a.MARKER_TYPE_DESTROY = "DestroyPortalAlert"
@@ -471,6 +472,9 @@ function wrapper(plugin_info) {
                 });
                 var buttons = this._dialog.dialog("option", "buttons");
                 this._dialog.dialog("option", "buttons", $.extend({}, {
+                    "Authenticate": function (b) {
+                        window.plugin.wasabee.authenticateWasabee();
+                    },
                     "Add New Operation": function (b) {
                         var promptAction = prompt('Enter an operation name.  Must not be empty.', '');
                         if (promptAction !== null && promptAction !== '') {
@@ -1413,7 +1417,7 @@ function wrapper(plugin_info) {
 
     //** this saves a paste and returns a link */
     window.plugin.wasabee.qbin_put = ((Q) => $.ajax({
-        url: Wasabee.Constants.QBIN_BASE_KEY + "/simple",
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/simple",
         type: "POST",
         data: Q,
         crossDomain: true,
@@ -1431,7 +1435,7 @@ function wrapper(plugin_info) {
 
     //** this gets paste json raw */
     window.plugin.wasabee.qbin_get = ((pasteID) => $.ajax({
-        url: Wasabee.Constants.QBIN_BASE_KEY + "/simple/" + pasteID,
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/simple/" + pasteID,
         crossDomain: true,
         method: "GET",
     }).done(function (response) {
@@ -1742,6 +1746,16 @@ function wrapper(plugin_info) {
         } else
             console.log("LATLNGS WAS NULL?!")
     }
+
+    window.plugin.wasabee.authenticateWasabee = (() => $.ajax({
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/me",
+        crossDomain: true,
+        method: "GET",
+    }).done(function (response) {
+        console.log("got response -> " + response)
+    }).fail(function (jqXHR, textStatus) {
+        alert('Authentication Failed -> ' + textStatus)
+    }));
 
     //** This function adds all the portals to the layer */
     window.plugin.wasabee.addAllPortals = function () {
