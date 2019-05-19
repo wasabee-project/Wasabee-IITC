@@ -82,6 +82,7 @@ function wrapper(plugin_info) {
             a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert"
             a.DEFAULT_OPERATION_COLOR = "groupa"
             a.BREAK_EXCEPTION = {};
+            a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY14"
 
         }(b = scope.Constants || (scope.Constants = {}));
     }(Wasabee || (Wasabee = {}));
@@ -323,6 +324,7 @@ function wrapper(plugin_info) {
                 this._dialog.dialog("option", "buttons", {});
             }
             return init.update = function (operation, show) {
+                console.log("OPERATION: -> " + JSON.stringify(operation))
                 var p = 0;
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
@@ -430,9 +432,9 @@ function wrapper(plugin_info) {
 
                 //***Function to add a portal -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addPortal = function (sentPortal) {
-                var resolvedLocalData = Promise.resolve(this._operation.portals)
+                var resolvedLocalData = Promise.resolve(this._operation.opportals)
 
-                return sentPortal ? (this._operation.portals.some(function (gotPortal) {
+                return sentPortal ? (this._operation.opportals.some(function (gotPortal) {
                     return gotPortal.id == sentPortal.id;
                 }) ? resolvedLocalData : scope.UiCommands.addPortal(this._operation, sentPortal, "", true)) : Promise.reject("no portal given");
 
@@ -1129,8 +1131,8 @@ function wrapper(plugin_info) {
                 if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + portal.name)) {
                     operation.removePortal(portal);
                 }
-            }, self.deleteMarker = function (operation, marker) {
-                if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.wasabee.getPopupBodyWithType(marker))) {
+            }, self.deleteMarker = function (operation, marker, portal) {
+                if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.wasabee.getPopupBodyWithType(portal, marker))) {
                     operation.removeMarker(marker);
                 }
             }, self.showLinksDialog = function (operation, portal) {
@@ -1548,7 +1550,10 @@ function wrapper(plugin_info) {
 
     //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
     window.plugin.wasabee.setupLocalStorage = function () {
-        //window.plugin.wasabee.resetOpList();
+        if (store.get(Wasabee.Constants.OP_RESTRUCTURE_KEY) == null) {
+            window.plugin.wasabee.resetOpList();
+            store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true)
+        }
         //This sets up the op list
         var opList = null;
         var opListObj = store.get(Wasabee.Constants.OP_LIST_KEY)
@@ -1613,7 +1618,7 @@ function wrapper(plugin_info) {
             Wasabee.OpsDialog.update(Wasabee.opList, false);
             Wasabee.MarkerDialog.update(selectedOp, false, false)
 
-            //console.log("LIST IS NOW: -> " + JSON.stringify(Wasabee.opList))
+            console.log("LIST IS NOW: -> " + JSON.stringify(Wasabee.opList))
             window.plugin.wasabee.drawThings();
         } else
             alert("Parse Error -> Saving Op List Failed");
@@ -1665,9 +1670,10 @@ function wrapper(plugin_info) {
 
     /** This function adds a Targets to the target layer group */
     window.plugin.wasabee.addTarget = function (target) {
-        var latLng = new L.LatLng(target.portal.lat, target.portal.lng);
+        var targetPortal = window.plugin.wasabee.getSelectedOperation().getPortal(target.portalId)
+        var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
         var marker = L.marker(latLng, {
-            title: target["name"],
+            title: targetPortal.name,
             icon: L.icon({
                 iconUrl: window.plugin.wasabee.getImageFromMarkerType(target.type),
                 shadowUrl: null,
@@ -1678,31 +1684,32 @@ function wrapper(plugin_info) {
         });
 
         window.registerMarkerForOMS(marker);
-        marker.bindPopup(window.plugin.wasabee.getMarkerPopup(marker, target));
+        marker.bindPopup(window.plugin.wasabee.getMarkerPopup(marker, target, targetPortal));
         marker.off("click", marker.togglePopup, marker);
         marker.on('spiderfiedclick', marker.togglePopup, marker);
         window.plugin.wasabee.targetLayers[target["ID"]] = marker;
         marker.addTo(window.plugin.wasabee.targetLayerGroup);
     }
 
-    window.plugin.wasabee.getMarkerPopup = function (marker, target) {
+    window.plugin.wasabee.getMarkerPopup = function (marker, target, portal) {
+        console.log("TARGET: " + JSON.stringify(target))
         marker.className = "wasabee-dialog wasabee-dialog-ops"
         var content = document.createElement("div");
         var title = content.appendChild(document.createElement("div"));
         title.className = "desc";
-        title.innerHTML = window.markdown.toHTML(window.plugin.wasabee.getPopupBodyWithType(target));
+        title.innerHTML = window.markdown.toHTML(window.plugin.wasabee.getPopupBodyWithType(portal, target));
         buttonSet = content.appendChild(document.createElement("div"));
         buttonSet.className = "temp-op-dialog";
         var deleteButton = buttonSet.appendChild(document.createElement("a"));
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", function () {
-            Wasabee.UiCommands.deleteMarker(window.plugin.wasabee.getSelectedOperation(), target)
+            Wasabee.UiCommands.deleteMarker(window.plugin.wasabee.getSelectedOperation(), target, portal)
             marker.closePopup();
         }, false);
         return content;
     }
 
-    window.plugin.wasabee.getPopupBodyWithType = function (target) {
+    window.plugin.wasabee.getPopupBodyWithType = function (portal, target) {
         var title = ""
         var comment = target.comment
         switch (target.type) {
@@ -1718,7 +1725,7 @@ function wrapper(plugin_info) {
             default:
                 title = "Unknown"
         }
-        title = title + " - " + target.portal.name
+        title = title + " - " + portal.name
         if (!comment)
             return title
         else
@@ -1832,10 +1839,10 @@ function wrapper(plugin_info) {
     //** This function adds all the portals to the layer */
     window.plugin.wasabee.addAllPortals = function () {
         var operation = window.plugin.wasabee.getSelectedOperation()
-        var portalList = operation.portals;
-        portalList.forEach(function (portal) {
+        var portalList = operation.anchors;
+        portalList.forEach(function (portalId) {
             //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.wasabee.addPortal(portal, operation.color);
+            window.plugin.wasabee.addPortal(portalId, operation.color);
             //console.log("ADDING PORTAL: " + JSON.stringify(portal));
         });
     }
@@ -1851,7 +1858,8 @@ function wrapper(plugin_info) {
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.wasabee.addPortal = function (portal, color) {
+    window.plugin.wasabee.addPortal = function (portalId, color) {
+        var portal = window.plugin.wasabee.getSelectedOperation().getPortal([portalId])
         var colorMarker = window.plugin.wasabee.getColorMarker(color)
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
@@ -1985,7 +1993,8 @@ function wrapper(plugin_info) {
             this.name = name;
             this.creator = creator;
             this.isSelected = isSelected;
-            this.portals = Array();
+            this.opportals = Array();
+            this.anchors = Array();
             this.links = Array();
             this.markers = Array();
             this.pasteKey = null;
@@ -2008,12 +2017,14 @@ function wrapper(plugin_info) {
         }
 
         containsPortal(portal) {
-            if (this.portals.length == 0)
-                return false;
-            else {
-                for (let portal_ in this.portals) {
-                    if (portal.id == portal_.id) {
-                        return true;
+            if (portal) {
+                if (this.opportals.length == 0)
+                    return false;
+                else {
+                    for (let portal_ in this.opportals) {
+                        if (portal_ && portal.id == portal_.id) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -2035,12 +2046,12 @@ function wrapper(plugin_info) {
             return false;
         }
 
-        containsMarker(portal) {
+        containsMarker(portal, markerType) {
             if (this.markers.length == 0)
                 return false;
             else {
                 for (let marker in this.markers) {
-                    if (this.markers[marker].portal.id == portal.id) {
+                    if (this.markers[marker].portalId == portal.id && this.markers[marker].type == markerType) {
                         return true;
                     }
                 }
@@ -2056,20 +2067,23 @@ function wrapper(plugin_info) {
         }
 
         getPortal(portalID) {
-            for (let portal_ in this.portals) {
-                if (portalID == this.portals[portal_].id) {
-                    return this.portals[portal_];
+            for (let portal_ in this.opportals) {
+                if (portalID == this.opportals[portal_].id) {
+                    return this.opportals[portal_];
                 }
             }
             return null;
         }
 
         removePortal(portal) {
-            this.portals = this.portals.filter(function (listPortal) {
+            this.opportals = this.opportals.filter(function (listPortal) {
                 return listPortal.id !== portal.id;
             });
             this.links = this.links.filter(function (listLink) {
                 return listLink.fromPortal.id !== portal.id && listLink.toPortal.id !== portal.id;
+            });
+            this.markers = this.markers.filter(function(portalId) {
+                return portalId != portal.id
             });
             this.cleanPortalList()
             this.update()
@@ -2086,7 +2100,7 @@ function wrapper(plugin_info) {
         removeLink(startPortal, endPortal) {
             var newLinks = [];
             for (let link_ in this.links) {
-                if (!(this.links[link_].fromPortal["id"] == startPortal["id"] && this.links[link_].toPortal["id"] == endPortal["id"])) {
+                if (!(this.links[link_].fromPortalId == startPortal.id && this.links[link_].toPortalId == endPortal.id)) {
                     newLinks.push(this.links[link_])
                 }
             }
@@ -2098,7 +2112,7 @@ function wrapper(plugin_info) {
         reverseLink(startPortal, endPortal) {
             var newLinks = [];
             for (let link_ in this.links) {
-                if (this.links[link_].fromPortal["id"] == startPortal["id"] && this.links[link_].toPortal["id"] == endPortal["id"]) {
+                if (this.links[link_].fromPortalId == startPortalId && this.links[link_].toPortalId == endPortalId) {
                     this.links[link_].fromPortal = endPortal;
                     this.links[link_].toPortal = startPortal;
                 }
@@ -2108,18 +2122,28 @@ function wrapper(plugin_info) {
             this.update()
         }
 
-        //This removes portals with no links and removes duplicates
+        //This removes opportals with no links and removes duplicates
         cleanPortalList() {
             var newPortals = [];
-            for (let portal_ in this.portals) {
+            for (let portal_ in this.opportals) {
                 var foundPortal = false;
                 for (let link_ in this.links) {
-                    if (this.portals[portal_]["id"] == this.links[link_].fromPortal["id"] || this.portals[portal_]["id"] == this.links[link_].toPortal["id"]) {
+                    if (this.opportals[portal_]["id"] == this.links[link_].fromPortalId || this.opportals[portal_]["id"] == this.links[link_].toPortalId) {
+                        foundPortal = true;
+                    }
+                }
+                for (let marker_ in this.markers) {
+                    if (this.opportals[portal_]["id"] == this.markers[marker_].portalId) {
+                        foundPortal = true;
+                    }
+                }
+                for (let anchor_ in this.anchors) {
+                    if (this.opportals[portal_]["id"] == this.anchors[anchor_]) {
                         foundPortal = true;
                     }
                 }
                 if (foundPortal) {
-                    newPortals.push(this.portals[portal_])
+                    newPortals.push(this.opportals[portal_])
                 }
             }
 
@@ -2139,26 +2163,50 @@ function wrapper(plugin_info) {
                     }
                 }
             }
-            this.portals = finalPortals;
+            this.opportals = finalPortals;
         }
 
         addPortal(portal) {
             if (!this.containsPortal(portal)) {
-                this.portals.push(portal)
+                this.opportals.push(portal);
             } else
                 console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal));
         }
 
         addLink(fromPortal, toPortal, description) {
-            var link = new Link(fromPortal, toPortal, description)
+            this.addAnchor(fromPortal)
+            this.addAnchor(toPortal)
+
+            var link = new Link(Operation.create(this), fromPortal.id, toPortal.id, description)
             if (!this.containsLink(link)) {
                 this.links.push(link)
             } else
                 console.log("Link Already Exists In Operation -> " + JSON.stringify(link));
         }
 
+        containsAnchor(portalId) {
+            if (this.anchors.length == 0)
+                return false;
+            else {
+                for (let anchor_ in this.anchors) {
+                    if (this.anchors[anchor_] == portalId) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        addAnchor(portal) {
+            if (!this.containsAnchor(portal.id)) {
+                this.anchors.push(portal.id)
+            }
+
+            this.addPortal(portal)
+        }
+
         swapPortal(originalPortal, newPortal) {
-            this.portals = this.portals.filter(function (listPortal) {
+            this.opportals = this.opportals.filter(function (listPortal) {
                 return listPortal.id !== originalPortal.id;
             });
             this.addPortal(newPortal)
@@ -2172,17 +2220,22 @@ function wrapper(plugin_info) {
         }
 
         addMarker(markerType, portal, comment) {
-            if (!this.containsMarker(portal)) {
-                var marker = new Marker(markerType, portal, comment);
-                this.markers.push(marker);
-                this.update();
-            } else {
-                alert("This portal already has a marker. Chose a different portal.")
+            if (portal) {
+                if (!this.containsMarker(portal, markerType)) {
+                    if (!this.containsPortal(portal)) {
+                        this.addPortal(portal)
+                    }
+                    var marker = new Marker(markerType, portal.id, comment);
+                    this.markers.push(marker);
+                    this.update();
+                } else {
+                    alert("This portal already has a marker. Chose a different portal.")
+                }
             }
         }
 
         clearAllItems() {
-            this.portals = Array();
+            this.opportals = Array();
             this.links = Array();
             this.markers = Array();
             this.update();
@@ -2198,7 +2251,7 @@ function wrapper(plugin_info) {
                 if (links[link_] instanceof Link) {
                     tempLinks.push(links[link_]);
                 } else {
-                    tempLinks.push(Link.create(links[link_]));
+                    tempLinks.push(Link.create(links[link_], this));
                 }
             }
             return tempLinks;
@@ -2219,9 +2272,9 @@ function wrapper(plugin_info) {
     }
 
     class Marker {
-        constructor(type, portal, comment) {
+        constructor(type, portalId, comment) {
             this.ID = window.plugin.wasabee.generateId();
-            this.portal = portal;
+            this.portalId = portalId;
             this.type = type;
             this.comment = comment;
         }
@@ -2242,14 +2295,26 @@ function wrapper(plugin_info) {
         //fromPortal <- portal the link is from
         //toPortal <- portal the link is to
         //description <- user entered description of link
-        constructor(fromPortal, toPortal, description) {
+        constructor(operation, fromPortalId, toPortalId, description) {
             this.ID = window.plugin.wasabee.generateId();
-            this.fromPortal = fromPortal;
-            this.toPortal = toPortal;
+            this.fromPortalId = fromPortalId;
+            this.toPortalId = toPortalId;
             this.description = description;
+            this.assignedTo = null;
+            this.throwOrderPos = null;
+            this.toPortal = null;
+            this.fromPortal = null;
+            this.populatePortals(operation)
+        }
+
+        populatePortals(operation) {
+
+            this.fromPortal = operation.getPortal(this.fromPortalId)
+            this.toPortal = operation.getPortal(this.toPortalId)
         }
 
         getLatLngs() {
+            console.log("FromPortal -> " + this.fromPortal)
             if (this.fromPortal != null && this.toPortal != null) {
                 var returnArray = Array();
                 returnArray.push(new L.LatLng(this.fromPortal.lat, this.fromPortal.lng))
@@ -2259,8 +2324,8 @@ function wrapper(plugin_info) {
                 return null;
         }
 
-        static create(obj) {
-            var link = new Link();
+        static create(obj, operation) {
+            var link = new Link(Operation.create(operation));
             for (var prop in obj) {
                 if (link.hasOwnProperty(prop)) {
                     link[prop] = obj[prop];
@@ -2497,14 +2562,16 @@ function wrapper(plugin_info) {
         return true;
     };
 
-    window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers) {
+    window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers, operation) {
         var a = link.getLatLngs();
         var start = {};
         var end = {};
-        start.lat = drawnLink.fromPortal.lat;
-        start.lng = drawnLink.fromPortal.lng;
-        end.lat = drawnLink.toPortal.lat;
-        end.lng = drawnLink.toPortal.lng;
+        var fromPortal = operation.getPortal(drawnLink.fromPortalId)
+        var toPortal = operation.getPortal(drawnLink.toPortalId)
+        start.lat = fromPortal.lat;
+        start.lng = fromPortal.lng;
+        end.lat = toPortal.lat;
+        end.lng = toPortal.lng;
 
         if (window.plugin.wasabee.greatCircleArcIntersect(a[0], a[1], start, end)) {
             for (i = 0; i < markers.length; i++) {
@@ -2546,11 +2613,11 @@ function wrapper(plugin_info) {
         window.plugin.wasabee.crossLinkLayerGroup[link.options.guid] = blocked;
     }
 
-    window.plugin.wasabee.testLink = function (drawnLinks, drawnMarkers, link) {
+    window.plugin.wasabee.testLink = function (drawnLinks, drawnMarkers, link, operation) {
         if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) return;
         try {
             drawnLinks.forEach(function (drawnLink) {
-                var shouldShowCrosslink = plugin.wasabee.testPolyLine(drawnLink, link, drawnMarkers);
+                var shouldShowCrosslink = plugin.wasabee.testPolyLine(drawnLink, link, drawnMarkers, operation);
                 if (shouldShowCrosslink) {
                     plugin.wasabee.showCrossLink(link);
                     throw Wasabee.Constants.BREAK_EXCEPTION;
@@ -2568,9 +2635,9 @@ function wrapper(plugin_info) {
         var operation = window.plugin.wasabee.getSelectedOperation();
         var drawnLinks = operation.links;
         var drawnMarkers = operation.markers;
-
+        
         $.each(window.links, function (guid, link) {
-            window.plugin.wasabee.doLinkTest(link, drawnLinks, drawnMarkers);
+            window.plugin.wasabee.doLinkTest(link, drawnLinks, drawnMarkers, operation);
         });
     }
 
@@ -2578,11 +2645,11 @@ function wrapper(plugin_info) {
         var operation = window.plugin.wasabee.getSelectedOperation();
         var drawnLinks = operation.links;
         var drawnMarkers = operation.markers;
-        plugin.wasabee.doLinkTest(data.link, drawnLinks, drawnMarkers);
+        plugin.wasabee.doLinkTest(data.link, drawnLinks, drawnMarkers, operation);
     }
 
-    window.plugin.wasabee.doLinkTest = function (finalLink, drawnLinks, drawnMarkers) {
-        plugin.wasabee.testLink(drawnLinks, drawnMarkers, finalLink);
+    window.plugin.wasabee.doLinkTest = function (finalLink, drawnLinks, drawnMarkers, operation) {
+        plugin.wasabee.testLink(drawnLinks, drawnMarkers, finalLink, operation);
     }
 
     window.plugin.wasabee.testForDeletedLinks = function () {
