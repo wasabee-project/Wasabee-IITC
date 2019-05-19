@@ -324,7 +324,6 @@ function wrapper(plugin_info) {
                 this._dialog.dialog("option", "buttons", {});
             }
             return init.update = function (operation, show) {
-                console.log("OPERATION: -> " + JSON.stringify(operation))
                 var p = 0;
                 var parameters = init._dialogs;
                 for (; p < parameters.length; p++) {
@@ -498,7 +497,6 @@ function wrapper(plugin_info) {
                             return page._dialog.dialog('close');
                         }
                         page._operationList = operationList; //doesn't update, need to manually?
-                        console.log("inside param iterator -> " + typeof page)
                         page.setupTabs()
                         return page.focus(), page;
                     }
@@ -532,13 +530,11 @@ function wrapper(plugin_info) {
                     if (this._operationList[i].isSelected)
                         selectedIndex = i;
                 }
-                console.log("selected index" + selectedIndex)
                 this.updateContentPane(this._operationList[selectedIndex], this._operationList.length)
                 $(tabs).tabs({
                     active: selectedIndex,
                     beforeActivate:
                         function (e, tab) {
-                            console.log("TABSELECTED: " + tab.newTab.index());
                             self.updateContentPane(self._operationList[tab.newTab.index()], self._operationList.length)
                         }
                 }).addClass('ui-tabs-vertical ui-helper-clearfix');
@@ -1128,8 +1124,8 @@ function wrapper(plugin_info) {
                 } else
                     alert("You must select a new portal!")
             }, self.deletePortal = function (operation, portal) {
-                if (confirm("Do you really want to delete this portal, including all incoming and outgoing links?\n\n" + portal.name)) {
-                    operation.removePortal(portal);
+                if (confirm("Do you really want to delete this anchor, including all incoming and outgoing links?\n\n" + portal.name)) {
+                    operation.removeAnchor(portal.id);
                 }
             }, self.deleteMarker = function (operation, marker, portal) {
                 if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.wasabee.getPopupBodyWithType(portal, marker))) {
@@ -1160,7 +1156,6 @@ function wrapper(plugin_info) {
         } catch (e) {
             alert(JSON.stringify(e))
         }
-        console.log('Loading Wasabee now');
 
         /* jshint ignore:start */
         /* arc.js by Dane Springmeyer, https://github.com/springmeyer/arc.js */
@@ -1618,7 +1613,6 @@ function wrapper(plugin_info) {
             Wasabee.OpsDialog.update(Wasabee.opList, false);
             Wasabee.MarkerDialog.update(selectedOp, false, false)
 
-            console.log("LIST IS NOW: -> " + JSON.stringify(Wasabee.opList))
             window.plugin.wasabee.drawThings();
         } else
             alert("Parse Error -> Saving Op List Failed");
@@ -1692,7 +1686,6 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wasabee.getMarkerPopup = function (marker, target, portal) {
-        console.log("TARGET: " + JSON.stringify(target))
         marker.className = "wasabee-dialog wasabee-dialog-ops"
         var content = document.createElement("div");
         var title = content.appendChild(document.createElement("div"));
@@ -1770,7 +1763,6 @@ function wrapper(plugin_info) {
     window.plugin.wasabee.addLink = function (link, color) {
         //console.log("Link IS: " + JSON.stringify(portal))
         var color = window.plugin.wasabee.getColorHex(color)
-        console.log("color link -> " + color)
         var options = {
             dashArray: [5, 5, 1, 5],
             color: color ? color : "#ff6600",
@@ -2075,15 +2067,12 @@ function wrapper(plugin_info) {
             return null;
         }
 
-        removePortal(portal) {
-            this.opportals = this.opportals.filter(function (listPortal) {
-                return listPortal.id !== portal.id;
+        removeAnchor(portalId) {
+            this.anchors = this.anchors.filter(function (anchor) {
+                return anchor !== portalId;
             });
             this.links = this.links.filter(function (listLink) {
-                return listLink.fromPortal.id !== portal.id && listLink.toPortal.id !== portal.id;
-            });
-            this.markers = this.markers.filter(function(portalId) {
-                return portalId != portal.id
+                return listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId;
             });
             this.cleanPortalList()
             this.update()
@@ -2314,7 +2303,6 @@ function wrapper(plugin_info) {
         }
 
         getLatLngs() {
-            console.log("FromPortal -> " + this.fromPortal)
             if (this.fromPortal != null && this.toPortal != null) {
                 var returnArray = Array();
                 returnArray.push(new L.LatLng(this.fromPortal.lat, this.fromPortal.lng))
@@ -2577,8 +2565,7 @@ function wrapper(plugin_info) {
             for (i = 0; i < markers.length; i++) {
                 var marker = markers[i];
                 if (marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY || marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS || marker.type == Wasabee.Constants.MARKER_TYPE_DECAY) {
-                    //The marker is of a destroy type.
-                    if (window.plugin.wasabee.checkMarkerAgainstLink(marker, link)) {
+                    if (window.plugin.wasabee.checkMarkerAgainstLink(marker, link, operation)) {
                         console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID)
                         return false;
                     }
@@ -2590,11 +2577,12 @@ function wrapper(plugin_info) {
     };
 
     /** This checks if a marker is on either side of a link */
-    window.plugin.wasabee.checkMarkerAgainstLink = function (marker, link) {
+    window.plugin.wasabee.checkMarkerAgainstLink = function (marker, link, operation) {
         var latlngs = link.getLatLngs();
+        var markerPortal = operation.getPortal(marker.portalId)
         var v = latlngs[0];
         var center = latlngs[1];
-        var view = marker.portal;
+        var view = markerPortal;
         return view ? view.lng == v.lng && view.lat == v.lat ? true : view.lng == center.lng && view.lat == center.lat ? true : false : false;
     }
 
