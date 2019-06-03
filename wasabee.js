@@ -82,8 +82,9 @@ function wrapper(plugin_info) {
             a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert"
             a.DEFAULT_OPERATION_COLOR = "groupa"
             a.BREAK_EXCEPTION = {};
-            a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY14"
-
+            a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY17"
+            a.SERVER_OP_LIST_KEY = "SERVER_OP_LIST_KEY"
+            a.SERVER_OWNED_OP_LIST_KEY = "SERVER_OWNED_OP_LIST_KEY"
         }(b = scope.Constants || (scope.Constants = {}));
     }(Wasabee || (Wasabee = {}));
 
@@ -484,6 +485,13 @@ function wrapper(plugin_info) {
                     },
                     "Import Operation": function (b) {
                         window.plugin.wasabee.importString();
+                    },
+                    "Clear All Operations": function (b) {
+                        var confirmed = confirm("Are you sure you want to clear ALL operations?")
+                        if (confirmed) {
+                            window.plugin.wasabee.resetOpList();
+                            window.plugin.wasabee.setupLocalStorage();
+                        }                    
                     }
                 }, buttons));
             }
@@ -592,7 +600,6 @@ function wrapper(plugin_info) {
                         var confirmed = confirm("Are you sure you want to select this operation?")
                         if (confirmed) {
                             window.plugin.wasabee.updateOperationInList(Operation.create(operation), true)
-
                         }
                     }, false);
                 }
@@ -617,6 +624,13 @@ function wrapper(plugin_info) {
                 deleteButton.addEventListener("click", function (arg) {
                     var confirmed = confirm("Are you sure you want to *DELETE* this operation?")
                     if (confirmed == true) {
+                        if (window.plugin.wasabee.opIsOwnedServerOp(operation.ID)) {
+                            var confirmedDeleteServerOp = confirm("Are you sure you want to *DELETE* this operation on the *SERVER*?")
+                            if (confirmedDeleteServerOp) {
+                                window.plugin.wasabee.deleteOwnedServerOp(operation.ID)
+                            }
+                        }
+                    
                         window.plugin.wasabee.removeOperationFromList(Operation.create(operation))
                     }
                 }, false);
@@ -1496,6 +1510,7 @@ function wrapper(plugin_info) {
                 });
                 $(container).append('<a id="wasabee_syncbutton" href="javascript: void(0);" class="wasabee-control" title="Sync All Ops"><img src=' + Wasabee.Images.toolbar_sync + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#wasabee_syncbutton', function () {
                     try {
+                        //TODO close links dialog, markers dialog, and ops dialog
                         window.plugin.wasabee.authWithWasabee();
                     } catch (e) {
                         window.plugin.wasabee.showMustAuthAlert();
@@ -1744,8 +1759,7 @@ function wrapper(plugin_info) {
         var operation = window.plugin.wasabee.getSelectedOperation()
         var linkList = operation.links;
         linkList.forEach(function (link) {
-            //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
-            window.plugin.wasabee.addLink(link, operation.color);
+            window.plugin.wasabee.addLink(link, operation.color, operation);
         });
     }
 
@@ -1760,8 +1774,7 @@ function wrapper(plugin_info) {
     }
 
     /** This function adds a portal to the portal layer group */
-    window.plugin.wasabee.addLink = function (link, color) {
-        //console.log("Link IS: " + JSON.stringify(portal))
+    window.plugin.wasabee.addLink = function (link, color, operation) {
         var color = window.plugin.wasabee.getColorHex(color)
         var options = {
             dashArray: [5, 5, 1, 5],
@@ -1769,13 +1782,20 @@ function wrapper(plugin_info) {
             opacity: 1,
             weight: 2
         };
-        var latLngs = link.getLatLngs();
+        console.log("LINK => " + JSON.stringify(link))
+        var latLngs = link.getLatLngs(operation);
+        console.log("latLngs -> " + JSON.stringify(latLngs))
         if (latLngs != null) {
+            var fromPortal = operation.getPortal(link.fromPortalId)
+            var toPortal = operation.getPortal(link.toPortalId)
             var startCoord = new window.plugin.wasabee.arc.Coord(latLngs[0].lng, latLngs[0].lat);
             var endCoord = new window.plugin.wasabee.arc.Coord(latLngs[1].lng, latLngs[1].lat);
             var gc = new window.plugin.wasabee.arc.GreatCircle(startCoord, endCoord);
-            var distance = window.plugin.wasabee.distance(link);
+            var distance = window.plugin.wasabee.distance(fromPortal, toPortal);
             var geojson_feature = gc.Arc(Math.round(distance)).json();
+            console.log("geojson_feature -> " + JSON.stringify(geojson_feature))
+            console.log("options -> " + JSON.stringify(options))
+
             var link_ = new L.geoJson(geojson_feature, options);
 
             window.plugin.wasabee.linkLayers[link["ID"]] = link_;
@@ -1792,8 +1812,9 @@ function wrapper(plugin_info) {
         crossDomain: true,
         method: "GET",
     }).done(function (response) {
-        alert("Sync Complete.")
-        console.log("got response -> " + JSON.stringify(response))
+        if (response.Ops != null) {
+            window.plugin.wasabee.updateServerOpList(response.Ops, true);
+        }
     }).fail(function (jqXHR, textStatus) {
         window.plugin.wasabee.showMustAuthAlert();
     }));
@@ -1810,9 +1831,8 @@ function wrapper(plugin_info) {
         contentType: "application/json",
     }).done(function (response) {
         alert("Upload Complete.")
-        console.log("got response -> " + JSON.stringify(response))
     }).fail(function (jqXHR, textStatus) {
-        alert("Upload Failed.")
+        window.plugin.wasabee.showMustAuthAlert();
     }));
 
     window.plugin.wasabee.downloadSingleOp = ((operation) => $.ajax({
@@ -1827,6 +1847,66 @@ function wrapper(plugin_info) {
     }).fail(function (jqXHR, textStatus) {
         alert("Download Failed.")
     }));
+
+    window.plugin.wasabee.deleteOwnedServerOp = ((opID) => $.ajax({
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID + "/delete",
+        xhrFields: {
+            withCredentials: true
+       },
+        crossDomain: true,
+        method: "GET",
+    }).done(function (response) {
+        console.log("got response -> " + JSON.stringify(response))
+    }).fail(function (jqXHR, textStatus) {
+        window.plugin.wasabee.showMustAuthAlert();
+    }));
+
+    window.plugin.wasabee.getOpDownloads = function(opList) {
+        var opCalls = Array()
+        opList.forEach(function (op, index) {
+            opCalls.push(window.plugin.wasabee.downloadOpInList(op))
+            console.log(op, index);
+        });
+        return opCalls
+    }
+
+    window.plugin.wasabee.downloadOpInList = ((op) => $.ajax({
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + op.ID,
+        xhrFields: {
+            withCredentials: true
+       },
+        crossDomain: true,
+        method: "GET",
+    }).done(function (response) {
+        window.plugin.wasabee.updateOperationInList(Operation.create(response))
+        console.log("got response -> " + JSON.stringify(response))
+    }).fail(function (jqXHR, textStatus) {
+        alert("Download Failed.")
+    }));
+
+    window.plugin.wasabee.updateServerOpList = function(opList, pullFullOps) {
+        store.set(Wasabee.Constants.SERVER_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
+        store.set(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
+
+        if (pullFullOps) {
+            Promise.all(window.plugin.wasabee.getOpDownloads(opList)).then(function () {
+                alert("Sync Complete.")
+            })["catch"](function (data) {
+                throw alert(data.message), console.log(data), data;
+            });
+        }
+    }
+
+    window.plugin.wasabee.opIsOwnedServerOp = function(opID) {
+        var isOwnedServerOp = false;
+        var serverOwnedOpList = store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY)
+        for (let opInList of JSON.parse(serverOwnedOpList)) {
+            if (opInList.ID != opID) {
+                isOwnedServerOp = true;
+            }
+        }
+        return isOwnedServerOp;
+    }
 
     //** This function adds all the portals to the layer */
     window.plugin.wasabee.addAllPortals = function () {
@@ -2098,12 +2178,12 @@ function wrapper(plugin_info) {
             this.update()
         }
 
-        reverseLink(startPortal, endPortal) {
+        reverseLink(startPortalID, endPortalID) {
             var newLinks = [];
             for (let link_ in this.links) {
-                if (this.links[link_].fromPortalId == startPortalId && this.links[link_].toPortalId == endPortalId) {
-                    this.links[link_].fromPortal = endPortal;
-                    this.links[link_].toPortal = startPortal;
+                if (this.links[link_].fromPortalId == startPortalID && this.links[link_].toPortalId == endPortalID) {
+                    this.links[link_].fromPortalId = endPortalID;
+                    this.links[link_].toPortalId = startPortalID;
                 }
                 newLinks.push(this.links[link_])
             }
@@ -2291,8 +2371,6 @@ function wrapper(plugin_info) {
             this.description = description;
             this.assignedTo = null;
             this.throwOrderPos = null;
-            this.toPortal = null;
-            this.fromPortal = null;
             this.populatePortals(operation)
         }
 
@@ -2302,11 +2380,13 @@ function wrapper(plugin_info) {
             this.toPortal = operation.getPortal(this.toPortalId)
         }
 
-        getLatLngs() {
-            if (this.fromPortal != null && this.toPortal != null) {
+        getLatLngs(operation) {
+        var fromPortal = operation.getPortal(this.fromPortalId)
+        var toPortal = operation.getPortal(this.toPortalId)
+            if (fromPortal != null && toPortal != null) {
                 var returnArray = Array();
-                returnArray.push(new L.LatLng(this.fromPortal.lat, this.fromPortal.lng))
-                returnArray.push(new L.LatLng(this.toPortal.lat, this.toPortal.lng))
+                returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng))
+                returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng))
                 return returnArray
             } else
                 return null;
@@ -2325,14 +2405,17 @@ function wrapper(plugin_info) {
     }
 
     /*** ARC THINGS */
-    window.plugin.wasabee.distance = function (link) {
+    window.plugin.wasabee.distance = function (fromPortal, toPortal) {
         //How far between portals.
         var R = 6367; // km
 
-        lat1 = link.fromPortal.lat;
-        lon1 = link.fromPortal.lng;
-        lat2 = link.toPortal.lat;
-        lon2 = link.toPortal.lng;
+        console.log("FROMPORTAL -> " + JSON.stringify(fromPortal))
+        console.log("TOPORTAL -> " + JSON.stringify(toPortal))
+
+        lat1 = fromPortal.lat;
+        lon1 = fromPortal.lng;
+        lat2 = toPortal.lat;
+        lon2 = toPortal.lng;
 
         var dLat = (lat2 - lat1) * Math.PI / 180;
         var dLon = (lon2 - lon1) * Math.PI / 180;
@@ -2551,7 +2634,7 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers, operation) {
-        var a = link.getLatLngs();
+        var a = link.getLatLngs(operation);
         var start = {};
         var end = {};
         var fromPortal = operation.getPortal(drawnLink.fromPortalId)
@@ -2578,7 +2661,7 @@ function wrapper(plugin_info) {
 
     /** This checks if a marker is on either side of a link */
     window.plugin.wasabee.checkMarkerAgainstLink = function (marker, link, operation) {
-        var latlngs = link.getLatLngs();
+        var latlngs = link.getLatLngs(operation);
         var markerPortal = operation.getPortal(marker.portalId)
         var v = latlngs[0];
         var center = latlngs[1];
@@ -2586,9 +2669,9 @@ function wrapper(plugin_info) {
         return view ? view.lng == v.lng && view.lat == v.lat ? true : view.lng == center.lng && view.lat == center.lat ? true : false : false;
     }
 
-    window.plugin.wasabee.showCrossLink = function (link) {
+    window.plugin.wasabee.showCrossLink = function (link, operation) {
 
-        var blocked = L.geodesicPolyline(link.getLatLngs(), {
+        var blocked = L.geodesicPolyline(link.getLatLngs(operation), {
             color: '#d22',
             opacity: 0.7,
             weight: 5,
@@ -2607,7 +2690,7 @@ function wrapper(plugin_info) {
             drawnLinks.forEach(function (drawnLink) {
                 var shouldShowCrosslink = plugin.wasabee.testPolyLine(drawnLink, link, drawnMarkers, operation);
                 if (shouldShowCrosslink) {
-                    plugin.wasabee.showCrossLink(link);
+                    plugin.wasabee.showCrossLink(link, operation);
                     throw Wasabee.Constants.BREAK_EXCEPTION;
                 }
             });
