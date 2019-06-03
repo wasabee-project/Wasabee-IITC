@@ -2,7 +2,7 @@
 // @id           wasabee
 // @name         IITC Plugin: Wasabee Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.11.1
+// @version      0.11.2
 // @updateURL    http://wasabee.rocks/wasabee.meta.js
 // @downloadURL  http:/wasabee.rocks/wasabee.user.js
 // @description  Less terrible draw tools, hopefully.
