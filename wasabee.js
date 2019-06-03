@@ -634,10 +634,20 @@ function wrapper(plugin_info) {
                         window.plugin.wasabee.removeOperationFromList(Operation.create(operation))
                     }
                 }, false);
+                //TODO if op is in local storage, show update
+                var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(operation.ID)
                 var uploadOpButton = buttonSection.appendChild(document.createElement("a"))
-                uploadOpButton.innerHTML = "Upload Op"
+                if (opIsInLocalStorage) {
+                    uploadOpButton.innerHTML = "Update Server Op"
+                } else {
+                    uploadOpButton.innerHTML = "Upload Op"
+                }
                 uploadOpButton.addEventListener("click", function (arg) {
-                    window.plugin.wasabee.uploadSingleOp(Operation.create(operation))
+                    if (opIsInLocalStorage) {
+                        window.plugin.wasabee.updateSingleOp(Operation.create(operation))
+                    } else {
+                        window.plugin.wasabee.uploadSingleOp(Operation.create(operation))
+                    }
                 }, false);
                 var downloadOpButton = buttonSection.appendChild(document.createElement("a"))
                 downloadOpButton.innerHTML = "Download Op"
@@ -1835,6 +1845,22 @@ function wrapper(plugin_info) {
         window.plugin.wasabee.showMustAuthAlert();
     }));
 
+    window.plugin.wasabee.updateSingleOp = ((operation) => $.ajax({
+        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
+        xhrFields: {
+            withCredentials: true
+       },
+        data: JSON.stringify(operation),
+        crossDomain: true,
+        method: "PUT",
+        dataType: "json",
+        contentType: "application/json",
+    }).done(function (response) {
+        alert("Update Complete.")
+    }).fail(function (jqXHR, textStatus) {
+        window.plugin.wasabee.showMustAuthAlert();
+    }));
+
     window.plugin.wasabee.downloadSingleOp = ((operation) => $.ajax({
         url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
         xhrFields: {
@@ -1906,6 +1932,17 @@ function wrapper(plugin_info) {
             }
         }
         return isOwnedServerOp;
+    }
+
+    window.plugin.wasabee.opIsServerOp = function(opID) {
+        var isServerOp = false;
+        var serverOpList = store.get(Wasabee.Constants.SERVER_OP_LIST_KEY)
+        for (let opInList of JSON.parse(serverOpList)) {
+            if (opInList.ID != opID) {
+                isServerOp = true;
+            }
+        }
+        return isServerOp;
     }
 
     //** This function adds all the portals to the layer */
