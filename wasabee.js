@@ -1926,22 +1926,24 @@ function wrapper(plugin_info) {
     window.plugin.wasabee.opIsOwnedServerOp = function(opID) {
         var isOwnedServerOp = false;
         var serverOwnedOpList = store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY)
-        for (let opInList of JSON.parse(serverOwnedOpList)) {
-            if (opInList.ID != opID) {
-                isOwnedServerOp = true;
+        if (serverOwnedOpList != null)
+            for (let opInList of JSON.parse(serverOwnedOpList)) {
+                if (opInList.ID != opID) {
+                    isOwnedServerOp = true;
+                }
             }
-        }
         return isOwnedServerOp;
     }
 
     window.plugin.wasabee.opIsServerOp = function(opID) {
         var isServerOp = false;
         var serverOpList = store.get(Wasabee.Constants.SERVER_OP_LIST_KEY)
-        for (let opInList of JSON.parse(serverOpList)) {
-            if (opInList.ID != opID) {
-                isServerOp = true;
+        if (serverOpList != null)
+            for (let opInList of JSON.parse(serverOpList)) {
+                if (opInList.ID != opID) {
+                    isServerOp = true;
+                }
             }
-        }
         return isServerOp;
     }
 
