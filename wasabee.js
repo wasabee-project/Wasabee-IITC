@@ -82,7 +82,7 @@ function wrapper(plugin_info) {
             a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert"
             a.DEFAULT_OPERATION_COLOR = "groupa"
             a.BREAK_EXCEPTION = {};
-            a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY17"
+            a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY22"
             a.SERVER_OP_LIST_KEY = "SERVER_OP_LIST_KEY"
             a.SERVER_OWNED_OP_LIST_KEY = "SERVER_OWNED_OP_LIST_KEY"
         }(b = scope.Constants || (scope.Constants = {}));
@@ -336,6 +336,12 @@ function wrapper(plugin_info) {
                     return;
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
+            }, init.closeDialogs = function() {
+                var parameters = init._dialogs;
+                for (p = 0; p < parameters.length; p++) {
+                    var page = parameters[p];
+                    page._dialog.dialog('close');
+                }
             }, init.prototype.clearLocalPortalSelections = function () {
                 delete localStorage["wasabee-portal-dst-1"];
                 delete localStorage["wasabee-portal-dst-2"];
@@ -425,7 +431,6 @@ function wrapper(plugin_info) {
 
                 //***Function to add a single link -- called in addLinkTo and addAllLinks functions
             }, init.prototype.addLink = function (fromPortal, toPortal) {
-                //alert("fromPortal: " + JSON.stringify(fromPortal) + "\ntoPortal: " + JSON.stringify(toPortal));
                 var description = this._desc.value;
                 if (!toPortal || !fromPortal) {
                     return Promise.reject("no portal given");
@@ -498,6 +503,12 @@ function wrapper(plugin_info) {
                     return new init(operationList);
                 else
                     return;
+            }, init.closeDialogs = function() {
+                var parameters = init._dialogs;
+                for (p = 0; p < parameters.length; p++) {
+                    var page = parameters[p];
+                    page._dialog.dialog('close');
+                }
             }, init.prototype.addOperation = function (name) {
                 window.plugin.wasabee.updateOperationInList(new Operation(PLAYER.nickname, name, true), true)
             }, init.prototype.setupTabs = function () {
@@ -1316,6 +1327,12 @@ function wrapper(plugin_info) {
                     return new init(operation);
                 else
                     return;
+            }, init.closeDialogs = function() {
+                var parameters = init._dialogs;
+                for (p = 0; p < parameters.length; p++) {
+                    var page = parameters[p];
+                    page._dialog.dialog('close');
+                }
             }, init.prototype.focus = function () {
                 this._dialog.dialog("open");
             }, init.prototype.sendAlert = function (selectedType, operation, comment) {
@@ -1453,9 +1470,7 @@ function wrapper(plugin_info) {
         crossDomain: true,
         method: "GET",
     }).done(function (response) {
-        console.log("got response -> " + response)
         var decodedResponse = atob(response)
-        console.log("got decoded response -> " + decodedResponse)
         window.plugin.wasabee.saveImportString(decodedResponse)
     }).fail(function (jqXHR, textStatus) {
         alert('Paste Creation Failed -> ' + textStatus)
@@ -1505,7 +1520,10 @@ function wrapper(plugin_info) {
                 });
                 $(container).append('<a id="wasabee_syncbutton" href="javascript: void(0);" class="wasabee-control" title="Sync All Ops"><img src=' + Wasabee.Images.toolbar_sync + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#wasabee_syncbutton', function () {
                     try {
-                        //TODO close links dialog, markers dialog, and ops dialog
+                        //TODO close markers dialog and ops dialog
+                        Wasabee.LinkDialog.closeDialogs();
+                        Wasabee.OpsDialog.closeDialogs();
+                        Wasabee.MarkerDialog.closeDialogs();
                         window.plugin.wasabee.authWithWasabee();
                     } catch (e) {
                         window.plugin.wasabee.showMustAuthAlert();
@@ -1598,14 +1616,22 @@ function wrapper(plugin_info) {
         }
         operation.cleanPortalList();
 
+        //TODO track selected thing and set it back to selected
+        var selectedOpID = null;
         for (let opInList of Wasabee.opList) {
+            if (!makeSelected) {
+                if (opInList.isSelected) {
+                    selectedOpID = opInList.ID
+                }
+            }
             if (opInList.ID != operation.ID && clearAllBut != true) {
                 if (makeSelected)
-                    opInList.isSelected = false;
+                    opInList.isSelected = false; 
                 updatedArray.push(opInList);
             }
         }
-        if (makeSelected)
+
+        if (makeSelected || selectedOpID == operation.ID)
             operation.isSelected = true;
         updatedArray.push(operation);
 
@@ -1777,9 +1803,7 @@ function wrapper(plugin_info) {
             opacity: 1,
             weight: 2
         };
-        console.log("LINK => " + JSON.stringify(link))
         var latLngs = link.getLatLngs(operation);
-        console.log("latLngs -> " + JSON.stringify(latLngs))
         if (latLngs != null) {
             var fromPortal = operation.getPortal(link.fromPortalId)
             var toPortal = operation.getPortal(link.toPortalId)
@@ -1788,8 +1812,6 @@ function wrapper(plugin_info) {
             var gc = new window.plugin.wasabee.arc.GreatCircle(startCoord, endCoord);
             var distance = window.plugin.wasabee.distance(fromPortal, toPortal);
             var geojson_feature = gc.Arc(Math.round(distance)).json();
-            console.log("geojson_feature -> " + JSON.stringify(geojson_feature))
-            console.log("options -> " + JSON.stringify(options))
 
             var link_ = new L.geoJson(geojson_feature, options);
 
@@ -1890,7 +1912,6 @@ function wrapper(plugin_info) {
         method: "GET",
     }).done(function (response) {
         window.plugin.wasabee.updateOperationInList(Operation.create(response))
-        console.log("got response -> " + JSON.stringify(response))
     }).fail(function (jqXHR, textStatus) {
         alert("Download Failed.")
     }));
@@ -2432,9 +2453,6 @@ function wrapper(plugin_info) {
     window.plugin.wasabee.distance = function (fromPortal, toPortal) {
         //How far between portals.
         var R = 6367; // km
-
-        console.log("FROMPORTAL -> " + JSON.stringify(fromPortal))
-        console.log("TOPORTAL -> " + JSON.stringify(toPortal))
 
         lat1 = fromPortal.lat;
         lon1 = fromPortal.lng;
