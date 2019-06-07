@@ -233,6 +233,7 @@ function wrapper(plugin_info) {
             function init(op) {
                 var self = this;
                 self.clearLocalPortalSelections()
+                this._broadcast = new BroadcastChannel("wasabee-linkdialog");
                 this._portals = {};
                 this._links = [];
                 this._operation = op;
@@ -302,6 +303,10 @@ function wrapper(plugin_info) {
                 button.addEventListener("click", function (a) {
                     return self._dialog.dialog("close");
                 }, false);
+                var sendMessage = function (name) {
+                    return self.onMessage(name);
+                };
+                this._broadcast.addEventListener("message", sendMessage, false);
                 this._dialog = window.dialog({
                     title: this._operation.name + " - Wasabee Links",
                     width: "auto",
@@ -309,6 +314,7 @@ function wrapper(plugin_info) {
                     html: container,
                     dialogClass: "wasabee-dialog wasabee-dialog-links",
                     closeCallback: function (popoverName) {
+                        self._broadcast.removeEventListener("message", sendMessage, false);
                         var paneIndex = init._dialogs.indexOf(self);
                         if (-1 !== paneIndex) {
                             init._dialogs.splice(paneIndex, 1);
@@ -342,6 +348,11 @@ function wrapper(plugin_info) {
                     var page = parameters[p];
                     page._dialog.dialog('close');
                 }
+            }, init.prototype.onMessage = function (command) {
+                if ("setPortal" === command.data.type) {
+                    this.updatePortal(command.data.name);
+                }
+                //***Function to clear local selections of portals for the dialog
             }, init.prototype.clearLocalPortalSelections = function () {
                 delete localStorage["wasabee-portal-dst-1"];
                 delete localStorage["wasabee-portal-dst-2"];
@@ -358,7 +369,10 @@ function wrapper(plugin_info) {
                     delete localStorage["wasabee-portal-" + updateID];
                 }
                 this.updatePortal(updateID);
-
+                this._broadcast.postMessage({
+                    type: "setPortal",
+                    name: updateID
+                });
                 //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
             }, init.prototype.getPortal = function (name) {
                 try {
