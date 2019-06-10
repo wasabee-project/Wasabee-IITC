@@ -916,7 +916,7 @@ function wrapper(plugin_info) {
                 }, {
                     name: "From",
                     value: function (link) {
-                        return that._operation.getPortal(link.fromPortal.id);
+                        return that._operation.getPortal(link.fromPortalId);
                     },
                     sortValue: function (b) {
                         return b.name;
@@ -930,7 +930,7 @@ function wrapper(plugin_info) {
                 }, {
                     name: "To",
                     value: function (link) {
-                        return that._operation.getPortal(link.toPortal.id);
+                        return that._operation.getPortal(link.toPortalId);
                     },
                     sortValue: function (b) {
                         return b.name;
@@ -1054,15 +1054,14 @@ function wrapper(plugin_info) {
             }, init.prototype._setLinks = function () {
                 this._table.items = this._operation.getLinkListFromPortal(this._portal);
             }, init.prototype.getLinkLength = function (link) {
-                var latlngs = link.getLatLngs();
+                var latlngs = link.getLatLngs(this._operation);
                 return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
             }, init.prototype.deleteLink = function (link) {
-                var that = this;
-                if (confirm("Do you really want to delete the link: " + link.fromPortal.name + " -> " + link.toPortal.name)) {
-                    this._operation.removeLink(link.fromPortal, link.toPortal)
+                if (confirm("Do you really want to delete the link: " + this._operation.getPortal(link.fromPortalId).name + " -> " + this._operation.getPortal(link.toPortalId).name)) {
+                    this._operation.removeLink(link.fromPortalId, link.toPortalId)
                 }
             }, init.prototype.reverseLink = function (link) {
-                this._operation.reverseLink(link.fromPortal, link.toPortal)
+                this._operation.reverseLink(link.fromPortalId, link.toPortalId)
             }, init.prototype.addAlert = function (message) {
                 /*
               window.renderPortalDetails(message.portalFrom.id);
@@ -2055,7 +2054,6 @@ function wrapper(plugin_info) {
             var keyIdentifier = "wasabeeShareKey="
             if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*")) && string.includes(keyIdentifier)) {
                 var key = string.substring(string.lastIndexOf(keyIdentifier) + keyIdentifier.length)
-                console.log("KEY IS: " + key)
                 window.plugin.wasabee.qbin_get(key)
 
             } else if (string.match(new RegExp("^(https?:\/\/)?(www\\.)?intel.ingress.com\/intel.*"))) {
@@ -2168,8 +2166,8 @@ function wrapper(plugin_info) {
             else {
                 for (let link_ in this.links) {
                     //THIS TESTS IF ITS THE SAME LINK
-                    if ((this.links[link_].fromPortal["id"] == link.fromPortal["id"] && this.links[link_].toPortal["id"] == link.toPortal["id"]) ||
-                        ((this.links[link_].toPortal["id"] == link.fromPortal["id"] && this.links[link_].fromPortal["id"] == link.toPortal["id"]))) {
+                    if ((this.links[link_].fromPortalId == link.fromPortalId && this.links[link_].toPortalId == link.toPortalId) ||
+                        ((this.links[link_].toPortalId == link.fromPortalId && this.links[link_].fromPortalId == link.toPortalId))) {
                         return true;
                     }
                 }
@@ -2192,7 +2190,7 @@ function wrapper(plugin_info) {
 
         getLinkListFromPortal(portal) {
             var links = this.links.filter(function (listLink) {
-                return listLink.fromPortal.id == portal.id || listLink.toPortal.id == portal.id;
+                return listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id;
             });
             return links;
         }
@@ -2228,11 +2226,12 @@ function wrapper(plugin_info) {
         removeLink(startPortal, endPortal) {
             var newLinks = [];
             for (let link_ in this.links) {
-                if (!(this.links[link_].fromPortalId == startPortal.id && this.links[link_].toPortalId == endPortal.id)) {
+                if (!(this.links[link_].fromPortalId == startPortal && this.links[link_].toPortalId == endPortal)) {
                     newLinks.push(this.links[link_])
                 }
             }
             this.links = newLinks;
+            this.cleanAnchorList()
             this.cleanPortalList()
             this.update()
         }
@@ -2248,6 +2247,23 @@ function wrapper(plugin_info) {
             }
             this.links = newLinks;
             this.update()
+        }
+
+        cleanAnchorList() {
+            var newAnchorList = [];
+            for (let anchor_ in this.anchors) {
+                var foundAnchor = false;
+                for (let link_ in this.links) {
+                    if (this.links[link_].fromPortalId == this.anchors[anchor_] || this.links[link_].toPortalId ==  this.anchors[anchor_]) {
+                        foundAnchor = true;
+                    }
+                }
+                
+                if (foundAnchor) {
+                    newAnchorList.push(this.anchors[anchor_])
+                }
+            }
+            this.anchors = newAnchorList;
         }
 
         //This removes opportals with no links and removes duplicates
@@ -2334,15 +2350,15 @@ function wrapper(plugin_info) {
         }
 
         swapPortal(originalPortal, newPortal) {
-            this.opportals = this.opportals.filter(function (listPortal) {
-                return listPortal.id !== originalPortal.id;
+            this.anchors = this.anchors.filter(function (listAnchor) {
+                return listAnchor !== originalPortal.id;
             });
-            this.addPortal(newPortal)
+            this.addAnchor(newPortal)
             for (let link_ in this.links) {
-                if (this.links[link_].fromPortal["id"] == originalPortal["id"]) {
-                    this.links[link_].fromPortal = newPortal;
-                } else if (this.links[link_].toPortal["id"] == originalPortal["id"]) {
-                    this.links[link_].toPortal = newPortal;
+                if (this.links[link_].fromPortalId == originalPortal["id"]) {
+                    this.links[link_].fromPortalId = newPortal["id"];
+                } else if (this.links[link_].toPortalId == originalPortal["id"]) {
+                    this.links[link_].toPortalId = newPortal["id"];
                 }
             }
         }
