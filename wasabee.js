@@ -460,7 +460,7 @@ function wrapper(plugin_info) {
             function init(operationList) {
                 this._operationList = operationList
                 init._dialogs.push(this);
-                this.container = document.createElement("article");
+                this.container = document.createElement("div");
                 this.container.id = "op-dialog-tabs";
                 this.setupTabs()
                 var self = this
@@ -528,34 +528,26 @@ function wrapper(plugin_info) {
             }, init.prototype.setupTabs = function () {
                 var self = this
                 this.container.innerHTML = ''
-                var tabs = this.container.appendChild(document.createElement("div"));
-                tabs.id = "operation-dialog-tabs";
-                var baseUl = tabs.appendChild(document.createElement("ul"))
-                this._operationList.forEach(function (operation) {
-                    var title = operation.name;
-                    var li = baseUl.appendChild(document.createElement("li"))
-                    var a = li.appendChild(document.createElement("a"))
-                    a.innerHTML = title
-                    a.setAttribute("href", "#a")
+
+                var operationSelect = document.createElement('select')
+                console.log("operationlistsize -> " + this._operationList.length)
+                this._operationList.forEach(function (op) {
+                    console.log("operation -> " + JSON.stringify(op))
+                    $(operationSelect).append($("<option>").prop({
+                        value: op.ID,
+                        text: op.name
+                    }));
                 });
-                this._tabContent = tabs.appendChild(document.createElement("div"))
-                this._tabContent.className = "op-dialog-content-pane"
-                this._tabContent.id = "a"
-                var self = this;
-                var i;
-                var selectedIndex = 0;
-                for (i = 0; i < this._operationList.length; i++) {
-                    if (this._operationList[i].isSelected)
-                        selectedIndex = i;
-                }
-                this.updateContentPane(this._operationList[selectedIndex], this._operationList.length)
-                $(tabs).tabs({
-                    active: selectedIndex,
-                    beforeActivate:
-                        function (e, tab) {
-                            self.updateContentPane(self._operationList[tab.newTab.index()], self._operationList.length)
-                        }
-                }).addClass('ui-tabs-vertical ui-helper-clearfix');
+                $(operationSelect).val(window.plugin.wasabee.getSelectedOperation().ID);
+                $(operationSelect).change(function () {
+                    console.log("Selected Op -> " + $(this).val())
+                   // self.updateContentPane(self._operationList[tab.newTab.index()], self._operationList.length)
+                });
+                $(operationSelect).change();
+                console.log("OperationSelect: -> " + Object.prototype.toString.call(operationSelect))
+                console.log("CONTAINER: -> " + Object.prototype.toString.call(this.container))
+                this.container.appendChild(operationSelect);
+                
             }, init.prototype.updateContentPane = function (operation, opListSize) {
                 var tabContent = this._tabContent
                 tabContent.innerHTML = "";
@@ -644,11 +636,10 @@ function wrapper(plugin_info) {
                         window.plugin.wasabee.removeOperationFromList(Operation.create(operation))
                     }
                 }, false);
-                //TODO if op is in local storage, show update
                 var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(operation.ID)
                 var uploadOpButton = buttonSection.appendChild(document.createElement("a"))
                 if (opIsInLocalStorage) {
-                    uploadOpButton.innerHTML = "Update Server Op"
+                    uploadOpButton.innerHTML = "Push To Server"
                 } else {
                     uploadOpButton.innerHTML = "Upload Op"
                 }
@@ -660,7 +651,7 @@ function wrapper(plugin_info) {
                     }
                 }, false);
                 var downloadOpButton = buttonSection.appendChild(document.createElement("a"))
-                downloadOpButton.innerHTML = "Download Op"
+                downloadOpButton.innerHTML = "Revert Local Changes"
                 downloadOpButton.addEventListener("click", function (arg) {
                     window.plugin.wasabee.downloadSingleOp(Operation.create(operation))
                 }, false);
@@ -1288,6 +1279,7 @@ function wrapper(plugin_info) {
                 $element.hide(); //TODO remove this when create link alert added
 
                 this._type.change(function () {
+                    //console.log("Changed to type -> " + self._type.val())
                     /*
                     self._preferences.save();
                     if ("CreateLinkAlert" == self._type.val()) {
@@ -1943,11 +1935,10 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wasabee.opIsOwnedServerOp = function(opID) {
-        var isOwnedServerOp = false;
-        var serverOwnedOpList = store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY)
+        var serverOwnedOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
         if (serverOwnedOpList != null)
-            for (let opInList of JSON.parse(serverOwnedOpList)) {
-                if (opInList.ID != opID) {
+            for (let opInList in serverOwnedOpList) {
+                if (serverOwnedOpList[opInList].ID == opID) {
                     isOwnedServerOp = true;
                 }
             }
@@ -1956,10 +1947,10 @@ function wrapper(plugin_info) {
 
     window.plugin.wasabee.opIsServerOp = function(opID) {
         var isServerOp = false;
-        var serverOpList = store.get(Wasabee.Constants.SERVER_OP_LIST_KEY)
+        var serverOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
         if (serverOpList != null)
-            for (let opInList of JSON.parse(serverOpList)) {
-                if (opInList.ID != opID) {
+            for (let opInList in serverOpList) {
+                if (serverOpList[opInList].ID == opID) {
                     isServerOp = true;
                 }
             }
