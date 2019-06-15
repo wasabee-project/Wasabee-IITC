@@ -462,7 +462,7 @@ function wrapper(plugin_info) {
                 init._dialogs.push(this);
                 this.container = document.createElement("div");
                 this.container.id = "op-dialog-tabs";
-                this.setupTabs()
+                this.setupSpinner()
                 var self = this
                 this._dialog = window.dialog({
                     title: "Operation List",
@@ -509,7 +509,7 @@ function wrapper(plugin_info) {
                             return page._dialog.dialog('close');
                         }
                         page._operationList = operationList; //doesn't update, need to manually?
-                        page.setupTabs()
+                        page.setupSpinner()
                         return page.focus(), page;
                     }
                 }
@@ -525,11 +525,16 @@ function wrapper(plugin_info) {
                 }
             }, init.prototype.addOperation = function (name) {
                 window.plugin.wasabee.updateOperationInList(new Operation(PLAYER.nickname, name, true), true)
-            }, init.prototype.setupTabs = function () {
+            }, init.prototype.setupSpinner = function () {
                 var self = this
                 this.container.innerHTML = ''
-
+                $(this.container).css({
+                    "text-align" : "center",
+                })
                 var operationSelect = document.createElement('select')
+                $(operationSelect).css({
+                    "width" : "50%"
+                })
                 console.log("operationlistsize -> " + this._operationList.length)
                 this._operationList.forEach(function (op) {
                     console.log("operation -> " + JSON.stringify(op))
@@ -540,16 +545,21 @@ function wrapper(plugin_info) {
                 });
                 $(operationSelect).val(window.plugin.wasabee.getSelectedOperation().ID);
                 $(operationSelect).change(function () {
-                    console.log("Selected Op -> " + $(this).val())
-                   // self.updateContentPane(self._operationList[tab.newTab.index()], self._operationList.length)
+                    console.log("Selected -> " + $(this).val())
+                    self.updateContentPane(window.plugin.wasabee.getOperationById($(this).val()), self._operationList.length)
                 });
-                $(operationSelect).change();
                 console.log("OperationSelect: -> " + Object.prototype.toString.call(operationSelect))
                 console.log("CONTAINER: -> " + Object.prototype.toString.call(this.container))
                 this.container.appendChild(operationSelect);
+                var _content = this.container.appendChild(document.createElement("div"));
+                _content.id = "operation-dialog-tabs";
+                this._opContent = _content.appendChild(document.createElement("div"))
+                this._opContent.className = "op-dialog-content-pane"
+                this._opContent.id = "a"
+                $(operationSelect).change();
                 
             }, init.prototype.updateContentPane = function (operation, opListSize) {
-                var tabContent = this._tabContent
+                var tabContent = this._opContent
                 tabContent.innerHTML = "";
                 var nameSection = tabContent.appendChild(document.createElement("p"))
                 nameSection.innerHTML = "Op Name -> "
@@ -1570,6 +1580,15 @@ function wrapper(plugin_info) {
     window.plugin.wasabee.getSelectedOperation = function () {
         for (let operation of Wasabee.opList) {
             if (operation.isSelected == true) {
+                return Operation.create(operation);
+            }
+        }
+        return null;
+    }
+
+    window.plugin.wasabee.getOperationById = function (opId) {
+        for (let operation of Wasabee.opList) {
+            if (operation.ID == opId) {
                 return Operation.create(operation);
             }
         }
