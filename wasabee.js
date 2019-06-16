@@ -40,6 +40,11 @@ function wrapper(plugin_info) {
             a.toolbar_viewOps = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAIJJREFUOMvF0rENwkAQRNGHER1YrgCJMhAB5AR2MQQkJK7BJUBIEbRAATRARmaSk4xI0C3B/WQ22dXMaCnN7GNukz5wixwYk17Q4fxjt4OqeIRv1v842GPAEs/cDhboUeMQcVBjk+YXrpH8DXaYRzu4Y4UTjrkdMD3SKEiDbW6E8rwBF5gTIsXCVDcAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMTItMTdUMjE6NDY6MDYrMDA6MDBKWVyZAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTEyLTE3VDIxOjQ2OjA2KzAwOjAwOwTkJQAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1pZ1pvenF3TFAypWwAAAAASUVORK5CYII="
             a.toolbar_addMarkers = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADhSURBVDiNpZI/DgFBFIc/G40tbRQcgQtwCpVOKQpaVHsNfxo6zeq4w7biAkLUhEayFKswG89mZhAvmcy83/zeN29nB/6MTCp3gSZQU3kIzIHrN7AKsAPi1NgC5U/FrqFYQnI2QFuYL0AP6Kt1ordsgJkw9oU+EPpUV+io+Wajq7jrxKyaN0Lzef0dX+hrG70ARJgvMQK8Ty1OLICh8AVAVQco8X7ryTgDReGLgYapi64G0BEnB0oLk06cFGAErES+BMam00zhAXueLzOv2X/7hKzGcATqan3S7C+Aw69dGeMBIk1M+lR0jGEAAAAASUVORK5CYII="
             a.toolbar_sync = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABT0lEQVQ4jb2RsUpDQRBFzzxSBLGSdEpAwTatdnYmRDC7NpbBVhA/wEJsBVvBSq1MGrNYBPULrAXBKohYSUqRFIFr4b74kjzsdJpl5s7ePTML/x3OObz3SZoX8hrMbAtoAhVJCfBsZldACzgDnoDjKQPv/SzQBuppzcwAysA6cALMAYepPkJxziGpDdQl9SXtSVoGFiXtAMN4eSxGBBG7LqkPrIQQepEqAap5406O0IxGR51Op5cWJc2Y2Ttwmqk95BlUonibfSGE8AHsR5oisAkUpwwk7UfhLQ819iyYWRt4AW4mCQZA1czWvPdIGgIHkYA4Xi2ej1MEZrYK7GbylqTPNHfOLfHzfZd5O8iiDs3szszK3vsCUIuXS0BX0vVvBn0zKwHnOVpX0nYIYVRIMuIAuADmgR1J95Je+V5YkOSBjexOxsJ7nzQajVztT+MLPDWCvXqGCZkAAAAASUVORK5CYII=";
+            a.toolbar_upload = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADcSURBVDiNxdC9LkRRFAXgb+YmKLjTSLyB0E4103kIeq+h03kBhU6002Ja3Sg8gEJJlCJIJERGYd/kOO7xExIrWcnJ3nutdfbmv1F90lvCAKu4x8N3TRewjydMg8/YRe8r8QzOEmHOk5j5gC7WcZwJJsG0tpWL5zBuSZugDqYmF1hJDbZbxKchbFBHLZ05Ql1hD4vJ8B120MFV1Pq4xBpmo7bchDwWDjZKTEeFmesuzvOj/ADTCjfYaGn2MIze0PubNDhoHpu4LXyzxEPMd7LEQSEpxYu3tX+z+h/iFXWKUfOfxOtzAAAAAElFTkSuQmCC"
+            a.toolbar_download = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABfSURBVDiNY2AYaMCIR+4/MWqZKHXB4DPAmIGB4R0Dpv8ZoGIfGRgYLAgZimwIMiZKMy5DSNKMbghZmmHAEorpB1YxYAYeOl6FrAE9eVoyMDDIELDkCQMDw3EqOJZKAAA/kB3pAyyI3AAAAABJRU5ErkJggg=="
+            a.toolbar_delete = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABqSURBVDiNY2AYaMCIxrdkYGCQYWBg4GNgYOiD0gwMDAyfGBgYiqD0EwYGhuO4DFzFwMDwnwBehc8FDAwMDKEEXL2akAH/CRiAooeJgGKCYNQAGhnwF496DDlsBszDYchfBgaGucS5i54AAOh5FY80o9GnAAAAAElFTkSuQmCC"
+            a.toolbar_plus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABESURBVDiNY2AY9qAIinECFgIGWBKygYkU59DEAEY0fhEDqrMtoPQJJLHjDAwMfVRzASGwGopxgoEPRELp4DilFgwBAADpzwZOFhODNwAAAABJRU5ErkJggg=="
+            a.toolbar_settings = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAJ2AAACdgBx6C5rQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADDSURBVDiNpZKxDcIwEEUfETUzpEuWQHJHg2ASxkhBzQjUmSJJASMkDUOkizAUHJK5GMeQL51k+f7/vjsfzMQikDsAazlXwOlX8yvwkLjECFLgCGTABugdg17uMuGkPoPSEUxFqcXGQ7oDtYT15I1rkAOtEm+d/E6ZtKL5wAoYhFB7WmwkNwgXgMQhJFoRwIibA51TopWy39irFjrdgmE8JCtlN0QMEWZ+I7yWo2B6kQq+LJJG1CovAwZn4CbnKubFv/AEkXVc9nttoyAAAAAASUVORK5CYII="
             a.marker_layer_main = "data:image/png;base64,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";
             a.marker_layer_groupa = "data:image/png;base64,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";
             a.marker_layer_groupb = "data:image/png;base64,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";
@@ -72,7 +77,7 @@ function wrapper(plugin_info) {
         !function (a) {
             a.OP_LIST_KEY = "OP_LIST_KEY";
             a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
-            a.SERVER_BASE_KEY = "https://server.wasabee.rocks:8443";
+            a.SERVER_BASE_KEY = "https://server.wasabee.rocks";
             a.SERVER_BASE_TEST_KEY = "https://server.wasabee.rocks:8444";
             a.INTEL_BASE_KEY = "https://intel.ingress.com/intel"
             a.CURRENT_EXPIRE_NUMERIC = 1209600000
@@ -495,6 +500,7 @@ function wrapper(plugin_info) {
                         if (confirmed) {
                             window.plugin.wasabee.resetOpList();
                             window.plugin.wasabee.setupLocalStorage();
+                            Wasabee.OpsDialog.closeDialogs();
                         }                    
                     }
                 }, buttons));
@@ -535,9 +541,7 @@ function wrapper(plugin_info) {
                 $(operationSelect).css({
                     "width" : "50%"
                 })
-                console.log("operationlistsize -> " + this._operationList.length)
                 this._operationList.forEach(function (op) {
-                    console.log("operation -> " + JSON.stringify(op))
                     $(operationSelect).append($("<option>").prop({
                         value: op.ID,
                         text: op.name
@@ -545,11 +549,8 @@ function wrapper(plugin_info) {
                 });
                 $(operationSelect).val(window.plugin.wasabee.getSelectedOperation().ID);
                 $(operationSelect).change(function () {
-                    console.log("Selected -> " + $(this).val())
                     self.updateContentPane(window.plugin.wasabee.getOperationById($(this).val()), self._operationList.length)
                 });
-                console.log("OperationSelect: -> " + Object.prototype.toString.call(operationSelect))
-                console.log("CONTAINER: -> " + Object.prototype.toString.call(this.container))
                 this.container.appendChild(operationSelect);
                 var _content = this.container.appendChild(document.createElement("div"));
                 _content.id = "operation-dialog-tabs";
@@ -612,6 +613,7 @@ function wrapper(plugin_info) {
                         var confirmed = confirm("Are you sure you want to select this operation?")
                         if (confirmed) {
                             window.plugin.wasabee.updateOperationInList(Operation.create(operation), true)
+                            window.plugin.wasabee.addButtons();
                         }
                     }, false);
                 }
@@ -644,20 +646,6 @@ function wrapper(plugin_info) {
                         }
                     
                         window.plugin.wasabee.removeOperationFromList(Operation.create(operation))
-                    }
-                }, false);
-                var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(operation.ID)
-                var uploadOpButton = buttonSection.appendChild(document.createElement("a"))
-                if (opIsInLocalStorage) {
-                    uploadOpButton.innerHTML = "Push To Server"
-                } else {
-                    uploadOpButton.innerHTML = "Upload Op"
-                }
-                uploadOpButton.addEventListener("click", function (arg) {
-                    if (opIsInLocalStorage) {
-                        window.plugin.wasabee.updateSingleOp(Operation.create(operation))
-                    } else {
-                        window.plugin.wasabee.uploadSingleOp(Operation.create(operation))
                     }
                 }, false);
                 var downloadOpButton = buttonSection.appendChild(document.createElement("a"))
@@ -1214,12 +1202,12 @@ function wrapper(plugin_info) {
         /* jshint ignore:end */
 
         window.plugin.wasabee.arc = arc;
-        window.plugin.wasabee.addButtons();
         Wasabee.opList = Array();
         Wasabee.pasteList = Array();
         window.plugin.wasabee.addCSS(Wasabee.CSS.ui);
         window.plugin.wasabee.addCSS(Wasabee.CSS.main);
         window.plugin.wasabee.setupLocalStorage();
+        window.plugin.wasabee.addButtons();
 
         window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
         window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
@@ -1229,6 +1217,7 @@ function wrapper(plugin_info) {
         window.addLayerGroup('Wasabee Draw Targets', window.plugin.wasabee.targetLayerGroup, true);
         window.plugin.wasabee.initCrossLinks();
         window.plugin.wasabee.drawThings();
+        
         var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null)
         if (shareKey != null) {
             window.plugin.wasabee.qbin_get(shareKey)
@@ -1509,7 +1498,7 @@ function wrapper(plugin_info) {
 
     //** This function adds the plugin buttons on the left side of the screen */
     window.plugin.wasabee.addButtons = function () {
-
+        var selectedOp = window.plugin.wasabee.getSelectedOperation();
         window.plugin.wasabee.buttons = L.Control.extend({
             options: {
                 position: 'topleft'
@@ -1533,7 +1522,7 @@ function wrapper(plugin_info) {
                     else
                         alert("No selected Operation found.");
                 });
-                $(container).append('<a id="wasabee_syncbutton" href="javascript: void(0);" class="wasabee-control" title="Sync All Ops"><img src=' + Wasabee.Images.toolbar_sync + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#wasabee_syncbutton', function () {
+                $(container).append('<a id="wasabee_syncbutton" href="javascript: void(0);" class="wasabee-control" title="Get All Ops"><img src=' + Wasabee.Images.toolbar_download + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#wasabee_syncbutton', function () {
                     try {
                         //TODO close markers dialog and ops dialog
                         Wasabee.LinkDialog.closeDialogs();
@@ -1544,11 +1533,27 @@ function wrapper(plugin_info) {
                         window.plugin.wasabee.showMustAuthAlert();
                     }
                 });
-
+                
+                var opIsOwnedServerOp = window.plugin.wasabee.opIsOwnedServerOp(selectedOp.ID)
+                var opIsServerOp = window.plugin.wasabee.opIsServerOp(selectedOp.ID)
+                if (opIsOwnedServerOp || (opIsOwnedServerOp != true && opIsServerOp != true)) {
+                    $(container).append('<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' + Wasabee.Images.toolbar_upload + ' style="vertical-align:middle;align:center;" /></a>').on('click', '#wasabee_uploadbutton', function () {
+                        var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(operation.ID)
+                        if (opIsInLocalStorage) {
+                            window.plugin.wasabee.updateSingleOp(Operation.create(operation))
+                        } else {
+                            window.plugin.wasabee.uploadSingleOp(Operation.create(operation))
+                        }
+                    });
+                }
                 return container;
             }
         });
-        map.addControl(new window.plugin.wasabee.buttons());
+        if (Wasabee.buttons != null) {
+            map.removeControl(Wasabee.buttons)
+        }    
+        Wasabee.buttons = new window.plugin.wasabee.buttons()
+        map.addControl(Wasabee.buttons);
     };
 
     window.plugin.wasabee.showMustAuthAlert = function() {
@@ -1954,6 +1959,8 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wasabee.opIsOwnedServerOp = function(opID) {
+        console.log("opId -> " + opID)
+        var isOwnedServerOp = false;
         var serverOwnedOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
         if (serverOwnedOpList != null)
             for (let opInList in serverOwnedOpList) {
@@ -2139,6 +2146,7 @@ function wrapper(plugin_info) {
             this.pasteKey = null;
             this.pasteExpireDate = 0;
             this.color = Wasabee.Constants.DEFAULT_OPERATION_COLOR
+            this.comment = null;
         }
 
         getColor() {
