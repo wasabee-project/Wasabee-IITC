@@ -591,7 +591,6 @@ function wrapper(plugin_info) {
                         var confirmed = confirm("Are you sure you want to select this operation?")
                         if (confirmed) {
                             window.plugin.wasabee.updateOperationInList(Operation.create(operation), true)
-                            window.plugin.wasabee.addButtons();
                         }
                     }, false);
                 }
@@ -1724,6 +1723,8 @@ function wrapper(plugin_info) {
 
         if (showExportDialog)
             Wasabee.ExportDialog.show(operation)
+        
+        window.plugin.wasabee.addButtons();
     }
 
     //** This function removes an operation from the main list */
@@ -1900,8 +1901,8 @@ function wrapper(plugin_info) {
         crossDomain: true,
         method: "GET",
     }).done(function (response) {
-        if (response.Ops != null) {
-            window.plugin.wasabee.updateServerOpList(response.Ops, true);
+        if (response.Ops != null && response.OwnedOps) {
+            window.plugin.wasabee.updateServerOpList(response.Ops, response.OwnedOps, true);
         }
     }).fail(function (jqXHR, textStatus) {
         window.plugin.wasabee.showMustAuthAlert();
@@ -1918,6 +1919,9 @@ function wrapper(plugin_info) {
         dataType: "json",
         contentType: "application/json",
     }).done(function (response) {
+        if (response.Ops != null && response.OwnedOps) {
+            window.plugin.wasabee.updateServerOpList(response.Ops, response.OwnedOps, false);
+        }
         alert("Upload Complete.")
     }).fail(function (jqXHR, textStatus) {
         window.plugin.wasabee.showMustAuthAlert();
@@ -1987,16 +1991,13 @@ function wrapper(plugin_info) {
         alert("Download Failed.")
     }));
 
-    window.plugin.wasabee.updateServerOpList = function(opList, pullFullOps) {
+    window.plugin.wasabee.updateServerOpList = function(opList, ownedOpList, pullFullOps) {
         store.set(Wasabee.Constants.SERVER_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
-        store.set(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
+        store.set(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY, JSON.stringify(JSON.stringify(ownedOpList)));
 
         if (pullFullOps) {
             Promise.all(window.plugin.wasabee.getOpDownloads(opList)).then(function () {
                 alert("Sync Complete.")
-                new Noty({
-                    text: 'Notification text'
-                }).show();
             })["catch"](function (data) {
                 throw alert(data.message), console.log(data), data;
             });
