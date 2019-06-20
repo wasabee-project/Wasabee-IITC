@@ -562,7 +562,7 @@ function wrapper(plugin_info) {
                     opColor.append(option);
                 });
                 $(opColor).change(function () {
-                    Operation.create(operation).updateColor($(opColor).val())
+                    Operation.create(operation).colorSelected($(opColor).val(), input.value, commentInput.value)
                 });
                 
                 //TODO enable comment section when !serverOp || (ownedServerOp)
@@ -2232,11 +2232,17 @@ function wrapper(plugin_info) {
             }
         }
 
-        updateColor(color) {
+        colorSelected(color, name, comment) {
             if (this.color != color) {
                 this.color = color
-                this.update()
             }
+            if (this.name != name) {
+                this.name = name
+            }
+            if (this.comment != comment) {
+                this.comment = comment
+            }
+            this.update()
         }
 
         containsPortal(portal) {
