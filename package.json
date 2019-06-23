@@ -1,0 +1,29 @@
+{
+  "name": "wasabee-iitc",
+  "version": "1.0.0",
+  "description": "IITC Plugin for Wasabee Project",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.2",
+    "gulp-inject-file": "0.0.19",
+    "gulp-inject-string": "^1.1.1",
+    "gulp-rename": "^1.2.3",
+    "gulp-sequence": "^1.0.0",
+    "gulp-trimlines": "^1.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pcaddict08/Wasabee-IITC.git"
+  },
+  "author": "Wasabee Project",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pcaddict08/Wasabee-IITC/issues"
+  },
+  "homepage": "https://github.com/pcaddict08/Wasabee-IITC/blob/master/README.md"
+}

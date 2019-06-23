@@ -1,0 +1,14 @@
+{
+    "rules": {
+        "eqeqeq": "off",
+        "curly": "warn",
+        "quotes": ["warn", "double"]
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
+
+    "env": {
+        "es6": true
+    }
+}
