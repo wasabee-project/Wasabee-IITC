@@ -11,6 +11,7 @@ const fs = require('fs'),
 	eslint = require('gulp-eslint'),
 	del = require('del'),
 	sequence = require('gulp-sequence');
+	autoFixTask = require('gulp-eslint-auto-fix')
 
 function ensureDirectoryExistence(filePath) {
 	var dirname = path.dirname(filePath);
@@ -109,3 +110,8 @@ gulp.task('build-prod', sequence('set-mode-prod', 'build', 'clear'));
 gulp.task('default', ['build-dev']);
 
 gulp.task('clean', function() { return del(['releases/*']); });
+
+
+autoFixTask('fix-js', [
+	'src/**/*.js',
+])

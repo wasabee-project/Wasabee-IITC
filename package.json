@@ -7,6 +7,7 @@
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^4.0.2",
+    "gulp-eslint-auto-fix": "^1.1.0",
     "gulp-inject-file": "0.0.19",
     "gulp-inject-string": "^1.1.1",
     "gulp-rename": "^1.2.3",
