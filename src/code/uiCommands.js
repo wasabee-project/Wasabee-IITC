@@ -1,5 +1,5 @@
 //This function helps with commonly used UI data getting functions
-Wasabee.uiHelper = {
+Wasabee.UiHelper = {
     getPortal: (id) => {
         if (window.portals[id] && window.portals[id].options.data.title) {
             var data = window.portals[id].options.data;
@@ -12,12 +12,12 @@ Wasabee.uiHelper = {
         }
         return null;
     },
-    getSelectedPortal: () => window.selectedPortal ? this.getPortal(window.selectedPortal) : null,
+    getSelectedPortal: () => window.selectedPortal ? Wasabee.UiHelper.getPortal(window.selectedPortal) : null,
     toLatLng: (data, angle) => {
         return void 0 === angle && "object" == typeof data && (angle = data.lng, data = data.lat), L.latLng(parseFloat(data), parseFloat(angle));
     },
     getPortalLink: (data) => {
-        var pt = helper.toLatLng(data);
+        var pt = Wasabee.UiHelper.toLatLng(data);
         var v = data.lat + "," + data.lng;
         var e = document.createElement("a");
         return e.appendChild(document.createTextNode(data.name)), e.title = data.name, e.href = "/intel?ll=" + v + "&pll=" + v, e.addEventListener("click", (event) => {
@@ -29,7 +29,7 @@ Wasabee.uiHelper = {
 }
 
 //This function deals with modifying objects on map layers
-Wasabee.uiCommands = {
+Wasabee.UiCommands = {
     addPortal: (operation, sentPortal, options, anyContent) => {
         if (void 0 === options && (options = ""), void 0 === anyContent && (anyContent = false), !sentPortal) {
             return void alert("Please select a portal first!");

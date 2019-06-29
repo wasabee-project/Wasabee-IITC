@@ -1,4 +1,4 @@
-Wasabee.linkListDialog = class {
+Wasabee.LinkListDialog = class {
     constructor(operation, portal) {
         var that = this;
         this._operation = operation;
@@ -86,7 +86,7 @@ Wasabee.linkListDialog = class {
         ];
         this._table.sortBy = 1;
         this._setLinks();
-        linkListDialog._dialogs.push(this);
+        Wasabee.LinkListDialog._dialogs.push(this);
         if (this._table.items.length > 0) {
             var that = this;
             this._dialog = window.dialog({
@@ -94,7 +94,7 @@ Wasabee.linkListDialog = class {
                 dialogClass: "wasabee-dialog wasabee-dialog-linklist",
                 title: this._portal.name + ": Links",
                 width: "auto",
-                closeCallback: (popoverName) => linkListDialog._dialogs = [],
+                closeCallback: (popoverName) => Wasabee.LinkListDialog._dialogs = [],
             });
             var buttons = this._dialog.dialog("option", "buttons");
             this._dialog.dialog("option", "buttons", $.extend({}, {
@@ -151,7 +151,7 @@ Wasabee.linkListDialog = class {
     }
     static update(operation, portal, show) {
         var p = 0;
-        var parameters = linkListDialog._dialogs;
+        var parameters = Wasabee.LinkListDialog._dialogs;
         for (; p < parameters.length; p++) {
             var page = parameters[p];
             if (page._operation.ID == operation.ID) {
@@ -172,9 +172,9 @@ Wasabee.linkListDialog = class {
             }
         }
         if (show)
-            return new linkListDialog(operation, portal);
+            return new Wasabee.LinkListDialog(operation, portal);
         else
             return;
     }
 };
-Wasabee.linkListDialog._dialogs = [];
+Wasabee.LinkListDialog._dialogs = [];

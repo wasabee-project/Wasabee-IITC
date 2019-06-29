@@ -1,4 +1,4 @@
-Wasabee.linkDialog = class {
+Wasabee.LinkDialog = class {
     constructor(op) {
         var self = this;
         self.clearLocalPortalSelections();
@@ -6,7 +6,7 @@ Wasabee.linkDialog = class {
         this._portals = {};
         this._links = [];
         this._operation = op;
-        linkDialog._dialogs.push(this);
+        Wasabee.LinkDialog._dialogs.push(this);
         var container = document.createElement("div");
         this._desc = container.appendChild(document.createElement("textarea"));
         this._desc.placeholder = "Description (optional)";
@@ -74,9 +74,9 @@ Wasabee.linkDialog = class {
             dialogClass: "wasabee-dialog wasabee-dialog-links",
             closeCallback: (popoverName) => {
                 self._broadcast.removeEventListener("message", sendMessage, false);
-                var paneIndex = linkDialog._dialogs.indexOf(self);
+                var paneIndex = Wasabee.LinkDialog._dialogs.indexOf(self);
                 if (-1 !== paneIndex) {
-                    linkDialog._dialogs.splice(paneIndex, 1);
+                    Wasabee.LinkDialog._dialogs.splice(paneIndex, 1);
                 }
                 self.clearLocalPortalSelections();
             }
@@ -201,7 +201,7 @@ Wasabee.linkDialog = class {
     }
     static update(operation, show) {
         var p = 0;
-        var parameters = linkDialog._dialogs;
+        var parameters = Wasabee.LinkDialog._dialogs;
         for (; p < parameters.length; p++) {
             var page = parameters[p];
             if (page._operation.ID == operation.ID) {
@@ -213,16 +213,16 @@ Wasabee.linkDialog = class {
             }
         }
         if (show)
-            return new linkDialog(operation);
+            return new Wasabee.LinkDialog(operation);
         else
             return;
     }
     static closeDialogs() {
-        var parameters = linkDialog._dialogs;
+        var parameters = Wasabee.LinkDialog._dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
             page._dialog.dialog('close');
         }
     }
 }
-Wasabee.linkDialog._dialogs = [];
+Wasabee.LinkDialog._dialogs = [];

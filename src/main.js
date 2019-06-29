@@ -13,8 +13,9 @@ function wrapper(plugin_info) {
 	/* inject: ./code/scopes.js                     */
 	/* inject: ./code/sortable.js                     */
 	/* inject: ./code/uiCommands.js                     */
-	/* inject: ./code/linkDistDialog.js                     */
 	/* inject: ./code/init.js                     */
+	/* inject: ./code/linkListDialog.js                     */
+	/* inject: ./code/linkDialog.js                     */
 	/* inject: ./code/overflowMenu.js                     */
 	/* inject: ./code/markerDialog.js                     */
 	/* inject: ./code/exportDialog.js                     */

@@ -19,9 +19,9 @@ window.plugin.wasabee.getColorHex = (color) => {
 }
 
 
-Wasabee.markerDialog = class {
+Wasabee.MarkerDialog = class {
     constructor(operation) {
-        markerDialogFunction._dialogs.push(this);
+        Wasabee.MarkerDialog._dialogs.push(this);
         var self = this;
         this._target = null;
         this._operation = operation;
@@ -73,12 +73,12 @@ Wasabee.markerDialog = class {
                 my: "center top",
                 at: "center center+30"
             },
-            closeCallback: () => markerDialogFunction._dialogs = [],
+            closeCallback: () => Wasabee.MarkerDialog._dialogs = [],
         });
         this._dialog.dialog("option", "buttons", {
             "add marker": () => self.sendAlert(self._type.val(), self._operation, self._comment.val()),
             close: () => {
-                markerDialogFunction._dialogs = Array();
+                Wasabee.MarkerDialog._dialogs = Array();
                 self._dialog.dialog("close");
             }
         });
@@ -90,10 +90,10 @@ Wasabee.markerDialog = class {
         operation.addMarker(selectedType, Wasabee.UiHelper.getSelectedPortal(), comment);
     }
     static update(operation, close = false, show = true) {
-        var parameters = markerDialogFunction._dialogs;
+        var parameters = Wasabee.MarkerDialog._dialogs;
         if (parameters.length != 0) {
             show = false;
-            for (index in parameters) {
+            for (var index in parameters) {
                 var page = parameters[index];
                 if (operation.ID != page._operation.ID || close) {
                     return page._dialog.dialog('close');
@@ -105,16 +105,16 @@ Wasabee.markerDialog = class {
             }
         }
         if (show)
-            return new markerDialogFunction(operation);
+            return new Wasabee.MarkerDialog(operation);
         else
             return;
     }
     static closeDialogs() {
-        var parameters = markerDialogFunction._dialogs;
+        var parameters = Wasabee.MarkerDialog._dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
             page._dialog.dialog('close');
         }
     }
 };
-Wasabee.markerDialog._dialogs = [];
+Wasabee.MarkerDialog._dialogs = [];
