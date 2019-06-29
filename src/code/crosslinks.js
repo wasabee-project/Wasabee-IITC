@@ -1,5 +1,5 @@
 //*** CROSSLINK THINGS */
-window.plugin.wasabee.greatCircleArcIntersect = function (ta0, ta1, tb0, tb1) {
+window.plugin.wasabee.greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
     // method:
@@ -103,58 +103,53 @@ window.plugin.wasabee.greatCircleArcIntersect = function (ta0, ta1, tb0, tb1) {
     // 1. calculate the overlapping min/max longitude
     // 2. calculate each line latitude at each point
     // 3. if latitudes change place between overlapping range, the lines cross
-
     // class to hold the pre-calculated maths for a geodesic line
     // TODO: move this outside this function, so it can be pre-calculated once for each line we test
-    var GeodesicLine = function (start, end) {
-        var d2r = Math.PI / 180.0;
-        var r2d = 180.0 / Math.PI;
-
-        // maths based on http://williams.best.vwh.net/avform.htm#Int
-
-        if (start.lng == end.lng) {
-            throw 'Error: cannot calculate latitude for meridians';
+    class GeodesicLine {
+        constructor(start, end) {
+            var d2r = Math.PI / 180.0;
+            var r2d = 180.0 / Math.PI;
+            // maths based on http://williams.best.vwh.net/avform.htm#Int
+            if (start.lng == end.lng) {
+                throw 'Error: cannot calculate latitude for meridians';
+            }
+            // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
+            this.lat1 = start.lat * d2r;
+            this.lat2 = end.lat * d2r;
+            this.lng1 = start.lng * d2r;
+            this.lng2 = end.lng * d2r;
+            var dLng = this.lng1 - this.lng2;
+            var sinLat1 = Math.sin(this.lat1);
+            var sinLat2 = Math.sin(this.lat2);
+            var cosLat1 = Math.cos(this.lat1);
+            var cosLat2 = Math.cos(this.lat2);
+            this.sinLat1CosLat2 = sinLat1 * cosLat2;
+            this.sinLat2CosLat1 = sinLat2 * cosLat1;
+            this.cosLat1CosLat2SinDLng = cosLat1 * cosLat2 * Math.sin(dLng);
         }
-
-        // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
-        this.lat1 = start.lat * d2r;
-        this.lat2 = end.lat * d2r;
-        this.lng1 = start.lng * d2r;
-        this.lng2 = end.lng * d2r;
-
-        var dLng = this.lng1 - this.lng2;
-
-        var sinLat1 = Math.sin(this.lat1);
-        var sinLat2 = Math.sin(this.lat2);
-        var cosLat1 = Math.cos(this.lat1);
-        var cosLat2 = Math.cos(this.lat2);
-
-        this.sinLat1CosLat2 = sinLat1 * cosLat2;
-        this.sinLat2CosLat1 = sinLat2 * cosLat1;
-
-        this.cosLat1CosLat2SinDLng = cosLat1 * cosLat2 * Math.sin(dLng);
-    };
-
-    GeodesicLine.prototype.isMeridian = function () {
-        return this.lng1 == this.lng2;
-    };
-
-    GeodesicLine.prototype.latAtLng = function (lng) {
-        lng = lng * Math.PI / 180; //to radians
-
-        var lat;
-        // if we're testing the start/end point, return that directly rather than calculating
-        // 1. this may be fractionally faster, no complex maths
-        // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
-        if (lng == this.lng1) {
-            lat = this.lat1;
-        } else if (lng == this.lng2) {
-            lat = this.lat2;
-        } else {
-            lat = Math.atan((this.sinLat1CosLat2 * Math.sin(lng - this.lng2) - this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) / this.cosLat1CosLat2SinDLng);
+        isMeridian() {
+            return this.lng1 == this.lng2;
         }
-        return lat * 180 / Math.PI; // return value in degrees
-    };
+        latAtLng(lng) {
+            lng = lng * Math.PI / 180; //to radians
+            var lat;
+            // if we're testing the start/end point, return that directly rather than calculating
+            // 1. this may be fractionally faster, no complex maths
+            // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
+            if (lng == this.lng1) {
+                lat = this.lat1;
+            }
+            else if (lng == this.lng2) {
+                lat = this.lat2;
+            }
+            else {
+                lat = Math.atan((this.sinLat1CosLat2 * Math.sin(lng - this.lng2) - this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) / this.cosLat1CosLat2SinDLng);
+            }
+            return lat * 180 / Math.PI; // return value in degrees
+        }
+    }
+
+
 
 
 
