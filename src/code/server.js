@@ -5,15 +5,15 @@ window.plugin.wasabee.authWithWasabee = (() => $.ajax({
     },
     crossDomain: true,
     method: "GET",
-}).done(function (response) {
+}).done((response) => {
     if (response.Ops != null) {
-        window.plugin.wasabee.updateServerOpList(response.Ops, response.OwnedOps, true);
+        window.plugin.wasabee.updateServerOpList(response.Ops, true);
     }
-}).fail(function (jqXHR, textStatus) {
+}).fail(() => {
     window.plugin.wasabee.showMustAuthAlert();
 }));
 
-window.plugin.wasabee.uploadSingleOp = ((operation) => $.ajax({
+window.plugin.wasabee.uploadSingleOp = (operation) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw",
     xhrFields: {
         withCredentials: true
@@ -23,16 +23,17 @@ window.plugin.wasabee.uploadSingleOp = ((operation) => $.ajax({
     method: "POST",
     dataType: "json",
     contentType: "application/json",
-}).done(function (response) {
+}).done((response) => {
+    //  We shouldn't read an answer to this. It's a POST.
     if (response.Ops != null) {
-        window.plugin.wasabee.updateServerOpList(response.Ops, response.OwnedOps, false);
+        window.plugin.wasabee.updateServerOpList(response.Ops, false);
     }
-    alert("Upload Complete.")
-}).fail(function (jqXHR, textStatus) {
+    alert("Upload Complete.");
+}).fail(() => {
     window.plugin.wasabee.showMustAuthAlert();
-}));
+});
 
-window.plugin.wasabee.updateSingleOp = ((operation) => $.ajax({
+window.plugin.wasabee.updateSingleOp = (operation) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
     xhrFields: {
         withCredentials: true
@@ -42,75 +43,76 @@ window.plugin.wasabee.updateSingleOp = ((operation) => $.ajax({
     method: "PUT",
     dataType: "json",
     contentType: "application/json",
-}).done(function (response) {
-    alert("Update Complete.")
-}).fail(function (jqXHR, textStatus) {
+}).done(() => {
+    alert("Update Complete.");
+}).fail(() => {
     window.plugin.wasabee.showMustAuthAlert();
-}));
+});
 
-window.plugin.wasabee.downloadSingleOp = ((operation) => $.ajax({
+window.plugin.wasabee.downloadSingleOp = (operation) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
     xhrFields: {
         withCredentials: true
     },
     crossDomain: true,
     method: "GET",
-}).done(function (response) {
-    console.log("got response -> " + JSON.stringify(response))
-}).fail(function (jqXHR, textStatus) {
-    alert("Download Failed.")
-}));
+}).done((response) => {
+    console.log("got response -> " + JSON.stringify(response));
+}).fail(() => {
+    alert("Download Failed.");
+});
 
-window.plugin.wasabee.deleteOwnedServerOp = ((opID) => $.ajax({
+window.plugin.wasabee.deleteOwnedServerOp = (opID) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID + "/delete",
     xhrFields: {
         withCredentials: true
     },
     crossDomain: true,
     method: "GET",
-}).done(function (response) {
-    console.log("got response -> " + JSON.stringify(response))
-}).fail(function (jqXHR, textStatus) {
+}).done((response) => {
+    console.log("got response -> " + JSON.stringify(response));
+}).fail(() => {
     window.plugin.wasabee.showMustAuthAlert();
-}));
+});
 
-window.plugin.wasabee.getOpDownloads = function (opList) {
-    var opCalls = Array()
-    opList.forEach(function (op, index) {
-        opCalls.push(window.plugin.wasabee.downloadOpInList(op))
+window.plugin.wasabee.getOpDownloads = (opList) => {
+    var opCalls = [];
+    opList.forEach((op, index) => {
+        opCalls.push(window.plugin.wasabee.downloadOpInList(op));
         console.log(op, index);
     });
-    return opCalls
+    return opCalls;
 }
 
-window.plugin.wasabee.downloadOpInList = ((op) => $.ajax({
+window.plugin.wasabee.downloadOpInList = (op) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + op.ID,
     xhrFields: {
         withCredentials: true
     },
     crossDomain: true,
     method: "GET",
-}).done(function (response) {
-    window.plugin.wasabee.updateOperationInList(Operation.create(response))
-}).fail(function (jqXHR, textStatus) {
-    alert("Download Failed.")
-}));
+}).done((response) => {
+    window.plugin.wasabee.updateOperationInList(Operation.create(response));
+}).fail(() => {
+    alert("Download Failed.");
+});
 
-window.plugin.wasabee.updateServerOpList = function (opList, ownedOpList, pullFullOps) {
+window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
+    let ownedOpList = opList.filter((op) => op.IsOwner);
     store.set(Wasabee.Constants.SERVER_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
     store.set(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY, JSON.stringify(JSON.stringify(ownedOpList)));
     console.log("opList -> " + JSON.stringify(opList))
     if (pullFullOps) {
         console.log("pulling ops")
-        Promise.all(window.plugin.wasabee.getOpDownloads(opList)).then(function () {
-            alert("Sync Complete.")
-        })["catch"](function (data) {
+        Promise.all(window.plugin.wasabee.getOpDownloads(opList)).then(() => {
+            alert("Sync Complete.");
+        }).catch((data) => {
             throw alert(data.message), console.log(data), data;
         });
     }
-}
+};
 
-window.plugin.wasabee.opIsOwnedServerOp = function (opID) {
+window.plugin.wasabee.opIsOwnedServerOp = (opID) => {
     console.log("opId -> " + opID)
     var isOwnedServerOp = false;
     try {
@@ -127,7 +129,7 @@ window.plugin.wasabee.opIsOwnedServerOp = function (opID) {
     return isOwnedServerOp;
 }
 
-window.plugin.wasabee.opIsServerOp = function (opID) {
+window.plugin.wasabee.opIsServerOp = (opID) => {
     var isServerOp = false;
     try {
         var serverOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
