@@ -56,7 +56,6 @@ window.plugin.wasabee.addButtons = function () {
                     }
                 });
             }
-            var v = latlngs[0];
             return container;
         }
     });

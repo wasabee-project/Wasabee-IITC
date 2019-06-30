@@ -3,7 +3,7 @@ Wasabee.LinkListDialog = class {
         var that = this;
         this._operation = operation;
         this._portal = portal;
-        this._table = new Wasabee.Sortable();
+        this._table = new Wasabee.Sortable;
         this._dialog = null;
         this._table.fields = [
             {
@@ -135,7 +135,7 @@ Wasabee.LinkListDialog = class {
     }
     makeMenu(list, data) {
         var $Wasabee = this;
-        var state = new Wasabee.OverflowMenu();
+        var state = new Wasabee.OverflowMenu;
         state.items = [
             {
                 label: "Reverse",

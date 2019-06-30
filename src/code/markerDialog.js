@@ -46,7 +46,7 @@ Wasabee.MarkerDialog = class {
             .text("set")
             .click(() => self.setTarget(Wasabee.UiHelper.getSelectedPortal()))
             .appendTo($element);
-        this._targetMenu = new Wasabee.OverflowMenu();
+        this._targetMenu = new Wasabee.OverflowMenu;
         this._targetMenu.button.firstElementChild.textContent = "\u25bc";
         $element.append(this._targetMenu.button);
         this._container = $("<div />").append($("<div>").addClass("flex").append(this._type).append(this._comment)).append(document.createTextNode(" ")).append(this._agent).append($element);
