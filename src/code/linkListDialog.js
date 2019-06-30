@@ -3,7 +3,7 @@ Wasabee.LinkListDialog = class {
         var that = this;
         this._operation = operation;
         this._portal = portal;
-        this._table = new Wasabee.Sortable;
+        this._table = new Wasabee.Sortable();
         this._dialog = null;
         this._table.fields = [
             {
@@ -107,7 +107,7 @@ Wasabee.LinkListDialog = class {
             }, buttons));
         }
         else {
-            alert('No links found.');
+            alert("No links found.");
         }
     }
     _setLinks() {
@@ -135,7 +135,7 @@ Wasabee.LinkListDialog = class {
     }
     makeMenu(list, data) {
         var $Wasabee = this;
-        var state = new Wasabee.OverflowMenu;
+        var state = new Wasabee.OverflowMenu();
         state.items = [
             {
                 label: "Reverse",
@@ -158,23 +158,21 @@ Wasabee.LinkListDialog = class {
                 page._operation = operation;
             }
             else {
-                return page._dialog.dialog('close');
+                return page._dialog.dialog("close");
             }
             if (!page._operation.containsPortal(page._portal)) {
-                return page._dialog.dialog('close');
+                return page._dialog.dialog("close");
             }
             page._setLinks();
             if (portal != null) {
                 page._portal = portal;
                 page._setLinks();
-                page._dialog.dialog('option', 'title', portal.name + ": Links");
+                page._dialog.dialog("option", "title", portal.name + ": Links");
                 return page._dialog.focus(), page._dialog;
             }
         }
-        if (show)
-            return new Wasabee.LinkListDialog(operation, portal);
-        else
-            return;
+        if (show) { return new Wasabee.LinkListDialog(operation, portal); }
+        else { return; }
     }
 };
 Wasabee.LinkListDialog._dialogs = [];

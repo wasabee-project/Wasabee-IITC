@@ -2,11 +2,11 @@ window.plugin.wasabee.getColorMarker = (color) => {
     var marker = null;
     Wasabee.layerTypes.forEach((type) => {
         if (type.name == color) {
-            marker = type.portal["iconUrl"];
+            marker = type.portal.iconUrl;
         }
     });
     return marker;
-}
+};
 
 window.plugin.wasabee.getColorHex = (color) => {
     var hex = null;
@@ -16,7 +16,7 @@ window.plugin.wasabee.getColorHex = (color) => {
         }
     });
     return hex;
-}
+};
 
 
 Wasabee.MarkerDialog = class {
@@ -46,7 +46,7 @@ Wasabee.MarkerDialog = class {
             .text("set")
             .click(() => self.setTarget(Wasabee.UiHelper.getSelectedPortal()))
             .appendTo($element);
-        this._targetMenu = new Wasabee.OverflowMenu;
+        this._targetMenu = new Wasabee.OverflowMenu();
         this._targetMenu.button.firstElementChild.textContent = "\u25bc";
         $element.append(this._targetMenu.button);
         this._container = $("<div />").append($("<div>").addClass("flex").append(this._type).append(this._comment)).append(document.createTextNode(" ")).append(this._agent).append($element);
@@ -96,7 +96,7 @@ Wasabee.MarkerDialog = class {
             for (var index in parameters) {
                 var page = parameters[index];
                 if (operation.ID != page._operation.ID || close) {
-                    return page._dialog.dialog('close');
+                    return page._dialog.dialog("close");
                 }
                 else {
                     page._operation = operation;
@@ -105,15 +105,15 @@ Wasabee.MarkerDialog = class {
             }
         }
         if (show)
-            return new Wasabee.MarkerDialog(operation);
+            {return new Wasabee.MarkerDialog(operation);}
         else
-            return;
+            {return;}
     }
     static closeDialogs() {
         var parameters = Wasabee.MarkerDialog._dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
-            page._dialog.dialog('close');
+            page._dialog.dialog("close");
         }
     }
 };

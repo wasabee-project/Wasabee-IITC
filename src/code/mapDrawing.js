@@ -44,7 +44,7 @@ window.plugin.wasabee.addTarget = function (target) {
     window.registerMarkerForOMS(marker);
     marker.bindPopup(window.plugin.wasabee.getMarkerPopup(marker, target, targetPortal));
     marker.off("click", marker.togglePopup, marker);
-    marker.on('spiderfiedclick', marker.togglePopup, marker);
+    marker.on("spiderfiedclick", marker.togglePopup, marker);
     window.plugin.wasabee.targetLayers[target["ID"]] = marker;
     marker.addTo(window.plugin.wasabee.targetLayerGroup);
 }
@@ -68,25 +68,25 @@ window.plugin.wasabee.getMarkerPopup = function (marker, target, portal) {
 
 window.plugin.wasabee.getPopupBodyWithType = function (portal, target) {
     var title = ""
-    var comment = target.comment
+    var comment = target.comment;
     switch (target.type) {
         case Wasabee.Constants.MARKER_TYPE_DESTROY:
-            title = "Destroy"
+            title = "Destroy";
             break;
         case Wasabee.Constants.MARKER_TYPE_DECAY:
-            title = "Let Decay"
+            title = "Let Decay";
             break;
         case Wasabee.Constants.MARKER_TYPE_VIRUS:
-            title = "Virus"
+            title = "Virus";
             break;
         default:
-            title = "Unknown"
+            title = "Unknown";
     }
-    title = title + " - " + portal.name
+    title = title + " - " + portal.name;
     if (!comment)
-        return title
+        {return title;}
     else
-        return title + "\n\n" + comment
+        {return title + "\n\n" + comment;}
 }
 
 //** This function returns the appropriate image for a marker type */
@@ -114,7 +114,7 @@ window.plugin.wasabee.addAllLinks = function () {
 
 //** This function resets all the Links and calls addAllLinks to add them */
 window.plugin.wasabee.resetAllLinks = function () {
-    for (guid in window.plugin.wasabee.linkLayers) {
+    for (var guid in window.plugin.wasabee.linkLayers) {
         var linkInLayer = window.plugin.wasabee.linkLayers[guid];
         window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
         delete window.plugin.wasabee.linkLayers[guid];
@@ -146,5 +146,5 @@ window.plugin.wasabee.addLink = function (link, color, operation) {
         window.plugin.wasabee.linkLayers[link["ID"]] = link_;
         link_.addTo(window.plugin.wasabee.linkLayerGroup);
     } else
-        console.log("LATLNGS WAS NULL?!")
+        {console.log("LATLNGS WAS NULL?!")}
 }

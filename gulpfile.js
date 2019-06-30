@@ -1,17 +1,16 @@
 // Requires
 /* global require: true */
-const fs = require('fs'),
-	path = require('path'),
-	gulp = require('gulp'),
-	injectfile = require('gulp-inject-file'),	// https://www.npmjs.com/package/gulp-inject-file
+const fs = require("fs"),
+	path = require("path"),
+	gulp = require("gulp"),
+	injectfile = require("gulp-inject-file"),	// https://www.npmjs.com/package/gulp-inject-file
 	rename = require("gulp-rename"), 			// https://www.npmjs.com/package/gulp-rename
-	contents = require('gulp-inject-string'),	// https://www.npmjs.com/package/gulp-inject-string
-	cfg = require('./plugin.config.json'),
-	trimlines = require('gulp-trimlines'),
-	eslint = require('gulp-eslint'),
-	del = require('del'),
-	sequence = require('gulp-sequence');
-	autoFixTask = require('gulp-eslint-auto-fix')
+	contents = require("gulp-inject-string"),	// https://www.npmjs.com/package/gulp-inject-string
+	cfg = require("./plugin.config.json"),
+	trimlines = require("gulp-trimlines"),
+	eslint = require("gulp-eslint"),
+	del = require("del"),
+	sequence = require("gulp-sequence");
 
 function ensureDirectoryExistence(filePath) {
 	var dirname = path.dirname(filePath);
@@ -29,25 +28,25 @@ var status = {
 };
 
 // status related tasks
-gulp.task('set-mode-dev', function (cb) {
-	status.mode = 'dev';
+gulp.task("set-mode-dev", function (cb) {
+	status.mode = "dev";
 	cb();
 });
 
-gulp.task('set-mode-prod', function (cb) {
-	status.mode = 'prod';
+gulp.task("set-mode-prod", function (cb) {
+	status.mode = "prod";
 	cb();
 });
 
-gulp.task('clear', function (cb) {
+gulp.task("clear", function (cb) {
 	status.headers = null;
 	status.mode = null;
 	cb();
 });
 
 // build tasks
-gulp.task('buildheaders', function(cb) {
-	var content = fs.readFileSync(cfg.src.meta, 'utf8'),
+gulp.task("buildheaders", function(cb) {
+	var content = fs.readFileSync(cfg.src.meta, "utf8"),
 		rmHeaders = cfg.headers[status.mode],
 		commonHeaders = cfg.headers.common;
 	
@@ -66,7 +65,7 @@ gulp.task('buildheaders', function(cb) {
 	cb();
 });
 
-gulp.task('buildplugin', function (cb) {
+gulp.task("buildplugin", function (cb) {
 	var destination = cfg.releaseFolder[status.mode];
 
 	gulp.src(cfg.src.plugin)
@@ -74,7 +73,7 @@ gulp.task('buildplugin', function (cb) {
 		.pipe(contents.prepend(status.headers))
 		// inject files
 		.pipe(injectfile({
-			pattern: '\\/\\*+\\s*inject:\\s*<filename>\\s*\\*+\\/'
+			pattern: "\\/\\*+\\s*inject:\\s*<filename>\\s*\\*+\\/"
 		}))
 		// trim leading spaces
 		.pipe( trimlines({leading: false}) )
@@ -84,7 +83,7 @@ gulp.task('buildplugin', function (cb) {
 	cb();
 });
 
-gulp.task('buildmeta', function (cb) {
+gulp.task("buildmeta", function (cb) {
 	var	path = cfg.releaseFolder[status.mode] + cfg.metaName;
 	
 	ensureDirectoryExistence(path);
@@ -94,24 +93,19 @@ gulp.task('buildmeta', function (cb) {
 });
 
 // ESLint
-gulp.task('eslint', function(cb) {
-	gulp.src(['**/*.js','!node_modules/**'])
+gulp.task("eslint", function(cb) {
+	gulp.src(["**/*.js","!node_modules/**"])
 		.pipe(eslint())
 		.pipe(eslint.format())
 		.pipe(eslint.failAfterError());
 	cb();
 });
 
-gulp.task('build', function(cb) { sequence('buildheaders', 'buildmeta', 'buildplugin', 'eslint', cb); });
+gulp.task("build", function(cb) { sequence("buildheaders", "buildmeta", "buildplugin", "eslint", cb); });
 
-gulp.task('build-dev',  sequence('set-mode-dev',  'build', 'clear'));
-gulp.task('build-prod', sequence('set-mode-prod', 'build', 'clear'));
+gulp.task("build-dev",  sequence("set-mode-dev",  "build", "clear"));
+gulp.task("build-prod", sequence("set-mode-prod", "build", "clear"));
 
-gulp.task('default', ['build-dev']);
+gulp.task("default", ["build-dev"]);
 
-gulp.task('clean', function() { return del(['releases/*']); });
-
-
-autoFixTask('fix-js', [
-	'src/**/*.js',
-])
+gulp.task("clean", function() { return del(["releases/*"]); });

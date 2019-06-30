@@ -82,7 +82,7 @@ window.plugin.wasabee.getOpDownloads = (opList) => {
         console.log(op, index);
     });
     return opCalls;
-}
+};
 
 window.plugin.wasabee.downloadOpInList = (op) => $.ajax({
     url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + op.ID,
@@ -101,9 +101,9 @@ window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
     let ownedOpList = opList.filter((op) => op.IsOwner);
     store.set(Wasabee.Constants.SERVER_OP_LIST_KEY, JSON.stringify(JSON.stringify(opList)));
     store.set(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY, JSON.stringify(JSON.stringify(ownedOpList)));
-    console.log("opList -> " + JSON.stringify(opList))
+    console.log("opList -> " + JSON.stringify(opList));
     if (pullFullOps) {
-        console.log("pulling ops")
+        console.log("pulling ops");
         Promise.all(window.plugin.wasabee.getOpDownloads(opList)).then(() => {
             alert("Sync Complete.");
         }).catch((data) => {
@@ -113,34 +113,34 @@ window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
 };
 
 window.plugin.wasabee.opIsOwnedServerOp = (opID) => {
-    console.log("opId -> " + opID)
+    console.log("opId -> " + opID);
     var isOwnedServerOp = false;
     try {
         var serverOwnedOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
         if (serverOwnedOpList != null)
-            for (let opInList in serverOwnedOpList) {
+            {for (let opInList in serverOwnedOpList) {
                 if (serverOwnedOpList[opInList].ID == opID) {
                     isOwnedServerOp = true;
                 }
-            }
+            }}
     } catch (e) {
         console.log("No Server ops or some other exception")
     }
     return isOwnedServerOp;
-}
+};
 
 window.plugin.wasabee.opIsServerOp = (opID) => {
     var isServerOp = false;
     try {
         var serverOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
         if (serverOpList != null)
-            for (let opInList in serverOpList) {
+            {for (let opInList in serverOpList) {
                 if (serverOpList[opInList].ID == opID) {
                     isServerOp = true;
                 }
-            }
+            }}
     } catch (e) {
         console.log("No Server ops or some other exception")
     }
     return isServerOp;
-}
+};
