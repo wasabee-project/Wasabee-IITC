@@ -10,25 +10,25 @@ class Link {
         this.description = description;
         this.assignedTo = null;
         this.throwOrderPos = null;
-        this.populatePortals(operation)
+        this.populatePortals(operation);
     }
 
     populatePortals(operation) {
 
-        this.fromPortal = operation.getPortal(this.fromPortalId)
-        this.toPortal = operation.getPortal(this.toPortalId)
+        this.fromPortal = operation.getPortal(this.fromPortalId);
+        this.toPortal = operation.getPortal(this.toPortalId);
     }
 
     getLatLngs(operation) {
-        var fromPortal = operation.getPortal(this.fromPortalId)
-        var toPortal = operation.getPortal(this.toPortalId)
+        var fromPortal = operation.getPortal(this.fromPortalId);
+        var toPortal = operation.getPortal(this.toPortalId);
         if (fromPortal != null && toPortal != null) {
             var returnArray = Array();
-            returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng))
-            returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng))
-            return returnArray
+            returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+            returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+            return returnArray;
         } else
-            return null;
+            {return null;}
     }
 
     static create(obj, operation) {

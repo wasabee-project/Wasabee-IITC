@@ -26,7 +26,7 @@ Wasabee.UiHelper = {
             return map.getBounds().contains(pt) ? (window.portals[data.id] || window.renderPortalDetails(data.id), window.zoomToAndShowPortal(data.id, pt)) : (map.panTo(pt), window.renderPortalDetails(data.id)), event.preventDefault(), false;
         }, false), e;
     }
-}
+};
 
 //This function deals with modifying objects on map layers
 Wasabee.UiCommands = {
@@ -50,13 +50,13 @@ Wasabee.UiCommands = {
         if (selectedPortal !== undefined) {
             if (confirm("Do you really want to swap these two portals?\n\n" + portal.name + "\n" + selectedPortal.name)) {
                 Promise.all([operation.swapPortal(portal, selectedPortal)]).then(() => {
-                    operation.update()
+                    operation.update();
                 }).catch((data) => {
                     throw alert(data.message), console.log(data), data;
                 });
             }
         } else
-            alert("You must select a new portal!")
+            {alert("You must select a new portal!");}
     },
     deletePortal : (operation, portal) =>{
         if (confirm("Do you really want to delete this anchor, including all incoming and outgoing links?\n\n" + portal.name)) {

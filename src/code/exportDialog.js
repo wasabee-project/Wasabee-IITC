@@ -22,8 +22,8 @@ Wasabee.ExportDialog = class {
         mainContent.innerHTML = "";
         var textArea = mainContent.appendChild(document.createElement("div"));
         textArea.className = "ui-dialog-wasabee-copy";
-        textArea.innerHTML = '<p><a onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-            + '<textarea readonly onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();">' + JSON.stringify(operation) + '</textarea>';
+        textArea.innerHTML = "<p><a onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">Select all</a> and press CTRL+C to copy it.</p>"
+            + "<textarea readonly onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">" + JSON.stringify(operation) + "</textarea>";
         var linkArea = mainContent.appendChild(document.createElement("div"));
         linkArea.className = "temp-op-dialog";
         var pasteLink = window.plugin.wasabee.getPasteLink(operation);
@@ -71,9 +71,9 @@ Wasabee.ExportDialog = class {
             }
         }
         if (show)
-            return new Wasabee.ExportDialog(operation);
+            {return new Wasabee.ExportDialog(operation);}
         else
-            return;
+            {return;}
     }
 };
 Wasabee.ExportDialog._dialogs = [];

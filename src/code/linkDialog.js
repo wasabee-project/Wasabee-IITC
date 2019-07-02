@@ -53,7 +53,7 @@ Wasabee.LinkDialog = class {
         opt.textContent = "\u21b3";
         button = div.appendChild(document.createElement("button"));
         button.textContent = "add all";
-        button.addEventListener("click", (a) => self.addAllLinks(self._operation), false);
+        button.addEventListener("click", () => self.addAllLinks(self._operation), false);
         var cardHeader = element.appendChild(document.createElement("label"));
         this._reversed = cardHeader.appendChild(document.createElement("input"));
         this._reversed.type = "checkbox";
@@ -63,7 +63,7 @@ Wasabee.LinkDialog = class {
         //element.appendChild(layerSelector.container);
         button = element.appendChild(document.createElement("button"));
         button.textContent = "close";
-        button.addEventListener("click", (a) => self._dialog.dialog("close"), false);
+        button.addEventListener("click", () => self._dialog.dialog("close"), false);
         var sendMessage = (name) => self.onMessage(name);
         this._broadcast.addEventListener("message", sendMessage, false);
         this._dialog = window.dialog({
@@ -72,7 +72,7 @@ Wasabee.LinkDialog = class {
             height: "auto",
             html: container,
             dialogClass: "wasabee-dialog wasabee-dialog-links",
-            closeCallback: (popoverName) => {
+            closeCallback: () => {
                 self._broadcast.removeEventListener("message", sendMessage, false);
                 var paneIndex = Wasabee.LinkDialog._dialogs.indexOf(self);
                 if (-1 !== paneIndex) {
@@ -147,7 +147,7 @@ Wasabee.LinkDialog = class {
             return void alert("Target and destination portals must be different.");
         }
         else
-            Promise.all([
+            {Promise.all([
                 item.addPortal(source),
                 item.addPortal(linkTo),
                 isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)
@@ -155,7 +155,7 @@ Wasabee.LinkDialog = class {
                 .then(() => operation.update())
                 .catch((data) => {
                     throw alert(data.message), console.log(data), data;
-                });
+                });}
         //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
     }
     addAllLinks(operation) {
@@ -209,20 +209,20 @@ Wasabee.LinkDialog = class {
                 return page.focus(), page;
             }
             else {
-                return page._dialog.dialog('close');
+                return page._dialog.dialog("close");
             }
         }
         if (show)
-            return new Wasabee.LinkDialog(operation);
+            {return new Wasabee.LinkDialog(operation);}
         else
-            return;
+            {return;}
     }
     static closeDialogs() {
         var parameters = Wasabee.LinkDialog._dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
-            page._dialog.dialog('close');
+            page._dialog.dialog("close");
         }
     }
-}
+};
 Wasabee.LinkDialog._dialogs = [];

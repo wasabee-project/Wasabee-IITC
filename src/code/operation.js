@@ -16,14 +16,14 @@ class Operation {
         this.markers = Array();
         this.pasteKey = null;
         this.pasteExpireDate = 0;
-        this.color = Wasabee.Constants.DEFAULT_OPERATION_COLOR
+        this.color = Wasabee.Constants.DEFAULT_OPERATION_COLOR;
         this.comment = null;
     }
 
     getColor() {
-        if (this.color == null) return Wasabee.Constants.DEFAULT_OPERATION_COLOR
+        if (this.color == null) { return Wasabee.Constants.DEFAULT_OPERATION_COLOR; }
         else {
-            return this.color
+            return this.color;
         }
     }
 
@@ -42,8 +42,7 @@ class Operation {
 
     containsPortal(portal) {
         if (portal) {
-            if (this.opportals.length == 0)
-                return false;
+            if (this.opportals.length == 0) { return false; }
             else {
                 for (let portal_ in this.opportals) {
                     if (portal_ && portal.id == portal_.id) {
@@ -56,8 +55,7 @@ class Operation {
     }
 
     containsLink(link) {
-        if (this.links.length == 0)
-            return false;
+        if (this.links.length == 0) { return false; }
         else {
             for (let link_ in this.links) {
                 //THIS TESTS IF ITS THE SAME LINK
@@ -71,8 +69,7 @@ class Operation {
     }
 
     containsMarker(portal, markerType) {
-        if (this.markers.length == 0)
-            return false;
+        if (this.markers.length == 0) { return false; }
         else {
             for (let marker in this.markers) {
                 if (this.markers[marker].portalId == portal.id && this.markers[marker].type == markerType) {
@@ -208,8 +205,7 @@ class Operation {
     addPortal(portal) {
         if (!this.containsPortal(portal)) {
             this.opportals.push(portal);
-        } else
-            console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal));
+        } else { console.log("Portal Already Exists In Operation -> " + JSON.stringify(sentPortal)); }
     }
 
     addLink(fromPortal, toPortal, description) {
@@ -219,13 +215,11 @@ class Operation {
         var link = new Link(Operation.create(this), fromPortal.id, toPortal.id, description)
         if (!this.containsLink(link)) {
             this.links.push(link)
-        } else
-            console.log("Link Already Exists In Operation -> " + JSON.stringify(link));
+        } else { console.log("Link Already Exists In Operation -> " + JSON.stringify(link)); }
     }
 
     containsAnchor(portalId) {
-        if (this.anchors.length == 0)
-            return false;
+        if (this.anchors.length == 0) { return false; }
         else {
             for (let anchor_ in this.anchors) {
                 if (this.anchors[anchor_] == portalId) {
@@ -300,10 +294,8 @@ class Operation {
         var operation = new Operation();
         for (var prop in obj) {
             if (operation.hasOwnProperty(prop)) {
-                if (prop == "links")
-                    operation[prop] = Operation.convertLinksToObjs(obj[prop]);
-                else
-                    operation[prop] = obj[prop];
+                if (prop == "links") { operation[prop] = Operation.convertLinksToObjs(obj[prop]); }
+                else { operation[prop] = obj[prop]; }
             }
         }
         return operation;
