@@ -3,7 +3,7 @@ const drawThings = () => {
     window.plugin.wasabee.resetAllPortals();
     resetAllTargets();
     resetAllLinks();
-    window.plugin.wasabee.checkAllLinks();
+    checkAllLinks();
 }
 
 //** This function adds all the Targets to the layer */

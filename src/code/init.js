@@ -55,7 +55,7 @@ window.plugin.wasabee.loadExternals = function () {
     window.addLayerGroup("Wasabee Draw Portals", window.plugin.wasabee.portalLayerGroup, true);
     window.addLayerGroup("Wasabee Draw Links", window.plugin.wasabee.linkLayerGroup, true);
     window.addLayerGroup("Wasabee Draw Targets", window.plugin.wasabee.targetLayerGroup, true);
-    window.plugin.wasabee.initCrossLinks();
+    initCrossLinks();
     drawThings();
     //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 

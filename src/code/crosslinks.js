@@ -32,14 +32,14 @@ window.plugin.wasabee.greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     b1.lat = tb1.lat;
     //debugger;
     // zero length line tests
-    if ((a0.lat == a1.lat) && (a0.lng == a1.lng)) {return false;}
-    if ((b0.lat == b1.lat) && (b0.lng == b1.lng)) {return false;}
+    if ((a0.lat == a1.lat) && (a0.lng == a1.lng)) { return false; }
+    if ((b0.lat == b1.lat) && (b0.lng == b1.lng)) { return false; }
 
     // lines have a common point
-    if ((a0.lat == b0.lat) && (a0.lng == b0.lng)) {return false;}
-    if ((a0.lat == b1.lat) && (a0.lng == b1.lng)) {return false;}
-    if ((a1.lat == b0.lat) && (a1.lng == b0.lng)) {return false;}
-    if ((a1.lat == b1.lat) && (a1.lng == b1.lng)) {return false;}
+    if ((a0.lat == b0.lat) && (a0.lng == b0.lng)) { return false; }
+    if ((a0.lat == b1.lat) && (a0.lng == b1.lng)) { return false; }
+    if ((a1.lat == b0.lat) && (a1.lng == b0.lng)) { return false; }
+    if ((a1.lat == b1.lat) && (a1.lng == b1.lng)) { return false; }
 
     // a0.lng<=-90 && a1.lng>=90 dosent suffice... a link from -70 to 179 still crosses
     //if a0.lng-a1.lng >180 or <-180 there is a cross!
@@ -96,8 +96,8 @@ window.plugin.wasabee.greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     }
 
     // check for 'horizontal' overlap in longitude
-    if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) {return false;}
-    if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) {return false;}
+    if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) { return false; }
+    if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) { return false; }
 
     // ok, our two lines have some horizontal overlap in longitude
     // 1. calculate the overlapping min/max longitude
@@ -188,15 +188,15 @@ window.plugin.wasabee.greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     //console.log(bRightLat);
     // if both a are less or greater than both b, then lines do not cross
 
-    if (aLeftLat < bLeftLat && aRightLat < bRightLat) {return false;}
-    if (aLeftLat > bLeftLat && aRightLat > bRightLat) {return false;}
+    if (aLeftLat < bLeftLat && aRightLat < bRightLat) { return false; }
+    if (aLeftLat > bLeftLat && aRightLat > bRightLat) { return false; }
 
     // latitudes cross between left and right - so geodesic lines cross
     //console.log('Xlink!');
     return true;
 };
 
-window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers, operation) {
+const testPolyLine = (drawnLink, link, markers, operation) => {
     var a = link.getLatLngs(operation);
     var start = {};
     var end = {};
@@ -211,7 +211,7 @@ window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers, operati
         for (i = 0; i < markers.length; i++) {
             var marker = markers[i];
             if (marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY || marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS || marker.type == Wasabee.Constants.MARKER_TYPE_DECAY) {
-                if (window.plugin.wasabee.checkMarkerAgainstLink(marker, link, operation)) {
+                if (checkMarkerAgainstLink(marker, link, operation)) {
                     console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
                     return false;
                 }
@@ -223,7 +223,7 @@ window.plugin.wasabee.testPolyLine = function (drawnLink, link, markers, operati
 };
 
 /** This checks if a marker is on either side of a link */
-window.plugin.wasabee.checkMarkerAgainstLink = function (marker, link, operation) {
+const checkMarkerAgainstLink = (marker, link, operation) => {
     var latlngs = link.getLatLngs(operation);
     var markerPortal = operation.getPortal(marker.portalId);
     var v = latlngs[0];
@@ -232,7 +232,7 @@ window.plugin.wasabee.checkMarkerAgainstLink = function (marker, link, operation
     return view ? view.lng == v.lng && view.lat == v.lat ? true : view.lng == center.lng && view.lat == center.lat ? true : false : false;
 };
 
-window.plugin.wasabee.showCrossLink = function (link, operation) {
+const showCrossLink = (link, operation) => {
 
     var blocked = L.geodesicPolyline(link.getLatLngs(operation), {
         color: "#d22",
@@ -247,22 +247,22 @@ window.plugin.wasabee.showCrossLink = function (link, operation) {
     window.plugin.wasabee.crossLinkLayerGroup[link.options.guid] = blocked;
 };
 
-window.plugin.wasabee.testLink = function (drawnLinks, drawnMarkers, link, operation) {
-    if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) {return;}
+const testLink = (drawnLinks, drawnMarkers, link, operation) => {
+    if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) { return; }
     try {
-        drawnLinks.forEach(function (drawnLink) {
-            var shouldShowCrosslink = plugin.wasabee.testPolyLine(drawnLink, link, drawnMarkers, operation);
+        drawnLinks.forEach((drawnLink) => {
+            var shouldShowCrosslink =testPolyLine(drawnLink, link, drawnMarkers, operation);
             if (shouldShowCrosslink) {
-                plugin.wasabee.showCrossLink(link, operation);
+               showCrossLink(link, operation);
                 throw Wasabee.Constants.BREAK_EXCEPTION;
             }
         });
     } catch (e) {
-        if (e !== Wasabee.Constants.BREAK_EXCEPTION) {throw e;}
+        if (e !== Wasabee.Constants.BREAK_EXCEPTION) { throw e; }
     }
 };
 
-window.plugin.wasabee.checkAllLinks = function () {
+const checkAllLinks = () => {
     window.plugin.wasabee.crossLinkLayers.clearLayers();
     plugin.wasabee.crossLinkLayerGroup = {};
 
@@ -270,24 +270,24 @@ window.plugin.wasabee.checkAllLinks = function () {
     var drawnLinks = operation.links;
     var drawnMarkers = operation.markers;
 
-    $.each(window.links, function (guid, link) {
-        window.plugin.wasabee.doLinkTest(link, drawnLinks, drawnMarkers, operation);
+    $.each(window.links, (guid, link) => {
+        doLinkTest(link, drawnLinks, drawnMarkers, operation);
     });
 };
 
-window.plugin.wasabee.onLinkAdded = function (data) {
+const onLinkAdded = (data) => {
     var operation = window.plugin.wasabee.getSelectedOperation();
     var drawnLinks = operation.links;
     var drawnMarkers = operation.markers;
-    plugin.wasabee.doLinkTest(data.link, drawnLinks, drawnMarkers, operation);
+    doLinkTest(data.link, drawnLinks, drawnMarkers, operation);
 };
 
-window.plugin.wasabee.doLinkTest = function (finalLink, drawnLinks, drawnMarkers, operation) {
-    plugin.wasabee.testLink(drawnLinks, drawnMarkers, finalLink, operation);
+const doLinkTest = (finalLink, drawnLinks, drawnMarkers, operation) => {
+    testLink(drawnLinks, drawnMarkers, finalLink, operation);
 };
 
-window.plugin.wasabee.testForDeletedLinks = function () {
-    window.plugin.wasabee.crossLinkLayers.eachLayer(function (layer) {
+const testForDeletedLinks = () => {
+    window.plugin.wasabee.crossLinkLayers.eachLayer((layer) => {
         var guid = layer.options.guid;
         if (!window.links[guid]) {
             plugin.wasabee.crossLinkLayers.removeLayer(layer);
@@ -296,30 +296,30 @@ window.plugin.wasabee.testForDeletedLinks = function () {
     });
 };
 
-window.plugin.wasabee.onMapDataRefreshEnd = function () {
+const onMapDataRefreshEnd = () => {
     window.plugin.wasabee.crossLinkLayers.bringToFront();
-    window.plugin.wasabee.testForDeletedLinks();
+    testForDeletedLinks();
 };
 
-window.plugin.wasabee.initCrossLinks = function () {
+const initCrossLinks = () => {
     window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
     window.plugin.wasabee.crossLinkLayerGroup = {};
     window.addLayerGroup("Wasabee Cross Links", window.plugin.wasabee.crossLinkLayers, true);
 
-    map.on("layeradd", function (obj) {
+    map.on("layeradd", (obj) => {
         if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-            window.plugin.wasabee.checkAllLinks();
+            checkAllLinks();
         }
     });
-    map.on("layerremove", function (obj) {
+    map.on("layerremove", (obj) => {
         if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
             window.plugin.wasabee.crossLinkLayers.clearLayers();
             window.plugin.wasabee.crossLinkLayerGroup = {};
         }
     });
 
-    window.addHook("linkAdded", window.plugin.wasabee.onLinkAdded);
-    window.addHook("mapDataRefreshEnd", window.plugin.wasabee.onMapDataRefreshEnd);
+    window.addHook("linkAdded", onLinkAdded);
+    window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
 };
 
 //*** END CROSSLINK THINGS */'
