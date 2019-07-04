@@ -64,7 +64,7 @@ Wasabee.UiCommands = {
         }
     },
     deleteMarker : (operation, marker, portal) =>{
-        if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + window.plugin.wasabee.getPopupBodyWithType(portal, marker))) {
+        if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + getPopupBodyWithType(portal, marker))) {
             operation.removeMarker(marker);
         }
     },

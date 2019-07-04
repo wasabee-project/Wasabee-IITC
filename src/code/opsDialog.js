@@ -148,7 +148,7 @@ window.plugin.wasabee.updateOperationInList = (operation, makeSelected = false, 
         Wasabee.OpsDialog.update(Wasabee.opList, false);
         Wasabee.MarkerDialog.update(selectedOp, false, false);
 
-        window.plugin.wasabee.drawThings();
+        drawThings();
     } else { alert("Parse Error -> Saving Op List Failed"); }
 
     if (showExportDialog) { Wasabee.ExportDialog.show(operation); }

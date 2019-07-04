@@ -56,7 +56,7 @@ window.plugin.wasabee.loadExternals = function () {
     window.addLayerGroup("Wasabee Draw Links", window.plugin.wasabee.linkLayerGroup, true);
     window.addLayerGroup("Wasabee Draw Targets", window.plugin.wasabee.targetLayerGroup, true);
     window.plugin.wasabee.initCrossLinks();
-    window.plugin.wasabee.drawThings();
+    drawThings();
     //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
     var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);

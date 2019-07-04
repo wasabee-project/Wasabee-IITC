@@ -1,5 +1,5 @@
 /*** ARC THINGS */
-window.plugin.wasabee.distance = function (fromPortal, toPortal) {
+const distance = (fromPortal, toPortal) => {
     //How far between portals.
     var R = 6367; // km
 
