@@ -9,7 +9,7 @@ const fs = require("fs"),
 	cfg = require("./plugin.config.json"),
 	trimlines = require("gulp-trimlines"),
 	eslint = require("gulp-eslint"),
-	del = require("del"),
+	del = require("del")
 
 function ensureDirectoryExistence(filePath) {
 	var dirname = path.dirname(filePath);
