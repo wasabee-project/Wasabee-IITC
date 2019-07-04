@@ -10,7 +10,6 @@ const fs = require("fs"),
 	trimlines = require("gulp-trimlines"),
 	eslint = require("gulp-eslint"),
 	del = require("del"),
-	sequence = require("gulp-sequence");
 
 function ensureDirectoryExistence(filePath) {
 	var dirname = path.dirname(filePath);
@@ -101,11 +100,11 @@ gulp.task("eslint", function(cb) {
 	cb();
 });
 
-gulp.task("build", function(cb) { sequence("buildheaders", "buildmeta", "buildplugin", "eslint", cb); });
+gulp.task("build", gulp.series(["buildheaders", "buildmeta", "buildplugin", "eslint"]));
 
-gulp.task("build-dev",  sequence("set-mode-dev",  "build", "clear"));
-gulp.task("build-prod", sequence("set-mode-prod", "build", "clear"));
+gulp.task("build-dev",  gulp.series(["set-mode-dev",  "build", "clear"]));
+gulp.task("build-prod", gulp.series(["set-mode-prod", "build", "clear"]));
 
-gulp.task("default", ["build-dev"]);
+gulp.task("default", gulp.series(["build-dev"]));
 
 gulp.task("clean", function() { return del(["releases/*"]); });

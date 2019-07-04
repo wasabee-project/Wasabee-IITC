@@ -5,13 +5,11 @@
   "main": "gulpfile.js",
   "devDependencies": {
     "del": "^3.0.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-eslint": "^4.0.2",
-    "gulp-eslint-auto-fix": "^1.1.0",
     "gulp-inject-file": "0.0.19",
     "gulp-inject-string": "^1.1.1",
     "gulp-rename": "^1.2.3",
-    "gulp-sequence": "^1.0.0",
     "gulp-trimlines": "^1.0.1"
   },
   "scripts": {
@@ -26,5 +24,9 @@
   "bugs": {
     "url": "https://github.com/pcaddict08/Wasabee-IITC/issues"
   },
-  "homepage": "https://github.com/pcaddict08/Wasabee-IITC/blob/master/README.md"
+  "homepage": "https://github.com/pcaddict08/Wasabee-IITC/blob/master/README.md",
+  "dependencies": {
+    "gulp-typescript": "^5.0.1",
+    "typescript": "^3.5.2"
+  }
 }
