@@ -2,7 +2,7 @@
 const drawThings = () => {
     window.plugin.wasabee.resetAllPortals();
     resetAllTargets();
-    addAllLinks();
+    resetAllLinks();
     window.plugin.wasabee.checkAllLinks();
 }
 
@@ -107,7 +107,7 @@ const addAllLinks = () => {
 }
 
 //** This function resets all the Links and calls addAllLinks to add them */
-const addAllLinks = () => {
+const resetAllLinks = () => {
     for (var guid in window.plugin.wasabee.linkLayers) {
         var linkInLayer = window.plugin.wasabee.linkLayers[guid];
         window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
