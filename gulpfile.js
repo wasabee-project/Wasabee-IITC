@@ -9,10 +9,9 @@ const fs = require("fs"),
 	cfg = require("./plugin.config.json"),
 	trimlines = require("gulp-trimlines"),
 	eslint = require("gulp-eslint"),
-	del = require("del"),
-	sequence = require("gulp-sequence");
+	del = require("del")
 
-function ensureDirectoryExistence(filePath) {
+const ensureDirectoryExistence = (filePath) => {
 	var dirname = path.dirname(filePath);
 	if (fs.existsSync(dirname)) {
 		return true;
@@ -28,28 +27,28 @@ var status = {
 };
 
 // status related tasks
-gulp.task("set-mode-dev", function (cb) {
+gulp.task("set-mode-dev", (cb) => {
 	status.mode = "dev";
 	cb();
 });
 
-gulp.task("set-mode-prod", function (cb) {
+gulp.task("set-mode-prod", (cb) => {
 	status.mode = "prod";
 	cb();
 });
 
-gulp.task("clear", function (cb) {
+gulp.task("clear", (cb) => {
 	status.headers = null;
 	status.mode = null;
 	cb();
 });
 
 // build tasks
-gulp.task("buildheaders", function(cb) {
+gulp.task("buildheaders", (cb) => {
 	var content = fs.readFileSync(cfg.src.meta, "utf8"),
 		rmHeaders = cfg.headers[status.mode],
 		commonHeaders = cfg.headers.common;
-	
+
 	// release mode headers
 	for (let k in rmHeaders) {
 		content = content.replace(new RegExp(`(//\\s*@${k}\\s+){{}}`), `$1${rmHeaders[k]}`);
@@ -59,13 +58,13 @@ gulp.task("buildheaders", function(cb) {
 	for (let k in commonHeaders) {
 		content = content.replace(new RegExp(`(//\\s*@${k}\\s+){{}}`), `$1${commonHeaders[k]}`);
 	}
-	
+
 	status.headers = content;
 
 	cb();
 });
 
-gulp.task("buildplugin", function (cb) {
+gulp.task("buildplugin", (cb) => {
 	var destination = cfg.releaseFolder[status.mode];
 
 	gulp.src(cfg.src.plugin)
@@ -76,36 +75,36 @@ gulp.task("buildplugin", function (cb) {
 			pattern: "\\/\\*+\\s*inject:\\s*<filename>\\s*\\*+\\/"
 		}))
 		// trim leading spaces
-		.pipe( trimlines({leading: false}) )
+		.pipe(trimlines({ leading: false }))
 		// rename and save
 		.pipe(rename(cfg.pluginName))
 		.pipe(gulp.dest(destination));
 	cb();
 });
 
-gulp.task("buildmeta", function (cb) {
-	var	path = cfg.releaseFolder[status.mode] + cfg.metaName;
-	
+gulp.task("buildmeta", (cb) => {
+	var path = cfg.releaseFolder[status.mode] + cfg.metaName;
+
 	ensureDirectoryExistence(path);
 	fs.writeFile(path, status.headers, (err) => {
 		cb(err);
-	}); 
+	});
 });
 
 // ESLint
-gulp.task("eslint", function(cb) {
-	gulp.src(["**/*.js","!node_modules/**"])
+gulp.task("eslint", (cb) => {
+	gulp.src(["**/*.js", "!node_modules/**"])
 		.pipe(eslint())
 		.pipe(eslint.format())
 		.pipe(eslint.failAfterError());
 	cb();
 });
 
-gulp.task("build", function(cb) { sequence("buildheaders", "buildmeta", "buildplugin", "eslint", cb); });
+gulp.task("build", gulp.series(["buildheaders", "buildmeta", "buildplugin", "eslint"]));
 
-gulp.task("build-dev",  sequence("set-mode-dev",  "build", "clear"));
-gulp.task("build-prod", sequence("set-mode-prod", "build", "clear"));
+gulp.task("build-dev", gulp.series(["set-mode-dev", "build", "clear"]));
+gulp.task("build-prod", gulp.series(["set-mode-prod", "build", "clear"]));
 
-gulp.task("default", ["build-dev"]);
+gulp.task("default", gulp.series(["build-dev"]));
 
-gulp.task("clean", function() { return del(["releases/*"]); });
+gulp.task("clean", () => del(["releases/*"]));

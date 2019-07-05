@@ -1,39 +1,37 @@
 //** This function draws things on the layers */
-window.plugin.wasabee.drawThings = function () {
+const drawThings = () => {
     window.plugin.wasabee.resetAllPortals();
-    window.plugin.wasabee.resetAllTargets();
-    window.plugin.wasabee.resetAllLinks();
-    window.plugin.wasabee.checkAllLinks();
+    resetAllTargets();
+    resetAllLinks();
+    checkAllLinks();
 }
 
 //** This function adds all the Targets to the layer */
-window.plugin.wasabee.addAllTargets = function () {
+const addAllTargets = () => {
     var targetList = window.plugin.wasabee.getSelectedOperation().markers;
     if (targetList != null) {
-        targetList.forEach(function (target) {
-            window.plugin.wasabee.addTarget(target);
-        });
+        targetList.forEach((target) => addTarget(target));
     }
 }
 
 //** This function resets all the Targets and calls addAllTargets to add them */
-window.plugin.wasabee.resetAllTargets = function () {
+const resetAllTargets = () => {
     for (guid in window.plugin.wasabee.targetLayers) {
         var targetInLayer = window.plugin.wasabee.targetLayers[guid];
         window.plugin.wasabee.targetLayerGroup.removeLayer(targetInLayer);
         delete window.plugin.wasabee.targetLayers[guid];
     }
-    window.plugin.wasabee.addAllTargets();
+    addAllTargets();
 }
 
 /** This function adds a Targets to the target layer group */
-window.plugin.wasabee.addTarget = function (target) {
+const addTarget = (target) => {
     var targetPortal = window.plugin.wasabee.getSelectedOperation().getPortal(target.portalId)
     var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
     var marker = L.marker(latLng, {
         title: targetPortal.name,
         icon: L.icon({
-            iconUrl: window.plugin.wasabee.getImageFromMarkerType(target.type),
+            iconUrl: getImageFromMarkerType(target.type),
             shadowUrl: null,
             iconSize: L.point(25, 41),
             iconAnchor: L.point(25, 41),
@@ -42,31 +40,31 @@ window.plugin.wasabee.addTarget = function (target) {
     });
 
     window.registerMarkerForOMS(marker);
-    marker.bindPopup(window.plugin.wasabee.getMarkerPopup(marker, target, targetPortal));
+    marker.bindPopup(getMarkerPopup(marker, target, targetPortal));
     marker.off("click", marker.togglePopup, marker);
     marker.on("spiderfiedclick", marker.togglePopup, marker);
     window.plugin.wasabee.targetLayers[target["ID"]] = marker;
     marker.addTo(window.plugin.wasabee.targetLayerGroup);
 }
 
-window.plugin.wasabee.getMarkerPopup = function (marker, target, portal) {
+const getMarkerPopup = (marker, target, portal) => {
     marker.className = "wasabee-dialog wasabee-dialog-ops"
     var content = document.createElement("div");
     var title = content.appendChild(document.createElement("div"));
     title.className = "desc";
-    title.innerHTML = window.markdown.toHTML(window.plugin.wasabee.getPopupBodyWithType(portal, target));
+    title.innerHTML = window.markdown.toHTML(getPopupBodyWithType(portal, target));
     buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     var deleteButton = buttonSet.appendChild(document.createElement("a"));
     deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", function () {
+    deleteButton.addEventListener("click", () => {
         Wasabee.UiCommands.deleteMarker(window.plugin.wasabee.getSelectedOperation(), target, portal)
         marker.closePopup();
     }, false);
     return content;
 }
 
-window.plugin.wasabee.getPopupBodyWithType = function (portal, target) {
+const getPopupBodyWithType = (portal, target) => {
     var title = ""
     var comment = target.comment;
     switch (target.type) {
@@ -83,14 +81,12 @@ window.plugin.wasabee.getPopupBodyWithType = function (portal, target) {
             title = "Unknown";
     }
     title = title + " - " + portal.name;
-    if (!comment)
-        {return title;}
-    else
-        {return title + "\n\n" + comment;}
+    if (!comment) { return title; }
+    else { return title + "\n\n" + comment; }
 }
 
 //** This function returns the appropriate image for a marker type */
-window.plugin.wasabee.getImageFromMarkerType = function (type) {
+const getImageFromMarkerType = (type) => {
     switch (type) {
         case Wasabee.Constants.MARKER_TYPE_VIRUS:
             return Wasabee.Images.marker_alert_virus;
@@ -104,26 +100,24 @@ window.plugin.wasabee.getImageFromMarkerType = function (type) {
 }
 
 //** This function adds all the Links to the layer */
-window.plugin.wasabee.addAllLinks = function () {
+const addAllLinks = () => {
     var operation = window.plugin.wasabee.getSelectedOperation()
     var linkList = operation.links;
-    linkList.forEach(function (link) {
-        window.plugin.wasabee.addLink(link, operation.color, operation);
-    });
+    linkList.forEach((link) => addLink(link, operation.color, operation));
 }
 
 //** This function resets all the Links and calls addAllLinks to add them */
-window.plugin.wasabee.resetAllLinks = function () {
+const resetAllLinks = () => {
     for (var guid in window.plugin.wasabee.linkLayers) {
         var linkInLayer = window.plugin.wasabee.linkLayers[guid];
         window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
         delete window.plugin.wasabee.linkLayers[guid];
     }
-    window.plugin.wasabee.addAllLinks();
+    addAllLinks();
 }
 
 /** This function adds a portal to the portal layer group */
-window.plugin.wasabee.addLink = function (link, color, operation) {
+const addLink = (link, color, operation) => {
     var color = window.plugin.wasabee.getColorHex(color)
     var options = {
         dashArray: [5, 5, 1, 5],
@@ -138,13 +132,11 @@ window.plugin.wasabee.addLink = function (link, color, operation) {
         var startCoord = new window.plugin.wasabee.arc.Coord(latLngs[0].lng, latLngs[0].lat);
         var endCoord = new window.plugin.wasabee.arc.Coord(latLngs[1].lng, latLngs[1].lat);
         var gc = new window.plugin.wasabee.arc.GreatCircle(startCoord, endCoord);
-        var distance = window.plugin.wasabee.distance(fromPortal, toPortal);
-        var geojson_feature = gc.Arc(Math.round(distance)).json();
+        var geojson_feature = gc.Arc(Math.round(distance(fromPortal, toPortal))).json();
 
         var link_ = new L.geoJson(geojson_feature, options);
 
         window.plugin.wasabee.linkLayers[link["ID"]] = link_;
         link_.addTo(window.plugin.wasabee.linkLayerGroup);
-    } else
-        {console.log("LATLNGS WAS NULL?!")}
+    } else { console.log("LATLNGS WAS NULL?!") }
 }
