@@ -70,10 +70,8 @@ Wasabee.ExportDialog = class {
                 return page.focus(), page;
             }
         }
-        if (show)
-            {return new Wasabee.ExportDialog(operation);}
-        else
-            {return;}
+        if (show) { return new Wasabee.ExportDialog(operation); }
+        else { return; }
     }
 };
 Wasabee.ExportDialog._dialogs = [];

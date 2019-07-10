@@ -2,5 +2,6 @@
 *	CSS Code to be injected
 */
 .example {
-	display: inline-block;
+  display: inline-block;
+  background-image: url(../images/toolbar_addlinks.png)
 }

@@ -117,12 +117,13 @@ window.plugin.wasabee.opIsOwnedServerOp = (opID) => {
     var isOwnedServerOp = false;
     try {
         var serverOwnedOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
-        if (serverOwnedOpList != null)
-            {for (let opInList in serverOwnedOpList) {
+        if (serverOwnedOpList != null) {
+            for (let opInList in serverOwnedOpList) {
                 if (serverOwnedOpList[opInList].ID == opID) {
                     isOwnedServerOp = true;
                 }
-            }}
+            }
+        }
     } catch (e) {
         console.log("No Server ops or some other exception")
     }
@@ -133,12 +134,13 @@ window.plugin.wasabee.opIsServerOp = (opID) => {
     var isServerOp = false;
     try {
         var serverOpList = JSON.parse(JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))) //Gotta do 2 json.parses b/c javascript is dumb?
-        if (serverOpList != null)
-            {for (let opInList in serverOpList) {
+        if (serverOpList != null) {
+            for (let opInList in serverOpList) {
                 if (serverOpList[opInList].ID == opID) {
                     isServerOp = true;
                 }
-            }}
+            }
+        }
     } catch (e) {
         console.log("No Server ops or some other exception")
     }

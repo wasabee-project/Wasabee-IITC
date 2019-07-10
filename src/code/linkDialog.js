@@ -146,16 +146,17 @@ Wasabee.LinkDialog = class {
         if (source.id == linkTo.id) {
             return void alert("Target and destination portals must be different.");
         }
-        else
-            {Promise.all([
+        else {
+            Promise.all([
                 item.addPortal(source),
                 item.addPortal(linkTo),
                 isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)
             ])
-                .then(() => operation.update())
-                .catch((data) => {
-                    throw alert(data.message), console.log(data), data;
-                });}
+            .then(() => operation.update())
+            .catch((data) => {
+                throw alert(data.message), console.log(data), data;
+            });
+        }
         //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
     }
     addAllLinks(operation) {
@@ -212,10 +213,8 @@ Wasabee.LinkDialog = class {
                 return page._dialog.dialog("close");
             }
         }
-        if (show)
-            {return new Wasabee.LinkDialog(operation);}
-        else
-            {return;}
+        if (show) { return new Wasabee.LinkDialog(operation); }
+        else { return; }
     }
     static closeDialogs() {
         var parameters = Wasabee.LinkDialog._dialogs;

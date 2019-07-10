@@ -104,10 +104,8 @@ Wasabee.MarkerDialog = class {
                 }
             }
         }
-        if (show)
-            {return new Wasabee.MarkerDialog(operation);}
-        else
-            {return;}
+        if (show) { return new Wasabee.MarkerDialog(operation); }
+        else { return; }
     }
     static closeDialogs() {
         var parameters = Wasabee.MarkerDialog._dialogs;

@@ -1,24 +1,24 @@
 Wasabee.setup = {};
 
-Wasabee.setup.run = function() {
-	this.css();
-	// this.leafletLayer();
+Wasabee.setup.run = function () {
+    this.css();
+    // this.leafletLayer();
 
-	// Examplebutton
-	Wasabee.gui.exampleButton.insert();
+    // Examplebutton
+    Wasabee.gui.exampleButton.insert();
 
-	// Module setup
-	// Wasabee.module.setup();
+    // Module setup
+    // Wasabee.module.setup();
 
-	// Other possible setup calls
-	// Wasabee.storage.load();
+    // Other possible setup calls
+    // Wasabee.storage.load();
 };
 
-Wasabee.setup.css = function() {
-	$("<style>")
-		.prop("type", "text/css")
-		.html(Wasabee.static.css)
-		.appendTo("head");
+Wasabee.setup.css = function () {
+    $("<style>")
+        .prop("type", "text/css")
+        .html(Wasabee.static.css)
+        .appendTo("head");
 };
 
 /*
@@ -31,8 +31,8 @@ Wasabee.setup.leafletLayer = function() {
 */
 
 // wrapper to follow the "standard" way of doing iitc plugins
-var setup = function() {
-	Wasabee.setup.run();
+var setup = function () {
+    Wasabee.setup.run();
 };
 
 
