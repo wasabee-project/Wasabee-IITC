@@ -3,7 +3,11 @@
         exampleButton: require("./html/exampleButton.html"),
         exampleDialog: require("./html/exampleDialog.html"),
     },
-    css: require("./css/styles.css"),
+    CSS: {
+        example: require("./css/styles.css"),
+        ui: require("./css/ui.css"),
+        main: require("./css/main.css")
+    },
     images: {
         toolbar_addlinks: require("./images/toolbar_addlinks.png"),
         toolbar_viewOps: require("./images/toolbar_viewOps.png"),
@@ -32,5 +36,3 @@
     }
     // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };
-
-

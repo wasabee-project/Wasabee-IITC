@@ -52,7 +52,7 @@ window.plugin.wasabee.showMustAuthAlert = () => {
 };
 
 window.plugin.wasabee.addCSS = (content) => {
-    $("head").append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + content + "\" />");
+    $("head").append("<style type=\"text/css\">\n" + content + "\n</style>");
 };
 
 //*** This function iterates through the opList and returns the selected one.
@@ -172,8 +172,8 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
 };
 
 
-!function (scope) {
-    var opsDialogFunc = function () {
+! function(scope) {
+    var opsDialogFunc = function() {
         function init(operationList) {
             this._operationList = operationList;
             init._dialogs.push(this);
@@ -187,7 +187,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
                 height: "auto",
                 html: this.container,
                 dialogClass: "wasabee-dialog wasabee-dialog-ops",
-                closeCallback: function (popoverName) {
+                closeCallback: function(popoverName) {
                     var paneIndex = init._dialogs.indexOf(self);
                     if (-1 !== paneIndex) {
                         init._dialogs.splice(paneIndex, 1);
@@ -195,7 +195,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
                 }
             });
         }
-        return init.update = function (operationList, show = true, close = false) {
+        return init.update = function(operationList, show = true, close = false) {
             var parameters = init._dialogs;
             if (parameters.length != 0) {
                 show = false;
@@ -209,15 +209,14 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
                     return page.focus(), page;
                 }
             }
-            if (show) { return new init(operationList); }
-            else { return; }
-        }, init.closeDialogs = function () {
+            if (show) { return new init(operationList); } else { return; }
+        }, init.closeDialogs = function() {
             var parameters = init._dialogs;
             for (p = 0; p < parameters.length; p++) {
                 var page = parameters[p];
                 page._dialog.dialog("close");
             }
-        }, init.prototype.setupSpinner = function () {
+        }, init.prototype.setupSpinner = function() {
             var self = this;
             this.container.innerHTML = "";
             $(this.container).css({
@@ -227,14 +226,14 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             $(operationSelect).css({
                 "width": "50%"
             });
-            this._operationList.forEach(function (op) {
+            this._operationList.forEach(function(op) {
                 $(operationSelect).append($("<option>").prop({
                     value: op.ID,
                     text: op.name
                 }));
             });
             $(operationSelect).val(window.plugin.wasabee.getSelectedOperation().ID);
-            $(operationSelect).change(function () {
+            $(operationSelect).change(function() {
                 self.updateContentPane(window.plugin.wasabee.getOperationById($(this).val()), self._operationList.length);
             });
             this.container.appendChild(operationSelect);
@@ -245,7 +244,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             this._opContent.id = "a";
             $(operationSelect).change();
 
-        }, init.prototype.updateContentPane = function (operation, opListSize) {
+        }, init.prototype.updateContentPane = function(operation, opListSize) {
             var tabContent = this._opContent;
             tabContent.innerHTML = "";
             var nameSection = tabContent.appendChild(document.createElement("p"));
@@ -260,14 +259,14 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             var operationColor = Wasabee.Constants.DEFAULT_OPERATION_COLOR;
             if (operation.color != null) { operationColor = operation.color; }
             var opColor = colorSection.appendChild(document.createElement("select"));
-            scope.layerTypes.forEach(function (a) {
+            scope.layerTypes.forEach(function(a) {
                 var option = document.createElement("option");
                 if (a.name == operationColor) { option.setAttribute("selected", true); }
                 option.setAttribute("value", a.name);
                 option.innerHTML = a.displayName;
                 opColor.append(option);
             });
-            $(opColor).change(function () {
+            $(opColor).change(function() {
                 Operation.create(operation).colorSelected($(opColor).val(), input.value, commentInput.value);
             });
 
@@ -294,7 +293,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             */
             var saveButton = buttonSection.appendChild(document.createElement("a"));
             saveButton.innerHTML = "Save Operation Name";
-            saveButton.addEventListener("click", function (arg) {
+            saveButton.addEventListener("click", function(arg) {
                 if (input.value == null || input.value == "") {
                     alert("That is an invalid operation name");
                 } else {
@@ -306,7 +305,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             if (commentInputEnabled) {
                 var saveCommentButton = buttonSection.appendChild(document.createElement("a"));
                 saveCommentButton.innerHTML = "Save Operation Comment";
-                saveCommentButton.addEventListener("click", function (arg) {
+                saveCommentButton.addEventListener("click", function(arg) {
                     if (commentInput.value == null || commentInput.value == "") {
                         alert("That is an invalid operation comment");
                     } else {
@@ -319,7 +318,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             if (!operation.isSelected) {
                 var selectedButton = buttonSection.appendChild(document.createElement("a"));
                 selectedButton.innerHTML = "Set Selected";
-                selectedButton.addEventListener("click", function (arg) {
+                selectedButton.addEventListener("click", function(arg) {
                     var confirmed = confirm("Are you sure you want to select this operation?");
                     if (confirmed) {
                         window.plugin.wasabee.updateOperationInList(Operation.create(operation), true);
@@ -328,13 +327,13 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             }
             var exportButton = buttonSection.appendChild(document.createElement("a"));
             exportButton.innerHTML = "Export";
-            exportButton.addEventListener("click", function () {
+            exportButton.addEventListener("click", function() {
                 Wasabee.OpsDialog.update([], false, true);
                 Wasabee.ExportDialog.show(operation);
             }, false);
             var clearOpButton = buttonSection.appendChild(document.createElement("a"));
             clearOpButton.innerHTML = "Clear Portals/Links/Markers";
-            clearOpButton.addEventListener("click", function (arg) {
+            clearOpButton.addEventListener("click", function(arg) {
                 var confirmClear = confirm("Are you sure you want to clear all portals, links, and markers from this operation?");
                 if (confirmClear == true) {
                     Operation.create(operation).clearAllItems();
@@ -344,7 +343,7 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
             var deleteButton = buttonSection.appendChild(document.createElement("a"));
             deleteButton.innerHTML = "Delete";
             deleteButton.disabled = opListSize == 0;
-            deleteButton.addEventListener("click", function (arg) {
+            deleteButton.addEventListener("click", function(arg) {
                 var confirmed = confirm("Are you sure you want to *DELETE* this operation?");
                 if (confirmed == true) {
                     if (window.plugin.wasabee.opIsOwnedServerOp(operation.ID)) {
@@ -357,10 +356,9 @@ window.plugin.wasabee.removeOperationFromList = (operation) => {
                     window.plugin.wasabee.removeOperationFromList(Operation.create(operation));
                 }
             }, false);
-        }, init.prototype.saveOperation = function (operation) {
-        }, init.updateOperation = function (operationList) {
+        }, init.prototype.saveOperation = function(operation) {}, init.updateOperation = function(operationList) {
             this._operationList = operationList;
-        }, init.prototype.focus = function () {
+        }, init.prototype.focus = function() {
             this._dialog.dialog("open");
         }, init._dialogs = [], init;
     }();

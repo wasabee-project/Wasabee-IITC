@@ -1,5 +1,3 @@
-
-
 function wrapper(plugin_info) {
     /* inject: ./wrapper/pluginStart.js				*/
 
@@ -24,7 +22,7 @@ function wrapper(plugin_info) {
     /* inject: ./code/opsDialog.js                     */
     /* inject: ./code/paste.js                     */
     /* inject: ./code/leftBar.js                     */
-    /* inject: ./code/mapDrawing.js                     */
+    /* inject: ../dist/mapDrawing-bundle.js                     */
     /* inject: ./code/server.js                     */
 
     /* inject: ./code/wasabee.js                     */

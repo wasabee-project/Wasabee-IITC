@@ -3,9 +3,9 @@
 const fs = require("fs"),
     path = require("path"),
     gulp = require("gulp"),
-    injectfile = require("gulp-inject-file"),	// https://www.npmjs.com/package/gulp-inject-file
-    rename = require("gulp-rename"), 			// https://www.npmjs.com/package/gulp-rename
-    contents = require("gulp-inject-string"),	// https://www.npmjs.com/package/gulp-inject-string
+    injectfile = require("gulp-inject-file"), // https://www.npmjs.com/package/gulp-inject-file
+    rename = require("gulp-rename"), // https://www.npmjs.com/package/gulp-rename
+    contents = require("gulp-inject-string"), // https://www.npmjs.com/package/gulp-inject-string
     cfg = require("./plugin.config.json"),
     trimlines = require("gulp-trimlines"),
     eslint = require("gulp-eslint"),
@@ -68,13 +68,19 @@ gulp.task("buildheaders", (cb) => {
 });
 
 gulp.task("webpack", (callback) => {
-    webpack(require("./webpack.config.js")(), function (err, stats) {
-        if (err) {
-            throw new PluginError("webpack", err);
-        }
+    var webpackConfig = require("./webpack.config.js");
+    if (status.mode === "dev") {
+        webpackConfig.mode = "development";
+    }
+    webpack(webpackConfig, function(err, stats) {
         log("[webpack]", stats.toString({
             // output options
         }));
+
+        if (err) {
+            throw new PluginError("webpack", err);
+        }
+
         callback();
     });
 });
@@ -108,7 +114,7 @@ gulp.task("buildmeta", (cb) => {
 
 // ESLint
 gulp.task("eslint", (cb) => {
-    gulp.src(["**/*.js", "!node_modules/**", "!dist/**", "!releases/**"])
+    gulp.src(["**/*.js", "!node_modules/**", "!dist/**", "!releases/**", "!src/lib/**"])
         .pipe(eslint({ "parserOptions": { "ecmaVersion": 6, "sourceType": "module" } }))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
