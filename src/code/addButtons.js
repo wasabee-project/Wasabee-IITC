@@ -1,6 +1,7 @@
 import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
 import { OpsDialog } from "./opsDialog";
+import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
 

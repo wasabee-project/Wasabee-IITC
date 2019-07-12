@@ -5,7 +5,7 @@ module.exports = {
     mode: "production",
     entry: {
         static: "./src/code/static.js",
-        mapDrawing: "./src/code/mapDrawing.js"
+        init: "./src/code/init.js"
     },
     output: {
         path: outputPath,

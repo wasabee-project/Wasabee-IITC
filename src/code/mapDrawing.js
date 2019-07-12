@@ -1,6 +1,7 @@
-import markdown from "markdown";
+var markdown = require( "markdown" ).markdown;
 import UiCommands from "./uiCommands.js";
 import {getColorHex} from "./markerDialog";
+import {checkAllLinks} from "./crosslinks";
 import distance from "./arc";
 
 var Wasabee = window.plugin.Wasabee;
@@ -60,7 +61,7 @@ const getMarkerPopup = (marker, target, portal) => {
     var title = content.appendChild(document.createElement("div"));
     title.className = "desc";
     title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
-    buttonSet = content.appendChild(document.createElement("div"));
+    var buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     var deleteButton = buttonSet.appendChild(document.createElement("a"));
     deleteButton.textContent = "Delete";

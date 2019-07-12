@@ -1,6 +1,5 @@
 //This methos helps with commonly used UI data getting functions
-
-export default UiHelper = {
+const UiHelper = {
     getPortal: function(id) {
         if (window.portals[id] && window.portals[id].options.data.title) {
             var data = window.portals[id].options.data;
@@ -13,12 +12,12 @@ export default UiHelper = {
         }
         return null;
     },
-    getSelectedPortal: () => window.selectedPortal ? self.UiHelper.getPortal(window.selectedPortal) : null,
+    getSelectedPortal: () => window.selectedPortal ? UiHelper.getPortal(window.selectedPortal) : null,
     toLatLng: (data, angle) => {
         return void 0 === angle && "object" == typeof data && (angle = data.lng, data = data.lat), L.latLng(parseFloat(data), parseFloat(angle));
     },
     getPortalLink: function(data) {
-        var pt = self.UiHelper.toLatLng(data);
+        var pt = UiHelper.toLatLng(data);
         var v = data.lat + "," + data.lng;
         var e = document.createElement("a");
         return e.appendChild(document.createTextNode(data.name)), e.title = data.name, e.href = "/intel?ll=" + v + "&pll=" + v, e.addEventListener("click", (event) => {
@@ -28,3 +27,5 @@ export default UiHelper = {
         }, false), e;
     }
 };
+
+export default UiHelper;

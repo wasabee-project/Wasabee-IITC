@@ -1,5 +1,7 @@
 import UiHelper from "./uiHelper.js";
 import { getPopupBodyWithType } from "./mapDrawing";
+import Operation from "./operation";
+import LinkListDialog from "./linkListDialog";
 
 //This methos helps with commonly used UI data getting functions
 export default {
@@ -41,6 +43,6 @@ export default {
         }
     },
     showLinksDialog: (operation, portal) => {
-        Wasabee.LinkListDialog.update(operation, portal, true);
+        LinkListDialog.update(operation, portal, true);
     }
 };

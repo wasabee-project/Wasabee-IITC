@@ -10,7 +10,7 @@ export default function () {
         this._body = this._table.appendChild(document.createElement("tbody"));
         this.renderHead();
     }
-    return Object.defineProperty(set.prototype, "sortBy", {
+    return window.Object.defineProperty(set.prototype, "sortBy", {
         get: function () {
             return this._sortBy;
         },
@@ -20,7 +20,7 @@ export default function () {
         },
         enumerable: true,
         configurable: true
-    }), Object.defineProperty(set.prototype, "sortAsc", {
+    }), window.Object.defineProperty(set.prototype, "sortAsc", {
         get: function () {
             return this._sortAsc;
         },
@@ -30,13 +30,13 @@ export default function () {
         },
         enumerable: true,
         configurable: true
-    }), Object.defineProperty(set.prototype, "table", {
+    }), window.Object.defineProperty(set.prototype, "table", {
         get: function () {
             return this._table;
         },
         enumerable: true,
         configurable: true
-    }), Object.defineProperty(set.prototype, "items", {
+    }), window.Object.defineProperty(set.prototype, "items", {
         get: function () {
             return this._items.map(function (focusTable) {
                 return focusTable.obj;
@@ -69,7 +69,7 @@ export default function () {
         },
         enumerable: true,
         configurable: true
-    }), Object.defineProperty(set.prototype, "fields", {
+    }), window.Object.defineProperty(set.prototype, "fields", {
         get: function () {
             return this._fields;
         },

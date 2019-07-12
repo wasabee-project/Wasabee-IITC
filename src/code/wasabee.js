@@ -1,7 +1,9 @@
-import store from "store";
-import markdown from "markdown";
+import store from "../lib/store";
+var markdown = require( "markdown" ).markdown;
 import UiCommands from "./uiCommands.js";
-import { getColorHex } from "./markerDialog";
+import Operation from "./operation";
+import { getColorMarker } from "./markerDialog";
+
 
 var Wasabee = window.plugin.Wasabee;
 export default function () {
@@ -27,11 +29,11 @@ export default function () {
         }
         window.plugin.wasabee.addAllPortals();
     };
-    
+
     /** This function adds a portal to the portal layer group */
     window.plugin.wasabee.addPortal = function (portalId, color) {
         var portal = window.plugin.wasabee.getSelectedOperation().getPortal([portalId]);
-        var colorMarker = window.plugin.wasabee.getColorMarker(color);
+        var colorMarker = getColorMarker(color);
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal.name,
@@ -58,7 +60,7 @@ export default function () {
         var title = content.appendChild(document.createElement("div"));
         title.className = "desc";
         title.innerHTML = markdown.toHTML(portal.name);
-        buttonSet = content.appendChild(document.createElement("div"));
+        var buttonSet = content.appendChild(document.createElement("div"));
         buttonSet.className = "temp-op-dialog";
         var linksButton = buttonSet.appendChild(document.createElement("a"));
         linksButton.textContent = "Links";

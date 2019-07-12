@@ -1,4 +1,5 @@
 import store from "store";
+import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
 

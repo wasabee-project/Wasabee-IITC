@@ -1,9 +1,10 @@
-import markdown from "markdown";
+var markdown = require( "markdown" ).markdown;
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
-import OverflowMenu from "./overflowMenu";
+import LinkDialog from "./linkDialog";
 
 var _dialogs = [];
+var Wasabee = window.plugin.Wasabee;
 
 export default class  LinkListDialog {
     constructor(operation, portal) {
@@ -142,7 +143,7 @@ export default class  LinkListDialog {
     }
     makeMenu(list, data) {
         var $Wasabee = this;
-        var state = new OverflowMenu;
+        var state = new Wasabee.OverflowMenu;
         state.items = [
             {
                 label: "Reverse",

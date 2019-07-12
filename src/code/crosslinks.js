@@ -21,10 +21,10 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
 
     //fuck this object scope
 
-    a0 = {};
-    a1 = {};
-    b0 = {};
-    b1 = {};
+    var a0 = {};
+    var a1 = {};
+    var b0 = {};
+    var b1 = {};
     a0.lng = ta0.lng;
     a0.lat = ta0.lat;
     a1.lng = ta1.lng;
@@ -267,7 +267,7 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
 
 export const checkAllLinks = () => {
     window.plugin.wasabee.crossLinkLayers.clearLayers();
-    plugin.wasabee.crossLinkLayerGroup = {};
+    window.plugin.wasabee.crossLinkLayerGroup = {};
 
     var operation = window.plugin.wasabee.getSelectedOperation();
     var drawnLinks = operation.links;
@@ -294,7 +294,7 @@ const testForDeletedLinks = () => {
         var guid = layer.options.guid;
         if (!window.links[guid]) {
             plugin.wasabee.crossLinkLayers.removeLayer(layer);
-            delete plugin.wasabee.crossLinkLayerGroup[guid];
+            delete window.plugin.wasabee.crossLinkLayerGroup[guid];
         }
     });
 };
