@@ -1,5 +1,5 @@
 /*** ARC THINGS */
-const distance = (fromPortal, toPortal) => {
+export default distance = (fromPortal, toPortal) => {
     //How far between portals.
     var R = 6367; // km
 
