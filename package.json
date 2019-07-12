@@ -1,32 +1,40 @@
 {
-  "name": "wasabee-iitc",
-  "version": "1.0.0",
-  "description": "IITC Plugin for Wasabee Project",
-  "main": "gulpfile.js",
-  "devDependencies": {
-    "del": "^3.0.0",
-    "gulp": "^4.0.0",
-    "gulp-eslint": "^4.0.2",
-    "gulp-inject-file": "0.0.19",
-    "gulp-inject-string": "^1.1.1",
-    "gulp-rename": "^1.2.3",
-    "gulp-trimlines": "^1.0.1"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pcaddict08/Wasabee-IITC.git"
-  },
-  "author": "Wasabee Project",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/pcaddict08/Wasabee-IITC/issues"
-  },
-  "homepage": "https://github.com/pcaddict08/Wasabee-IITC/blob/master/README.md",
-  "dependencies": {
-    "gulp-typescript": "^5.0.1",
-    "typescript": "^3.5.2"
-  }
+    "name": "wasabee-iitc",
+    "version": "1.0.0",
+    "description": "IITC Plugin for Wasabee Project",
+    "main": "gulpfile.js",
+    "devDependencies": {
+        "css-loader": "^3.0.0",
+        "del": "^3.0.0",
+        "gulp": "^4.0.0",
+        "gulp-eslint": "^4.0.2",
+        "gulp-inject-file": "0.0.19",
+        "gulp-inject-string": "^1.1.1",
+        "gulp-rename": "^1.2.3",
+        "gulp-trimlines": "^1.0.1",
+        "html-loader": "^0.5.5",
+        "to-string-loader": "^1.1.5",
+        "url-loader": "^2.0.1",
+        "webpack": "^4.35.3",
+        "webpack-cli": "^3.3.5"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pcaddict08/Wasabee-IITC.git"
+    },
+    "author": "Wasabee Project",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/pcaddict08/Wasabee-IITC/issues"
+    },
+    "homepage": "https://github.com/pcaddict08/Wasabee-IITC/blob/master/README.md",
+    "dependencies": {
+        "fancy-log": "^1.3.3",
+        "gulp-typescript": "^5.0.1",
+        "plugin-error": "^1.0.1",
+        "typescript": "^3.5.2"
+    }
 }

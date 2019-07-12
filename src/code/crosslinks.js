@@ -254,9 +254,9 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
     if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) { return; }
     try {
         drawnLinks.forEach((drawnLink) => {
-            var shouldShowCrosslink =testPolyLine(drawnLink, link, drawnMarkers, operation);
+            var shouldShowCrosslink = testPolyLine(drawnLink, link, drawnMarkers, operation);
             if (shouldShowCrosslink) {
-               showCrossLink(link, operation);
+                showCrossLink(link, operation);
                 throw Wasabee.Constants.BREAK_EXCEPTION;
             }
         });

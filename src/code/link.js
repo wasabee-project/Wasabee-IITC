@@ -29,8 +29,7 @@ export default class Link {
             returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
             returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
             return returnArray;
-        } else
-            {return null;}
+        } else { return null; }
     }
 
     static create(obj, operation) {

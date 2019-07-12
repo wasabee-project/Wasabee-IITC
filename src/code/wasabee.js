@@ -27,16 +27,16 @@ export default function () {
         }
         window.plugin.wasabee.addAllPortals();
     };
-
+    
     /** This function adds a portal to the portal layer group */
     window.plugin.wasabee.addPortal = function (portalId, color) {
         var portal = window.plugin.wasabee.getSelectedOperation().getPortal([portalId]);
-        var colorMarker = getColorMarker(color);
+        var colorMarker = window.plugin.wasabee.getColorMarker(color);
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {
             title: portal.name,
             icon: L.icon({
-                iconUrl: colorMarker ? colorMarker : Wasabee.Images.marker_layer_groupa,
+                iconUrl: colorMarker ? colorMarker : Wasabee.static.images.marker_layer_groupa,
                 iconAnchor: [12, 41],
                 iconSize: [25, 41],
                 popupAnchor: [0, -35]

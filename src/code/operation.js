@@ -25,8 +25,7 @@ export default class Operation {
     }
 
     getColor() {
-        if (this.color == null) { return Wasabee.Constants.DEFAULT_OPERATION_COLOR; }
-        else {
+        if (this.color == null) { return Wasabee.Constants.DEFAULT_OPERATION_COLOR; } else {
             return this.color;
         }
     }
@@ -46,8 +45,7 @@ export default class Operation {
 
     containsPortal(portal) {
         if (portal) {
-            if (this.opportals.length == 0) { return false; }
-            else {
+            if (this.opportals.length == 0) { return false; } else {
                 for (let portal_ in this.opportals) {
                     if (portal_ && portal.id == portal_.id) {
                         return true;
@@ -59,8 +57,7 @@ export default class Operation {
     }
 
     containsLink(link) {
-        if (this.links.length == 0) { return false; }
-        else {
+        if (this.links.length == 0) { return false; } else {
             for (let link_ in this.links) {
                 //THIS TESTS IF ITS THE SAME LINK
                 if ((this.links[link_].fromPortalId == link.fromPortalId && this.links[link_].toPortalId == link.toPortalId) ||
@@ -73,8 +70,7 @@ export default class Operation {
     }
 
     containsMarker(portal, markerType) {
-        if (this.markers.length == 0) { return false; }
-        else {
+        if (this.markers.length == 0) { return false; } else {
             for (let marker in this.markers) {
                 if (this.markers[marker].portalId == portal.id && this.markers[marker].type == markerType) {
                     return true;
@@ -85,7 +81,7 @@ export default class Operation {
     }
 
     getLinkListFromPortal(portal) {
-        var links = this.links.filter(function (listLink) {
+        var links = this.links.filter(function(listLink) {
             return listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id;
         });
         return links;
@@ -101,10 +97,10 @@ export default class Operation {
     }
 
     removeAnchor(portalId) {
-        this.anchors = this.anchors.filter(function (anchor) {
+        this.anchors = this.anchors.filter(function(anchor) {
             return anchor !== portalId;
         });
-        this.links = this.links.filter(function (listLink) {
+        this.links = this.links.filter(function(listLink) {
             return listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId;
         });
         this.cleanPortalList()
@@ -112,7 +108,7 @@ export default class Operation {
     }
 
     removeMarker(marker) {
-        this.markers = this.markers.filter(function (listMarker) {
+        this.markers = this.markers.filter(function(listMarker) {
             return listMarker.ID !== marker.ID;
         });
         this.update();
@@ -223,8 +219,7 @@ export default class Operation {
     }
 
     containsAnchor(portalId) {
-        if (this.anchors.length == 0) { return false; }
-        else {
+        if (this.anchors.length == 0) { return false; } else {
             for (let anchor_ in this.anchors) {
                 if (this.anchors[anchor_] == portalId) {
                     return true;
@@ -243,7 +238,7 @@ export default class Operation {
     }
 
     swapPortal(originalPortal, newPortal) {
-        this.anchors = this.anchors.filter(function (listAnchor) {
+        this.anchors = this.anchors.filter(function(listAnchor) {
             return listAnchor !== originalPortal.id;
         });
         this.addAnchor(newPortal)
@@ -294,14 +289,25 @@ export default class Operation {
         return tempLinks;
     }
 
+    _ensureCollections() {
+        if (!this.markers) { this.markers = Array(); }
+        if (!this.opportals) { this.opportals = Array(); }
+        if (!this.links) { this.links = Array(); }
+        if (!this.anchors) { this.anchors = Array(); }
+    }
+
     static create(obj) {
         var operation = new Operation();
         for (var prop in obj) {
             if (operation.hasOwnProperty(prop)) {
-                if (prop == "links") { operation[prop] = Operation.convertLinksToObjs(obj[prop]); }
-                else { operation[prop] = obj[prop]; }
+                if (prop == "links") {
+                    operation[prop] = Operation.convertLinksToObjs(obj[prop]);
+                } else {
+                    operation[prop] = obj[prop];
+                }
             }
         }
+        operation._ensureCollections();
         return operation;
     }
 }

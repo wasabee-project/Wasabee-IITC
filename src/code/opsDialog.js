@@ -59,7 +59,7 @@ window.plugin.wasabee.showMustAuthAlert = () => {
 };
 
 window.plugin.wasabee.addCSS = (content) => {
-    $("head").append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + content + "\" />");
+    $("head").append("<style type=\"text/css\">\n" + content + "\n</style>");
 };
 
 //*** This function iterates through the opList and returns the selected one.
