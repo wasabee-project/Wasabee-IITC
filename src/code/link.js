@@ -1,4 +1,6 @@
-class Link {
+import Operation from "./operation";
+
+export default class Link {
     //ID <- randomly generated alpha-numeric ID for the link
     //fromPortal <- portal the link is from
     //toPortal <- portal the link is to

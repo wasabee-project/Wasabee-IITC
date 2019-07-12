@@ -1,4 +1,9 @@
-Wasabee.LinkDialog = class {
+import UiCommands from "./uiCommands.js";
+import UiHelper from "./uiHelper.js";
+
+var _dialogs = [];
+
+export default  class LinkDialog {
     constructor(op) {
         var self = this;
         self.clearLocalPortalSelections();
@@ -6,7 +11,7 @@ Wasabee.LinkDialog = class {
         this._portals = {};
         this._links = [];
         this._operation = op;
-        Wasabee.LinkDialog._dialogs.push(this);
+        _dialogs.push(this);
         var container = document.createElement("div");
         this._desc = container.appendChild(document.createElement("textarea"));
         this._desc.placeholder = "Description (optional)";
@@ -74,9 +79,9 @@ Wasabee.LinkDialog = class {
             dialogClass: "wasabee-dialog wasabee-dialog-links",
             closeCallback: () => {
                 self._broadcast.removeEventListener("message", sendMessage, false);
-                var paneIndex = Wasabee.LinkDialog._dialogs.indexOf(self);
+                var paneIndex = _dialogs.indexOf(self);
                 if (-1 !== paneIndex) {
-                    Wasabee.LinkDialog._dialogs.splice(paneIndex, 1);
+                    _dialogs.splice(paneIndex, 1);
                 }
                 self.clearLocalPortalSelections();
             }
@@ -101,7 +106,7 @@ Wasabee.LinkDialog = class {
     }
     setPortal(event) {
         var updateID = event.currentTarget.parentNode.parentNode.getAttribute("data-portal");
-        var selectedPortal = Wasabee.UiHelper.getSelectedPortal();
+        var selectedPortal = UiHelper.getSelectedPortal();
         if (selectedPortal) {
             localStorage["wasabee-portal-" + updateID] = JSON.stringify(selectedPortal);
         }
@@ -130,7 +135,7 @@ Wasabee.LinkDialog = class {
         var viewContainer = this._portals[key];
         $(viewContainer).empty();
         if (i) {
-            viewContainer.appendChild(Wasabee.UiHelper.getPortalLink(i));
+            viewContainer.appendChild(UiHelper.getPortalLink(i));
         }
         //***Function to add link between the portals -- called from 'Add' Button next to To portals
     }
@@ -188,7 +193,7 @@ Wasabee.LinkDialog = class {
         return sentPortal ?
             (this._operation.opportals.some((gotPortal) => gotPortal.id == sentPortal.id) ?
                 resolvedLocalData :
-                Wasabee.UiCommands.addPortal(this._operation, sentPortal, "", true))
+                UiCommands.addPortal(this._operation, sentPortal, "", true))
             : Promise.reject("no portal given");
     }
     //***Function to add a single link -- called in addLinkTo and addAllLinks functions
@@ -201,7 +206,7 @@ Wasabee.LinkDialog = class {
     }
     static update(operation, show) {
         var p = 0;
-        var parameters = Wasabee.LinkDialog._dialogs;
+        var parameters = _dialogs;
         for (; p < parameters.length; p++) {
             var page = parameters[p];
             if (page._operation.ID == operation.ID) {
@@ -213,16 +218,15 @@ Wasabee.LinkDialog = class {
             }
         }
         if (show)
-            {return new Wasabee.LinkDialog(operation);}
+            {return new LinkDialog(operation);}
         else
             {return;}
     }
     static closeDialogs() {
-        var parameters = Wasabee.LinkDialog._dialogs;
+        var parameters = _dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
             page._dialog.dialog("close");
         }
     }
-};
-Wasabee.LinkDialog._dialogs = [];
+}

@@ -1,9 +1,16 @@
-Wasabee.LinkListDialog = class {
+import markdown from "markdown";
+import Sortable from "./sortable";
+import UiHelper from "./uiHelper.js";
+import OverflowMenu from "./overflowMenu";
+
+var _dialogs = [];
+
+export default class  LinkListDialog {
     constructor(operation, portal) {
         var that = this;
         this._operation = operation;
         this._portal = portal;
-        this._table = new Wasabee.Sortable;
+        this._table = new Sortable;
         this._dialog = null;
         this._table.fields = [
             {
@@ -12,7 +19,7 @@ Wasabee.LinkListDialog = class {
                 sort: (a, b) => a.localeCompare(b),
                 format: (row, obj) => {
                     row.className = "desc";
-                    row.innerHTML = window.markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+                    row.innerHTML = markdown.toHTML(window.escapeHtmlSpecialChars(obj));
                 }
             },
             {
@@ -20,14 +27,14 @@ Wasabee.LinkListDialog = class {
                 value: (link) => that._operation.getPortal(link.fromPortalId),
                 sortValue: (b) => b.name,
                 sort: (a, b) => a.localeCompare(b),
-                format: (d, data) => d.appendChild(Wasabee.UiHelper.getPortalLink(data)),
+                format: (d, data) => d.appendChild(UiHelper.getPortalLink(data)),
             },
             {
                 name: "To",
                 value: (link) => that._operation.getPortal(link.toPortalId),
                 sortValue: (b) => b.name,
                 sort: (a, b) => a.localeCompare(b),
-                format: (d, data) => d.appendChild(Wasabee.UiHelper.getPortalLink(data)),
+                format: (d, data) => d.appendChild(UiHelper.getPortalLink(data)),
             },
             {
                 name: "Length",
@@ -86,7 +93,7 @@ Wasabee.LinkListDialog = class {
         ];
         this._table.sortBy = 1;
         this._setLinks();
-        Wasabee.LinkListDialog._dialogs.push(this);
+        _dialogs.push(this);
         if (this._table.items.length > 0) {
             var that = this;
             this._dialog = window.dialog({
@@ -94,7 +101,7 @@ Wasabee.LinkListDialog = class {
                 dialogClass: "wasabee-dialog wasabee-dialog-linklist",
                 title: this._portal.name + ": Links",
                 width: "auto",
-                closeCallback: (popoverName) => Wasabee.LinkListDialog._dialogs = [],
+                closeCallback: (popoverName) => _dialogs = [],
             });
             var buttons = this._dialog.dialog("option", "buttons");
             this._dialog.dialog("option", "buttons", $.extend({}, {
@@ -102,7 +109,7 @@ Wasabee.LinkListDialog = class {
                     if (that._portal) {
                         window.renderPortalDetails(that._portal.id);
                     }
-                    Wasabee.LinkDialog.update(that._operation, that._portal);
+                    LinkDialog.update(that._operation, that._portal);
                 }
             }, buttons));
         }
@@ -135,7 +142,7 @@ Wasabee.LinkListDialog = class {
     }
     makeMenu(list, data) {
         var $Wasabee = this;
-        var state = new Wasabee.OverflowMenu;
+        var state = new OverflowMenu;
         state.items = [
             {
                 label: "Reverse",
@@ -151,7 +158,7 @@ Wasabee.LinkListDialog = class {
     }
     static update(operation, portal, show) {
         var p = 0;
-        var parameters = Wasabee.LinkListDialog._dialogs;
+        var parameters = _dialogs;
         for (; p < parameters.length; p++) {
             var page = parameters[p];
             if (page._operation.ID == operation.ID) {
@@ -171,8 +178,8 @@ Wasabee.LinkListDialog = class {
                 return page._dialog.focus(), page._dialog;
             }
         }
-        if (show) { return new Wasabee.LinkListDialog(operation, portal); }
+        if (show) { return new LinkListDialog(operation, portal); }
         else { return; }
     }
-};
-Wasabee.LinkListDialog._dialogs = [];
+}
+

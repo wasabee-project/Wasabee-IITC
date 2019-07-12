@@ -1,5 +1,8 @@
+
+var Wasabee = window.plugin.Wasabee;
+
 //*** CROSSLINK THINGS */
-window.plugin.wasabee.greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
+export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
     // method:
@@ -207,7 +210,7 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
     end.lat = toPortal.lat;
     end.lng = toPortal.lng;
 
-    if (window.plugin.wasabee.greatCircleArcIntersect(a[0], a[1], start, end)) {
+    if (greatCircleArcIntersect(a[0], a[1], start, end)) {
         for (i = 0; i < markers.length; i++) {
             var marker = markers[i];
             if (marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY || marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS || marker.type == Wasabee.Constants.MARKER_TYPE_DECAY) {
@@ -262,7 +265,7 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
     }
 };
 
-const checkAllLinks = () => {
+export const checkAllLinks = () => {
     window.plugin.wasabee.crossLinkLayers.clearLayers();
     plugin.wasabee.crossLinkLayerGroup = {};
 
@@ -301,7 +304,7 @@ const onMapDataRefreshEnd = () => {
     testForDeletedLinks();
 };
 
-const initCrossLinks = () => {
+export const initCrossLinks = () => {
     window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
     window.plugin.wasabee.crossLinkLayerGroup = {};
     window.addLayerGroup("Wasabee Cross Links", window.plugin.wasabee.crossLinkLayers, true);

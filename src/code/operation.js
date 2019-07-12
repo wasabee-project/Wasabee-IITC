@@ -1,4 +1,8 @@
-class Operation {
+import Link from "./link";
+
+var Wasabee = window.plugin.Wasabee;
+
+export default class Operation {
     //ID <- randomly generated alpha-numeric ID for the operation
     //name <- name of operation
     //creator <- agent who created it

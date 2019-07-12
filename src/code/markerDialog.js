@@ -1,4 +1,9 @@
-window.plugin.wasabee.getColorMarker = (color) => {
+import OverflowMenu from "./overflowMenu";
+import UiHelper from "./uiHelper.js";
+
+var Wasabee = window.plugin.Wasabee;
+
+export const getColorMarker = (color) => {
     var marker = null;
     Wasabee.layerTypes.forEach((type) => {
         if (type.name == color) {
@@ -8,7 +13,7 @@ window.plugin.wasabee.getColorMarker = (color) => {
     return marker;
 };
 
-window.plugin.wasabee.getColorHex = (color) => {
+export const getColorHex = (color) => {
     var hex = null;
     Wasabee.layerTypes.forEach((type) => {
         if (type.name == color) {
@@ -19,9 +24,10 @@ window.plugin.wasabee.getColorHex = (color) => {
 };
 
 
-Wasabee.MarkerDialog = class {
+var _dialogs = [];
+export class MarkerDialog {
     constructor(operation) {
-        Wasabee.MarkerDialog._dialogs.push(this);
+        _dialogs.push(this);
         var self = this;
         this._target = null;
         this._operation = operation;
@@ -44,9 +50,9 @@ Wasabee.MarkerDialog = class {
         this._targetLink = $("<strong>").text("(not set)").appendTo($element);
         $("<button>")
             .text("set")
-            .click(() => self.setTarget(Wasabee.UiHelper.getSelectedPortal()))
+            .click(() => self.setTarget(UiHelper.getSelectedPortal()))
             .appendTo($element);
-        this._targetMenu = new Wasabee.OverflowMenu;
+        this._targetMenu = new OverflowMenu;
         this._targetMenu.button.firstElementChild.textContent = "\u25bc";
         $element.append(this._targetMenu.button);
         this._container = $("<div />").append($("<div>").addClass("flex").append(this._type).append(this._comment)).append(document.createTextNode(" ")).append(this._agent).append($element);
@@ -73,12 +79,12 @@ Wasabee.MarkerDialog = class {
                 my: "center top",
                 at: "center center+30"
             },
-            closeCallback: () => Wasabee.MarkerDialog._dialogs = [],
+            closeCallback: () => _dialogs = [],
         });
         this._dialog.dialog("option", "buttons", {
             "add marker": () => self.sendAlert(self._type.val(), self._operation, self._comment.val()),
             close: () => {
-                Wasabee.MarkerDialog._dialogs = Array();
+                _dialogs = Array();
                 self._dialog.dialog("close");
             }
         });
@@ -87,10 +93,10 @@ Wasabee.MarkerDialog = class {
         this._dialog.dialog("open");
     }
     sendAlert(selectedType, operation, comment) {
-        operation.addMarker(selectedType, Wasabee.UiHelper.getSelectedPortal(), comment);
+        operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
     }
     static update(operation, close = false, show = true) {
-        var parameters = Wasabee.MarkerDialog._dialogs;
+        var parameters = _dialogs;
         if (parameters.length != 0) {
             show = false;
             for (var index in parameters) {
@@ -104,17 +110,14 @@ Wasabee.MarkerDialog = class {
                 }
             }
         }
-        if (show)
-            {return new Wasabee.MarkerDialog(operation);}
-        else
-            {return;}
+        if (show) { return new Wasabee.MarkerDialog(operation); }
+        else { return; }
     }
     static closeDialogs() {
-        var parameters = Wasabee.MarkerDialog._dialogs;
+        var parameters = _dialogs;
         for (p = 0; p < parameters.length; p++) {
             var page = parameters[p];
             page._dialog.dialog("close");
         }
     }
 };
-Wasabee.MarkerDialog._dialogs = [];
