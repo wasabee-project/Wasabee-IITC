@@ -29,7 +29,7 @@ window.plugin.wasabee.addPortal = function (portalId, color) {
     var marker = L.marker(latLng, {
         title: portal.name,
         icon: L.icon({
-            iconUrl: colorMarker ? colorMarker : Wasabee.Images.marker_layer_groupa,
+            iconUrl: colorMarker ? colorMarker : Wasabee.static.images.marker_layer_groupa,
             iconAnchor: [12, 41],
             iconSize: [25, 41],
             popupAnchor: [0, -35]

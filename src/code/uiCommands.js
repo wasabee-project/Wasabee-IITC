@@ -55,20 +55,19 @@ Wasabee.UiCommands = {
                     throw alert(data.message), console.log(data), data;
                 });
             }
-        } else
-            {alert("You must select a new portal!");}
+        } else { alert("You must select a new portal!"); }
     },
-    deletePortal : (operation, portal) =>{
+    deletePortal: (operation, portal) => {
         if (confirm("Do you really want to delete this anchor, including all incoming and outgoing links?\n\n" + portal.name)) {
             operation.removeAnchor(portal.id);
         }
     },
-    deleteMarker : (operation, marker, portal) =>{
+    deleteMarker: (operation, marker, portal) => {
         if (confirm("Do you really want to delete this marker? Marking it complete?\n\n" + getPopupBodyWithType(portal, marker))) {
             operation.removeMarker(marker);
         }
     },
-    showLinksDialog : (operation, portal)=> {
+    showLinksDialog: (operation, portal) => {
         Wasabee.LinkListDialog.update(operation, portal, true);
     }
 };

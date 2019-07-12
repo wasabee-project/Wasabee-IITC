@@ -89,13 +89,13 @@ const getPopupBodyWithType = (portal, target) => {
 const getImageFromMarkerType = (type) => {
     switch (type) {
         case Wasabee.Constants.MARKER_TYPE_VIRUS:
-            return Wasabee.Images.marker_alert_virus;
+            return Wasabee.static.images.marker_alert_virus;
         case Wasabee.Constants.MARKER_TYPE_DESTROY:
-            return Wasabee.Images.marker_alert_destroy;
+            return Wasabee.static.images.marker_alert_destroy;
         case Wasabee.Constants.MARKER_TYPE_DECAY:
-            return Wasabee.Images.marker_alert_decay;
+            return Wasabee.static.images.marker_alert_decay;
         default:
-            return Wasabee.Images.marker_alert_unknown;
+            return Wasabee.static.images.marker_alert_unknown;
     }
 }
 

@@ -1,16 +1,16 @@
 {
     "headers": {
         "prod": {
-            "id":		   "Wasabee",
-            "name":		   "IITC plugin: Wasabee",
+            "id": "Wasabee",
+            "name": "IITC plugin: Wasabee",
             "downloadURL": "https://wasabee.rocks/wasabee.user.js",
-            "updateURL":   "https://wasabee.rocks/wasabee.meta.js"
+            "updateURL": "https://wasabee.rocks/wasabee.meta.js"
         },
         "dev": {
-            "id":			 "dev-Wasabee",
-            "name":		 "{dev} IITC plugin: Wasabee",
+            "id": "dev-Wasabee",
+            "name": "{dev} IITC plugin: Wasabee",
             "downloadURL": "not-sure",
-            "updateURL":   "not-sure-either"
+            "updateURL": "not-sure-either"
         },
         "common": {
             "description": "Better DrawTools",
@@ -29,5 +29,5 @@
         "meta": "./src/headers.js"
     },
     "pluginName": "wasabee.user.js",
-    "metaName":   "wasabee.meta.js"
+    "metaName": "wasabee.meta.js"
 }
