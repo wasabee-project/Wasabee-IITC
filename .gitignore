@@ -1,3 +1,5 @@
 node_modules
 releases
-.vscode
+.vscodedist/
+dist/My_Userscript_Name.meta.js
+dist/My_Userscript_Name.user.js
