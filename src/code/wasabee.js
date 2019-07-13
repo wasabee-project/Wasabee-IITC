@@ -22,7 +22,6 @@ export default function () {
 
     //** This function resets all the portals and calls addAllPortals to add them */
     window.plugin.wasabee.resetAllPortals = function () {
-        debugger;
         for (var guid in window.plugin.wasabee.portalLayers) {
             var portalInLayer = window.plugin.wasabee.portalLayers[guid];
             window.plugin.wasabee.portalLayerGroup.removeLayer(portalInLayer);
@@ -33,7 +32,8 @@ export default function () {
 
     /** This function adds a portal to the portal layer group */
     window.plugin.wasabee.addPortal = function (portalId, color) {
-        var portal = window.plugin.wasabee.getSelectedOperation().getPortal([portalId]);
+        debugger;
+        var portal = window.plugin.wasabee.getSelectedOperation().getPortal(portalId);
         var colorMarker = getColorMarker(color);
         var latLng = new L.LatLng(portal.lat, portal.lng);
         var marker = L.marker(latLng, {

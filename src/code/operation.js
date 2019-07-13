@@ -269,6 +269,7 @@ export default class Operation {
 
     clearAllItems() {
         this.opportals = Array();
+        this.anchors = Array();
         this.links = Array();
         this.markers = Array();
         this.update();
