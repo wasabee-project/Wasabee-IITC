@@ -3,83 +3,75 @@ import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
 
-export default function () {
-    window.plugin.wasabee.authWithWasabee = () => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/me",
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        method: "GET",
-    }).done((response) => {
-        if (response.Ops != null) {
-            window.plugin.wasabee.updateServerOpList(response.Ops, true);
+export default function() {
+    function sendServerRequest(endpoint, method, data) {
+        method = method || "GET";
+        let options = {
+            url: Wasabee.Constants.SERVER_BASE_KEY + endpoint,
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            method: method
+        };
+
+        if (data) {
+            $.extend(options, {
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json"
+            });
         }
-    }).fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-    });
 
-    window.plugin.wasabee.uploadSingleOp = (operation) => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw",
-        xhrFields: {
-            withCredentials: true
-        },
-        data: JSON.stringify(operation),
-        crossDomain: true,
-        method: "POST",
-        dataType: "json",
-        contentType: "application/json",
-    }).done((response) => {
-        //  We shouldn't read an answer to this. It's a POST.
-        if (response.Ops != null) {
-            window.plugin.wasabee.updateServerOpList(response.Ops, false);
-        }
-        alert("Upload Complete.");
-    }).fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-    });
+        return $.ajax(options);
+    }
 
-    window.plugin.wasabee.updateSingleOp = (operation) => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
-        xhrFields: {
-            withCredentials: true
-        },
-        data: JSON.stringify(operation),
-        crossDomain: true,
-        method: "PUT",
-        dataType: "json",
-        contentType: "application/json",
-    }).done(() => {
-        alert("Update Complete.");
-    }).fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-    });
+    window.plugin.wasabee.authWithWasabee = () =>
+        sendServerRequest("/me")
+        .done((response) => {
+            if (response.Ops != null) {
+                window.plugin.wasabee.updateServerOpList(response.Ops, true);
+            }
+        }).fail(() => {
+            window.plugin.wasabee.showMustAuthAlert();
+        });
 
-    window.plugin.wasabee.downloadSingleOp = (operation) => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID,
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        method: "GET",
-    }).done((response) => {
-        console.log("got response -> " + JSON.stringify(response));
-    }).fail(() => {
-        alert("Download Failed.");
-    });
+    window.plugin.wasabee.uploadSingleOp = (operation) =>
+        sendServerRequest("/api/v1/draw", "POST", operation)
+        .done((response) => {
+            //  We shouldn't read an answer to this. It's a POST.
+            if (response.Ops != null) {
+                window.plugin.wasabee.updateServerOpList(response.Ops, false);
+            }
+            alert("Upload Complete.");
+        }).fail(() => {
+            window.plugin.wasabee.showMustAuthAlert();
+        });
 
-    window.plugin.wasabee.deleteOwnedServerOp = (opID) => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID + "/delete",
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        method: "GET",
-    }).done((response) => {
-        console.log("got response -> " + JSON.stringify(response));
-    }).fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-    });
+    window.plugin.wasabee.updateSingleOp = (operation) =>
+        sendServerRequest("/api/v1/draw/" + operation.ID, "PUT", operation)
+        .done(() => {
+            alert("Update Complete.");
+        }).fail(() => {
+            window.plugin.wasabee.showMustAuthAlert();
+        });
+
+    window.plugin.wasabee.downloadSingleOp = (operation) =>
+        sendServerRequest("/api/v1/draw/" + operation.ID)
+        .done((response) => {
+            console.log("got response -> " + JSON.stringify(response));
+        }).fail(() => {
+            alert("Download Failed.");
+        });
+
+    //TODO: Should this use the DELETE verb?
+    window.plugin.wasabee.deleteOwnedServerOp = (opID) =>
+        sendServerRequest("/api/v1/draw/" + opID + "/delete")
+        .done((response) => {
+            console.log("got response -> " + JSON.stringify(response));
+        }).fail(() => {
+            window.plugin.wasabee.showMustAuthAlert();
+        });
 
     window.plugin.wasabee.getOpDownloads = (opList) => {
         var opCalls = [];
@@ -90,18 +82,13 @@ export default function () {
         return opCalls;
     };
 
-    window.plugin.wasabee.downloadOpInList = (op) => $.ajax({
-        url: Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + op.ID,
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        method: "GET",
-    }).done((response) => {
-        window.plugin.wasabee.updateOperationInList(Operation.create(response));
-    }).fail(() => {
-        alert("Download Failed.");
-    });
+    window.plugin.wasabee.downloadOpInList = (op) =>
+        sendServerRequest("/api/v1/draw/" + op.ID)
+        .done((response) => {
+            window.plugin.wasabee.updateOperationInList(Operation.create(response));
+        }).fail(() => {
+            alert("Download Failed.");
+        });
 
     window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
         let ownedOpList = opList.filter((op) => op.IsOwner);

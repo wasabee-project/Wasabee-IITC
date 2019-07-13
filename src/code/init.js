@@ -1,17 +1,16 @@
-const arc = require("./../lib/arc");
 import { initCrossLinks } from "./crosslinks";
 import initWasabee from "./wasabee";
 import initPaste from "./paste";
 import initServer from "./server";
 import initSortable from "./sortable";
-import {initOpsDialog} from "./opsDialog";
+import { initOpsDialog } from "./opsDialog";
 import initOverflowMenu from "./overflowMenu"
 import { drawThings } from "./mapDrawing";
 import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 
-window.plugin.wasabee.init =  function () {
+window.plugin.wasabee.init = function() {
     //** LAYER DEFINITIONS */
     window.plugin.wasabee.portalLayers = {};
     window.plugin.wasabee.portalLayerGroup = null;
@@ -20,9 +19,8 @@ window.plugin.wasabee.init =  function () {
     window.plugin.wasabee.targetLayers = {};
     window.plugin.wasabee.targetLayerGroup = null;
 
-    window.plugin.wasabee.loadExternals = function () {
-        
-        window.plugin.wasabee.arc = arc;
+    window.plugin.wasabee.loadExternals = function() {
+
         Wasabee.opList = Array();
         Wasabee.pasteList = Array();
 
@@ -48,7 +46,7 @@ window.plugin.wasabee.init =  function () {
         window.addLayerGroup("Wasabee Draw Portals", window.plugin.wasabee.portalLayerGroup, true);
         window.addLayerGroup("Wasabee Draw Links", window.plugin.wasabee.linkLayerGroup, true);
         window.addLayerGroup("Wasabee Draw Targets", window.plugin.wasabee.targetLayerGroup, true);
-        
+
         initCrossLinks();
         drawThings();
         //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
