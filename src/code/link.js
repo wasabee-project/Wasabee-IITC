@@ -1,4 +1,5 @@
 import Operation from "./operation";
+import { generateId } from "./auxiliar";
 
 export default class Link {
     //ID <- randomly generated alpha-numeric ID for the link
@@ -6,7 +7,7 @@ export default class Link {
     //toPortal <- portal the link is to
     //description <- user entered description of link
     constructor(operation, fromPortalId, toPortalId, description) {
-        this.ID = window.plugin.wasabee.generateId();
+        this.ID = generateId();
         this.fromPortalId = fromPortalId;
         this.toPortalId = toPortalId;
         this.description = description;

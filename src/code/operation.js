@@ -1,7 +1,8 @@
 import Link from "./link";
 import Marker from "./marker";
- 
-var Wasabee = window.plugin.Wasabee;
+import { generateId } from "./auxiliar";
+
+const DEFAULT_OPERATION_COLOR = "groupa";
 
 export default class Operation {
     //ID <- randomly generated alpha-numeric ID for the operation
@@ -11,7 +12,7 @@ export default class Operation {
     //portals <- List of Portals
     //links <- List of Links
     constructor(creator, name, isSelected) {
-        this.ID = window.plugin.wasabee.generateId();
+        this.ID = generateId();
         this.name = name;
         this.creator = creator;
         this.isSelected = isSelected;
@@ -21,12 +22,12 @@ export default class Operation {
         this.markers = Array();
         this.pasteKey = null;
         this.pasteExpireDate = 0;
-        this.color = Wasabee.Constants.DEFAULT_OPERATION_COLOR;
+        this.color = DEFAULT_OPERATION_COLOR;
         this.comment = null;
     }
 
     getColor() {
-        if (this.color == null) { return Wasabee.Constants.DEFAULT_OPERATION_COLOR; } else {
+        if (this.color == null) { return DEFAULT_OPERATION_COLOR; } else {
             return this.color;
         }
     }
@@ -82,7 +83,7 @@ export default class Operation {
     }
 
     getLinkListFromPortal(portal) {
-        var links = this.links.filter(function(listLink) {
+        var links = this.links.filter(function (listLink) {
             return listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id;
         });
         return links;
@@ -98,10 +99,10 @@ export default class Operation {
     }
 
     removeAnchor(portalId) {
-        this.anchors = this.anchors.filter(function(anchor) {
+        this.anchors = this.anchors.filter(function (anchor) {
             return anchor !== portalId;
         });
-        this.links = this.links.filter(function(listLink) {
+        this.links = this.links.filter(function (listLink) {
             return listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId;
         });
         this.cleanPortalList()
@@ -109,7 +110,7 @@ export default class Operation {
     }
 
     removeMarker(marker) {
-        this.markers = this.markers.filter(function(listMarker) {
+        this.markers = this.markers.filter(function (listMarker) {
             return listMarker.ID !== marker.ID;
         });
         this.update();
@@ -239,7 +240,7 @@ export default class Operation {
     }
 
     swapPortal(originalPortal, newPortal) {
-        this.anchors = this.anchors.filter(function(listAnchor) {
+        this.anchors = this.anchors.filter(function (listAnchor) {
             return listAnchor !== originalPortal.id;
         });
         this.addAnchor(newPortal)

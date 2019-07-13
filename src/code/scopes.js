@@ -5,13 +5,11 @@
         a.PASTE_LIST_KEY = "PASTE_LIST_KEY";
         a.SERVER_BASE_KEY = "https://server.wasabee.rocks";
         a.SERVER_BASE_TEST_KEY = "https://server.wasabee.rocks:8444";
-        a.INTEL_BASE_KEY = "https://intel.ingress.com/intel"
         a.CURRENT_EXPIRE_NUMERIC = 1209600000;
         a.MARKER_TYPE_DESTROY = "DestroyPortalAlert";
         a.MARKER_TYPE_VIRUS = "UseVirusPortalAlert";
         a.MARKER_TYPE_DECAY = "LetDecayPortalAlert";
         a.DEFAULT_ALERT_TYPE = "DestroyPortalAlert";
-        a.DEFAULT_OPERATION_COLOR = "groupa";
         a.BREAK_EXCEPTION = {};
         a.OP_RESTRUCTURE_KEY = "OP_RESTRUCTURE_KEY22";
         a.SERVER_OP_LIST_KEY = "SERVER_OP_LIST_KEY";
