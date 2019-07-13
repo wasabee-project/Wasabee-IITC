@@ -1,4 +1,4 @@
-import arc from "arc";
+const arc = require("./../lib/arc");
 import { initCrossLinks } from "./crosslinks";
 import initWasabee from "./wasabee";
 import initPaste from "./paste";

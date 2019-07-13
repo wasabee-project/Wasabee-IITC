@@ -22,6 +22,7 @@ export default function () {
 
     //** This function resets all the portals and calls addAllPortals to add them */
     window.plugin.wasabee.resetAllPortals = function () {
+        debugger;
         for (var guid in window.plugin.wasabee.portalLayers) {
             var portalInLayer = window.plugin.wasabee.portalLayers[guid];
             window.plugin.wasabee.portalLayerGroup.removeLayer(portalInLayer);
