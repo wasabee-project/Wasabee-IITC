@@ -1,6 +1,8 @@
+import { generateId } from "./auxiliar";
+
 export default class Marker {
     constructor(type, portalId, comment) {
-        this.ID = window.plugin.wasabee.generateId();
+        this.ID = generateId();
         this.portalId = portalId;
         this.type = type;
         this.comment = comment;

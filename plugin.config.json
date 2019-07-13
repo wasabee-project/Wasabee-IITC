@@ -26,7 +26,8 @@
     },
     "src": {
         "plugin": "./src/main.js",
-        "meta": "./src/headers.js"
+        "meta": "./src/headers.js",
+        "test": "./src/test/*.js"
     },
     "pluginName": "wasabee.user.js",
     "metaName": "wasabee.meta.js"

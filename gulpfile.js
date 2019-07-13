@@ -13,6 +13,7 @@ const fs = require("fs"),
     webpack = require("webpack"),
     PluginError = require("plugin-error"),
     log = require("fancy-log");
+jest = require("gulp-jest").default;
 
 const ensureDirectoryExistence = (filePath) => {
     var dirname = path.dirname(filePath);
@@ -21,7 +22,7 @@ const ensureDirectoryExistence = (filePath) => {
     }
     ensureDirectoryExistence(dirname);
     fs.mkdirSync(dirname);
-}
+};
 
 // Config
 var status = {
@@ -67,12 +68,23 @@ gulp.task("buildheaders", (cb) => {
     cb();
 });
 
+gulp.task("jest", (callback) => {
+    process.env.NODE_ENV = 'test';
+    gulp.src(cfg.src.test).pipe(jest({
+        "preprocessorIgnorePatterns": [
+            "<rootDir>/dist/", "<rootDir>/node_modules/"
+        ],
+        "automock": false
+    }));
+    callback();
+});
+
 gulp.task("webpack", (callback) => {
     var webpackConfig = require("./webpack.config.js");
     if (status.mode === "dev") {
         webpackConfig.mode = "development";
     }
-    webpack(webpackConfig, function(err, stats) {
+    webpack(webpackConfig, function (err, stats) {
         log("[webpack]", stats.toString({
             // output options
         }));
@@ -121,7 +133,7 @@ gulp.task("eslint", (cb) => {
     cb();
 });
 
-gulp.task("build", gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"]));
+gulp.task("build", gulp.series(["buildheaders", "buildmeta", "jest", "webpack", "buildplugin", "eslint"]));
 
 gulp.task("build-dev", gulp.series(["set-mode-dev", "build", "clear"]));
 gulp.task("build-prod", gulp.series(["set-mode-prod", "build", "clear"]));
