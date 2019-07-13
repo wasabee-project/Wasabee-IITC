@@ -1,8 +1,7 @@
-var markdown = require( "markdown" ).markdown;
+var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
-import {getColorHex} from "./markerDialog";
-import {checkAllLinks} from "./crosslinks";
-import distance from "./arc";
+import { getColorHex } from "./markerDialog";
+import { checkAllLinks } from "./crosslinks";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -89,8 +88,7 @@ export const getPopupBodyWithType = (portal, target) => {
             title = "Unknown";
     }
     title = title + " - " + portal.name;
-    if (!comment) { return title; }
-    else { return title + "\n\n" + comment; }
+    if (!comment) { return title; } else { return title + "\n\n" + comment; }
 };
 
 //** This function returns the appropriate image for a marker type */
@@ -135,14 +133,7 @@ const addLink = (link, color, operation) => {
     };
     var latLngs = link.getLatLngs(operation);
     if (latLngs != null) {
-        var fromPortal = operation.getPortal(link.fromPortalId)
-        var toPortal = operation.getPortal(link.toPortalId)
-        var startCoord = new window.plugin.wasabee.arc.Coord(latLngs[0].lng, latLngs[0].lat);
-        var endCoord = new window.plugin.wasabee.arc.Coord(latLngs[1].lng, latLngs[1].lat);
-        var gc = new window.plugin.wasabee.arc.GreatCircle(startCoord, endCoord);
-        var geojson_feature = gc.Arc(Math.round(distance(fromPortal, toPortal))).json();
-
-        var link_ = new L.geoJson(geojson_feature, options);
+        var link_ = new L.GeodesicPolyline(latLngs, options);
 
         window.plugin.wasabee.linkLayers[link["ID"]] = link_;
         link_.addTo(window.plugin.wasabee.linkLayerGroup);
