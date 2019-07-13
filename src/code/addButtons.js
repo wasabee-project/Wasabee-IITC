@@ -1,5 +1,12 @@
+import LinkDialog from "./linkDialog";
+import { MarkerDialog } from "./markerDialog";
+import { OpsDialog } from "./opsDialog";
+import Operation from "./operation";
+
+var Wasabee = window.plugin.Wasabee;
+
 //** This function adds the plugin buttons on the left side of the screen */
-window.plugin.wasabee.addButtons = function () {
+export default function () {
     var selectedOp = window.plugin.wasabee.getSelectedOperation();
     window.plugin.wasabee.buttons = L.Control.extend({
         options: {
@@ -8,16 +15,16 @@ window.plugin.wasabee.addButtons = function () {
         onAdd: function (map) {
             var container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
             $(container).append("<a id=\"wasabee_viewopsbutton\" href=\"javascript: void(0);\" class=\"wasabee-control\" title=\"Manage Operations\"><img src=" + Wasabee.static.images.toolbar_viewOps + " style=\"vertical-align:middle;align:center;\" /></a>").on("click", "#wasabee_viewopsbutton", function () {
-                Wasabee.OpsDialog.update(Wasabee.opList);
+                OpsDialog.update(Wasabee.opList);
             });
             $(container).append("<a id=\"wasabee_addlinksbutton\" href=\"javascript: void(0);\" class=\"wasabee-control\" title=\"Add Links\"><img src=" + Wasabee.static.images.toolbar_addlinks + " style=\"vertical-align:middle;align:center;\" /></a>").on("click", "#wasabee_addlinksbutton", function () {
                 var selectedOp = window.plugin.wasabee.getSelectedOperation();
-                if (selectedOp != null) { Wasabee.LinkDialog.update(selectedOp, true); }
+                if (selectedOp != null) { LinkDialog.update(selectedOp, true); }
                 else { alert("No selected Operation found."); }
             });
             $(container).append("<a id=\"wasabee_addmarkersbutton\" href=\"javascript: void(0);\" class=\"wasabee-control\" title=\"Add Markers\"><img src=" + Wasabee.static.images.toolbar_addMarkers + " style=\"vertical-align:middle;align:center;\" /></a>").on("click", "#wasabee_addmarkersbutton", function () {
                 var selectedOp = window.plugin.wasabee.getSelectedOperation();
-                if (selectedOp != null) { Wasabee.MarkerDialog.update(selectedOp); }
+                if (selectedOp != null) { MarkerDialog.update(selectedOp); }
                 else { alert("No selected Operation found."); }
             });
             $(container).append("<a id=\"wasabee_addopbutton\" href=\"javascript: void(0);\" class=\"wasabee-control\" title=\"Add Op\"><img src=" + Wasabee.static.images.toolbar_plus + " style=\"vertical-align:middle;align:center;\" /></a>").on("click", "#wasabee_addopbutton", function () {
@@ -29,15 +36,15 @@ window.plugin.wasabee.addButtons = function () {
                 if (confirmed) {
                     window.plugin.wasabee.resetOpList();
                     window.plugin.wasabee.setupLocalStorage();
-                    Wasabee.OpsDialog.closeDialogs();
+                    OpsDialog.closeDialogs();
                 }
             });
 
             $(container).append("<a id=\"wasabee_syncbutton\" href=\"javascript: void(0);\" class=\"wasabee-control\" title=\"Get All Ops\"><img src=" + Wasabee.static.images.toolbar_download + " style=\"vertical-align:middle;align:center;\" /></a>").on("click", "#wasabee_syncbutton", function () {
                 try {
-                    Wasabee.LinkDialog.closeDialogs();
-                    Wasabee.OpsDialog.closeDialogs();
-                    Wasabee.MarkerDialog.closeDialogs();
+                    LinkDialog.closeDialogs();
+                    OpsDialog.closeDialogs();
+                    MarkerDialog.closeDialogs();
                     window.plugin.wasabee.authWithWasabee();
                 } catch (e) {
                     window.plugin.wasabee.showMustAuthAlert();

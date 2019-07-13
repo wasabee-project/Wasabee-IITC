@@ -1,4 +1,9 @@
-class Operation {
+import Link from "./link";
+import Marker from "./marker";
+ 
+var Wasabee = window.plugin.Wasabee;
+
+export default class Operation {
     //ID <- randomly generated alpha-numeric ID for the operation
     //name <- name of operation
     //creator <- agent who created it
@@ -264,6 +269,7 @@ class Operation {
 
     clearAllItems() {
         this.opportals = Array();
+        this.anchors = Array();
         this.links = Array();
         this.markers = Array();
         this.update();

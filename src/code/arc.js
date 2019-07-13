@@ -1,12 +1,11 @@
-/*** ARC THINGS */
 const distance = (fromPortal, toPortal) => {
     //How far between portals.
     var R = 6367; // km
 
-    lat1 = fromPortal.lat;
-    lon1 = fromPortal.lng;
-    lat2 = toPortal.lat;
-    lon2 = toPortal.lng;
+    var lat1 = fromPortal.lat;
+    var lon1 = fromPortal.lng;
+    var lat2 = toPortal.lat;
+    var lon2 = toPortal.lng;
 
     var dLat = (lat2 - lat1) * Math.PI / 180;
     var dLon = (lon2 - lon1) * Math.PI / 180;
@@ -19,4 +18,5 @@ const distance = (fromPortal, toPortal) => {
     d = Math.round(d * 1000) / 1000;
     return d;
 };
-//*** END ARC THINGS */
+
+export default distance;

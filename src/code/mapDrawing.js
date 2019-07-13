@@ -1,10 +1,18 @@
+var markdown = require( "markdown" ).markdown;
+import UiCommands from "./uiCommands.js";
+import {getColorHex} from "./markerDialog";
+import {checkAllLinks} from "./crosslinks";
+import distance from "./arc";
+
+var Wasabee = window.plugin.Wasabee;
+
 //** This function draws things on the layers */
-const drawThings = () => {
+export const drawThings = () => {
     window.plugin.wasabee.resetAllPortals();
     resetAllTargets();
     resetAllLinks();
     checkAllLinks();
-}
+};
 
 //** This function adds all the Targets to the layer */
 const addAllTargets = () => {
@@ -12,17 +20,17 @@ const addAllTargets = () => {
     if (targetList != null) {
         targetList.forEach((target) => addTarget(target));
     }
-}
+};
 
 //** This function resets all the Targets and calls addAllTargets to add them */
 const resetAllTargets = () => {
-    for (guid in window.plugin.wasabee.targetLayers) {
+    for (var guid in window.plugin.wasabee.targetLayers) {
         var targetInLayer = window.plugin.wasabee.targetLayers[guid];
         window.plugin.wasabee.targetLayerGroup.removeLayer(targetInLayer);
         delete window.plugin.wasabee.targetLayers[guid];
     }
     addAllTargets();
-}
+};
 
 /** This function adds a Targets to the target layer group */
 const addTarget = (target) => {
@@ -45,26 +53,26 @@ const addTarget = (target) => {
     marker.on("spiderfiedclick", marker.togglePopup, marker);
     window.plugin.wasabee.targetLayers[target["ID"]] = marker;
     marker.addTo(window.plugin.wasabee.targetLayerGroup);
-}
+};
 
 const getMarkerPopup = (marker, target, portal) => {
     marker.className = "wasabee-dialog wasabee-dialog-ops"
     var content = document.createElement("div");
     var title = content.appendChild(document.createElement("div"));
     title.className = "desc";
-    title.innerHTML = window.markdown.toHTML(getPopupBodyWithType(portal, target));
-    buttonSet = content.appendChild(document.createElement("div"));
+    title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
+    var buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     var deleteButton = buttonSet.appendChild(document.createElement("a"));
     deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", () => {
-        Wasabee.UiCommands.deleteMarker(window.plugin.wasabee.getSelectedOperation(), target, portal)
+        UiCommands.deleteMarker(window.plugin.wasabee.getSelectedOperation(), target, portal)
         marker.closePopup();
     }, false);
     return content;
-}
+};
 
-const getPopupBodyWithType = (portal, target) => {
+export const getPopupBodyWithType = (portal, target) => {
     var title = ""
     var comment = target.comment;
     switch (target.type) {
@@ -83,7 +91,7 @@ const getPopupBodyWithType = (portal, target) => {
     title = title + " - " + portal.name;
     if (!comment) { return title; }
     else { return title + "\n\n" + comment; }
-}
+};
 
 //** This function returns the appropriate image for a marker type */
 const getImageFromMarkerType = (type) => {
@@ -97,14 +105,14 @@ const getImageFromMarkerType = (type) => {
         default:
             return Wasabee.static.images.marker_alert_unknown;
     }
-}
+};
 
 //** This function adds all the Links to the layer */
 const addAllLinks = () => {
     var operation = window.plugin.wasabee.getSelectedOperation()
     var linkList = operation.links;
     linkList.forEach((link) => addLink(link, operation.color, operation));
-}
+};
 
 //** This function resets all the Links and calls addAllLinks to add them */
 const resetAllLinks = () => {
@@ -114,11 +122,11 @@ const resetAllLinks = () => {
         delete window.plugin.wasabee.linkLayers[guid];
     }
     addAllLinks();
-}
+};
 
 /** This function adds a portal to the portal layer group */
 const addLink = (link, color, operation) => {
-    var color = window.plugin.wasabee.getColorHex(color)
+    var color = getColorHex(color);
     var options = {
         dashArray: [5, 5, 1, 5],
         color: color ? color : "#ff6600",

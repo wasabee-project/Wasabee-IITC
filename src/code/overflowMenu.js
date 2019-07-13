@@ -1,5 +1,7 @@
-!function (scope) {
-    var overFlowMenu = function () {
+
+var Wasabee = window.plugin.Wasabee;
+export default function (scope) {
+    Wasabee.OverflowMenu = function () {
         function init() {
             var _this = this;
             this._button = document.createElement("a");
@@ -71,5 +73,4 @@
             }
         }, init;
     }();
-    scope.OverflowMenu = overFlowMenu;
-}(Wasabee || (Wasabee = {}));
+}

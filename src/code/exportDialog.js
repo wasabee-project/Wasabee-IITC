@@ -1,6 +1,8 @@
-Wasabee.ExportDialog = class {
+var _dialogs = [];
+
+export default class ExportDialog {
     constructor(operation) {
-        Wasabee.ExportDialog._dialogs.push(this);
+        _dialogs.push(this);
         this._operation = operation;
         this._mainContent = document.createElement("div");
         this.updateContentPane();
@@ -12,7 +14,7 @@ Wasabee.ExportDialog = class {
             html: this._mainContent,
             dialogClass: "wasabee-dialog wasabee-dialog-ops",
             closeCallback: (popoverName) => {
-                Wasabee.ExportDialog._dialogs = [];
+                _dialogs = [];
             }
         });
     }
@@ -60,7 +62,7 @@ Wasabee.ExportDialog = class {
         this._dialog.dialog("open");
     }
     static show(operation) {
-        var parameters = Wasabee.ExportDialog._dialogs;
+        var parameters = _dialogs;
         if (parameters.length != 0) {
             show = false;
             for (var index in parameters) {
@@ -70,8 +72,9 @@ Wasabee.ExportDialog = class {
                 return page.focus(), page;
             }
         }
-        if (show) { return new Wasabee.ExportDialog(operation); }
-        else { return; }
+        if (show)
+            {return new ExportDialog(operation);}
+        else
+            {return;}
     }
-};
-Wasabee.ExportDialog._dialogs = [];
+}
