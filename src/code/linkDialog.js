@@ -28,7 +28,7 @@ export default  class LinkDialog {
             node = tr.insertCell();
             if (0 != string) {
                 filter = node.appendChild(document.createElement("input"));
-                filter.type = "checkbox";
+                // filter.type = "checkbox";
                 filter.checked = true;
                 filter.value = type;
                 self._links.push(filter);

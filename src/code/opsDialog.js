@@ -1,9 +1,10 @@
 import store from "../lib/store";
+import { drawThings } from "./mapDrawing";
 import LinkListDialog from "./linkListDialog";
 import ExportDialog from "./exportDialog";
-import { drawThings } from "./mapDrawing";
 import { MarkerDialog } from "./markerDialog";
 import LinkDialog from "./linkDialog";
+import addButtons from "./addButtons";
 import Operation from "./operation";
 
 
@@ -164,7 +165,7 @@ export function initOpsDialog() {
 
         if (showExportDialog) { ExportDialog.show(operation); }
 
-        window.plugin.wasabee.addButtons();
+        addButtons();
     };
 
     //** This function removes an operation from the main list */
@@ -240,7 +241,7 @@ export class OpsDialog {
         var nameSection = tabContent.appendChild(document.createElement("p"));
         nameSection.innerHTML = "Op Name -> ";
         var input = nameSection.appendChild(document.createElement("input"));
-        input.type = "text";
+        // input.type = "text";
         input.id = "op-dialog-content-nameinput";
         input.value = operation.name;
         var colorSection = tabContent.appendChild(document.createElement("p"));
@@ -268,7 +269,7 @@ export class OpsDialog {
         var commentInputEnabled = !opIsServerOp || opIsOwnedServerOp;
         var commentSection = tabContent.appendChild(document.createElement("p"));
         var commentInput = commentSection.appendChild(document.createElement("textarea"));
-        commentInput.type = "text";
+        // commentInput.type = "text";
         commentInput.rows = "3";
         commentInput.placeholder = "Op Comment";
         commentInput.value = operation.comment;

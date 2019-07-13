@@ -5,7 +5,7 @@ import initPaste from "./paste";
 import initServer from "./server";
 import initSortable from "./sortable";
 import {initOpsDialog} from "./opsDialog";
-
+import initOverflowMenu from "./overflowMenu"
 import { drawThings } from "./mapDrawing";
 import addButtons from "./addButtons";
 
@@ -29,6 +29,7 @@ window.plugin.wasabee.init =  function () {
         // All of these should eventually export functions.
         // We do this because they still assign them to the global scope.
         initWasabee();
+        initOverflowMenu();
         initPaste();
         initServer();
         initSortable();

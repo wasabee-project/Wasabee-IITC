@@ -1,5 +1,6 @@
 import Link from "./link";
-
+import Marker from "./marker";
+ 
 var Wasabee = window.plugin.Wasabee;
 
 export default class Operation {

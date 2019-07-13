@@ -1,4 +1,5 @@
-import UiHelper from "./uiHelper.js";
+import UiHelper from "./uiHelper";
+import Marker from "./marker";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -51,7 +52,7 @@ export class MarkerDialog {
             .text("set")
             .click(() => self.setTarget(UiHelper.getSelectedPortal()))
             .appendTo($element);
-        this._targetMenu = new Wasabee.OverflowMenu();
+        this._targetMenu = new Wasabee.OverflowMenu;
         this._targetMenu.button.firstElementChild.textContent = "\u25bc";
         $element.append(this._targetMenu.button);
         this._container = $("<div />").append($("<div>").addClass("flex").append(this._type).append(this._comment)).append(document.createTextNode(" ")).append(this._agent).append($element);
