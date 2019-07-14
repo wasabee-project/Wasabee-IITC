@@ -4,6 +4,8 @@ import { generateId } from "./auxiliar";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
+// var Wasabee = window.plugin.Wasabee;
+
 export default class Operation {
     //ID <- randomly generated alpha-numeric ID for the operation
     //name <- name of operation
@@ -58,17 +60,23 @@ export default class Operation {
         return false;
     }
 
-    containsLink(link) {
+    containsLinkFromTo(fromPortalId, toPortalId) {
         if (this.links.length == 0) { return false; } else {
             for (let link_ in this.links) {
                 //THIS TESTS IF ITS THE SAME LINK
-                if ((this.links[link_].fromPortalId == link.fromPortalId && this.links[link_].toPortalId == link.toPortalId) ||
-                    ((this.links[link_].toPortalId == link.fromPortalId && this.links[link_].fromPortalId == link.toPortalId))) {
+                if ((this.links[link_].fromPortalId == fromPortalId && this.links[link_].toPortalId == toPortalId) ||
+                    ((this.links[link_].toPortalId == fromPortalId && this.links[link_].fromPortalId == toPortalId))) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    containsLink(link) {
+        var fromPortalId = link.fromPortalId;
+        var toPortalId = link.toPortalId;
+        return this.containsLinkFromTo(fromPortalId, toPortalId);
     }
 
     containsMarker(portal, markerType) {
@@ -211,6 +219,11 @@ export default class Operation {
     }
 
     addLink(fromPortal, toPortal, description) {
+        if (fromPortal.id === toPortal.id) {
+            console.log("Operation: Ignoring link where source and target are the same portal.");
+            return;
+        }
+
         this.addAnchor(fromPortal)
         this.addAnchor(toPortal)
 
@@ -243,14 +256,37 @@ export default class Operation {
         this.anchors = this.anchors.filter(function (listAnchor) {
             return listAnchor !== originalPortal.id;
         });
-        this.addAnchor(newPortal)
-        for (let link_ in this.links) {
+        this.addAnchor(newPortal);
+        let linksToRemove = [];
+        for (let link_ = 0; link_ < this.links.length; link_++) {
             if (this.links[link_].fromPortalId == originalPortal["id"]) {
-                this.links[link_].fromPortalId = newPortal["id"];
+                if (this.links[link_].toPortalId === newPortal["id"]) {
+                    console.log(`Operation: Removing link '${this.links[link_].ID}' while swapping because it would create a link with the same source and target.`);
+                    linksToRemove.push(this.links[link_]);
+                } else if (!this.containsLinkFromTo(newPortal["id"], this.links[link_].toPortalId)) {
+                    this.links[link_].fromPortalId = newPortal["id"];
+                } else {
+                    console.log(`Operation: Removing link '${this.links[link_].ID}' while swapping because it would duplicate an existing link in the operation.`);
+                    linksToRemove.push(this.links[link_]);
+                }
             } else if (this.links[link_].toPortalId == originalPortal["id"]) {
-                this.links[link_].toPortalId = newPortal["id"];
+                if (this.links[link_].fromPortalId === newPortal["id"]) {
+                    console.log(`Operation: Removing link '${this.links[link_].ID}' while swapping because it would create a link with the same source and target.`);
+                    linksToRemove.push(this.links[link_]);
+                } else if (!this.containsLinkFromTo(this.links[link_].fromPortalId, newPortal["id"])) {
+                    this.links[link_].toPortalId = newPortal["id"];
+                } else {
+                    console.log(`Operation: Removing link '${this.links[link_].ID}' while swapping because it would duplicate an existing link in the operation.`);
+                    linksToRemove.push(this.links[link_]);
+                }
             }
         }
+        // Remove the invalid links from the array (after we are done iterating through it)
+        this.links = this.links.filter(element => !linksToRemove.includes(element));
+
+        this.cleanAnchorList();
+        this.cleanPortalList();
+        this.update();
     }
 
     addMarker(markerType, portal, comment) {
