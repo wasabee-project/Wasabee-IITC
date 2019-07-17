@@ -1,4 +1,3 @@
-
 var Wasabee = window.plugin.Wasabee;
 
 //*** CROSSLINK THINGS */
@@ -49,7 +48,7 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     var aCross = false;
     var bCross = false;
     //this is the real link
-    if ((a0.lng - a1.lng) < -180 || (a0.lng - a1.lng) > 180) {	//we have a dateline cross
+    if ((a0.lng - a1.lng) < -180 || (a0.lng - a1.lng) > 180) { //we have a dateline cross
         //console.log('DateLine Cross!');
         //move everything in the eastern hemisphere to the extended eastern one
         aCross = true;
@@ -76,16 +75,14 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
     if (bCross && aCross) {
         //both got moved. all should be good.
         //do nothing
-    }
-    else if (aCross) {
+    } else if (aCross) {
         //now we need to move any links in the west of the main one
         if (Math.max(b0.lng, b1.lng) < Math.min(a0.lng, a1.lng)) {
             //console.log('arc shift');
             b0.lng += 360;
             b1.lng += 360;
         }
-    }
-    else if (bCross) {
+    } else if (bCross) {
         //now we need to move any links in the west of the main one
         if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) {
             //console.log('link shift');
@@ -141,11 +138,9 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
             // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
             if (lng == this.lng1) {
                 lat = this.lat1;
-            }
-            else if (lng == this.lng2) {
+            } else if (lng == this.lng2) {
                 lat = this.lat2;
-            }
-            else {
+            } else {
                 lat = Math.atan((this.sinLat1CosLat2 * Math.sin(lng - this.lng2) - this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) / this.cosLat1CosLat2SinDLng);
             }
             return lat * 180 / Math.PI; // return value in degrees
@@ -205,6 +200,10 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
     var end = {};
     var fromPortal = operation.getPortal(drawnLink.fromPortalId);
     var toPortal = operation.getPortal(drawnLink.toPortalId);
+    if (fromPortal === null || toPortal === null) {
+        console.warn("testPolyLine: Found a null value for fromPortal or toPortal.");
+        return false;
+    }
     start.lat = fromPortal.lat;
     start.lng = fromPortal.lng;
     end.lat = toPortal.lat;

@@ -12,8 +12,7 @@ export default {
 
         if (operation instanceof Operation) {
             operation.addPortal(sentPortal);
-        }
-        else {
+        } else {
             alert("Operation Invalid");
         }
     },
@@ -23,6 +22,10 @@ export default {
     swapPortal: (operation, portal) => {
         var selectedPortal = UiHelper.getSelectedPortal();
         if (selectedPortal !== undefined) {
+            if (portal.id === selectedPortal.id) {
+                alert("Cannot swap a portal with itself! Select a different portal.");
+                return;
+            }
             if (confirm("Do you really want to swap these two portals?\n\n" + portal.name + "\n" + selectedPortal.name)) {
                 Promise.all([operation.swapPortal(portal, selectedPortal)]).then(() => {
                     operation.update();
