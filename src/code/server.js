@@ -1,5 +1,7 @@
 import store from "store";
 import Operation from "./operation";
+import Agent from "./agent";
+import Team from "./team";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -139,4 +141,31 @@ export default function() {
         }
         return isServerOp;
     };
+
+    window.plugin.wasabee.teamPromise = (teamid) => {
+        return new Promise(function(resolve, reject) {
+            var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;
+            var req = new XMLHttpRequest();
+	    req.open("GET", url);
+	    req.withCredentials = true;
+	    req.crossDomain = true;
+
+	    req.onload = function() {
+	      if (req.status == 200) {
+                  console.log("got response for team: " + teamid);
+                  var team = Team.create(req.response);
+                  Wasabee.teams.set(teamid, team);
+	          resolve(team);
+	      } else {
+                  reject(Error(req.statusText));
+	      }
+	    };
+
+	    req.onerror = function() {
+	        reject(Error("Network Error"));
+	    };
+
+	    req.send();
+        });
+    }
 }
