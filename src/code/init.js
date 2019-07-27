@@ -25,7 +25,7 @@ window.plugin.wasabee.init = function() {
 
         Wasabee.opList = Array();
         Wasabee.pasteList = Array();
-	Wasabee.teams = new Map();
+        Wasabee.teams = new Map();
 
         // All of these should eventually export functions.
         // We do this because they still assign them to the global scope.
@@ -52,7 +52,9 @@ window.plugin.wasabee.init = function() {
         window.addLayerGroup("Wasabee Draw Targets", window.plugin.wasabee.targetLayerGroup, true);
         window.addLayerGroup("Wasabee Agents", window.plugin.wasabee.agentLayerGroup, true);
 
-
+        window.addHook("mapDataRefreshStart", function () {
+          drawAgents()
+        });
         initCrossLinks();
         drawThings();
         //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)

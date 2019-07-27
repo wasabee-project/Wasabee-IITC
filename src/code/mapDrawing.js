@@ -11,9 +11,6 @@ export const drawThings = () => {
     resetAllTargets();
     resetAllLinks();
     checkAllLinks();
-    window.addHook("mapDataRefreshStart", function () {
-        drawAgents() 
-    });
 };
 
 //** This function adds all the Targets to the layer */
@@ -155,11 +152,11 @@ const drawAgents = () => {
     window.plugin.wasabee.teamPromise(operation.teamid).then(function(team) {
         team.agents.forEach(function(agent) {
             var agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
-	    if (agentInLayer != null) {
+            if (agentInLayer != null) {
                 window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
                 delete window.plugin.wasabee.agentLayers[agent.id];
-	    }
-	    if (agent.lat != 0) {
+            }
+            if (agent.lat != 0) {
                 var latLng = new L.LatLng(agent.lat, agent.lng);
                 var a_ = L.marker(latLng, {
                     title: agent.name,
@@ -171,7 +168,7 @@ const drawAgents = () => {
                         popupAnchor: L.point(-1, -48)
                     })
                 });
-	        window.registerMarkerForOMS(a_);
+                window.registerMarkerForOMS(a_);
                 a_.bindPopup(getAgentPopup(agent));
                 a_.off("click", agent.togglePopup, agent);
                 a_.on("spiderfiedclick", a_.togglePopup, a_);
@@ -181,7 +178,7 @@ const drawAgents = () => {
         });
     }, function(err) {
         console.log(err); // promise rejected 
-	window.plugin.wasabee.showMustAuthAlert();
+        window.plugin.wasabee.showMustAuthAlert();
     });
     // redraw target popup menus
     // window.plugin.wasabee.resetAllTargets();
