@@ -26,6 +26,7 @@ export default class Operation {
         this.pasteExpireDate = 0;
         this.color = DEFAULT_OPERATION_COLOR;
         this.comment = null;
+	this.teamid = null;
     }
 
     getColor() {
