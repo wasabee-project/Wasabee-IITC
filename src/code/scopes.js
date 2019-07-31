@@ -34,33 +34,42 @@
             label: "let decay",
             color: "#7D7D7D",
             markerIcon: scope.static.images.marker_alert_decay
-        }
-        /*, {
+        }, {
+	    name: Wasabee.Constants.MARKER_TYPE_KEY,
+	    label: "get key",
+	    color: "#7D7D7D",
+	    markerIcon: scope.static.images.marker_alert_key
+	}, {
+	    name: Wasabee.Constants.MARKER_TYPE_LINK,
           name : "CreateLinkAlert",
           label : "link",
           color : "#5994FF",
           markerIcon : data.Images.marker_alert_link,
         }, {
-          name : "GotoPortalAlert",
+	    name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
+          name : "MeetAgentPortalAlert",
           label : "go to",
           color : "#EDA032",
-          markerIcon : data.Images.marker_alert_goto,
+          markerIcon : data.Images.marker_alert_meetagent,
         }, {
+	    name: Wasabee.Constants.MARKER_TYPE_OTHER,
+          name : "OtherPortalAlert",
+          label : "other",
+          color : "#3679B4",
+          markerIcon : data.Images.marker_alert_other,
+        }, {
+	    name: Wasabee.Constants.MARKER_TYPE_RECHARGE,
+          name : "RechargePortalAlert",
+          label : "recharge",
+          color : "#53AD53",
+          markerIcon : data.Images.marker_alert_recharge,
+        }, {
+	    name: Wasabee.Constants.MARKER_TYPE_UPGRADE,
           name : "UpgradePortalAlert",
           label : "upgrade",
-          color : "#3679B4",
+          color : "#448800",
           markerIcon : data.Images.marker_alert_upgrade,
-        }, {
-          name : "FarmPortalAlert",
-          label : "farm",
-          color : "#53AD53",
-          markerIcon : data.Images.marker_alert_farm,
-        }, {
-          name : "MessageAlert",
-          label : "message",
-          color : "transparent",
-          markerIcon : data.Images.marker_alert_unknown,
-        }*/
+        }
     ];
 }(Wasabee || (Wasabee = {}));
 
