@@ -1,0 +1,5 @@
+releases/**
+node_modules/**
+dist/**
+src/wrapper/**
+src/lib/**
