@@ -110,9 +110,9 @@ const getImageFromMarkerType = (type) => {
         case Wasabee.Constants.MARKER_TYPE_OTHER:
             return Wasabee.static.images.marker_alert_other;
         case Wasabee.Constants.MARKER_TYPE_RECHARGE:
-            return Wasabee.static.images.marker_alert_other;
+            return Wasabee.static.images.marker_alert_recharge;
         case Wasabee.Constants.MARKER_TYPE_UPGRADE:
-            return Wasabee.static.images.marker_alert_other;
+            return Wasabee.static.images.marker_alert_upgrade;
         default:
             return Wasabee.static.images.marker_alert_other;
     }
