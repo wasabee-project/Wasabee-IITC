@@ -65,8 +65,6 @@
 //     points: Vertex[];
 // }
 
-
-
 // // Calculates if portal A is under the field formed by base and B.
 //         // The geometrical trick is to check if a link between A and a point in the middle of the ocean crosses cero, one or two sides of the field
 //         // one = it's inside
@@ -100,7 +98,6 @@
 
 // const getAllPortalsOnScreen = () : Portal[] => portals.filter((isOnScreen));
 
-
 // const crossCheck = (link1 : Link, link2 : Link) : boolean => {
 
 // };
@@ -112,5 +109,5 @@
 // };
 
 // const buildPartialOrder = (portals: Portal[], baseA: Portal, baseB: Portal) => Map {
-    
+
 // }

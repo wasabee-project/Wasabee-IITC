@@ -1,0 +1,22 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "env": {
+    "browser": true,
+    "jest": true,
+    "es6": true,
+    "node": true,
+    "jquery": true
+  },
+  "rules": {
+    "no-console": "off",
+    "lines-between-class-members": ["error", "always"]
+  },
+  "globals": {
+    "L": "readonly",
+    "PLAYER": "readonly"
+  }
+}
