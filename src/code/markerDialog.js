@@ -32,10 +32,9 @@ export class MarkerDialog {
     this._type = $("<select>");
     Wasabee.alertTypes.forEach(a => {
       self._type.append(
-        $("<option>").prop({
-          value: a.name,
-          text: a.label
-        })
+        $("<option>")
+          .val(a.name)
+          .text(a.label)
       );
     });
     this._type.val(Wasabee.Constants.DEFAULT_ALERT_TYPE);

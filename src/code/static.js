@@ -26,14 +26,15 @@ Wasabee.static = {
     marker_layer_groupd: require("./images/marker_layer_groupd.png"),
     marker_layer_groupe: require("./images/marker_layer_groupe.png"),
     marker_layer_groupf: require("./images/marker_layer_groupf.png"),
-    marker_alert_decay: require("./images/marker_alert_decay.png"),
     marker_alert_destroy: require("./images/marker_alert_destroy.png"),
-    marker_alert_farm: require("./images/marker_alert_farm.png"),
-    marker_alert_goto: require("./images/marker_alert_goto.png"),
+    marker_alert_virus: require("./images/marker_alert_virus.png"),
+    marker_alert_decay: require("./images/marker_alert_decay.png"),
+    marker_alert_key: require("./images/marker_alert_key.png"),
     marker_alert_link: require("./images/marker_alert_link.png"),
-    marker_alert_unknown: require("./images/marker_alert_unknown.png"),
-    marker_alert_upgrade: require("./images/marker_alert_upgrade.png"),
-    marker_alert_virus: require("./images/marker_alert_virus.png")
+    marker_alert_meetagent: require("./images/marker_alert_meetagent.png"),
+    marker_alert_other: require("./images/marker_alert_other.png"),
+    marker_alert_recharge: require("./images/marker_alert_recharge.png"),
+    marker_alert_upgrade: require("./images/marker_alert_upgrade.png")
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

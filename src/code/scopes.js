@@ -10,7 +10,13 @@ export default function() {
     MARKER_TYPE_DESTROY: "DestroyPortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
+    MARKER_TYPE_LINK: "CreateLinkAlert",
     DEFAULT_ALERT_TYPE: "DestroyPortalAlert",
+    MARKER_TYPE_KEY: "GetKeyPortalAlert",
+    MARKER_TYPE_MEETAGENT: "MeetAgentPortalAlert",
+    MARKER_TYPE_OTHER: "OtherPortalAlert",
+    MARKER_TYPE_RECHARGE: "RechargePortalAlert",
+    MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
     SERVER_OP_LIST_KEY: "SERVER_OP_LIST_KEY",
@@ -36,33 +42,43 @@ export default function() {
       label: "let decay",
       color: "#7D7D7D",
       markerIcon: Wasabee.static.images.marker_alert_decay
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_KEY,
+      label: "get key",
+      color: "#7D7D7D",
+      markerIcon: Wasabee.static.images.marker_alert_key
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_LINK,
+      label: "link",
+      color: "#5994FF",
+      markerIcon: Wasabee.static.images.marker_alert_link
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
+      label: "go to",
+      color: "#EDA032",
+      markerIcon: Wasabee.static.images.marker_alert_meetagent
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_OTHER,
+      label: "other",
+      color: "#3679B4",
+      markerIcon: Wasabee.static.images.marker_alert_other
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_RECHARGE,
+      label: "recharge",
+      color: "#53AD53",
+      markerIcon: Wasabee.static.images.marker_alert_recharge
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_UPGRADE,
+      label: "upgrade",
+      color: "#448800",
+      markerIcon: Wasabee.static.images.marker_alert_upgrade
     }
-    /* , {
-        name : "CreateLinkAlert",
-        label : "link",
-        color : "#5994FF",
-        markerIcon : data.Images.marker_alert_link,
-      }, {
-        name : "GotoPortalAlert",
-        label : "go to",
-        color : "#EDA032",
-        markerIcon : data.Images.marker_alert_goto,
-      }, {
-        name : "UpgradePortalAlert",
-        label : "upgrade",
-        color : "#3679B4",
-        markerIcon : data.Images.marker_alert_upgrade,
-      }, {
-        name : "FarmPortalAlert",
-        label : "farm",
-        color : "#53AD53",
-        markerIcon : data.Images.marker_alert_farm,
-      }, {
-        name : "MessageAlert",
-        label : "message",
-        color : "transparent",
-        markerIcon : data.Images.marker_alert_unknown,
-      } */
   ];
 
   Wasabee.layerTypes = [
