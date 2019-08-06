@@ -22,13 +22,19 @@ export const firebaseInit = () => {
 
     console.log("Message received: ", event.data);
 
-    //TODO: What do we want to do with the message?
-    if (event.data.cmd === "Agent Location Change") {
-      // and event.data.msg == current team ID?
+    var operation = window.plugin.wasabee.getSelectedOperation();
+    if (
+      event.data.data.cmd === "Agent Location Change" &&
+      operation.teamid == event.data.data.msg
+    ) {
       drawAgents();
     }
-    if (event.data.cmd === "Map Change") {
-      // and event.data.msg == current op ID
+    if (
+      event.data.data.cmd === "Map Change" &&
+      operation.ID == event.data.data.msg
+    ) {
+      console.log("refreshing/redrawing map");
+      window.plugin.wasabee.downloadSingleOp(operation.ID);
       drawThings();
     }
   });
