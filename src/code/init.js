@@ -7,6 +7,7 @@ import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
+import { firebaseInit } from "./firebaseSupport";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -70,6 +71,8 @@ window.plugin.wasabee.init = function() {
     window.addHook("mapDataRefreshStart", function() {
       drawAgents();
     });
+
+    firebaseInit();
     initCrossLinks();
     drawThings();
     //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
