@@ -18,7 +18,7 @@ export const firebaseInit = () => {
 
   window.addEventListener("message", event => {
     console.log("Wasabee: Received a message from postMessage().");
-    if (event.origin.indexOf("https://server.wasabee.rocks") === -1) return;
+    if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
 
     console.log("Message received: ", event.data);
 
