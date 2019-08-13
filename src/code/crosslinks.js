@@ -1,4 +1,9 @@
-var Wasabee = window.plugin.Wasabee;
+import {
+  MARKER_TYPE_DESTROY,
+  MARKER_TYPE_VIRUS,
+  MARKER_TYPE_DECAY,
+  BREAK_EXCEPTION
+} from "./constants";
 
 //*** CROSSLINK THINGS */
 export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
@@ -238,9 +243,9 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
     for (let i = 0; i < markers.length; i++) {
       var marker = markers[i];
       if (
-        marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
-        marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS ||
-        marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
+        marker.type == MARKER_TYPE_DESTROY ||
+        marker.type == MARKER_TYPE_VIRUS ||
+        marker.type == MARKER_TYPE_DECAY
       ) {
         if (checkMarkerAgainstLink(marker, link, operation)) {
           console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
@@ -297,11 +302,11 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
       );
       if (shouldShowCrosslink) {
         showCrossLink(link, operation);
-        throw Wasabee.Constants.BREAK_EXCEPTION;
+        throw BREAK_EXCEPTION;
       }
     });
   } catch (e) {
-    if (e !== Wasabee.Constants.BREAK_EXCEPTION) {
+    if (e !== BREAK_EXCEPTION) {
       throw e;
     }
   }
