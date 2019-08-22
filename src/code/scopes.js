@@ -43,7 +43,7 @@ export default function() {
       name: Wasabee.Constants.MARKER_TYPE_FARM,
       label: "farm",
       color: "#CE3B37",
-      markerIcon: Wasabee.static.images.marker_farm_destroy
+      markerIcon: Wasabee.static.images.marker_alert_farm
     },
     {
       name: Wasabee.Constants.MARKER_TYPE_GOTO,
@@ -64,7 +64,7 @@ export default function() {
       markerIcon: Wasabee.static.images.marker_alert_link
     },
     {
-      name: Wasabee.Constants.MARKER_TYPE_MEET_AGENT,
+      name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
       label: "meet agent",
       color: "#EDA032",
       markerIcon: Wasabee.static.images.marker_alert_meetagent
