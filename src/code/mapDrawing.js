@@ -40,10 +40,10 @@ const addTarget = target => {
   var marker = L.marker(latLng, {
     title: targetPortal.name,
     icon: L.icon({
-      iconUrl: getImageFromMarkerType(target.type),
+      iconUrl: getImageFromMarkerType(target.type, "pending"),
       shadowUrl: null,
-      iconSize: L.point(25, 41),
-      iconAnchor: L.point(25, 41),
+      iconSize: L.point(24, 40),
+      iconAnchor: L.point(12, 40),
       popupAnchor: L.point(-1, -48)
     })
   });
@@ -85,11 +85,35 @@ export const getPopupBodyWithType = (portal, target) => {
   var title = "";
   var comment = target.comment;
   switch (target.type) {
+    case Wasabee.Constants.MARKER_TYPE_DECAY:
+      title = "Let Decay";
+      break;
     case Wasabee.Constants.MARKER_TYPE_DESTROY:
       title = "Destroy";
       break;
-    case Wasabee.Constants.MARKER_TYPE_DECAY:
-      title = "Let Decay";
+    case Wasabee.Constants.MARKER_TYPE_FARM:
+      title = "Farm";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_GOTO:
+      title = "Go To";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_KEY:
+      title = "Get Keys";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_LINK:
+      title = "Establish Link";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_MEETAGENT:
+      title = "Meet agent";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_OTHER:
+      title = "Other";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_RECHARGE:
+      title = "Recharge";
+      break;
+    case Wasabee.Constants.MARKER_TYPE_UPGRADE:
+      title = "Upgrade";
       break;
     case Wasabee.Constants.MARKER_TYPE_VIRUS:
       title = "Virus";
@@ -106,7 +130,8 @@ export const getPopupBodyWithType = (portal, target) => {
 };
 
 //** This function returns the appropriate image for a marker type */
-const getImageFromMarkerType = type => {
+const getImageFromMarkerType = (type, state) => {
+  console.log(state);
   switch (type) {
     case Wasabee.Constants.MARKER_TYPE_DECAY:
       return Wasabee.static.images.marker_alert_decay;
@@ -130,8 +155,6 @@ const getImageFromMarkerType = type => {
       return Wasabee.static.images.marker_alert_upgrade;
     case Wasabee.Constants.MARKER_TYPE_VIRUS:
       return Wasabee.static.images.marker_alert_virus;
-    default:
-      return Wasabee.static.images.marker_alert_other;
   }
 };
 
