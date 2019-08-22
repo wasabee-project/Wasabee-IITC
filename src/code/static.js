@@ -37,7 +37,31 @@ Wasabee.static = {
     marker_alert_other: require("./images/wasabee_markers_other_pending.png"),
     marker_alert_recharge: require("./images/wasabee_markers_recharge_pending.png"),
     marker_alert_upgrade: require("./images/wasabee_markers_farm_pending.png"),
-    marker_alert_virus: require("./images/wasabee_markers_virus_pending.png")
+    marker_alert_virus: require("./images/wasabee_markers_virus_pending.png"),
+
+    marker_alert_decay_assigned: require("./images/wasabee_markers_decay_assigned.png"),
+    marker_alert_destroy_assigned: require("./images/wasabee_markers_destroy_assigned.png"),
+    marker_alert_farm_assigned: require("./images/wasabee_markers_farm_assigned.png"),
+    marker_alert_goto_assigned: require("./images/wasabee_markers_goto_assigned.png"),
+    marker_alert_key_assigned: require("./images/wasabee_markers_key_assigned.png"),
+    marker_alert_link_assigned: require("./images/wasabee_markers_link_assigned.png"),
+    marker_alert_meetagent_assigned: require("./images/wasabee_markers_meetagent_assigned.png"),
+    marker_alert_other_assigned: require("./images/wasabee_markers_other_assigned.png"),
+    marker_alert_recharge_assigned: require("./images/wasabee_markers_recharge_assigned.png"),
+    marker_alert_upgrade_assigned: require("./images/wasabee_markers_farm_assigned.png"),
+    marker_alert_virus_assigned: require("./images/wasabee_markers_virus_assigned.png"),
+
+    marker_alert_decay_done: require("./images/wasabee_markers_decay_done.png"),
+    marker_alert_destroy_done: require("./images/wasabee_markers_destroy_done.png"),
+    marker_alert_farm_done: require("./images/wasabee_markers_farm_done.png"),
+    marker_alert_goto_done: require("./images/wasabee_markers_goto_done.png"),
+    marker_alert_key_done: require("./images/wasabee_markers_key_done.png"),
+    marker_alert_link_done: require("./images/wasabee_markers_link_done.png"),
+    marker_alert_meetagent_done: require("./images/wasabee_markers_meetagent_done.png"),
+    marker_alert_other_done: require("./images/wasabee_markers_other_done.png"),
+    marker_alert_recharge_done: require("./images/wasabee_markers_recharge_done.png"),
+    marker_alert_upgrade_done: require("./images/wasabee_markers_farm_done.png"),
+    marker_alert_virus_done: require("./images/wasabee_markers_virus_done.png")
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };
