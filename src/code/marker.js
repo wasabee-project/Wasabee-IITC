@@ -6,6 +6,10 @@ export default class Marker {
     this.portalId = portalId;
     this.type = type;
     this.comment = comment;
+    this.state = "pending";
+    this.completedBy = "";
+    this.assignedTo = "";
+    this.assignedNickname = "";
   }
 
   static create(obj) {
