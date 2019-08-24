@@ -7,16 +7,18 @@ export default function() {
     SERVER_BASE_KEY: "https://server.wasabee.rocks",
     SERVER_BASE_TEST_KEY: "https://server.wasabee.rocks:8444",
     CURRENT_EXPIRE_NUMERIC: 1209600000,
-    MARKER_TYPE_DESTROY: "DestroyPortalAlert",
-    MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
+    MARKER_TYPE_DESTROY: "DestroyPortalAlert",
+    MARKER_TYPE_FARM: "FarmPortalMarker",
+    MARKER_TYPE_GOTO: "GotoPortalMarker",
+    MARKER_TYPE_KEY: "GetKeyPortalMarker",
     MARKER_TYPE_LINK: "CreateLinkAlert",
-    DEFAULT_ALERT_TYPE: "DestroyPortalAlert",
-    MARKER_TYPE_KEY: "GetKeyPortalAlert",
-    MARKER_TYPE_MEETAGENT: "MeetAgentPortalAlert",
+    MARKER_TYPE_MEETAGENT: "MeetAgentPortalMarker",
     MARKER_TYPE_OTHER: "OtherPortalAlert",
     MARKER_TYPE_RECHARGE: "RechargePortalAlert",
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
+    MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
+    DEFAULT_ALERT_TYPE: "OtherPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
     SERVER_OP_LIST_KEY: "SERVER_OP_LIST_KEY",
@@ -26,26 +28,32 @@ export default function() {
 
   Wasabee.alertTypes = [
     {
-      name: Wasabee.Constants.MARKER_TYPE_DESTROY,
-      label: "destroy",
-      color: "#CE3B37",
-      markerIcon: Wasabee.static.images.marker_alert_destroy
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_VIRUS,
-      label: "use virus",
-      color: "#8920C3",
-      markerIcon: Wasabee.static.images.marker_alert_virus
-    },
-    {
       name: Wasabee.Constants.MARKER_TYPE_DECAY,
       label: "let decay",
       color: "#7D7D7D",
       markerIcon: Wasabee.static.images.marker_alert_decay
     },
     {
+      name: Wasabee.Constants.MARKER_TYPE_DESTROY,
+      label: "destroy",
+      color: "#CE3B37",
+      markerIcon: Wasabee.static.images.marker_alert_destroy
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_FARM,
+      label: "farm",
+      color: "#CE3B37",
+      markerIcon: Wasabee.static.images.marker_alert_farm
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_GOTO,
+      label: "go to",
+      color: "#EDA032",
+      markerIcon: Wasabee.static.images.marker_alert_goto
+    },
+    {
       name: Wasabee.Constants.MARKER_TYPE_KEY,
-      label: "get key",
+      label: "get keys",
       color: "#7D7D7D",
       markerIcon: Wasabee.static.images.marker_alert_key
     },
@@ -57,7 +65,7 @@ export default function() {
     },
     {
       name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
-      label: "go to",
+      label: "meet agent",
       color: "#EDA032",
       markerIcon: Wasabee.static.images.marker_alert_meetagent
     },
@@ -78,6 +86,12 @@ export default function() {
       label: "upgrade",
       color: "#448800",
       markerIcon: Wasabee.static.images.marker_alert_upgrade
+    },
+    {
+      name: Wasabee.Constants.MARKER_TYPE_VIRUS,
+      label: "use virus",
+      color: "#8920C3",
+      markerIcon: Wasabee.static.images.marker_alert_virus
     }
   ];
 
