@@ -26,7 +26,8 @@ export default class Operation {
     this.pasteExpireDate = 0;
     this.color = DEFAULT_OPERATION_COLOR;
     this.comment = null;
-    this.teamid = null;
+    // this.teamid = null; // teamid is now deprecated, use teamslist
+    this.teamlist = Array();
   }
 
   getColor() {
@@ -409,6 +410,9 @@ export default class Operation {
     }
     if (!this.anchors) {
       this.anchors = Array();
+    }
+    if (!this.teamlist) {
+      this.teamlist = Array();
     }
   }
 
