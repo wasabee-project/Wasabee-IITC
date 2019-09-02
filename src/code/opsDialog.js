@@ -312,11 +312,9 @@ export class OpsDialog {
       );
     });
     //TODO enable comment section when !serverOp || (ownedServerOp)
-    var opIsOwnedServerOp = window.plugin.wasabee.opIsOwnedServerOp(
-      operation.ID
-    );
-    var opIsServerOp = window.plugin.wasabee.opIsServerOp(operation.ID);
-    var commentInputEnabled = !opIsServerOp || opIsOwnedServerOp;
+    var isWritableOp = window.plugin.wasabee.IsWritableOp(operation.ID);
+    var isServerOp = window.plugin.wasabee.IsServerOp(operation.ID);
+    var commentInputEnabled = !isServerOp || isWritableOp;
     var commentSection = tabContent.appendChild(document.createElement("p"));
     var commentInput = commentSection.appendChild(
       document.createElement("textarea")
@@ -426,7 +424,7 @@ export class OpsDialog {
           "Are you sure you want to *DELETE* this operation?"
         );
         if (confirmed == true) {
-          if (window.plugin.wasabee.opIsOwnedServerOp(operation.ID)) {
+          if (window.plugin.wasabee.IsWritableOp(operation.ID)) {
             var confirmedDeleteServerOp = confirm(
               "Are you sure you want to *DELETE* this operation on the *SERVER*?"
             );

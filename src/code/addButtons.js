@@ -95,14 +95,9 @@ export default function() {
           }
         });
 
-      var opIsOwnedServerOp = window.plugin.wasabee.opIsOwnedServerOp(
-        selectedOp.ID
-      );
-      var opIsServerOp = window.plugin.wasabee.opIsServerOp(selectedOp.ID);
-      if (
-        opIsOwnedServerOp ||
-        (opIsOwnedServerOp !== true && opIsServerOp !== true)
-      ) {
+      var IsWritableOp = window.plugin.wasabee.IsWritableOp(selectedOp.ID);
+      var IsServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+      if (IsWritableOp || (IsWritableOp !== true && IsServerOp !== true)) {
         $(container)
           .append(
             '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +

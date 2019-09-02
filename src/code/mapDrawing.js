@@ -308,24 +308,8 @@ const getAgentPopup = agent => {
   var title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.id = agent.id;
-  var profile = title.appendChild(document.createElement("a"));
-  profile.href =
-    Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/agent/" + agent.id;
-  profile.target = "_new";
-  profile.innerHTML = markdown.toHTML(agent.name);
+  title.innerHTML = markdown.toHTML(agent.name);
   var date = content.appendChild(document.createElement("span"));
-  date.innerHTML = markdown.toHTML("Last seen: " + agent.date);
-  if (agent.battery != 0) {
-    var battery = content.appendChild(document.createElement("span"));
-    battery.innerHTML = markdown.toHTML("Battery: " + agent.battery);
-  }
-  if (agent.alt != 0) {
-    var altitude = content.appendChild(document.createElement("span"));
-    altitude.innerHTML = markdown.toHTML("Altitude: " + agent.alt);
-  }
-  if (agent.cansendto == true) {
-    var send = content.appendChild(document.createElement("span"));
-    send.innerHTML = markdown.toHTML("send message field goes here");
-  }
+  date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
 };

@@ -1,6 +1,7 @@
 import store from "store";
 import Operation from "./operation";
 import Team from "./team";
+import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -30,6 +31,7 @@ export default function() {
   window.plugin.wasabee.authWithWasabee = () =>
     sendServerRequest("/me")
       .done(response => {
+        Wasabee.Me = new WasabeeMe(response);
         if (response.Ops != null) {
           window.plugin.wasabee.updateServerOpList(response.Ops, true);
         }
@@ -79,38 +81,30 @@ export default function() {
         window.plugin.wasabee.showMustAuthAlert();
       });
 
-  window.plugin.wasabee.getOpDownloads = opList => {
-    var opCalls = [];
-    opList.forEach((op, index) => {
-      opCalls.push(window.plugin.wasabee.downloadOpInList(op));
-      console.log(op, index);
+  window.plugin.wasabee.fetchAllOps = ops => {
+    ops.forEach(opid => {
+      if (window.plugin.wasabee.IsServerOp(opid) === true) {
+        window.plugin.wasabee.opPromise(opid).then(
+          function(newop) {
+            // save it to local storage
+            store.set(opid, newop);
+          },
+          function(err) {
+            console.log(err);
+          }
+        );
+      }
     });
-    return opCalls;
   };
 
-  window.plugin.wasabee.downloadOpInList = op =>
-    sendServerRequest("/api/v1/draw/" + op.ID)
-      .done(response => {
-        window.plugin.wasabee.updateOperationInList(Operation.create(response));
-      })
-      .fail(() => {
-        alert("Download Failed.");
-      });
+  window.plugin.wasabee.updateServerOpMap = (ops, pullFullOps) => {
+    // save the list of op IDs to the local store
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+    console.log("ops -> " + JSON.stringify(ops));
 
-  window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
-    const ownedOpList = opList.filter(op => op.IsOwner);
-    store.set(
-      Wasabee.Constants.SERVER_OP_LIST_KEY,
-      JSON.stringify(JSON.stringify(opList))
-    );
-    store.set(
-      Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY,
-      JSON.stringify(JSON.stringify(ownedOpList))
-    );
-    console.log("opList -> " + JSON.stringify(opList));
+    // pull all known ops from server to local store
     if (pullFullOps) {
-      console.log("pulling ops");
-      Promise.all(window.plugin.wasabee.getOpDownloads(opList))
+      Promise.all(window.plugin.wasabee.fetchAllOps(ops))
         .then(() => {
           alert("Sync Complete.");
         })
@@ -120,41 +114,38 @@ export default function() {
     }
   };
 
-  window.plugin.wasabee.opIsOwnedServerOp = opID => {
-    console.log("opId -> " + opID);
-    var isOwnedServerOp = false;
+  window.plugin.wasabee.IsWritableOp = opID => {
+    console.log("checking IsWritableOp: " + opID);
+    var isWritable = false;
     try {
-      var serverOwnedOpList = JSON.parse(
-        JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))
-      ); // Gotta do 2 json.parses b/c javascript is dumb?
-      if (serverOwnedOpList != null) {
-        for (const opInList in serverOwnedOpList) {
-          if (serverOwnedOpList[opInList].ID === opID) {
-            isOwnedServerOp = true;
-          }
+      var op = JSON.parse(store.get(opID));
+      if (op != null) {
+        // XXX TODO properly fetch and store /me
+        console.log("me: " + Wasabee.Me.GoogleID);
+        console.log("my teams: " + Wasabee.Me.Teams);
+        console.log(op);
+        if (Wasabee.Me.GoogleID != null) {
+          // XXX determine if an op team with write access is in the agent's teams
+          isWritable = true;
         }
       }
     } catch (e) {
-      console.log("No Server ops or some other exception");
+      console.log(e);
     }
-    return isOwnedServerOp;
+    return isWritable;
   };
 
-  window.plugin.wasabee.opIsServerOp = opID => {
+  window.plugin.wasabee.IsServerOp = opID => {
     var isServerOp = false;
     try {
-      var serverOpList = JSON.parse(
-        JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))
-      ); // Gotta do 2 json.parses b/c javascript is dumb?
-      if (serverOpList != null) {
-        for (const opInList in serverOpList) {
-          if (serverOpList[opInList].ID === opID) {
-            isServerOp = true;
-          }
+      var op = JSON.parse(store.get(opID));
+      if (op != null) {
+        if (op.Teams != null) {
+          isServerOp = true;
         }
       }
     } catch (e) {
-      console.log("No Server ops or some other exception");
+      console.log(e);
     }
     return isServerOp;
   };
@@ -171,14 +162,48 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
+            // add it to the global Wasabee.teams map -- should we let the caller do this?
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
           case 401:
             reject(
-              "it is safe to ignore this 401: you are not authorized for team " +
+              "it is safe to ignore this 401: you are not authorized for team: " +
                 teamid
             );
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.opPromise = opID => {
+    return new Promise(function(resolve, reject) {
+      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
+      var req = new XMLHttpRequest();
+      req.open("GET", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            var newop = Operation.create(req.response);
+            // Wasabee.ops.set(opID, newop);
+            resolve(newop);
+            break;
+          case 401:
+            reject("not authorized to access op: " + opID);
+            window.plugin.wasabee.showMustAuthAlert();
             break;
           default:
             reject(Error(req.statusText));
