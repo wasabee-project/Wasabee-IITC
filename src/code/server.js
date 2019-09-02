@@ -115,7 +115,7 @@ export default function() {
     console.log("checking IsWritableOp: " + opID);
     var isWritable = false;
     try {
-      var op = JSON.parse(store.get(opID));
+      var op = window.plugin.wasabee.getOperationByID(opID);
       if (op != null) {
         // XXX TODO properly fetch and store /me
         console.log("me: " + Wasabee.Me.GoogleID);
@@ -135,7 +135,7 @@ export default function() {
   window.plugin.wasabee.IsServerOp = opID => {
     var isServerOp = false;
     try {
-      var op = JSON.parse(store.get(opID));
+      var op = window.plugin.wasabee.getOperationByID(opID);
       if (op != null && op.Teams != null) {
         isServerOp = true;
       }

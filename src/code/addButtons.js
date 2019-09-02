@@ -105,10 +105,8 @@ export default function() {
               ' style="vertical-align:middle;align:center;" /></a>'
           )
           .on("click", "#wasabee_uploadbutton", function() {
-            var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(
-              selectedOp.ID
-            );
-            if (opIsInLocalStorage) {
+            // upload is different than update -- upload on 1st, update after
+            if (IsServerOp) {
               window.plugin.wasabee.updateSingleOp(
                 Operation.create(selectedOp)
               );

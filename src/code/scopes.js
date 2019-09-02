@@ -3,6 +3,7 @@ export default function() {
 
   Wasabee.Constants = {
     OP_LIST_KEY: "OP_LIST_KEY",
+    SELECTED_OP_KEY: "SELECTED_OP_KEY",
     PASTE_LIST_KEY: "PASTE_LIST_KEY",
     SERVER_BASE_KEY: "https://server.wasabee.rocks",
     SERVER_BASE_TEST_KEY: "https://server.wasabee.rocks:8444",

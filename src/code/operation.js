@@ -11,14 +11,12 @@ export default class Operation {
   //ID <- randomly generated alpha-numeric ID for the operation
   //name <- name of operation
   //creator <- agent who created it
-  //isSelected <- if true, this operation is the one that's currently displayed
   //portals <- List of Portals
   //links <- List of Links
-  constructor(creator, name, isSelected) {
+  constructor(creator, name) {
     this.ID = generateId();
     this.name = name;
     this.creator = creator;
-    this.isSelected = isSelected;
     this.opportals = Array();
     this.anchors = Array();
     this.links = Array();
@@ -33,7 +31,6 @@ export default class Operation {
 
   store() {
     try {
-      console.log("storing: " + JSON.stringify(this) + " as " + this.ID);
       store.set(this.ID, JSON.stringify(this));
     } catch (e) {
       console.log(e);
