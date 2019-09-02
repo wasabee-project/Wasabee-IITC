@@ -168,13 +168,21 @@ export default function() {
       req.crossDomain = true;
 
       req.onload = function() {
-        if (req.status === 200) {
-          console.log("got response for team: " + teamid);
-          var team = Team.create(req.response);
-          Wasabee.teams.set(teamid, team);
-          resolve(team);
-        } else {
-          reject(Error(req.statusText));
+        switch (req.status) {
+          case 200:
+            var team = Team.create(req.response);
+            Wasabee.teams.set(teamid, team);
+            resolve(team);
+            break;
+          case 401:
+            reject(
+              "it is safe to ignore this 401: you are not authorized for team " +
+                teamid
+            );
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
         }
       };
 

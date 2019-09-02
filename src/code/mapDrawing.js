@@ -131,7 +131,6 @@ export const getPopupBodyWithType = (portal, target) => {
 
 //** This function returns the appropriate image for a marker type */
 const getImageFromMarker = target => {
-  console.log(target);
   switch (target.state) {
     case "pending":
       switch (target.type) {
@@ -255,50 +254,49 @@ const addLink = (link, color, operation) => {
 /** this function fetches and displays agent location */
 export const drawAgents = () => {
   var operation = window.plugin.wasabee.getSelectedOperation();
-  console.log("drawAgents");
-  if (operation.teamid == null) {
-    return;
-  }
-  /* each pull resets this team  -- put rate limiting here, don't fetch if less than 60 seconds old */
-  if (Wasabee.teams.has(operation.teamid)) {
-    Wasabee.teams.delete(operation.teamid);
-  }
 
-  /* this fetches and team into Wasabee.teams */
-  window.plugin.wasabee.teamPromise(operation.teamid).then(
-    function(team) {
-      team.agents.forEach(function(agent) {
-        var agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
-        if (agentInLayer != null) {
-          window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
-          delete window.plugin.wasabee.agentLayers[agent.id];
-        }
-        if (agent.lat != 0) {
-          var latLng = new L.LatLng(agent.lat, agent.lng);
-          var a_ = L.marker(latLng, {
-            title: agent.name,
-            icon: L.icon({
-              iconUrl: agent.pic,
-              shadowUrl: null,
-              iconSize: L.point(41, 41),
-              iconAnchor: L.point(25, 41),
-              popupAnchor: L.point(-1, -48)
-            })
-          });
-          window.registerMarkerForOMS(a_);
-          a_.bindPopup(getAgentPopup(agent));
-          a_.off("click", agent.togglePopup, agent);
-          a_.on("spiderfiedclick", a_.togglePopup, a_);
-          window.plugin.wasabee.agentLayers[agent.id] = a_;
-          a_.addTo(window.plugin.wasabee.agentLayerGroup);
-        }
-      });
-    },
-    function(err) {
-      console.log(err); // promise rejected
-      window.plugin.wasabee.showMustAuthAlert();
+  /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
+  operation.teamlist.forEach(function(t) {
+    if (Wasabee.teams.has(t.teamid)) {
+      Wasabee.teams.delete(t.teamid);
     }
-  );
+
+    /* this fetches the team into Wasabee.teams */
+    window.plugin.wasabee.teamPromise(t.teamid).then(
+      function(team) {
+        team.agents.forEach(function(agent) {
+          var agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
+          if (agentInLayer != null) {
+            window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
+            delete window.plugin.wasabee.agentLayers[agent.id];
+          }
+          if (agent.lat != 0) {
+            var latLng = new L.LatLng(agent.lat, agent.lng);
+            var a_ = L.marker(latLng, {
+              title: agent.name,
+              icon: L.icon({
+                iconUrl: agent.pic,
+                shadowUrl: null,
+                iconSize: L.point(41, 41),
+                iconAnchor: L.point(25, 41),
+                popupAnchor: L.point(-1, -48)
+              })
+            });
+            window.registerMarkerForOMS(a_);
+            a_.bindPopup(getAgentPopup(agent));
+            a_.off("click", agent.togglePopup, agent);
+            a_.on("spiderfiedclick", a_.togglePopup, a_);
+            window.plugin.wasabee.agentLayers[agent.id] = a_;
+            a_.addTo(window.plugin.wasabee.agentLayerGroup);
+          }
+        });
+      },
+      function(err) {
+        console.log(err); // promise rejected
+        // you may not have access to every team on the op -- ignore the problems
+      }
+    );
+  }); // forEach team
   // redraw target popup menus
   // window.plugin.wasabee.resetAllTargets();
   // create new window.plugin.wasabee.updateAllTargets
