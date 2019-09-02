@@ -33,7 +33,7 @@ export default function() {
       .done(response => {
         Wasabee.Me = new WasabeeMe(response);
         if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpList(response.Ops, true);
+          window.plugin.wasabee.updateServerOpMap(response.Ops, true);
         }
       })
       .fail(() => {
@@ -45,7 +45,7 @@ export default function() {
       .done(response => {
         //  We shouldn't read an answer to this. It's a POST.
         if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpList(response.Ops, false);
+          window.plugin.wasabee.updateServerOpMap(response.Ops, false);
         }
         alert("Upload Complete.");
       })
@@ -62,14 +62,22 @@ export default function() {
         window.plugin.wasabee.showMustAuthAlert();
       });
 
-  window.plugin.wasabee.downloadSingleOp = operation =>
-    sendServerRequest("/api/v1/draw/" + operation.ID)
-      .done(response => {
-        console.log("got response -> " + JSON.stringify(response));
-      })
-      .fail(() => {
-        alert("Download Failed.");
-      });
+  window.plugin.wasabee.downloadSingleOp = opID => {
+    if (window.plugin.wasabee.IsServerOp(opID) === true) {
+      window.plugin.wasabee.opPromise(opID).then(
+        function(newop) {
+          // save it to local storage
+          // not really necessary since Operation.create() (called from opPromise) does this for us
+          newop.store();
+          // add it to the list of known ops
+          Wasabee.ops.set(opID, true);
+        },
+        function(err) {
+          console.log(err);
+        }
+      );
+    }
+  };
 
   // TODO: Should this use the DELETE verb?
   window.plugin.wasabee.deleteOwnedServerOp = opID =>
@@ -82,24 +90,13 @@ export default function() {
       });
 
   window.plugin.wasabee.fetchAllOps = ops => {
-    ops.forEach(opid => {
-      if (window.plugin.wasabee.IsServerOp(opid) === true) {
-        window.plugin.wasabee.opPromise(opid).then(
-          function(newop) {
-            // save it to local storage
-            store.set(opid, newop);
-          },
-          function(err) {
-            console.log(err);
-          }
-        );
-      }
+    ops.forEach(opID => {
+      window.plugin.wasabee.downloadSingleOp(opID);
     });
   };
 
   window.plugin.wasabee.updateServerOpMap = (ops, pullFullOps) => {
     // save the list of op IDs to the local store
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
     console.log("ops -> " + JSON.stringify(ops));
 
     // pull all known ops from server to local store
@@ -112,6 +109,9 @@ export default function() {
           throw (alert(data.message), console.log(data), data);
         });
     }
+
+    // save the list of ops
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
   };
 
   window.plugin.wasabee.IsWritableOp = opID => {
@@ -162,7 +162,7 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
-            // add it to the global Wasabee.teams map -- should we let the caller do this?
+            // add it to the global Wasabee.teams map
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
@@ -198,7 +198,6 @@ export default function() {
         switch (req.status) {
           case 200:
             var newop = Operation.create(req.response);
-            // Wasabee.ops.set(opID, newop);
             resolve(newop);
             break;
           case 401:

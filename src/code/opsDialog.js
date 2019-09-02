@@ -86,19 +86,18 @@ export function initOpsDialog() {
 
   //*** This function iterates through the opList and returns the selected one.
   window.plugin.wasabee.getSelectedOperation = () => {
-    for (let operation of Wasabee.opList) {
-      if (operation.isSelected == true) {
-        return Operation.create(operation);
-      }
-    }
-    return null;
+    return Wasabee.selectedOp;
   };
 
-  window.plugin.wasabee.getOperationById = opId => {
-    for (let operation of Wasabee.opList) {
-      if (operation.ID == opId) {
-        return Operation.create(operation);
+  window.plugin.wasabee.getOperationById = opID => {
+    try {
+      var v = JSON.parse(store.get(opID));
+      if (v == null) {
+        return null;
       }
+      return Operation.create(v);
+    } catch (e) {
+      console.log(e);
     }
     return null;
   };
@@ -110,20 +109,27 @@ export function initOpsDialog() {
       store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true);
     }
     //This sets up the op list
-    var opList = null;
-    var opListObj = store.get(Wasabee.Constants.OP_LIST_KEY);
-    if (opListObj != null) {
-      opList = JSON.parse(opListObj);
-    }
-
-    if (opList == null) {
+    var ops = store.get(Wasabee.Constants.OP_LIST_KEY);
+    if (ops == null) {
       var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
-      var listToStore = [];
-      listToStore.push(baseOp);
-      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(listToStore));
-      opList = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+      try {
+        store.set(baseOp.ID, JSON.stringify(baseOp));
+      } catch (e) {
+        console.log(e);
+      }
+
+      ops = new Map();
+      ops.set(baseOp.ID, true);
+      Wasabee.selectedOp = baseOp;
+      // round-trip to be safe
+      try {
+        store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+      } catch (e) {
+        console.log(e);
+      }
+      ops = store.get(Wasabee.Constants.OP_LIST_KEY);
     }
-    Wasabee.opList = opList;
+    Wasabee.ops = JSON.parse(ops);
 
     //This sets up the paste list
     var pasteList = null;
@@ -146,34 +152,43 @@ export function initOpsDialog() {
     clearAllBut = false,
     showExportDialog = false
   ) => {
-    var updatedArray = [];
     if (!(operation instanceof Operation)) {
       operation = Operation.create(operation);
     }
     operation.cleanPortalList();
 
-    var selectedOpID = null;
-    for (let opInList of Wasabee.opList) {
-      if (!makeSelected) {
-        if (opInList.isSelected) {
-          selectedOpID = opInList.ID;
+    if (clearAllBut === true) {
+      // whack every known op
+      Wasabee.ops.forEach(function(opID) {
+        try {
+          store.removeItem(opID);
+        } catch (e) {
+          console.log(e);
         }
-      }
-      if (opInList.ID != operation.ID && clearAllBut != true) {
-        if (makeSelected) {
-          opInList.isSelected = false;
-        }
-        updatedArray.push(opInList);
-      }
+        Wasabee.ops.delete(opID);
+      });
     }
 
-    if (makeSelected || selectedOpID == operation.ID) {
-      operation.isSelected = true;
+    // add this one
+    operation.store();
+    if (makeSelected === true) {
+      Wasabee.selectedOp = operation.ID;
     }
-    updatedArray.push(operation);
+    Wasabee.ops.set(operation.ID, true);
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(Wasabee.ops));
 
-    if (updatedArray.length != 0) {
-      updatedArray.sort((a, b) => {
+    var displayList = Array();
+    Wasabee.ops.forEach(function(opID) {
+      try {
+        var tmpOp = JSON.parse(store.get(opID));
+        displayList.push(tmpOp);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    if (displayList.length != 0) {
+      displayList.sort((a, b) => {
         if (a.name.toLowerCase() < b.name.toLowerCase()) {
           return -1;
         }
@@ -182,12 +197,11 @@ export function initOpsDialog() {
         }
         return 0;
       });
-      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
-      Wasabee.opList = updatedArray;
+
       var selectedOp = window.plugin.wasabee.getSelectedOperation();
       LinkDialog.update(selectedOp, false);
       LinkListDialog.update(selectedOp, null, false);
-      OpsDialog.update(Wasabee.opList, false);
+      OpsDialog.update(Wasabee.ops, false);
       MarkerDialog.update(selectedOp, false, false);
 
       drawThings();

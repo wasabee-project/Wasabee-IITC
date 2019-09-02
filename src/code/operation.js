@@ -1,6 +1,7 @@
 import Link from "./link";
 import Marker from "./marker";
 import { generateId } from "./auxiliar";
+import store from "../lib/store";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
@@ -28,6 +29,14 @@ export default class Operation {
     this.comment = null;
     // this.teamid = null; // teamid is now deprecated, use teamslist
     this.teamlist = Array();
+  }
+
+  store() {
+    try {
+      store.set(this.ID, JSON.stringify(this));
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   getColor() {
@@ -428,6 +437,7 @@ export default class Operation {
       }
     }
     operation._ensureCollections();
+    operation.store();
     return operation;
   }
 }
