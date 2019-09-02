@@ -92,10 +92,9 @@ export function initOpsDialog() {
   window.plugin.wasabee.getOperationById = opID => {
     try {
       var v = JSON.parse(store.get(opID));
-      if (v == null) {
-        return null;
+      if (v != null) {
+        return Operation.create(v);
       }
-      return Operation.create(v);
     } catch (e) {
       console.log(e);
     }
@@ -109,6 +108,7 @@ export function initOpsDialog() {
       store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true);
     }
     //This sets up the op list
+    console.log("setupLocalStorage");
     var ops = store.get(Wasabee.Constants.OP_LIST_KEY);
     if (ops == null) {
       var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
@@ -119,6 +119,7 @@ export function initOpsDialog() {
       }
 
       ops = new Map();
+      console.log("adding baseOp to ops");
       ops.set(baseOp.ID, true);
       Wasabee.selectedOp = baseOp;
       // round-trip to be safe
@@ -130,6 +131,7 @@ export function initOpsDialog() {
       ops = store.get(Wasabee.Constants.OP_LIST_KEY);
     }
     Wasabee.ops = JSON.parse(ops);
+    console.log(Wasabee.ops);
 
     //This sets up the paste list
     var pasteList = null;
@@ -160,18 +162,13 @@ export function initOpsDialog() {
     if (clearAllBut === true) {
       // whack every known op
       Wasabee.ops.forEach(function(opID) {
-        try {
-          store.removeItem(opID);
-        } catch (e) {
-          console.log(e);
-        }
-        Wasabee.ops.delete(opID);
+        window.plugin.wasabee.removeOperationFromList(opID);
       });
     }
 
     // add this one
     operation.store();
-    if (makeSelected === true) {
+    if (makeSelected === true || clearAllBut === true) {
       Wasabee.selectedOp = operation.ID;
     }
     Wasabee.ops.set(operation.ID, true);
@@ -181,7 +178,9 @@ export function initOpsDialog() {
     Wasabee.ops.forEach(function(opID) {
       try {
         var tmpOp = JSON.parse(store.get(opID));
-        displayList.push(tmpOp);
+        if (tmpOp != null) {
+          displayList.push(tmpOp);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -217,23 +216,17 @@ export function initOpsDialog() {
   };
 
   //** This function removes an operation from the main list */
-  window.plugin.wasabee.removeOperationFromList = operation => {
-    if (Wasabee.opList.length > 1) {
-      var updatedArray = [];
-      for (let opInList of Wasabee.opList) {
-        if (opInList.ID != operation.ID) {
-          updatedArray.push(opInList);
-        }
-      }
-      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(updatedArray));
-      Wasabee.opList = updatedArray;
-      window.plugin.wasabee.updateOperationInList(
-        Wasabee.opList[0],
-        operation.isSelected
-      );
+  window.plugin.wasabee.removeOperationFromList = opID => {
+    try {
+      store.removeItem(opID);
+    } catch (e) {
+      console.log(e);
     }
+    Wasabee.ops.delete(opID);
+    // XXX update the store?
   };
 }
+
 var _dialogs = [];
 
 export class OpsDialog {

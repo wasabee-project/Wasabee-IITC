@@ -66,11 +66,8 @@ export default function() {
     if (window.plugin.wasabee.IsServerOp(opID) === true) {
       window.plugin.wasabee.opPromise(opID).then(
         function(newop) {
-          // save it to local storage
-          // not really necessary since Operation.create() (called from opPromise) does this for us
-          newop.store();
           // add it to the list of known ops
-          Wasabee.ops.set(opID, true);
+          Wasabee.ops.set(newop.ID, true);
         },
         function(err) {
           console.log(err);
@@ -139,10 +136,8 @@ export default function() {
     var isServerOp = false;
     try {
       var op = JSON.parse(store.get(opID));
-      if (op != null) {
-        if (op.Teams != null) {
-          isServerOp = true;
-        }
+      if (op != null && op.Teams != null) {
+        isServerOp = true;
       }
     } catch (e) {
       console.log(e);

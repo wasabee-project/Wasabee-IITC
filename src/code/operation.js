@@ -33,6 +33,7 @@ export default class Operation {
 
   store() {
     try {
+      console.log("storing: " + JSON.stringify(this) + " as " + this.ID);
       store.set(this.ID, JSON.stringify(this));
     } catch (e) {
       console.log(e);

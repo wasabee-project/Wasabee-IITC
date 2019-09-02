@@ -154,6 +154,11 @@ export default function() {
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOpList = function() {
-    store.set(Wasabee.Constants.OP_LIST_KEY, null);
+    Wasabee.ops.forEach(function(opID) {
+      store.removeItem(opID);
+    });
+    var ops = new Map();
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+    Wasabee.ops = ops;
   };
 }

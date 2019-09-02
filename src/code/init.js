@@ -24,11 +24,10 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.agentLayerGroup = null;
 
   window.plugin.wasabee.loadExternals = function() {
-    Wasabee.opList = Array(); // XXX deprecated make it go away
     Wasabee.pasteList = Array();
     // simply a list of opIDs for now
-    Wasabee.ops = new Map();
-    Wasabee.selectedOp = null; // the in-memory working op
+    Wasabee.ops = new Map(); // init'd in initOpsDialog();
+    Wasabee.selectedOp = null; // the in-memory working op;
     Wasabee.teams = new Map();
     Wasabee.Me = new WasabeeMe();
 
