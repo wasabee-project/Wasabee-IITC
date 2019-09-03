@@ -1,4 +1,3 @@
-import store from "store";
 import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
@@ -112,9 +111,6 @@ export default function() {
           throw (alert(data.message), console.log(data), data);
         });
     }
-
-    // save the list of ops
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
   };
 
   window.plugin.wasabee.IsWritableOp = opID => {

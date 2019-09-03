@@ -2,10 +2,11 @@
 // @id           wasabee
 // @name         IITC Plugin: Wasabee Draw Tools
 // @namespace    http://tampermonkey.net/
-// @version      0.12.0
-// @updateURL    http://wasabee.rocks/wasabee.meta.js
-// @downloadURL  http:/wasabee.rocks/wasabee.user.js
-// @description  Less terrible draw tools, hopefully.
+// @version      0.13.1-deviousness
+// @updateURL    http://server.wasabee.rocks/static/dev/wasabee.meta.js
+// @downloadURL  http://server.wasabee.rocks/static/dev/wasabee.user.js
+// @description  Wasabee is not for dating. Period.
+// @category     Draw
 // @author       Wasabee
 // @include      https://*.ingress.com/*
 // @include      http://*.ingress.com/*

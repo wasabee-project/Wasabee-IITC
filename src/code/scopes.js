@@ -2,7 +2,6 @@ export default function() {
   const Wasabee = window.plugin.Wasabee || {};
 
   Wasabee.Constants = {
-    OP_LIST_KEY: "OP_LIST_KEY",
     SELECTED_OP_KEY: "SELECTED_OP_KEY",
     PASTE_LIST_KEY: "PASTE_LIST_KEY",
     SERVER_BASE_KEY: "https://server.wasabee.rocks",
