@@ -154,6 +154,7 @@ export function initOpsDialog() {
     try {
       var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
       var ops = window.plugin.wasabee.objToStrMap(JSON.parse(jlist));
+      if (ops.size === 0) window.plugin.wasabee.initOps();
       console.log(ops);
     } catch (e) {
       console.log(e);
@@ -257,7 +258,7 @@ export function initOpsDialog() {
   //** This function removes an operation from the main list */
   window.plugin.wasabee.removeOperation = opID => {
     try {
-      store.removeItem(opID);
+      store.remove(opID);
     } catch (e) {
       console.log(e);
     }
@@ -280,7 +281,7 @@ export function initOpsDialog() {
       ops = window.plugin.wasabee.objToStrMap(jlist);
     }
     ops.forEach(function(value, opID) {
-      store.removeItem(opID);
+      store.remove(opID);
     });
     var blank = new Map();
     store.set(
