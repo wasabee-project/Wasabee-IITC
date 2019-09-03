@@ -5,16 +5,16 @@ export default class WasabeeMe {
   }
 
   static create(data) {
-    var d = JSON.parse(data);
+    // console.log(data);
     var wme = new WasabeeMe();
-    for (var prop in d) {
+    for (var prop in data) {
       if (wme.hasOwnProperty(prop)) {
         if (prop === "Teams") {
-          d.agents.forEach(function(agent) {
-            wme.agents.push(agent);
+          data.Teams.forEach(function(team) {
+            wme.Teams.push(team);
           });
         } else {
-          wme[prop] = d[prop];
+          wme[prop] = data[prop];
         }
       }
     }
