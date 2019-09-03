@@ -34,7 +34,8 @@ export default function() {
         Wasabee.Me = new WasabeeMe(response);
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
-            var tmp = new Operation(op); // saves it to local storage
+            var tmp = new Operation(op);
+            tmp.store();
             window.plugin.wasabee.addOperationToList(tmp.ID);
           });
         }
@@ -50,7 +51,8 @@ export default function() {
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
             if (op.ID == operation.ID) {
-              var tmp = new Operation(op); // saves it to local storage
+              var tmp = new Operation(op);
+              tmp.store();
               window.plugin.wasabee.addOperationToList(tmp.ID);
             }
           });

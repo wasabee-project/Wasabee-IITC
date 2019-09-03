@@ -135,42 +135,30 @@ export function initOpsDialog() {
   window.plugin.wasabee.initOps = () => {
     console.log("initOps");
     var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
-    try {
-      baseOp.store();
-    } catch (e) {
-      console.log(e);
-    }
+    baseOp.store();
 
-    var newops = new Map();
-    newops.set(baseOp.ID, true);
+    window.plugin.wasabee.resetOps();
+    window.plugin.wasabee.addOperationToList(baseOp.ID);
     Wasabee._selectedOp = baseOp;
     window.plugin.wasabee.setSelectedOpID(baseOp.ID);
-    try {
-      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(newops));
-    } catch (e) {
-      console.log(e);
-    }
-    // round-trip to be safe
-    try {
-      var jops = store.get(Wasabee.Constants.OP_LIST_KEY);
-    } catch (e) {
-      console.log(e);
-    }
-    return jops;
   };
 
   //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
   window.plugin.wasabee.setupLocalStorage = () => {
     if (store.get(Wasabee.Constants.OP_RESTRUCTURE_KEY) == null) {
-      window.plugin.wasabee.resetOps();
+      window.plugin.wasabee.initOps();
       store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true);
     }
+
     //This sets up the op list
-    var ops = store.get(Wasabee.Constants.OP_LIST_KEY);
-    if (ops == null) {
-      ops = window.plugin.wasabee.initOps();
+    try {
+      var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
+      var ops = window.plugin.wasabee.objToStrMap(JSON.parse(jlist));
+      console.log(ops);
+    } catch (e) {
+      console.log(e);
+      window.plugin.wasabee.initOps();
     }
-    console.log(ops);
 
     //This sets up the paste list
     var pasteList = null;
@@ -254,15 +242,16 @@ export function initOpsDialog() {
 
   window.plugin.wasabee.addOperationToList = opID => {
     var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
-    console.log(jlist);
     if (jlist == null) {
       var l = new Map();
     } else {
-      l = JSON.parse(jlist);
+      l = window.plugin.wasabee.objToStrMap(JSON.parse(jlist));
     }
-    console.log(l);
-    l.set(opID, "true");
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(l));
+    l.set(opID, opID);
+    store.set(
+      Wasabee.Constants.OP_LIST_KEY,
+      JSON.stringify(window.plugin.wasabee.strMapToObj(l))
+    );
   };
 
   //** This function removes an operation from the main list */
@@ -272,28 +261,62 @@ export function initOpsDialog() {
     } catch (e) {
       console.log(e);
     }
-    var ops = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    var ops = window.plugin.wasabee.objToStrMap(
+      JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY))
+    );
     ops.delete(opID);
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+    store.set(
+      Wasabee.Constants.OP_LIST_KEY,
+      JSON.stringify(window.plugin.wasabee.strMapToObj(ops))
+    );
   };
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOps = () => {
-    var ops = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
+    if (jlist == null) {
+      var ops = new Map();
+    } else {
+      ops = window.plugin.wasabee.objToStrMap(jlist);
+    }
     ops.forEach(function(value, opID) {
       store.removeItem(opID);
     });
     var blank = new Map();
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(blank));
+    store.set(
+      Wasabee.Constants.OP_LIST_KEY,
+      JSON.stringify(window.plugin.wasabee.strMapToObj(blank))
+    );
   };
 
   window.plugin.wasabee.opsList = () => {
-    var raw = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
+    if (jlist == null) {
+      var raw = new Map();
+    } else {
+      raw = window.plugin.wasabee.objToStrMap(jlist);
+    }
     var out = new Array();
     raw.forEach(function(value, opID) {
       out.push(opID);
     });
     return out;
+  };
+
+  window.plugin.wasabee.strMapToObj = strMap => {
+    var o = Object.create(null);
+    strMap.forEach(function(v, k) {
+      o[k] = v;
+    });
+    return o;
+  };
+
+  window.plugin.wasabee.objToStrMap = o => {
+    var m = new Map();
+    for (var k in o) {
+      m.set(k, o[k]);
+    }
+    return m;
   };
 }
 

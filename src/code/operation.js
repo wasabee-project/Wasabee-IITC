@@ -30,6 +30,7 @@ export default class Operation {
   }
 
   store() {
+    console.log("store: " + this.ID + ": " + JSON.stringify(this));
     try {
       store.set(this.ID, JSON.stringify(this));
     } catch (e) {
