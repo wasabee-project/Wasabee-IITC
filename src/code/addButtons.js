@@ -72,7 +72,7 @@ export default function() {
             "Are you sure you want to clear ALL operations?"
           );
           if (confirmed) {
-            window.plugin.wasabee.resetOpList();
+            window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
             OpsDialog.closeDialogs();
           }

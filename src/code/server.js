@@ -30,11 +30,17 @@ export default function() {
   window.plugin.wasabee.authWithWasabee = () =>
     sendServerRequest("/me")
       .done(response => {
-        Wasabee.Me = new WasabeeMe(response);
+        Wasabee.Me = WasabeeMe.create(response);
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
-            var tmp = new Operation(op);
-            tmp.store();
+            window.plugin.wasabee.opPromise(op.ID).then(
+              function(newop) {
+                newop.store();
+              },
+              function(err) {
+                console.log(err);
+              }
+            );
           });
         }
       })
@@ -49,8 +55,14 @@ export default function() {
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
             if (op.ID == operation.ID) {
-              var tmp = new Operation(op);
-              tmp.store();
+              window.plugin.wasabee.opPromise(op.ID).then(
+                function(newop) {
+                  newop.store();
+                },
+                function(err) {
+                  console.log(err);
+                }
+              );
             }
           });
         }

@@ -25,17 +25,13 @@ export default class Operation {
     this.pasteExpireDate = 0;
     this.color = DEFAULT_OPERATION_COLOR;
     this.comment = null;
-    // this.teamid = null; // teamid is now deprecated, use teamslist
     this.teamlist = Array();
   }
 
   store() {
-    console.log("store: " + this.ID + ": " + JSON.stringify(this));
-    try {
-      store.set(this.ID, JSON.stringify(this));
-    } catch (e) {
-      console.log(e);
-    }
+    console.log("pushing to local store: " + this.ID);
+    this._ensureCollections();
+    store.set(this.ID, JSON.stringify(this));
   }
 
   getColor() {
@@ -425,6 +421,9 @@ export default class Operation {
   }
 
   static create(obj) {
+    if (typeof obj == "string") {
+      obj = JSON.parse(obj);
+    }
     var operation = new Operation();
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
@@ -436,6 +435,7 @@ export default class Operation {
       }
     }
     operation._ensureCollections();
+    console.log(operation);
     // operation.store();
     return operation;
   }

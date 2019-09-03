@@ -256,8 +256,10 @@ export function initOpsDialog() {
     var out = new Array();
 
     store.each(function(value, key) {
+      // value is hashed, need to get it the long way
+      // var v = store.get(key);
+      // if (key.length == 40 && v.includes("opportals")) {
       if (key.length == 40) {
-        // XXX add a test to make sure it is an op
         out.push(key);
       }
     });
@@ -300,7 +302,6 @@ export class OpsDialog {
     $(operationSelect).css({
       width: "50%"
     });
-    console.log("setupSpinner: " + JSON.stringify(this._operationList));
     this._operationList.forEach(function(opID) {
       var op = window.plugin.wasabee.getOperationByID(opID);
       $(operationSelect).append(
@@ -416,7 +417,7 @@ export class OpsDialog {
         false
       );
     }
-    if (operation.ID == window.plugin.wasabee.getSelectedOpID()) {
+    if (operation.ID != window.plugin.wasabee.getSelectedOpID()) {
       var selectedButton = buttonSection.appendChild(
         document.createElement("a")
       );
