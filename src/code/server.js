@@ -36,7 +36,6 @@ export default function() {
           response.Ops.forEach(function(op) {
             var tmp = new Operation(op);
             tmp.store();
-            window.plugin.wasabee.addOperationToList(tmp.ID);
           });
         }
       })
@@ -53,7 +52,6 @@ export default function() {
             if (op.ID == operation.ID) {
               var tmp = new Operation(op);
               tmp.store();
-              window.plugin.wasabee.addOperationToList(tmp.ID);
             }
           });
         }
@@ -76,8 +74,7 @@ export default function() {
     if (window.plugin.wasabee.IsServerOp(opID) === true) {
       window.plugin.wasabee.opPromise(opID).then(
         function(newop) {
-          // newop.store();
-          window.plugin.wasabee.addOperationToList(newop.ID);
+          newop.store();
         },
         function(err) {
           console.log(err);

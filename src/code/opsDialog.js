@@ -134,11 +134,10 @@ export function initOpsDialog() {
 
   window.plugin.wasabee.initOps = () => {
     console.log("initOps");
+    window.plugin.wasabee.resetOps();
+
     var baseOp = new Operation(PLAYER.nickname, "Default Op", true);
     baseOp.store();
-
-    window.plugin.wasabee.resetOps();
-    window.plugin.wasabee.addOperationToList(baseOp.ID);
     Wasabee._selectedOp = baseOp;
     window.plugin.wasabee.setSelectedOpID(baseOp.ID);
   };
@@ -151,12 +150,9 @@ export function initOpsDialog() {
     }
 
     //This sets up the op list
-    try {
-      var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
-      var ops = window.plugin.wasabee.objToStrMap(JSON.parse(jlist));
-      console.log(ops);
-    } catch (e) {
-      console.log(e);
+    var ops = window.plugin.wasabee.opsList();
+    console.log(ops);
+    if (ops.length == 0) {
       window.plugin.wasabee.initOps();
     }
 
@@ -196,10 +192,9 @@ export function initOpsDialog() {
       Wasabee._selectedOp = operation;
       window.plugin.wasabee.setSelectedOpID(operation.ID);
     }
-    window.plugin.wasabee.addOperationToList(operation.ID);
 
     var displayList = Array();
-    var ops = window.plugin.wasabee.opList();
+    var ops = window.plugin.wasabee.opsList();
     ops.forEach(function(opID) {
       try {
         var tmpOp = window.plugin.wasabee.getSelectedOperation(opID);
@@ -240,83 +235,33 @@ export function initOpsDialog() {
     addButtons();
   };
 
-  window.plugin.wasabee.addOperationToList = opID => {
-    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
-    if (jlist == null) {
-      var l = new Map();
-    } else {
-      l = window.plugin.wasabee.objToStrMap(JSON.parse(jlist));
-    }
-    l.set(opID, opID);
-    store.set(
-      Wasabee.Constants.OP_LIST_KEY,
-      JSON.stringify(window.plugin.wasabee.strMapToObj(l))
-    );
-  };
-
   //** This function removes an operation from the main list */
   window.plugin.wasabee.removeOperation = opID => {
     try {
-      store.removeItem(opID);
+      store.remove(opID);
     } catch (e) {
       console.log(e);
     }
-    var ops = window.plugin.wasabee.objToStrMap(
-      JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY))
-    );
-    ops.delete(opID);
-    store.set(
-      Wasabee.Constants.OP_LIST_KEY,
-      JSON.stringify(window.plugin.wasabee.strMapToObj(ops))
-    );
   };
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOps = () => {
-    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
-    if (jlist == null) {
-      var ops = new Map();
-    } else {
-      ops = window.plugin.wasabee.objToStrMap(jlist);
-    }
-    ops.forEach(function(value, opID) {
-      store.removeItem(opID);
+    var ops = window.plugin.wasabee.opsList();
+    ops.forEach(function(opID) {
+      window.plugin.wasabee.removeOperation(opID);
     });
-    var blank = new Map();
-    store.set(
-      Wasabee.Constants.OP_LIST_KEY,
-      JSON.stringify(window.plugin.wasabee.strMapToObj(blank))
-    );
   };
 
   window.plugin.wasabee.opsList = () => {
-    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
-    if (jlist == null) {
-      var raw = new Map();
-    } else {
-      raw = window.plugin.wasabee.objToStrMap(jlist);
-    }
     var out = new Array();
-    raw.forEach(function(value, opID) {
-      out.push(opID);
+
+    store.each(function(value, key) {
+      if (key.length == 40) {
+        // XXX add a test to make sure it is an op
+        out.push(key);
+      }
     });
     return out;
-  };
-
-  window.plugin.wasabee.strMapToObj = strMap => {
-    var o = Object.create(null);
-    strMap.forEach(function(v, k) {
-      o[k] = v;
-    });
-    return o;
-  };
-
-  window.plugin.wasabee.objToStrMap = o => {
-    var m = new Map();
-    for (var k in o) {
-      m.set(k, o[k]);
-    }
-    return m;
   };
 }
 
