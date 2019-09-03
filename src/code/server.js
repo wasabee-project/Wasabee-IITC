@@ -31,38 +31,28 @@ export default function() {
     sendServerRequest("/me")
       .done(response => {
         Wasabee.Me = WasabeeMe.create(response);
+        console.log("/me : " + response);
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
-            window.plugin.wasabee.opPromise(op.ID).then(
-              function(newop) {
-                newop.store();
-              },
-              function(err) {
-                console.log(err);
-              }
-            );
+            window.plugin.wasabee.downloadSingleOp(op.ID);
           });
         }
       })
       .fail(() => {
         window.plugin.wasabee.showMustAuthAlert();
+      })
+      .then(() => {
+        alert("Sync Complete.");
       });
 
   window.plugin.wasabee.uploadSingleOp = operation =>
     sendServerRequest("/api/v1/draw", "POST", operation)
       .done(response => {
-        //  We shouldn't read an answer to this. It's a POST.
+        // update local copy after server does its magic on it
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
             if (op.ID == operation.ID) {
-              window.plugin.wasabee.opPromise(op.ID).then(
-                function(newop) {
-                  newop.store();
-                },
-                function(err) {
-                  console.log(err);
-                }
-              );
+              window.plugin.wasabee.dowloadSingleOp(op.ID);
             }
           });
         }
@@ -82,16 +72,14 @@ export default function() {
       });
 
   window.plugin.wasabee.downloadSingleOp = opID => {
-    if (window.plugin.wasabee.IsServerOp(opID) === true) {
-      window.plugin.wasabee.opPromise(opID).then(
-        function(newop) {
-          newop.store();
-        },
-        function(err) {
-          console.log(err);
-        }
-      );
-    }
+    window.plugin.wasabee.opPromise(opID).then(
+      function(newop) {
+        newop.store();
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
   };
 
   // TODO: Should this use the DELETE verb?
@@ -105,32 +93,12 @@ export default function() {
       });
   };
 
-  window.plugin.wasabee.fetchAllOps = ops => {
-    ops.forEach(op => {
-      window.plugin.wasabee.downloadSingleOp(op.ID);
-    });
-  };
-
-  // XXX why does this do two different things?
-  window.plugin.wasabee.updateServerOpMap = (ops, pullFullOps) => {
-    // pull all known ops from server to local store
-    if (pullFullOps) {
-      Promise.all(window.plugin.wasabee.fetchAllOps(ops))
-        .then(() => {
-          alert("Sync Complete.");
-        })
-        .catch(data => {
-          throw (alert(data.message), console.log(data), data);
-        });
-    }
-  };
-
   window.plugin.wasabee.IsWritableOp = opID => {
     console.log("checking IsWritableOp: " + opID);
     var isWritable = false;
     try {
       var op = window.plugin.wasabee.getOperationByID(opID);
-      if (op != null) {
+      if (typeof op == Operation) {
         // XXX TODO properly fetch and store /me
         console.log("me: " + Wasabee.Me.GoogleID);
         console.log("my teams: " + Wasabee.Me.Teams);
@@ -147,6 +115,7 @@ export default function() {
   };
 
   window.plugin.wasabee.IsServerOp = opID => {
+    console.log("checking IsServerOp: " + opID);
     var isServerOp = false;
     try {
       var op = window.plugin.wasabee.getOperationByID(opID);
@@ -206,6 +175,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
+            console.log("opPromise creating new op");
             var newop = Operation.create(req.response);
             resolve(newop);
             break;

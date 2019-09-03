@@ -193,8 +193,8 @@ export function initOpsDialog() {
       window.plugin.wasabee.setSelectedOpID(operation.ID);
     }
 
-    var displayList = Array();
-    var ops = window.plugin.wasabee.opsList();
+    var displayList = Array(); // array of Operation objects
+    var ops = window.plugin.wasabee.opsList(); // array of opIDs
     ops.forEach(function(opID) {
       try {
         var tmpOp = window.plugin.wasabee.getSelectedOperation(opID);
@@ -328,6 +328,7 @@ export class OpsDialog {
   }
 
   updateContentPane(operation, opListSize) {
+    console.log("update content pane: " + operation);
     var tabContent = this._opContent;
     tabContent.innerHTML = "";
     var nameSection = tabContent.appendChild(document.createElement("p"));
@@ -472,6 +473,7 @@ export class OpsDialog {
           "Are you sure you want to *DELETE* this operation?"
         );
         if (confirmed == true) {
+          // IsWritable is not enough, need ownership
           if (window.plugin.wasabee.IsWritableOp(operation.ID)) {
             var confirmedDeleteServerOp = confirm(
               "Are you sure you want to *DELETE* this operation from the *SERVER*?"
@@ -489,7 +491,9 @@ export class OpsDialog {
 
   /* eslint-disable no-unused-vars */
   // what does this do?
-  saveOperation(operation) {}
+  saveOperation(operation) {
+    console.log("saveOperation called: " + operation);
+  }
   /* eslint-enable no-unused-vars */
 
   focus() {

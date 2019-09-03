@@ -1,4 +1,4 @@
-import Operation from "./operation";
+// import Operation from "./operation";
 import { generateId } from "./auxiliar";
 
 export default class Link {
@@ -35,7 +35,7 @@ export default class Link {
   }
 
   static create(obj, operation) {
-    var link = new Link(Operation.create(operation));
+    var link = new Link(operation);
     for (var prop in obj) {
       if (link.hasOwnProperty(prop)) {
         link[prop] = obj[prop];

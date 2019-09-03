@@ -141,6 +141,7 @@ export default function() {
       } else {
         var data = JSON.parse(string);
         var importedOp = Operation.create(data);
+        importedOp.store();
         window.plugin.wasabee.updateOperationInList(importedOp, true);
         console.log("WasabeeTools: reset and imported drawn items");
         alert("Imported Operation: " + importedOp.name + " Successfuly.");

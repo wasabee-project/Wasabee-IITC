@@ -272,12 +272,7 @@ export default class Operation {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    var link = new Link(
-      Operation.create(this),
-      fromPortal.id,
-      toPortal.id,
-      description
-    );
+    var link = new Link(this, fromPortal.id, toPortal.id, description);
     if (!this.containsLink(link)) {
       this.links.push(link);
     } else {
@@ -390,7 +385,7 @@ export default class Operation {
     window.plugin.wasabee.updateOperationInList(this);
   }
 
-  static convertLinksToObjs(links) {
+  convertLinksToObjs(links) {
     var tempLinks = Array();
     for (let link_ in links) {
       if (links[link_] instanceof Link) {
@@ -428,7 +423,7 @@ export default class Operation {
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {
-          operation[prop] = Operation.convertLinksToObjs(obj[prop]);
+          operation[prop] = operation.convertLinksToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }
@@ -436,6 +431,9 @@ export default class Operation {
     }
     operation._ensureCollections();
     console.log(operation);
+    /* if (typeof operation.name != "string") {
+      console.log(new Error().stack);
+    } */
     // operation.store();
     return operation;
   }
