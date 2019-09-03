@@ -85,13 +85,11 @@ export function initOpsDialog() {
   };
 
   window.plugin.wasabee.setSelectedOpID = opID => {
-    // console.log("setSelectedOpID: " + opID);
     store.set(Wasabee.Constants.SELECTED_OP_KEY, opID);
   };
 
   window.plugin.wasabee.getSelectedOpID = () => {
     var so = store.get(Wasabee.Constants.SELECTED_OP_KEY);
-    // console.log("getSelectedOpID: " + so);
     if (so == null) {
       console.log("selected op unset");
     }
@@ -99,24 +97,25 @@ export function initOpsDialog() {
   };
 
   window.plugin.wasabee.getSelectedOperation = () => {
-    // console.log("getSelectedOperation");
     var opID = window.plugin.wasabee.getSelectedOpID();
     if (Wasabee._selectedOp != null && Wasabee._selectedOp.ID == opID) {
-      // console.log("getSelectedOperation (in memory): " + Wasabee._selectedOp);
       return Wasabee._selectedOp;
     }
     var op = window.plugin.wasabee.getOperationByID(opID);
-    console.log("getSelectedOperation (fetched from local store): " + op);
     Wasabee._selectedOp = op;
     return Wasabee._selectedOp;
   };
 
   window.plugin.wasabee.getOperationByID = opID => {
-    console.log("getOperationByID: " + opID);
-    if (opID == null) {
-      console.log("trying to load null opID");
-      return null;
+    // frequently the op is already parsed and ready to go
+    if (
+      opID == window.plugin.wasabee.getSelectedOpID() &&
+      Wasabee._selectedOp != null &&
+      Wasabee._selectedOp.ID == opID
+    ) {
+      return Wasabee._selectedOp;
     }
+
     var op = null;
     try {
       var v = store.get(opID);
@@ -328,6 +327,10 @@ export class OpsDialog {
   }
 
   updateContentPane(operation, opListSize) {
+    if (!(operation instanceof Operation)) {
+      console.log("updateContentPane called with obj, not Operation");
+      operation = Operation.create(operation);
+    }
     console.log("update content pane: " + operation);
     var tabContent = this._opContent;
     tabContent.innerHTML = "";
@@ -354,7 +357,7 @@ export class OpsDialog {
       opColor.append(option);
     });
     $(opColor).change(function() {
-      Operation.create(operation).colorSelected(
+      operation.colorSelected(
         $(opColor).val(),
         input.value,
         commentInput.value
@@ -391,9 +394,7 @@ export class OpsDialog {
           alert("That is an invalid operation name");
         } else {
           operation.name = input.value;
-          window.plugin.wasabee.updateOperationInList(
-            Operation.create(operation)
-          );
+          window.plugin.wasabee.updateOperationInList(operation);
         }
       },
       false
@@ -410,9 +411,7 @@ export class OpsDialog {
             alert("That is an invalid operation comment");
           } else {
             operation.comment = commentInput.value;
-            window.plugin.wasabee.updateOperationInList(
-              Operation.create(operation)
-            );
+            window.plugin.wasabee.updateOperationInList(operation);
           }
         },
         false
@@ -430,10 +429,7 @@ export class OpsDialog {
             "Are you sure you want to select this operation?"
           );
           if (confirmed) {
-            window.plugin.wasabee.updateOperationInList(
-              Operation.create(operation),
-              true
-            );
+            window.plugin.wasabee.updateOperationInList(operation, true);
           }
         },
         false
@@ -458,7 +454,7 @@ export class OpsDialog {
           "Are you sure you want to clear all portals, links, and markers from this operation?"
         );
         if (confirmClear == true) {
-          Operation.create(operation).clearAllItems();
+          operation.clearAllItems();
         }
       },
       false

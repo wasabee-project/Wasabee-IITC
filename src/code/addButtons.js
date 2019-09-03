@@ -1,7 +1,7 @@
 import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
 import { OpsDialog } from "./opsDialog";
-import Operation from "./operation";
+// import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -107,13 +107,9 @@ export default function() {
           .on("click", "#wasabee_uploadbutton", function() {
             // upload is different than update -- upload on 1st, update after
             if (IsServerOp) {
-              window.plugin.wasabee.updateSingleOp(
-                Operation.create(selectedOp)
-              );
+              window.plugin.wasabee.updateSingleOp(selectedOp);
             } else {
-              window.plugin.wasabee.uploadSingleOp(
-                Operation.create(selectedOp)
-              );
+              window.plugin.wasabee.uploadSingleOp(selectedOp);
             }
           });
       }
