@@ -33,7 +33,10 @@ export default function() {
       .done(response => {
         Wasabee.Me = new WasabeeMe(response);
         if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpMap(response.Ops, true);
+          response.Ops.forEach(function(op) {
+            var tmp = new Operation(op); // saves it to local storage
+            window.plugin.wasabee.addOperationToList(tmp.ID);
+          });
         }
       })
       .fail(() => {
@@ -45,7 +48,12 @@ export default function() {
       .done(response => {
         //  We shouldn't read an answer to this. It's a POST.
         if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpMap(response.Ops, false);
+          response.Ops.forEach(function(op) {
+            if (op.ID == operation.ID) {
+              var tmp = new Operation(op); // saves it to local storage
+              window.plugin.wasabee.addOperationToList(tmp.ID);
+            }
+          });
         }
         alert("Upload Complete.");
       })
@@ -66,8 +74,8 @@ export default function() {
     if (window.plugin.wasabee.IsServerOp(opID) === true) {
       window.plugin.wasabee.opPromise(opID).then(
         function(newop) {
-          // add it to the list of known ops
-          Wasabee.ops.set(newop.ID, true);
+          // newop.store();
+          window.plugin.wasabee.addOperationToList(newop.ID);
         },
         function(err) {
           console.log(err);
@@ -77,7 +85,7 @@ export default function() {
   };
 
   // TODO: Should this use the DELETE verb?
-  window.plugin.wasabee.deleteOwnedServerOp = opID =>
+  window.plugin.wasabee.deleteOwnedServerOp = opID => {
     sendServerRequest("/api/v1/draw/" + opID + "/delete")
       .done(response => {
         console.log("got response -> " + JSON.stringify(response));
@@ -85,17 +93,16 @@ export default function() {
       .fail(() => {
         window.plugin.wasabee.showMustAuthAlert();
       });
+  };
 
   window.plugin.wasabee.fetchAllOps = ops => {
-    ops.forEach(opID => {
-      window.plugin.wasabee.downloadSingleOp(opID);
+    ops.forEach(op => {
+      window.plugin.wasabee.downloadSingleOp(op.ID);
     });
   };
 
+  // XXX why does this do two different things?
   window.plugin.wasabee.updateServerOpMap = (ops, pullFullOps) => {
-    // save the list of op IDs to the local store
-    console.log("ops -> " + JSON.stringify(ops));
-
     // pull all known ops from server to local store
     if (pullFullOps) {
       Promise.all(window.plugin.wasabee.fetchAllOps(ops))
@@ -136,7 +143,7 @@ export default function() {
     var isServerOp = false;
     try {
       var op = window.plugin.wasabee.getOperationByID(opID);
-      if (op != null && op.Teams != null) {
+      if (op != null && op.teamlist.length != 0) {
         isServerOp = true;
       }
     } catch (e) {

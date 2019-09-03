@@ -1,7 +1,7 @@
 export default class WasabeeMe {
   constructor() {
     this.GoogleID = null;
-    this.Teams = [];
+    this.Teams = Array();
   }
 
   static create(data) {

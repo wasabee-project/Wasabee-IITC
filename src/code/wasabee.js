@@ -1,4 +1,3 @@
-import store from "../lib/store";
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
@@ -150,15 +149,5 @@ export default function() {
       console.warn("WasabeeTools: failed to import data: " + e);
       alert("Import Failed.");
     }
-  };
-
-  //*** This function resets the local op list
-  window.plugin.wasabee.resetOpList = function() {
-    Wasabee.ops.forEach(function(opID) {
-      store.removeItem(opID);
-    });
-    var ops = new Map();
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
-    Wasabee.ops = ops;
   };
 }

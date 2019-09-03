@@ -101,33 +101,35 @@ export function initOpsDialog() {
   window.plugin.wasabee.getSelectedOperation = () => {
     // console.log("getSelectedOperation");
     var opID = window.plugin.wasabee.getSelectedOpID();
-    if (Wasabee.selectedOp != null && Wasabee.selectedOp.ID == opID) {
-      // console.log("getSelectedOperation (in memory): " + Wasabee.selectedOp);
-      return Wasabee.selectedOp;
+    if (Wasabee._selectedOp != null && Wasabee._selectedOp.ID == opID) {
+      // console.log("getSelectedOperation (in memory): " + Wasabee._selectedOp);
+      return Wasabee._selectedOp;
     }
     var op = window.plugin.wasabee.getOperationByID(opID);
     console.log("getSelectedOperation (fetched from local store): " + op);
-    Wasabee.selectedOp = op;
-    return Wasabee.selectedOp;
+    Wasabee._selectedOp = op;
+    return Wasabee._selectedOp;
   };
 
   window.plugin.wasabee.getOperationByID = opID => {
-    // console.log("getOperationByID: " + opID);
+    console.log("getOperationByID: " + opID);
     if (opID == null) {
       console.log("trying to load null opID");
       return null;
     }
+    var op = null;
     try {
-      var o = JSON.parse(store.get(opID));
-      if (o != null) {
-        return Operation.create(o);
-      } else {
+      var v = store.get(opID);
+      if (v == null) {
         console.log("no such op in local store: " + opID);
+      } else {
+        var o = JSON.parse(v);
+        op = Operation.create(o);
       }
     } catch (e) {
       console.log(e);
     }
-    return null;
+    return op;
   };
 
   window.plugin.wasabee.initOps = () => {
@@ -139,29 +141,28 @@ export function initOpsDialog() {
       console.log(e);
     }
 
-    var ops = new Map();
-    ops.set(baseOp.ID, true);
-    Wasabee.selectedOp = baseOp;
+    var newops = new Map();
+    newops.set(baseOp.ID, true);
+    Wasabee._selectedOp = baseOp;
     window.plugin.wasabee.setSelectedOpID(baseOp.ID);
     try {
-      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+      store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(newops));
     } catch (e) {
       console.log(e);
     }
     // round-trip to be safe
     try {
-      var tmp = store.get(Wasabee.Constants.OP_LIST_KEY);
-      ops = JSON.parse(tmp);
+      var jops = store.get(Wasabee.Constants.OP_LIST_KEY);
     } catch (e) {
       console.log(e);
     }
-    return ops;
+    return jops;
   };
 
   //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
   window.plugin.wasabee.setupLocalStorage = () => {
     if (store.get(Wasabee.Constants.OP_RESTRUCTURE_KEY) == null) {
-      window.plugin.wasabee.resetOpList();
+      window.plugin.wasabee.resetOps();
       store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true);
     }
     //This sets up the op list
@@ -169,8 +170,7 @@ export function initOpsDialog() {
     if (ops == null) {
       ops = window.plugin.wasabee.initOps();
     }
-    Wasabee.ops = ops;
-    console.log(Wasabee.ops);
+    console.log(ops);
 
     //This sets up the paste list
     var pasteList = null;
@@ -199,23 +199,20 @@ export function initOpsDialog() {
     operation.cleanPortalList();
 
     if (clearAllBut === true) {
-      // whack every known op
-      Wasabee.ops.forEach(function(opID) {
-        window.plugin.wasabee.removeOperationFromList(opID);
-      });
+      window.plugin.wasabee.resetOps();
     }
 
     // add this one
     operation.store();
     if (makeSelected === true || clearAllBut === true) {
-      Wasabee.selectedOp = operation;
+      Wasabee._selectedOp = operation;
       window.plugin.wasabee.setSelectedOpID(operation.ID);
     }
-    Wasabee.ops.set(operation.ID, true);
-    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(Wasabee.ops));
+    window.plugin.wasabee.addOperationToList(operation.ID);
 
     var displayList = Array();
-    Wasabee.ops.forEach(function(opID) {
+    var ops = window.plugin.wasabee.opList();
+    ops.forEach(function(opID) {
       try {
         var tmpOp = window.plugin.wasabee.getSelectedOperation(opID);
         if (tmpOp != null) {
@@ -237,10 +234,10 @@ export function initOpsDialog() {
         return 0;
       });
 
+      OpsDialog.update(false);
       var selectedOp = window.plugin.wasabee.getSelectedOperation();
       LinkDialog.update(selectedOp, false);
       LinkListDialog.update(selectedOp, null, false);
-      OpsDialog.update(Wasabee.ops, false);
       MarkerDialog.update(selectedOp, false, false);
 
       drawThings();
@@ -255,23 +252,56 @@ export function initOpsDialog() {
     addButtons();
   };
 
+  window.plugin.wasabee.addOperationToList = opID => {
+    var jlist = store.get(Wasabee.Constants.OP_LIST_KEY);
+    console.log(jlist);
+    if (jlist == null) {
+      var l = new Map();
+    } else {
+      l = JSON.parse(jlist);
+    }
+    console.log(l);
+    l.set(opID, "true");
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(l));
+  };
+
   //** This function removes an operation from the main list */
-  window.plugin.wasabee.removeOperationFromList = opID => {
+  window.plugin.wasabee.removeOperation = opID => {
     try {
       store.removeItem(opID);
     } catch (e) {
       console.log(e);
     }
-    Wasabee.ops.delete(opID);
-    // XXX update the store?
+    var ops = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    ops.delete(opID);
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(ops));
+  };
+
+  //*** This function resets the local op list
+  window.plugin.wasabee.resetOps = () => {
+    var ops = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    ops.forEach(function(value, opID) {
+      store.removeItem(opID);
+    });
+    var blank = new Map();
+    store.set(Wasabee.Constants.OP_LIST_KEY, JSON.stringify(blank));
+  };
+
+  window.plugin.wasabee.opsList = () => {
+    var raw = JSON.parse(store.get(Wasabee.Constants.OP_LIST_KEY));
+    var out = new Array();
+    raw.forEach(function(value, opID) {
+      out.push(opID);
+    });
+    return out;
   };
 }
 
 var _dialogs = [];
 
 export class OpsDialog {
-  constructor(operationList) {
-    this._operationList = operationList;
+  constructor() {
+    this._operationList = window.plugin.wasabee.opsList();
     _dialogs.push(this);
     this.container = document.createElement("div");
     this.container.id = "op-dialog-tabs";
@@ -302,10 +332,12 @@ export class OpsDialog {
     $(operationSelect).css({
       width: "50%"
     });
-    this._operationList.forEach(function(op) {
+    console.log("setupSpinner: " + JSON.stringify(this._operationList));
+    this._operationList.forEach(function(opID) {
+      var op = window.plugin.wasabee.getOperationByID(opID);
       $(operationSelect).append(
         $("<option>").prop({
-          value: op.ID,
+          value: opID,
           text: op.name
         })
       );
@@ -473,15 +505,13 @@ export class OpsDialog {
         if (confirmed == true) {
           if (window.plugin.wasabee.IsWritableOp(operation.ID)) {
             var confirmedDeleteServerOp = confirm(
-              "Are you sure you want to *DELETE* this operation on the *SERVER*?"
+              "Are you sure you want to *DELETE* this operation from the *SERVER*?"
             );
             if (confirmedDeleteServerOp) {
               window.plugin.wasabee.deleteOwnedServerOp(operation.ID);
             }
           }
-          window.plugin.wasabee.removeOperationFromList(
-            Operation.create(operation)
-          );
+          window.plugin.wasabee.removeOperation(operation.ID);
         }
       },
       false
@@ -489,6 +519,7 @@ export class OpsDialog {
   }
 
   /* eslint-disable no-unused-vars */
+  // what does this do?
   saveOperation(operation) {}
   /* eslint-enable no-unused-vars */
 
@@ -496,7 +527,7 @@ export class OpsDialog {
     this._dialog.dialog("open");
   }
 
-  static update(operationList, show = true, close = false) {
+  static update(show = true, close = false) {
     var parameters = _dialogs;
     if (parameters.length != 0) {
       show = false;
@@ -505,13 +536,13 @@ export class OpsDialog {
         if (close) {
           return page._dialog.dialog("close");
         }
-        page._operationList = operationList; //doesn't update, need to manually?
+        page._operationList = window.plugin.wasabee.opsList();
         page.setupSpinner();
         return page.focus(), page;
       }
     }
     if (show) {
-      return new OpsDialog(operationList);
+      return new OpsDialog(window.plugin.wasabee.opsList());
     } else {
       return;
     }
@@ -525,7 +556,7 @@ export class OpsDialog {
     }
   }
 
-  static updateOperation(operationList) {
-    this._operationList = operationList;
+  static updateOperation() {
+    this._operationList = window.plugin.wasabee.opsList();
   }
 }

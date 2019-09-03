@@ -26,8 +26,7 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.loadExternals = function() {
     Wasabee.pasteList = Array();
     // simply a list of opIDs for now
-    Wasabee.ops = new Map(); // init'd in initOpsDialog();
-    Wasabee.selectedOp = null; // the in-memory working op;
+    Wasabee._selectedOp = null; // the in-memory working op;
     Wasabee.teams = new Map();
     Wasabee.Me = new WasabeeMe();
 
