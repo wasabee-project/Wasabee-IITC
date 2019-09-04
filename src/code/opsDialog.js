@@ -365,8 +365,11 @@ export class OpsDialog {
       );
     });
     //TODO enable comment section when !serverOp || (ownedServerOp)
-    var isWritableOp = window.plugin.wasabee.IsWritableOp(operation.ID);
     var isServerOp = window.plugin.wasabee.IsServerOp(operation.ID);
+    var isWritableOp = false;
+    if (isServerOp) {
+      isWritableOp = window.plugin.wasabee.IsWritableOp(operation.ID);
+    }
     var commentInputEnabled = !isServerOp || isWritableOp;
     var commentSection = tabContent.appendChild(document.createElement("p"));
     var commentInput = commentSection.appendChild(
@@ -470,8 +473,7 @@ export class OpsDialog {
           "Are you sure you want to *DELETE* this operation?"
         );
         if (confirmed == true) {
-          // IsWritable is not enough, need ownership
-          if (window.plugin.wasabee.IsWritableOp(operation.ID)) {
+          if (window.plugin.wasabee.IsOwnedOp(operation.ID)) {
             var confirmedDeleteServerOp = confirm(
               "Are you sure you want to *DELETE* this operation from the *SERVER*?"
             );

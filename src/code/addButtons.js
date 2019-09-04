@@ -95,8 +95,11 @@ export default function() {
           }
         });
 
-      var IsWritableOp = window.plugin.wasabee.IsWritableOp(selectedOp.ID);
       var IsServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+      var IsWritableOp = false;
+      if (IsServerOp) {
+        IsWritableOp = window.plugin.wasabee.IsWritableOp(selectedOp.ID);
+      }
       if (IsWritableOp || (IsWritableOp !== true && IsServerOp !== true)) {
         $(container)
           .append(
@@ -109,7 +112,16 @@ export default function() {
             if (IsServerOp) {
               window.plugin.wasabee.updateSingleOp(selectedOp);
             } else {
-              window.plugin.wasabee.uploadSingleOp(selectedOp);
+              LinkDialog.closeDialogs();
+              OpsDialog.closeDialogs();
+              MarkerDialog.closeDialogs();
+              try {
+                window.plugin.wasabee.uploadSingleOp(selectedOp);
+                // reload everything
+                window.plugin.wasabee.authWithWasabee();
+              } catch (e) {
+                window.plugin.wasabee.showMustAuthAlert();
+              }
             }
           });
       }
