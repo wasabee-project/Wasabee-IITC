@@ -4,10 +4,10 @@ import LinkListDialog from "./linkListDialog";
 import ExportDialog from "./exportDialog";
 import { MarkerDialog } from "./markerDialog";
 import LinkDialog from "./linkDialog";
-import addButtons from "./addButtons";
 import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
+
 export function initOpsDialog() {
   window.plugin.wasabee.showAddOpDialog = () => {
     var content = document.createElement("div");
@@ -198,8 +198,6 @@ export function initOpsDialog() {
     if (showExportDialog) {
       ExportDialog.show(operation);
     }
-
-    addButtons();
   };
 
   //** This function removes an operation from the main list */
