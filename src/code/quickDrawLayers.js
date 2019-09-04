@@ -33,11 +33,11 @@ const QuickDrawControl = Feature.extend({
 
   initialize: function(map, options) {
     this.type = QuickDrawControl.TYPE;
-    L.Draw.Feature.prototype.initialize.call(this, map, options);
+    Feature.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
-    L.Draw.Feature.prototype.addHooks.call(this);
+    Feature.prototype.addHooks.call(this);
     if (!this._map) return;
     this._operation = window.plugin.wasabee.getSelectedOperation();
     this._anchor1 = null;
@@ -53,7 +53,7 @@ const QuickDrawControl = Feature.extend({
   },
 
   removeHooks: function() {
-    L.Draw.Feature.prototype.removeHooks.call(this);
+    Feature.prototype.removeHooks.call(this);
 
     delete this._anchor1;
     delete this._anchor2;
