@@ -8,7 +8,7 @@
 import { drawThings, drawAgents } from "./mapDrawing";
 var Wasabee = window.plugin.Wasabee;
 
-export const firebaseInit = () => {
+export const initFirebase = () => {
   const $iframe = $("<iframe></iframe>")
     .width(0)
     .height(0)

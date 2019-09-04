@@ -75,7 +75,7 @@ window.plugin.wasabee.init = function() {
       drawAgents();
     });
 
-    firebaseInit();
+    initFirebase();
     initCrossLinks();
     drawThings();
     //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
