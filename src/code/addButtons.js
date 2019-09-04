@@ -152,7 +152,7 @@ export default function() {
       let actionsContainer = this._createActions([
         {
           title: "Click to stop drawing fields.",
-          text: "Cancel",
+          text: "End",
           callback: quickDrawHandler.disable,
           context: quickDrawHandler
         }
