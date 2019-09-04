@@ -253,6 +253,10 @@ const addLink = (link, color, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = () => {
+  if (Wasabee.Me == null) {
+    // not logged in, do nothing
+    return;
+  }
   var operation = window.plugin.wasabee.getSelectedOperation();
 
   /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
