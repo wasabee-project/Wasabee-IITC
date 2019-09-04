@@ -8,7 +8,6 @@ import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
 import { firebaseInit } from "./firebaseSupport";
-import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -28,7 +27,7 @@ window.plugin.wasabee.init = function() {
     // simply a list of opIDs for now
     Wasabee._selectedOp = null; // the in-memory working op;
     Wasabee.teams = new Map();
-    Wasabee.Me = new WasabeeMe();
+    Wasabee.Me = null;
 
     // All of these should eventually export functions.
     // We do this because they still assign them to the global scope.

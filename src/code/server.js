@@ -1,6 +1,7 @@
 import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
+import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -31,7 +32,6 @@ export default function() {
     sendServerRequest("/me")
       .done(response => {
         Wasabee.Me = WasabeeMe.create(response);
-        console.log("/me : " + response);
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
             window.plugin.wasabee.downloadSingleOp(op.ID);
@@ -42,6 +42,7 @@ export default function() {
         window.plugin.wasabee.showMustAuthAlert();
       })
       .then(() => {
+        addButtons();
         alert("Sync Complete.");
       });
 
@@ -94,38 +95,44 @@ export default function() {
   };
 
   window.plugin.wasabee.IsWritableOp = opID => {
-    console.log("checking IsWritableOp: " + opID);
-    var isWritable = false;
-    try {
-      var op = window.plugin.wasabee.getOperationByID(opID);
-      if (typeof op == Operation) {
-        // XXX TODO properly fetch and store /me
-        console.log("me: " + Wasabee.Me.GoogleID);
-        console.log("my teams: " + Wasabee.Me.Teams);
-        console.log(op);
-        if (Wasabee.Me.GoogleID != null) {
-          // XXX determine if an op team with write access is in the agent's teams
-          isWritable = true;
-        }
-      }
-    } catch (e) {
-      console.log(e);
+    // console.log("checking IsWritableOp: " + opID);
+    if (Wasabee.Me == null) {
+      console.log("IsWritableOp called while not logged in");
+      return false;
     }
-    return isWritable;
+    var op = window.plugin.wasabee.getOperationByID(opID);
+    // owner can do whatever
+    if (Wasabee.Me.GoogleID == op.creator) {
+      return true;
+    }
+    op.teamlist.forEach(function(t) {
+      if (t.role == "write" && Wasabee.Me.Teams.includes(t.ID)) {
+        return true;
+      }
+    });
+    return false;
   };
 
   window.plugin.wasabee.IsServerOp = opID => {
-    console.log("checking IsServerOp: " + opID);
-    var isServerOp = false;
-    try {
-      var op = window.plugin.wasabee.getOperationByID(opID);
-      if (op != null && op.teamlist.length != 0) {
-        isServerOp = true;
-      }
-    } catch (e) {
-      console.log(e);
+    // console.log("checking IsServerOp: " + opID);
+    var op = window.plugin.wasabee.getOperationByID(opID);
+    if (op != null && op.teamlist.length != 0) {
+      return true;
     }
-    return isServerOp;
+    return false;
+  };
+
+  window.plugin.wasabee.IsOwnedOp = opID => {
+    console.log("checking IsOwnedOp: " + opID);
+    if (Wasabee.Me == null) {
+      console.log("IsOwnedOp called while not logged in");
+      return false;
+    }
+    var op = window.plugin.wasabee.getOperationByID(opID);
+    if (Wasabee.Me.GoogleID == op.creator) {
+      return true;
+    }
+    return false;
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
@@ -175,7 +182,6 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            console.log("opPromise creating new op");
             var newop = Operation.create(req.response);
             resolve(newop);
             break;

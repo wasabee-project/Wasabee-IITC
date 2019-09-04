@@ -103,6 +103,12 @@ export function initOpsDialog() {
     }
     var op = window.plugin.wasabee.getOperationByID(opID);
     Wasabee._selectedOp = op;
+
+    // if the ID is invalid, nothing is selected
+    if (op == null) {
+      console.log("selected op invalid, selecting nothing");
+      window.plugin.wasabee.setSelectedOpID(null);
+    }
     return Wasabee._selectedOp;
   };
 
@@ -150,7 +156,6 @@ export function initOpsDialog() {
 
     //This sets up the op list
     var ops = window.plugin.wasabee.opsList();
-    console.log(ops);
     if (ops.length == 0) {
       window.plugin.wasabee.initOps();
     }
@@ -327,11 +332,7 @@ export class OpsDialog {
   }
 
   updateContentPane(operation, opListSize) {
-    if (!(operation instanceof Operation)) {
-      console.log("updateContentPane called with obj, not Operation");
-      operation = Operation.create(operation);
-    }
-    console.log("update content pane: " + operation);
+    // console.log("update content pane: " + JSON.stringify(operation));
     var tabContent = this._opContent;
     tabContent.innerHTML = "";
     var nameSection = tabContent.appendChild(document.createElement("p"));
@@ -489,6 +490,7 @@ export class OpsDialog {
   // what does this do?
   saveOperation(operation) {
     console.log("saveOperation called: " + operation);
+    operation.store();
   }
   /* eslint-enable no-unused-vars */
 

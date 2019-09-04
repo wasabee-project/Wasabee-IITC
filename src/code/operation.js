@@ -416,6 +416,11 @@ export default class Operation {
   }
 
   static create(obj) {
+    if (operation instanceof Operation) {
+      console.log("do not call Operation.create() on an Operation");
+      console.log(new Error().stack);
+      return obj;
+    }
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
@@ -430,11 +435,6 @@ export default class Operation {
       }
     }
     operation._ensureCollections();
-    console.log(operation);
-    /* if (typeof operation.name != "string") {
-      console.log(new Error().stack);
-    } */
-    // operation.store();
     return operation;
   }
 }

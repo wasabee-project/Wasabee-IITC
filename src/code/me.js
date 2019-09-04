@@ -5,7 +5,6 @@ export default class WasabeeMe {
   }
 
   static create(data) {
-    // console.log(data);
     var wme = new WasabeeMe();
     for (var prop in data) {
       if (wme.hasOwnProperty(prop)) {
