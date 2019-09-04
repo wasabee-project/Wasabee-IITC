@@ -41,6 +41,7 @@ window.plugin.wasabee.init = function() {
     window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
     window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
     window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
+    window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
 
     window.plugin.wasabee.setupLocalStorage();
     addButtons();

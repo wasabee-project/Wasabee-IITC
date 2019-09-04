@@ -2,18 +2,25 @@ import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
 import { OpsDialog } from "./opsDialog";
 // import Operation from "./operation";
+import QuickDrawControl from "./quickDrawLayers";
 
 var Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function() {
-  var selectedOp = window.plugin.wasabee.getSelectedOperation();
   const ButtonsControl = L.Control.extend({
     options: {
       position: "topleft"
     },
-    onAdd: function() {
+    onAdd: function(map) {
+      var outerDiv = L.DomUtil.create(
+        "div",
+        "leaflet-draw leaflet-draw-section"
+      );
       var container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
+      outerDiv.appendChild(container);
+      this._modes = {};
+
       $(container)
         .append(
           '<a id="wasabee_viewopsbutton" href="javascript: void(0);" class="wasabee-control" title="Manage Operations"><img src=' +
@@ -23,6 +30,9 @@ export default function() {
         .on("click", "#wasabee_viewopsbutton", function() {
           OpsDialog.update(Wasabee.opList);
         });
+
+      this._addQuickDrawButton(map, container, outerDiv);
+
       $(container)
         .append(
           '<a id="wasabee_addlinksbutton" href="javascript: void(0);" class="wasabee-control" title="Add Links"><img src=' +
@@ -95,6 +105,7 @@ export default function() {
           }
         });
 
+      var selectedOp = window.plugin.wasabee.getSelectedOperation();
       var IsServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
       var IsWritableOp = false;
       if (IsServerOp) {
@@ -125,11 +136,104 @@ export default function() {
             }
           });
       }
+      return outerDiv;
+    },
+    _addQuickDrawButton: function(map, container, outerDiv) {
+      let quickDrawHandler = new QuickDrawControl(map);
+      let type = quickDrawHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = quickDrawHandler;
+      this._modes[type].button = this._createButton({
+        title: "Quick Draw Layers",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_quickdraw,
+        callback: quickDrawHandler.enable,
+        context: quickDrawHandler
+      });
+      let actionsContainer = this._createActions([
+        {
+          title: "Click to stop drawing fields.",
+          text: "Cancel",
+          callback: quickDrawHandler.disable,
+          context: quickDrawHandler
+        }
+      ]);
+      actionsContainer.style.top = "26px";
+      L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
+
+      this._modes[type].actionsContainer = actionsContainer;
+
+      quickDrawHandler.on(
+        "enabled",
+        function() {
+          actionsContainer.style.display = "block";
+        },
+        this
+      );
+      quickDrawHandler.on(
+        "disabled",
+        function() {
+          actionsContainer.style.display = "none";
+        },
+        this
+      );
+      outerDiv.appendChild(actionsContainer);
+    },
+    _createActions: function(buttons) {
+      var container = L.DomUtil.create("ul", "leaflet-draw-actions"),
+        l = buttons.length,
+        li;
+
+      for (var i = 0; i < l; i++) {
+        li = L.DomUtil.create("li", "", container);
+
+        this._createButton({
+          title: buttons[i].title,
+          text: buttons[i].text,
+          container: li,
+          callback: buttons[i].callback,
+          context: buttons[i].context
+        });
+      }
+
       return container;
+    },
+    _createButton: function(options) {
+      var link = L.DomUtil.create(
+        "a",
+        options.className || "",
+        options.container
+      );
+      link.href = "#";
+
+      if (options.text) {
+        link.innerHTML = options.text;
+      }
+
+      if (options.buttonImage) {
+        $(link).append(
+          $("<img/>")
+            .prop("src", options.buttonImage)
+            .css("vertical-align", "middle")
+            .css("align", "center")
+        );
+      }
+
+      if (options.title) {
+        link.title = options.title;
+      }
+
+      L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
+        .on(link, "mousedown", L.DomEvent.stopPropagation)
+        .on(link, "dblclick", L.DomEvent.stopPropagation)
+        .on(link, "click", L.DomEvent.preventDefault)
+        .on(link, "click", options.callback, options.context);
+
+      return link;
     }
   });
   if (Wasabee.buttons != null) {
-    window.map.removeControl(Wasabee.buttons);
+    return;
   }
   Wasabee.buttons = new ButtonsControl();
   window.map.addControl(Wasabee.buttons);
