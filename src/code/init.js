@@ -7,7 +7,7 @@ import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
-import { firebaseInit } from "./firebaseSupport";
+import { initFirebase } from "./firebaseSupport";
 
 var Wasabee = window.plugin.Wasabee;
 
