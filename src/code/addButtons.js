@@ -13,10 +13,13 @@ export default function() {
       position: "topleft"
     },
     onAdd: function(map) {
+      var outerDiv = L.DomUtil.create(
+        "div",
+        "leaflet-draw leaflet-draw-section"
+      );
       var container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
+      outerDiv.appendChild(container);
       this._modes = {};
-
-      this._addQuickDrawButton(map, container);
 
       $(container)
         .append(
@@ -27,6 +30,9 @@ export default function() {
         .on("click", "#wasabee_viewopsbutton", function() {
           OpsDialog.update(Wasabee.opList);
         });
+
+      this._addQuickDrawButton(map, container, outerDiv);
+
       $(container)
         .append(
           '<a id="wasabee_addlinksbutton" href="javascript: void(0);" class="wasabee-control" title="Add Links"><img src=' +
@@ -129,9 +135,9 @@ export default function() {
             }
           });
       }
-      return container;
+      return outerDiv;
     },
-    _addQuickDrawButton: function(map, container) {
+    _addQuickDrawButton: function(map, container, outerDiv) {
       let quickDrawHandler = new QuickDrawControl(map);
       let type = quickDrawHandler.type;
       this._modes[type] = {};
@@ -151,6 +157,7 @@ export default function() {
           context: quickDrawHandler
         }
       ]);
+      actionsContainer.style.top = "26px";
       L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
 
       this._modes[type].actionsContainer = actionsContainer;
@@ -169,7 +176,7 @@ export default function() {
         },
         this
       );
-      container.appendChild(actionsContainer);
+      outerDiv.appendChild(actionsContainer);
     },
     _createActions: function(buttons) {
       var container = L.DomUtil.create("ul", "leaflet-draw-actions"),
