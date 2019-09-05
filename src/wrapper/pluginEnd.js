@@ -1,5 +1,4 @@
 // PLUGIN END ----------------------------------------------------------
-var setup = window.plugin.wasabee.loadExternals;
 setup.info = plugin_info; //add the script info data to the function as a property
 if (!window.bootPlugins) {
   window.bootPlugins = [];
