@@ -26,6 +26,7 @@ export default class Operation {
     this.color = DEFAULT_OPERATION_COLOR;
     this.comment = null;
     this.teamlist = Array();
+    this.fetched = null;
   }
 
   store() {

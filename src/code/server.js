@@ -175,7 +175,14 @@ export default function() {
     return new Promise(function(resolve, reject) {
       var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
       var req = new XMLHttpRequest();
+      var localop = window.plugin.wasabee.getOperationByID(opID);
+
       req.open("GET", url);
+
+      if (localop != null && localop.teamlist.length != 0) {
+        req.setRequestHeader("If-Modified-Since", localop.fetched);
+      }
+
       req.withCredentials = true;
       req.crossDomain = true;
 
@@ -184,6 +191,9 @@ export default function() {
           case 200:
             var newop = Operation.create(req.response);
             resolve(newop);
+            break;
+          case 304: // If-Modified-Since replied NotModified
+            resolve(localop);
             break;
           case 401:
             reject("not authorized to access op: " + opID);
