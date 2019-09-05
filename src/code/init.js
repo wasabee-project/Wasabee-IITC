@@ -22,67 +22,63 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.agentLayers = {};
   window.plugin.wasabee.agentLayerGroup = null;
 
-  window.plugin.wasabee.loadExternals = function() {
-    Wasabee.pasteList = Array();
-    // simply a list of opIDs for now
-    Wasabee._selectedOp = null; // the in-memory working op;
-    Wasabee.teams = new Map();
-    Wasabee.Me = null;
+  Wasabee._selectedOp = null; // the in-memory working op;
+  Wasabee.Me = null;
+  Wasabee.pasteList = Array();
 
-    // All of these should eventually export functions.
-    // We do this because they still assign them to the global scope.
-    initScopes();
-    initWasabee();
-    initOverflowMenu();
-    initPaste();
-    initServer();
-    initOpsDialog();
+  // All of these should eventually export functions.
+  // We do this because they still assign them to the global scope.
+  initScopes();
+  initWasabee();
+  initOverflowMenu();
+  initPaste();
+  initServer();
+  initOpsDialog();
 
-    window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
-    window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
-    window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
-    window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
+  window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
+  window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
+  window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
+  window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
 
-    window.plugin.wasabee.setupLocalStorage();
-    addButtons();
+  window.plugin.wasabee.setupLocalStorage();
+  addButtons();
 
-    window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
-    window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
-    window.plugin.wasabee.targetLayerGroup = new L.LayerGroup();
-    window.plugin.wasabee.agentLayerGroup = new L.LayerGroup();
-    window.addLayerGroup(
-      "Wasabee Draw Portals",
-      window.plugin.wasabee.portalLayerGroup,
-      true
-    );
-    window.addLayerGroup(
-      "Wasabee Draw Links",
-      window.plugin.wasabee.linkLayerGroup,
-      true
-    );
-    window.addLayerGroup(
-      "Wasabee Draw Targets",
-      window.plugin.wasabee.targetLayerGroup,
-      true
-    );
-    window.addLayerGroup(
-      "Wasabee Agents",
-      window.plugin.wasabee.agentLayerGroup,
-      true
-    );
+  window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.targetLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.agentLayerGroup = new L.LayerGroup();
+  window.addLayerGroup(
+    "Wasabee Draw Portals",
+    window.plugin.wasabee.portalLayerGroup,
+    true
+  );
+  window.addLayerGroup(
+    "Wasabee Draw Links",
+    window.plugin.wasabee.linkLayerGroup,
+    true
+  );
+  window.addLayerGroup(
+    "Wasabee Draw Targets",
+    window.plugin.wasabee.targetLayerGroup,
+    true
+  );
+  window.addLayerGroup(
+    "Wasabee Agents",
+    window.plugin.wasabee.agentLayerGroup,
+    true
+  );
 
-    window.addHook("mapDataRefreshStart", function() {
-      drawAgents();
-    });
+  window.addHook("mapDataRefreshStart", function() {
+    drawAgents();
+  });
 
-    initFirebase();
-    initCrossLinks();
-    drawThings();
-    //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
+  initFirebase();
+  initCrossLinks();
+  drawThings();
+  //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
-    var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);
-    if (shareKey != null) {
-      window.plugin.wasabee.qbin_get(shareKey);
-    }
-  };
+  var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);
+  if (shareKey != null) {
+    window.plugin.wasabee.qbin_get(shareKey);
+  }
 };

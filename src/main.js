@@ -5,11 +5,13 @@ function wrapper(plugin_info) {
   window.plugin.Wasabee = window.plugin.wasabee = {};
 
   // Code injection
+  let setup = function() {
+    /* inject: ../dist/static-bundle.js                     */
 
-  /* inject: ../dist/static-bundle.js                     */
-  /* inject: ../dist/init-bundle.js                     */
+    /* inject: ../dist/init-bundle.js                     */
 
-  window.plugin.wasabee.init();
+    window.plugin.wasabee.init();
+  };
 
   /* inject: ./wrapper/pluginEnd.js				*/
 }
