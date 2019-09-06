@@ -37,7 +37,7 @@ export class MarkerDialog {
           .text(a.label)
       );
     });
-    this._type.val(Wasabee.Constants.DEFAULT_ALERT_TYPE);
+    this._type.val(Wasabee.Constants.DEFAULT_MARKER_TYPE);
     this._comment = $("<input>").attr("placeholder", "comment");
     /*  Uncomment this when adding specific targetting to agents
         this._agent = $('<select class="wasabee-agentselect"></select>').css({

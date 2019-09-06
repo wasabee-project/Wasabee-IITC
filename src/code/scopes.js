@@ -18,12 +18,12 @@ export default function() {
     MARKER_TYPE_RECHARGE: "RechargePortalAlert",
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
-    DEFAULT_ALERT_TYPE: "OtherPortalAlert",
+    DEFAULT_MARKER_TYPE: "OtherPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
     SERVER_OP_LIST_KEY: "SERVER_OP_LIST_KEY",
     SERVER_OWNED_OP_LIST_KEY: "SERVER_OWNED_OP_LIST_KEY",
-    SCRIPT_URL_NOTY: "http/://wasabee.rocks/wasabee_extras/noty.js"
+    SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   };
 
   Wasabee.markerTypes = new Map([
@@ -33,9 +33,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_DECAY,
         label: "let decay",
         color: "#7D7D7D",
-        markerIcon: Wasabee.static.images.marker_alert_decay,
-        markerIconAssigned: Wasabee.static.images.marker_alert_decay_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_decay_done
+        markerIcon: require("./images/wasabee_markers_decay_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_decay_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_decay_done.png")
       }
     ],
     [
@@ -44,9 +44,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_DESTROY,
         label: "destroy",
         color: "#CE3B37",
-        markerIcon: Wasabee.static.images.marker_alert_destroy,
-        markerIconAssigned: Wasabee.static.images.marker_alert_destroy_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_destroy_done
+        markerIcon: require("./images/wasabee_markers_destroy_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_destroy_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_destroy_done.png")
       }
     ],
     [
@@ -55,9 +55,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_FARM,
         label: "farm",
         color: "#CE3B37",
-        markerIcon: Wasabee.static.images.marker_alert_farm,
-        markerIconAssigned: Wasabee.static.images.marker_alert_farm_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_farm_done
+        markerIcon: require("./images/wasabee_markers_farm_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_farm_done.png")
       }
     ],
     [
@@ -66,9 +66,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_GOTO,
         label: "go to",
         color: "#EDA032",
-        markerIcon: Wasabee.static.images.marker_alert_goto,
-        markerIconAssigned: Wasabee.static.images.marker_alert_goto_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_goto_done
+        markerIcon: require("./images/wasabee_markers_goto_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_goto_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_goto_done.png")
       }
     ],
     [
@@ -77,9 +77,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_KEY,
         label: "get keys",
         color: "#7D7D7D",
-        markerIcon: Wasabee.static.images.marker_alert_key,
-        markerIconAssigned: Wasabee.static.images.marker_alert_key_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_key_done
+        markerIcon: require("./images/wasabee_markers_key_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_key_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_key_done.png")
       }
     ],
     [
@@ -88,21 +88,21 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_LINK,
         label: "link",
         color: "#5994FF",
-        markerIcon: Wasabee.static.images.marker_alert_link,
-        markerIconAssigned: Wasabee.static.images.marker_alert_link_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_link_done
+        markerIcon: require("./images/wasabee_markers_link_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_link_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_link_done.png")
       }
     ],
+
     [
       Wasabee.Constants.MARKER_TYPE_MEETAGENT,
       {
         name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
         label: "meet agent",
         color: "#EDA032",
-        markerIcon: Wasabee.static.images.marker_alert_meetagent,
-        markerIconAssigned:
-          Wasabee.static.images.marker_alert_meetagent_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_meetagent_done
+        markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_meetagent_done.png")
       }
     ],
     [
@@ -111,9 +111,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_OTHER,
         label: "other",
         color: "#3679B4",
-        markerIcon: Wasabee.static.images.marker_alert_other,
-        markerIconAssigned: Wasabee.static.images.marker_alert_other_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_other_done
+        markerIcon: require("./images/wasabee_markers_other_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_other_done.png")
       }
     ],
     [
@@ -122,10 +122,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_RECHARGE,
         label: "recharge",
         color: "#53AD53",
-        markerIcon: Wasabee.static.images.marker_alert_recharge,
-        markerIconAssigned:
-          Wasabee.static.images.marker_alert_recharge_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_recharge_done
+        markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_recharge_done.png")
       }
     ],
     [
@@ -134,9 +133,9 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_UPGRADE,
         label: "upgrade",
         color: "#448800",
-        markerIcon: Wasabee.static.images.marker_alert_upgrade,
-        markerIconAssigned: Wasabee.static.images.marker_alert_upgrade_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_upgrade_done
+        markerIcon: require("./images/wasabee_markers_farm_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_farm_done.png")
       }
     ],
     [
@@ -145,20 +144,20 @@ export default function() {
         name: Wasabee.Constants.MARKER_TYPE_VIRUS,
         label: "use virus",
         color: "#8920C3",
-        markerIcon: Wasabee.static.images.marker_alert_virus,
-        markerIconAssigned: Wasabee.static.images.marker_alert_virus_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_virus_done
+        markerIcon: require("./images/wasabee_markers_virus_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_virus_done.png")
       }
     ],
     [
-      Wasabee.Constants.DEFAULT_ALERT_TYPE,
+      Wasabee.Constants.DEFAULT_MARKER_TYPE,
       {
         name: Wasabee.Constants.MARKER_TYPE_OTHER,
         label: "unknown",
         color: "#8920C3",
-        markerIcon: Wasabee.static.images.marker_alert_other,
-        markerIconAssigned: Wasabee.static.images.marker_alert_other_assigned,
-        markerIconDone: Wasabee.static.images.marker_alert_other_done
+        markerIcon: require("./images/wasabee_markers_other_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_other_done.png")
       }
     ]
   ]);
