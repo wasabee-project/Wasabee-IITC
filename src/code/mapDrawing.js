@@ -253,7 +253,7 @@ const addLink = (link, color, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = () => {
-  if (Wasabee.Me == null) {
+  if (window.plugin.wasabee.Me() == null) {
     // not logged in, do nothing
     return;
   }

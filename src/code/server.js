@@ -1,7 +1,7 @@
 import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
-import addButtons from "./addButtons";
+import store from "../lib/store";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -28,23 +28,19 @@ export default function() {
     return $.ajax(options);
   }
 
-  window.plugin.wasabee.authWithWasabee = () =>
-    sendServerRequest("/me")
-      .done(response => {
-        Wasabee.Me = WasabeeMe.create(response);
-        if (response.Ops != null) {
-          response.Ops.forEach(function(op) {
-            window.plugin.wasabee.downloadSingleOp(op.ID);
-          });
-        }
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      })
-      .then(() => {
-        addButtons();
-        alert("Sync Complete.");
-      });
+  window.plugin.wasabee.serverSync = () => {
+    window.plugin.wasabee.mePromise().then(
+      function(me) {
+        me.store();
+        me.ops.forEach(function(op) {
+          window.plugin.wasabee.downloadSingleOp(op.ID);
+        });
+      },
+      function(err) {
+        throw err;
+      }
+    );
+  };
 
   window.plugin.wasabee.uploadSingleOp = operation =>
     sendServerRequest("/api/v1/draw", "POST", operation)
@@ -94,19 +90,40 @@ export default function() {
       });
   };
 
+  window.plugin.wasabee.Me = () => {
+    var me = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    if (me == null) {
+      window.plugin.wasabee.mePromise().then(
+        function(nme) {
+          nme.store();
+          me = nme;
+        },
+        function(err) {
+          console.log(err);
+          me = null;
+        }
+      );
+    } else {
+      me = new WasabeeMe(me);
+    }
+    return me;
+  };
+
   window.plugin.wasabee.IsWritableOp = opID => {
-    // console.log("checking IsWritableOp: " + opID);
-    if (Wasabee.Me == null) {
+    console.log("checking IsWritableOp: " + opID);
+    var me = window.plugin.wasabee.Me();
+    if (me == null) {
       console.log("IsWritableOp called while not logged in");
       return false;
     }
+
     var op = window.plugin.wasabee.getOperationByID(opID);
     // owner can do whatever
-    if (Wasabee.Me.GoogleID == op.creator) {
+    if (me.GoogleID == op.creator) {
       return true;
     }
     op.teamlist.forEach(function(t) {
-      if (t.role == "write" && Wasabee.Me.Teams.includes(t.ID)) {
+      if (t.role == "write" && me.Teams.includes(t.ID)) {
         return true;
       }
     });
@@ -124,12 +141,13 @@ export default function() {
 
   window.plugin.wasabee.IsOwnedOp = opID => {
     console.log("checking IsOwnedOp: " + opID);
-    if (Wasabee.Me == null) {
+    var me = window.plugin.wasabee.Me();
+    if (me == null) {
       console.log("IsOwnedOp called while not logged in");
       return false;
     }
     var op = window.plugin.wasabee.getOperationByID(opID);
-    if (Wasabee.Me.GoogleID == op.creator) {
+    if (me.GoogleID == op.creator) {
       return true;
     }
     return false;
@@ -198,6 +216,37 @@ export default function() {
           case 401:
             reject("not authorized to access op: " + opID);
             window.plugin.wasabee.showMustAuthAlert();
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.mePromise = () => {
+    return new Promise(function(resolve, reject) {
+      var url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
+      var req = new XMLHttpRequest();
+      req.open("GET", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            var me = WasabeeMe.create(req.response);
+            resolve(me);
+            break;
+          case 401:
+            reject("not logged in");
             break;
           default:
             reject(Error(req.statusText));

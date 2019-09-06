@@ -99,7 +99,8 @@ export default function() {
             LinkDialog.closeDialogs();
             OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
-            window.plugin.wasabee.authWithWasabee();
+            window.plugin.wasabee.serverSync();
+            alert("Sync Complete");
           } catch (e) {
             window.plugin.wasabee.showMustAuthAlert();
           }
@@ -117,7 +118,11 @@ export default function() {
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
-            window.plugin.wasabee.updateSingleOp(selectedOp);
+            try {
+              window.plugin.wasabee.updateSingleOp(selectedOp);
+            } catch (e) {
+              window.plugin.wasabee.showMustAuthAlert();
+            }
           } else {
             LinkDialog.closeDialogs();
             OpsDialog.closeDialogs();
@@ -125,7 +130,7 @@ export default function() {
             try {
               window.plugin.wasabee.uploadSingleOp(selectedOp);
               // reload everything
-              window.plugin.wasabee.authWithWasabee();
+              window.plugin.wasabee.serverSync();
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }

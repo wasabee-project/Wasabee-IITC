@@ -1,20 +1,13 @@
 // ==UserScript==
-// @id           wasabee
-// @name         IITC Plugin: Wasabee Draw Tools
-// @namespace    http://tampermonkey.net/
+// @id           wasabee.user.js
+// @name         IITC plugin: Wasabee Draw Tools
+// @namespace    https://wasabee.rocks/
 // @version      0.13.1-deviousness
-// @updateURL    http://server.wasabee.rocks/static/dev/wasabee.meta.js
-// @downloadURL  http://server.wasabee.rocks/static/dev/wasabee.user.js
-// @description  Wasabee is not for dating. Period.
+// @updateURL    https://server.wasabee.rocks/static/dev/wasabee.meta.js
+// @downloadURL  https://server.wasabee.rocks/static/dev/wasabee.user.js
+// @description  Wasabee is not for dating.
+// @author       Wasabee Project Team
+// @include      https://intel.ingress.com/*
 // @category     Draw
-// @author       Wasabee
-// @include      https://*.ingress.com/*
-// @include      http://*.ingress.com/*
-// @match        https://*.ingress.com/*
-// @match        http://*.ingress.com/*
-// @include      https://*.ingress.com/mission/*
-// @include      http://*.ingress.com/mission/*
-// @match        https://*.ingress.com/mission/*
-// @match        http://*.ingress.com/mission/*
 // @grant        none
 // ==/UserScript==

@@ -23,7 +23,6 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.agentLayerGroup = null;
 
   Wasabee._selectedOp = null; // the in-memory working op;
-  Wasabee.Me = null;
   Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
 
