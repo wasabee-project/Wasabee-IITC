@@ -25,6 +25,7 @@ window.plugin.wasabee.init = function() {
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.Me = null;
   Wasabee.pasteList = Array();
+  Wasabee.teams = new Map();
 
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.

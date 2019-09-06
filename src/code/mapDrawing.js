@@ -261,7 +261,7 @@ export const drawAgents = () => {
 
   /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
   operation.teamlist.forEach(function(t) {
-    if (Wasabee.teams.has(t.teamid)) {
+    if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.teamid)) {
       Wasabee.teams.delete(t.teamid);
     }
 

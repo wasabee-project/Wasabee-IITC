@@ -21,7 +21,7 @@ export default function() {
     DEFAULT_ALERT_TYPE: "OtherPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
-    SCRIPT_URL_NOTY: "http/://wasabee.rocks/wasabee_extras/noty.js"
+    SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   };
 
   Wasabee.alertTypes = [
