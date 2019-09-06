@@ -105,13 +105,13 @@ const getImageFromMarker = target => {
   var img = null;
   switch (target.state) {
     case "pending":
-      img = marker.markerImage;
+      img = marker.markerIcon;
       break;
     case "assigned":
-      img = marker.markerImageAssigned;
+      img = marker.markerIconAssigned;
       break;
     case "completed":
-      img = marker.markerImageDone;
+      img = marker.markerIconDone;
       break;
   }
   return img;
