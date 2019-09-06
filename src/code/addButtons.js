@@ -105,37 +105,33 @@ export default function() {
           }
         });
 
-      var selectedOp = window.plugin.wasabee.getSelectedOperation();
-      var IsServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
-      var IsWritableOp = false;
-      if (IsServerOp) {
-        IsWritableOp = window.plugin.wasabee.IsWritableOp(selectedOp.ID);
-      }
-      if (IsWritableOp || (IsWritableOp !== true && IsServerOp !== true)) {
-        $(container)
-          .append(
-            '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +
-              Wasabee.static.images.toolbar_upload +
-              ' style="vertical-align:middle;align:center;" /></a>'
-          )
-          .on("click", "#wasabee_uploadbutton", function() {
-            // upload is different than update -- upload on 1st, update after
-            if (IsServerOp) {
-              window.plugin.wasabee.updateSingleOp(selectedOp);
-            } else {
-              LinkDialog.closeDialogs();
-              OpsDialog.closeDialogs();
-              MarkerDialog.closeDialogs();
-              try {
-                window.plugin.wasabee.uploadSingleOp(selectedOp);
-                // reload everything
-                window.plugin.wasabee.authWithWasabee();
-              } catch (e) {
-                window.plugin.wasabee.showMustAuthAlert();
-              }
+      $(container)
+        .append(
+          '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +
+            Wasabee.static.images.toolbar_upload +
+            ' style="vertical-align:middle;align:center;" /></a>'
+        )
+        .on("click", "#wasabee_uploadbutton", function() {
+          var selectedOp = window.plugin.wasabee.getSelectedOperation();
+          var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+
+          // upload is different than update -- upload on 1st, update after
+          if (isServerOp) {
+            window.plugin.wasabee.updateSingleOp(selectedOp);
+          } else {
+            LinkDialog.closeDialogs();
+            OpsDialog.closeDialogs();
+            MarkerDialog.closeDialogs();
+            try {
+              window.plugin.wasabee.uploadSingleOp(selectedOp);
+              // reload everything
+              window.plugin.wasabee.authWithWasabee();
+            } catch (e) {
+              window.plugin.wasabee.showMustAuthAlert();
             }
-          });
-      }
+          }
+        });
+
       return outerDiv;
     },
     _addQuickDrawButton: function(map, container, outerDiv) {
@@ -232,9 +228,17 @@ export default function() {
       return link;
     }
   });
-  if (Wasabee.buttons != null) {
-    return;
+  if (typeof Wasabee.buttons === "undefined") {
+    Wasabee.buttons = new ButtonsControl();
+    window.map.addControl(Wasabee.buttons);
   }
-  Wasabee.buttons = new ButtonsControl();
-  window.map.addControl(Wasabee.buttons);
+  var selectedOp = window.plugin.wasabee.getSelectedOperation();
+  var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+  var isWritableOp =
+    isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp.ID);
+  if (isWritableOp) {
+    $("#wasabee_uploadbutton").css("display", "");
+  } else {
+    $("#wasabee_uploadbutton").css("display", "none");
+  }
 }

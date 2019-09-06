@@ -5,6 +5,7 @@ import ExportDialog from "./exportDialog";
 import { MarkerDialog } from "./markerDialog";
 import LinkDialog from "./linkDialog";
 import Operation from "./operation";
+import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -235,6 +236,8 @@ export function initOpsDialog() {
     if (showExportDialog) {
       ExportDialog.show(operation);
     }
+
+    addButtons();
   };
 
   //** This function removes an operation from the main list */
