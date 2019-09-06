@@ -26,74 +26,142 @@ export default function() {
     SCRIPT_URL_NOTY: "http/://wasabee.rocks/wasabee_extras/noty.js"
   };
 
-  Wasabee.alertTypes = [
-    {
-      name: Wasabee.Constants.MARKER_TYPE_DECAY,
-      label: "let decay",
-      color: "#7D7D7D",
-      markerIcon: Wasabee.static.images.marker_alert_decay
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_DESTROY,
-      label: "destroy",
-      color: "#CE3B37",
-      markerIcon: Wasabee.static.images.marker_alert_destroy
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_FARM,
-      label: "farm",
-      color: "#CE3B37",
-      markerIcon: Wasabee.static.images.marker_alert_farm
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_GOTO,
-      label: "go to",
-      color: "#EDA032",
-      markerIcon: Wasabee.static.images.marker_alert_goto
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_KEY,
-      label: "get keys",
-      color: "#7D7D7D",
-      markerIcon: Wasabee.static.images.marker_alert_key
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_LINK,
-      label: "link",
-      color: "#5994FF",
-      markerIcon: Wasabee.static.images.marker_alert_link
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
-      label: "meet agent",
-      color: "#EDA032",
-      markerIcon: Wasabee.static.images.marker_alert_meetagent
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_OTHER,
-      label: "other",
-      color: "#3679B4",
-      markerIcon: Wasabee.static.images.marker_alert_other
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_RECHARGE,
-      label: "recharge",
-      color: "#53AD53",
-      markerIcon: Wasabee.static.images.marker_alert_recharge
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_UPGRADE,
-      label: "upgrade",
-      color: "#448800",
-      markerIcon: Wasabee.static.images.marker_alert_upgrade
-    },
-    {
-      name: Wasabee.Constants.MARKER_TYPE_VIRUS,
-      label: "use virus",
-      color: "#8920C3",
-      markerIcon: Wasabee.static.images.marker_alert_virus
-    }
-  ];
+  Wasabee.markerTypes = new Map([
+    [
+      Wasabee.Constants.MARKER_TYPE_DECAY,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_DECAY,
+        label: "let decay",
+        color: "#7D7D7D",
+        markerIcon: Wasabee.static.images.marker_alert_decay,
+        markerIconAssigned: Wasabee.static.images.marker_alert_decay_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_decay_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_DESTROY,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_DESTROY,
+        label: "destroy",
+        color: "#CE3B37",
+        markerIcon: Wasabee.static.images.marker_alert_destroy,
+        markerIconAssigned: Wasabee.static.images.marker_alert_destroy_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_destroy_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_FARM,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_FARM,
+        label: "farm",
+        color: "#CE3B37",
+        markerIcon: Wasabee.static.images.marker_alert_farm,
+        markerIconAssigned: Wasabee.static.images.marker_alert_farm_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_farm_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_GOTO,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_GOTO,
+        label: "go to",
+        color: "#EDA032",
+        markerIcon: Wasabee.static.images.marker_alert_goto,
+        markerIconAssigned: Wasabee.static.images.marker_alert_goto_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_goto_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_KEY,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_KEY,
+        label: "get keys",
+        color: "#7D7D7D",
+        markerIcon: Wasabee.static.images.marker_alert_key,
+        markerIconAssigned: Wasabee.static.images.marker_alert_key_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_key_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_LINK,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_LINK,
+        label: "link",
+        color: "#5994FF",
+        markerIcon: Wasabee.static.images.marker_alert_link,
+        markerIconAssigned: Wasabee.static.images.marker_alert_link_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_link_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_MEETAGENT,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_MEETAGENT,
+        label: "meet agent",
+        color: "#EDA032",
+        markerIcon: Wasabee.static.images.marker_alert_meetagent,
+        markerIconAssigned:
+          Wasabee.static.images.marker_alert_meetagent_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_meetagent_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_OTHER,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_OTHER,
+        label: "other",
+        color: "#3679B4",
+        markerIcon: Wasabee.static.images.marker_alert_other,
+        markerIconAssigned: Wasabee.static.images.marker_alert_other_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_other_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_RECHARGE,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_RECHARGE,
+        label: "recharge",
+        color: "#53AD53",
+        markerIcon: Wasabee.static.images.marker_alert_recharge,
+        markerIconAssigned:
+          Wasabee.static.images.marker_alert_recharge_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_recharge_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_UPGRADE,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_UPGRADE,
+        label: "upgrade",
+        color: "#448800",
+        markerIcon: Wasabee.static.images.marker_alert_upgrade,
+        markerIconAssigned: Wasabee.static.images.marker_alert_upgrade_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_upgrade_done
+      }
+    ],
+    [
+      Wasabee.Constants.MARKER_TYPE_VIRUS,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_VIRUS,
+        label: "use virus",
+        color: "#8920C3",
+        markerIcon: Wasabee.static.images.marker_alert_virus,
+        markerIconAssigned: Wasabee.static.images.marker_alert_virus_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_virus_done
+      }
+    ],
+    [
+      Wasabee.Constants.DEFAULT_ALERT_TYPE,
+      {
+        name: Wasabee.Constants.MARKER_TYPE_OTHER,
+        label: "unknown",
+        color: "#8920C3",
+        markerIcon: Wasabee.static.images.marker_alert_other,
+        markerIconAssigned: Wasabee.static.images.marker_alert_other_assigned,
+        markerIconDone: Wasabee.static.images.marker_alert_other_done
+      }
+    ]
+  ]);
 
   Wasabee.layerTypes = [
     {
