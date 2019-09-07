@@ -243,7 +243,7 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
         marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
       ) {
         if (checkMarkerAgainstLink(marker, link, operation)) {
-          console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
+          // console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
           return false;
         }
       }

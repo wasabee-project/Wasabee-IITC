@@ -1,7 +1,6 @@
 import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
-import store from "../lib/store";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -28,19 +27,7 @@ export default function() {
     return $.ajax(options);
   }
 
-  window.plugin.wasabee.serverSync = () => {
-    window.plugin.wasabee.mePromise().then(
-      function(me) {
-        me.store();
-        me.ops.forEach(function(op) {
-          window.plugin.wasabee.downloadSingleOp(op.ID);
-        });
-      },
-      function(err) {
-        throw err;
-      }
-    );
-  };
+  // sendServerRequest needs to go away in favor of promises
 
   window.plugin.wasabee.uploadSingleOp = operation =>
     sendServerRequest("/api/v1/draw", "POST", operation)
@@ -68,17 +55,6 @@ export default function() {
         window.plugin.wasabee.showMustAuthAlert();
       });
 
-  window.plugin.wasabee.downloadSingleOp = opID => {
-    window.plugin.wasabee.opPromise(opID).then(
-      function(newop) {
-        newop.store();
-      },
-      function(err) {
-        console.log(err);
-      }
-    );
-  };
-
   // TODO: Should this use the DELETE verb?
   window.plugin.wasabee.deleteOwnedServerOp = opID => {
     sendServerRequest("/api/v1/draw/" + opID + "/delete")
@@ -90,30 +66,34 @@ export default function() {
       });
   };
 
-  window.plugin.wasabee.Me = () => {
-    var me = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+  // below this line already converted to promises
+
+  window.plugin.wasabee.downloadSingleOp = opID => {
+    window.plugin.wasabee.opPromise(opID).then(
+      function(newop) {
+        newop.store();
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
+  };
+
+  window.plugin.wasabee.serverSync = () => {
+    var me = WasabeeMe.get();
     if (me == null) {
-      window.plugin.wasabee.mePromise().then(
-        function(nme) {
-          nme.store();
-          me = nme;
-        },
-        function(err) {
-          console.log(err);
-          me = null;
-        }
-      );
-    } else {
-      me = new WasabeeMe(me);
+      return false;
     }
-    return me;
+    me.Ops.forEach(function(op) {
+      window.plugin.wasabee.downloadSingleOp(op);
+    });
   };
 
   window.plugin.wasabee.IsWritableOp = opID => {
-    console.log("checking IsWritableOp: " + opID);
-    var me = window.plugin.wasabee.Me();
+    // console.log("checking IsWritableOp: " + opID);
+    var me = WasabeeMe.get();
     if (me == null) {
-      console.log("IsWritableOp called while not logged in");
+      // console.log("IsWritableOp called while not logged in");
       return false;
     }
 
@@ -131,7 +111,6 @@ export default function() {
   };
 
   window.plugin.wasabee.IsServerOp = opID => {
-    // console.log("checking IsServerOp: " + opID);
     var op = window.plugin.wasabee.getOperationByID(opID);
     if (op != null && op.teamlist.length != 0) {
       return true;
@@ -140,8 +119,8 @@ export default function() {
   };
 
   window.plugin.wasabee.IsOwnedOp = opID => {
-    console.log("checking IsOwnedOp: " + opID);
-    var me = window.plugin.wasabee.Me();
+    // console.log("checking IsOwnedOp: " + opID);
+    var me = WasabeeMe.get();
     if (me == null) {
       console.log("IsOwnedOp called while not logged in");
       return false;
@@ -165,7 +144,7 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
-            // add it to the global Wasabee.teams map
+            // add it to the window Wasabee.teams map
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;

@@ -12,9 +12,28 @@ export default class WasabeeMe {
   store() {
     // store.unobserve(Wasabee.Constants.AGENT_INFO_KEY);
     store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(this));
-    store.observe(Wasabee.Constants.AGENT_INFO_KEY, function() {
-      console.log("AGENT_INFO_KEY changed in another window");
-    });
+    // store.observe(Wasabee.Constants.AGENT_INFO_KEY, function() {
+    //  console.log("AGENT_INFO_KEY changed in another window");
+    //});
+  }
+
+  static get() {
+    var me = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    if (me == null) {
+      window.plugin.wasabee.mePromise().then(
+        function(nme) {
+          me = nme;
+          nme.store();
+        },
+        function(err) {
+          console.log(err);
+          me = null;
+        }
+      );
+    } else {
+      me = WasabeeMe.create(me);
+    }
+    return me;
   }
 
   static create(data) {

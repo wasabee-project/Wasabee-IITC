@@ -2,6 +2,7 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import { getColorHex } from "./markerDialog";
 import { checkAllLinks } from "./crosslinks";
+import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -253,7 +254,8 @@ const addLink = (link, color, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = () => {
-  if (window.plugin.wasabee.Me() == null) {
+  var me = WasabeeMe.get();
+  if (me == null) {
     // not logged in, do nothing
     return;
   }

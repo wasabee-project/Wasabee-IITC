@@ -30,7 +30,7 @@ export default class Operation {
   }
 
   store() {
-    console.log("pushing to local store: " + this.ID);
+    // console.log("pushing to local store: " + this.ID);
     this._ensureCollections();
     store.set(this.ID, JSON.stringify(this));
   }

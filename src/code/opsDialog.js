@@ -91,7 +91,6 @@ export function initOpsDialog() {
       console.log("not bothering to switch to the same opID");
       return;
     }
-    // store.unobserve(old);
     store.set(Wasabee.Constants.SELECTED_OP_KEY, opID);
     //store.observe(opID, function(val) {
     //  console.log(
@@ -337,7 +336,11 @@ export class OpsDialog {
       curop.store();
       var newop = window.plugin.wasabee.getOperationByID($(this).val());
       self.updateContentPane(newop, self._operationList.length);
-      window.plugin.wasabee.updateOperationInList(newop, true);
+      // I don't like this
+      Wasabee._selectedOp = newop;
+      window.plugin.wasabee.setSelectedOpID(newop.ID);
+      drawThings();
+      // window.plugin.wasabee.updateOperationInList(newop, true);
     });
     this.container.appendChild(operationSelect);
     var _content = this.container.appendChild(document.createElement("div"));
