@@ -52,7 +52,7 @@ export default class WasabeeMe {
             break;
           case "Ops":
             data.Ops.forEach(function(op) {
-              wme.Ops.push(op.ID);
+              wme.Ops.push(op);
             });
             break;
           default:

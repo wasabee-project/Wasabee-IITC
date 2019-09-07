@@ -79,15 +79,16 @@ export default function() {
     );
   };
 
+  /* no longer used
   window.plugin.wasabee.serverSync = () => {
     var me = WasabeeMe.get();
     if (me == null) {
       return false;
     }
     me.Ops.forEach(function(op) {
-      window.plugin.wasabee.downloadSingleOp(op);
+      window.plugin.wasabee.downloadSingleOp(op.ID);
     });
-  };
+  }; */
 
   window.plugin.wasabee.IsWritableOp = opID => {
     // console.log("checking IsWritableOp: " + opID);

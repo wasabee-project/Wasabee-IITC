@@ -1,8 +1,9 @@
 import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
 import { OpsDialog } from "./opsDialog";
-// import Operation from "./operation";
+import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
+// import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -99,8 +100,22 @@ export default function() {
             LinkDialog.closeDialogs();
             OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
-            window.plugin.wasabee.serverSync();
-            alert("Sync Complete");
+            var me = WasabeeMe.get();
+            if (me == null) {
+              window.plugin.wasabee.showMustAuthAlert();
+            } else {
+              me.Ops.forEach(function(op) {
+                window.plugin.wasabee.opPromise(op.ID).then(
+                  function(newop) {
+                    newop.store();
+                  },
+                  function(err) {
+                    console.log(err);
+                  }
+                );
+              });
+              alert("Sync Complete");
+            }
           } catch (e) {
             window.plugin.wasabee.showMustAuthAlert();
           }
@@ -129,8 +144,7 @@ export default function() {
             MarkerDialog.closeDialogs();
             try {
               window.plugin.wasabee.uploadSingleOp(selectedOp);
-              // reload everything
-              window.plugin.wasabee.serverSync();
+              window.plugin.wasabee.downloadSingleOp(selectedOp.ID);
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }
