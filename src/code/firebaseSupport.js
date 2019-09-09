@@ -5,7 +5,7 @@
  * simply pass the messages along using window.parent.postMessage.
  */
 
-import { drawThings, drawAgents } from "./mapDrawing";
+import { drawAgents } from "./mapDrawing";
 var Wasabee = window.plugin.Wasabee;
 
 export const initFirebase = () => {
@@ -17,11 +17,10 @@ export const initFirebase = () => {
   $(document.body).append($iframe);
 
   window.addEventListener("message", event => {
-    console.log("Wasabee: Received a message from postMessage().");
+    // console.log("Wasabee: Received a message from postMessage().");
     if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
 
-    console.log("Message received: ", event.data);
-
+    // console.log("Message received: ", event.data);
     var operation = window.plugin.wasabee.getSelectedOperation();
     if (
       event.data.data.cmd === "Agent Location Change" &&
@@ -29,13 +28,15 @@ export const initFirebase = () => {
     ) {
       drawAgents();
     }
-    if (
-      event.data.data.cmd === "Map Change" &&
-      operation.ID == event.data.data.msg
-    ) {
-      console.log("refreshing/redrawing map");
-      window.plugin.wasabee.downloadSingleOp(operation.ID);
-      drawThings();
+    if (event.data.data.cmd === "Map Change") {
+      window.plugin.wasabee.downloadSingleOp(event.data.data.opID);
+      if (event.data.data.opID == operation.ID) {
+        console.log("selected map changed, refreshing/redrawing map");
+        // Wasabee._selectedOp = null; // required to trigger redraw
+        window.plugin.wasabee.setSelectedOpID(null);
+        Wasabee._selectedOp = operation; // required to trigger redraw
+        window.plugin.wasabee.setSelectedOpID(operation.ID);
+      }
     }
   });
 };

@@ -7,6 +7,7 @@ export default class WasabeeMe {
     this.GoogleID = null;
     this.Teams = Array();
     this.Ops = Array();
+    this.fetched = Date.now();
   }
 
   store() {
@@ -19,7 +20,10 @@ export default class WasabeeMe {
 
   static get() {
     var me = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    if (me == null) {
+    var maxCacheAge = Date.now() - 1000 * 60 * 15;
+    // if older than 15 minutes, pull again
+    if (me == null || me.fetched == undefined || me.fetched < maxCacheAge) {
+      console.log(me.fetched);
       window.plugin.wasabee.mePromise().then(
         function(nme) {
           me = nme;

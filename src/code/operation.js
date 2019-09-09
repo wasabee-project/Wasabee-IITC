@@ -383,7 +383,9 @@ export default class Operation {
   }
 
   update() {
-    window.plugin.wasabee.updateOperationInList(this);
+    console.log("operation.update called");
+    console.log(new Error().stack);
+    window.plugin.wasabee.loadOp(this.ID);
   }
 
   convertLinksToObjs(links) {
