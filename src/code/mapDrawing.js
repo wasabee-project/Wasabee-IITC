@@ -216,18 +216,18 @@ const getImageFromMarker = target => {
 };
 
 //** This function adds all the Links to the layer */
-const addAllLinks = op => {
-  op.links.forEach(link => addLink(link, op.color, op));
+const addAllLinks = operation => {
+  operation.links.forEach(link => addLink(link, operation.color, operation));
 };
 
 //** This function resets all the Links and calls addAllLinks to add them */
-const resetAllLinks = op => {
+const resetAllLinks = operation => {
   for (var guid in window.plugin.wasabee.linkLayers) {
     var linkInLayer = window.plugin.wasabee.linkLayers[guid];
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
-  addAllLinks(op);
+  addAllLinks(operation);
 };
 
 /** This function adds a portal to the portal layer group */

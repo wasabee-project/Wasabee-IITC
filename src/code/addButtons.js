@@ -126,7 +126,7 @@ export default function(selectedOp) {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_uploadbutton", function() {
-          var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+          var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
@@ -249,9 +249,9 @@ export default function(selectedOp) {
     window.map.addControl(Wasabee.buttons);
   }
   // var selectedOp = window.plugin.wasabee.getSelectedOperation();
-  var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
+  var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
   var isWritableOp =
-    isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp.ID);
+    isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp);
   if (isWritableOp) {
     $("#wasabee_uploadbutton").css("display", "");
   } else {

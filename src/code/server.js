@@ -90,7 +90,7 @@ export default function() {
     });
   }; */
 
-  window.plugin.wasabee.IsWritableOp = opID => {
+  window.plugin.wasabee.IsWritableOp = op => {
     // console.log("checking IsWritableOp: " + opID);
     var me = WasabeeMe.get();
     if (me == null) {
@@ -98,8 +98,6 @@ export default function() {
       return false;
     }
 
-    var op = window.plugin.wasabee.getOperationByID(opID);
-    // owner can do whatever
     if (me.GoogleID == op.creator) {
       return true;
     }
@@ -111,22 +109,19 @@ export default function() {
     return false;
   };
 
-  window.plugin.wasabee.IsServerOp = opID => {
-    var op = window.plugin.wasabee.getOperationByID(opID);
-    if (op != null && op.teamlist.length != 0) {
+  window.plugin.wasabee.IsServerOp = op => {
+    if (op.teamlist.length != 0) {
       return true;
     }
     return false;
   };
 
-  window.plugin.wasabee.IsOwnedOp = opID => {
-    // console.log("checking IsOwnedOp: " + opID);
+  window.plugin.wasabee.IsOwnedOp = op => {
     var me = WasabeeMe.get();
     if (me == null) {
       console.log("IsOwnedOp called while not logged in");
       return false;
     }
-    var op = window.plugin.wasabee.getOperationByID(opID);
     if (me.GoogleID == op.creator) {
       return true;
     }

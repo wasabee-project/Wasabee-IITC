@@ -23,7 +23,6 @@ export default class WasabeeMe {
     var maxCacheAge = Date.now() - 1000 * 60 * 15;
     // if older than 15 minutes, pull again
     if (me == null || me.fetched == undefined || me.fetched < maxCacheAge) {
-      console.log(me.fetched);
       window.plugin.wasabee.mePromise().then(
         function(nme) {
           me = nme;
