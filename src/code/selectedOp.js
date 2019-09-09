@@ -174,8 +174,6 @@ export default function() {
         out.push(key);
       }
     });
-    console.log("opsList");
-    console.log(out);
     return out;
   };
 }
