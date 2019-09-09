@@ -307,11 +307,10 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
   }
 };
 
-export const checkAllLinks = () => {
+export const checkAllLinks = operation => {
   // window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee.crossLinkLayerGroup = {};
 
-  var operation = window.plugin.wasabee.getSelectedOperation();
   var drawnLinks = operation.links;
   var drawnMarkers = operation.markers;
 
@@ -321,6 +320,8 @@ export const checkAllLinks = () => {
 };
 
 const onLinkAdded = data => {
+  console.log("onLinkAdded");
+  console.log(data);
   var operation = window.plugin.wasabee.getSelectedOperation();
   var drawnLinks = operation.links;
   var drawnMarkers = operation.markers;
@@ -357,7 +358,10 @@ export const initCrossLinks = () => {
 
   window.map.on("layeradd", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      checkAllLinks();
+      var operation = window.plugin.wasabee.getSelectedOperation();
+      if (operation != null) {
+        checkAllLinks(operation);
+      }
     }
   });
   window.map.on("layerremove", obj => {

@@ -18,7 +18,7 @@ export const drawThings = op => {
 const addAllTargets = op => {
   var targetList = op.markers;
   if (targetList != null) {
-    targetList.forEach(target => addTarget(target));
+    targetList.forEach(target => addTarget(target, op));
   }
 };
 
@@ -33,10 +33,8 @@ const resetAllTargets = op => {
 };
 
 /** This function adds a Targets to the target layer group */
-const addTarget = target => {
-  var targetPortal = window.plugin.wasabee
-    .getSelectedOperation()
-    .getPortal(target.portalId);
+const addTarget = (target, operation) => {
+  var targetPortal = operation.getPortal(target.portalId);
   var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
   var marker = L.marker(latLng, {
     title: targetPortal.name,
@@ -50,14 +48,14 @@ const addTarget = target => {
   });
 
   window.registerMarkerForOMS(marker);
-  marker.bindPopup(getMarkerPopup(marker, target, targetPortal));
+  marker.bindPopup(getMarkerPopup(marker, target, targetPortal, operation));
   marker.off("click", marker.togglePopup, marker);
   marker.on("spiderfiedclick", marker.togglePopup, marker);
   window.plugin.wasabee.targetLayers[target["ID"]] = marker;
   marker.addTo(window.plugin.wasabee.targetLayerGroup);
 };
 
-const getMarkerPopup = (marker, target, portal) => {
+const getMarkerPopup = (marker, target, portal, operation) => {
   marker.className = "wasabee-dialog wasabee-dialog-ops";
   var content = document.createElement("div");
   var title = content.appendChild(document.createElement("div"));
@@ -70,11 +68,7 @@ const getMarkerPopup = (marker, target, portal) => {
   deleteButton.addEventListener(
     "click",
     () => {
-      UiCommands.deleteMarker(
-        window.plugin.wasabee.getSelectedOperation(),
-        target,
-        portal
-      );
+      UiCommands.deleteMarker(operation, target, portal);
       marker.closePopup();
     },
     false

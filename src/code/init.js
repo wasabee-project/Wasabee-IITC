@@ -3,6 +3,7 @@ import initWasabee from "./wasabee";
 import initPaste from "./paste";
 import initServer from "./server";
 import { initOpsDialog } from "./opsDialog";
+import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
@@ -28,20 +29,34 @@ window.plugin.wasabee.init = function() {
 
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.
-  initScopes();
-  initWasabee();
-  initOverflowMenu();
-  initPaste();
-  initServer();
-  initOpsDialog();
+  try {
+    console.log("initScopes");
+    initScopes();
+    console.log("initSelectedOp");
+    initSelectedOp(); // loads the next two
+    window.plugin.wasabee.setupLocalStorage();
+    window.plugin.wasabee.initSelectedOp(); // after local storage, before wasabee GUI
+
+    console.log("initWasabee");
+    initWasabee();
+    console.log("initOverflowMenu");
+    initOverflowMenu();
+    console.log("initPaste");
+    initPaste();
+    console.log("initServer");
+    initServer();
+    console.log("initOpsDialog");
+    initOpsDialog();
+  } catch (e) {
+    console.log(e);
+  }
 
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
 
-  window.plugin.wasabee.setupLocalStorage();
-  addButtons();
+  addButtons(Wasabee._selectedOp);
 
   window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
@@ -68,14 +83,15 @@ window.plugin.wasabee.init = function() {
     true
   );
 
-  var op = window.plugin.wasabee.getSelectedOp();
   window.addHook("mapDataRefreshStart", function() {
-    drawAgents(op);
+    if (Wasabee._selectedOp != null) {
+      drawAgents(Wasabee._selectedOp);
+    }
   });
 
   initFirebase();
   initCrossLinks();
-  drawThings(op);
+  drawThings(Wasabee._selectedOp);
   //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
   var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);

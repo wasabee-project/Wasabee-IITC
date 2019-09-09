@@ -21,7 +21,7 @@ export const initFirebase = () => {
     if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
 
     // console.log("Message received: ", event.data);
-    var operation = window.plugin.wasabee.getSelectedOperation();
+    var operation = Wasabee._selectedOp;
     if (
       event.data.data.cmd === "Agent Location Change" &&
       operation.teamid == event.data.data.msg
@@ -31,11 +31,15 @@ export const initFirebase = () => {
     if (event.data.data.cmd === "Map Change") {
       window.plugin.wasabee.downloadSingleOp(event.data.data.opID);
       if (event.data.data.opID == operation.ID) {
-        console.log("selected map changed, refreshing/redrawing map");
-        // Wasabee._selectedOp = null; // required to trigger redraw
-        window.plugin.wasabee.setSelectedOpID(null);
-        Wasabee._selectedOp = operation; // required to trigger redraw
-        window.plugin.wasabee.setSelectedOpID(operation.ID);
+        console.log(
+          "selected map changed by firebase push, refreshing/redrawing map"
+        );
+        var trashID = "000000000000000000000000000000000000000"; // required to trigger redraw
+        operation.ID = trashID;
+        operation.name = "swap for reload";
+        operation.store();
+        window.plugin.wasabee.makeSelectedOperation(event.data.data.opID);
+        window.plugin.wasabee.removeOperation(trashID);
       }
     }
   });
