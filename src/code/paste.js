@@ -1,3 +1,5 @@
+import ExportDialog from "./exportDialog";
+
 export default function() {
   var Wasabee = window.plugin.Wasabee;
 

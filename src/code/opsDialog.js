@@ -5,7 +5,7 @@ import ExportDialog from "./exportDialog";
 import { MarkerDialog } from "./markerDialog";
 import LinkDialog from "./linkDialog";
 import Operation from "./operation";
-import addButtons from "./addButtons";
+// import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -47,8 +47,8 @@ export function initOpsDialog() {
         if (promptAction !== null && promptAction !== "") {
           console.log("promptaction -> " + promptAction);
           var newop = new Operation(PLAYER.nickname, promptAction, true);
-	  newop.store();
-	  wasabee.window.plugin.loadOp(newop.ID);
+          newop.store();
+          window.wasabee.plugin.loadOp(newop.ID);
         } else {
           alert("You must enter a valid Operation name. Try again.");
         }
@@ -88,78 +88,94 @@ export function initOpsDialog() {
     store.set(Wasabee.Constants.SELECTED_OP_KEY, opID);
   };
 
-  window.plugin.wasabee.getRestoreOpID = opID => {
+  window.plugin.wasabee.getRestoreOpID = () => {
     return store.get(Wasabee.Constants.SELECTED_OP_KEY);
   };
 
-  // this should be unused now
-  window.plugin.wasabee.setSelectedOpID = opID => {
-    console.log("XXX setSelectedOpID called");
-  };
-
   window.plugin.wasabee.getSelectedOpID = () => {
-    so = window.plugin.wasabee.getSelectedOperation();
+    console.log("getSelectedOpID");
+    var so = window.plugin.wasabee.getSelectedOperation();
+    console.log("getSelectedOpID done");
     return so.ID;
   };
 
   window.plugin.wasabee.getSelectedOperation = () => {
+    console.log("getSelectedOperation");
     if (Wasabee._selectedOp == null) {
-     console.log("_selectedOp == null; this is a problem");
-     var toLoad = window.plugin.wasabee.getRestoreOpID();
-     if (toLoad == null) {
-       window.plugin.wasabee.loadNewDefaultOp();
-     } else {
-       try {
-         window.plugin.wasabee.loadOp(toLoad);
-       } catch (e) {
-         console.log(e);
-	 window.plugin.wasabee.loadNewDefaultOp();
-     }
+      console.log("no op selected, loading restore most recently loaded");
+      var toLoad = window.plugin.wasabee.getRestoreOpID();
+      if (toLoad == null) {
+        console.log("most recently loaded unset, starting afresh");
+        window.plugin.wasabee.loadNewDefaultOp();
+      } else {
+        try {
+          window.plugin.wasabee.loadOp(toLoad);
+        } catch (e) {
+          console.log(e);
+          window.plugin.wasabee.loadNewDefaultOp();
+        }
+      }
+    } else {
+      console.log("returning normal selected op");
     }
+    console.log("getSelectedOperation done");
+    console.log(Wasabee._selectedOp);
     return Wasabee._selectedOp;
   };
 
   window.plugin.wasabee.loadNewDefaultOp = () => {
+    console.log("loadNewDefaultOp");
     var newOp = new Operation(PLAYER.nickname, "Default Op", true);
     newOp.store();
-    window.plugin.wasabee.loadOp(newOp.ID); // we could short-cut this, but a single load path is better
+    var op = window.plugin.wasabee.loadOp(newOp.ID); // we could short-cut this, but a single load path ensures no skipped steps
+    return op;
   };
 
   // this is the function that loads an op from the store, makes it the selected op and draws it to the screen, only this should write to _selectedOp
   window.plugin.wasabee.loadOp = opID => {
-    if (typeof opID != "string") {
-      console.log("loadOp must be called on an opID string");
-      throw("use opID");
+    console.log("loadOp: " + opID);
+
+    if (Wasabee._selectedOp != null) {
+      if (opID == Wasabee._selectedOp.ID) {
+        console.log("loadOp called on the current op; doing nothing");
+        return Wasabee._selectedOp;
+      } else {
+        console.log(
+          "saving current op before loading new: " + Wasabee._selectedOp.ID
+        );
+        Wasabee._selectedOp.store();
+      }
     }
-    if (opID == Wasabee._selectedOp.ID) {
-      console.log("loadOp called on the current op; doing full refresh");
-    }
-    op = window.plugin.wasabee.getOperationById(opID);
-    Wasabee._selectedOp = op;
+    var op = window.plugin.wasabee.getOperationByID(opID);
     if (op == null) {
-        console.log("loadOp called on invalid opID");
-        throw("use opID");
+      console.log("loadOp called on invalid opID");
+      throw "attempted to load invalid opID";
     }
-    // what else needs to be done here?
-    operation.cleanPortalList();
+    Wasabee._selectedOp = op;
+
+    window.plugin.wasabee.updateVisual(Wasabee._selectedOp);
+    window.plugin.wasabee.setRestoreOpID(Wasabee._selectedOp.ID);
+    console.log("addButtons");
+    // addButtons(Wasabee._selectedOp);
+    return Wasabee._selectedOp;
+  };
+
+  window.plugin.wasabee.updateVisual = op => {
+    console.log("cleanPortalList");
+    op.cleanPortalList();
+    console.log("OpsDialog.update");
     OpsDialog.update(false); // update but do not show
+    console.log("LinksDialog.update");
     LinkDialog.update(op, false);
+    console.log("LinkListDialog.update");
     LinkListDialog.update(op, null, false);
+    console.log("MarkerDialog.update");
     MarkerDialog.update(op, false, false);
-    drawThings();
-    window.plugin.wasabee.setRestoreOpID(opID);
-    return op;
+    console.log("drawThings");
+    drawThings(op);
   };
 
   window.plugin.wasabee.getOperationByID = opID => {
-    // frequently the op is already parsed and ready to go
-    if (
-      Wasabee._selectedOp != null &&
-      Wasabee._selectedOp.ID == opID
-    ) {
-      return Wasabee._selectedOp;
-    }
-
     var op = null;
     try {
       var v = store.get(opID);
@@ -185,6 +201,7 @@ export function initOpsDialog() {
 
   //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
   window.plugin.wasabee.setupLocalStorage = () => {
+    console.log("setupLocalStorage");
     if (store.get(Wasabee.Constants.OP_RESTRUCTURE_KEY) == null) {
       window.plugin.wasabee.initOps();
       store.set(Wasabee.Constants.OP_RESTRUCTURE_KEY, true);
@@ -200,7 +217,7 @@ export function initOpsDialog() {
     // if the restore ID is not set, set it to the first thing we find
     var rID = window.plugin.wasabee.getRestoreOpID();
     if (rID == null) {
-      rid = ops[0];
+      rID = ops[0];
       window.plugin.wasabee.setRestoreOpID(rID);
     }
 
@@ -218,61 +235,6 @@ export function initOpsDialog() {
     Wasabee.pasteList = pasteList;
   };
 
-  //** This function takes an operation and updates the entry in the op list that matches it */
-  window.plugin.wasabee.updateOperationInList = (
-    operation,
-    makeSelected = false,
-    clearAllBut = false
-  ) => {
-    if (!(operation instanceof Operation)) {
-      operation = Operation.create(operation);
-    }
-    operation.cleanPortalList();
-
-    // add this one
-    operation.store();
-    if (makeSelected === true || clearAllBut === true) {
-      Wasabee._selectedOp = operation;
-      window.plugin.wasabee.setSelectedOpID(operation.ID);
-      drawThings();
-    }
-
-    var displayList = Array(); // array of Operation objects
-    var ops = window.plugin.wasabee.opsList(); // array of opIDs
-    ops.forEach(function(opID) {
-      try {
-        var tmpOp = window.plugin.wasabee.getSelectedOperation(opID);
-        if (tmpOp != null) {
-          displayList.push(tmpOp);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    });
-
-    if (displayList.length != 0) {
-      displayList.sort((a, b) => {
-        if (a.name.toLowerCase() < b.name.toLowerCase()) {
-          return -1;
-        }
-        if (a.name.toLowerCase() > b.name.toLowerCase()) {
-          return 1;
-        }
-        return 0;
-      });
-
-      OpsDialog.update(false);
-      var selectedOp = window.plugin.wasabee.getSelectedOperation();
-      LinkDialog.update(selectedOp, false);
-      LinkListDialog.update(selectedOp, null, false);
-      MarkerDialog.update(selectedOp, false, false);
-
-      drawThings();
-    }
-
-    addButtons();
-  };
-
   //** This function removes an operation from the main list */
   window.plugin.wasabee.removeOperation = opID => {
     try {
@@ -285,6 +247,7 @@ export function initOpsDialog() {
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOps = () => {
+    console.log("resetOps");
     var ops = window.plugin.wasabee.opsList();
     ops.forEach(function(opID) {
       window.plugin.wasabee.removeOperation(opID);
@@ -295,9 +258,6 @@ export function initOpsDialog() {
     var out = new Array();
 
     store.each(function(value, key) {
-      // value is hashed, need to get it the long way
-      // var v = store.get(key);
-      // if (key.length == 40 && v.includes("opportals")) {
       if (key.length == 40) {
         out.push(key);
       }
@@ -352,9 +312,7 @@ export class OpsDialog {
     });
     $(operationSelect).val(window.plugin.wasabee.getSelectedOpID());
     $(operationSelect).change(function() {
-      var curop = window.plugin.wasabee.getSelectedOperation();
-      curop.store();
-      newop = window.plugin.wasabee.loadOp($(this).val());
+      var newop = window.plugin.wasabee.loadOp($(this).val());
       self.updateContentPane(newop, self._operationList.length);
     });
     this.container.appendChild(operationSelect);
@@ -433,7 +391,7 @@ export class OpsDialog {
           alert("That is an invalid operation name");
         } else {
           Wasabee._selectedOp.name = input.value;
-	  Wasabee._selectedOp.store();
+          Wasabee._selectedOp.store();
           // window.plugin.wasabee.updateOperationInList(operation);
         }
       },
@@ -451,7 +409,7 @@ export class OpsDialog {
             alert("That is an invalid operation comment");
           } else {
             Wasabee._selectedOp.comment = commentInput.value;
-	    Wasabee._selectedOp.store();
+            Wasabee._selectedOp.store();
             //window.plugin.wasabee.updateOperationInList(operation);
           }
         },

@@ -7,29 +7,29 @@ import WasabeeMe from "./me";
 var Wasabee = window.plugin.Wasabee;
 
 //** This function draws things on the layers */
-export const drawThings = () => {
-  window.plugin.wasabee.resetAllPortals();
-  resetAllTargets();
-  resetAllLinks();
-  checkAllLinks();
+export const drawThings = op => {
+  window.plugin.wasabee.resetAllPortals(op);
+  resetAllTargets(op);
+  resetAllLinks(op);
+  checkAllLinks(op);
 };
 
 //** This function adds all the Targets to the layer */
-const addAllTargets = () => {
-  var targetList = window.plugin.wasabee.getSelectedOperation().markers;
+const addAllTargets = op => {
+  var targetList = op.markers;
   if (targetList != null) {
     targetList.forEach(target => addTarget(target));
   }
 };
 
 //** This function resets all the Targets and calls addAllTargets to add them */
-const resetAllTargets = () => {
+const resetAllTargets = op => {
   for (var guid in window.plugin.wasabee.targetLayers) {
     var targetInLayer = window.plugin.wasabee.targetLayers[guid];
     window.plugin.wasabee.targetLayerGroup.removeLayer(targetInLayer);
     delete window.plugin.wasabee.targetLayers[guid];
   }
-  addAllTargets();
+  addAllTargets(op);
 };
 
 /** This function adds a Targets to the target layer group */
@@ -216,20 +216,18 @@ const getImageFromMarker = target => {
 };
 
 //** This function adds all the Links to the layer */
-const addAllLinks = () => {
-  var operation = window.plugin.wasabee.getSelectedOperation();
-  var linkList = operation.links;
-  linkList.forEach(link => addLink(link, operation.color, operation));
+const addAllLinks = op => {
+  op.links.forEach(link => addLink(link, op.color, op));
 };
 
 //** This function resets all the Links and calls addAllLinks to add them */
-const resetAllLinks = () => {
+const resetAllLinks = op => {
   for (var guid in window.plugin.wasabee.linkLayers) {
     var linkInLayer = window.plugin.wasabee.linkLayers[guid];
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
-  addAllLinks();
+  addAllLinks(op);
 };
 
 /** This function adds a portal to the portal layer group */
@@ -253,16 +251,15 @@ const addLink = (link, color, operation) => {
 };
 
 /** this function fetches and displays agent location */
-export const drawAgents = () => {
+export const drawAgents = op => {
   var me = WasabeeMe.get();
   if (me == null) {
     // not logged in, do nothing
     return;
   }
-  var operation = window.plugin.wasabee.getSelectedOperation();
 
   /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
-  operation.teamlist.forEach(function(t) {
+  op.teamlist.forEach(function(t) {
     if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.teamid)) {
       Wasabee.teams.delete(t.teamid);
     }

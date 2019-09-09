@@ -8,7 +8,7 @@ import QuickDrawControl from "./quickDrawLayers";
 var Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
-export default function() {
+export default function(selectedOp) {
   const ButtonsControl = L.Control.extend({
     options: {
       position: "topleft"
@@ -41,7 +41,6 @@ export default function() {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_addlinksbutton", function() {
-          var selectedOp = window.plugin.wasabee.getSelectedOperation();
           if (selectedOp != null) {
             LinkDialog.update(selectedOp, true);
           } else {
@@ -55,7 +54,6 @@ export default function() {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_addmarkersbutton", function() {
-          var selectedOp = window.plugin.wasabee.getSelectedOperation();
           if (selectedOp != null) {
             MarkerDialog.update(selectedOp);
           } else {
@@ -128,7 +126,6 @@ export default function() {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_uploadbutton", function() {
-          var selectedOp = window.plugin.wasabee.getSelectedOperation();
           var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
 
           // upload is different than update -- upload on 1st, update after
@@ -251,7 +248,7 @@ export default function() {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
   }
-  var selectedOp = window.plugin.wasabee.getSelectedOperation();
+  // var selectedOp = window.plugin.wasabee.getSelectedOperation();
   var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp.ID);
   var isWritableOp =
     isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp.ID);

@@ -68,13 +68,14 @@ window.plugin.wasabee.init = function() {
     true
   );
 
+  var op = window.plugin.wasabee.getSelectedOp();
   window.addHook("mapDataRefreshStart", function() {
-    drawAgents();
+    drawAgents(op);
   });
 
   initFirebase();
   initCrossLinks();
-  drawThings();
+  drawThings(op);
   //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
   var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);
