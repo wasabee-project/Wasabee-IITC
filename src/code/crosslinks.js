@@ -320,8 +320,6 @@ export const checkAllLinks = operation => {
 };
 
 const onLinkAdded = data => {
-  console.log("onLinkAdded");
-  console.log(data);
   var operation = window.plugin.wasabee.getSelectedOperation();
   var drawnLinks = operation.links;
   var drawnMarkers = operation.markers;

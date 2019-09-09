@@ -35,7 +35,7 @@ window.plugin.wasabee.init = function() {
     console.log("initSelectedOp");
     initSelectedOp(); // loads the next two
     window.plugin.wasabee.setupLocalStorage();
-    window.plugin.wasabee.initSelectedOp(); // after local storage, before wasabee GUI
+    window.plugin.wasabee.initSelectedOperation(); // after local storage, before wasabee GUI
 
     console.log("initWasabee");
     initWasabee();
