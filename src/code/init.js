@@ -29,27 +29,16 @@ window.plugin.wasabee.init = function() {
 
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.
-  try {
-    console.log("initScopes");
-    initScopes();
-    console.log("initSelectedOp");
-    initSelectedOp(); // loads the next two
-    window.plugin.wasabee.setupLocalStorage();
-    window.plugin.wasabee.initSelectedOperation(); // after local storage, before wasabee GUI
+  initScopes();
+  initSelectedOp(); // loads the next two
+  window.plugin.wasabee.setupLocalStorage();
+  window.plugin.wasabee.initSelectedOperation();
 
-    console.log("initWasabee");
-    initWasabee();
-    console.log("initOverflowMenu");
-    initOverflowMenu();
-    console.log("initPaste");
-    initPaste();
-    console.log("initServer");
-    initServer();
-    console.log("initOpsDialog");
-    initOpsDialog();
-  } catch (e) {
-    console.log(e);
-  }
+  initWasabee();
+  initOverflowMenu();
+  initPaste();
+  initServer();
+  initOpsDialog();
 
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
@@ -84,9 +73,7 @@ window.plugin.wasabee.init = function() {
   );
 
   window.addHook("mapDataRefreshStart", function() {
-    if (Wasabee._selectedOp != null) {
-      drawAgents(Wasabee._selectedOp);
-    }
+    drawAgents(Wasabee._selectedOp);
   });
 
   initFirebase();

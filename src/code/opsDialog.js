@@ -49,6 +49,7 @@ export function initOpsDialog() {
           newop.store();
           window.plugin.wasabee.makeSelectedOperation(newop.ID);
           window.plugin.wasabee.updateVisual(newop);
+          drawThings(newop);
         } else {
           alert("You must enter a valid Operation name. Try again.");
         }
@@ -125,9 +126,7 @@ export class OpsDialog {
   }
 
   setupSpinner(selectedOp) {
-    console.log("setupSpinner");
-    console.log(selectedOp);
-
+    console.log("setupSpinner: " + selectedOp.ID);
     this.container.innerHTML = "";
     $(this.container).css({
       "text-align": "center"
@@ -153,14 +152,16 @@ export class OpsDialog {
         console.log("load requested for" + newID);
         try {
           var newop = window.plugin.wasabee.makeSelectedOperation(newID);
-          this.updateContentPane(newop, ol.length);
+          // this.updateContentPane(newop, ol.length);
           window.plugin.wasabee.updateVisual(newop);
+          drawThings(newop);
         } catch (e) {
           console.log(e);
           alert(e);
         }
       } else {
         console.log("not bothering to load the current op");
+        // this.updateContentPane(selectedOp, ol.length);
       }
     });
     this.container.appendChild(operationSelect);

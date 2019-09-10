@@ -248,8 +248,6 @@ export default function(selectedOp) {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
   }
-  console.log("addButtons");
-  console.log(selectedOp);
   var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
   var isWritableOp =
     isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp);
