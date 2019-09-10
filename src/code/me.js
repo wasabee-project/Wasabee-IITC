@@ -19,23 +19,20 @@ export default class WasabeeMe {
   }
 
   static get() {
-    var lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    var me = JSON.parse(lsme);
     var maxCacheAge = Date.now() - 1000 * 60 * 15;
-    var storeit = false;
-
+    var lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    if (lsme != null) {
+      var me = JSON.parse(lsme);
+    } else {
+      me = null;
+    }
     // if older than 15 minutes, pull again
-    if (me == null || me.fetched == undefined || me.fetched > maxCacheAge) {
-      console.log(
-        "WasabeeMe.get: pulling from server: " +
-          me.fetched +
-          " > " +
-          maxCacheAge
-      );
+    if (me == null || me.fetched == undefined || me.fetched < maxCacheAge) {
+      console.log("WasabeeMe.get: pulling from server");
       window.plugin.wasabee.mePromise().then(
         function(nme) {
           me = nme;
-          storeit = true;
+          me.store();
         },
         function(err) {
           console.log(err);
@@ -49,9 +46,6 @@ export default class WasabeeMe {
     // convert JSON or obj into WasabeeMe
     if (me != null && !(me instanceof WasabeeMe)) {
       me = WasabeeMe.create(me);
-    }
-    if (storeit) {
-      me.store();
     }
     return me;
   }
