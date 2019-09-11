@@ -30,14 +30,14 @@ export class MarkerDialog {
     this._target = null;
     this._operation = operation;
     this._type = $("<select>");
-    Wasabee.alertTypes.forEach(a => {
+    Wasabee.markerTypes.forEach((a, k) => {
       self._type.append(
         $("<option>")
-          .val(a.name)
+          .val(k)
           .text(a.label)
       );
     });
-    this._type.val(Wasabee.Constants.DEFAULT_ALERT_TYPE);
+    this._type.val(Wasabee.Constants.DEFAULT_MARKER_TYPE);
     this._comment = $("<input>").attr("placeholder", "comment");
     /*  Uncomment this when adding specific targetting to agents
         this._agent = $('<select class="wasabee-agentselect"></select>').css({
