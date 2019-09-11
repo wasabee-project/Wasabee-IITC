@@ -83,44 +83,11 @@ const getMarkerPopup = (marker, target, portal) => {
 
 export const getPopupBodyWithType = (portal, target) => {
   var title = "";
-  switch (target.type) {
-    case Wasabee.Constants.MARKER_TYPE_DECAY:
-      title = "Let Decay";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_DESTROY:
-      title = "Destroy";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_FARM:
-      title = "Farm";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_GOTO:
-      title = "Go To";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_KEY:
-      title = "Get Keys";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_LINK:
-      title = "Establish Link";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_MEETAGENT:
-      title = "Meet agent";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_OTHER:
-      title = "Other";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_RECHARGE:
-      title = "Recharge";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_UPGRADE:
-      title = "Upgrade";
-      break;
-    case Wasabee.Constants.MARKER_TYPE_VIRUS:
-      title = "Virus";
-      break;
-    default:
-      title = "Unknown";
+  if (!Wasabee.markerTypes.has(target.type)) {
+    target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
   }
-  title = title + " - " + portal.name;
+  var marker = Wasabee.markerTypes.has(target.type);
+  title = marker.label + " - " + portal.name;
   if (target.comment) title = title + "\n\n" + target.comment;
   if (target.state != "completed" && target.assignedNickname)
     title = title + "\n\nAssigned To: " + target.assignedNickname;
@@ -129,89 +96,25 @@ export const getPopupBodyWithType = (portal, target) => {
   return title;
 };
 
-//** This function returns the appropriate image for a marker type */
+//** This function returns the appropriate image for a marker type / state */
 const getImageFromMarker = target => {
+  if (!Wasabee.markerTypes.has(target.type)) {
+    target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
+  }
+  var marker = Wasabee.markerTypes.get(target.type);
+  var img = null;
   switch (target.state) {
     case "pending":
-      switch (target.type) {
-        case Wasabee.Constants.MARKER_TYPE_DECAY:
-          return Wasabee.static.images.marker_alert_decay;
-        case Wasabee.Constants.MARKER_TYPE_DESTROY:
-          return Wasabee.static.images.marker_alert_destroy;
-        case Wasabee.Constants.MARKER_TYPE_FARM:
-          return Wasabee.static.images.marker_alert_farm;
-        case Wasabee.Constants.MARKER_TYPE_GOTO:
-          return Wasabee.static.images.marker_alert_goto;
-        case Wasabee.Constants.MARKER_TYPE_KEY:
-          return Wasabee.static.images.marker_alert_key;
-        case Wasabee.Constants.MARKER_TYPE_LINK:
-          return Wasabee.static.images.marker_alert_link;
-        case Wasabee.Constants.MARKER_TYPE_MEETAGENT:
-          return Wasabee.static.images.marker_alert_meetagent;
-        case Wasabee.Constants.MARKER_TYPE_OTHER:
-          return Wasabee.static.images.marker_alert_other;
-        case Wasabee.Constants.MARKER_TYPE_RECHARGE:
-          return Wasabee.static.images.marker_alert_recharge;
-        case Wasabee.Constants.MARKER_TYPE_UPGRADE:
-          return Wasabee.static.images.marker_alert_upgrade;
-        case Wasabee.Constants.MARKER_TYPE_VIRUS:
-          return Wasabee.static.images.marker_alert_virus;
-      }
+      img = marker.markerIcon;
       break;
     case "assigned":
-      switch (target.type) {
-        case Wasabee.Constants.MARKER_TYPE_DECAY:
-          return Wasabee.static.images.marker_alert_decay_assigned;
-        case Wasabee.Constants.MARKER_TYPE_DESTROY:
-          return Wasabee.static.images.marker_alert_destroy_assigned;
-        case Wasabee.Constants.MARKER_TYPE_FARM:
-          return Wasabee.static.images.marker_alert_farm_assigned;
-        case Wasabee.Constants.MARKER_TYPE_GOTO:
-          return Wasabee.static.images.marker_alert_goto_assigned;
-        case Wasabee.Constants.MARKER_TYPE_KEY:
-          return Wasabee.static.images.marker_alert_key_assigned;
-        case Wasabee.Constants.MARKER_TYPE_LINK:
-          return Wasabee.static.images.marker_alert_link_assigned;
-        case Wasabee.Constants.MARKER_TYPE_MEETAGENT:
-          return Wasabee.static.images.marker_alert_meetagent_assigned;
-        case Wasabee.Constants.MARKER_TYPE_OTHER:
-          return Wasabee.static.images.marker_alert_other_assigned;
-        case Wasabee.Constants.MARKER_TYPE_RECHARGE:
-          return Wasabee.static.images.marker_alert_recharge_assigned;
-        case Wasabee.Constants.MARKER_TYPE_UPGRADE:
-          return Wasabee.static.images.marker_alert_upgrade_assigned;
-        case Wasabee.Constants.MARKER_TYPE_VIRUS:
-          return Wasabee.static.images.marker_alert_virus_assigned;
-      }
+      img = marker.markerIconAssigned;
       break;
     case "completed":
-      switch (target.type) {
-        case Wasabee.Constants.MARKER_TYPE_DECAY:
-          return Wasabee.static.images.marker_alert_decay_done;
-        case Wasabee.Constants.MARKER_TYPE_DESTROY:
-          return Wasabee.static.images.marker_alert_destroy_done;
-        case Wasabee.Constants.MARKER_TYPE_FARM:
-          return Wasabee.static.images.marker_alert_farm_done;
-        case Wasabee.Constants.MARKER_TYPE_GOTO:
-          return Wasabee.static.images.marker_alert_goto_done;
-        case Wasabee.Constants.MARKER_TYPE_KEY:
-          return Wasabee.static.images.marker_alert_key_done;
-        case Wasabee.Constants.MARKER_TYPE_LINK:
-          return Wasabee.static.images.marker_alert_link_done;
-        case Wasabee.Constants.MARKER_TYPE_MEETAGENT:
-          return Wasabee.static.images.marker_alert_meetagent_done;
-        case Wasabee.Constants.MARKER_TYPE_OTHER:
-          return Wasabee.static.images.marker_alert_other_done;
-        case Wasabee.Constants.MARKER_TYPE_RECHARGE:
-          return Wasabee.static.images.marker_alert_recharge_done;
-        case Wasabee.Constants.MARKER_TYPE_UPGRADE:
-          return Wasabee.static.images.marker_alert_upgrade_done;
-        case Wasabee.Constants.MARKER_TYPE_VIRUS:
-          return Wasabee.static.images.marker_alert_virus_done;
-      }
+      img = marker.markerIconDone;
       break;
   }
-  return Wasabee.static.images.marker_alert_other;
+  return img;
 };
 
 //** This function adds all the Links to the layer */
