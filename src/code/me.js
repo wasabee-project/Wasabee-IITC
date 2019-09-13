@@ -28,6 +28,10 @@ export default class WasabeeMe {
     }
     // if older than 15 minutes, pull again
     if (me == null || me.fetched == undefined || me.fetched < maxCacheAge) {
+      if (me != null) {
+        me == null;
+        store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+      }
       console.log("WasabeeMe.get: pulling from server");
       window.plugin.wasabee.mePromise().then(
         function(nme) {

@@ -1,8 +1,11 @@
 import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
-import { OpsDialog } from "./opsDialog";
+// import { OpsDialog } from "./opsDialog";
 import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
+import WasabeeButtonControl from "./wasabeeButton";
+import opsButtonControl from "./opsButton";
+import NewopButtonControl from "./newopButton";
 // import Operation from "./operation";
 
 var Wasabee = window.plugin.Wasabee;
@@ -22,16 +25,8 @@ export default function(selectedOp) {
       outerDiv.appendChild(container);
       this._modes = {};
 
-      $(container)
-        .append(
-          '<a id="wasabee_viewopsbutton" href="javascript: void(0);" class="wasabee-control" title="Manage Operations"><img src=' +
-            Wasabee.static.images.toolbar_viewOps +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_viewopsbutton", function() {
-          OpsDialog.update(Wasabee.opList);
-        });
-
+      this._addWasabeeButton(map, container, outerDiv);
+      this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
 
       $(container)
@@ -60,15 +55,8 @@ export default function(selectedOp) {
             window.alert("No selected Operation found.");
           }
         });
-      $(container)
-        .append(
-          '<a id="wasabee_addopbutton" href="javascript: void(0);" class="wasabee-control" title="Add Op"><img src=' +
-            Wasabee.static.images.toolbar_plus +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addopbutton", function() {
-          window.plugin.wasabee.showAddOpDialog();
-        });
+
+      this._addNewopButton(map, container, outerDiv);
 
       $(container)
         .append(
@@ -83,7 +71,7 @@ export default function(selectedOp) {
           if (confirmed) {
             window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
-            OpsDialog.closeDialogs();
+            // OpsDialog.closeDialogs();
           }
         });
 
@@ -96,7 +84,7 @@ export default function(selectedOp) {
         .on("click", "#wasabee_syncbutton", function() {
           try {
             LinkDialog.closeDialogs();
-            OpsDialog.closeDialogs();
+            // OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
             var me = WasabeeMe.get();
             if (me == null) {
@@ -137,7 +125,7 @@ export default function(selectedOp) {
             }
           } else {
             LinkDialog.closeDialogs();
-            OpsDialog.closeDialogs();
+            // OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
             try {
               window.plugin.wasabee.uploadSingleOp(selectedOp);
@@ -149,6 +137,51 @@ export default function(selectedOp) {
         });
 
       return outerDiv;
+    },
+    _addWasabeeButton: function(map, container) {
+      let wasabeeButtonHandler = new WasabeeButtonControl(map);
+      let me = WasabeeMe.get();
+      let image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+      if (me == null) {
+        image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+      }
+      let type = wasabeeButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = wasabeeButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Wasabee Status",
+        container: container,
+        buttonImage: image,
+        callback: wasabeeButtonHandler.enable,
+        context: wasabeeButtonHandler
+      });
+      // XXX need an update callback for when login status changes
+    },
+    _addOpsButton: function(map, container) {
+      let opsButtonHandler = new opsButtonControl(map);
+      let type = opsButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = opsButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Operations",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_viewOps,
+        callback: opsButtonHandler.enable,
+        context: opsButtonHandler
+      });
+    },
+    _addNewopButton: function(map, container) {
+      let newopButtonHandler = new NewopButtonControl(map);
+      let type = newopButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = newopButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "New Operation",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_plus,
+        callback: newopButtonHandler.enable,
+        context: newopButtonHandler
+      });
     },
     _addQuickDrawButton: function(map, container, outerDiv) {
       let quickDrawHandler = new QuickDrawControl(map);

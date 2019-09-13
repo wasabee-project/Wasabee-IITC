@@ -15,12 +15,12 @@ export default function() {
   };
 
   window.plugin.wasabee.getSelectedOperation = () => {
-    // console.log("getSelectedOperation");
+    // javascript is pass-by-values for objects
     return Wasabee._selectedOp;
   };
 
   window.plugin.wasabee.initSelectedOperation = () => {
-    console.log("getSelectedOperation");
+    console.log("initSelectedOperation");
     if (Wasabee._selectedOp == null) {
       console.log("no op selected, restoring most recently loaded");
       var toLoad = window.plugin.wasabee.getRestoreOpID();
@@ -50,11 +50,12 @@ export default function() {
     console.log("loadNewDefaultOp");
     var newOp = new Operation(PLAYER.nickname, "Default Op", true);
     newOp.store();
-    var op = window.plugin.wasabee.makeSelectedOperation(newOp.ID); // we could short-cut this, but a single load path ensures no skipped steps
+    var op = window.plugin.wasabee.makeSelectedOperation(newOp.ID);
     return op;
   };
 
-  // this is the function that loads an op from the store, makes it the selected op and draws it to the screen, only this should write to _selectedOp
+  // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
+  // only this should write to _selectedOp
   window.plugin.wasabee.makeSelectedOperation = opID => {
     console.log("makeSelectedOperation: " + opID);
 
@@ -80,17 +81,21 @@ export default function() {
       console.log("makeSelectedOperation called on invalid opID");
       throw "attempted to load invalid opID";
     }
+    // the only place we should change the selected op.
     Wasabee._selectedOp = op;
     window.plugin.wasabee.setRestoreOpID(Wasabee._selectedOp.ID);
     return Wasabee._selectedOp;
   };
 
+  // use this to pull an op from local store by ID
+  // wrap it in a try/catch
   window.plugin.wasabee.getOperationByID = opID => {
     var op = null;
     try {
       var v = store.get(opID);
       if (v == null) {
         console.log("no such op in local store: " + opID);
+        alert("No such operation in local store, try logging in and syncing");
       } else {
         // we can pass v directly, but this catches if the json is malformed
         var o = JSON.parse(v);
@@ -130,7 +135,7 @@ export default function() {
       console.log(
         "last loaded op preference is unset, using first available op"
       );
-      rID = ops[0];
+      rID = ops[0]; // ops cannot be empty due to previous block
       window.plugin.wasabee.setRestoreOpID(rID);
     }
 

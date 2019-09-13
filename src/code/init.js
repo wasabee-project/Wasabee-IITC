@@ -86,3 +86,8 @@ window.plugin.wasabee.init = function() {
     window.plugin.wasabee.qbin_get(shareKey);
   }
 };
+
+window.plugin.wasabee.addCSS = content => {
+  $("head").append('<style type="text/css">\n' + content + "\n</style>");
+};
+
