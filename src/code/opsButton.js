@@ -1,10 +1,6 @@
 import { Feature } from "./leafletDrawImports";
 import { drawThings } from "./mapDrawing";
-//import LinkListDialog from "./linkListDialog";
 import ExportDialog from "./exportDialog";
-// import { MarkerDialog } from "./markerDialog";
-// import LinkDialog from "./linkDialog";
-// import Operation from "./operation";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -55,6 +51,13 @@ const opsButtonControl = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+  },
+
+  //_closeDialog: function(ctx) {
+  _closeDialog: function() {
+    console.log("dialog close goes here");
+    this._dialog.dialog("close");
+    // ctx._dialog.dialog("close");
   },
 
   _opSelectMenu: function(context, selectedOp) {

@@ -1,12 +1,10 @@
-import LinkDialog from "./linkDialog";
 import { MarkerDialog } from "./markerDialog";
-// import { OpsDialog } from "./opsDialog";
 import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
 import WasabeeButtonControl from "./wasabeeButton";
 import opsButtonControl from "./opsButton";
 import NewopButtonControl from "./newopButton";
-// import Operation from "./operation";
+import LinkDialogButtonControl from "./linkDialogButton";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -26,22 +24,10 @@ export default function(selectedOp) {
       this._modes = {};
 
       this._addWasabeeButton(map, container, outerDiv);
-      this._addOpsButton(map, container, outerDiv);
+      var opsHandler = this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
+      this._addLinkDialogButton(map, container, outerDiv);
 
-      $(container)
-        .append(
-          '<a id="wasabee_addlinksbutton" href="javascript: void(0);" class="wasabee-control" title="Add Links"><img src=' +
-            Wasabee.static.images.toolbar_addlinks +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addlinksbutton", function() {
-          if (selectedOp != null) {
-            LinkDialog.update(selectedOp, true);
-          } else {
-            window.alert("No selected Operation found.");
-          }
-        });
       $(container)
         .append(
           '<a id="wasabee_addmarkersbutton" href="javascript: void(0);" class="wasabee-control" title="Add Markers"><img src=' +
@@ -71,7 +57,7 @@ export default function(selectedOp) {
           if (confirmed) {
             window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
-            // OpsDialog.closeDialogs();
+            opsHandler.closeDialogs(opsHandler);
           }
         });
 
@@ -83,7 +69,7 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_syncbutton", function() {
           try {
-            LinkDialog.closeDialogs();
+            // LinkDialog.closeDialogs();
             // OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
             var me = WasabeeMe.get();
@@ -124,7 +110,7 @@ export default function(selectedOp) {
               window.plugin.wasabee.showMustAuthAlert();
             }
           } else {
-            LinkDialog.closeDialogs();
+            // LinkDialog.closeDialogs();
             // OpsDialog.closeDialogs();
             MarkerDialog.closeDialogs();
             try {
@@ -155,7 +141,10 @@ export default function(selectedOp) {
         callback: wasabeeButtonHandler.enable,
         context: wasabeeButtonHandler
       });
-      // XXX need an update callback for when login status changes
+      var wb = this._modes[type];
+      window.addHook("mapDataRefreshStart", function() {
+        wb.button = wasabeeButtonHandler._getIcon();
+      });
     },
     _addOpsButton: function(map, container) {
       let opsButtonHandler = new opsButtonControl(map);
@@ -169,6 +158,7 @@ export default function(selectedOp) {
         callback: opsButtonHandler.enable,
         context: opsButtonHandler
       });
+      return opsButtonHandler;
     },
     _addNewopButton: function(map, container) {
       let newopButtonHandler = new NewopButtonControl(map);
@@ -181,6 +171,19 @@ export default function(selectedOp) {
         buttonImage: window.plugin.Wasabee.static.images.toolbar_plus,
         callback: newopButtonHandler.enable,
         context: newopButtonHandler
+      });
+    },
+    _addLinkDialogButton: function(map, container) {
+      let ldButtonHandler = new LinkDialogButtonControl(map);
+      let type = ldButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = ldButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Add Links",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_addlinks,
+        callback: ldButtonHandler.enable,
+        context: ldButtonHandler
       });
     },
     _addQuickDrawButton: function(map, container, outerDiv) {
@@ -203,7 +206,7 @@ export default function(selectedOp) {
           context: quickDrawHandler
         }
       ]);
-      actionsContainer.style.top = "26px";
+      actionsContainer.style.top = "39px";
       L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
 
       this._modes[type].actionsContainer = actionsContainer;

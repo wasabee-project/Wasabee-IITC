@@ -2,7 +2,6 @@ import { initCrossLinks } from "./crosslinks";
 import initWasabee from "./wasabee";
 import initPaste from "./paste";
 import initServer from "./server";
-import { initOpsDialog } from "./opsDialog";
 import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
@@ -38,7 +37,6 @@ window.plugin.wasabee.init = function() {
   initOverflowMenu();
   initPaste();
   initServer();
-  initOpsDialog();
 
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
@@ -90,4 +88,3 @@ window.plugin.wasabee.init = function() {
 window.plugin.wasabee.addCSS = content => {
   $("head").append('<style type="text/css">\n' + content + "\n</style>");
 };
-

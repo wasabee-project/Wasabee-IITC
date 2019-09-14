@@ -49,6 +49,14 @@ const WasabeeButtonControl = Feature.extend({
     }
   },
 
+  _getIcon() {
+    let me = WasabeeMe.get();
+    if (me == null) {
+      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+    }
+    return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+  },
+
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
   }
