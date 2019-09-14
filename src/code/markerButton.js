@@ -14,7 +14,7 @@ const MarkerButtonControl = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation()
+    this._operation = window.plugin.wasabee.getSelectedOperation();
     this._displayDialog();
   },
 
@@ -102,7 +102,7 @@ const MarkerButtonControl = Feature.extend({
             mHandler._comment.val()
           ),
         OK: () => {
-          mHandler.disable();
+          mHandler._dialog.dialog("close");
         }
       }
     });

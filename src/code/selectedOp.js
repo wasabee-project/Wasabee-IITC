@@ -95,7 +95,6 @@ export default function() {
       var v = store.get(opID);
       if (v == null) {
         console.log("no such op in local store: " + opID);
-        alert("No such operation in local store, try logging in and syncing");
       } else {
         // we can pass v directly, but this catches if the json is malformed
         var o = JSON.parse(v);
