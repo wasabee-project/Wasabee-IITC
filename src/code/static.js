@@ -30,6 +30,14 @@ Wasabee.static = {
     marker_layer_groupd: require("./images/marker_layer_groupd.png"),
     marker_layer_groupe: require("./images/marker_layer_groupe.png"),
     marker_layer_groupf: require("./images/marker_layer_groupf.png")
+  },
+  dialogNames: {
+    linkDialogButton: "wasabee-addlinks",
+    markerButton: "wasabee-marker",
+    mustauth: "wasabee-mustauth",
+    newopButton: "wasabee-newop",
+    opsButton: "wasabee-operations",
+    wasabeeButton: "wasabee-userinfo"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

@@ -168,7 +168,7 @@ export default function() {
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
-      id: "wasabee-dialog-mustauth"
+      id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
   };
 

@@ -46,7 +46,7 @@ const opsButtonControl = Feature.extend({
         obHandler.disable();
         delete obHandler._dialog;
       },
-      id: "wasabee-operations"
+      id: window.plugin.Wasabee.static.dialogNames.opsButton
     });
     let operationSelect = document.getElementById("wasabee-operationSelect");
     $(operationSelect).change();
@@ -90,7 +90,25 @@ const opsButtonControl = Feature.extend({
     $(operationSelect).change(function() {
       var newID = $(this).val();
       console.log("load requested for " + newID);
-      // XXX close all other dialogs or things will get ugly
+      // close all other dialogs or things get weird
+      Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
+        name
+      ) {
+        if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
+          let id = "dialog-" + name;
+          console.log("trying to close " + id);
+          if (window.DIALOGS[id]) {
+            try {
+              let selector = $(window.DIALOGS[id]);
+              selector.dialog("close");
+              selector.remove();
+            } catch (err) {
+              console.log("closing dialog: " + err);
+            }
+          }
+        }
+      });
+
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(newop);
       window.plugin.wasabee.updateVisual(newop);

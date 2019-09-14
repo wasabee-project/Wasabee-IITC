@@ -105,7 +105,7 @@ const LinkDialogButtonControl = Feature.extend({
         self._clearLocalPortalSelections();
         delete self._dialog;
       },
-      id: "wasabee-user-info"
+      id: window.plugin.Wasabee.static.dialogNames.linkDialogButton
     });
   },
 

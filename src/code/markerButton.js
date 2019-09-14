@@ -93,7 +93,7 @@ const MarkerButtonControl = Feature.extend({
         mHandler.disable();
         delete mHandler._dialog;
       },
-      id: "wasabee-marker",
+      id: window.plugin.Wasabee.static.dialogNames.markerButton,
       buttons: {
         "Add Marker": () =>
           mHandler._addMarker(
