@@ -85,19 +85,20 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_uploadbutton", function() {
           opsHandler._closeDialogs();
-          var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
+          let so = window.plugin.wasabee.getSelectedOperation();
+          let isServerOp = window.plugin.wasabee.IsServerOp(so);
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
             try {
-              window.plugin.wasabee.updateSingleOp(selectedOp);
+              window.plugin.wasabee.updateSingleOp(so);
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }
           } else {
             try {
-              window.plugin.wasabee.uploadSingleOp(selectedOp);
-              window.plugin.wasabee.downloadSingleOp(selectedOp.ID);
+              window.plugin.wasabee.uploadSingleOp(so);
+              window.plugin.wasabee.downloadSingleOp(so.ID);
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }
