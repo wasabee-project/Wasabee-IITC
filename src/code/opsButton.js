@@ -29,6 +29,7 @@ const opsButtonControl = Feature.extend({
   _displayDialog: function() {
     var op = window.plugin.Wasabee.getSelectedOperation();
     var content = document.createElement("div");
+    content.id = "wasabee-dialog-operation-content";
     var opinfo = document.createElement("div");
     opinfo.id = "wasabee-dialog-operation-opinfo";
 
@@ -75,9 +76,22 @@ const opsButtonControl = Feature.extend({
     });
   },
 
+  _opSelectMenuUpdate: function(context, operation) {
+    var dialogcontainer = document.getElementById(
+      "wasabee-dialog-operation-content"
+    );
+    var oldspinner = document.getElementById(
+      "wasabee-dialog-operation-spinner"
+    );
+    dialogcontainer.replaceChild(
+      context._opSelectMenu(context, operation),
+      oldspinner
+    );
+  },
+
   _opSelectMenu: function(context, operation) {
     var container = document.createElement("div");
-
+    container.id = "wasabee-dialog-operation-spinner";
     container.className = "spinner";
     container.innerHTML = "";
     $(container).css({
@@ -121,17 +135,17 @@ const opsButtonControl = Feature.extend({
       });
 
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
-      context._displayOpInfo(newop);
+      context._displayOpInfo(context, newop);
       newop.update();
       addButtons(newop);
     });
 
     container.appendChild(operationSelect);
-    context._displayOpInfo(operation);
+    context._displayOpInfo(context, operation);
     return container;
   },
 
-  _displayOpInfo: function(operation) {
+  _displayOpInfo: function(context, operation) {
     var opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
     if (!opinfo) {
       console.log(
@@ -152,6 +166,7 @@ const opsButtonControl = Feature.extend({
       } else {
         operation.name = $(input).val();
         operation.store();
+        context._opSelectMenuUpdate(context, operation);
       }
     });
     var colorSection = opinfo.appendChild(document.createElement("p"));
