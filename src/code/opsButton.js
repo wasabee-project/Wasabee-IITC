@@ -29,10 +29,11 @@ const opsButtonControl = Feature.extend({
   _displayDialog: function() {
     var op = window.plugin.Wasabee.getSelectedOperation();
     var content = document.createElement("div");
-    var title = content.appendChild(document.createElement("div"));
-    title.className = "desc";
-    title.innerHTML = "";
+    var opinfo = document.createElement("div");
+    opinfo.id = "wasabee-dialog-operation-opinfo";
+
     content.appendChild(this._opSelectMenu(this, op));
+    content.appendChild(opinfo);
 
     var obHandler = this;
     this._dialog = window.dialog({
@@ -47,6 +48,8 @@ const opsButtonControl = Feature.extend({
       },
       id: "wasabee-operations"
     });
+    let operationSelect = document.getElementById("wasabee-operationSelect");
+    $(operationSelect).change();
   },
 
   removeHooks: function() {
@@ -60,10 +63,8 @@ const opsButtonControl = Feature.extend({
     // ctx._dialog.dialog("close");
   },
 
-  _opSelectMenu: function(context, selectedOp) {
+  _opSelectMenu: function(context, operation) {
     var container = document.createElement("div");
-    var opinfo = document.createElement("div");
-    opinfo.id = "wasabee-dialog-operation-opinfo";
 
     container.className = "spinner";
     container.innerHTML = "";
@@ -71,6 +72,7 @@ const opsButtonControl = Feature.extend({
       "text-align": "center"
     });
     var operationSelect = document.createElement("select");
+    operationSelect.id = "wasabee-operationSelect";
     $(operationSelect).css({
       width: "50%"
     });
@@ -84,7 +86,7 @@ const opsButtonControl = Feature.extend({
         })
       );
     });
-    $(operationSelect).val(selectedOp.ID);
+    $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       var newID = $(this).val();
       console.log("load requested for " + newID);
@@ -95,8 +97,7 @@ const opsButtonControl = Feature.extend({
     });
 
     container.appendChild(operationSelect);
-    container.appendChild(opinfo);
-    context._displayOpInfo(selectedOp);
+    context._displayOpInfo(operation);
     return container;
   },
 
@@ -248,6 +249,7 @@ const opsButtonControl = Feature.extend({
       },
       false
     );
+    // return opinfo;
   }
 });
 

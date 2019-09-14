@@ -1,10 +1,10 @@
-import { MarkerDialog } from "./markerDialog";
 import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
 import WasabeeButtonControl from "./wasabeeButton";
 import opsButtonControl from "./opsButton";
 import NewopButtonControl from "./newopButton";
 import LinkDialogButtonControl from "./linkDialogButton";
+import MarkerButtonControl from "./markerButton";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -27,21 +27,7 @@ export default function(selectedOp) {
       var opsHandler = this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
       this._addLinkDialogButton(map, container, outerDiv);
-
-      $(container)
-        .append(
-          '<a id="wasabee_addmarkersbutton" href="javascript: void(0);" class="wasabee-control" title="Add Markers"><img src=' +
-            Wasabee.static.images.toolbar_addMarkers +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addmarkersbutton", function() {
-          if (selectedOp != null) {
-            MarkerDialog.update(selectedOp);
-          } else {
-            window.alert("No selected Operation found.");
-          }
-        });
-
+      this._addMarkerButton(map, container, outerDiv);
       this._addNewopButton(map, container, outerDiv);
 
       $(container)
@@ -71,7 +57,7 @@ export default function(selectedOp) {
           try {
             // LinkDialog.closeDialogs();
             // OpsDialog.closeDialogs();
-            MarkerDialog.closeDialogs();
+            // MarkerDialog.closeDialogs();
             var me = WasabeeMe.get();
             if (me == null) {
               window.plugin.wasabee.showMustAuthAlert();
@@ -112,7 +98,7 @@ export default function(selectedOp) {
           } else {
             // LinkDialog.closeDialogs();
             // OpsDialog.closeDialogs();
-            MarkerDialog.closeDialogs();
+            // MarkerDialog.closeDialogs();
             try {
               window.plugin.wasabee.uploadSingleOp(selectedOp);
               window.plugin.wasabee.downloadSingleOp(selectedOp.ID);
@@ -184,6 +170,19 @@ export default function(selectedOp) {
         buttonImage: window.plugin.Wasabee.static.images.toolbar_addlinks,
         callback: ldButtonHandler.enable,
         context: ldButtonHandler
+      });
+    },
+    _addMarkerButton: function(map, container) {
+      let mButtonHandler = new MarkerButtonControl(map);
+      let type = mButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = mButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Add Marker",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
+        callback: mButtonHandler.enable,
+        context: mButtonHandler
       });
     },
     _addQuickDrawButton: function(map, container, outerDiv) {

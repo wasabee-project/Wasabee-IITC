@@ -121,7 +121,7 @@ export default class LinkListDialog {
               if (that._portal) {
                 window.renderPortalDetails(that._portal.id);
               }
-	      // XXX yes, this doesn't work. May need to store the map reference globally
+              // XXX yes, this doesn't work. May need to store the map reference globally
               let map = L.DomUtil.get("map");
               console.log(map);
               let ld = new LinkDialogButtonControl(map);
