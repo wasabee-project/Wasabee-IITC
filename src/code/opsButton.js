@@ -146,6 +146,14 @@ const opsButtonControl = Feature.extend({
     // input.type = "text";
     input.id = "op-dialog-content-nameinput";
     input.value = operation.name;
+    $(input).change(function() {
+      if ($(input).val() == null || $(input).val() == "") {
+        alert("That is an invalid operation name");
+      } else {
+        operation.name = $(input).val();
+        operation.store();
+      }
+    });
     var colorSection = opinfo.appendChild(document.createElement("p"));
     colorSection.innerHTML = "Op Color: ";
     var operationColor =
@@ -195,22 +203,6 @@ const opsButtonControl = Feature.extend({
             window.plugin.wasabee.viewOpSummary(operation);
         }, false);
         */
-    // scb: just auto-save on defocus/change
-    var saveButton = buttonSection.appendChild(document.createElement("a"));
-    saveButton.innerHTML = "Save Operation Name";
-    saveButton.addEventListener(
-      "click",
-      function() {
-        if (input.value == null || input.value == "") {
-          alert("That is an invalid operation name");
-        } else {
-          window.plugin.Wasabee._selectedOp.name = input.value;
-          window.plugin.Wasabee._selectedOp.store();
-          // window.plugin.wasabee.updateOperationInList(operation);
-        }
-      },
-      false
-    );
     if (commentInputEnabled) {
       var saveCommentButton = buttonSection.appendChild(
         document.createElement("a")
