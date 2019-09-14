@@ -3,8 +3,8 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker } from "./markerDialog";
 import { drawThings } from "./mapDrawing";
-import LinkListDialog from "./linkListDialog";
-import { MarkerDialog } from "./markerDialog";
+// import LinkListDialog from "./linkListDialog";
+// import { MarkerDialog } from "./markerDialog";
 
 var Wasabee = window.plugin.Wasabee;
 export default function() {
@@ -173,13 +173,12 @@ export default function() {
   };
 
   window.plugin.wasabee.updateVisual = op => {
-    console.log("updateVisual");
     console.log("cleanPortalList");
     op.cleanPortalList();
-    console.log("LinkListDialog.update");
-    LinkListDialog.update(op, null, false);
-    console.log("MarkerDialog.update");
-    MarkerDialog.update(op, false, false);
+    // console.log("LinkListDialog.update");
+    // LinkListDialog.update(op, null, false);
+    // console.log("MarkerDialog.update");
+    // MarkerDialog.update(op, false, false);
     console.log("drawThings");
     drawThings(op);
   };
