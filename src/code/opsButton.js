@@ -90,6 +90,7 @@ const opsButtonControl = Feature.extend({
     $(operationSelect).change(function() {
       var newID = $(this).val();
       console.log("load requested for " + newID);
+      // XXX close all other dialogs or things will get ugly
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(newop);
       window.plugin.wasabee.updateVisual(newop);

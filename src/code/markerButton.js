@@ -14,6 +14,7 @@ const MarkerButtonControl = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
+    this._operation = window.plugin.wasabee.getSelectedOperation()
     this._displayDialog();
   },
 
@@ -21,12 +22,10 @@ const MarkerButtonControl = Feature.extend({
     Feature.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function(operation) {
+  _displayDialog: function() {
     var content = document.createElement("div");
-
     var self = this;
     this._target = null;
-    this._operation = operation;
     this._type = $("<select>");
     window.plugin.Wasabee.markerTypes.forEach((a, k) => {
       self._type.append(
@@ -97,7 +96,7 @@ const MarkerButtonControl = Feature.extend({
       id: "wasabee-marker",
       buttons: {
         "Add Marker": () =>
-          mHandler._sendAlert(
+          mHandler._addMarker(
             mHandler._type.val(),
             mHandler._operation,
             mHandler._comment.val()
@@ -109,7 +108,7 @@ const MarkerButtonControl = Feature.extend({
     });
   },
 
-  _sendAlert: function(selectedType, operation, comment) {
+  _addMarker: function(selectedType, operation, comment) {
     operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
   }
 });
