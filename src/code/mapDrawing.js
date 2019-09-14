@@ -1,10 +1,30 @@
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
-import { getColorHex } from "./markerDialog";
 import { checkAllLinks } from "./crosslinks";
 import WasabeeMe from "./me";
+// import UiHelper from "./uiHelper";
 
 var Wasabee = window.plugin.Wasabee;
+
+export const getColorMarker = color => {
+  var marker = null;
+  Wasabee.layerTypes.forEach(type => {
+    if (type.name == color) {
+      marker = type.portal.iconUrl;
+    }
+  });
+  return marker;
+};
+
+const getColorHex = color => {
+  var hex = null;
+  Wasabee.layerTypes.forEach(type => {
+    if (type.name == color) {
+      hex = type.color;
+    }
+  });
+  return hex;
+};
 
 //** This function draws things on the layers */
 export const drawThings = op => {

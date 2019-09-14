@@ -57,18 +57,13 @@ export default function() {
   // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
   // only this should write to _selectedOp
   window.plugin.wasabee.makeSelectedOperation = opID => {
-    console.log("makeSelectedOperation: " + opID);
-
+    // console.log("makeSelectedOperation: " + opID);
     if (Wasabee._selectedOp != null) {
       if (opID == Wasabee._selectedOp.ID) {
-        console.log(
-          "makeSelectedOperation called on the current op; doing nothing"
-        );
+        // console.log( "makeSelectedOperation called on the current op; doing nothing");
         return Wasabee._selectedOp;
       } else {
-        console.log(
-          "saving current op before loading new: " + Wasabee._selectedOp.ID
-        );
+        // console.log( "saving current op before loading new: " + Wasabee._selectedOp.ID);
         Wasabee._selectedOp.store();
       }
     }

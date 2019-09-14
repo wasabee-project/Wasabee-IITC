@@ -2,6 +2,7 @@ import Link from "./link";
 import Marker from "./marker";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
+// import { drawThings } from "./mapDrawing";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
@@ -382,10 +383,11 @@ export default class Operation {
     this.update();
   }
 
+  // call update to redra everything on the map
   update() {
-    // window.plugin.wasabee.loadOp(this.ID);
-    // drawThings(this)
     console.log("operation.update");
+    this.cleanPortalList();
+    // drawThings(this);
     window.plugin.wasabee.updateVisual(this);
   }
 

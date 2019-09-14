@@ -1,5 +1,4 @@
 import { Feature } from "./leafletDrawImports";
-import { drawThings } from "./mapDrawing";
 import Operation from "./operation";
 
 const NewopButtonControl = Feature.extend({
@@ -50,8 +49,7 @@ const NewopButtonControl = Feature.extend({
           var newop = new Operation(PLAYER.nickname, promptAction, true);
           newop.store();
           window.plugin.wasabee.makeSelectedOperation(newop.ID);
-          window.plugin.wasabee.updateVisual(newop);
-          drawThings(newop);
+          newop.update();
         } else {
           alert("You must enter a valid Operation name. Try again.");
         }

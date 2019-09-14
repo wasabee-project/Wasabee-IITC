@@ -44,7 +44,7 @@ export default class WasabeeMe {
         }
       );
     } else {
-      console.log("WasabeeMe.get: returning from localstore");
+      // console.log("WasabeeMe.get: returning from localstore");
     }
 
     // convert JSON or obj into WasabeeMe

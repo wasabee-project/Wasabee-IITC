@@ -41,9 +41,9 @@ export default function(selectedOp) {
             "Are you sure you want to clear ALL operations?"
           );
           if (confirmed) {
+            opsHandler._closeDialogs();
             window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
-            opsHandler.closeDialogs(opsHandler);
           }
         });
 
@@ -54,10 +54,8 @@ export default function(selectedOp) {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_syncbutton", function() {
+          opsHandler._closeDialogs();
           try {
-            // LinkDialog.closeDialogs();
-            // OpsDialog.closeDialogs();
-            // MarkerDialog.closeDialogs();
             var me = WasabeeMe.get();
             if (me == null) {
               window.plugin.wasabee.showMustAuthAlert();
@@ -86,6 +84,7 @@ export default function(selectedOp) {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_uploadbutton", function() {
+          opsHandler._closeDialogs();
           var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
 
           // upload is different than update -- upload on 1st, update after
@@ -96,9 +95,6 @@ export default function(selectedOp) {
               window.plugin.wasabee.showMustAuthAlert();
             }
           } else {
-            // LinkDialog.closeDialogs();
-            // OpsDialog.closeDialogs();
-            // MarkerDialog.closeDialogs();
             try {
               window.plugin.wasabee.uploadSingleOp(selectedOp);
               window.plugin.wasabee.downloadSingleOp(selectedOp.ID);

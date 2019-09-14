@@ -1,6 +1,6 @@
 import { Feature } from "./leafletDrawImports";
-import { drawThings } from "./mapDrawing";
 import ExportDialog from "./exportDialog";
+import addButtons from "./addButtons";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -56,11 +56,23 @@ const opsButtonControl = Feature.extend({
     Feature.prototype.removeHooks.call(this);
   },
 
-  //_closeDialog: function(ctx) {
-  _closeDialog: function() {
-    console.log("dialog close goes here");
-    this._dialog.dialog("close");
-    // ctx._dialog.dialog("close");
+  _closeDialogs: function() {
+    Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
+      name
+    ) {
+      if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
+        let id = "dialog-" + name;
+        if (window.DIALOGS[id]) {
+          try {
+            let selector = $(window.DIALOGS[id]);
+            selector.dialog("close");
+            selector.remove();
+          } catch (err) {
+            console.log("closing dialog: " + err);
+          }
+        }
+      }
+    });
   },
 
   _opSelectMenu: function(context, operation) {
@@ -96,7 +108,6 @@ const opsButtonControl = Feature.extend({
       ) {
         if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
           let id = "dialog-" + name;
-          console.log("trying to close " + id);
           if (window.DIALOGS[id]) {
             try {
               let selector = $(window.DIALOGS[id]);
@@ -111,8 +122,8 @@ const opsButtonControl = Feature.extend({
 
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(newop);
-      window.plugin.wasabee.updateVisual(newop);
-      drawThings(newop);
+      newop.update();
+      addButtons(newop);
     });
 
     container.appendChild(operationSelect);
