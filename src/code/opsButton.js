@@ -170,7 +170,7 @@ const opsButtonControl = Feature.extend({
       }
     });
     var colorSection = opinfo.appendChild(document.createElement("p"));
-    colorSection.innerHTML = "Op Color: ";
+    colorSection.innerHTML = "Operation Color: ";
     var operationColor =
       window.plugin.Wasabee.Constants.DEFAULT_OPERATION_COLOR;
     if (operation.color != null) {
@@ -187,13 +187,10 @@ const opsButtonControl = Feature.extend({
       opColor.append(option);
     });
     $(opColor).change(function() {
-      operation.colorSelected(
-        $(opColor).val(),
-        input.value,
-        commentInput.value
-      );
+      operation.color = $(opColor).val();
+      operation.update();
     });
-    //TODO enable comment section when !serverOp || (ownedServerOp)
+
     var isServerOp = window.plugin.wasabee.IsServerOp(operation);
     var isWritableOp = false;
     if (isServerOp) {
@@ -204,45 +201,22 @@ const opsButtonControl = Feature.extend({
     var commentInput = commentSection.appendChild(
       document.createElement("textarea")
     );
-    // commentInput.type = "text";
     commentInput.rows = "3";
     commentInput.placeholder = "Op Comment";
     commentInput.value = operation.comment;
     $(commentInput).prop("disabled", !commentInputEnabled);
+    $(commentInput).change(function() {
+      operation.comment = $(commentInput).val();
+      operation.store();
+    });
+
     var buttonSection = opinfo.appendChild(document.createElement("div"));
     buttonSection.className = "temp-op-dialog";
-    /*
-        var viewOpSummaryButton = buttonSection.appendChild(document.createElement("a"))
-        viewOpSummaryButton.innerHTML = "View Op Summary"
-        viewOpSummaryButton.addEventListener("click", function (arg) {
-            window.plugin.wasabee.viewOpSummary(operation);
-        }, false);
-        */
-    if (commentInputEnabled) {
-      var saveCommentButton = buttonSection.appendChild(
-        document.createElement("a")
-      );
-      saveCommentButton.innerHTML = "Save Operation Comment";
-      saveCommentButton.addEventListener(
-        "click",
-        function() {
-          if (commentInput.value == null || commentInput.value == "") {
-            alert("That is an invalid operation comment");
-          } else {
-            window.plugin.Wasabee._selectedOp.comment = commentInput.value;
-            window.plugin.Wasabee._selectedOp.store();
-            //window.plugin.wasabee.updateOperationInList(operation);
-          }
-        },
-        false
-      );
-    }
     var exportButton = buttonSection.appendChild(document.createElement("a"));
     exportButton.innerHTML = "Export";
     exportButton.addEventListener(
       "click",
       function() {
-        // XXX this is wrong this.OpsDialog.update(false, true);
         ExportDialog.show(operation);
       },
       false
