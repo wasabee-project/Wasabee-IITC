@@ -256,7 +256,31 @@ const opsButtonControl = Feature.extend({
               window.plugin.wasabee.deleteOwnedServerOp(operation.ID);
             }
           }
-          window.plugin.wasabee.removeOperation(operation.ID);
+          var ol = window.plugin.wasabee.opsList();
+          var newopID = ol[0];
+          console.log(newopID);
+          if (newopID == null || newopID == operation.ID) {
+            console.log(
+              "removing first op in list? I was going to use that...."
+            );
+
+            newopID = ol[1];
+            console.log(newopID);
+            if (newopID == null) {
+              console.log("not removing last op... fix this");
+            }
+          }
+          let removeid = operation.ID;
+          let operationSelect = document.getElementById(
+            "wasabee-operationSelect"
+          );
+          $(operationSelect).val(newopID);
+          $(operationSelect).change();
+          window.plugin.wasabee.removeOperation(removeid);
+          context._opSelectMenuUpdate(
+            context,
+            window.plugin.Wasabee.getSelectedOperation()
+          );
         }
       },
       false
