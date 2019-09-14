@@ -44,19 +44,6 @@ export default class Operation {
     }
   }
 
-  colorSelected(color, name, comment) {
-    if (this.color != color) {
-      this.color = color;
-    }
-    if (this.name != name) {
-      this.name = name;
-    }
-    if (this.comment != comment) {
-      this.comment = comment;
-    }
-    this.update();
-  }
-
   containsPortal(portal) {
     if (portal) {
       if (this.opportals.length == 0) {
@@ -420,6 +407,24 @@ export default class Operation {
     if (!this.teamlist) {
       this.teamlist = Array();
     }
+  }
+
+  // minimum bounds rectangle
+  mbr() {
+    let lats = [];
+    let lngs = [];
+    this.opportals.forEach(function(a) {
+      lats.push(a.lat);
+      lngs.push(a.lng);
+    });
+    let minlat = Math.min.apply(null, lats);
+    let maxlat = Math.max.apply(null, lats);
+    let minlng = Math.min.apply(null, lngs);
+    let maxlng = Math.max.apply(null, lngs);
+    let min = L.latLng(minlat, minlng);
+    let max = L.latLng(maxlat, maxlng);
+    var bounds = L.latLngBounds(min, max);
+    return bounds;
   }
 
   static create(obj) {
