@@ -175,7 +175,7 @@ export default function() {
             resolve(newop);
             break;
           case 304: // If-Modified-Since replied NotModified
-	    console.log("server copy is older/unmodified, keeping local copy");
+            console.log("server copy is older/unmodified, keeping local copy");
             resolve(localop);
             break;
           case 401:
