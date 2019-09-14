@@ -387,6 +387,7 @@ export default class Operation {
   update() {
     console.log("operation.update");
     this.cleanPortalList();
+    this.store();
     // drawThings(this);
     window.plugin.wasabee.updateVisual(this);
   }
