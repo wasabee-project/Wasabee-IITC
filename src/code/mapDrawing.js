@@ -97,12 +97,11 @@ const getMarkerPopup = (marker, target, portal, operation) => {
 };
 
 export const getPopupBodyWithType = (portal, target) => {
-  var title = "";
   if (!Wasabee.markerTypes.has(target.type)) {
     target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
   }
-  var marker = Wasabee.markerTypes.has(target.type);
-  title = marker.label + " - " + portal.name;
+  let marker = Wasabee.markerTypes.get(target.type);
+  let title = marker.label + ": " + portal.name;
   if (target.comment) title = title + "\n\n" + target.comment;
   if (target.state != "completed" && target.assignedNickname)
     title = title + "\n\nAssigned To: " + target.assignedNickname;
@@ -116,8 +115,8 @@ const getImageFromMarker = target => {
   if (!Wasabee.markerTypes.has(target.type)) {
     target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
   }
-  var marker = Wasabee.markerTypes.get(target.type);
-  var img = null;
+  let marker = Wasabee.markerTypes.get(target.type);
+  let img = null;
   switch (target.state) {
     case "pending":
       img = marker.markerIcon;
