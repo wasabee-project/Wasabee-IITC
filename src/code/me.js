@@ -18,7 +18,7 @@ export default class WasabeeMe {
     //});
   }
 
-  static get() {
+  static get(force) {
     var maxCacheAge = Date.now() - 1000 * 60 * 15;
     var lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     if (lsme != null) {
@@ -27,7 +27,12 @@ export default class WasabeeMe {
       me = null;
     }
     // if older than 15 minutes, pull again
-    if (me == null || me.fetched == undefined || me.fetched < maxCacheAge) {
+    if (
+      me == null ||
+      me.fetched == undefined ||
+      me.fetched < maxCacheAge ||
+      force
+    ) {
       if (me != null) {
         me == null;
         store.remove(Wasabee.Constants.AGENT_INFO_KEY);

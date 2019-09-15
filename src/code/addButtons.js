@@ -56,7 +56,7 @@ export default function(selectedOp) {
         .on("click", "#wasabee_syncbutton", function() {
           opsHandler._closeDialogs();
           try {
-            var me = WasabeeMe.get();
+            var me = WasabeeMe.get(true);
             if (me == null) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
@@ -110,8 +110,9 @@ export default function(selectedOp) {
     _addWasabeeButton: function(map, container) {
       let wasabeeButtonHandler = new WasabeeButtonControl(map);
       let me = WasabeeMe.get();
-      let image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+      let image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
       if (me == null) {
+        console.log("using logged out button image");
         image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
       }
       let type = wasabeeButtonHandler.type;
