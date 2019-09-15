@@ -25,7 +25,7 @@ const MarkerButtonControl = Feature.extend({
   _displayDialog: function() {
     var content = document.createElement("div");
     var self = this;
-    this._target = null;
+    this._marker = null;
     this._type = $("<select>");
     window.plugin.Wasabee.markerTypes.forEach((a, k) => {
       self._type.append(
@@ -43,18 +43,18 @@ const MarkerButtonControl = Feature.extend({
         });
         */
     var $element = $("<div>")
-      .addClass("wasabee-targetselect")
+      .addClass("wasabee-markerselect")
       .text("To: ");
-    this._targetLink = $("<strong>")
+    this._markerLink = $("<strong>")
       .text("(not set)")
       .appendTo($element);
     $("<button>")
       .text("set")
       .click(() => self.setTarget(UiHelper.getSelectedPortal()))
       .appendTo($element);
-    this._targetMenu = new window.plugin.Wasabee.OverflowMenu();
-    this._targetMenu.button.firstElementChild.textContent = "\u25bc";
-    $element.append(this._targetMenu.button);
+    this._markerMenu = new window.plugin.Wasabee.OverflowMenu();
+    this._markerMenu.button.firstElementChild.textContent = "\u25bc";
+    $element.append(this._markerMenu.button);
     content = $("<div />")
       .append(
         $("<div>")
