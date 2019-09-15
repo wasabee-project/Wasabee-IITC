@@ -61,6 +61,7 @@ const WasabeeButtonControl = Feature.extend({
     return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
   },
 
+  // unused, here just in case we want to be able to close individual dialogs
   _closeDialog() {
     let id = "dialog-" + window.plugin.Wasabee.static.dialogNames.wasabeeButton;
     if (window.DIALOGS[id]) {
