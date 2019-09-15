@@ -175,4 +175,23 @@ export default function() {
   window.plugin.wasabee.updateVisual = op => {
     drawThings(op);
   };
+
+  window.plugin.wasabee.closeAllDialogs = () => {
+    Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
+      name
+    ) {
+      if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
+        let id = "dialog-" + name;
+        if (window.DIALOGS[id]) {
+          try {
+            let selector = $(window.DIALOGS[id]);
+            selector.dialog("close");
+            selector.remove();
+          } catch (err) {
+            console.log("closing dialog: " + err);
+          }
+        }
+      }
+    });
+  };
 }
