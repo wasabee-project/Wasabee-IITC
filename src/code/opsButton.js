@@ -57,25 +57,6 @@ const opsButtonControl = Feature.extend({
     Feature.prototype.removeHooks.call(this);
   },
 
-  _closeDialogs: function() {
-    Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
-      name
-    ) {
-      if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
-        let id = "dialog-" + name;
-        if (window.DIALOGS[id]) {
-          try {
-            let selector = $(window.DIALOGS[id]);
-            selector.dialog("close");
-            selector.remove();
-          } catch (err) {
-            console.log("closing dialog: " + err);
-          }
-        }
-      }
-    });
-  },
-
   _opSelectMenuUpdate: function(context, operation) {
     var dialogcontainer = document.getElementById(
       "wasabee-dialog-operation-content"
@@ -116,24 +97,7 @@ const opsButtonControl = Feature.extend({
     $(operationSelect).change(function() {
       var newID = $(this).val();
       console.log("load requested for " + newID);
-      // close all other dialogs or things get weird
-      Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
-        name
-      ) {
-        if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
-          let id = "dialog-" + name;
-          if (window.DIALOGS[id]) {
-            try {
-              let selector = $(window.DIALOGS[id]);
-              selector.dialog("close");
-              selector.remove();
-            } catch (err) {
-              console.log("closing dialog: " + err);
-            }
-          }
-        }
-      });
-
+      window.plugin.wasabee.closeAllDialogs();
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
       newop.update();
