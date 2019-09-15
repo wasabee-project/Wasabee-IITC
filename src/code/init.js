@@ -17,8 +17,8 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.portalLayerGroup = null;
   window.plugin.wasabee.linkLayers = {};
   window.plugin.wasabee.linkLayerGroup = null;
-  window.plugin.wasabee.targetLayers = {};
-  window.plugin.wasabee.targetLayerGroup = null;
+  window.plugin.wasabee.markerLayers = {};
+  window.plugin.wasabee.markerLayerGroup = null;
   window.plugin.wasabee.agentLayers = {};
   window.plugin.wasabee.agentLayerGroup = null;
 
@@ -47,7 +47,7 @@ window.plugin.wasabee.init = function() {
 
   window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
-  window.plugin.wasabee.targetLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.agentLayerGroup = new L.LayerGroup();
   window.addLayerGroup(
     "Wasabee Draw Portals",
@@ -60,8 +60,8 @@ window.plugin.wasabee.init = function() {
     true
   );
   window.addLayerGroup(
-    "Wasabee Draw Targets",
-    window.plugin.wasabee.targetLayerGroup,
+    "Wasabee Draw Markers",
+    window.plugin.wasabee.markerLayerGroup,
     true
   );
   window.addLayerGroup(
