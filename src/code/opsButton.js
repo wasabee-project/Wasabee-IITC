@@ -1,6 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
 import addButtons from "./addButtons";
+import WasabeeMe from "./me";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -156,10 +157,10 @@ const opsButtonControl = Feature.extend({
       operation.update();
     });
 
-    var isServerOp = window.plugin.wasabee.IsServerOp(operation);
+    var isServerOp = operation.IsServerOp();
     var isWritableOp = false;
     if (isServerOp) {
-      isWritableOp = window.plugin.wasabee.IsWritableOp(operation);
+      isWritableOp = operation.IsWritableOp(WasabeeMe.get());
     }
     var commentInputEnabled = !isServerOp || isWritableOp;
     var commentSection = opinfo.appendChild(document.createElement("p"));
@@ -212,7 +213,7 @@ const opsButtonControl = Feature.extend({
           "Are you sure you want to *DELETE* this operation?"
         );
         if (confirmed == true) {
-          if (window.plugin.wasabee.IsOwnedOp(operation)) {
+          if (operation.IsOwnedOp(WasabeeMe.get())) {
             var confirmedDeleteServerOp = confirm(
               "Are you sure you want to *DELETE* this operation from the *SERVER*?"
             );

@@ -29,31 +29,31 @@ const getColorHex = color => {
 //** This function draws things on the layers */
 export const drawThings = op => {
   window.plugin.wasabee.resetAllPortals(op);
-  resetAllTargets(op);
+  resetAllMarkers(op);
   resetAllLinks(op);
   checkAllLinks(op);
 };
 
-//** This function adds all the Targets to the layer */
-const addAllTargets = op => {
-  var targetList = op.markers;
-  if (targetList != null) {
-    targetList.forEach(target => addTarget(target, op));
+//** This function adds all the markers to the layer */
+const addAllMarkers = op => {
+  var markerList = op.markers;
+  if (markerList != null) {
+    markerList.forEach(marker => addMarker(marker, op));
   }
 };
 
-//** This function resets all the Targets and calls addAllTargets to add them */
-const resetAllTargets = op => {
-  for (var guid in window.plugin.wasabee.targetLayers) {
-    var targetInLayer = window.plugin.wasabee.targetLayers[guid];
-    window.plugin.wasabee.targetLayerGroup.removeLayer(targetInLayer);
-    delete window.plugin.wasabee.targetLayers[guid];
+//** This function resets all the markers  and calls addAllMarkers to add them */
+const resetAllMarkers = op => {
+  for (var guid in window.plugin.wasabee.markerLayers) {
+    var m = window.plugin.wasabee.markerLayers[guid];
+    window.plugin.wasabee.markerLayerGroup.removeLayer(m);
+    delete window.plugin.wasabee.markerLayers[guid];
   }
-  addAllTargets(op);
+  addAllMarkers(op);
 };
 
-/** This function adds a Targets to the target layer group */
-const addTarget = (target, operation) => {
+/** This function adds a Markers to the target layer group */
+const addMarker = (target, operation) => {
   var targetPortal = operation.getPortal(target.portalId);
   var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
   var marker = L.marker(latLng, {
@@ -71,8 +71,8 @@ const addTarget = (target, operation) => {
   marker.bindPopup(getMarkerPopup(marker, target, targetPortal, operation));
   marker.off("click", marker.togglePopup, marker);
   marker.on("spiderfiedclick", marker.togglePopup, marker);
-  window.plugin.wasabee.targetLayers[target["ID"]] = marker;
-  marker.addTo(window.plugin.wasabee.targetLayerGroup);
+  window.plugin.wasabee.markerLayers[target["ID"]] = marker;
+  marker.addTo(window.plugin.wasabee.markerLayerGroup);
 };
 
 const getMarkerPopup = (marker, target, portal, operation) => {
@@ -127,6 +127,13 @@ const getImageFromMarker = target => {
     case "completed":
       img = marker.markerIconDone;
       break;
+    case "acknowledged":
+      img = marker.markerIconAcknowledged;
+      break;
+  }
+  if (img == null) {
+    console.log("getImageFromMarker: ");
+    console.log(target);
   }
   return img;
 };
@@ -217,8 +224,8 @@ export const drawAgents = op => {
     );
   }); // forEach team
   // redraw target popup menus
-  // window.plugin.wasabee.resetAllTargets();
-  // create new window.plugin.wasabee.updateAllTargets
+  // window.plugin.wasabee.resetAllMarkers();
+  // create new window.plugin.wasabee.updateAllMarkers
 };
 
 const getAgentPopup = agent => {

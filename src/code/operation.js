@@ -2,11 +2,8 @@ import Link from "./link";
 import Marker from "./marker";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
-// import { drawThings } from "./mapDrawing";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
-
-// var Wasabee = window.plugin.Wasabee;
 
 export default class Operation {
   //ID <- randomly generated alpha-numeric ID for the operation
@@ -425,6 +422,39 @@ export default class Operation {
     let max = L.latLng(maxlat, maxlng);
     var bounds = L.latLngBounds(min, max);
     return bounds;
+  }
+
+  IsWritableOp(me) {
+    if (me == null) {
+      return false;
+    }
+
+    if (me.GoogleID == this.creator) {
+      return true;
+    }
+    this.teamlist.forEach(function(t) {
+      if (t.role == "write" && me.Teams.includes(t.ID)) {
+        return true;
+      }
+    });
+    return false;
+  }
+
+  IsServerOp() {
+    if (this.teamlist.length != 0) {
+      return true;
+    }
+    return false;
+  }
+
+  IsOwnedOp(me) {
+    if (me == null) {
+      return false;
+    }
+    if (me.GoogleID == this.creator) {
+      return true;
+    }
+    return false;
   }
 
   static create(obj) {

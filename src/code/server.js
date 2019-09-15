@@ -79,44 +79,6 @@ export default function() {
     );
   };
 
-  window.plugin.wasabee.IsWritableOp = op => {
-    // console.log("checking IsWritableOp: " + opID);
-    var me = WasabeeMe.get();
-    if (me == null) {
-      // console.log("IsWritableOp called while not logged in");
-      return false;
-    }
-
-    if (me.GoogleID == op.creator) {
-      return true;
-    }
-    op.teamlist.forEach(function(t) {
-      if (t.role == "write" && me.Teams.includes(t.ID)) {
-        return true;
-      }
-    });
-    return false;
-  };
-
-  window.plugin.wasabee.IsServerOp = op => {
-    if (op.teamlist.length != 0) {
-      return true;
-    }
-    return false;
-  };
-
-  window.plugin.wasabee.IsOwnedOp = op => {
-    var me = WasabeeMe.get();
-    if (me == null) {
-      console.log("IsOwnedOp called while not logged in");
-      return false;
-    }
-    if (me.GoogleID == op.creator) {
-      return true;
-    }
-    return false;
-  };
-
   window.plugin.wasabee.teamPromise = teamid => {
     return new Promise(function(resolve, reject) {
       var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;

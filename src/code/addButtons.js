@@ -88,7 +88,7 @@ export default function(selectedOp) {
         .on("click", "#wasabee_uploadbutton", function() {
           window.plugin.wasabee.closeAllDialogs();
           let so = window.plugin.wasabee.getSelectedOperation();
-          let isServerOp = window.plugin.wasabee.IsServerOp(so);
+          let isServerOp = so.IsServerOp();
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
@@ -283,9 +283,8 @@ export default function(selectedOp) {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
   }
-  var isServerOp = window.plugin.wasabee.IsServerOp(selectedOp);
-  var isWritableOp =
-    isServerOp && window.plugin.wasabee.IsWritableOp(selectedOp);
+  var isServerOp = selectedOp.IsServerOp();
+  var isWritableOp = isServerOp && selectedOp.IsWritableOp(WasabeeMe.get());
   if (isWritableOp) {
     $("#wasabee_uploadbutton").css("display", "");
   } else {
