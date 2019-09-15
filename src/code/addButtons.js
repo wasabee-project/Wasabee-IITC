@@ -24,12 +24,13 @@ export default function(selectedOp) {
       this._modes = {};
 
       this._addWasabeeButton(map, container, outerDiv);
-      var opsHandler = this._addOpsButton(map, container, outerDiv);
+      this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
       this._addLinkDialogButton(map, container, outerDiv);
       this._addMarkerButton(map, container, outerDiv);
       this._addNewopButton(map, container, outerDiv);
 
+      // these three buttons need to be converted to the new format as well
       $(container)
         .append(
           '<a id="wasabee_clearopsbutton" href="javascript: void(0);" class="wasabee-control" title="Clear All Ops"><img src=' +
@@ -38,12 +39,13 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_clearopsbutton", function() {
           var confirmed = window.confirm(
-            "Are you sure you want to clear ALL operations?"
+            "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
           );
           if (confirmed) {
-            opsHandler._closeDialogs();
+            window.plugin.wasabee.closeAllDialogs();
             window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
+            // load the new default w/o saving the currently selected op...
           }
         });
 
@@ -54,7 +56,7 @@ export default function(selectedOp) {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_syncbutton", function() {
-          opsHandler._closeDialogs();
+          window.plugin.wasabee.closeAllDialogs();
           try {
             var me = WasabeeMe.get(true);
             if (me == null) {
@@ -84,7 +86,7 @@ export default function(selectedOp) {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_uploadbutton", function() {
-          opsHandler._closeDialogs();
+          window.plugin.wasabee.closeAllDialogs();
           let so = window.plugin.wasabee.getSelectedOperation();
           let isServerOp = window.plugin.wasabee.IsServerOp(so);
 
