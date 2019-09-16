@@ -77,19 +77,36 @@ const addMarker = (target, operation) => {
 
 const getMarkerPopup = (marker, target, portal, operation) => {
   marker.className = "wasabee-dialog wasabee-dialog-ops";
-  var content = document.createElement("div");
-  var title = content.appendChild(document.createElement("div"));
+  const content = document.createElement("div");
+  const title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
-  var buttonSet = content.appendChild(document.createElement("div"));
+  const buttonSet = content.appendChild(document.createElement("div"));
   buttonSet.className = "temp-op-dialog";
-  var deleteButton = buttonSet.appendChild(document.createElement("a"));
+  const deleteButton = buttonSet.appendChild(document.createElement("a"));
   deleteButton.textContent = "Delete";
   deleteButton.addEventListener(
     "click",
     () => {
       UiCommands.deleteMarker(operation, target, portal);
       marker.closePopup();
+    },
+    false
+  );
+
+  const subhead = content.appendChild(document.createElement("div"));
+  subhead.className = "desc";
+  subhead.innerHTML = "Marker Assignment";
+  const assignmentMenu = subhead.appendChild(agentSelectMenu());
+  const id = "wasabee-marker-assignment-" + target.id;
+  assignmentMenu.id = id;
+  assignmentMenu.addEventListener(
+    "change",
+    () => {
+      console.log(
+        "assignment (not really) changed to: " + assignmentMenu.value
+      );
+      // window.plugin.wasabee.assignmentPromise().then()
     },
     false
   );
@@ -228,22 +245,22 @@ export const drawAgents = op => {
 
 const getAgentPopup = agent => {
   agent.className = "wasabee-dialog wasabee-dialog-ops";
-  var content = document.createElement("div");
-  var title = content.appendChild(document.createElement("div"));
+  const content = document.createElement("div");
+  const title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.id = agent.id;
   title.innerHTML = markdown.toHTML(agent.name);
-  var date = content.appendChild(document.createElement("span"));
+  const date = content.appendChild(document.createElement("span"));
   date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
 };
 
 const getAllKnownAgents = () => {
   const agents = new Map();
-  Wasabee.teams.forEach(function(t) {
-    // this will get messy if display name is used -- last-in wins
-    t.forEach(function(a) {
-      agents.set(a.id, a);
+  Wasabee.teams.forEach(function(team) {
+    // XXX this will get messy if display name is used -- last-in wins
+    team.agents.forEach(function(agent) {
+      agents.set(agent.id, agent.name);
     });
   });
   return agents;
@@ -252,12 +269,14 @@ const getAllKnownAgents = () => {
 const agentSelectMenu = () => {
   const menu = document.createElement("select");
   const agents = getAllKnownAgents();
-  agents.forEach(function(a) {
-    const option = document.createElement("option");
-    // XXX HERE
-    option.value = "";
-    option.option = "";
-    menu.appendChild(option);
+  const unset = menu.appendChild(document.createElement("option"));
+  unset.value = "";
+  unset.text = "Not Assigned";
+
+  agents.forEach(function(v, k) {
+    const option = menu.appendChild(document.createElement("option"));
+    option.value = k;
+    option.text = v;
   });
   return menu;
-}
+};

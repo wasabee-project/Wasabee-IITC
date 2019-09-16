@@ -2,7 +2,7 @@ import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 export default function() {
   function sendServerRequest(endpoint, method, data) {
@@ -29,14 +29,15 @@ export default function() {
 
   // sendServerRequest needs to go away in favor of promises
 
-  window.plugin.wasabee.uploadSingleOp = operation =>
+  window.plugin.wasabee.uploadSingleOp = operation => {
+    let result = null;
     sendServerRequest("/api/v1/draw", "POST", operation)
       .done(response => {
         // update local copy after server does its magic on it
         if (response.Ops != null) {
           response.Ops.forEach(function(op) {
             if (op.ID == operation.ID) {
-              window.plugin.wasabee.dowloadSingleOp(op.ID);
+              result = window.plugin.wasabee.downloadSingleOp(op.ID);
             }
           });
         }
@@ -45,6 +46,8 @@ export default function() {
       .fail(() => {
         window.plugin.wasabee.showMustAuthAlert();
       });
+    return result;
+  };
 
   window.plugin.wasabee.updateSingleOp = operation =>
     sendServerRequest("/api/v1/draw/" + operation.ID, "PUT", operation)
@@ -72,17 +75,19 @@ export default function() {
     window.plugin.wasabee.opPromise(opID).then(
       function(newop) {
         newop.store();
+        return newop;
       },
       function(err) {
         console.log(err);
+        return null;
       }
     );
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;
-      var req = new XMLHttpRequest();
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;
+      const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
       req.crossDomain = true;
@@ -91,7 +96,6 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
-            // add it to the window Wasabee.teams map
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
@@ -117,9 +121,9 @@ export default function() {
 
   window.plugin.wasabee.opPromise = opID => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
-      var req = new XMLHttpRequest();
-      var localop = window.plugin.wasabee.getOperationByID(opID);
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
+      const req = new XMLHttpRequest();
+      const localop = window.plugin.wasabee.getOperationByID(opID);
 
       req.open("GET", url);
 
@@ -133,8 +137,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            var newop = Operation.create(req.response);
-            resolve(newop);
+            resolve(Operation.create(req.response));
             break;
           case 304: // If-Modified-Since replied NotModified
             console.log("server copy is older/unmodified, keeping local copy");
@@ -142,7 +145,6 @@ export default function() {
             break;
           case 401:
             reject("not authorized to access op: " + opID);
-            window.plugin.wasabee.showMustAuthAlert();
             break;
           default:
             reject(Error(req.statusText));
@@ -160,8 +162,8 @@ export default function() {
 
   window.plugin.wasabee.mePromise = () => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
-      var req = new XMLHttpRequest();
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
+      const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
       req.crossDomain = true;
@@ -169,8 +171,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            var me = WasabeeMe.create(req.response);
-            resolve(me);
+            resolve(WasabeeMe.create(req.response));
             break;
           case 401:
             reject("not logged in");

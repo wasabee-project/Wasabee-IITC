@@ -57,18 +57,29 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_syncbutton", function() {
           window.plugin.wasabee.closeAllDialogs();
+          const so = window.plugin.Wasabee.getSelectedOperation();
           try {
-            var me = WasabeeMe.get(true);
+            const me = WasabeeMe.get(true);
             if (me == null) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
               me.Ops.forEach(function(op) {
                 window.plugin.wasabee.opPromise(op.ID).then(
                   function(newop) {
-                    newop.store();
+                    if (newop != null) {
+                      newop.store();
+                      // if the op changed out beneath us, use the new
+                      if (newop.ID == so.ID) {
+                        window.plugin.wasabee.makeSelectedOperation(newop.ID);
+                      }
+                    } else {
+                      console.log("opPromise returned null op but no err?");
+                      window.plugin.wasabee.showMustAuthAlert();
+                    }
                   },
                   function(err) {
                     console.log(err);
+                    window.plugin.wasabee.showMustAuthAlert();
                   }
                 );
               });
@@ -87,28 +98,30 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_uploadbutton", function() {
           window.plugin.wasabee.closeAllDialogs();
-          let so = window.plugin.wasabee.getSelectedOperation();
+          const so = window.plugin.wasabee.getSelectedOperation();
+          const id = so.ID;
           let isServerOp = so.IsServerOp();
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
             try {
-              window.plugin.wasabee.updateSingleOp(so);
+              window.plugin.wasabee.updateSingleOp(so); // server should not change anything (?) XXX marker status may be different
+              window.plugin.wasabee.makeSelectedOperation(id); // switch to version in local store
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }
           } else {
             try {
-              window.plugin.wasabee.uploadSingleOp(so);
-              window.plugin.wasabee.downloadSingleOp(so.ID);
+              window.plugin.wasabee.uploadSingleOp(so); // this downloads and stores it in local store
+              window.plugin.wasabee.makeSelectedOperation(id); // switch to version in local store
             } catch (e) {
               window.plugin.wasabee.showMustAuthAlert();
             }
           }
         });
-
       return outerDiv;
     },
+
     _addWasabeeButton: function(map, container) {
       let wasabeeButtonHandler = new WasabeeButtonControl(map);
       let image = wasabeeButtonHandler.getIcon();
