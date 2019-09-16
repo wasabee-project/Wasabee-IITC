@@ -1,3 +1,5 @@
+import ExportDialog from "./exportDialog";
+
 export default function() {
   var Wasabee = window.plugin.Wasabee;
 
@@ -23,7 +25,8 @@ export default function() {
     operation.pasteKey = key;
     operation.pasteExpireDate =
       Date.now() + Wasabee.Constants.CURRENT_EXPIRE_NUMERIC;
-    window.plugin.wasabee.updateOperationInList(operation, false, false, true);
+    window.plugin.wasabee.loadOp(operation.ID);
+    ExportDialog.show(operation);
   };
 
   window.plugin.wasabee.viewOpSummary = function(operation) {

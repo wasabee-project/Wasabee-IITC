@@ -7,8 +7,6 @@ export default class Agent {
     this.date = null;
     this.pic = null;
     this.cansendto = false;
-    this.battery = 0;
-    this.alt = 0;
   }
 
   static create(obj) {
@@ -16,10 +14,6 @@ export default class Agent {
     for (var prop in obj) {
       if (agent.hasOwnProperty(prop)) {
         agent[prop] = obj[prop];
-      }
-      if (prop === "OwnTracks") {
-        agent.battery = obj[prop].batt;
-        agent.alt = obj[prop].alt;
       }
     }
     return agent;

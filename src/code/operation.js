@@ -1,23 +1,20 @@
 import Link from "./link";
 import Marker from "./marker";
 import { generateId } from "./auxiliar";
+import store from "../lib/store";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
-
-// var Wasabee = window.plugin.Wasabee;
 
 export default class Operation {
   //ID <- randomly generated alpha-numeric ID for the operation
   //name <- name of operation
   //creator <- agent who created it
-  //isSelected <- if true, this operation is the one that's currently displayed
   //portals <- List of Portals
   //links <- List of Links
-  constructor(creator, name, isSelected) {
+  constructor(creator, name) {
     this.ID = generateId();
     this.name = name;
     this.creator = creator;
-    this.isSelected = isSelected;
     this.opportals = Array();
     this.anchors = Array();
     this.links = Array();
@@ -26,8 +23,14 @@ export default class Operation {
     this.pasteExpireDate = 0;
     this.color = DEFAULT_OPERATION_COLOR;
     this.comment = null;
-    // this.teamid = null; // teamid is now deprecated, use teamslist
     this.teamlist = Array();
+    this.fetched = null;
+  }
+
+  store() {
+    // console.log("pushing to local store: " + this.ID);
+    this._ensureCollections();
+    store.set(this.ID, JSON.stringify(this));
   }
 
   getColor() {
@@ -36,19 +39,6 @@ export default class Operation {
     } else {
       return this.color;
     }
-  }
-
-  colorSelected(color, name, comment) {
-    if (this.color != color) {
-      this.color = color;
-    }
-    if (this.name != name) {
-      this.name = name;
-    }
-    if (this.comment != comment) {
-      this.comment = comment;
-    }
-    this.update();
   }
 
   containsPortal(portal) {
@@ -268,12 +258,7 @@ export default class Operation {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    var link = new Link(
-      Operation.create(this),
-      fromPortal.id,
-      toPortal.id,
-      description
-    );
+    var link = new Link(this, fromPortal.id, toPortal.id, description);
     if (!this.containsLink(link)) {
       this.links.push(link);
     } else {
@@ -382,11 +367,16 @@ export default class Operation {
     this.update();
   }
 
+  // call update to redra everything on the map
   update() {
-    window.plugin.wasabee.updateOperationInList(this);
+    console.log("operation.update");
+    this.cleanPortalList();
+    this.store();
+    // drawThings(this);
+    window.plugin.wasabee.updateVisual(this);
   }
 
-  static convertLinksToObjs(links) {
+  convertLinksToObjs(links) {
     var tempLinks = Array();
     for (let link_ in links) {
       if (links[link_] instanceof Link) {
@@ -416,12 +406,71 @@ export default class Operation {
     }
   }
 
+  // minimum bounds rectangle
+  mbr() {
+    let lats = [];
+    let lngs = [];
+    this.opportals.forEach(function(a) {
+      lats.push(a.lat);
+      lngs.push(a.lng);
+    });
+    let minlat = Math.min.apply(null, lats);
+    let maxlat = Math.max.apply(null, lats);
+    let minlng = Math.min.apply(null, lngs);
+    let maxlng = Math.max.apply(null, lngs);
+    let min = L.latLng(minlat, minlng);
+    let max = L.latLng(maxlat, maxlng);
+    var bounds = L.latLngBounds(min, max);
+    return bounds;
+  }
+
+  IsWritableOp(me) {
+    if (me == null) {
+      return false;
+    }
+
+    if (me.GoogleID == this.creator) {
+      return true;
+    }
+    this.teamlist.forEach(function(t) {
+      if (t.role == "write" && me.Teams.includes(t.ID)) {
+        return true;
+      }
+    });
+    return false;
+  }
+
+  IsServerOp() {
+    if (this.teamlist.length != 0) {
+      return true;
+    }
+    return false;
+  }
+
+  IsOwnedOp(me) {
+    if (me == null) {
+      return false;
+    }
+    if (me.GoogleID == this.creator) {
+      return true;
+    }
+    return false;
+  }
+
   static create(obj) {
+    if (operation instanceof Operation) {
+      console.log("do not call Operation.create() on an Operation");
+      console.log(new Error().stack);
+      return obj;
+    }
+    if (typeof obj == "string") {
+      obj = JSON.parse(obj);
+    }
     var operation = new Operation();
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {
-          operation[prop] = Operation.convertLinksToObjs(obj[prop]);
+          operation[prop] = operation.convertLinksToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }

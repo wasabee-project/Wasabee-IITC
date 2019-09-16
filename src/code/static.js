@@ -19,6 +19,8 @@ Wasabee.static = {
     toolbar_download: require("./images/toolbar_download.png"),
     toolbar_delete: require("./images/toolbar_delete.png"),
     toolbar_plus: require("./images/toolbar_plus.png"),
+    toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
+    toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
     toolbar_settings: require("./images/toolbar_settings.png"),
     marker_layer_main: require("./images/marker_layer_main.png"),
@@ -28,6 +30,14 @@ Wasabee.static = {
     marker_layer_groupd: require("./images/marker_layer_groupd.png"),
     marker_layer_groupe: require("./images/marker_layer_groupe.png"),
     marker_layer_groupf: require("./images/marker_layer_groupf.png")
+  },
+  dialogNames: {
+    linkDialogButton: "wasabee-addlinks",
+    markerButton: "wasabee-marker",
+    mustauth: "wasabee-mustauth",
+    newopButton: "wasabee-newop",
+    opsButton: "wasabee-operations",
+    wasabeeButton: "wasabee-userinfo"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

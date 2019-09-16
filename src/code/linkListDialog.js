@@ -1,7 +1,7 @@
 var markdown = require("markdown").markdown;
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
-import LinkDialog from "./linkDialog";
+import LinkDialogButtonControl from "./linkDialogButton";
 
 var _dialogs = [];
 var Wasabee = window.plugin.Wasabee;
@@ -117,11 +117,15 @@ export default class LinkListDialog {
         $.extend(
           {},
           {
-            "Add links": () => {
+            "Add Links": () => {
               if (that._portal) {
                 window.renderPortalDetails(that._portal.id);
               }
-              LinkDialog.update(that._operation, that._portal);
+              // XXX
+              // console.log(window.map);
+              let ld = new LinkDialogButtonControl(window.map);
+              ld._operation = that._operation();
+              ld._displayDialog();
             }
           },
           buttons

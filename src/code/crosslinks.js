@@ -243,7 +243,7 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
         marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
       ) {
         if (checkMarkerAgainstLink(marker, link, operation)) {
-          console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
+          // console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
           return false;
         }
       }
@@ -307,11 +307,10 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
   }
 };
 
-export const checkAllLinks = () => {
+export const checkAllLinks = operation => {
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee.crossLinkLayerGroup = {};
 
-  var operation = window.plugin.wasabee.getSelectedOperation();
   var drawnLinks = operation.links;
   var drawnMarkers = operation.markers;
 
@@ -357,7 +356,10 @@ export const initCrossLinks = () => {
 
   window.map.on("layeradd", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      checkAllLinks();
+      var operation = window.plugin.wasabee.getSelectedOperation();
+      if (operation != null) {
+        checkAllLinks(operation);
+      }
     }
   });
   window.map.on("layerremove", obj => {

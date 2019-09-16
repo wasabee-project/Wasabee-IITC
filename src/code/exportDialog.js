@@ -1,8 +1,8 @@
-var _dialogs = [];
+var _exportdialogs = [];
 
 export default class ExportDialog {
   constructor(operation) {
-    _dialogs.push(this);
+    _exportdialogs.push(this);
     this._operation = operation;
     this._mainContent = document.createElement("div");
     this.updateContentPane();
@@ -13,9 +13,19 @@ export default class ExportDialog {
       html: this._mainContent,
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
       closeCallback: () => {
-        _dialogs = [];
+        _exportdialogs = [];
       }
     });
+  }
+
+  getPasteLink(operation) {
+    if (operation.pasteKey != null) {
+      return (
+        "https://intel.ingress.com/intel?wasabeeShareKey=" + operation.pasteKey
+      );
+    } else {
+      return null;
+    }
   }
 
   updateContentPane() {
@@ -31,7 +41,7 @@ export default class ExportDialog {
       "</textarea>";
     var linkArea = mainContent.appendChild(document.createElement("div"));
     linkArea.className = "temp-op-dialog";
-    var pasteLink = window.plugin.wasabee.getPasteLink(operation);
+    var pasteLink = this.getPasteLink(operation);
     if (pasteLink == null) {
       let createLinkButton = linkArea.appendChild(document.createElement("a"));
       createLinkButton.innerHTML = "Create Sharing Link";
@@ -84,7 +94,7 @@ export default class ExportDialog {
   }
 
   static show(operation) {
-    var parameters = _dialogs;
+    var parameters = _exportdialogs;
     let show = true;
     if (parameters.length != 0) {
       show = false;

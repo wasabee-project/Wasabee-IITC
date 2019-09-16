@@ -2,7 +2,8 @@ export default function() {
   const Wasabee = window.plugin.Wasabee || {};
 
   Wasabee.Constants = {
-    OP_LIST_KEY: "OP_LIST_KEY",
+    SELECTED_OP_KEY: "SELECTED_OP_KEY",
+    AGENT_INFO_KEY: "AGENT_INFO_KEY",
     PASTE_LIST_KEY: "PASTE_LIST_KEY",
     SERVER_BASE_KEY: "https://server.wasabee.rocks",
     SERVER_BASE_TEST_KEY: "https://server.wasabee.rocks:8444",
@@ -21,8 +22,6 @@ export default function() {
     DEFAULT_MARKER_TYPE: "OtherPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
-    SERVER_OP_LIST_KEY: "SERVER_OP_LIST_KEY",
-    SERVER_OWNED_OP_LIST_KEY: "SERVER_OWNED_OP_LIST_KEY",
     SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   };
 
@@ -35,6 +34,7 @@ export default function() {
         color: "#7D7D7D",
         markerIcon: require("./images/wasabee_markers_decay_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_decay_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_decay_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_decay_done.png")
       }
     ],
@@ -46,6 +46,7 @@ export default function() {
         color: "#CE3B37",
         markerIcon: require("./images/wasabee_markers_destroy_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_destroy_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_destroy_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_destroy_done.png")
       }
     ],
@@ -57,6 +58,7 @@ export default function() {
         color: "#CE3B37",
         markerIcon: require("./images/wasabee_markers_farm_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_farm_done.png")
       }
     ],
@@ -68,6 +70,7 @@ export default function() {
         color: "#EDA032",
         markerIcon: require("./images/wasabee_markers_goto_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_goto_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_goto_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_goto_done.png")
       }
     ],
@@ -79,6 +82,7 @@ export default function() {
         color: "#7D7D7D",
         markerIcon: require("./images/wasabee_markers_key_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_key_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_key_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_key_done.png")
       }
     ],
@@ -90,6 +94,7 @@ export default function() {
         color: "#5994FF",
         markerIcon: require("./images/wasabee_markers_link_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_link_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_link_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_link_done.png")
       }
     ],
@@ -102,6 +107,7 @@ export default function() {
         color: "#EDA032",
         markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_meetagent_done.png")
       }
     ],
@@ -113,6 +119,7 @@ export default function() {
         color: "#3679B4",
         markerIcon: require("./images/wasabee_markers_other_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_other_done.png")
       }
     ],
@@ -124,6 +131,7 @@ export default function() {
         color: "#53AD53",
         markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_recharge_done.png")
       }
     ],
@@ -135,6 +143,7 @@ export default function() {
         color: "#448800",
         markerIcon: require("./images/wasabee_markers_farm_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_farm_done.png")
       }
     ],
@@ -146,6 +155,7 @@ export default function() {
         color: "#8920C3",
         markerIcon: require("./images/wasabee_markers_virus_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_virus_done.png")
       }
     ],
@@ -157,6 +167,7 @@ export default function() {
         color: "#8920C3",
         markerIcon: require("./images/wasabee_markers_other_pending.png"),
         markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_other_done.png")
       }
     ]

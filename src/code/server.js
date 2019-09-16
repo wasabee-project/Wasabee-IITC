@@ -1,6 +1,6 @@
-import store from "store";
 import Operation from "./operation";
 import Team from "./team";
+import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -27,23 +27,18 @@ export default function() {
     return $.ajax(options);
   }
 
-  window.plugin.wasabee.authWithWasabee = () =>
-    sendServerRequest("/me")
-      .done(response => {
-        if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpList(response.Ops, true);
-        }
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+  // sendServerRequest needs to go away in favor of promises
 
   window.plugin.wasabee.uploadSingleOp = operation =>
     sendServerRequest("/api/v1/draw", "POST", operation)
       .done(response => {
-        //  We shouldn't read an answer to this. It's a POST.
+        // update local copy after server does its magic on it
         if (response.Ops != null) {
-          window.plugin.wasabee.updateServerOpList(response.Ops, false);
+          response.Ops.forEach(function(op) {
+            if (op.ID == operation.ID) {
+              window.plugin.wasabee.dowloadSingleOp(op.ID);
+            }
+          });
         }
         alert("Upload Complete.");
       })
@@ -60,17 +55,8 @@ export default function() {
         window.plugin.wasabee.showMustAuthAlert();
       });
 
-  window.plugin.wasabee.downloadSingleOp = operation =>
-    sendServerRequest("/api/v1/draw/" + operation.ID)
-      .done(response => {
-        console.log("got response -> " + JSON.stringify(response));
-      })
-      .fail(() => {
-        alert("Download Failed.");
-      });
-
   // TODO: Should this use the DELETE verb?
-  window.plugin.wasabee.deleteOwnedServerOp = opID =>
+  window.plugin.wasabee.deleteOwnedServerOp = opID => {
     sendServerRequest("/api/v1/draw/" + opID + "/delete")
       .done(response => {
         console.log("got response -> " + JSON.stringify(response));
@@ -78,85 +64,19 @@ export default function() {
       .fail(() => {
         window.plugin.wasabee.showMustAuthAlert();
       });
-
-  window.plugin.wasabee.getOpDownloads = opList => {
-    var opCalls = [];
-    opList.forEach((op, index) => {
-      opCalls.push(window.plugin.wasabee.downloadOpInList(op));
-      console.log(op, index);
-    });
-    return opCalls;
   };
 
-  window.plugin.wasabee.downloadOpInList = op =>
-    sendServerRequest("/api/v1/draw/" + op.ID)
-      .done(response => {
-        window.plugin.wasabee.updateOperationInList(Operation.create(response));
-      })
-      .fail(() => {
-        alert("Download Failed.");
-      });
+  // below this line already converted to promises
 
-  window.plugin.wasabee.updateServerOpList = (opList, pullFullOps) => {
-    const ownedOpList = opList.filter(op => op.IsOwner);
-    store.set(
-      Wasabee.Constants.SERVER_OP_LIST_KEY,
-      JSON.stringify(JSON.stringify(opList))
-    );
-    store.set(
-      Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY,
-      JSON.stringify(JSON.stringify(ownedOpList))
-    );
-    console.log("opList -> " + JSON.stringify(opList));
-    if (pullFullOps) {
-      console.log("pulling ops");
-      Promise.all(window.plugin.wasabee.getOpDownloads(opList))
-        .then(() => {
-          alert("Sync Complete.");
-        })
-        .catch(data => {
-          throw (alert(data.message), console.log(data), data);
-        });
-    }
-  };
-
-  window.plugin.wasabee.opIsOwnedServerOp = opID => {
-    console.log("opId -> " + opID);
-    var isOwnedServerOp = false;
-    try {
-      var serverOwnedOpList = JSON.parse(
-        JSON.parse(store.get(Wasabee.Constants.SERVER_OWNED_OP_LIST_KEY))
-      ); // Gotta do 2 json.parses b/c javascript is dumb?
-      if (serverOwnedOpList != null) {
-        for (const opInList in serverOwnedOpList) {
-          if (serverOwnedOpList[opInList].ID === opID) {
-            isOwnedServerOp = true;
-          }
-        }
+  window.plugin.wasabee.downloadSingleOp = opID => {
+    window.plugin.wasabee.opPromise(opID).then(
+      function(newop) {
+        newop.store();
+      },
+      function(err) {
+        console.log(err);
       }
-    } catch (e) {
-      console.log("No Server ops or some other exception");
-    }
-    return isOwnedServerOp;
-  };
-
-  window.plugin.wasabee.opIsServerOp = opID => {
-    var isServerOp = false;
-    try {
-      var serverOpList = JSON.parse(
-        JSON.parse(store.get(Wasabee.Constants.SERVER_OP_LIST_KEY))
-      ); // Gotta do 2 json.parses b/c javascript is dumb?
-      if (serverOpList != null) {
-        for (const opInList in serverOpList) {
-          if (serverOpList[opInList].ID === opID) {
-            isServerOp = true;
-          }
-        }
-      }
-    } catch (e) {
-      console.log("No Server ops or some other exception");
-    }
-    return isServerOp;
+    );
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
@@ -171,14 +91,89 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
+            // add it to the window Wasabee.teams map
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
           case 401:
             reject(
-              "it is safe to ignore this 401: you are not authorized for team " +
+              "it is safe to ignore this 401: you are not authorized for team: " +
                 teamid
             );
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.opPromise = opID => {
+    return new Promise(function(resolve, reject) {
+      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
+      var req = new XMLHttpRequest();
+      var localop = window.plugin.wasabee.getOperationByID(opID);
+
+      req.open("GET", url);
+
+      if (localop != null && localop.teamlist.length != 0) {
+        req.setRequestHeader("If-Modified-Since", localop.fetched);
+      }
+
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            var newop = Operation.create(req.response);
+            resolve(newop);
+            break;
+          case 304: // If-Modified-Since replied NotModified
+            console.log("server copy is older/unmodified, keeping local copy");
+            resolve(localop);
+            break;
+          case 401:
+            reject("not authorized to access op: " + opID);
+            window.plugin.wasabee.showMustAuthAlert();
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.mePromise = () => {
+    return new Promise(function(resolve, reject) {
+      var url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
+      var req = new XMLHttpRequest();
+      req.open("GET", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            var me = WasabeeMe.create(req.response);
+            resolve(me);
+            break;
+          case 401:
+            reject("not logged in");
             break;
           default:
             reject(Error(req.statusText));

@@ -5,10 +5,10 @@
  * simply pass the messages along using window.parent.postMessage.
  */
 
-import { drawThings, drawAgents } from "./mapDrawing";
+import { drawAgents } from "./mapDrawing";
 var Wasabee = window.plugin.Wasabee;
 
-export const firebaseInit = () => {
+export const initFirebase = () => {
   const $iframe = $("<iframe></iframe>")
     .width(0)
     .height(0)
@@ -17,25 +17,30 @@ export const firebaseInit = () => {
   $(document.body).append($iframe);
 
   window.addEventListener("message", event => {
-    console.log("Wasabee: Received a message from postMessage().");
+    // console.log("Wasabee: Received a message from postMessage().");
     if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
 
-    console.log("Message received: ", event.data);
-
-    var operation = window.plugin.wasabee.getSelectedOperation();
+    // console.log("Message received: ", event.data);
+    var operation = Wasabee._selectedOp;
     if (
       event.data.data.cmd === "Agent Location Change" &&
       operation.teamid == event.data.data.msg
     ) {
       drawAgents();
     }
-    if (
-      event.data.data.cmd === "Map Change" &&
-      operation.ID == event.data.data.msg
-    ) {
-      console.log("refreshing/redrawing map");
-      window.plugin.wasabee.downloadSingleOp(operation.ID);
-      drawThings();
+    if (event.data.data.cmd === "Map Change") {
+      window.plugin.wasabee.downloadSingleOp(event.data.data.opID);
+      if (event.data.data.opID == operation.ID) {
+        console.log(
+          "selected map changed by firebase push, refreshing/redrawing map"
+        );
+        var trashID = "000000000000000000000000000000000000000"; // required to trigger redraw
+        operation.ID = trashID;
+        operation.name = "swap for reload";
+        operation.store();
+        window.plugin.wasabee.makeSelectedOperation(event.data.data.opID);
+        window.plugin.wasabee.removeOperation(trashID);
+      }
     }
   });
 };

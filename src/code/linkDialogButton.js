@@ -1,17 +1,30 @@
+import { Feature } from "./leafletDrawImports";
 import UiCommands from "./uiCommands.js";
 import UiHelper from "./uiHelper.js";
 
-var _dialogs = [];
+const LinkDialogButtonControl = Feature.extend({
+  statics: {
+    TYPE: "linkdialogButton"
+  },
 
-export default class LinkDialog {
-  constructor(op) {
+  initialize: function(map, options) {
+    this.type = LinkDialogButtonControl.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    Feature.prototype.addHooks.call(this);
+    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._displayDialog();
+  },
+
+  _displayDialog: function() {
     var self = this;
-    self.clearLocalPortalSelections();
+    self._clearLocalPortalSelections();
     this._broadcast = new BroadcastChannel("wasabee-linkdialog");
     this._portals = {};
     this._links = [];
-    this._operation = op;
-    _dialogs.push(this);
     var container = document.createElement("div");
     this._desc = container.appendChild(document.createElement("textarea"));
     this._desc.placeholder = "Description (optional)";
@@ -38,21 +51,21 @@ export default class LinkDialog {
       node = tr.insertCell();
       button = node.appendChild(document.createElement("button"));
       button.textContent = "set";
-      button.addEventListener("click", arg => self.setPortal(arg), false);
+      button.addEventListener("click", arg => self._setPortal(arg), false);
       node = tr.insertCell();
       if (0 != string) {
         button = node.appendChild(document.createElement("button"));
         button.textContent = "add";
         button.addEventListener(
           "click",
-          other => self.addLinkTo(other, self._operation),
+          other => self._addLinkTo(other, self._operation),
           false
         );
       }
       node = tr.insertCell();
       node.className = "portal portal-" + type;
       self._portals[type] = node;
-      self.updatePortal(type);
+      self._updatePortal(type);
     });
     var element = container.appendChild(document.createElement("div"));
     element.className = "buttonbar";
@@ -64,7 +77,7 @@ export default class LinkDialog {
     button.textContent = "add all";
     button.addEventListener(
       "click",
-      () => self.addAllLinks(self._operation),
+      () => self._addAllLinks(self._operation),
       false
     );
     var cardHeader = element.appendChild(document.createElement("label"));
@@ -79,44 +92,39 @@ export default class LinkDialog {
     button.addEventListener("click", () => self._dialog.dialog("close"), false);
     var sendMessage = name => self.onMessage(name);
     this._broadcast.addEventListener("message", sendMessage, false);
+
     this._dialog = window.dialog({
-      title: this._operation.name + " - Wasabee Links",
+      title: "Add Links",
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog wasabee-dialog-links",
-      closeCallback: () => {
+      dialogClass: "wasabee-dialog-mustauth",
+      closeCallback: function() {
+        self.disable();
         self._broadcast.removeEventListener("message", sendMessage, false);
-        var paneIndex = _dialogs.indexOf(self);
-        if (-1 !== paneIndex) {
-          _dialogs.splice(paneIndex, 1);
-        }
-        self.clearLocalPortalSelections();
-      }
+        self._clearLocalPortalSelections();
+        delete self._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.linkDialogButton
     });
-    this._dialog.dialog("option", "buttons", {});
-  }
+  },
 
-  focus() {
-    this._dialog.dialog("open");
-  }
-
-  onMessage(command) {
+  _onMessage: function(command) {
     if ("setPortal" === command.data.type) {
-      this.updatePortal(command.data.name);
+      this._updatePortal(command.data.name);
     }
     //***Function to clear local selections of portals for the dialog
-  }
+  },
 
-  clearLocalPortalSelections() {
+  _clearLocalPortalSelections: function() {
     delete localStorage["wasabee-portal-dst-1"];
     delete localStorage["wasabee-portal-dst-2"];
     delete localStorage["wasabee-portal-dst-3"];
     delete localStorage["wasabee-portal-src"];
     //***Function to set portal -- called from 'Set' Button
-  }
+  },
 
-  setPortal(event) {
+  _setPortal: function(event) {
     var updateID = event.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
@@ -129,40 +137,40 @@ export default class LinkDialog {
       alert("No Portal Selected.");
       delete localStorage["wasabee-portal-" + updateID];
     }
-    this.updatePortal(updateID);
+    this._updatePortal(updateID);
     this._broadcast.postMessage({
       type: "setPortal",
       name: updateID
     });
     //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
-  }
+  },
 
-  getPortal(name) {
+  _getPortal: function(name) {
     try {
       return JSON.parse(localStorage["wasabee-portal-" + name]);
     } catch (b) {
       return null;
     }
     //***Function to update portal in the dialog
-  }
+  },
 
-  updatePortal(key) {
-    var i = this.getPortal(key);
+  _updatePortal: function(key) {
+    var i = this._getPortal(key);
     var viewContainer = this._portals[key];
     $(viewContainer).empty();
     if (i) {
       viewContainer.appendChild(UiHelper.getPortalLink(i));
     }
     //***Function to add link between the portals -- called from 'Add' Button next to To portals
-  }
+  },
 
-  addLinkTo(instance, operation) {
+  _addLinkTo: function(instance, operation) {
     var item = this;
     var server = instance.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
-    var linkTo = this.getPortal(server);
-    var source = this.getPortal("src");
+    var linkTo = this._getPortal(server);
+    var source = this._getPortal("src");
     if (!source || !linkTo) {
       return void alert("Please select target and destination portals first!");
     }
@@ -171,9 +179,11 @@ export default class LinkDialog {
       return void alert("Target and destination portals must be different.");
     } else {
       Promise.all([
-        item.addPortal(source),
-        item.addPortal(linkTo),
-        isReversed ? item.addLink(linkTo, source) : item.addLink(source, linkTo)
+        item._addPortal(source),
+        item._addPortal(linkTo),
+        isReversed
+          ? item._addLink(linkTo, source)
+          : item._addLink(source, linkTo)
       ])
         .then(() => operation.update())
         .catch(data => {
@@ -181,39 +191,39 @@ export default class LinkDialog {
         });
     }
     //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
-  }
+  },
 
-  addAllLinks(operation) {
+  _addAllLinks: function(operation) {
     var item = this;
-    var source = this.getPortal("src");
+    var source = this._getPortal("src");
     if (!source) {
       return void alert("Please select a target portal first!");
     }
     var resolvedSourceMapConfigs = this._links
-      .map(b => (b.checked ? item.getPortal(b.value) : null))
+      .map(b => (b.checked ? item._getPortal(b.value) : null))
       .filter(a => null != a);
     if (0 == resolvedSourceMapConfigs.length) {
       return void alert("Please select a destination portal first!");
     }
     var isReversedChecked = this._reversed.checked;
-    var documentBodyPromise = this.addPortal(source);
+    var documentBodyPromise = this._addPortal(source);
     Promise.all(
       resolvedSourceMapConfigs.map(linkTo => {
         return Promise.all([
           documentBodyPromise,
-          item.addPortal(linkTo),
+          item._addPortal(linkTo),
           isReversedChecked
-            ? item.addLink(linkTo, source)
-            : item.addLink(source, linkTo)
+            ? item._addLink(linkTo, source)
+            : item._addLink(source, linkTo)
         ]).then(() => operation.update());
       })
     ).catch(data => {
       throw (alert(data.message), console.log(data), data);
     });
     //***Function to add a portal -- called in addLinkTo and addAllLinks functions
-  }
+  },
 
-  addPortal(sentPortal) {
+  _addPortal: function(sentPortal) {
     var resolvedLocalData = Promise.resolve(this._operation.opportals);
     return sentPortal
       ? this._operation.opportals.some(
@@ -222,41 +232,20 @@ export default class LinkDialog {
         ? resolvedLocalData
         : UiCommands.addPortal(this._operation, sentPortal, "", true)
       : Promise.reject("no portal given");
-  }
+  },
 
   //***Function to add a single link -- called in addLinkTo and addAllLinks functions
-  addLink(fromPortal, toPortal) {
+  _addLink: function(fromPortal, toPortal) {
     var description = this._desc.value;
     if (!toPortal || !fromPortal) {
       return Promise.reject("no portal given");
     }
     return this._operation.addLink(fromPortal, toPortal, description);
-  }
+  },
 
-  static update(operation, show) {
-    var p = 0;
-    var parameters = _dialogs;
-    for (; p < parameters.length; p++) {
-      var page = parameters[p];
-      if (page._operation.ID == operation.ID) {
-        page._operation = operation;
-        return page.focus(), page;
-      } else {
-        return page._dialog.dialog("close");
-      }
-    }
-    if (show) {
-      return new LinkDialog(operation);
-    } else {
-      return;
-    }
+  removeHooks: function() {
+    Feature.prototype.removeHooks.call(this);
   }
+});
 
-  static closeDialogs() {
-    var parameters = _dialogs;
-    for (let p = 0; p < parameters.length; p++) {
-      var page = parameters[p];
-      page._dialog.dialog("close");
-    }
-  }
-}
+export default LinkDialogButtonControl;

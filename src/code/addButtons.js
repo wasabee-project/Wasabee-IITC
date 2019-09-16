@@ -1,13 +1,15 @@
-import LinkDialog from "./linkDialog";
-import { MarkerDialog } from "./markerDialog";
-import { OpsDialog } from "./opsDialog";
-import Operation from "./operation";
+import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
+import WasabeeButtonControl from "./wasabeeButton";
+import opsButtonControl from "./opsButton";
+import NewopButtonControl from "./newopButton";
+import LinkDialogButtonControl from "./linkDialogButton";
+import MarkerButtonControl from "./markerButton";
 
 var Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
-export default function() {
+export default function(selectedOp) {
   const ButtonsControl = L.Control.extend({
     options: {
       position: "topleft"
@@ -21,56 +23,14 @@ export default function() {
       outerDiv.appendChild(container);
       this._modes = {};
 
-      $(container)
-        .append(
-          '<a id="wasabee_viewopsbutton" href="javascript: void(0);" class="wasabee-control" title="Manage Operations"><img src=' +
-            Wasabee.static.images.toolbar_viewOps +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_viewopsbutton", function() {
-          OpsDialog.update(Wasabee.opList);
-        });
-
+      this._addWasabeeButton(map, container, outerDiv);
+      this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
+      this._addLinkDialogButton(map, container, outerDiv);
+      this._addMarkerButton(map, container, outerDiv);
+      this._addNewopButton(map, container, outerDiv);
 
-      $(container)
-        .append(
-          '<a id="wasabee_addlinksbutton" href="javascript: void(0);" class="wasabee-control" title="Add Links"><img src=' +
-            Wasabee.static.images.toolbar_addlinks +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addlinksbutton", function() {
-          var selectedOp = window.plugin.wasabee.getSelectedOperation();
-          if (selectedOp != null) {
-            LinkDialog.update(selectedOp, true);
-          } else {
-            window.alert("No selected Operation found.");
-          }
-        });
-      $(container)
-        .append(
-          '<a id="wasabee_addmarkersbutton" href="javascript: void(0);" class="wasabee-control" title="Add Markers"><img src=' +
-            Wasabee.static.images.toolbar_addMarkers +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addmarkersbutton", function() {
-          var selectedOp = window.plugin.wasabee.getSelectedOperation();
-          if (selectedOp != null) {
-            MarkerDialog.update(selectedOp);
-          } else {
-            window.alert("No selected Operation found.");
-          }
-        });
-      $(container)
-        .append(
-          '<a id="wasabee_addopbutton" href="javascript: void(0);" class="wasabee-control" title="Add Op"><img src=' +
-            Wasabee.static.images.toolbar_plus +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_addopbutton", function() {
-          window.plugin.wasabee.showAddOpDialog();
-        });
-
+      // these three buttons need to be converted to the new format as well
       $(container)
         .append(
           '<a id="wasabee_clearopsbutton" href="javascript: void(0);" class="wasabee-control" title="Clear All Ops"><img src=' +
@@ -79,12 +39,13 @@ export default function() {
         )
         .on("click", "#wasabee_clearopsbutton", function() {
           var confirmed = window.confirm(
-            "Are you sure you want to clear ALL operations?"
+            "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
           );
           if (confirmed) {
-            window.plugin.wasabee.resetOpList();
+            window.plugin.wasabee.closeAllDialogs();
+            window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
-            OpsDialog.closeDialogs();
+            // load the new default w/o saving the currently selected op...
           }
         });
 
@@ -95,47 +56,129 @@ export default function() {
             ' style="vertical-align:middle;align:center;" /></a>'
         )
         .on("click", "#wasabee_syncbutton", function() {
+          window.plugin.wasabee.closeAllDialogs();
           try {
-            LinkDialog.closeDialogs();
-            OpsDialog.closeDialogs();
-            MarkerDialog.closeDialogs();
-            window.plugin.wasabee.authWithWasabee();
+            var me = WasabeeMe.get(true);
+            if (me == null) {
+              window.plugin.wasabee.showMustAuthAlert();
+            } else {
+              me.Ops.forEach(function(op) {
+                window.plugin.wasabee.opPromise(op.ID).then(
+                  function(newop) {
+                    newop.store();
+                  },
+                  function(err) {
+                    console.log(err);
+                  }
+                );
+              });
+              alert("Sync Complete");
+            }
           } catch (e) {
             window.plugin.wasabee.showMustAuthAlert();
           }
         });
 
-      var selectedOp = window.plugin.wasabee.getSelectedOperation();
-      var opIsOwnedServerOp = window.plugin.wasabee.opIsOwnedServerOp(
-        selectedOp.ID
-      );
-      var opIsServerOp = window.plugin.wasabee.opIsServerOp(selectedOp.ID);
-      if (
-        opIsOwnedServerOp ||
-        (opIsOwnedServerOp !== true && opIsServerOp !== true)
-      ) {
-        $(container)
-          .append(
-            '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +
-              Wasabee.static.images.toolbar_upload +
-              ' style="vertical-align:middle;align:center;" /></a>'
-          )
-          .on("click", "#wasabee_uploadbutton", function() {
-            var opIsInLocalStorage = window.plugin.wasabee.opIsServerOp(
-              selectedOp.ID
-            );
-            if (opIsInLocalStorage) {
-              window.plugin.wasabee.updateSingleOp(
-                Operation.create(selectedOp)
-              );
-            } else {
-              window.plugin.wasabee.uploadSingleOp(
-                Operation.create(selectedOp)
-              );
+      $(container)
+        .append(
+          '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +
+            Wasabee.static.images.toolbar_upload +
+            ' style="vertical-align:middle;align:center;" /></a>'
+        )
+        .on("click", "#wasabee_uploadbutton", function() {
+          window.plugin.wasabee.closeAllDialogs();
+          let so = window.plugin.wasabee.getSelectedOperation();
+          let isServerOp = so.IsServerOp();
+
+          // upload is different than update -- upload on 1st, update after
+          if (isServerOp) {
+            try {
+              window.plugin.wasabee.updateSingleOp(so);
+            } catch (e) {
+              window.plugin.wasabee.showMustAuthAlert();
             }
-          });
-      }
+          } else {
+            try {
+              window.plugin.wasabee.uploadSingleOp(so);
+              window.plugin.wasabee.downloadSingleOp(so.ID);
+            } catch (e) {
+              window.plugin.wasabee.showMustAuthAlert();
+            }
+          }
+        });
+
       return outerDiv;
+    },
+    _addWasabeeButton: function(map, container) {
+      let wasabeeButtonHandler = new WasabeeButtonControl(map);
+      let image = wasabeeButtonHandler.getIcon();
+      let type = wasabeeButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = wasabeeButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Wasabee Status",
+        container: container,
+        buttonImage: image,
+        callback: wasabeeButtonHandler.enable,
+        context: wasabeeButtonHandler
+      });
+      var wb = this._modes[type];
+      window.addHook("mapDataRefreshStart", function() {
+        wb.button = wasabeeButtonHandler.getIcon();
+      });
+    },
+    _addOpsButton: function(map, container) {
+      let opsButtonHandler = new opsButtonControl(map);
+      let type = opsButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = opsButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Operations",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_viewOps,
+        callback: opsButtonHandler.enable,
+        context: opsButtonHandler
+      });
+      return opsButtonHandler;
+    },
+    _addNewopButton: function(map, container) {
+      let newopButtonHandler = new NewopButtonControl(map);
+      let type = newopButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = newopButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "New Operation",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_plus,
+        callback: newopButtonHandler.enable,
+        context: newopButtonHandler
+      });
+    },
+    _addLinkDialogButton: function(map, container) {
+      let ldButtonHandler = new LinkDialogButtonControl(map);
+      let type = ldButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = ldButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Add Links",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_addlinks,
+        callback: ldButtonHandler.enable,
+        context: ldButtonHandler
+      });
+    },
+    _addMarkerButton: function(map, container) {
+      let mButtonHandler = new MarkerButtonControl(map);
+      let type = mButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = mButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Add Marker",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
+        callback: mButtonHandler.enable,
+        context: mButtonHandler
+      });
     },
     _addQuickDrawButton: function(map, container, outerDiv) {
       let quickDrawHandler = new QuickDrawControl(map);
@@ -157,7 +200,7 @@ export default function() {
           context: quickDrawHandler
         }
       ]);
-      actionsContainer.style.top = "26px";
+      actionsContainer.style.top = "39px";
       L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
 
       this._modes[type].actionsContainer = actionsContainer;
@@ -231,9 +274,15 @@ export default function() {
       return link;
     }
   });
-  if (Wasabee.buttons != null) {
-    return;
+  if (typeof Wasabee.buttons === "undefined") {
+    Wasabee.buttons = new ButtonsControl();
+    window.map.addControl(Wasabee.buttons);
   }
-  Wasabee.buttons = new ButtonsControl();
-  window.map.addControl(Wasabee.buttons);
+  var isServerOp = selectedOp.IsServerOp();
+  var isWritableOp = isServerOp && selectedOp.IsWritableOp(WasabeeMe.get());
+  if (isWritableOp) {
+    $("#wasabee_uploadbutton").css("display", "");
+  } else {
+    $("#wasabee_uploadbutton").css("display", "none");
+  }
 }
