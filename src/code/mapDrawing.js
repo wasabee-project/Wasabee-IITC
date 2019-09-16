@@ -98,15 +98,23 @@ const getMarkerPopup = (marker, target, portal, operation) => {
   subhead.className = "desc";
   subhead.innerHTML = "Marker Assignment";
   const assignmentMenu = subhead.appendChild(agentSelectMenu());
-  const id = "wasabee-marker-assignment-" + target.id;
+  const id = "wasabee-marker-assignment-" + target.ID;
   assignmentMenu.id = id;
   assignmentMenu.addEventListener(
     "change",
     () => {
-      console.log(
-        "assignment (not really) changed to: " + assignmentMenu.value
-      );
-      // window.plugin.wasabee.assignmentPromise().then()
+      window.plugin.wasabee
+        .assignMarkerPromise(operation.ID, target.ID, assignmentMenu.value)
+        .then(
+          function() {
+            console.log("assign marker succeeded");
+            // XXX some DOM magic to update the marker icon
+            // are marker IDs known?
+          },
+          function(err) {
+            console.log("assign marker failed: " + err);
+          }
+        );
     },
     false
   );

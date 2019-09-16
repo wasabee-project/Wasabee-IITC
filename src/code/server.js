@@ -72,7 +72,7 @@ export default function() {
   // below this line already converted to promises
 
   window.plugin.wasabee.downloadSingleOp = opID => {
-    window.plugin.wasabee.opPromise(opID).then(
+    let n = window.plugin.wasabee.opPromise(opID).then(
       function(newop) {
         newop.store();
         return newop;
@@ -82,6 +82,7 @@ export default function() {
         return null;
       }
     );
+    return n;
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
@@ -187,6 +188,41 @@ export default function() {
       };
 
       req.send();
+    });
+  };
+
+  window.plugin.wasabee.assignMarkerPromise = (opID, markerID, agentID) => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY +
+        "/api/v1/draw/" +
+        opID +
+        "/marker/" +
+        markerID +
+        "/assign";
+      const req = new XMLHttpRequest();
+      req.open("POST", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve(true);
+            break;
+          case 401:
+            reject("not logged in");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+      req.send("agent=" + agentID);
     });
   };
 }
