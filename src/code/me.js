@@ -11,16 +11,20 @@ export default class WasabeeMe {
   }
 
   store() {
-    // store.unobserve(Wasabee.Constants.AGENT_INFO_KEY);
     store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(this));
     // store.observe(Wasabee.Constants.AGENT_INFO_KEY, function() {
     //  console.log("AGENT_INFO_KEY changed in another window");
     //});
   }
 
+  remove() {
+    // store.unobserve(Wasabee.Constants.AGENT_INFO_KEY);
+    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+  }
+
   static isLoggedIn() {
-    let maxCacheAge = Date.now() - 1000 * 60 * 15;
-    let lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    const maxCacheAge = Date.now() - 1000 * 60 * 15;
+    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     if (lsme == null) {
       return false;
     }
@@ -28,16 +32,17 @@ export default class WasabeeMe {
     if (me.fetched > maxCacheAge) {
       return true;
     }
+    // older than max-cache-age, remove
+    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
     return false;
   }
 
   static get(force) {
-    let maxCacheAge = Date.now() - 1000 * 60 * 15;
-    let lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    const maxCacheAge = Date.now() - 1000 * 60 * 15;
+    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    let me = null;
     if (lsme != null) {
-      var me = JSON.parse(lsme);
-    } else {
-      me = null;
+      me = JSON.parse(lsme);
     }
     // if older than 15 minutes, pull again
     if (

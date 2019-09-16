@@ -13,7 +13,7 @@ export default class Marker {
   }
 
   static create(obj) {
-    var marker = new Marker();
+    const marker = new Marker();
     for (var prop in obj) {
       if (marker.hasOwnProperty(prop)) {
         marker[prop] = obj[prop];

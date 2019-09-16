@@ -175,9 +175,7 @@ const addLink = (link, color, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = op => {
-  var me = WasabeeMe.get();
-  if (me == null) {
-    // not logged in, do nothing
+  if (!WasabeeMe.isLoggedIn()) {
     return;
   }
 
@@ -239,3 +237,27 @@ const getAgentPopup = agent => {
   date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
 };
+
+const getAllKnownAgents = () => {
+  const agents = new Map();
+  Wasabee.teams.forEach(function(t) {
+    // this will get messy if display name is used -- last-in wins
+    t.forEach(function(a) {
+      agents.set(a.id, a);
+    });
+  });
+  return agents;
+};
+
+const agentSelectMenu = () => {
+  const menu = document.createElement("select");
+  const agents = getAllKnownAgents();
+  agents.forEach(function(a) {
+    const option = document.createElement("option");
+    // XXX HERE
+    option.value = "";
+    option.option = "";
+    menu.appendChild(option);
+  });
+  return menu;
+}

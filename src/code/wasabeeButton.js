@@ -55,7 +55,7 @@ const WasabeeButtonControl = Feature.extend({
 
   getIcon() {
     if (WasabeeMe.isLoggedIn()) {
-      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
     }
     return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
   },

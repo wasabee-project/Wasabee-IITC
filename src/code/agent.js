@@ -10,7 +10,7 @@ export default class Agent {
   }
 
   static create(obj) {
-    var agent = new Agent();
+    const agent = new Agent();
     for (var prop in obj) {
       if (agent.hasOwnProperty(prop)) {
         agent[prop] = obj[prop];

@@ -124,7 +124,10 @@ export default function(selectedOp) {
       });
       var wb = this._modes[type];
       window.addHook("mapDataRefreshStart", function() {
-        wb.button = wasabeeButtonHandler.getIcon();
+        wb.button.innerHTML =
+          '<img src="' +
+          wasabeeButtonHandler.getIcon() +
+          '" style="vertical-align: middle;">';
       });
     },
     _addOpsButton: function(map, container) {
