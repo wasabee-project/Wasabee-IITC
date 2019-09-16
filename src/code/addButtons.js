@@ -111,12 +111,7 @@ export default function(selectedOp) {
     },
     _addWasabeeButton: function(map, container) {
       let wasabeeButtonHandler = new WasabeeButtonControl(map);
-      let me = WasabeeMe.get();
-      let image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
-      if (me == null) {
-        console.log("using logged out button image");
-        image = window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
-      }
+      let image = wasabeeButtonHandler.getIcon();
       let type = wasabeeButtonHandler.type;
       this._modes[type] = {};
       this._modes[type].handler = wasabeeButtonHandler;
@@ -129,7 +124,7 @@ export default function(selectedOp) {
       });
       var wb = this._modes[type];
       window.addHook("mapDataRefreshStart", function() {
-        wb.button = wasabeeButtonHandler._getIcon();
+        wb.button = wasabeeButtonHandler.getIcon();
       });
     },
     _addOpsButton: function(map, container) {

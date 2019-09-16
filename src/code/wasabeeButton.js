@@ -19,7 +19,7 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    let me = WasabeeMe.get(); // don't cache this, use up-to-date
+    let me = WasabeeMe.get(true); // don't cache this, use up-to-date
     if (me != null && me.GoogleID != undefined) {
       var content = document.createElement("div");
       var info = content.appendChild(document.createElement("div"));
@@ -53,9 +53,8 @@ const WasabeeButtonControl = Feature.extend({
     }
   },
 
-  _getIcon() {
-    let me = WasabeeMe.get();
-    if (me == null) {
+  getIcon() {
+    if (WasabeeMe.isLoggedIn()) {
       return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
     }
     return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;

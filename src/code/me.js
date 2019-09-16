@@ -18,9 +18,22 @@ export default class WasabeeMe {
     //});
   }
 
+  static isLoggedIn() {
+    let maxCacheAge = Date.now() - 1000 * 60 * 15;
+    let lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    if (lsme == null) {
+      return false;
+    }
+    let me = JSON.parse(lsme);
+    if (me.fetched > maxCacheAge) {
+      return true;
+    }
+    return false;
+  }
+
   static get(force) {
-    var maxCacheAge = Date.now() - 1000 * 60 * 15;
-    var lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    let maxCacheAge = Date.now() - 1000 * 60 * 15;
+    let lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     if (lsme != null) {
       var me = JSON.parse(lsme);
     } else {
@@ -64,7 +77,7 @@ export default class WasabeeMe {
       data = JSON.parse(data);
     }
 
-    var wme = new WasabeeMe();
+    let wme = new WasabeeMe();
     for (var prop in data) {
       if (wme.hasOwnProperty(prop)) {
         switch (prop) {
