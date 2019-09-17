@@ -108,7 +108,8 @@ export default class LinkListDialog {
         dialogClass: "wasabee-dialog wasabee-dialog-linklist",
         title: this._portal.name + ": Links",
         width: "auto",
-        closeCallback: () => (_dialogs = [])
+        closeCallback: () => (_dialogs = []),
+        id: window.plugin.Wasabee.static.dialogNames.linkList
       });
       var buttons = this._dialog.dialog("option", "buttons");
       this._dialog.dialog(
@@ -155,23 +156,23 @@ export default class LinkListDialog {
       )
     ) {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);
+      this._setLinks();
     }
   }
 
   reverseLink(link) {
     this._operation.reverseLink(link.fromPortalId, link.toPortalId);
+    this._setLinks();
   }
 
-  /* eslint-disable no-unused-vars */
-  addAlert(message) {
-    /*
-      window.renderPortalDetails(message.portalFrom.id);
-      var s = new Wasabee.AlertDialog(this._operation, new Wasabee.Preferences);
-      s.showDialog();
-      s.setTarget(this._operation.data.getPortal(message.portalTo.id));
-      */
+  setDescription(link) {
+    var promptAction = prompt("Link Description", link.description);
+    if (promptAction !== null) {
+      link.description = promptAction;
+      this._operation.update();
+    }
+    this._setLinks();
   }
-  /* eslint-enable no-unused-vars */
 
   makeMenu(list, data) {
     var $Wasabee = this;
@@ -184,6 +185,10 @@ export default class LinkListDialog {
       {
         label: "Delete",
         onclick: () => $Wasabee.deleteLink(data)
+      },
+      {
+        label: "Set Description",
+        onclick: () => $Wasabee.setDescription(data)
       }
     ];
     list.className = "menu";

@@ -97,7 +97,7 @@ const opsButtonControl = Feature.extend({
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       var newID = $(this).val();
-      console.log("load requested for " + newID);
+      // console.log("load requested for " + newID);
       window.plugin.wasabee.closeAllDialogs();
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);

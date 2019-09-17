@@ -212,8 +212,10 @@ export default function() {
         }
       };
 
+      // most of the time a CORS error will happen - this is the path taken, not the 401 above
       req.onerror = function() {
-        reject(Error("Network Error"));
+        console.log(new Error().stack);
+        reject(Error("not logged in"));
       };
 
       req.send();

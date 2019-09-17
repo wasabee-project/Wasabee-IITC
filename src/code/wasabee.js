@@ -170,6 +170,9 @@ export default function() {
       closeCallback: function() {
         // prime the pump
         WasabeeMe.get();
+        // force an update -- need addButtons() here too
+        const so = window.plugin.wasabee.getSelectedOperation();
+        so.update();
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
