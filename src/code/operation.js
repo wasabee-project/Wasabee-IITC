@@ -432,6 +432,11 @@ export default class Operation {
     if (me.GoogleID == this.creator) {
       return true;
     }
+
+    if (me.Teams == undefined) {
+      return false;
+    }
+
     this.teamlist.forEach(function(t) {
       if (t.role == "write" && me.Teams.includes(t.ID)) {
         return true;

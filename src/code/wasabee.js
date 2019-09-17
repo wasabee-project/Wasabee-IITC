@@ -2,6 +2,7 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker, drawThings } from "./mapDrawing";
+import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 export default function() {
@@ -149,22 +150,27 @@ export default function() {
     var content = document.createElement("div");
     var title = content.appendChild(document.createElement("div"));
     title.className = "desc";
-    title.innerHTML = "In order to sync operations, you must log in.<br/>";
+    title.innerHTML =
+      "In order to use the server functionality, you must log in.<br/>";
     var buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     var visitButton = buttonSet.appendChild(document.createElement("a"));
-    visitButton.innerHTML = "Visit Site";
+    visitButton.innerHTML = "Log In";
     visitButton.addEventListener(
       "click",
-      () => window.open("https://server.wasabee.rocks"),
+      () => window.open("https://server.wasabee.rocks/"),
       false
     );
     window.dialog({
-      title: "You Must Authenticate",
+      title: "Authentication Required",
       width: "auto",
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
+      closeCallback: function() {
+        // prime the pump
+        WasabeeMe.get();
+      },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
   };

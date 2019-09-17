@@ -218,7 +218,15 @@ const opsButtonControl = Feature.extend({
               "Are you sure you want to *DELETE* this operation from the *SERVER*?"
             );
             if (confirmedDeleteServerOp) {
-              window.plugin.wasabee.deleteOwnedServerOp(operation.ID);
+              window.plugin.wasabee.deleteOpPromise(operation.ID).then(
+                function() {
+                  console.log("delete from server successful");
+                },
+                function(err) {
+                  console.log(err);
+                  alert(err);
+                }
+              );
             }
           }
           var ol = window.plugin.wasabee.opsList();

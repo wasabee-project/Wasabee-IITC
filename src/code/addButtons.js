@@ -104,19 +104,30 @@ export default function(selectedOp) {
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
-            try {
-              window.plugin.wasabee.updateSingleOp(so); // server should not change anything (?) XXX marker status may be different
-              window.plugin.wasabee.makeSelectedOperation(id); // switch to version in local store
-            } catch (e) {
-              window.plugin.wasabee.showMustAuthAlert();
-            }
+            window.plugin.wasabee.updateOpPromise(so).then(
+              function() {
+                console.log("server accepted the update");
+              },
+              function(reject) {
+                console.log(reject);
+                window.plugin.wasabee.showMustAuthAlert();
+              }
+            );
           } else {
-            try {
-              window.plugin.wasabee.uploadSingleOp(so); // this downloads and stores it in local store
-              window.plugin.wasabee.makeSelectedOperation(id); // switch to version in local store
-            } catch (e) {
-              window.plugin.wasabee.showMustAuthAlert();
-            }
+            window.plugin.wasabee.uploadOpPromise(so).then(
+              function() {
+                window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
+                // do I need to do this to get the button to refresh?
+                const newop = window.plugin.wasabee.getSelectedOperation();
+                newop.update();
+                alert("Upload Successful");
+                isServerOp = true;
+              },
+              function(reject) {
+                console.log(reject);
+                window.plugin.wasabee.showMustAuthAlert();
+              }
+            );
           }
         });
       return outerDiv;
@@ -294,9 +305,10 @@ export default function(selectedOp) {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
   }
-  var isServerOp = selectedOp.IsServerOp();
-  var isWritableOp = isServerOp && selectedOp.IsWritableOp(WasabeeMe.get());
-  if (isWritableOp) {
+  if (
+    selectedOp.IsServerOp() == false ||
+    selectedOp.IsWritableOp(WasabeeMe.get()) == true
+  ) {
     $("#wasabee_uploadbutton").css("display", "");
   } else {
     $("#wasabee_uploadbutton").css("display", "none");

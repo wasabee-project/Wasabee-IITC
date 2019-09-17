@@ -49,6 +49,7 @@ const WasabeeButtonControl = Feature.extend({
         id: window.plugin.Wasabee.static.dialogNames.wasabeeButton
       });
     } else {
+      this.disable();
       this._dialog = window.plugin.wasabee.showMustAuthAlert();
     }
   },

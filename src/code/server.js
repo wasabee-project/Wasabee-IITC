@@ -5,84 +5,113 @@ import WasabeeMe from "./me";
 const Wasabee = window.plugin.Wasabee;
 
 export default function() {
-  function sendServerRequest(endpoint, method, data) {
-    method = method || "GET";
-    const options = {
-      url: Wasabee.Constants.SERVER_BASE_KEY + endpoint,
-      xhrFields: {
-        withCredentials: true
-      },
-      crossDomain: true,
-      method: method
-    };
+  window.plugin.wasabee.uploadOpPromise = operation => {
+    return new Promise(function(resolve, reject) {
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw";
+      const req = new XMLHttpRequest();
+      req.open("POST", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-    if (data) {
-      $.extend(options, {
-        data: JSON.stringify(data),
-        dataType: "json",
-        contentType: "application/json"
-      });
-    }
-
-    return $.ajax(options);
-  }
-
-  // sendServerRequest needs to go away in favor of promises
-
-  window.plugin.wasabee.uploadSingleOp = operation => {
-    let result = null;
-    sendServerRequest("/api/v1/draw", "POST", operation)
-      .done(response => {
-        // update local copy after server does its magic on it
-        if (response.Ops != null) {
-          response.Ops.forEach(function(op) {
-            if (op.ID == operation.ID) {
-              result = window.plugin.wasabee.downloadSingleOp(op.ID);
-            }
-          });
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            WasabeeMe.create(req.response); // free update
+            window.plugin.wasabee.opPromise(operation.ID).then(
+              function(newop) {
+                newop.store();
+                return newop;
+              },
+              function(err) {
+                console.log("failure to fetch newly uploaded op: " + err);
+              }
+            );
+            break;
+          case 401:
+            reject("permission to upload denied");
+            break;
+          case 500:
+            console.log(
+              "probably trying to upload an op with an ID already taken... use update"
+            );
+            reject(req.response);
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
         }
-        alert("Upload Complete.");
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
-    return result;
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      req.send(JSON.stringify(operation));
+    });
   };
 
-  window.plugin.wasabee.updateSingleOp = operation =>
-    sendServerRequest("/api/v1/draw/" + operation.ID, "PUT", operation)
-      .done(() => {
-        alert("Update Complete.");
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+  window.plugin.wasabee.updateOpPromise = operation => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID;
+      const req = new XMLHttpRequest();
+      req.open("PUT", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-  // TODO: Should this use the DELETE verb?
-  window.plugin.wasabee.deleteOwnedServerOp = opID => {
-    sendServerRequest("/api/v1/draw/" + opID + "/delete")
-      .done(response => {
-        console.log("got response -> " + JSON.stringify(response));
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            // nothing to do
+            break;
+          case 401:
+            reject("permission to upload denied");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      req.send(JSON.stringify(operation));
+    });
   };
 
-  // below this line already converted to promises
+  window.plugin.wasabee.deleteOpPromise = operation => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID;
+      const req = new XMLHttpRequest();
+      req.open("DELETE", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-  window.plugin.wasabee.downloadSingleOp = opID => {
-    let n = window.plugin.wasabee.opPromise(opID).then(
-      function(newop) {
-        newop.store();
-        return newop;
-      },
-      function(err) {
-        console.log(err);
-        return null;
-      }
-    );
-    return n;
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            // nothing to do
+            break;
+          case 401:
+            reject("permission to delete denied");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
