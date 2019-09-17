@@ -105,17 +105,19 @@ export default function(selectedOp) {
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
             window.plugin.wasabee.updateOpPromise(so).then(
-              function() {
-                console.log("server accepted the update");
+              function(resolve) {
+                console.log("server accepted the update: " + resolve);
               },
               function(reject) {
                 console.log(reject);
+                // alert(reject);
                 window.plugin.wasabee.showMustAuthAlert();
               }
             );
           } else {
             window.plugin.wasabee.uploadOpPromise(so).then(
-              function() {
+              function(resolve) {
+                console.log(resolve);
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
                 // do I need to do this to get the button to refresh?
                 const newop = window.plugin.wasabee.getSelectedOperation();

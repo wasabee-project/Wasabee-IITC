@@ -20,10 +20,11 @@ export default function() {
             window.plugin.wasabee.opPromise(operation.ID).then(
               function(newop) {
                 newop.store();
-                return newop;
+                resolve(newop);
               },
               function(err) {
                 console.log("failure to fetch newly uploaded op: " + err);
+                reject(err);
               }
             );
             break;
@@ -63,7 +64,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            // nothing to do
+            resolve("successfully uploaded");
             break;
           case 401:
             reject("permission to upload denied");
@@ -83,10 +84,9 @@ export default function() {
     });
   };
 
-  window.plugin.wasabee.deleteOpPromise = operation => {
+  window.plugin.wasabee.deleteOpPromise = opID => {
     return new Promise(function(resolve, reject) {
-      const url =
-        Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID;
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
       const req = new XMLHttpRequest();
       req.open("DELETE", url);
       req.withCredentials = true;
@@ -95,7 +95,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            // nothing to do
+            resolve("successfully deleted");
             break;
           case 401:
             reject("permission to delete denied");
