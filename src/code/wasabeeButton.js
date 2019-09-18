@@ -49,13 +49,14 @@ const WasabeeButtonControl = Feature.extend({
         id: window.plugin.Wasabee.static.dialogNames.wasabeeButton
       });
     } else {
+      this.disable();
       this._dialog = window.plugin.wasabee.showMustAuthAlert();
     }
   },
 
   getIcon() {
     if (WasabeeMe.isLoggedIn()) {
-      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
     }
     return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
   },

@@ -97,7 +97,7 @@ const opsButtonControl = Feature.extend({
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       var newID = $(this).val();
-      console.log("load requested for " + newID);
+      // console.log("load requested for " + newID);
       window.plugin.wasabee.closeAllDialogs();
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
@@ -218,7 +218,15 @@ const opsButtonControl = Feature.extend({
               "Are you sure you want to *DELETE* this operation from the *SERVER*?"
             );
             if (confirmedDeleteServerOp) {
-              window.plugin.wasabee.deleteOwnedServerOp(operation.ID);
+              window.plugin.wasabee.deleteOpPromise(operation.ID).then(
+                function() {
+                  console.log("delete from server successful");
+                },
+                function(err) {
+                  console.log(err);
+                  alert(err);
+                }
+              );
             }
           }
           var ol = window.plugin.wasabee.opsList();

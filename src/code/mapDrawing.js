@@ -77,19 +77,44 @@ const addMarker = (target, operation) => {
 
 const getMarkerPopup = (marker, target, portal, operation) => {
   marker.className = "wasabee-dialog wasabee-dialog-ops";
-  var content = document.createElement("div");
-  var title = content.appendChild(document.createElement("div"));
+  const content = document.createElement("div");
+  const title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
-  var buttonSet = content.appendChild(document.createElement("div"));
+  const buttonSet = content.appendChild(document.createElement("div"));
   buttonSet.className = "temp-op-dialog";
-  var deleteButton = buttonSet.appendChild(document.createElement("a"));
+  const deleteButton = buttonSet.appendChild(document.createElement("a"));
   deleteButton.textContent = "Delete";
   deleteButton.addEventListener(
     "click",
     () => {
       UiCommands.deleteMarker(operation, target, portal);
       marker.closePopup();
+    },
+    false
+  );
+
+  const subhead = content.appendChild(document.createElement("div"));
+  subhead.className = "desc";
+  subhead.innerHTML = "Marker Assignment";
+  const assignmentMenu = subhead.appendChild(agentSelectMenu());
+  const id = "wasabee-marker-assignment-" + target.ID;
+  assignmentMenu.id = id;
+  assignmentMenu.addEventListener(
+    "change",
+    () => {
+      window.plugin.wasabee
+        .assignMarkerPromise(operation.ID, target.ID, assignmentMenu.value)
+        .then(
+          function() {
+            console.log("assign marker succeeded");
+            // XXX some DOM magic to update the marker icon
+            // are marker IDs known?
+          },
+          function(err) {
+            console.log("assign marker failed: " + err);
+          }
+        );
     },
     false
   );
@@ -175,9 +200,7 @@ const addLink = (link, color, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = op => {
-  var me = WasabeeMe.get();
-  if (me == null) {
-    // not logged in, do nothing
+  if (!WasabeeMe.isLoggedIn()) {
     return;
   }
 
@@ -230,12 +253,38 @@ export const drawAgents = op => {
 
 const getAgentPopup = agent => {
   agent.className = "wasabee-dialog wasabee-dialog-ops";
-  var content = document.createElement("div");
-  var title = content.appendChild(document.createElement("div"));
+  const content = document.createElement("div");
+  const title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.id = agent.id;
   title.innerHTML = markdown.toHTML(agent.name);
-  var date = content.appendChild(document.createElement("span"));
+  const date = content.appendChild(document.createElement("span"));
   date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
+};
+
+const getAllKnownAgents = () => {
+  const agents = new Map();
+  Wasabee.teams.forEach(function(team) {
+    // XXX this will get messy if display name is used -- last-in wins
+    team.agents.forEach(function(agent) {
+      agents.set(agent.id, agent.name);
+    });
+  });
+  return agents;
+};
+
+const agentSelectMenu = () => {
+  const menu = document.createElement("select");
+  const agents = getAllKnownAgents();
+  const unset = menu.appendChild(document.createElement("option"));
+  unset.value = "";
+  unset.text = "Not Assigned";
+
+  agents.forEach(function(v, k) {
+    const option = menu.appendChild(document.createElement("option"));
+    option.value = k;
+    option.text = v;
+  });
+  return menu;
 };

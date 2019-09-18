@@ -57,18 +57,29 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_syncbutton", function() {
           window.plugin.wasabee.closeAllDialogs();
+          const so = window.plugin.Wasabee.getSelectedOperation();
           try {
-            var me = WasabeeMe.get(true);
+            const me = WasabeeMe.get(true);
             if (me == null) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
               me.Ops.forEach(function(op) {
                 window.plugin.wasabee.opPromise(op.ID).then(
                   function(newop) {
-                    newop.store();
+                    if (newop != null) {
+                      newop.store();
+                      // if the op changed out beneath us, use the new
+                      if (newop.ID == so.ID) {
+                        window.plugin.wasabee.makeSelectedOperation(newop.ID);
+                      }
+                    } else {
+                      console.log("opPromise returned null op but no err?");
+                      window.plugin.wasabee.showMustAuthAlert();
+                    }
                   },
                   function(err) {
                     console.log(err);
+                    window.plugin.wasabee.showMustAuthAlert();
                   }
                 );
               });
@@ -87,28 +98,43 @@ export default function(selectedOp) {
         )
         .on("click", "#wasabee_uploadbutton", function() {
           window.plugin.wasabee.closeAllDialogs();
-          let so = window.plugin.wasabee.getSelectedOperation();
+          const so = window.plugin.wasabee.getSelectedOperation();
+          const id = so.ID;
           let isServerOp = so.IsServerOp();
 
           // upload is different than update -- upload on 1st, update after
           if (isServerOp) {
-            try {
-              window.plugin.wasabee.updateSingleOp(so);
-            } catch (e) {
-              window.plugin.wasabee.showMustAuthAlert();
-            }
+            window.plugin.wasabee.updateOpPromise(so).then(
+              function(resolve) {
+                console.log("server accepted the update: " + resolve);
+              },
+              function(reject) {
+                console.log(reject);
+                // alert(reject);
+                window.plugin.wasabee.showMustAuthAlert();
+              }
+            );
           } else {
-            try {
-              window.plugin.wasabee.uploadSingleOp(so);
-              window.plugin.wasabee.downloadSingleOp(so.ID);
-            } catch (e) {
-              window.plugin.wasabee.showMustAuthAlert();
-            }
+            window.plugin.wasabee.uploadOpPromise(so).then(
+              function(resolve) {
+                console.log(resolve);
+                window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
+                // do I need to do this to get the button to refresh?
+                const newop = window.plugin.wasabee.getSelectedOperation();
+                newop.update();
+                alert("Upload Successful");
+                isServerOp = true;
+              },
+              function(reject) {
+                console.log(reject);
+                window.plugin.wasabee.showMustAuthAlert();
+              }
+            );
           }
         });
-
       return outerDiv;
     },
+
     _addWasabeeButton: function(map, container) {
       let wasabeeButtonHandler = new WasabeeButtonControl(map);
       let image = wasabeeButtonHandler.getIcon();
@@ -124,7 +150,10 @@ export default function(selectedOp) {
       });
       var wb = this._modes[type];
       window.addHook("mapDataRefreshStart", function() {
-        wb.button = wasabeeButtonHandler.getIcon();
+        wb.button.innerHTML =
+          '<img src="' +
+          wasabeeButtonHandler.getIcon() +
+          '" style="vertical-align: middle;">';
       });
     },
     _addOpsButton: function(map, container) {
@@ -278,9 +307,10 @@ export default function(selectedOp) {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
   }
-  var isServerOp = selectedOp.IsServerOp();
-  var isWritableOp = isServerOp && selectedOp.IsWritableOp(WasabeeMe.get());
-  if (isWritableOp) {
+  if (
+    selectedOp.IsServerOp() == false ||
+    selectedOp.IsWritableOp(WasabeeMe.get()) == true
+  ) {
     $("#wasabee_uploadbutton").css("display", "");
   } else {
     $("#wasabee_uploadbutton").css("display", "none");

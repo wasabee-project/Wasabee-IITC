@@ -2,87 +2,122 @@ import Operation from "./operation";
 import Team from "./team";
 import WasabeeMe from "./me";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 export default function() {
-  function sendServerRequest(endpoint, method, data) {
-    method = method || "GET";
-    const options = {
-      url: Wasabee.Constants.SERVER_BASE_KEY + endpoint,
-      xhrFields: {
-        withCredentials: true
-      },
-      crossDomain: true,
-      method: method
-    };
+  window.plugin.wasabee.uploadOpPromise = operation => {
+    return new Promise(function(resolve, reject) {
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw";
+      const req = new XMLHttpRequest();
+      req.open("POST", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-    if (data) {
-      $.extend(options, {
-        data: JSON.stringify(data),
-        dataType: "json",
-        contentType: "application/json"
-      });
-    }
-
-    return $.ajax(options);
-  }
-
-  // sendServerRequest needs to go away in favor of promises
-
-  window.plugin.wasabee.uploadSingleOp = operation =>
-    sendServerRequest("/api/v1/draw", "POST", operation)
-      .done(response => {
-        // update local copy after server does its magic on it
-        if (response.Ops != null) {
-          response.Ops.forEach(function(op) {
-            if (op.ID == operation.ID) {
-              window.plugin.wasabee.dowloadSingleOp(op.ID);
-            }
-          });
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            WasabeeMe.create(req.response); // free update
+            window.plugin.wasabee.opPromise(operation.ID).then(
+              function(newop) {
+                newop.store();
+                resolve(newop);
+              },
+              function(err) {
+                console.log("failure to fetch newly uploaded op: " + err);
+                reject(err);
+              }
+            );
+            break;
+          case 401:
+            reject("permission to upload denied");
+            break;
+          case 500:
+            console.log(
+              "probably trying to upload an op with an ID already taken... use update"
+            );
+            reject(req.response);
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
         }
-        alert("Upload Complete.");
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+      };
 
-  window.plugin.wasabee.updateSingleOp = operation =>
-    sendServerRequest("/api/v1/draw/" + operation.ID, "PUT", operation)
-      .done(() => {
-        alert("Update Complete.");
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
 
-  // TODO: Should this use the DELETE verb?
-  window.plugin.wasabee.deleteOwnedServerOp = opID => {
-    sendServerRequest("/api/v1/draw/" + opID + "/delete")
-      .done(response => {
-        console.log("got response -> " + JSON.stringify(response));
-      })
-      .fail(() => {
-        window.plugin.wasabee.showMustAuthAlert();
-      });
+      req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      req.send(JSON.stringify(operation));
+    });
   };
 
-  // below this line already converted to promises
+  window.plugin.wasabee.updateOpPromise = operation => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + operation.ID;
+      const req = new XMLHttpRequest();
+      req.open("PUT", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-  window.plugin.wasabee.downloadSingleOp = opID => {
-    window.plugin.wasabee.opPromise(opID).then(
-      function(newop) {
-        newop.store();
-      },
-      function(err) {
-        console.log(err);
-      }
-    );
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve("successfully uploaded");
+            break;
+          case 401:
+            reject("permission to upload denied");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      req.send(JSON.stringify(operation));
+    });
+  };
+
+  window.plugin.wasabee.deleteOpPromise = opID => {
+    return new Promise(function(resolve, reject) {
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
+      const req = new XMLHttpRequest();
+      req.open("DELETE", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve("successfully deleted");
+            break;
+          case 401:
+            reject("permission to delete denied");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      req.send();
+    });
   };
 
   window.plugin.wasabee.teamPromise = teamid => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;
-      var req = new XMLHttpRequest();
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/team/" + teamid;
+      const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
       req.crossDomain = true;
@@ -91,7 +126,6 @@ export default function() {
         switch (req.status) {
           case 200:
             var team = Team.create(req.response);
-            // add it to the window Wasabee.teams map
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
@@ -117,9 +151,9 @@ export default function() {
 
   window.plugin.wasabee.opPromise = opID => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
-      var req = new XMLHttpRequest();
-      var localop = window.plugin.wasabee.getOperationByID(opID);
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/draw/" + opID;
+      const req = new XMLHttpRequest();
+      const localop = window.plugin.wasabee.getOperationByID(opID);
 
       req.open("GET", url);
 
@@ -133,8 +167,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            var newop = Operation.create(req.response);
-            resolve(newop);
+            resolve(Operation.create(req.response));
             break;
           case 304: // If-Modified-Since replied NotModified
             console.log("server copy is older/unmodified, keeping local copy");
@@ -142,7 +175,6 @@ export default function() {
             break;
           case 401:
             reject("not authorized to access op: " + opID);
-            window.plugin.wasabee.showMustAuthAlert();
             break;
           default:
             reject(Error(req.statusText));
@@ -160,8 +192,8 @@ export default function() {
 
   window.plugin.wasabee.mePromise = () => {
     return new Promise(function(resolve, reject) {
-      var url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
-      var req = new XMLHttpRequest();
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/me";
+      const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
       req.crossDomain = true;
@@ -169,8 +201,45 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            var me = WasabeeMe.create(req.response);
-            resolve(me);
+            resolve(WasabeeMe.create(req.response));
+            break;
+          case 401:
+            reject("not logged in");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      // most of the time a CORS error will happen - this is the path taken, not the 401 above
+      req.onerror = function() {
+        console.log(new Error().stack);
+        reject(Error("not logged in"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.assignMarkerPromise = (opID, markerID, agentID) => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY +
+        "/api/v1/draw/" +
+        opID +
+        "/marker/" +
+        markerID +
+        "/assign";
+      const req = new XMLHttpRequest();
+      req.open("POST", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve(true);
             break;
           case 401:
             reject("not logged in");
@@ -184,8 +253,7 @@ export default function() {
       req.onerror = function() {
         reject(Error("Network Error"));
       };
-
-      req.send();
+      req.send("agent=" + agentID);
     });
   };
 }

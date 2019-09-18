@@ -25,11 +25,13 @@ export default class Operation {
     this.comment = null;
     this.teamlist = Array();
     this.fetched = null;
+    this.stored = null;
   }
 
   store() {
     // console.log("pushing to local store: " + this.ID);
     this._ensureCollections();
+    this.stored = Date.now();
     store.set(this.ID, JSON.stringify(this));
   }
 
@@ -124,7 +126,6 @@ export default class Operation {
         listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId
       );
     });
-    this.cleanPortalList();
     this.update();
   }
 
@@ -150,7 +151,6 @@ export default class Operation {
     }
     this.links = newLinks;
     this.cleanAnchorList();
-    this.cleanPortalList();
     this.update();
   }
 
@@ -340,7 +340,6 @@ export default class Operation {
     this.links = this.links.filter(element => !linksToRemove.includes(element));
 
     this.cleanAnchorList();
-    this.cleanPortalList();
     this.update();
   }
 
@@ -367,7 +366,7 @@ export default class Operation {
     this.update();
   }
 
-  // call update to redra everything on the map
+  // call update to redraw everything on the map
   update() {
     console.log("operation.update");
     this.cleanPortalList();
@@ -432,6 +431,11 @@ export default class Operation {
     if (me.GoogleID == this.creator) {
       return true;
     }
+
+    if (me.Teams == undefined) {
+      return false;
+    }
+
     this.teamlist.forEach(function(t) {
       if (t.role == "write" && me.Teams.includes(t.ID)) {
         return true;

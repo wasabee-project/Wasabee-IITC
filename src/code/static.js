@@ -37,7 +37,8 @@ Wasabee.static = {
     mustauth: "wasabee-mustauth",
     newopButton: "wasabee-newop",
     opsButton: "wasabee-operations",
-    wasabeeButton: "wasabee-userinfo"
+    wasabeeButton: "wasabee-userinfo",
+    linkList: "wasabee-linklist"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

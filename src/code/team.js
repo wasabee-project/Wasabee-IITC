@@ -8,8 +8,8 @@ export default class Team {
   }
 
   static create(data) {
-    var d = JSON.parse(data);
-    var team = new Team();
+    const d = JSON.parse(data);
+    const team = new Team();
     for (var prop in d) {
       if (team.hasOwnProperty(prop)) {
         if (prop === "agents") {
