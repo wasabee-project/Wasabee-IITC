@@ -56,7 +56,7 @@ const resetAllMarkers = op => {
 const addMarker = (target, operation) => {
   var targetPortal = operation.getPortal(target.portalId);
   var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
-  var marker = L.marker(latLng, {
+  var wMarker = L.marker(latLng, {
     title: targetPortal.name,
     icon: L.icon({
       iconUrl: getImageFromMarker(target),
@@ -67,15 +67,38 @@ const addMarker = (target, operation) => {
     })
   });
 
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup(getMarkerPopup(marker, target, targetPortal, operation));
-  marker.off("click", marker.togglePopup, marker);
-  marker.on("spiderfiedclick", marker.togglePopup, marker);
-  window.plugin.wasabee.markerLayers[target["ID"]] = marker;
-  marker.addTo(window.plugin.wasabee.markerLayerGroup);
+  window.registerMarkerForOMS(wMarker);
+  console.log("TonyRoomZ -- building marker for: " + targetPortal.name);
+  wMarker.bindPopup("loading...");
+  wMarker.off("click", wMarker.togglePopup, wMarker);
+  wMarker.on(
+    "click",
+    () => {
+      console.log("click for marker popup");
+      // this version of leaflet does not have ... wMarker.isPopupOpen()
+      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.update();
+      wMarker.togglePopup();
+    },
+    wMarker
+  );
+  wMarker.on(
+    "spiderfiedclick",
+    () => {
+      console.log("spiderfiedclick for marker popup");
+      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.update();
+      wMarker.togglePopup();
+    },
+    wMarker
+  );
+  window.plugin.wasabee.markerLayers[target["ID"]] = wMarker;
+  wMarker.addTo(window.plugin.wasabee.markerLayerGroup);
 };
 
-const getMarkerPopup = (marker, target, portal, operation) => {
+const getMarkerPopup = (marker, target, operation) => {
+  console.log("getMarkerPopup");
+  const portal = operation.getPortal(target.portalId);
   marker.className = "wasabee-dialog wasabee-dialog-ops";
   const content = document.createElement("div");
   const title = content.appendChild(document.createElement("div"));
