@@ -68,14 +68,13 @@ const addMarker = (target, operation) => {
   });
 
   window.registerMarkerForOMS(wMarker);
-  console.log("TonyRoomZ -- building marker for: " + targetPortal.name);
   wMarker.bindPopup("loading...");
   wMarker.off("click", wMarker.togglePopup, wMarker);
   wMarker.on(
     "click",
     () => {
       console.log("click for marker popup");
-      // this version of leaflet does not have ... wMarker.isPopupOpen()
+      // IITCs version of leaflet does not have marker.isPopupOpen()
       wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
       wMarker.update();
       wMarker.togglePopup();
