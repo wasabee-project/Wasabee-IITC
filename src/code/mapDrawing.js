@@ -29,27 +29,22 @@ const getColorHex = color => {
 //** This function draws things on the layers */
 export const drawThings = op => {
   window.plugin.wasabee.resetAllPortals(op);
-  resetAllMarkers(op);
-  resetAllLinks(op);
+  resetMarkers(op);
+  resetLinks(op);
   checkAllLinks(op);
 };
 
-//** This function adds all the markers to the layer */
-const addAllMarkers = op => {
-  var markerList = op.markers;
-  if (markerList != null) {
-    markerList.forEach(marker => addMarker(marker, op));
-  }
-};
-
-//** This function resets all the markers  and calls addAllMarkers to add them */
-const resetAllMarkers = op => {
+//** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */
+const resetMarkers = op => {
   for (var guid in window.plugin.wasabee.markerLayers) {
     var m = window.plugin.wasabee.markerLayers[guid];
     window.plugin.wasabee.markerLayerGroup.removeLayer(m);
     delete window.plugin.wasabee.markerLayers[guid];
   }
-  addAllMarkers(op);
+  var markerList = op.markers;
+  if (markerList != null) {
+    markerList.forEach(marker => addMarker(marker, op));
+  }
 };
 
 /** This function adds a Markers to the target layer group */
@@ -185,34 +180,28 @@ const getImageFromMarker = target => {
   return img;
 };
 
-//** This function adds all the Links to the layer */
-const addAllLinks = operation => {
-  operation.links.forEach(link => addLink(link, operation.color, operation));
-};
-
-//** This function resets all the Links and calls addAllLinks to add them */
-const resetAllLinks = operation => {
+/** this could be smarter */
+const resetLinks = operation => {
   for (var guid in window.plugin.wasabee.linkLayers) {
     var linkInLayer = window.plugin.wasabee.linkLayers[guid];
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
-  addAllLinks(operation);
+  const color = getColorHex(operation.color);
+  operation.links.forEach(link => addLink(link, color, operation));
 };
 
 /** This function adds a portal to the portal layer group */
 const addLink = (link, color, operation) => {
-  const colorHex = getColorHex(color);
   var options = {
     dashArray: [5, 5, 1, 5],
-    color: colorHex ? colorHex : "#ff6600",
+    color: color,
     opacity: 1,
     weight: 2
   };
   var latLngs = link.getLatLngs(operation);
   if (latLngs != null) {
     var link_ = new L.GeodesicPolyline(latLngs, options);
-
     window.plugin.wasabee.linkLayers[link["ID"]] = link_;
     link_.addTo(window.plugin.wasabee.linkLayerGroup);
   } else {
@@ -268,9 +257,6 @@ export const drawAgents = op => {
       }
     );
   }); // forEach team
-  // redraw target popup menus
-  // window.plugin.wasabee.resetAllMarkers();
-  // create new window.plugin.wasabee.updateAllMarkers
 };
 
 const getAgentPopup = agent => {
