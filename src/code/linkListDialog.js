@@ -1,4 +1,4 @@
-var markdown = require("markdown").markdown;
+const markdown = require("markdown").markdown;
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
@@ -15,12 +15,13 @@ export default class LinkListDialog {
     this._dialog = null;
     this._table.fields = [
       {
-        name: "Description",
-        value: link => link.description,
-        sort: (a, b) => a.localeCompare(b),
-        format: (row, obj) => {
-          row.className = "desc";
-          row.innerHTML = markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+        name: "Throw Order",
+        value: link => link.throwOrderPos,
+        sort: (a, b) => {
+          return a - b;
+        },
+        format: (a, m) => {
+          a.textContent = m;
         }
       },
       {
@@ -89,6 +90,23 @@ export default class LinkListDialog {
             }
           }
           a.textContent = s;
+        }
+      },
+      {
+        name: "Description",
+        value: link => link.description,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, obj) => {
+          row.className = "desc";
+          row.innerHTML = markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+        }
+      },
+      {
+        name: "Color",
+        value: link => link.color,
+        sort: null,
+        format: (list, data, link) => {
+          that.makeColorMenu(list, data, operation, link);
         }
       },
       {
@@ -193,6 +211,37 @@ export default class LinkListDialog {
     ];
     list.className = "menu";
     list.appendChild(state.button);
+  }
+
+  makeColorMenu(list, data, operation, link) {
+    const colorSection = list.appendChild(document.createElement("div"));
+    const linkColor = colorSection.appendChild(
+      document.createElement("select")
+    );
+    linkColor.id = link.id;
+
+    if (data == "main") {
+      data = operation.color;
+    }
+
+    window.plugin.Wasabee.layerTypes.forEach(function(a) {
+      const option = document.createElement("option");
+      option.setAttribute("value", a.name);
+      if (a.name == data) {
+        option.setAttribute("selected", true);
+      }
+      option.innerHTML = a.displayName;
+      linkColor.append(option);
+    });
+
+    linkColor.addEventListener(
+      "change",
+      () => {
+        link.color = linkColor.value;
+        operation.update();
+      },
+      false
+    );
   }
 
   static update(operation, portal, show) {

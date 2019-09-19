@@ -22,14 +22,7 @@ Wasabee.static = {
     toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
     toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
-    toolbar_settings: require("./images/toolbar_settings.png"),
-    marker_layer_main: require("./images/marker_layer_main.png"),
-    marker_layer_groupa: require("./images/marker_layer_groupa.png"),
-    marker_layer_groupb: require("./images/marker_layer_groupb.png"),
-    marker_layer_groupc: require("./images/marker_layer_groupc.png"),
-    marker_layer_groupd: require("./images/marker_layer_groupd.png"),
-    marker_layer_groupe: require("./images/marker_layer_groupe.png"),
-    marker_layer_groupf: require("./images/marker_layer_groupf.png")
+    toolbar_settings: require("./images/toolbar_settings.png")
   },
   dialogNames: {
     linkDialogButton: "wasabee-addlinks",

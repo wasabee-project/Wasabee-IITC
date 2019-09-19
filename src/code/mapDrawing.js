@@ -6,24 +6,12 @@ import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
-export const getColorMarker = color => {
-  var marker = null;
-  Wasabee.layerTypes.forEach(type => {
-    if (type.name == color) {
-      marker = type.portal.iconUrl;
-    }
-  });
-  return marker;
-};
-
-const getColorHex = color => {
-  var hex = null;
-  Wasabee.layerTypes.forEach(type => {
-    if (type.name == color) {
-      hex = type.color;
-    }
-  });
-  return hex;
+export const getColorMarker = colorGroup => {
+  let lt = Wasabee.layerTypes.get("main");
+  if (Wasabee.layerTypes.has(colorGroup)) {
+    lt = Wasabee.layerTypes.get(colorGroup);
+  }
+  return lt.portal.iconUrl;
 };
 
 //** This function draws things on the layers */
@@ -187,21 +175,28 @@ const resetLinks = operation => {
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
-  const color = getColorHex(operation.color);
-  operation.links.forEach(link => addLink(link, color, operation));
+
+  // pick the right style for the links
+  let lt = Wasabee.layerTypes.get("main");
+  if (Wasabee.layerTypes.has(operation.color)) {
+    lt = Wasabee.layerTypes.get(operation.color);
+  }
+  lt.link.color = lt.color;
+
+  operation.links.forEach(link => addLink(link, lt.link, operation));
 };
 
 /** This function adds a portal to the portal layer group */
-const addLink = (link, color, operation) => {
-  var options = {
-    dashArray: [5, 5, 1, 5],
-    color: color,
-    opacity: 1,
-    weight: 2
-  };
-  var latLngs = link.getLatLngs(operation);
+const addLink = (link, style, operation) => {
+  if (link.color != "main" && Wasabee.layerTypes.has(link.color)) {
+    const linkLt = Wasabee.layerTypes.get(link.color);
+    style = linkLt.link;
+    style.color = linkLt.color;
+  }
+
+  const latLngs = link.getLatLngs(operation);
   if (latLngs != null) {
-    var link_ = new L.GeodesicPolyline(latLngs, options);
+    const link_ = new L.GeodesicPolyline(latLngs, style);
     window.plugin.wasabee.linkLayers[link["ID"]] = link_;
     link_.addTo(window.plugin.wasabee.linkLayerGroup);
   } else {

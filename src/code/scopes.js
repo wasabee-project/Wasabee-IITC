@@ -25,6 +25,7 @@ export default function() {
     SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   };
 
+  // name and color are not used
   Wasabee.markerTypes = new Map([
     [
       Wasabee.Constants.MARKER_TYPE_DECAY,
@@ -173,104 +174,126 @@ export default function() {
     ]
   ]);
 
-  Wasabee.layerTypes = [
-    {
-      name: "main",
-      displayName: "Red",
-      color: "#FF0000",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_main
+  // link is not used
+  Wasabee.layerTypes = new Map([
+    [
+      "main",
+      {
+        name: "main",
+        displayName: "Red",
+        color: "#ff0000",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_main.png")
+        }
       }
-    },
-    {
-      name: "groupa",
-      displayName: "Orange",
-      color: "#ff6600",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupa
+    ],
+    [
+      "groupa",
+      {
+        name: "groupa",
+        displayName: "Orange",
+        color: "#ff6600",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupa.png")
+        }
       }
-    },
-    {
-      name: "groupb",
-      displayName: "Light Orange",
-      color: "#ff9900",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupb
+    ],
+    [
+      "groupb",
+      {
+        name: "groupb",
+        displayName: "Light Orange",
+        color: "#ff9900",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupb.png")
+        }
       }
-    },
-    {
-      name: "groupc",
-      displayName: "Tan",
-      color: "#BB9900",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupc
+    ],
+    [
+      "groupc",
+      {
+        name: "groupc",
+        displayName: "Tan",
+        color: "#bb9900",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupc.png")
+        }
       }
-    },
-    {
-      name: "groupd",
-      displayName: "Purple",
-      color: "#bb22cc",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupd
+    ],
+    [
+      "groupd",
+      {
+        name: "groupd",
+        displayName: "Purple",
+        color: "#bb22cc",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupd.png")
+        }
       }
-    },
-    {
-      name: "groupe",
-      displayName: "Teal",
-      color: "#33cccc",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupe
+    ],
+    [
+      "groupe",
+      {
+        name: "groupe",
+        displayName: "Teal",
+        color: "#33cccc",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupe.png")
+        }
       }
-    },
-    {
-      name: "groupf",
-      displayName: "Pink",
-      color: "#ff55ff",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: Wasabee.static.images.marker_layer_groupf
+    ],
+    [
+      "groupf",
+      {
+        name: "groupf",
+        displayName: "Pink",
+        color: "#ff55ff",
+        link: {
+          dashArray: [5, 5, 1, 5],
+          sharedKeysDashArray: [5, 5],
+          opacity: 1,
+          weight: 2
+        },
+        portal: {
+          iconUrl: require("./images/marker_layer_groupf.png")
+        }
       }
-    }
-  ];
+    ]
+  ]);
 }
