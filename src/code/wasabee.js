@@ -49,7 +49,7 @@ export default function() {
     marker.bindPopup(
       window.plugin.wasabee.getPortalPopup(marker, portal, latLng, operation)
     );
-    marker.off("click", marker.togglePopup, marker);
+    marker.on("click", marker.togglePopup, marker);
     marker.on("spiderfiedclick", marker.togglePopup, marker);
     window.plugin.wasabee.portalLayers[portal.id] = marker;
     marker.addTo(window.plugin.wasabee.portalLayerGroup);
