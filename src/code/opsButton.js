@@ -103,9 +103,8 @@ const opsButtonControl = Feature.extend({
       );
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
-      newop.update();
       context._map.fitBounds(newop.mbr());
-      window.runHooks("wasabeeUIUpdate");
+      newop.update();
     });
 
     container.appendChild(operationSelect);

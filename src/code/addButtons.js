@@ -49,13 +49,13 @@ export default function(selectedOp) {
         callback: wasabeeButtonHandler.enable,
         context: wasabeeButtonHandler
       });
-      const wb = this._modes[type];
-      window.addHook("wasabeeUIUpdate", function() {
-        wb.button.innerHTML =
-          '<img src="' +
-          wasabeeButtonHandler.getIcon() +
-          '" style="vertical-align: middle;">';
-      });
+    },
+    _updateWasabeeButton: function() {
+      const wb = this._modes["wasabeeButton"]; // yuk hardcoded...
+      wb.button.innerHTML =
+        '<img src="' +
+        wb.handler.getIcon() +
+        '" style="vertical-align: middle;">';
     },
     _addOpsButton: function(map, container) {
       let opsButtonHandler = new opsButtonControl(map);
@@ -99,7 +99,6 @@ export default function(selectedOp) {
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
                         newop.update();
-                        window.runHooks("wasabeeUIUpdate");
                       }
                     } else {
                       console.log("opPromise returned null op but no err?");
@@ -179,7 +178,6 @@ export default function(selectedOp) {
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
                 const newop = window.plugin.wasabee.getSelectedOperation();
                 newop.update();
-                window.runHooks("wasabeeUIUpdate");
                 alert("Upload Successful");
               },
               function(reject) {
@@ -190,6 +188,10 @@ export default function(selectedOp) {
           }
         }
       });
+    },
+    _updateUploadButton: function() {
+      this._modes["upload op"].button.title =
+        "Upload " + window.plugin.wasabee.getSelectedOperation().name;
     },
     _addNewopButton: function(map, container) {
       let newopButtonHandler = new NewopButtonControl(map);
@@ -332,6 +334,8 @@ export default function(selectedOp) {
       } else {
         $("#wasabee_uploadbutton").css("display", "none");
       }
+      Wasabee.buttons._updateUploadButton();
+      Wasabee.buttons._updateWasabeeButton();
     }
   });
   if (typeof Wasabee.buttons === "undefined") {

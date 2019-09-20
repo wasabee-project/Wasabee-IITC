@@ -50,7 +50,6 @@ const NewopButtonControl = Feature.extend({
           newop.store();
           window.plugin.wasabee.makeSelectedOperation(newop.ID);
           newop.update();
-          window.runHooks("wasabeeUIUpdate");
         } else {
           alert("You must enter a valid Operation name. Try again.");
         }

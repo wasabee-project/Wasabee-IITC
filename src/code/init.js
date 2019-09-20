@@ -4,7 +4,7 @@ import initPaste from "./paste";
 import initServer from "./server";
 import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
-import { drawThings, drawAgents } from "./mapDrawing";
+import { drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
 import { initFirebase } from "./firebaseSupport";
@@ -71,11 +71,10 @@ window.plugin.wasabee.init = function() {
     drawAgents(Wasabee._selectedOp);
   });
   addButtons(Wasabee._selectedOp);
-  window.runHooks("wasabeeUIUpdate");
 
   initFirebase();
   initCrossLinks();
-  drawThings(Wasabee._selectedOp);
+  Wasabee._selectedOp.update();
   //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
   var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);

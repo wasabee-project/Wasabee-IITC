@@ -173,8 +173,6 @@ export default function() {
         WasabeeMe.get();
         const so = window.plugin.wasabee.getSelectedOperation();
         so.update();
-        window.runHooks("wasabeeUIUpdate");
-        // addButtons();
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });

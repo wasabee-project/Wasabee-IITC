@@ -371,8 +371,10 @@ export default class Operation {
     console.log("operation.update");
     this.cleanPortalList();
     this.store();
+    // don't bother with either drawThings or updateVisual, stuff drawThings in the hook...
     // drawThings(this);
     window.plugin.wasabee.updateVisual(this);
+    window.runHooks("wasabeeUIUpdate", this);
   }
 
   convertLinksToObjs(links) {

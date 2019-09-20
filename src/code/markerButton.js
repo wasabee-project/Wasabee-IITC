@@ -129,16 +129,18 @@ const MarkerButtonControl = Feature.extend({
     this._listDialogContent = content;
   },
 
-  _update: function() {
-    this._getListDialogContent(this._operation);
+  _update: function(operation) {
+    console.log(this);
+    console.log(operation);
+    // this._getListDialogContent(operation);
     // XXX figure out how to refresh the html option
-    console.log(this._listDialogData);
+    // console.log(this._listDialogData);
   },
 
   _listDialog: function(operation) {
     this._getListDialogContent(operation);
 
-    window.addHook("wasabeeUIUpdate", this._update());
+    window.addHook("wasabeeUIUpdate", this._update);
 
     this._listDialogData = window.dialog({
       title: "Marker List: " + operation.name,
@@ -151,7 +153,8 @@ const MarkerButtonControl = Feature.extend({
       html: this._listDialogContent.table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
-        window.removeHook("wasabeeUIUpdate", this._update());
+        const that = this;
+        window.removeHook("wasabeeUIUpdate", that._update);
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
     });
