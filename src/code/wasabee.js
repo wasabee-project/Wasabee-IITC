@@ -3,6 +3,7 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker, drawThings } from "./mapDrawing";
 import WasabeeMe from "./me";
+import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 export default function() {
@@ -170,9 +171,9 @@ export default function() {
       closeCallback: function() {
         // prime the pump
         WasabeeMe.get();
-        // force an update -- need addButtons() here too
         const so = window.plugin.wasabee.getSelectedOperation();
         so.update();
+        addButtons();
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });

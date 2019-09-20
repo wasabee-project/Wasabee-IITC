@@ -94,10 +94,10 @@ const opsButtonControl = Feature.extend({
         })
       );
     });
+    // XXX use operationSelect.addEventListener instead of this format
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       var newID = $(this).val();
-      // console.log("load requested for " + newID);
       window.plugin.wasabee.closeAllDialogs(
         window.plugin.Wasabee.static.dialogNames.opsButton
       );

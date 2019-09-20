@@ -96,6 +96,7 @@ export default function(selectedOp) {
                       // if the op changed out beneath us, use the new
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
+                        newop.update();
                       }
                     } else {
                       console.log("opPromise returned null op but no err?");
@@ -125,7 +126,7 @@ export default function(selectedOp) {
         // Feature.prototype.addHooks.call(tmp);
       };
       this._modes[type].button = this._createButton({
-        title: "Clear All Operation",
+        title: "Clear All Operations",
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
         callback: () => {
@@ -218,7 +219,7 @@ export default function(selectedOp) {
       this._modes[type] = {};
       this._modes[type].handler = mButtonHandler;
       this._modes[type].button = this._createButton({
-        title: "Add Marker",
+        title: "Add Markers",
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
         callback: mButtonHandler.enable,
