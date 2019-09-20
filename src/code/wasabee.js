@@ -185,11 +185,12 @@ export default function() {
     drawThings(op);
   };
 
-  window.plugin.wasabee.closeAllDialogs = () => {
+  window.plugin.wasabee.closeAllDialogs = skip => {
+    skip = skip || "nothing";
     Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
       name
     ) {
-      if (name != window.plugin.Wasabee.static.dialogNames.opsButton) {
+      if (name != skip) {
         let id = "dialog-" + name;
         if (window.DIALOGS[id]) {
           try {

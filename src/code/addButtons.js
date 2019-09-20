@@ -6,7 +6,7 @@ import NewopButtonControl from "./newopButton";
 import LinkDialogButtonControl from "./linkDialogButton";
 import MarkerButtonControl from "./markerButton";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
@@ -15,11 +15,11 @@ export default function(selectedOp) {
       position: "topleft"
     },
     onAdd: function(map) {
-      var outerDiv = L.DomUtil.create(
+      const outerDiv = L.DomUtil.create(
         "div",
         "leaflet-draw leaflet-draw-section"
       );
-      var container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
+      const container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
       outerDiv.appendChild(container);
       this._modes = {};
 
@@ -47,7 +47,7 @@ export default function(selectedOp) {
         callback: wasabeeButtonHandler.enable,
         context: wasabeeButtonHandler
       });
-      var wb = this._modes[type];
+      const wb = this._modes[type];
       window.addHook("mapDataRefreshStart", function() {
         wb.button.innerHTML =
           '<img src="' +
@@ -81,7 +81,7 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
         callback: () => {
-          window.plugin.wasabee.closeAllDialogs();
+          window.plugin.wasabee.closeAllDialogs("nothing");
           const so = window.plugin.Wasabee.getSelectedOperation();
           try {
             const me = WasabeeMe.get(true);
@@ -129,11 +129,11 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
         callback: () => {
-          var confirmed = window.confirm(
+          const confirmed = window.confirm(
             "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
           );
           if (confirmed) {
-            window.plugin.wasabee.closeAllDialogs();
+            window.plugin.wasabee.closeAllDialogs("nothing");
             window.plugin.wasabee.resetOps();
             window.plugin.wasabee.setupLocalStorage();
           }
@@ -153,7 +153,7 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
         callback: () => {
-          window.plugin.wasabee.closeAllDialogs();
+          window.plugin.wasabee.closeAllDialogs("nothing");
           const so = window.plugin.wasabee.getSelectedOperation();
           const id = so.ID;
 
@@ -286,7 +286,7 @@ export default function(selectedOp) {
       return container;
     },
     _createButton: function(options) {
-      var link = L.DomUtil.create(
+      const link = L.DomUtil.create(
         "a",
         options.className || "",
         options.container
