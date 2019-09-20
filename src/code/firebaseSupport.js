@@ -33,6 +33,7 @@ export const initFirebase = () => {
           if (refreshed.ID == operation.ID) {
             window.plugin.wasabee.makeSelectedOperation(refreshed.ID);
             refreshed.update();
+            window.runHooks("wasabeeUIUpdate");
           }
         },
         function(err) {

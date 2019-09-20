@@ -25,6 +25,7 @@ window.plugin.wasabee.init = function() {
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
+  window.pluginCreateHook("wasabeeUIUpdate");
 
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.
@@ -32,7 +33,6 @@ window.plugin.wasabee.init = function() {
   initSelectedOp(); // loads the next two
   window.plugin.wasabee.setupLocalStorage();
   window.plugin.wasabee.initSelectedOperation();
-
   initWasabee();
   initOverflowMenu();
   initPaste();
@@ -42,9 +42,6 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
-
-  addButtons(Wasabee._selectedOp);
-
   window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
@@ -73,6 +70,8 @@ window.plugin.wasabee.init = function() {
   window.addHook("mapDataRefreshStart", function() {
     drawAgents(Wasabee._selectedOp);
   });
+  addButtons(Wasabee._selectedOp);
+  window.runHooks("wasabeeUIUpdate");
 
   initFirebase();
   initCrossLinks();

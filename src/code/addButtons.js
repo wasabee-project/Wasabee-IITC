@@ -10,6 +10,8 @@ const Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
+  selectedOp = selectedOp || window.plugin.wasabee.getSelectedOperation();
+
   const ButtonsControl = L.Control.extend({
     options: {
       position: "topleft"
@@ -48,7 +50,7 @@ export default function(selectedOp) {
         context: wasabeeButtonHandler
       });
       const wb = this._modes[type];
-      window.addHook("mapDataRefreshStart", function() {
+      window.addHook("wasabeeUIUpdate", function() {
         wb.button.innerHTML =
           '<img src="' +
           wasabeeButtonHandler.getIcon() +
@@ -82,7 +84,7 @@ export default function(selectedOp) {
         buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
         callback: () => {
           window.plugin.wasabee.closeAllDialogs("nothing");
-          const so = window.plugin.Wasabee.getSelectedOperation();
+          const so = window.plugin.wasabee.getSelectedOperation();
           try {
             const me = WasabeeMe.get(true);
             if (me == null) {
@@ -97,6 +99,7 @@ export default function(selectedOp) {
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
                         newop.update();
+                        window.runHooks("wasabeeUIUpdate");
                       }
                     } else {
                       console.log("opPromise returned null op but no err?");
@@ -176,6 +179,7 @@ export default function(selectedOp) {
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
                 const newop = window.plugin.wasabee.getSelectedOperation();
                 newop.update();
+                window.runHooks("wasabeeUIUpdate");
                 alert("Upload Successful");
               },
               function(reject) {
@@ -318,18 +322,22 @@ export default function(selectedOp) {
         .on(link, "click", options.callback, options.context);
 
       return link;
+    },
+    update: function() {
+      if (
+        selectedOp.IsServerOp() == false ||
+        selectedOp.IsWritableOp(WasabeeMe.get()) == true
+      ) {
+        $("#wasabee_uploadbutton").css("display", "");
+      } else {
+        $("#wasabee_uploadbutton").css("display", "none");
+      }
     }
   });
   if (typeof Wasabee.buttons === "undefined") {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
+    window.addHook("wasabeeUIUpdate", Wasabee.buttons.update);
   }
-  if (
-    selectedOp.IsServerOp() == false ||
-    selectedOp.IsWritableOp(WasabeeMe.get()) == true
-  ) {
-    $("#wasabee_uploadbutton").css("display", "");
-  } else {
-    $("#wasabee_uploadbutton").css("display", "none");
-  }
+  Wasabee.buttons.update();
 }

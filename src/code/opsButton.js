@@ -1,6 +1,6 @@
 import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
-import addButtons from "./addButtons";
+// import addButtons from "./addButtons";
 import WasabeeMe from "./me";
 
 const opsButtonControl = Feature.extend({
@@ -28,7 +28,7 @@ const opsButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    var op = window.plugin.Wasabee.getSelectedOperation();
+    var op = window.plugin.wasabee.getSelectedOperation();
     var content = document.createElement("div");
     content.id = "wasabee-dialog-operation-content";
     var opinfo = document.createElement("div");
@@ -105,7 +105,7 @@ const opsButtonControl = Feature.extend({
       context._displayOpInfo(context, newop);
       newop.update();
       context._map.fitBounds(newop.mbr());
-      addButtons(newop);
+      window.runHooks("wasabeeUIUpdate");
     });
 
     container.appendChild(operationSelect);
@@ -254,7 +254,7 @@ const opsButtonControl = Feature.extend({
           window.plugin.wasabee.removeOperation(removeid);
           context._opSelectMenuUpdate(
             context,
-            window.plugin.Wasabee.getSelectedOperation()
+            window.plugin.wasabee.getSelectedOperation()
           );
         }
       },

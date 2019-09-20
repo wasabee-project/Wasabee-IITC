@@ -59,7 +59,6 @@ const MarkerButtonControl = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.markerButton,
       buttons: {
-        // "Add Marker": () => mHandler._addMarker( mHandler._type.value, mHandler._operation, mHandler._comment.value),
         "Operation Marker List": () => mHandler._listDialog(mHandler._operation)
       }
     });
@@ -69,7 +68,7 @@ const MarkerButtonControl = Feature.extend({
     operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
   },
 
-  _listDialog: function(operation) {
+  _getListDialogContent: function(operation) {
     const content = new Sortable();
     content.fields = [
       {
@@ -77,6 +76,9 @@ const MarkerButtonControl = Feature.extend({
         value: marker => operation.getPortal(marker.portalId).name,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m) => {
+          // XXX get portal link...
+          // const p = operation.getPortal(marker.portalId);
+          // getPortalLink(p);
           a.textContent = m;
         }
       },
@@ -124,8 +126,21 @@ const MarkerButtonControl = Feature.extend({
     ];
     content.sortBy = 0;
     content.items = operation.markers;
+    this._listDialogContent = content;
+  },
 
-    const mld = window.dialog({
+  _update: function() {
+    this._getListDialogContent(this._operation);
+    // XXX figure out how to refresh the html option
+    console.log(this._listDialogData);
+  },
+
+  _listDialog: function(operation) {
+    this._getListDialogContent(operation);
+
+    window.addHook("wasabeeUIUpdate", this._update());
+
+    this._listDialogData = window.dialog({
       title: "Marker List: " + operation.name,
       width: "auto",
       height: "auto",
@@ -133,14 +148,13 @@ const MarkerButtonControl = Feature.extend({
         my: "center top",
         at: "center center"
       },
-      html: content.table,
+      html: this._listDialogContent.table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
-        // XXX
+        window.removeHook("wasabeeUIUpdate", this._update());
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
     });
-    return mld;
   }
 });
 
