@@ -3,6 +3,7 @@ import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
 
+// don't use this _dialog[] any more. Use the new framework.
 var _dialogs = [];
 var Wasabee = window.plugin.Wasabee;
 
@@ -116,7 +117,7 @@ export default class LinkListDialog {
         format: (o, e) => that.makeMenu(o, e)
       }
     ];
-    this._table.sortBy = 1;
+    this._table.sortBy = 0;
     this._setLinks();
     _dialogs.push(this);
     if (this._table.items.length > 0) {
@@ -218,15 +219,14 @@ export default class LinkListDialog {
     const linkColor = colorSection.appendChild(
       document.createElement("select")
     );
-    linkColor.id = link.id;
-
-    if (data == "main") {
-      data = operation.color;
-    }
+    linkColor.id = link.ID;
 
     window.plugin.Wasabee.layerTypes.forEach(function(a) {
       const option = document.createElement("option");
       option.setAttribute("value", a.name);
+      if (a.name == "main") {
+        a.displayName = "Op Color";
+      }
       if (a.name == data) {
         option.setAttribute("selected", true);
       }
