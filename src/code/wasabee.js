@@ -1,7 +1,7 @@
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
-import { getColorMarker, drawThings } from "./mapDrawing";
+import { getColorMarker } from "./mapDrawing";
 import WasabeeMe from "./me";
 // import addButtons from "./addButtons";
 
@@ -171,18 +171,11 @@ export default function() {
       closeCallback: function() {
         // prime the pump
         WasabeeMe.get();
-        const so = window.plugin.wasabee.getSelectedOperation();
-        so.update();
+        // redraw everything, mostly to just update the buttons
+        window.plugin.wasabee.getSelectedOperation().update();
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
-  };
-
-  // this is just a kludge until I can figure out how to make
-  // operation.update() call drawThings directly
-  // DO NOT USE THIS
-  window.plugin.wasabee.updateVisual = op => {
-    drawThings(op);
   };
 
   window.plugin.wasabee.closeAllDialogs = skip => {

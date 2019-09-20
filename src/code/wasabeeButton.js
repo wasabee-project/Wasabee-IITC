@@ -52,6 +52,10 @@ const WasabeeButtonControl = Feature.extend({
         html: teamlist.table,
         dialogClass: "wasabee-dialog-mustauth",
         closeCallback: function() {
+          window.runHooks(
+            "wasabeeUIUpdate",
+            window.plugin.wasabee.getSelectedOperation()
+          );
           wbHandler.disable();
           delete wbHandler._dialog;
         },

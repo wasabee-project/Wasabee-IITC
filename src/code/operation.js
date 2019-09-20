@@ -366,14 +366,11 @@ export default class Operation {
     this.update();
   }
 
-  // call update to redraw everything on the map
+  // call update to save the op and redraw everything on the map
   update() {
     console.log("operation.update");
     this.cleanPortalList();
     this.store();
-    // don't bother with either drawThings or updateVisual, stuff drawThings in the hook...
-    // drawThings(this);
-    window.plugin.wasabee.updateVisual(this);
     window.runHooks("wasabeeUIUpdate", this);
   }
 

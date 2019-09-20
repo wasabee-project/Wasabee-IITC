@@ -4,7 +4,7 @@ import initPaste from "./paste";
 import initServer from "./server";
 import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
-import { drawAgents } from "./mapDrawing";
+import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
 import { initFirebase } from "./firebaseSupport";
@@ -70,10 +70,15 @@ window.plugin.wasabee.init = function() {
   window.addHook("mapDataRefreshStart", function() {
     drawAgents(Wasabee._selectedOp);
   });
+  window.addHook("wasabeeUIUpdate", function() {
+    drawThings(Wasabee._selectedOp);
+  });
   addButtons(Wasabee._selectedOp);
 
   initFirebase();
   initCrossLinks();
+
+  // once everything else is done, call update, which triggers wasabeeUIUpdate, drawing things
   Wasabee._selectedOp.update();
   //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
