@@ -68,80 +68,8 @@ const MarkerButtonControl = Feature.extend({
     operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
   },
 
-  _getListDialogContent: function(operation) {
-    const content = new Sortable();
-    content.fields = [
-      {
-        name: "Portal Name",
-        value: marker => operation.getPortal(marker.portalId).name,
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          // XXX get portal link...
-          // const p = operation.getPortal(marker.portalId);
-          // getPortalLink(p);
-          a.textContent = m;
-        }
-      },
-      {
-        name: "Marker Type",
-        value: marker =>
-          window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
-      },
-      {
-        name: "State",
-        value: marker => marker.state,
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
-      },
-      {
-        name: "Comment",
-        value: marker => marker.comment,
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
-      },
-      {
-        name: "Assigned To",
-        value: marker => marker.assignedNickname,
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
-      },
-      {
-        name: "Completed By",
-        value: marker => marker.complatedBy,
-        sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
-      }
-    ];
-    content.sortBy = 0;
-    content.items = operation.markers;
-    this._listDialogContent = content;
-  },
-
-  _update: function(operation) {
-    console.log(this);
-    console.log(operation);
-    // this._getListDialogContent(operation);
-    // XXX figure out how to refresh the html option
-    // console.log(this._listDialogData);
-  },
-
   _listDialog: function(operation) {
-    this._getListDialogContent(operation);
-
-    window.addHook("wasabeeUIUpdate", this._update);
-
+    window.addHook("wasabeeUIUpdate", markerListUpdate);
     this._listDialogData = window.dialog({
       title: "Marker List: " + operation.name,
       width: "auto",
@@ -150,11 +78,10 @@ const MarkerButtonControl = Feature.extend({
         my: "center top",
         at: "center center"
       },
-      html: this._listDialogContent.table,
+      html: getListDialogContent(operation).table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
-        const that = this;
-        window.removeHook("wasabeeUIUpdate", that._update);
+        window.removeHook("wasabeeUIUpdate", markerListUpdate);
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
     });
@@ -162,3 +89,72 @@ const MarkerButtonControl = Feature.extend({
 });
 
 export default MarkerButtonControl;
+
+const markerListUpdate = operation => {
+  const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.markerList;
+  if (window.DIALOGS[id]) {
+    const table = getListDialogContent(operation).table;
+    window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
+  }
+};
+
+const getListDialogContent = operation => {
+  const content = new Sortable();
+  content.fields = [
+    {
+      name: "Portal Name",
+      value: marker => operation.getPortal(marker.portalId).name,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        // XXX get portal link...
+        // const p = operation.getPortal(marker.portalId);
+        // getPortalLink(p);
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Marker Type",
+      value: marker =>
+        window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "State",
+      value: marker => marker.state,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Comment",
+      value: marker => marker.comment,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Assigned To",
+      value: marker => marker.assignedNickname,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Completed By",
+      value: marker => marker.complatedBy,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    }
+  ];
+  content.sortBy = 0;
+  content.items = operation.markers;
+  return content;
+};
