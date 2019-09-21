@@ -127,9 +127,13 @@ export default class LinkListDialog {
         dialogClass: "wasabee-dialog wasabee-dialog-linklist",
         title: this._portal.name + ": Links",
         width: "auto",
-        closeCallback: () => (_dialogs = []),
+        closeCallback: () => {
+          _dialogs = [];
+          window.removeHook("wasabeeUIUpdate", that.update);
+        },
         id: window.plugin.Wasabee.static.dialogNames.linkList
       });
+      window.addHook("wasabeeUIUpdate", that.update);
       var buttons = this._dialog.dialog("option", "buttons");
       this._dialog.dialog(
         "option",
@@ -141,8 +145,6 @@ export default class LinkListDialog {
               if (that._portal) {
                 window.renderPortalDetails(that._portal.id);
               }
-              // XXX
-              // console.log(window.map);
               let ld = new LinkDialogButtonControl(window.map);
               ld._operation = that._operation();
               ld._displayDialog();
@@ -244,7 +246,13 @@ export default class LinkListDialog {
     );
   }
 
-  static update(operation, portal, show) {
+  update(operation) {
+    // this is super hacky
+    _dialogs[0]._setLinks(operation, _dialogs[0]._portal);
+  }
+
+  // this needs a lot of love
+  static showDialog(operation, portal, show) {
     var p = 0;
     var parameters = _dialogs;
     for (; p < parameters.length; p++) {

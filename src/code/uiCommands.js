@@ -73,6 +73,6 @@ export default {
     }
   },
   showLinksDialog: (operation, portal) => {
-    LinkListDialog.update(operation, portal, true);
+    LinkListDialog.showDialog(operation, portal, true);
   }
 };
