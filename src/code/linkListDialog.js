@@ -1,6 +1,7 @@
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
+import AssignDialog from "./assignDialog";
 
 // don't use this _dialog[] any more. Use the new framework.
 var _dialogs = [];
@@ -229,6 +230,13 @@ export default class LinkListDialog {
       {
         label: "Set Description",
         onclick: () => $Wasabee.setDescription(data)
+      },
+      {
+        label: "Assign",
+        onclick: () => {
+          const m = new AssignDialog(data);
+          console.log(m);
+        }
       }
     ];
     list.className = "menu";
