@@ -238,6 +238,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
+            // console.log(req.response);
             resolve(Agent.create(req.response));
             break;
           case 401:

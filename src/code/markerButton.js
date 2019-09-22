@@ -1,6 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import UiHelper from "./uiHelper";
 import Sortable from "./sortable";
+import AssignDialog from "./assignDialog";
 
 const MarkerButtonControl = Feature.extend({
   statics: {
@@ -169,7 +170,10 @@ const makeMarkerDialogMenu = (list, data) => {
   state.items = [
     {
       label: "Assign",
-      onclick: () => assignMarker(data)
+      onclick: () => {
+        const m = new AssignDialog(data, operation);
+        console.log(m);
+      }
     },
     {
       label: "Set Comment",
@@ -187,9 +191,4 @@ const makeMarkerDialogMenu = (list, data) => {
   ];
   list.className = "menu";
   list.appendChild(state.button);
-};
-
-const assignMarker = data => {
-  alert("not finished yet");
-  console.log(data);
 };

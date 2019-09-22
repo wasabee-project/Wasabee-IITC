@@ -386,7 +386,7 @@ export default class Operation {
   }
 
   convertLinksToObjs(links) {
-    var tempLinks = Array();
+    const tempLinks = Array();
     for (let link_ in links) {
       if (links[link_] instanceof Link) {
         tempLinks.push(links[link_]);
@@ -395,6 +395,17 @@ export default class Operation {
       }
     }
     return tempLinks;
+  }
+
+  convertMarkersToObjs(markers) {
+    const tmpMarkers = Array();
+    for (let marker_ in markers) {
+      if (markers[marker_] instanceof Marker) {
+        tmpMarkers.push(markers[marker_]);
+      } else {
+        tmpMarkers.push(Marker.create(markers[marker_], this));
+      }
+    }
   }
 
   _ensureCollections() {
@@ -472,7 +483,7 @@ export default class Operation {
   }
 
   static create(obj) {
-    if (operation instanceof Operation) {
+    if (obj instanceof Operation) {
       console.log("do not call Operation.create() on an Operation");
       console.log(new Error().stack);
       return obj;
@@ -480,11 +491,13 @@ export default class Operation {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    var operation = new Operation();
+    const operation = new Operation();
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {
           operation[prop] = operation.convertLinksToObjs(obj[prop]);
+        } else if (prop == "markers") {
+          operation[prop] = operation.convertMarkersToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }

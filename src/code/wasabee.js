@@ -198,24 +198,35 @@ export default function() {
     });
   };
 
+  // how to make this async? I get a syntax error on the obvious decls
   window.plugin.wasabee.getAgent = gid => {
+    // prime update the cache with any known teams
+    // probably better to do this on team fetch... doesn't seem too expensive here
+    window.plugin.Wasabee.teams.forEach(function(t) {
+      t.agents.forEach(function(a) {
+        if (!window.plugin.Wasabee._agentCache.has(a.id)) {
+          window.plugin.Wasabee._agentCache.set(a.id, a);
+        }
+      });
+    });
+
     if (window.plugin.Wasabee._agentCache.has(gid)) {
-      console.log("found agent in _agentCache");
+      // console.log("found agent in _agentCache");
       return window.plugin.Wasabee._agentCache.get(gid);
     }
 
     let agent = null;
     window.plugin.wasabee.agentPromise(gid).then(
       function(resolve) {
-        console.log(resolve);
-        window.plugin.Wasabee._agentCache.set(gid, resolve);
         agent = resolve;
+        window.plugin.Wasabee._agentCache.set(gid, agent);
       },
       function(reject) {
         console.log(reject);
+        alert(reject);
       }
     );
-    console.log("getAgent");
+    // this returns early from the promise, giving false nulls. await?
     return agent;
   };
 }

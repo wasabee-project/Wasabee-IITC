@@ -106,14 +106,12 @@ export default class LinkListDialog {
       {
         name: "Assigned To",
         value: link => {
-          console.log(link);
           if (link.assignedTo != null) {
             const agent = window.plugin.wasabee.getAgent(link.assignedTo);
             if (agent != null) {
-              console.log(agent);
               return agent.name;
             } else {
-              return link.assignedTo;
+              return "looking up: " + link.assignedTo;
             }
           }
           return "";
