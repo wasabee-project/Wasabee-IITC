@@ -26,6 +26,7 @@ export default class Operation {
     this.teamlist = Array();
     this.fetched = null;
     this.stored = null;
+    this.localchanged = true;
   }
 
   store() {
@@ -33,6 +34,7 @@ export default class Operation {
     this._ensureCollections();
     this.stored = Date.now();
     store.set(this.ID, JSON.stringify(this));
+    this.localchanged = true;
   }
 
   getColor() {
@@ -132,6 +134,15 @@ export default class Operation {
   removeMarker(marker) {
     this.markers = this.markers.filter(function(listMarker) {
       return listMarker.ID !== marker.ID;
+    });
+    this.update();
+  }
+
+  setMarkerComment(marker, comment) {
+    this.markers.forEach(function(v) {
+      if (v.ID == marker.ID) {
+        v.comment = comment;
+      }
     });
     this.update();
   }

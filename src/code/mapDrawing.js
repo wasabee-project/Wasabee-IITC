@@ -98,31 +98,6 @@ const getMarkerPopup = (marker, target, operation) => {
     },
     false
   );
-
-  const subhead = content.appendChild(document.createElement("div"));
-  subhead.className = "desc";
-  subhead.innerHTML = "Marker Assignment";
-  const assignmentMenu = subhead.appendChild(agentSelectMenu());
-  const id = "wasabee-marker-assignment-" + target.ID;
-  assignmentMenu.id = id;
-  assignmentMenu.addEventListener(
-    "change",
-    () => {
-      window.plugin.wasabee
-        .assignMarkerPromise(operation.ID, target.ID, assignmentMenu.value)
-        .then(
-          function() {
-            console.log("assign marker succeeded");
-            // XXX some DOM magic to update the marker icon
-            // are marker IDs known?
-          },
-          function(err) {
-            console.log("assign marker failed: " + err);
-          }
-        );
-    },
-    false
-  );
   return content;
 };
 
@@ -264,30 +239,4 @@ const getAgentPopup = agent => {
   const date = content.appendChild(document.createElement("span"));
   date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
-};
-
-const getAllKnownAgents = () => {
-  const agents = new Map();
-  Wasabee.teams.forEach(function(team) {
-    // XXX this will get messy if display name is used -- last-in wins
-    team.agents.forEach(function(agent) {
-      agents.set(agent.id, agent.name);
-    });
-  });
-  return agents;
-};
-
-const agentSelectMenu = () => {
-  const menu = document.createElement("select");
-  const agents = getAllKnownAgents();
-  const unset = menu.appendChild(document.createElement("option"));
-  unset.value = "";
-  unset.text = "Not Assigned";
-
-  agents.forEach(function(v, k) {
-    const option = menu.appendChild(document.createElement("option"));
-    option.value = k;
-    option.text = v;
-  });
-  return menu;
 };

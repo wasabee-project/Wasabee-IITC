@@ -105,56 +105,79 @@ const getListDialogContent = operation => {
       name: "Portal Name",
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        // XXX get portal link...
-        // const p = operation.getPortal(marker.portalId);
-        // getPortalLink(p);
-        a.textContent = m;
-      }
+      // format: (a, m) => a.appendChild(UiHelper.getPortalLink(m))
+      format: (a, m) => (a.textContent = m)
     },
     {
       name: "Marker Type",
       value: marker =>
         window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
+      format: (a, m) => (a.textContent = m)
     },
     {
       name: "State",
       value: marker => marker.state,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
+      format: (a, m) => (a.textContent = m)
     },
     {
       name: "Comment",
       value: marker => marker.comment,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
+      format: (a, m) => (a.textContent = m)
     },
     {
       name: "Assigned To",
       value: marker => marker.assignedNickname,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
+      format: (a, m) => (a.textContent = m)
     },
     {
       name: "Completed By",
-      value: marker => marker.complatedBy,
+      value: marker => marker.completedBy,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
+      format: (a, m) => (a.textContent = m)
+    },
+    {
+      name: "",
+      sort: null,
+      value: m => m,
+      format: (o, e) => makeMarkerDialogMenu(o, e)
     }
   ];
   content.sortBy = 0;
   content.items = operation.markers;
   return content;
+};
+
+const makeMarkerDialogMenu = (list, data) => {
+  const operation = window.plugin.wasabee.getSelectedOperation();
+  var state = new window.plugin.Wasabee.OverflowMenu();
+  state.items = [
+    {
+      label: "Assign",
+      onclick: () => assignMarker(data)
+    },
+    {
+      label: "Set Comment",
+      onclick: () => {
+        const reponse = prompt("Marker Comment", data.comment);
+        if (reponse != null) {
+          operation.setMarkerComment(data, reponse);
+        }
+      }
+    },
+    {
+      label: "Delete",
+      onclick: () => operation.removeMarker(data)
+    }
+  ];
+  list.className = "menu";
+  list.appendChild(state.button);
+};
+
+const assignMarker = data => {
+  alert("not finished yet");
+  console.log(data);
 };

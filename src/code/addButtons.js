@@ -165,6 +165,7 @@ export default function(selectedOp) {
               function(resolve) {
                 console.log("server accepted the update: " + resolve);
                 alert("Update Successful");
+                window.runHooks("wasabeeUIUpdate", this);
               },
               function(reject) {
                 console.log(reject);
@@ -190,8 +191,13 @@ export default function(selectedOp) {
       });
     },
     _updateUploadButton: function() {
+      let operation = window.plugin.wasabee.getSelectedOperation();
+      let status = "";
+      if (operation.localchanged) {
+        status = " (locally modified)";
+      }
       this._modes["upload op"].button.title =
-        "Upload " + window.plugin.wasabee.getSelectedOperation().name;
+        "Upload " + operation.name + status;
     },
     _addNewopButton: function(map, container) {
       let newopButtonHandler = new NewopButtonControl(map);

@@ -20,6 +20,7 @@ export default function() {
             window.plugin.wasabee.opPromise(operation.ID).then(
               function(newop) {
                 newop.store();
+                newop.localchanged = false;
                 resolve(newop);
               },
               function(err) {
@@ -64,6 +65,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
+            operation.localchanged = false;
             resolve("successfully uploaded");
             break;
           case 401:
@@ -164,10 +166,13 @@ export default function() {
       req.withCredentials = true;
       req.crossDomain = true;
 
+      let newop = null;
       req.onload = function() {
         switch (req.status) {
           case 200:
-            resolve(Operation.create(req.response));
+            newop = Operation.create(req.response);
+            newop.localchanged = false;
+            resolve(newop);
             break;
           case 304: // If-Modified-Since replied NotModified
             console.log("server copy is older/unmodified, keeping local copy");
