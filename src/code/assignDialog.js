@@ -5,10 +5,7 @@ import Marker from "./marker";
 //var Wasabee = window.plugin.Wasabee;
 
 export default class AssignDialog {
-  constructor(operation, target) {
-    console.log(operation);
-    console.log(target);
-
+  constructor(target, operation) {
     this._operation = operation;
     this._dialog = null;
     this._html = "unable to determine target type";

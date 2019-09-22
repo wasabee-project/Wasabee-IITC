@@ -379,7 +379,7 @@ export default class Operation {
 
   // call update to save the op and redraw everything on the map
   update() {
-    console.log("operation.update");
+    console.log("operation.update (saving/redrawing)");
     this.cleanPortalList();
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
@@ -403,9 +403,10 @@ export default class Operation {
       if (markers[marker_] instanceof Marker) {
         tmpMarkers.push(markers[marker_]);
       } else {
-        tmpMarkers.push(Marker.create(markers[marker_], this));
+        tmpMarkers.push(Marker.create(markers[marker_]));
       }
     }
+    return tmpMarkers;
   }
 
   _ensureCollections() {
