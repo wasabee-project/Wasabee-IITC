@@ -1,4 +1,3 @@
-const markdown = require("markdown").markdown;
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
@@ -99,7 +98,29 @@ export default class LinkListDialog {
         sort: (a, b) => a.localeCompare(b),
         format: (row, obj) => {
           row.className = "desc";
-          row.innerHTML = markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+          if (obj != null) {
+            row.innerHTML = window.escapeHtmlSpecialChars(obj);
+          }
+        }
+      },
+      {
+        name: "Assigned To",
+        value: link => {
+          console.log(link);
+          if (link.assignedTo != null) {
+            const agent = window.plugin.wasabee.getAgent(link.assignedTo);
+            if (agent != null) {
+              console.log(agent);
+              return agent.name;
+            } else {
+              return link.assignedTo;
+            }
+          }
+          return "";
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m) => {
+          a.textContent = m;
         }
       },
       {

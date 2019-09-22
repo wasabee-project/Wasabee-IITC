@@ -25,6 +25,7 @@ window.plugin.wasabee.init = function() {
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
+  Wasabee._agentCache = new Map();
   window.pluginCreateHook("wasabeeUIUpdate");
 
   // All of these should eventually export functions.

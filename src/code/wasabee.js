@@ -197,4 +197,25 @@ export default function() {
       }
     });
   };
+
+  window.plugin.wasabee.getAgent = gid => {
+    if (window.plugin.Wasabee._agentCache.has(gid)) {
+      console.log("found agent in _agentCache");
+      return window.plugin.Wasabee._agentCache.get(gid);
+    }
+
+    let agent = null;
+    window.plugin.wasabee.agentPromise(gid).then(
+      function(resolve) {
+        console.log(resolve);
+        window.plugin.Wasabee._agentCache.set(gid, resolve);
+        agent = resolve;
+      },
+      function(reject) {
+        console.log(reject);
+      }
+    );
+    console.log("getAgent");
+    return agent;
+  };
 }

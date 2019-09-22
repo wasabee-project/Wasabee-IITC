@@ -1,6 +1,7 @@
+import Agent from "./agent";
+import WasabeeMe from "./me";
 import Operation from "./operation";
 import Team from "./team";
-import WasabeeMe from "./me";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -217,7 +218,37 @@ export default function() {
         }
       };
 
-      // most of the time a CORS error will happen - this is the path taken, not the 401 above
+      req.onerror = function() {
+        console.log(new Error().stack);
+        reject(Error("not logged in"));
+      };
+
+      req.send();
+    });
+  };
+
+  window.plugin.wasabee.agentPromise = GID => {
+    return new Promise(function(resolve, reject) {
+      const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/agent/" + GID;
+      const req = new XMLHttpRequest();
+      req.open("GET", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve(Agent.create(req.response));
+            break;
+          case 401:
+            reject("not logged in");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
       req.onerror = function() {
         console.log(new Error().stack);
         reject(Error("not logged in"));
