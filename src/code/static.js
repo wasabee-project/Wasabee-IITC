@@ -32,7 +32,8 @@ Wasabee.static = {
     opsButton: "wasabee-operations",
     wasabeeButton: "wasabee-userinfo",
     linkList: "wasabee-linklist",
-    markerList: "wasabee-markerlist"
+    markerList: "wasabee-markerlist",
+    assign: "wasabee-assign"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

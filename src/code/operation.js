@@ -369,6 +369,16 @@ export default class Operation {
     }
   }
 
+  // strictly speaking, this doesn't do anything since the server does it all, but this is for UI changes real-time
+  assignMarker(id, gid) {
+    this.markers.forEach(function(v) {
+      if (v.ID == id) {
+        v.assignedTo = gid;
+      }
+    });
+    this.update();
+  }
+
   clearAllItems() {
     this.opportals = Array();
     this.anchors = Array();
@@ -381,6 +391,7 @@ export default class Operation {
   update() {
     console.log("operation.update (saving/redrawing)");
     this.cleanPortalList();
+    this.cleanAnchorList();
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
   }
@@ -429,19 +440,19 @@ export default class Operation {
 
   // minimum bounds rectangle
   mbr() {
-    let lats = [];
-    let lngs = [];
+    const lats = [];
+    const lngs = [];
     this.opportals.forEach(function(a) {
       lats.push(a.lat);
       lngs.push(a.lng);
     });
-    let minlat = Math.min.apply(null, lats);
-    let maxlat = Math.max.apply(null, lats);
-    let minlng = Math.min.apply(null, lngs);
-    let maxlng = Math.max.apply(null, lngs);
-    let min = L.latLng(minlat, minlng);
-    let max = L.latLng(maxlat, maxlng);
-    var bounds = L.latLngBounds(min, max);
+    const minlat = Math.min.apply(null, lats);
+    const maxlat = Math.max.apply(null, lats);
+    const minlng = Math.min.apply(null, lngs);
+    const maxlng = Math.max.apply(null, lngs);
+    const min = L.latLng(minlat, minlng);
+    const max = L.latLng(maxlat, maxlng);
+    const bounds = L.latLngBounds(min, max);
     return bounds;
   }
 
