@@ -1,6 +1,5 @@
 import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
-// import addButtons from "./addButtons";
 import WasabeeMe from "./me";
 
 const opsButtonControl = Feature.extend({
@@ -103,7 +102,10 @@ const opsButtonControl = Feature.extend({
       );
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
-      context._map.fitBounds(newop.mbr());
+      const mbr = newop.mbr();
+      if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+        context._map.fitBounds(mbr);
+      }
       newop.update();
     });
 
