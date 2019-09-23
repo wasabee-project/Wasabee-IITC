@@ -229,7 +229,12 @@ export default function() {
 
   window.plugin.wasabee.agentPromise = GID => {
     return new Promise(function(resolve, reject) {
+      if (GID == null) {
+        reject(Error("null gid"));
+      }
+
       const url = Wasabee.Constants.SERVER_BASE_KEY + "/api/v1/agent/" + GID;
+      console.log(url);
       const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
@@ -290,7 +295,48 @@ export default function() {
       req.onerror = function() {
         reject(Error("Network Error"));
       };
-      req.send("agent=" + agentID);
+
+      const fd = new FormData();
+      fd.append("agent", agentID);
+      req.send(fd);
+    });
+  };
+
+  window.plugin.wasabee.assignLinkPromise = (opID, linkID, agentID) => {
+    return new Promise(function(resolve, reject) {
+      const url =
+        Wasabee.Constants.SERVER_BASE_KEY +
+        "/api/v1/draw/" +
+        opID +
+        "/link/" +
+        linkID +
+        "/assign";
+      const req = new XMLHttpRequest();
+      req.open("POST", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
+
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve(true);
+            break;
+          case 401:
+            reject("not logged in");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
+
+      req.onerror = function() {
+        reject(Error("Network Error"));
+      };
+
+      const fd = new FormData();
+      fd.append("agent", agentID);
+      req.send(fd);
     });
   };
 }

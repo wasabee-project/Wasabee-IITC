@@ -107,12 +107,12 @@ export default class LinkListDialog {
       {
         name: "Assigned To",
         value: link => {
-          if (link.assignedTo != null) {
+          if (link.assignedTo != null && link.assignedTo != "") {
             const agent = window.plugin.wasabee.getAgent(link.assignedTo);
             if (agent != null) {
               return agent.name;
             } else {
-              return "looking up: " + link.assignedTo;
+              return "looking up: [" + link.assignedTo + "]";
             }
           }
           return "";
@@ -234,8 +234,7 @@ export default class LinkListDialog {
       {
         label: "Assign",
         onclick: () => {
-          const m = new AssignDialog(data);
-          console.log(m);
+          new AssignDialog(data, this._operation);
         }
       }
     ];

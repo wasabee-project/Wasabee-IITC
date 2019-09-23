@@ -379,6 +379,15 @@ export default class Operation {
     this.update();
   }
 
+  assignLink(id, gid) {
+    this.links.forEach(function(v) {
+      if (v.ID == id) {
+        v.assignedTo = gid;
+      }
+    });
+    this.update();
+  }
+
   clearAllItems() {
     this.opportals = Array();
     this.anchors = Array();

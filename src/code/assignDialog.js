@@ -1,5 +1,6 @@
 import Link from "./link";
 import Marker from "./marker";
+import Team from "./team";
 
 // don't use this _dialog[] any more. Use the new framework.
 //var Wasabee = window.plugin.Wasabee;
@@ -14,16 +15,13 @@ export default class AssignDialog {
     // determine target type - link or marker
     if (target instanceof Link) {
       this._type = "Link";
-      console.log(target);
       this._html = this._getAgentMenu(target.assignedTo);
       const portal = operation.getPortal(target.fromPortalId);
-      console.log(portal);
       this._name = "Assign link from: " + portal.name;
     }
 
     if (target instanceof Marker) {
       this._type = "Marker";
-      this._html = "looking for a marker";
       this._html = this._getAgentMenu(target.assignedTo);
       const portal = operation.getPortal(target.portalId);
       this._name = "Assign marker for: " + portal.name;
@@ -65,7 +63,7 @@ export default class AssignDialog {
           }
         );
       }
-      const tt = window.plugin.Wasabee.teams.get(t.teamid) || {};
+      const tt = window.plugin.Wasabee.teams.get(t.teamid) || new Team();
       tt.agents.forEach(function(a) {
         option = document.createElement("option");
         option.setAttribute("value", a.id);
@@ -76,17 +74,36 @@ export default class AssignDialog {
         menu.appendChild(option);
       });
     });
-    menu.addEventListener("change", this.assign);
+    // => functions inherit the "this" of the caller
+    menu.addEventListener("change", value => {
+      this.assign(value);
+    });
 
     return container;
   }
 
   assign(value) {
-    console.log(this);
     if (this._type == "Marker") {
       this._operation.assignMarker(this._targetID, value.srcElement.value);
       window.plugin.wasabee
         .assignMarkerPromise(
+          this._operation.ID,
+          this._targetID,
+          value.srcElement.value
+        )
+        .then(
+          function(result) {
+            console.log(result);
+          },
+          function(err) {
+            console.log(err);
+          }
+        );
+    }
+    if (this._type == "Link") {
+      this._operation.assignLink(this._targetID, value.srcElement.value);
+      window.plugin.wasabee
+        .assignLinkPromise(
           this._operation.ID,
           this._targetID,
           value.srcElement.value

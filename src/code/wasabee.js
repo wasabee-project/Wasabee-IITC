@@ -223,7 +223,7 @@ export default function() {
       },
       function(reject) {
         console.log(reject);
-        alert(reject);
+        // alert(reject);
       }
     );
     // this returns early from the promise, giving false nulls. await?

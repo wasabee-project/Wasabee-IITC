@@ -171,8 +171,7 @@ const makeMarkerDialogMenu = (list, data) => {
     {
       label: "Assign",
       onclick: () => {
-        const m = new AssignDialog(data, operation);
-        console.log(m);
+        new AssignDialog(data, operation);
       }
     },
     {
