@@ -2,27 +2,23 @@ import Link from "./link";
 import Marker from "./marker";
 import Team from "./team";
 
-// don't use this _dialog[] any more. Use the new framework.
-//var Wasabee = window.plugin.Wasabee;
-
 export default class AssignDialog {
   constructor(target, operation) {
     this._operation = operation;
     this._dialog = null;
     this._html = "unable to determine target type";
     this._targetID = target.ID;
+    this._html = this._getAgentMenu(target.assignedTo);
 
     // determine target type - link or marker
     if (target instanceof Link) {
       this._type = "Link";
-      this._html = this._getAgentMenu(target.assignedTo);
       const portal = operation.getPortal(target.fromPortalId);
       this._name = "Assign link from: " + portal.name;
     }
 
     if (target instanceof Marker) {
       this._type = "Marker";
-      this._html = this._getAgentMenu(target.assignedTo);
       const portal = operation.getPortal(target.portalId);
       this._name = "Assign marker for: " + portal.name;
     }
@@ -32,17 +28,16 @@ export default class AssignDialog {
       dialogClass: "wasabee-dialog",
       title: this._name,
       width: "auto",
-      closeCallback: () => {
-        window.removeHook("wasabeeUIUpdate", this.update);
-      },
+      // closeCallback: () => { window.removeHook("wasabeeUIUpdate", this.update); },
       id: window.plugin.Wasabee.static.dialogNames.assign + this._targetID
     });
-    window.addHook("wasabeeUIUpdate", this.update);
+    // window.addHook("wasabeeUIUpdate", this.update);
   }
 
+  /* no need to do anything
   update() {
     console.log("assignDialog.update called");
-  }
+  } */
 
   _getAgentMenu(current) {
     const container = document.createElement("div");
@@ -74,7 +69,7 @@ export default class AssignDialog {
         menu.appendChild(option);
       });
     });
-    // => functions inherit the "this" of the caller
+    // ( => ) functions inherit the "this" of the caller
     menu.addEventListener("change", value => {
       this.assign(value);
     });
