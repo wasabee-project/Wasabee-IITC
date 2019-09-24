@@ -216,9 +216,9 @@ export default class LinkListDialog {
   }
 
   makeMenu(list, data) {
-    var $Wasabee = this;
-    var state = new Wasabee.OverflowMenu();
-    state.items = [
+    const $Wasabee = this;
+    const state = new Wasabee.OverflowMenu();
+    const options = [
       {
         label: "Reverse",
         onclick: () => $Wasabee.reverseLink(data)
@@ -230,14 +230,18 @@ export default class LinkListDialog {
       {
         label: "Set Description",
         onclick: () => $Wasabee.setDescription(data)
-      },
-      {
+      }
+    ];
+    if (this._operation.IsServerOp()) {
+      console.log("adding assign option");
+      options.push({
         label: "Assign",
         onclick: () => {
           new AssignDialog(data, this._operation);
         }
-      }
-    ];
+      });
+    }
+    state.items = options;
     list.className = "menu";
     list.appendChild(state.button);
   }
