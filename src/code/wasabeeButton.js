@@ -43,15 +43,17 @@ const WasabeeButtonControl = Feature.extend({
     teamlist.sortBy = 0;
 
     const html = document.createElement("div");
-    const serverInfo = html.appendChild(document.createElement("div"));
-    serverInfo.innerHTML =
+    this.serverInfo = html.appendChild(document.createElement("div"));
+    this.serverInfo.innerHTML =
       "Server: " +
       store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
       "<br/><br/>";
+    this.serverInfo.addEventListener("click", this.setServer);
     html.appendChild(teamlist.table);
 
     let me = WasabeeMe.get(true); // don't cache this, use up-to-date
     if (me != null && me.GoogleID != undefined) {
+      window.addHook("wasabeeUIUpdate", () => this.wasabeeButtonUpdate);
       teamlist.items = me.Teams;
       const wbHandler = this;
       this._dialog = window.dialog({
@@ -61,6 +63,7 @@ const WasabeeButtonControl = Feature.extend({
         html: html,
         dialogClass: "wasabee-dialog-mustauth",
         closeCallback: function() {
+          window.removeHook("wasabeeUIUpdate", () => this.wasabeeButtonUpdate);
           window.runHooks(
             "wasabeeUIUpdate",
             window.plugin.wasabee.getSelectedOperation()
@@ -76,7 +79,17 @@ const WasabeeButtonControl = Feature.extend({
     }
   },
 
-  getIcon() {
+  wasabeeButtonUpdate: function(data) {
+    console.log("wasabeeButtonUpdate");
+    console.log(this);
+    console.log(data);
+    this.serverInfo.innerHTML =
+      "Server: " +
+      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
+      "<br/><br/>";
+  },
+
+  getIcon: function() {
     if (WasabeeMe.isLoggedIn()) {
       return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
     }
@@ -84,7 +97,7 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   // unused, here just in case we want to be able to close individual dialogs
-  _closeDialog() {
+  _closeDialog: function() {
     let id = "dialog-" + window.plugin.Wasabee.static.dialogNames.wasabeeButton;
     if (window.DIALOGS[id]) {
       try {
@@ -99,6 +112,22 @@ const WasabeeButtonControl = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+  },
+
+  setServer: function() {
+    const promptAction = prompt(
+      "Change WASABEE server",
+      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY)
+    );
+    if (promptAction !== null && promptAction !== "") {
+      // do we need sanity checking here?
+      store.set(window.plugin.Wasabee.Constants.SERVER_BASE_KEY, promptAction);
+      store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+      window.runHooks(
+        "wasabeeUIUpdate",
+        window.plugin.wasabee.getSelectedOperation()
+      );
+    }
   }
 });
 
