@@ -8,9 +8,13 @@ export default class AssignDialog {
     this._dialog = null;
     this._html = "unable to determine target type";
     this._targetID = target.ID;
-    this._html = this._getAgentMenu(target.assignedTo);
+    this._html = document.createElement("div");
+    const divtitle = this._html.appendChild(document.createElement("div"));
+    this._html.appendChild(this._getAgentMenu(target.assignedTo));
+    const note = this._html.appendChild(document.createElement("div"));
+    note.innerHTML =
+      "If the menu is empty, close and reopen this assignment, this is a known bug";
 
-    // determine target type - link or marker
     if (target instanceof Link) {
       this._type = "Link";
       const portal = operation.getPortal(target.fromPortalId);
@@ -23,13 +27,15 @@ export default class AssignDialog {
       this._name = "Assign marker for: " + portal.name;
     }
 
+    divtitle.innerHTML = this._name;
+
     this._dialog = window.dialog({
       html: this._html,
       dialogClass: "wasabee-dialog",
       title: this._name,
       width: "auto",
       // closeCallback: () => { window.removeHook("wasabeeUIUpdate", this.update); },
-      id: window.plugin.Wasabee.static.dialogNames.assign + this._targetID
+      id: window.plugin.Wasabee.static.dialogNames.assign
     });
     // window.addHook("wasabeeUIUpdate", this.update);
   }
@@ -45,6 +51,7 @@ export default class AssignDialog {
     let option = menu.appendChild(document.createElement("option"));
     option.setAttribute("value", "");
     option.innerHTML = "Unassigned";
+    const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...
     this._operation.teamlist.forEach(function(t) {
@@ -60,13 +67,16 @@ export default class AssignDialog {
       }
       const tt = window.plugin.Wasabee.teams.get(t.teamid) || new Team();
       tt.agents.forEach(function(a) {
-        option = document.createElement("option");
-        option.setAttribute("value", a.id);
-        option.innerHTML = a.name;
-        if (a.id == current) {
-          option.setAttribute("selected", true);
+        if (alreadyAdded.indexOf(a.id) == -1) {
+          alreadyAdded.push(a.id);
+          option = document.createElement("option");
+          option.setAttribute("value", a.id);
+          option.innerHTML = a.name;
+          if (a.id == current) {
+            option.setAttribute("selected", true);
+          }
+          menu.appendChild(option);
         }
-        menu.appendChild(option);
       });
     });
     // ( => ) functions inherit the "this" of the caller

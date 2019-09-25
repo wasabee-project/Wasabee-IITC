@@ -19,7 +19,7 @@ export default function() {
     MARKER_TYPE_RECHARGE: "RechargePortalAlert",
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
-    DEFAULT_MARKER_TYPE: "OtherPortalAlert",
+    DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
     SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
