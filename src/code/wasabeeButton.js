@@ -2,6 +2,7 @@
 import { Feature } from "./leafletDrawImports";
 import WasabeeMe from "./me";
 import Sortable from "./sortable";
+import store from "../lib/store";
 
 const WasabeeButtonControl = Feature.extend({
   statics: {
@@ -41,6 +42,14 @@ const WasabeeButtonControl = Feature.extend({
     ];
     teamlist.sortBy = 0;
 
+    const html = document.createElement("div");
+    const serverInfo = html.appendChild(document.createElement("div"));
+    serverInfo.innerHTML =
+      "Server: " +
+      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
+      "<br/><br/>";
+    html.appendChild(teamlist.table);
+
     let me = WasabeeMe.get(true); // don't cache this, use up-to-date
     if (me != null && me.GoogleID != undefined) {
       teamlist.items = me.Teams;
@@ -49,7 +58,7 @@ const WasabeeButtonControl = Feature.extend({
         title: "Current User Information",
         width: "auto",
         height: "auto",
-        html: teamlist.table,
+        html: html,
         dialogClass: "wasabee-dialog-mustauth",
         closeCallback: function() {
           window.runHooks(
