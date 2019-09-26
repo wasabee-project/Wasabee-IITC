@@ -56,7 +56,6 @@ const addMarker = (target, operation) => {
   wMarker.on(
     "click",
     () => {
-      console.log("click for marker popup");
       // IITCs version of leaflet does not have marker.isPopupOpen()
       wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
       wMarker.update();
@@ -67,7 +66,6 @@ const addMarker = (target, operation) => {
   wMarker.on(
     "spiderfiedclick",
     () => {
-      console.log("spiderfiedclick for marker popup");
       wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
       wMarker.update();
       wMarker.togglePopup();
@@ -79,7 +77,6 @@ const addMarker = (target, operation) => {
 };
 
 const getMarkerPopup = (marker, target, operation) => {
-  console.log("getMarkerPopup");
   const portal = operation.getPortal(target.portalId);
   marker.className = "wasabee-dialog wasabee-dialog-ops";
   const content = document.createElement("div");

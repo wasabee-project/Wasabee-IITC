@@ -3,13 +3,13 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker } from "./mapDrawing";
 import WasabeeMe from "./me";
-// import addButtons from "./addButtons";
+import store from "../lib/store";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 export default function() {
   //** This function adds all the portals to the layer */
   window.plugin.wasabee.addAllPortals = function(operation) {
-    var portalList = operation.anchors;
+    const portalList = operation.anchors;
     if (portalList != null) {
       portalList.forEach(function(portalId) {
         //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
@@ -31,10 +31,10 @@ export default function() {
 
   /** This function adds a portal to the portal layer group */
   window.plugin.wasabee.addPortal = function(portalId, operation) {
-    var portal = operation.getPortal(portalId);
-    var colorMarker = getColorMarker(operation.color);
-    var latLng = new L.LatLng(portal.lat, portal.lng);
-    var marker = L.marker(latLng, {
+    const portal = operation.getPortal(portalId);
+    const colorMarker = getColorMarker(operation.color);
+    const latLng = new L.LatLng(portal.lat, portal.lng);
+    const marker = L.marker(latLng, {
       title: portal.name,
       icon: L.icon({
         iconUrl: colorMarker
@@ -64,13 +64,13 @@ export default function() {
     operation
   ) {
     marker.className = "wasabee-dialog wasabee-dialog-ops";
-    var content = document.createElement("div");
-    var title = content.appendChild(document.createElement("div"));
+    const content = document.createElement("div");
+    const title = content.appendChild(document.createElement("div"));
     title.className = "desc";
     title.innerHTML = markdown.toHTML(portal.name);
-    var buttonSet = content.appendChild(document.createElement("div"));
+    const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
-    var linksButton = buttonSet.appendChild(document.createElement("a"));
+    const linksButton = buttonSet.appendChild(document.createElement("a"));
     linksButton.textContent = "Links";
     linksButton.addEventListener(
       "click",
@@ -108,7 +108,10 @@ export default function() {
 
   //** This function opens a dialog with a text field to copy */
   window.plugin.wasabee.importString = function() {
-    var promptAction = prompt("Press CTRL+V to paste (Wasabee data only).", "");
+    const promptAction = prompt(
+      "Press CTRL+V to paste (Wasabee data only).",
+      ""
+    );
     if (promptAction !== null && promptAction !== "") {
       window.plugin.wasabee.saveImportString(promptAction);
     }
@@ -116,14 +119,14 @@ export default function() {
 
   window.plugin.wasabee.saveImportString = function(string) {
     try {
-      var keyIdentifier = "wasabeeShareKey=";
+      const keyIdentifier = "wasabeeShareKey=";
       if (
         string.match(
           new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
         ) &&
         string.includes(keyIdentifier)
       ) {
-        var key = string.substring(
+        const key = string.substring(
           string.lastIndexOf(keyIdentifier) + keyIdentifier.length
         );
         window.plugin.wasabee.qbin_get(key);
@@ -134,8 +137,8 @@ export default function() {
       ) {
         alert("Wasabee doesn't support stock intel draw imports");
       } else {
-        var data = JSON.parse(string);
-        var importedOp = Operation.create(data);
+        const data = JSON.parse(string);
+        const importedOp = Operation.create(data);
         importedOp.store();
         window.plugin.wasabee.loadOp(importedOp.ID);
         console.log("WasabeeTools: reset and imported drawn items");
@@ -148,20 +151,38 @@ export default function() {
   };
 
   window.plugin.wasabee.showMustAuthAlert = () => {
-    var content = document.createElement("div");
-    var title = content.appendChild(document.createElement("div"));
+    const content = document.createElement("div");
+    const title = content.appendChild(document.createElement("div"));
     title.className = "desc";
     title.innerHTML =
       "In order to use the server functionality, you must log in.<br/>";
-    var buttonSet = content.appendChild(document.createElement("div"));
+    const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
-    var visitButton = buttonSet.appendChild(document.createElement("a"));
+    const visitButton = buttonSet.appendChild(document.createElement("a"));
     visitButton.innerHTML = "Log In";
     visitButton.addEventListener(
       "click",
       () => window.open("https://server.wasabee.rocks/"),
       false
     );
+    const changeServerButton = buttonSet.appendChild(
+      document.createElement("a")
+    );
+    changeServerButton.innerHTML = "Change Server";
+    changeServerButton.addEventListener("click", () => {
+      const promptAction = prompt(
+        "Change WASABEE server",
+        store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY)
+      );
+      if (promptAction !== null && promptAction !== "") {
+        store.set(
+          window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
+          promptAction
+        );
+        store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+      }
+    });
+
     window.dialog({
       title: "Authentication Required",
       width: "auto",

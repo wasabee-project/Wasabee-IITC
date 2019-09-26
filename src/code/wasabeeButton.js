@@ -53,7 +53,6 @@ const WasabeeButtonControl = Feature.extend({
 
     let me = WasabeeMe.get(true); // don't cache this, use up-to-date
     if (me != null && me.GoogleID != undefined) {
-      window.addHook("wasabeeUIUpdate", () => this.wasabeeButtonUpdate);
       teamlist.items = me.Teams;
       const wbHandler = this;
       this._dialog = window.dialog({
@@ -63,7 +62,6 @@ const WasabeeButtonControl = Feature.extend({
         html: html,
         dialogClass: "wasabee-dialog-mustauth",
         closeCallback: function() {
-          window.removeHook("wasabeeUIUpdate", () => this.wasabeeButtonUpdate);
           window.runHooks(
             "wasabeeUIUpdate",
             window.plugin.wasabee.getSelectedOperation()
@@ -77,16 +75,6 @@ const WasabeeButtonControl = Feature.extend({
       this.disable();
       this._dialog = window.plugin.wasabee.showMustAuthAlert();
     }
-  },
-
-  wasabeeButtonUpdate: function(data) {
-    console.log("wasabeeButtonUpdate");
-    console.log(this);
-    console.log(data);
-    this.serverInfo.innerHTML =
-      "Server: " +
-      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
-      "<br/><br/>";
   },
 
   getIcon: function() {
@@ -123,10 +111,10 @@ const WasabeeButtonControl = Feature.extend({
       // do we need sanity checking here?
       store.set(window.plugin.Wasabee.Constants.SERVER_BASE_KEY, promptAction);
       store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
-      window.runHooks(
-        "wasabeeUIUpdate",
-        window.plugin.wasabee.getSelectedOperation()
-      );
+      this.innerHTML =
+        "Server: " +
+        store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
+        "<br/><br/>";
     }
   }
 });
