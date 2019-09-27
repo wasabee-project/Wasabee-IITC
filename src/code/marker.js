@@ -10,6 +10,7 @@ export default class Marker {
     this.completedBy = "";
     this.assignedTo = "";
     this.assignedNickname = "";
+    this.order = 0;
   }
 
   static create(obj) {
