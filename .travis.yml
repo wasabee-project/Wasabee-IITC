@@ -1,7 +1,7 @@
 language: node_js
 node_js:
 - stable
-script: npx gulp build-release
+script: npx gulp build-prod
 deploy:
   provider: releases
   api_key:
