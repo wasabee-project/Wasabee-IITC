@@ -94,6 +94,7 @@ const getMarkerPopup = (marker, target, portal, operation) => {
     false
   );
 
+  /* 
   const subhead = content.appendChild(document.createElement("div"));
   subhead.className = "desc";
   subhead.innerHTML = "Marker Assignment";
@@ -117,7 +118,7 @@ const getMarkerPopup = (marker, target, portal, operation) => {
         );
     },
     false
-  );
+  ); */
   return content;
 };
 
@@ -263,6 +264,7 @@ const getAgentPopup = agent => {
   return content;
 };
 
+/*
 const getAllKnownAgents = () => {
   const agents = new Map();
   Wasabee.teams.forEach(function(team) {
@@ -287,4 +289,4 @@ const agentSelectMenu = () => {
     option.text = v;
   });
   return menu;
-};
+}; */
