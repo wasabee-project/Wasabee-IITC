@@ -3,6 +3,8 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker, drawThings } from "./mapDrawing";
 import WasabeeMe from "./me";
+import { SendAccessTokenAsync } from "./server";
+import addButtons from "./addButtons";
 
 var Wasabee = window.plugin.Wasabee;
 export default function() {
@@ -158,10 +160,33 @@ export default function() {
     visitButton.innerHTML = "Log In";
     visitButton.addEventListener(
       "click",
-      () => window.open("https://server.wasabee.rocks/"),
+      async () => {
+        window.gapi.auth2.authorize(
+          {
+            prompt:
+              "undefined" != typeof window.android && window.android
+                ? "none"
+                : "select_account",
+            client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
+            scope: "email profile openid",
+            response_type: "id_token permission"
+          },
+          async response => {
+            console.debug("gapi.auth2.authorize response: ", response);
+            if (response.error) {
+              console.error(response.error, response.error_subtype);
+              return;
+            }
+            await SendAccessTokenAsync(response.access_token);
+            WasabeeMe.get(false);
+            _dialog.dialog("close");
+          }
+        );
+        //window.open("https://server.wasabee.rocks/")
+      },
       false
     );
-    window.dialog({
+    var _dialog = window.dialog({
       title: "Authentication Required",
       width: "auto",
       height: "auto",
@@ -170,9 +195,9 @@ export default function() {
       closeCallback: function() {
         // prime the pump
         WasabeeMe.get();
-        // force an update -- need addButtons() here too
-        const so = window.plugin.wasabee.getSelectedOperation();
-        so.update();
+        const selectedOperation = window.plugin.wasabee.getSelectedOperation();
+        selectedOperation.update();
+        addButtons(selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });

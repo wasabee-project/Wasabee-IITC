@@ -26,6 +26,8 @@ window.plugin.wasabee.init = function() {
   Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
 
+  initGoogleAPI();
+
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.
   initScopes();
@@ -88,3 +90,14 @@ window.plugin.wasabee.init = function() {
 window.plugin.wasabee.addCSS = content => {
   $("head").append('<style type="text/css">\n' + content + "\n</style>");
 };
+
+function initGoogleAPI() {
+  if (typeof window.gapi !== "undefined") return;
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.async = true;
+  script.src = "https://apis.google.com/js/client:platform:auth2.js";
+  (document.body || document.head || document.documentElement).appendChild(
+    script
+  );
+}

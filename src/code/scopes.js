@@ -7,6 +7,8 @@ export default function() {
     PASTE_LIST_KEY: "PASTE_LIST_KEY",
     SERVER_BASE_KEY: "https://server.wasabee.rocks",
     SERVER_BASE_TEST_KEY: "https://server.wasabee.rocks:8444",
+    OAUTH_CLIENT_ID:
+      "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     CURRENT_EXPIRE_NUMERIC: 1209600000,
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
     MARKER_TYPE_DESTROY: "DestroyPortalAlert",

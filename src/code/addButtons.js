@@ -306,6 +306,14 @@ export default function(selectedOp) {
   if (typeof Wasabee.buttons === "undefined") {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
+  } else {
+    let type = WasabeeButtonControl.TYPE;
+    let handler = Wasabee.buttons._modes[type].handler;
+    let image = handler.getIcon();
+    let button = Wasabee.buttons._modes[type].button;
+    $(button)
+      .children("img")
+      .attr("src", image);
   }
   if (
     selectedOp.IsServerOp() == false ||

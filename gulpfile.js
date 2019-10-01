@@ -190,7 +190,7 @@ gulp.task(
   gulp.series([
     "buildheaders",
     "buildmeta",
-    "jest",
+    //"jest",
     "webpack",
     "buildplugin",
     "eslint"
