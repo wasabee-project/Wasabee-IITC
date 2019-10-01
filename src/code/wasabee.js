@@ -161,12 +161,11 @@ export default function() {
     visitButton.addEventListener(
       "click",
       async () => {
+        const isMobile = "undefined" != typeof window.android && window.android;
+        const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
         window.gapi.auth2.authorize(
           {
-            prompt:
-              "undefined" != typeof window.android && window.android
-                ? "none"
-                : "select_account",
+            prompt: isMobile && !isiOS ? "none" : "select_account",
             client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
             scope: "email profile openid",
             response_type: "id_token permission"
