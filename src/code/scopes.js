@@ -160,18 +160,6 @@ export default function() {
         markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
         markerIconDone: require("./images/wasabee_markers_virus_done.png")
       }
-    ],
-    [
-      Wasabee.Constants.DEFAULT_MARKER_TYPE,
-      {
-        name: Wasabee.Constants.MARKER_TYPE_OTHER,
-        label: "unknown",
-        color: "#8920C3",
-        markerIcon: require("./images/wasabee_markers_other_pending.png"),
-        markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
-        markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
-        markerIconDone: require("./images/wasabee_markers_other_done.png")
-      }
     ]
   ]);
 
