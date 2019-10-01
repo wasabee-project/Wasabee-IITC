@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+- stable
+script: npx gulp build-prod
+deploy:
+  provider: releases
+  api_key:
+    secure: "V1Z0wGDHODEzyki8iXC3hRC4z7vLbVmDAmy1R7aBXQsqRdMq9YqAToM3isf/39QF0D0siAYRihZdVsRStq99upwxRql7eto7EiUVPH6kVti5AAHWLF87meoyekI3FOz9fwK2CmOReKIiDQv65GjXbT6YIg1HFZrh3/ilDmj5/cyHf/2hDV8/iylWgau+1PE3m/fM6PIHFjq+PBHCnxmIah9cSSRashHR0nh0B+IaXyMGR9UsgLyLXhJpuUCf1eA8L+DlOwUsIxHehc0sCcIyZmuchF4QIIgyYUarhk4FUYnz/JPbLUPwLWtOrTOVo2IG+9ZIVbMvJ/rNoxn1xb1uvu/+mXJLGUyg/KojyslkSyoPdkpp+iMPLGU3T13FxKOwOyvGDbsi0MM6WXxPzWWtc/xCLFVwy/dNOZ2cK65auZKpj4sZTLSUeiEQUu2hgYw28Gf6DUaaZyW9ReMlQiZU+6GF2+CS7FDDExxIb7X4MjnWzebDEZDY2O1HyuLcr26psViYya1bm/OeQgcRS0G/dSn2/YkAwd1e7DbTiBaQruqn/BONI0YnL8z453JjcFm7gV9YQeWXOTHvjiMbWziatIGTbdHeBkN0qTCDvPh8iqsY30W6RlNKLX/0+3pPGd0a5DfFLIv0RPnj+/+7hFwuzQS//eY/vSKka8ZC4nC3i3k="
+  file:
+    - releases/prod/wasabee.user.js
+    - releases/prod/wasabee.meta.js
+  on:
+    repo: wasabee-project/Wasabee-IITC
+    tags: true
+  skip_cleanup: true
