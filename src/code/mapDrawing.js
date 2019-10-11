@@ -6,57 +6,40 @@ import WasabeeMe from "./me";
 
 var Wasabee = window.plugin.Wasabee;
 
-export const getColorMarker = color => {
-  var marker = null;
-  Wasabee.layerTypes.forEach(type => {
-    if (type.name == color) {
-      marker = type.portal.iconUrl;
-    }
-  });
-  return marker;
-};
-
-const getColorHex = color => {
-  var hex = null;
-  Wasabee.layerTypes.forEach(type => {
-    if (type.name == color) {
-      hex = type.color;
-    }
-  });
-  return hex;
+export const getColorMarker = colorGroup => {
+  let lt = Wasabee.layerTypes.get("main");
+  if (Wasabee.layerTypes.has(colorGroup)) {
+    lt = Wasabee.layerTypes.get(colorGroup);
+  }
+  return lt.portal.iconUrl;
 };
 
 //** This function draws things on the layers */
 export const drawThings = op => {
   window.plugin.wasabee.resetAllPortals(op);
-  resetAllMarkers(op);
-  resetAllLinks(op);
+  resetMarkers(op);
+  resetLinks(op);
   checkAllLinks(op);
 };
 
-//** This function adds all the markers to the layer */
-const addAllMarkers = op => {
+//** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */
+const resetMarkers = op => {
+  for (var guid in window.plugin.wasabee.markerLayers) {
+    var m = window.plugin.wasabee.markerLayers[guid];
+    window.plugin.wasabee.markerLayerGroup.removeLayer(m);
+    delete window.plugin.wasabee.markerLayers[guid];
+  }
   var markerList = op.markers;
   if (markerList != null) {
     markerList.forEach(marker => addMarker(marker, op));
   }
 };
 
-//** This function resets all the markers  and calls addAllMarkers to add them */
-const resetAllMarkers = op => {
-  for (var guid in window.plugin.wasabee.markerLayers) {
-    var m = window.plugin.wasabee.markerLayers[guid];
-    window.plugin.wasabee.markerLayerGroup.removeLayer(m);
-    delete window.plugin.wasabee.markerLayers[guid];
-  }
-  addAllMarkers(op);
-};
-
 /** This function adds a Markers to the target layer group */
 const addMarker = (target, operation) => {
   var targetPortal = operation.getPortal(target.portalId);
   var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
-  var marker = L.marker(latLng, {
+  var wMarker = L.marker(latLng, {
     title: targetPortal.name,
     icon: L.icon({
       iconUrl: getImageFromMarker(target),
@@ -67,15 +50,34 @@ const addMarker = (target, operation) => {
     })
   });
 
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup(getMarkerPopup(marker, target, targetPortal, operation));
-  marker.off("click", marker.togglePopup, marker);
-  marker.on("spiderfiedclick", marker.togglePopup, marker);
-  window.plugin.wasabee.markerLayers[target["ID"]] = marker;
-  marker.addTo(window.plugin.wasabee.markerLayerGroup);
+  window.registerMarkerForOMS(wMarker);
+  wMarker.bindPopup("loading...");
+  wMarker.off("click", wMarker.togglePopup, wMarker);
+  wMarker.on(
+    "click",
+    () => {
+      // IITCs version of leaflet does not have marker.isPopupOpen()
+      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.update();
+      wMarker.togglePopup();
+    },
+    wMarker
+  );
+  wMarker.on(
+    "spiderfiedclick",
+    () => {
+      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.update();
+      wMarker.togglePopup();
+    },
+    wMarker
+  );
+  window.plugin.wasabee.markerLayers[target["ID"]] = wMarker;
+  wMarker.addTo(window.plugin.wasabee.markerLayerGroup);
 };
 
-const getMarkerPopup = (marker, target, portal, operation) => {
+const getMarkerPopup = (marker, target, operation) => {
+  const portal = operation.getPortal(target.portalId);
   marker.className = "wasabee-dialog wasabee-dialog-ops";
   const content = document.createElement("div");
   const title = content.appendChild(document.createElement("div"));
@@ -94,31 +96,6 @@ const getMarkerPopup = (marker, target, portal, operation) => {
     false
   );
 
-  /* 
-  const subhead = content.appendChild(document.createElement("div"));
-  subhead.className = "desc";
-  subhead.innerHTML = "Marker Assignment";
-  const assignmentMenu = subhead.appendChild(agentSelectMenu());
-  const id = "wasabee-marker-assignment-" + target.ID;
-  assignmentMenu.id = id;
-  assignmentMenu.addEventListener(
-    "change",
-    () => {
-      window.plugin.wasabee
-        .assignMarkerPromise(operation.ID, target.ID, assignmentMenu.value)
-        .then(
-          function() {
-            console.log("assign marker succeeded");
-            // XXX some DOM magic to update the marker icon
-            // are marker IDs known?
-          },
-          function(err) {
-            console.log("assign marker failed: " + err);
-          }
-        );
-    },
-    false
-  ); */
   return content;
 };
 
@@ -164,34 +141,35 @@ const getImageFromMarker = target => {
   return img;
 };
 
-//** This function adds all the Links to the layer */
-const addAllLinks = operation => {
-  operation.links.forEach(link => addLink(link, operation.color, operation));
-};
-
-//** This function resets all the Links and calls addAllLinks to add them */
-const resetAllLinks = operation => {
+/** this could be smarter */
+const resetLinks = operation => {
   for (var guid in window.plugin.wasabee.linkLayers) {
     var linkInLayer = window.plugin.wasabee.linkLayers[guid];
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
-  addAllLinks(operation);
+
+  // pick the right style for the links
+  let lt = Wasabee.layerTypes.get("main");
+  if (Wasabee.layerTypes.has(operation.color)) {
+    lt = Wasabee.layerTypes.get(operation.color);
+  }
+  lt.link.color = lt.color;
+
+  operation.links.forEach(link => addLink(link, lt.link, operation));
 };
 
 /** This function adds a portal to the portal layer group */
-const addLink = (link, color, operation) => {
-  const colorHex = getColorHex(color);
-  var options = {
-    dashArray: [5, 5, 1, 5],
-    color: colorHex ? colorHex : "#ff6600",
-    opacity: 1,
-    weight: 2
-  };
-  var latLngs = link.getLatLngs(operation);
-  if (latLngs != null) {
-    var link_ = new L.GeodesicPolyline(latLngs, options);
+const addLink = (link, style, operation) => {
+  if (link.color != "main" && Wasabee.layerTypes.has(link.color)) {
+    const linkLt = Wasabee.layerTypes.get(link.color);
+    style = linkLt.link;
+    style.color = linkLt.color;
+  }
 
+  const latLngs = link.getLatLngs(operation);
+  if (latLngs != null) {
+    const link_ = new L.GeodesicPolyline(latLngs, style);
     window.plugin.wasabee.linkLayers[link["ID"]] = link_;
     link_.addTo(window.plugin.wasabee.linkLayerGroup);
   } else {
@@ -247,9 +225,6 @@ export const drawAgents = op => {
       }
     );
   }); // forEach team
-  // redraw target popup menus
-  // window.plugin.wasabee.resetAllMarkers();
-  // create new window.plugin.wasabee.updateAllMarkers
 };
 
 const getAgentPopup = agent => {
@@ -264,29 +239,3 @@ const getAgentPopup = agent => {
   return content;
 };
 
-/*
-const getAllKnownAgents = () => {
-  const agents = new Map();
-  Wasabee.teams.forEach(function(team) {
-    // XXX this will get messy if display name is used -- last-in wins
-    team.agents.forEach(function(agent) {
-      agents.set(agent.id, agent.name);
-    });
-  });
-  return agents;
-};
-
-const agentSelectMenu = () => {
-  const menu = document.createElement("select");
-  const agents = getAllKnownAgents();
-  const unset = menu.appendChild(document.createElement("option"));
-  unset.value = "";
-  unset.text = "Not Assigned";
-
-  agents.forEach(function(v, k) {
-    const option = menu.appendChild(document.createElement("option"));
-    option.value = k;
-    option.text = v;
-  });
-  return menu;
-}; */

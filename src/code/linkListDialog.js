@@ -1,8 +1,9 @@
-var markdown = require("markdown").markdown;
 import Sortable from "./sortable";
 import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
+import AssignDialog from "./assignDialog";
 
+// don't use this _dialog[] any more. Use the new framework.
 var _dialogs = [];
 var Wasabee = window.plugin.Wasabee;
 
@@ -15,12 +16,13 @@ export default class LinkListDialog {
     this._dialog = null;
     this._table.fields = [
       {
-        name: "Description",
-        value: link => link.description,
-        sort: (a, b) => a.localeCompare(b),
-        format: (row, obj) => {
-          row.className = "desc";
-          row.innerHTML = markdown.toHTML(window.escapeHtmlSpecialChars(obj));
+        name: "Throw Order",
+        value: link => link.throwOrderPos,
+        sort: (a, b) => {
+          return a - b;
+        },
+        format: (a, m) => {
+          a.textContent = m;
         }
       },
       {
@@ -92,13 +94,50 @@ export default class LinkListDialog {
         }
       },
       {
+        name: "Description",
+        value: link => link.description,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, obj) => {
+          row.className = "desc";
+          if (obj != null) {
+            row.innerHTML = window.escapeHtmlSpecialChars(obj);
+          }
+        }
+      },
+      {
+        name: "Assigned To",
+        value: link => {
+          if (link.assignedTo != null && link.assignedTo != "") {
+            const agent = window.plugin.wasabee.getAgent(link.assignedTo);
+            if (agent != null) {
+              return agent.name;
+            } else {
+              return "looking up: [" + link.assignedTo + "]";
+            }
+          }
+          return "";
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m) => {
+          a.textContent = m;
+        }
+      },
+      {
+        name: "Color",
+        value: link => link.color,
+        sort: null,
+        format: (list, data, link) => {
+          that.makeColorMenu(list, data, operation, link);
+        }
+      },
+      {
         name: "",
         sort: null,
         value: link => link,
         format: (o, e) => that.makeMenu(o, e)
       }
     ];
-    this._table.sortBy = 1;
+    this._table.sortBy = 0;
     this._setLinks();
     _dialogs.push(this);
     if (this._table.items.length > 0) {
@@ -108,9 +147,13 @@ export default class LinkListDialog {
         dialogClass: "wasabee-dialog wasabee-dialog-linklist",
         title: this._portal.name + ": Links",
         width: "auto",
-        closeCallback: () => (_dialogs = []),
+        closeCallback: () => {
+          _dialogs = [];
+          window.removeHook("wasabeeUIUpdate", that.update);
+        },
         id: window.plugin.Wasabee.static.dialogNames.linkList
       });
+      window.addHook("wasabeeUIUpdate", that.update);
       var buttons = this._dialog.dialog("option", "buttons");
       this._dialog.dialog(
         "option",
@@ -122,8 +165,6 @@ export default class LinkListDialog {
               if (that._portal) {
                 window.renderPortalDetails(that._portal.id);
               }
-              // XXX
-              // console.log(window.map);
               let ld = new LinkDialogButtonControl(window.map);
               ld._operation = that._operation();
               ld._displayDialog();
@@ -175,9 +216,9 @@ export default class LinkListDialog {
   }
 
   makeMenu(list, data) {
-    var $Wasabee = this;
-    var state = new Wasabee.OverflowMenu();
-    state.items = [
+    const $Wasabee = this;
+    const state = new Wasabee.OverflowMenu();
+    const options = [
       {
         label: "Reverse",
         onclick: () => $Wasabee.reverseLink(data)
@@ -191,11 +232,57 @@ export default class LinkListDialog {
         onclick: () => $Wasabee.setDescription(data)
       }
     ];
+    if (this._operation.IsServerOp()) {
+      console.log("adding assign option");
+      options.push({
+        label: "Assign",
+        onclick: () => {
+          new AssignDialog(data, this._operation);
+        }
+      });
+    }
+    state.items = options;
     list.className = "menu";
     list.appendChild(state.button);
   }
 
-  static update(operation, portal, show) {
+  makeColorMenu(list, data, operation, link) {
+    const colorSection = list.appendChild(document.createElement("div"));
+    const linkColor = colorSection.appendChild(
+      document.createElement("select")
+    );
+    linkColor.id = link.ID;
+
+    window.plugin.Wasabee.layerTypes.forEach(function(a) {
+      const option = document.createElement("option");
+      option.setAttribute("value", a.name);
+      if (a.name == "main") {
+        a.displayName = "Op Color";
+      }
+      if (a.name == data) {
+        option.setAttribute("selected", true);
+      }
+      option.innerHTML = a.displayName;
+      linkColor.append(option);
+    });
+
+    linkColor.addEventListener(
+      "change",
+      () => {
+        link.color = linkColor.value;
+        operation.update();
+      },
+      false
+    );
+  }
+
+  update(operation) {
+    // this is super hacky
+    _dialogs[0]._setLinks(operation, _dialogs[0]._portal);
+  }
+
+  // this needs a lot of love
+  static showDialog(operation, portal, show) {
     var p = 0;
     var parameters = _dialogs;
     for (; p < parameters.length; p++) {

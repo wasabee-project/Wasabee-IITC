@@ -15,6 +15,7 @@ export default class Team {
         if (prop === "agents") {
           d.agents.forEach(function(agent) {
             team.agents.push(Agent.create(agent));
+            // push into Wasabee._agentCache
           });
         } else {
           team[prop] = d[prop];

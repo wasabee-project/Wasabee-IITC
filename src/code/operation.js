@@ -26,6 +26,7 @@ export default class Operation {
     this.teamlist = Array();
     this.fetched = null;
     this.stored = null;
+    this.localchanged = true;
   }
 
   store() {
@@ -33,6 +34,7 @@ export default class Operation {
     this._ensureCollections();
     this.stored = Date.now();
     store.set(this.ID, JSON.stringify(this));
+    this.localchanged = true;
   }
 
   getColor() {
@@ -132,6 +134,15 @@ export default class Operation {
   removeMarker(marker) {
     this.markers = this.markers.filter(function(listMarker) {
       return listMarker.ID !== marker.ID;
+    });
+    this.update();
+  }
+
+  setMarkerComment(marker, comment) {
+    this.markers.forEach(function(v) {
+      if (v.ID == marker.ID) {
+        v.comment = comment;
+      }
     });
     this.update();
   }
@@ -358,6 +369,25 @@ export default class Operation {
     }
   }
 
+  // strictly speaking, this doesn't do anything since the server does it all, but this is for UI changes real-time
+  assignMarker(id, gid) {
+    this.markers.forEach(function(v) {
+      if (v.ID == id) {
+        v.assignedTo = gid;
+      }
+    });
+    this.update();
+  }
+
+  assignLink(id, gid) {
+    this.links.forEach(function(v) {
+      if (v.ID == id) {
+        v.assignedTo = gid;
+      }
+    });
+    this.update();
+  }
+
   clearAllItems() {
     this.opportals = Array();
     this.anchors = Array();
@@ -366,17 +396,17 @@ export default class Operation {
     this.update();
   }
 
-  // call update to redraw everything on the map
+  // call update to save the op and redraw everything on the map
   update() {
-    console.log("operation.update");
+    console.log("operation.update (saving/redrawing)");
     this.cleanPortalList();
+    this.cleanAnchorList();
     this.store();
-    // drawThings(this);
-    window.plugin.wasabee.updateVisual(this);
+    window.runHooks("wasabeeUIUpdate", this);
   }
 
   convertLinksToObjs(links) {
-    var tempLinks = Array();
+    const tempLinks = Array();
     for (let link_ in links) {
       if (links[link_] instanceof Link) {
         tempLinks.push(links[link_]);
@@ -385,6 +415,18 @@ export default class Operation {
       }
     }
     return tempLinks;
+  }
+
+  convertMarkersToObjs(markers) {
+    const tmpMarkers = Array();
+    for (let marker_ in markers) {
+      if (markers[marker_] instanceof Marker) {
+        tmpMarkers.push(markers[marker_]);
+      } else {
+        tmpMarkers.push(Marker.create(markers[marker_]));
+      }
+    }
+    return tmpMarkers;
   }
 
   _ensureCollections() {
@@ -407,19 +449,19 @@ export default class Operation {
 
   // minimum bounds rectangle
   mbr() {
-    let lats = [];
-    let lngs = [];
+    const lats = [];
+    const lngs = [];
     this.opportals.forEach(function(a) {
       lats.push(a.lat);
       lngs.push(a.lng);
     });
-    let minlat = Math.min.apply(null, lats);
-    let maxlat = Math.max.apply(null, lats);
-    let minlng = Math.min.apply(null, lngs);
-    let maxlng = Math.max.apply(null, lngs);
-    let min = L.latLng(minlat, minlng);
-    let max = L.latLng(maxlat, maxlng);
-    var bounds = L.latLngBounds(min, max);
+    const minlat = Math.min.apply(null, lats);
+    const maxlat = Math.max.apply(null, lats);
+    const minlng = Math.min.apply(null, lngs);
+    const maxlng = Math.max.apply(null, lngs);
+    const min = L.latLng(minlat, minlng);
+    const max = L.latLng(maxlat, maxlng);
+    const bounds = L.latLngBounds(min, max);
     return bounds;
   }
 
@@ -462,7 +504,7 @@ export default class Operation {
   }
 
   static create(obj) {
-    if (operation instanceof Operation) {
+    if (obj instanceof Operation) {
       console.log("do not call Operation.create() on an Operation");
       console.log(new Error().stack);
       return obj;
@@ -470,11 +512,13 @@ export default class Operation {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    var operation = new Operation();
+    const operation = new Operation();
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {
           operation[prop] = operation.convertLinksToObjs(obj[prop]);
+        } else if (prop == "markers") {
+          operation[prop] = operation.convertMarkersToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }

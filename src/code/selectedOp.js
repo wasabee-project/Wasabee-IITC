@@ -100,8 +100,9 @@ export default function() {
   // called when loaded for the first time or when all ops are purged
   window.plugin.wasabee.initOps = () => {
     console.log("initOps");
-    window.plugin.wasabee.resetOps();
-    window.plugin.wasabee.loadNewDefaultOp();
+    const newop = window.plugin.wasabee.loadNewDefaultOp();
+    window.plugin.wasabee.resetOps(); // deletes everything including newop
+    newop.update(); // re-saves newop
   };
 
   //*** This function creates an op list if one doesn't exist and sets the op list for the plugin

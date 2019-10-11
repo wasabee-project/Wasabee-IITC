@@ -1,5 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import UiHelper from "./uiHelper";
+import Sortable from "./sortable";
+import AssignDialog from "./assignDialog";
 
 const MarkerButtonControl = Feature.extend({
   statics: {
@@ -23,61 +25,24 @@ const MarkerButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    var content = document.createElement("div");
-    var self = this;
     this._marker = null;
-    this._type = $("<select>");
+
+    const content = document.createElement("div");
+    this._type = content.appendChild(document.createElement("select"));
     window.plugin.Wasabee.markerTypes.forEach((a, k) => {
-      self._type.append(
-        $("<option>")
-          .val(k)
-          .text(a.label)
-      );
+      const o = this._type.appendChild(document.createElement("option"));
+      o.setAttribute("value", k);
+      o.innerHTML = a.label;
     });
-    this._type.val(window.plugin.Wasabee.Constants.DEFAULT_MARKER_TYPE);
-    this._comment = $("<input>").attr("placeholder", "comment");
-    /*  Uncomment this when adding specific targetting to agents
-        this._agent = $('<select class="wasabee-agentselect"></select>').css({
-          width : "100%",
-          boxSizing : "border-box"
-        });
-        */
-    var $element = $("<div>")
-      .addClass("wasabee-markerselect")
-      .text("To: ");
-    this._markerLink = $("<strong>")
-      .text("(not set)")
-      .appendTo($element);
-    $("<button>")
-      .text("set")
-      .click(() => self.setTarget(UiHelper.getSelectedPortal()))
-      .appendTo($element);
-    this._markerMenu = new window.plugin.Wasabee.OverflowMenu();
-    this._markerMenu.button.firstElementChild.textContent = "\u25bc";
-    $element.append(this._markerMenu.button);
-    content = $("<div />")
-      .append(
-        $("<div>")
-          .addClass("flex")
-          .append(this._type)
-          .append(this._comment)
-      )
-      .append(document.createTextNode(" "))
-      .append(this._agent)
-      .append($element);
-    $element.hide(); //TODO remove this when create link alert added
-    this._type.change(() => {
-      //console.log("Changed to type -> " + self._type.val())
-      /*
-            self._preferences.save();
-            if ("CreateLinkAlert" == self._type.val()) {
-              $element.css("display", "");
-            } else {
-              $element.hide();
-            }
-            */
-    });
-    this._type.change();
+    this._type.value = window.plugin.Wasabee.Constants.DEFAULT_MARKER_TYPE;
+    this._comment = content.appendChild(document.createElement("input"));
+    this._comment.setAttribute("placeholder", "comment");
+    const addMarkerButton = content.appendChild(document.createElement("a"));
+    addMarkerButton.innerHTML = "Add Marker";
+    addMarkerButton.addEventListener("click", () =>
+      this._addMarker(this._type.value, this._operation, this._comment.value)
+    );
+
     var mHandler = this;
     this._dialog = window.dialog({
       title: "Add Marker",
@@ -95,22 +60,138 @@ const MarkerButtonControl = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.markerButton,
       buttons: {
-        "Add Marker": () =>
-          mHandler._addMarker(
-            mHandler._type.val(),
-            mHandler._operation,
-            mHandler._comment.val()
-          ),
-        OK: () => {
-          mHandler._dialog.dialog("close");
-        }
+        "Operation Marker List": () => mHandler._listDialog(mHandler._operation)
       }
     });
   },
 
   _addMarker: function(selectedType, operation, comment) {
     operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
+  },
+
+  _listDialog: function(operation) {
+    window.addHook("wasabeeUIUpdate", markerListUpdate);
+    this._listDialogData = window.dialog({
+      title: "Marker List: " + operation.name,
+      width: "auto",
+      height: "auto",
+      position: {
+        my: "center top",
+        at: "center center"
+      },
+      html: getListDialogContent(operation).table,
+      dialogClass: "wasabee-dialog-alerts",
+      closeCallback: function() {
+        window.removeHook("wasabeeUIUpdate", markerListUpdate);
+      },
+      id: window.plugin.Wasabee.static.dialogNames.markerList
+    });
   }
 });
 
 export default MarkerButtonControl;
+
+const markerListUpdate = operation => {
+  console.log("markerListUpdate");
+  const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.markerList;
+  if (window.DIALOGS[id]) {
+    const table = getListDialogContent(operation).table;
+    window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
+  }
+};
+
+const getListDialogContent = operation => {
+  const content = new Sortable();
+  content.fields = [
+    {
+      name: "Portal Name",
+      value: marker => operation.getPortal(marker.portalId).name,
+      sort: (a, b) => a.localeCompare(b),
+      // format: (a, m) => a.appendChild(UiHelper.getPortalLink(m))
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Marker Type",
+      value: marker =>
+        window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "State",
+      value: marker => marker.state,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Comment",
+      value: marker => marker.comment,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Assigned To",
+      value: marker => marker.assignedNickname,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "Completed By",
+      value: marker => marker.completedBy,
+      sort: (a, b) => a.localeCompare(b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
+      name: "",
+      sort: null,
+      value: m => m,
+      format: (o, e) => makeMarkerDialogMenu(o, e)
+    }
+  ];
+  content.sortBy = 0;
+  content.items = operation.markers;
+  return content;
+};
+
+const makeMarkerDialogMenu = (list, data) => {
+  const operation = window.plugin.wasabee.getSelectedOperation();
+  const state = new window.plugin.Wasabee.OverflowMenu();
+  const options = [
+    {
+      label: "Set Comment",
+      onclick: () => {
+        const reponse = prompt("Marker Comment", data.comment);
+        if (reponse != null) {
+          operation.setMarkerComment(data, reponse);
+        }
+      }
+    },
+    {
+      label: "Delete",
+      onclick: () => operation.removeMarker(data)
+    }
+  ];
+  if (operation.IsServerOp()) {
+    options.push({
+      label: "Assign",
+      onclick: () => {
+        new AssignDialog(data, operation);
+      }
+    });
+  }
+  state.items = options;
+  list.className = "menu";
+  list.appendChild(state.button);
+};

@@ -25,6 +25,8 @@ window.plugin.wasabee.init = function() {
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
+  Wasabee._agentCache = new Map();
+  window.pluginCreateHook("wasabeeUIUpdate");
 
   initGoogleAPI();
 
@@ -34,7 +36,6 @@ window.plugin.wasabee.init = function() {
   initSelectedOp(); // loads the next two
   window.plugin.wasabee.setupLocalStorage();
   window.plugin.wasabee.initSelectedOperation();
-
   initWasabee();
   initOverflowMenu();
   initPaste();
@@ -44,9 +45,6 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
-
-  addButtons(Wasabee._selectedOp);
-
   window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
@@ -75,10 +73,16 @@ window.plugin.wasabee.init = function() {
   window.addHook("mapDataRefreshStart", function() {
     drawAgents(Wasabee._selectedOp);
   });
+  window.addHook("wasabeeUIUpdate", function() {
+    drawThings(Wasabee._selectedOp);
+  });
+  addButtons(Wasabee._selectedOp);
 
   initFirebase();
   initCrossLinks();
-  drawThings(Wasabee._selectedOp);
+
+  // once everything else is done, call update, which triggers wasabeeUIUpdate, drawing things
+  Wasabee._selectedOp.update();
   //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
 
   var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);
