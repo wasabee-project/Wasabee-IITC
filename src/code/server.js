@@ -344,3 +344,35 @@ export default function() {
     });
   };
 }
+
+export const SendAccessTokenAsync = function(accessToken) {
+  return new Promise((resolve, reject) => {
+    const url = Wasabee.Constants.SERVER_BASE_KEY + "/aptok";
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        case 401:
+          reject(Error("not logged in"));
+          break;
+        default:
+          reject(Error(req.statusText));
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify({ accessToken: accessToken }));
+  });
+};

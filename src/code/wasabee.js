@@ -3,6 +3,8 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker } from "./mapDrawing";
 import WasabeeMe from "./me";
+import { SendAccessTokenAsync } from "./server";
+import addButtons from "./addButtons";
 import store from "../lib/store";
 
 const Wasabee = window.plugin.Wasabee;
@@ -162,9 +164,32 @@ export default function() {
     visitButton.innerHTML = "Log In";
     visitButton.addEventListener(
       "click",
-      () => window.open("https://server.wasabee.rocks/"),
+      async () => {
+        const isMobile = "undefined" != typeof window.android && window.android;
+        const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        window.gapi.auth2.authorize(
+          {
+            prompt: isMobile && !isiOS ? "none" : "select_account",
+            client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
+            scope: "email profile openid",
+            response_type: "id_token permission"
+          },
+          async response => {
+            console.debug("gapi.auth2.authorize response: ", response);
+            if (response.error) {
+              console.error(response.error, response.error_subtype);
+              return;
+            }
+            await SendAccessTokenAsync(response.access_token);
+            WasabeeMe.get(false);
+            _dialog.dialog("close");
+          }
+        );
+        //window.open("https://server.wasabee.rocks/")
+      },
       false
     );
+
     const changeServerButton = buttonSet.appendChild(
       document.createElement("a")
     );
@@ -183,7 +208,7 @@ export default function() {
       }
     });
 
-    window.dialog({
+    var _dialog = window.dialog({
       title: "Authentication Required",
       width: "auto",
       height: "auto",
@@ -192,8 +217,9 @@ export default function() {
       closeCallback: function() {
         // prime the pump
         WasabeeMe.get();
-        // redraw everything, mostly to just update the buttons
-        window.plugin.wasabee.getSelectedOperation().update();
+        const selectedOperation = window.plugin.wasabee.getSelectedOperation();
+        selectedOperation.update();
+        addButtons(selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
