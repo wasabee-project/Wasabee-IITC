@@ -190,7 +190,6 @@ export default function() {
       false
     );
 
-    var _dialog = window.dialog({
     const changeServerButton = buttonSet.appendChild(
       document.createElement("a")
     );
@@ -209,7 +208,7 @@ export default function() {
       }
     });
 
-    window.dialog({
+    var _dialog = window.dialog({
       title: "Authentication Required",
       width: "auto",
       height: "auto",
