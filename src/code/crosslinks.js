@@ -1,11 +1,6 @@
-import {
-  MARKER_TYPE_DESTROY,
-  MARKER_TYPE_VIRUS,
-  MARKER_TYPE_DECAY,
-  BREAK_EXCEPTION
-} from "./constants";
-
 //*** CROSSLINK THINGS */
+const Wasabee = window.plugin.Wasabee;
+
 export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
@@ -243,9 +238,9 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
     for (let i = 0; i < markers.length; i++) {
       var marker = markers[i];
       if (
-        marker.type == MARKER_TYPE_DESTROY ||
-        marker.type == MARKER_TYPE_VIRUS ||
-        marker.type == MARKER_TYPE_DECAY
+        marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
+        marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS ||
+        marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
       ) {
         if (checkMarkerAgainstLink(marker, link, operation)) {
           // console.log("FOUND MARKER TO NOT SHOW CROSSLINK -> " + marker.ID);
@@ -302,11 +297,11 @@ const testLink = (drawnLinks, drawnMarkers, link, operation) => {
       );
       if (shouldShowCrosslink) {
         showCrossLink(link, operation);
-        throw BREAK_EXCEPTION;
+        throw Wasabee.Constants.BREAK_EXCEPTION;
       }
     });
   } catch (e) {
-    if (e !== BREAK_EXCEPTION) {
+    if (e !== Wasabee.Constants.BREAK_EXCEPTION) {
       throw e;
     }
   }

@@ -238,4 +238,3 @@ const getAgentPopup = agent => {
   date.innerHTML = markdown.toHTML("Last update: " + agent.date);
   return content;
 };
-

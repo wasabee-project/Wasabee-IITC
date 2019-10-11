@@ -63,6 +63,9 @@ const MarkerButtonControl = Feature.extend({
         "Operation Marker List": () => mHandler._listDialog(mHandler._operation)
       }
     });
+    this._dialog.dialog("option", "buttons", {
+      "Operation Marker List": () => mHandler._listDialog(mHandler._operation)
+    });
   },
 
   _addMarker: function(selectedType, operation, comment) {

@@ -5,6 +5,7 @@ import opsButtonControl from "./opsButton";
 import NewopButtonControl from "./newopButton";
 import LinkDialogButtonControl from "./linkDialogButton";
 import MarkerButtonControl from "./markerButton";
+import MultimaxButtonControl from "./multimaxDialog";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -28,6 +29,7 @@ export default function(selectedOp) {
       this._addWasabeeButton(map, container);
       this._addOpsButton(map, container);
       this._addQuickDrawButton(map, container, outerDiv);
+      this._addMultimaxButton(map, container);
       this._addLinkDialogButton(map, container);
       this._addMarkerButton(map, container);
       this._addNewopButton(map, container);
@@ -236,6 +238,19 @@ export default function(selectedOp) {
         buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
         callback: mButtonHandler.enable,
         context: mButtonHandler
+      });
+    },
+    _addMultimaxButton: function(map, container) {
+      let multimaxButtonHandler = new MultimaxButtonControl(map);
+      let type = multimaxButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = multimaxButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Multimax Draw",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
+        callback: multimaxButtonHandler.enable,
+        context: multimaxButtonHandler
       });
     },
     _addQuickDrawButton: function(map, container, outerDiv) {

@@ -1,4 +1,3 @@
-// import UiHelper from "./uiHelper.js";
 import { Feature } from "./leafletDrawImports";
 import WasabeeMe from "./me";
 import Sortable from "./sortable";

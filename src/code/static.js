@@ -33,7 +33,8 @@ Wasabee.static = {
     wasabeeButton: "wasabee-userinfo",
     linkList: "wasabee-linklist",
     markerList: "wasabee-markerlist",
-    assign: "wasabee-assign"
+    assign: "wasabee-assign",
+    multimaxButton: "wasabee-multimax"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

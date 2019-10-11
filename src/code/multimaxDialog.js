@@ -1,23 +1,68 @@
+import { Feature } from "./leafletDrawImports";
 import UiCommands from "./uiCommands.js";
 import UiHelper from "./uiHelper.js";
 import multimax from "./multimax.js";
 
 var _dialogs = [];
+const MultimaxButtonControl = Feature.extend({
+  statics: {
+    TYPE: "multimaxButton"
+  },
 
-export default class LinkDialog {
-  constructor(op) {
+  initialize: function(map, options) {
+    this.type = MultimaxButtonControl.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    Feature.prototype.addHooks.call(this);
+    this._displayDialog();
+  },
+
+  removeHooks: function() {
+    Feature.prototype.removeHooks.call(this);
+  },
+
+  _displayDialog: function() {
+    if (!this._map) return;
+    this.mmd = new MultimaxDialog();
+    console.log(this.mmd);
+    const mmhandler = this;
+    this._dialog = window.dialog({
+      title: "Multimax",
+      width: "auto",
+      height: "auto",
+      html: this.mmd.container,
+      dialogClass: "wasabee-dialog-mustauth",
+      closeCallback: function() {
+        window.runHooks(
+          "wasabeeUIUpdate",
+          window.plugin.wasabee.getSelectedOperation()
+        );
+        mmhandler.disable();
+        delete mmhandler._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.multimaxButton
+    });
+  }
+});
+
+export default MultimaxButtonControl;
+
+class MultimaxDialog {
+  constructor() {
     var self = this;
     self.clearLocalPortalSelections();
-    this._broadcast = new BroadcastChannel("wasabee-multimaxdialog");
     this._portals = {};
     this._links = [];
-    this._operation = op;
+    this._operation = window.plugin.wasabee.getSelectedOperation();
     _dialogs.push(this);
-    var container = document.createElement("div");
+    this.container = document.createElement("div");
     var tr;
     var node;
     var button;
-    var rdnTable = container.appendChild(document.createElement("table"));
+    var rdnTable = this.container.appendChild(document.createElement("table"));
 
     // Anchors
     ["A", "B"].forEach(string => {
@@ -39,7 +84,7 @@ export default class LinkDialog {
     });
 
     // Bottom buttons bar
-    var element = container.appendChild(document.createElement("div"));
+    var element = this.container.appendChild(document.createElement("div"));
     element.className = "buttonbar";
     var div = element.appendChild(document.createElement("span"));
 
@@ -61,10 +106,8 @@ export default class LinkDialog {
     button = element.appendChild(document.createElement("button"));
     button.textContent = "close";
     button.addEventListener("click", () => self._dialog.dialog("close"), false);
-
-    // Broadcast message about dialog being open and open the dialog
-    var sendMessage = name => self.onMessage(name);
-    this._broadcast.addEventListener("message", sendMessage, false);
+  }
+  /*
     this._dialog = window.dialog({
       title: this._operation.name + " - Wasabee Multimax",
       width: "auto",
@@ -72,7 +115,6 @@ export default class LinkDialog {
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-links",
       closeCallback: () => {
-        self._broadcast.removeEventListener("message", sendMessage, false);
         var paneIndex = _dialogs.indexOf(self);
         if (-1 !== paneIndex) {
           _dialogs.splice(paneIndex, 1);
@@ -94,6 +136,7 @@ export default class LinkDialog {
       this.updatePortal(command.data.name);
     }
   }
+*/
 
   //***Function to clear local selections of portals for the dialog
   clearLocalPortalSelections() {
@@ -116,10 +159,6 @@ export default class LinkDialog {
       delete localStorage["wasabee-multimax-" + updateID];
     }
     this.updatePortal(updateID);
-    this._broadcast.postMessage({
-      type: "setPortal",
-      name: updateID
-    });
   }
 
   //***Function to get portal -- called in doMultimax
@@ -141,7 +180,7 @@ export default class LinkDialog {
     }
   }
 
-  doMultimax(operation) {
+  doMultimax() {
     let portalsOnScreen = getAllPortalsOnScreen();
     let A = this.getPortal("A");
     let B = this.getPortal("B"); //mmmm
@@ -179,6 +218,7 @@ export default class LinkDialog {
     return this._operation.addLink(fromPortal, toPortal, description);
   }
 
+  // should be unused now ?
   static update(operation, show) {
     var p = 0;
     var parameters = _dialogs;
@@ -192,7 +232,7 @@ export default class LinkDialog {
       }
     }
     if (show) {
-      return new LinkDialog(operation);
+      return new MultimaxDialog();
     } else {
       return;
     }
@@ -220,10 +260,11 @@ const isOnScreen = portal => {
 
 const getAllPortalsOnScreen = () => window.portals.filter(isOnScreen);
 
+/*
 let links = sequence
   .map(c => new Link(operation, a.guid, c.guid, "Multimax-generated link"))
   .concat(
     sequence.map(
       c => new Link(operation, b.guid, c.guid, "Multimax-generated link")
     )
-  );
+  ); */
