@@ -6,7 +6,7 @@
  */
 
 import { drawAgents } from "./mapDrawing";
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 export const initFirebase = () => {
   const $iframe = $("<iframe></iframe>")
@@ -19,7 +19,7 @@ export const initFirebase = () => {
   window.addEventListener("message", event => {
     if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
 
-    var operation = Wasabee._selectedOp;
+    const operation = Wasabee._selectedOp;
     if (
       event.data.data.cmd === "Agent Location Change" &&
       operation.teamid == event.data.data.msg

@@ -6,58 +6,85 @@ import NewopButtonControl from "./newopButton";
 import LinkDialogButtonControl from "./linkDialogButton";
 import MarkerButtonControl from "./markerButton";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
+  selectedOp = selectedOp || window.plugin.wasabee.getSelectedOperation();
+
   const ButtonsControl = L.Control.extend({
     options: {
       position: "topleft"
     },
     onAdd: function(map) {
-      var outerDiv = L.DomUtil.create(
+      const outerDiv = L.DomUtil.create(
         "div",
         "leaflet-draw leaflet-draw-section"
       );
-      var container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
+      const container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
       outerDiv.appendChild(container);
       this._modes = {};
 
-      this._addWasabeeButton(map, container, outerDiv);
-      this._addOpsButton(map, container, outerDiv);
+      this._addWasabeeButton(map, container);
+      this._addOpsButton(map, container);
       this._addQuickDrawButton(map, container, outerDiv);
-      this._addLinkDialogButton(map, container, outerDiv);
-      this._addMarkerButton(map, container, outerDiv);
-      this._addNewopButton(map, container, outerDiv);
-
-      // these three buttons need to be converted to the new format as well
-      $(container)
-        .append(
-          '<a id="wasabee_clearopsbutton" href="javascript: void(0);" class="wasabee-control" title="Clear All Ops"><img src=' +
-            Wasabee.static.images.toolbar_delete +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_clearopsbutton", function() {
-          var confirmed = window.confirm(
-            "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
-          );
-          if (confirmed) {
-            window.plugin.wasabee.closeAllDialogs();
-            window.plugin.wasabee.resetOps();
-            window.plugin.wasabee.setupLocalStorage();
-            // load the new default w/o saving the currently selected op...
-          }
-        });
-
-      $(container)
-        .append(
-          '<a id="wasabee_syncbutton" href="javascript: void(0);" class="wasabee-control" title="Get All Ops"><img src=' +
-            Wasabee.static.images.toolbar_download +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_syncbutton", function() {
-          window.plugin.wasabee.closeAllDialogs();
-          const so = window.plugin.Wasabee.getSelectedOperation();
+      this._addLinkDialogButton(map, container);
+      this._addMarkerButton(map, container);
+      this._addNewopButton(map, container);
+      this._addClearButton(map, container);
+      this._addSyncButton(map, container);
+      this._addUploadButton(map, container);
+      return outerDiv;
+    },
+    _addWasabeeButton: function(map, container) {
+      let wasabeeButtonHandler = new WasabeeButtonControl(map);
+      let image = wasabeeButtonHandler.getIcon();
+      let type = wasabeeButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = wasabeeButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Wasabee Status",
+        container: container,
+        buttonImage: image,
+        callback: wasabeeButtonHandler.enable,
+        context: wasabeeButtonHandler
+      });
+    },
+    _updateWasabeeButton: function() {
+      const wb = this._modes["wasabeeButton"]; // yuk hardcoded...
+      wb.button.innerHTML =
+        '<img src="' +
+        wb.handler.getIcon() +
+        '" style="vertical-align: middle;">';
+    },
+    _addOpsButton: function(map, container) {
+      let opsButtonHandler = new opsButtonControl(map);
+      let type = opsButtonHandler.type;
+      this._modes[type] = {};
+      this._modes[type].handler = opsButtonHandler;
+      this._modes[type].button = this._createButton({
+        title: "Operations",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_viewOps,
+        callback: opsButtonHandler.enable,
+        context: opsButtonHandler
+      });
+    },
+    _addSyncButton: function(map, container) {
+      const tmp = {};
+      tmp.type = "download all ops";
+      let type = tmp.type;
+      this._modes[type] = {};
+      this._modes[type].handler = () => {
+        // Feature.prototype.addHooks.call(tmp);
+      };
+      this._modes[type].button = this._createButton({
+        title: "Download Available Operations",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
+        callback: () => {
+          window.plugin.wasabee.closeAllDialogs("nothing");
+          const so = window.plugin.wasabee.getSelectedOperation();
           try {
             const me = WasabeeMe.get(true);
             if (me == null) {
@@ -71,6 +98,7 @@ export default function(selectedOp) {
                       // if the op changed out beneath us, use the new
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
+                        newop.update();
                       }
                     } else {
                       console.log("opPromise returned null op but no err?");
@@ -88,29 +116,59 @@ export default function(selectedOp) {
           } catch (e) {
             window.plugin.wasabee.showMustAuthAlert();
           }
-        });
-
-      $(container)
-        .append(
-          '<a id="wasabee_uploadbutton" href="javascript: void(0);" class="wasabee-control" title="Push To Server"><img src=' +
-            Wasabee.static.images.toolbar_upload +
-            ' style="vertical-align:middle;align:center;" /></a>'
-        )
-        .on("click", "#wasabee_uploadbutton", function() {
-          window.plugin.wasabee.closeAllDialogs();
+        }
+      });
+    },
+    _addClearButton: function(map, container) {
+      const tmp = {};
+      tmp.type = "clear ops";
+      let type = tmp.type;
+      this._modes[type] = {};
+      this._modes[type].handler = () => {
+        // Feature.prototype.addHooks.call(tmp);
+      };
+      this._modes[type].button = this._createButton({
+        title: "Clear All Operations",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
+        callback: () => {
+          const confirmed = window.confirm(
+            "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
+          );
+          if (confirmed) {
+            window.plugin.wasabee.closeAllDialogs("nothing");
+            window.plugin.wasabee.resetOps();
+            window.plugin.wasabee.setupLocalStorage();
+          }
+        }
+      });
+    },
+    _addUploadButton: function(map, container) {
+      const tmp = {};
+      tmp.type = "upload op";
+      let type = tmp.type;
+      this._modes[type] = {};
+      this._modes[type].handler = () => {
+        // Feature.prototype.addHooks.call(tmp);
+      };
+      this._modes[type].button = this._createButton({
+        title: "Upload Operation",
+        container: container,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
+        callback: () => {
+          window.plugin.wasabee.closeAllDialogs("nothing");
           const so = window.plugin.wasabee.getSelectedOperation();
           const id = so.ID;
-          let isServerOp = so.IsServerOp();
 
-          // upload is different than update -- upload on 1st, update after
-          if (isServerOp) {
+          if (so.IsServerOp()) {
             window.plugin.wasabee.updateOpPromise(so).then(
               function(resolve) {
                 console.log("server accepted the update: " + resolve);
+                alert("Update Successful");
+                window.runHooks("wasabeeUIUpdate", this);
               },
               function(reject) {
                 console.log(reject);
-                // alert(reject);
                 window.plugin.wasabee.showMustAuthAlert();
               }
             );
@@ -119,11 +177,9 @@ export default function(selectedOp) {
               function(resolve) {
                 console.log(resolve);
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
-                // do I need to do this to get the button to refresh?
                 const newop = window.plugin.wasabee.getSelectedOperation();
                 newop.update();
                 alert("Upload Successful");
-                isServerOp = true;
               },
               function(reject) {
                 console.log(reject);
@@ -131,44 +187,17 @@ export default function(selectedOp) {
               }
             );
           }
-        });
-      return outerDiv;
-    },
-
-    _addWasabeeButton: function(map, container) {
-      let wasabeeButtonHandler = new WasabeeButtonControl(map);
-      let image = wasabeeButtonHandler.getIcon();
-      let type = wasabeeButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = wasabeeButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Wasabee Status",
-        container: container,
-        buttonImage: image,
-        callback: wasabeeButtonHandler.enable,
-        context: wasabeeButtonHandler
-      });
-      var wb = this._modes[type];
-      window.addHook("mapDataRefreshStart", function() {
-        wb.button.innerHTML =
-          '<img src="' +
-          wasabeeButtonHandler.getIcon() +
-          '" style="vertical-align: middle;">';
+        }
       });
     },
-    _addOpsButton: function(map, container) {
-      let opsButtonHandler = new opsButtonControl(map);
-      let type = opsButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = opsButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Operations",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_viewOps,
-        callback: opsButtonHandler.enable,
-        context: opsButtonHandler
-      });
-      return opsButtonHandler;
+    _updateUploadButton: function() {
+      let operation = window.plugin.wasabee.getSelectedOperation();
+      let status = "";
+      if (operation.localchanged) {
+        status = " (locally modified)";
+      }
+      this._modes["upload op"].button.title =
+        "Upload " + operation.name + status;
     },
     _addNewopButton: function(map, container) {
       let newopButtonHandler = new NewopButtonControl(map);
@@ -202,7 +231,7 @@ export default function(selectedOp) {
       this._modes[type] = {};
       this._modes[type].handler = mButtonHandler;
       this._modes[type].button = this._createButton({
-        title: "Add Marker",
+        title: "Add Markers",
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
         callback: mButtonHandler.enable,
@@ -270,7 +299,7 @@ export default function(selectedOp) {
       return container;
     },
     _createButton: function(options) {
-      var link = L.DomUtil.create(
+      const link = L.DomUtil.create(
         "a",
         options.className || "",
         options.container
@@ -301,18 +330,24 @@ export default function(selectedOp) {
         .on(link, "click", options.callback, options.context);
 
       return link;
+    },
+    update: function() {
+      if (
+        selectedOp.IsServerOp() == false ||
+        selectedOp.IsWritableOp(WasabeeMe.get()) == true
+      ) {
+        $("#wasabee_uploadbutton").css("display", "");
+      } else {
+        $("#wasabee_uploadbutton").css("display", "none");
+      }
+      Wasabee.buttons._updateUploadButton();
+      Wasabee.buttons._updateWasabeeButton();
     }
   });
   if (typeof Wasabee.buttons === "undefined") {
     Wasabee.buttons = new ButtonsControl();
     window.map.addControl(Wasabee.buttons);
+    window.addHook("wasabeeUIUpdate", Wasabee.buttons.update);
   }
-  if (
-    selectedOp.IsServerOp() == false ||
-    selectedOp.IsWritableOp(WasabeeMe.get()) == true
-  ) {
-    $("#wasabee_uploadbutton").css("display", "");
-  } else {
-    $("#wasabee_uploadbutton").css("display", "none");
-  }
+  Wasabee.buttons.update();
 }

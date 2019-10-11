@@ -22,7 +22,6 @@ const LinkDialogButtonControl = Feature.extend({
   _displayDialog: function() {
     var self = this;
     self._clearLocalPortalSelections();
-    this._broadcast = new BroadcastChannel("wasabee-linkdialog");
     this._portals = {};
     this._links = [];
     var container = document.createElement("div");
@@ -90,8 +89,6 @@ const LinkDialogButtonControl = Feature.extend({
     button = element.appendChild(document.createElement("button"));
     button.textContent = "close";
     button.addEventListener("click", () => self._dialog.dialog("close"), false);
-    var sendMessage = name => self.onMessage(name);
-    this._broadcast.addEventListener("message", sendMessage, false);
 
     this._dialog = window.dialog({
       title: "Add Links",
@@ -101,7 +98,6 @@ const LinkDialogButtonControl = Feature.extend({
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: function() {
         self.disable();
-        self._broadcast.removeEventListener("message", sendMessage, false);
         self._clearLocalPortalSelections();
         delete self._dialog;
       },
@@ -138,10 +134,6 @@ const LinkDialogButtonControl = Feature.extend({
       delete localStorage["wasabee-portal-" + updateID];
     }
     this._updatePortal(updateID);
-    this._broadcast.postMessage({
-      type: "setPortal",
-      name: updateID
-    });
     //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
   },
 

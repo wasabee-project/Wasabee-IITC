@@ -1,6 +1,5 @@
 import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
-import addButtons from "./addButtons";
 import WasabeeMe from "./me";
 
 const opsButtonControl = Feature.extend({
@@ -28,7 +27,7 @@ const opsButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    var op = window.plugin.Wasabee.getSelectedOperation();
+    var op = window.plugin.wasabee.getSelectedOperation();
     var content = document.createElement("div");
     content.id = "wasabee-dialog-operation-content";
     var opinfo = document.createElement("div");
@@ -94,16 +93,20 @@ const opsButtonControl = Feature.extend({
         })
       );
     });
+    // XXX use operationSelect.addEventListener instead of this format
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       var newID = $(this).val();
-      // console.log("load requested for " + newID);
-      window.plugin.wasabee.closeAllDialogs();
+      window.plugin.wasabee.closeAllDialogs(
+        window.plugin.Wasabee.static.dialogNames.opsButton
+      );
       var newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
+      const mbr = newop.mbr();
+      if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+        context._map.fitBounds(mbr);
+      }
       newop.update();
-      context._map.fitBounds(newop.mbr());
-      addButtons(newop);
     });
 
     container.appendChild(operationSelect);
@@ -252,7 +255,7 @@ const opsButtonControl = Feature.extend({
           window.plugin.wasabee.removeOperation(removeid);
           context._opSelectMenuUpdate(
             context,
-            window.plugin.Wasabee.getSelectedOperation()
+            window.plugin.wasabee.getSelectedOperation()
           );
         }
       },

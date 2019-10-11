@@ -14,6 +14,7 @@ export default class Link {
     this.assignedTo = null;
     this.throwOrderPos = null;
     this.populatePortals(operation);
+    this.color = "main";
   }
 
   populatePortals(operation) {

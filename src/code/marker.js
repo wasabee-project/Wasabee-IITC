@@ -10,9 +10,16 @@ export default class Marker {
     this.completedBy = "";
     this.assignedTo = "";
     this.assignedNickname = "";
+    this.order = 0;
   }
 
   static create(obj) {
+    if (obj instanceof Marker) {
+      console.log("do not call Marker.create() on a Marker");
+      console.log(new Error().stack);
+      return obj;
+    }
+
     const marker = new Marker();
     for (var prop in obj) {
       if (marker.hasOwnProperty(prop)) {
