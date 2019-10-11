@@ -1,9 +1,0 @@
-export const OP_LIST_KEY = "OP_LIST_KEY";
-export const PASTE_LIST_KEY = "PASTE_LIST_KEY";
-export const SERVER_BASE_KEY = "https://server.wasabee.rocks";
-export const SERVER_BASE_TEST_KEY = "https://server.wasabee.rocks:8444";
-export const CURRENT_EXPIRE_NUMERIC = 1209600000;
-export const MARKER_TYPE_DESTROY = "DestroyPortalAlert";
-export const MARKER_TYPE_VIRUS = "UseVirusPortalAlert";
-export const MARKER_TYPE_DECAY = "LetDecayPortalAlert";
-export const BREAK_EXCEPTION = {};
