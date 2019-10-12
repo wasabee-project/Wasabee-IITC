@@ -4,17 +4,23 @@
 */
 import { greatCircleArcIntersect } from "./crosslinks";
 
-const fieldCoversPortal = ([field1, field2, field3], portal) => {
+const fieldCoversPortal = ([a, b, field3], portal) => {
   // Let's hope no one ever wants to field over this point!
   const unreachableMapPoint = {
     lat: -74.2,
     lng: -143.4
   };
-  var p = portal.getLatLng();
-  var f1 = field1.getLatLng();
-  var f2 = field2.getLatLng();
-  var f3 = field3.getLatLng();
-  var c = 0;
+  const p = portal.getLatLng();
+  const f1 = {
+    lat: a.lat,
+    lng: a.lng
+  };
+  const f2 = {
+    lat: b.lat,
+    lng: b.lng
+  };
+  const f3 = field3.getLatLng();
+  let c = 0;
   if (greatCircleArcIntersect(unreachableMapPoint, p, f1, f2)) c++;
   if (greatCircleArcIntersect(unreachableMapPoint, p, f1, f3)) c++;
   if (greatCircleArcIntersect(unreachableMapPoint, p, f3, f2)) c++;
@@ -24,7 +30,7 @@ const fieldCoversPortal = ([field1, field2, field3], portal) => {
 
 function buildPOSet(a, b, C) {
   const lesser = (p1, p2) => fieldCoversPortal([a, b, p2], p1);
-  var poset = new Map();
+  const poset = new Map();
   C.forEach(i => {
     poset.set(i, C.filter(j => j === i || lesser(j, i)));
   });
@@ -32,18 +38,18 @@ function buildPOSet(a, b, C) {
 }
 
 function longestSequence(poset) {
-  var allreadyCalculatedSequences = new Map();
+  const alreadyCalculatedSequences = new Map();
   const sequence_from = c => {
-    if (allreadyCalculatedSequences.get(c) === undefined) {
+    if (alreadyCalculatedSequences.get(c) === undefined) {
       let sequence = poset
         .get(c)
         .filter(i => i !== c)
         .map(sequence_from)
         .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
       sequence.push(c);
-      allreadyCalculatedSequences.set(c, sequence);
+      alreadyCalculatedSequences.set(c, sequence);
     }
-    return allreadyCalculatedSequences.get(c);
+    return alreadyCalculatedSequences.get(c);
   };
   return Array.from(poset.keys())
     .map(sequence_from)
@@ -51,6 +57,8 @@ function longestSequence(poset) {
 }
 
 export default function multimax(a, b, C) {
+  // console.log("multimax starting");
   let poset = buildPOSet(a, b, C);
+  console.log("multimax done");
   return longestSequence(poset);
 }
