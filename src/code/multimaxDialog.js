@@ -3,7 +3,6 @@ import UiHelper from "./uiHelper";
 import multimax from "./multimax";
 import store from "../lib/store";
 
-var _dialogs = [];
 const MultimaxButtonControl = Feature.extend({
   statics: {
     TYPE: "multimaxButton"
@@ -56,7 +55,6 @@ class MultimaxDialog {
     this._portals = {};
     this._links = [];
     this._operation = window.plugin.wasabee.getSelectedOperation();
-    _dialogs.push(this);
     this.container = document.createElement("div");
     var tr;
     var node;
@@ -162,8 +160,7 @@ class MultimaxDialog {
     }
     this._operation.addLink(A, B, "multimax base");
     sequence.forEach(node => {
-      let p = node.getLatLng();
-      console.log(node.options);
+      const p = node.getLatLng();
       p["name"] = node.options.data.title;
       p["id"] = node.options.guid;
       this._operation.addLink(p, A, "multimax generated link");
@@ -185,6 +182,7 @@ const isOnScreen = (ll, bounds) => {
 const getAllPortalsOnScreen = () => {
   const bounds = window.clampLatLngBounds(window.map.getBounds());
   const x = [];
+  // XXX should just convert from leaflet to wasabee portal format here
   for (let portal in window.portals) {
     if (isOnScreen(window.portals[portal].getLatLng(), bounds)) {
       x.push(window.portals[portal]);

@@ -11,19 +11,11 @@ const fieldCoversPortal = ([a, b, field3], portal) => {
     lng: -143.4
   };
   const p = portal.getLatLng();
-  const f1 = {
-    lat: a.lat,
-    lng: a.lng
-  };
-  const f2 = {
-    lat: b.lat,
-    lng: b.lng
-  };
   const f3 = field3.getLatLng();
   let c = 0;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, f1, f2)) c++;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, f1, f3)) c++;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, f3, f2)) c++;
+  if (greatCircleArcIntersect(unreachableMapPoint, p, a, b)) c++;
+  if (greatCircleArcIntersect(unreachableMapPoint, p, a, f3)) c++;
+  if (greatCircleArcIntersect(unreachableMapPoint, p, f3, b)) c++;
   if (c == 1) return true;
   else return false;
 };
