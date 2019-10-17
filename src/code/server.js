@@ -346,8 +346,10 @@ export default function() {
 }
 
 export const SendAccessTokenAsync = function(accessToken) {
+  let SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+
   return new Promise((resolve, reject) => {
-    const url = Wasabee.Constants.SERVER_BASE_KEY + "/aptok";
+    const url = SERVER_BASE + "/aptok";
     const req = new XMLHttpRequest();
 
     req.open("POST", url);
