@@ -2,6 +2,7 @@ import { Feature } from "./leafletDrawImports";
 import WasabeeMe from "./me";
 import Sortable from "./sortable";
 import store from "../lib/store";
+import { GetWasabeeServer } from "./server";
 
 const WasabeeButtonControl = Feature.extend({
   statics: {
@@ -43,10 +44,7 @@ const WasabeeButtonControl = Feature.extend({
 
     const html = document.createElement("div");
     this.serverInfo = html.appendChild(document.createElement("div"));
-    this.serverInfo.innerHTML =
-      "Server: " +
-      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
-      "<br/><br/>";
+    this.serverInfo.innerHTML = "Server: " + GetWasabeeServer() + "<br/><br/>";
     this.serverInfo.addEventListener("click", this.setServer);
     html.appendChild(teamlist.table);
 
@@ -102,18 +100,12 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   setServer: function() {
-    const promptAction = prompt(
-      "Change WASABEE server",
-      store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY)
-    );
+    const promptAction = prompt("Change WASABEE server", GetWasabeeServer());
     if (promptAction !== null && promptAction !== "") {
       // do we need sanity checking here?
       store.set(window.plugin.Wasabee.Constants.SERVER_BASE_KEY, promptAction);
       store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
-      this.innerHTML =
-        "Server: " +
-        store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY) +
-        "<br/><br/>";
+      this.innerHTML = "Server: " + promptAction + "<br/><br/>";
     }
   }
 });

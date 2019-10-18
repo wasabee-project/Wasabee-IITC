@@ -6,18 +6,22 @@
  */
 
 import { drawAgents } from "./mapDrawing";
+import { GetWasabeeServer } from "./server";
+
 const Wasabee = window.plugin.Wasabee;
 
 export const initFirebase = () => {
+  const server = GetWasabeeServer();
+
   const $iframe = $("<iframe></iframe>")
     .width(0)
     .height(0)
-    .attr("src", Wasabee.Constants.SERVER_BASE_KEY + "/static/firebase/");
+    .attr("src", server + "/static/firebase/");
 
   $(document.body).append($iframe);
 
   window.addEventListener("message", event => {
-    if (event.origin.indexOf(Wasabee.Constants.SERVER_BASE_KEY) === -1) return;
+    if (event.origin.indexOf(server) === -1) return;
 
     const operation = Wasabee._selectedOp;
     if (

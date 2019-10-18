@@ -3,7 +3,7 @@ import UiCommands from "./uiCommands.js";
 import Operation from "./operation";
 import { getColorMarker } from "./mapDrawing";
 import WasabeeMe from "./me";
-import { SendAccessTokenAsync } from "./server";
+import { SendAccessTokenAsync, GetWasabeeServer } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
 
@@ -161,44 +161,45 @@ export default function() {
     const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     const visitButton = buttonSet.appendChild(document.createElement("a"));
+    const isMobile = "undefined" != typeof window.android && window.android;
+    const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
     visitButton.innerHTML = "Log In";
-    visitButton.addEventListener(
-      "click",
-      async () => {
-        const isMobile = "undefined" != typeof window.android && window.android;
-        const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-        window.gapi.auth2.authorize(
-          {
-            prompt: isMobile && !isiOS ? "none" : "select_account",
-            client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
-            scope: "email profile openid",
-            response_type: "id_token permission"
-          },
-          async response => {
-            console.debug("gapi.auth2.authorize response: ", response);
-            if (response.error) {
-              console.error(response.error, response.error_subtype);
-              return;
+    if (!isiOS) {
+      visitButton.addEventListener(
+        "click",
+        async () => {
+          window.gapi.auth2.authorize(
+            {
+              prompt: isMobile && !isiOS ? "none" : "select_account",
+              client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
+              scope: "email profile openid",
+              response_type: "id_token permission"
+            },
+            async response => {
+              console.debug("gapi.auth2.authorize response: ", response);
+              if (response.error) {
+                console.error(response.error, response.error_subtype);
+                return;
+              }
+              await SendAccessTokenAsync(response.access_token);
+              WasabeeMe.get(false);
+              _dialog.dialog("close");
             }
-            await SendAccessTokenAsync(response.access_token);
-            WasabeeMe.get(false);
-            _dialog.dialog("close");
-          }
-        );
-        //window.open("https://server.wasabee.rocks/")
-      },
-      false
-    );
+          );
+        },
+        false
+      );
+    } else {
+      const server = GetWasabeeServer();
+      visitButton.addEventListener("click", window.open(server), false);
+    }
 
     const changeServerButton = buttonSet.appendChild(
       document.createElement("a")
     );
     changeServerButton.innerHTML = "Change Server";
     changeServerButton.addEventListener("click", () => {
-      const promptAction = prompt(
-        "Change WASABEE server",
-        store.get(window.plugin.Wasabee.Constants.SERVER_BASE_KEY)
-      );
+      const promptAction = prompt("Change WASABEE server", GetWasabeeServer());
       if (promptAction !== null && promptAction !== "") {
         store.set(
           window.plugin.Wasabee.Constants.SERVER_BASE_KEY,

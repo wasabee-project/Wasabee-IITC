@@ -1,4 +1,5 @@
 import ExportDialog from "./exportDialog";
+import { GetWasabeeServer } from "./server";
 
 export default function() {
   var Wasabee = window.plugin.Wasabee;
@@ -41,9 +42,9 @@ export default function() {
   };
 
   //** this saves a paste and returns a link */
-  window.plugin.wasabee.qbin_put = Q =>
+  window.plugin.wasabee.qbin_put = Q => {
     $.ajax({
-      url: Wasabee.Constants.SERVER_BASE_KEY + "/simple",
+      url: GetWasabeeServer() + "/simple",
       type: "POST",
       data: Q,
       crossDomain: true,
@@ -65,11 +66,12 @@ export default function() {
             JSON.stringify(jqXHR)
         );
       });
+  };
 
   //** this gets paste json raw */
-  window.plugin.wasabee.qbin_get = pasteID =>
+  window.plugin.wasabee.qbin_get = pasteID => {
     $.ajax({
-      url: Wasabee.Constants.SERVER_BASE_KEY + "/simple/" + pasteID,
+      url: GetWasabeeServer() + "/simple/" + pasteID,
       crossDomain: true,
       method: "GET"
     })
@@ -80,6 +82,7 @@ export default function() {
       .fail(function(jqXHR, textStatus) {
         alert("Paste Creation Failed -> " + textStatus);
       });
+  };
 
   window.plugin.wasabee.getUrlParams = function(parameter, defaultvalue) {
     var urlparameter = defaultvalue;

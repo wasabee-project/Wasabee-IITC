@@ -7,14 +7,7 @@ import store from "../lib/store";
 const Wasabee = window.plugin.Wasabee;
 
 export default function() {
-  let SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
-  if (SERVER_BASE == null) {
-    SERVER_BASE = Wasabee.Constants.SERVER_BASE_DEFAULT;
-    store.set(
-      Wasabee.Constants.SERVER_BASE_KEY,
-      Wasabee.Constants.SERVER_BASE_DEFAULT
-    );
-  }
+  const SERVER_BASE = GetWasabeeServer();
 
   window.plugin.wasabee.uploadOpPromise = operation => {
     return new Promise(function(resolve, reject) {
@@ -377,4 +370,16 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify({ accessToken: accessToken }));
   });
+};
+
+export const GetWasabeeServer = function() {
+  let server = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+  if (server == null) {
+    server = Wasabee.Constants.SERVER_BASE_DEFAULT;
+    store.set(
+      Wasabee.Constants.SERVER_BASE_KEY,
+      Wasabee.Constants.SERVER_BASE_DEFAULT
+    );
+  }
+  return server;
 };
