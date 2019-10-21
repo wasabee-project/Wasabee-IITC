@@ -49,7 +49,6 @@ function longestSequence(poset) {
 }
 
 export default function multimax(a, b, C) {
-  // console.log("multimax starting");
   let poset = buildPOSet(a, b, C);
   console.log("multimax done");
   return longestSequence(poset);

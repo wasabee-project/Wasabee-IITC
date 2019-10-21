@@ -184,6 +184,7 @@ export default function() {
               await SendAccessTokenAsync(response.access_token);
               WasabeeMe.get(false);
               _dialog.dialog("close");
+              window.runHooks("wasabeeUIUpdate", this); // or addButtons()?
             }
           );
         },

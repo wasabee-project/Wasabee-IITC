@@ -171,7 +171,11 @@ export default function(selectedOp) {
               },
               function(reject) {
                 console.log(reject);
-                window.plugin.wasabee.showMustAuthAlert();
+                if (reject == "permission to upload denied") {
+                  window.plugin.wasabee.showMustAuthAlert();
+                } else {
+                  alert(reject);
+                }
               }
             );
           } else {
@@ -193,7 +197,7 @@ export default function(selectedOp) {
       });
     },
     _updateUploadButton: function() {
-      let operation = window.plugin.wasabee.getSelectedOperation();
+      const operation = window.plugin.wasabee.getSelectedOperation();
       let status = "";
       if (operation.localchanged) {
         status = " (locally modified)";

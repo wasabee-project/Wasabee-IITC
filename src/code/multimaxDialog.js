@@ -161,6 +161,10 @@ class MultimaxDialog {
     this._operation.addLink(A, B, "multimax base");
     sequence.forEach(node => {
       const p = node.getLatLng();
+      if (typeof p["lat"] == "number") {
+        p["lat"] = p["lat"].toString();
+        p["lng"] = p["lng"].toString();
+      }
       p["name"] = node.options.data.title;
       p["id"] = node.options.guid;
       this._operation.addLink(p, A, "multimax generated link");

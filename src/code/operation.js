@@ -259,6 +259,7 @@ export default class Operation {
   }
 
   addLink(fromPortal, toPortal, description) {
+    // console.log("addLink " + fromPortal + " " + toPortal);
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."

@@ -72,7 +72,7 @@ export default function() {
             resolve("successfully uploaded");
             break;
           case 401:
-            reject("permission to upload denied");
+            reject("permission to update denied");
             break;
           default:
             reject(Error(req.statusText));
