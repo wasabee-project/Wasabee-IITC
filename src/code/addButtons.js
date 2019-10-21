@@ -252,7 +252,7 @@ export default function(selectedOp) {
       this._modes[type].button = this._createButton({
         title: "Multimax Draw",
         container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
+        buttonImage: window.plugin.Wasabee.static.images.toolbar_multimax,
         callback: multimaxButtonHandler.enable,
         context: multimaxButtonHandler
       });
