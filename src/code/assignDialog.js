@@ -37,7 +37,6 @@ export default class AssignDialog {
       // closeCallback: () => { window.removeHook("wasabeeUIUpdate", this.update); },
       id: window.plugin.Wasabee.static.dialogNames.assign
     });
-    // window.addHook("wasabeeUIUpdate", this.update);
   }
 
   /* no need to do anything
@@ -89,7 +88,6 @@ export default class AssignDialog {
 
   assign(value) {
     if (this._type == "Marker") {
-      this._operation.assignMarker(this._targetID, value.srcElement.value);
       window.plugin.wasabee
         .assignMarkerPromise(
           this._operation.ID,
@@ -104,9 +102,9 @@ export default class AssignDialog {
             console.log(err);
           }
         );
+      this._operation.assignMarker(this._targetID, value.srcElement.value);
     }
     if (this._type == "Link") {
-      this._operation.assignLink(this._targetID, value.srcElement.value);
       window.plugin.wasabee
         .assignLinkPromise(
           this._operation.ID,
@@ -121,6 +119,7 @@ export default class AssignDialog {
             console.log(err);
           }
         );
+      this._operation.assignLink(this._targetID, value.srcElement.value);
     }
   }
 }

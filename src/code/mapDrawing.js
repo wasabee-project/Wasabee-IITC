@@ -106,10 +106,13 @@ export const getPopupBodyWithType = (portal, target) => {
   let marker = Wasabee.markerTypes.get(target.type);
   let title = marker.label + ": " + portal.name;
   if (target.comment) title = title + "\n\n" + target.comment;
-  if (target.state != "completed" && target.assignedNickname)
-    title = title + "\n\nAssigned To: " + target.assignedNickname;
+  if (target.state != "completed" && target.assignedTo)
+    title =
+      title +
+      "\n\nAssigned To: " +
+      window.plugin.wasabee.getAgent(target.assignedTo);
   if (target.state == "completed" && target.completedBy)
-    title = title + "\n\nCompleted By: " + target.completedBy;
+    title = title + "\n\nCompleted By: " + target.completedBy; // this should be GID too...
   return title;
 };
 

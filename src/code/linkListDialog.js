@@ -233,7 +233,6 @@ export default class LinkListDialog {
       }
     ];
     if (this._operation.IsServerOp()) {
-      console.log("adding assign option");
       options.push({
         label: "Assign",
         onclick: () => {

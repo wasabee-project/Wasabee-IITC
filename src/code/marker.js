@@ -7,9 +7,8 @@ export default class Marker {
     this.type = type;
     this.comment = comment;
     this.state = "pending";
-    this.completedBy = "";
+    this.completedBy = ""; // should be GID, requires change on the server
     this.assignedTo = "";
-    this.assignedNickname = "";
     this.order = 0;
   }
 

@@ -10,12 +10,15 @@ export default class Agent {
   }
 
   static create(obj) {
-    const agent = new Agent();
+    if (typeof obj == "string") {
+      obj = JSON.parse(obj);
+    }
+    const a = new Agent();
     for (var prop in obj) {
-      if (agent.hasOwnProperty(prop)) {
-        agent[prop] = obj[prop];
+      if (a.hasOwnProperty(prop)) {
+        a[prop] = obj[prop];
       }
     }
-    return agent;
+    return a;
   }
 }

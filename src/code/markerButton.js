@@ -142,7 +142,17 @@ const getListDialogContent = operation => {
     },
     {
       name: "Assigned To",
-      value: marker => marker.assignedNickname,
+      value: marker => {
+        if (marker.assignedTo != null && marker.assignedTo != "") {
+          const agent = window.plugin.wasabee.getAgent(marker.assignedTo);
+          if (agent != null) {
+            return agent.name;
+          } else {
+            return "looking up: [" + marker.assignedTo + "]";
+          }
+        }
+        return "";
+      },
       sort: (a, b) => a.localeCompare(b),
       format: (a, m) => {
         a.textContent = m;
