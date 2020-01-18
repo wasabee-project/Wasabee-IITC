@@ -20,12 +20,9 @@ export default function() {
   };
 
   window.plugin.wasabee.initSelectedOperation = () => {
-    console.log("initSelectedOperation");
     if (Wasabee._selectedOp == null) {
-      console.log("no op selected, restoring most recently loaded");
       var toLoad = window.plugin.wasabee.getRestoreOpID();
       if (toLoad == null) {
-        console.log("most recently loaded unset, starting with new default op");
         window.plugin.wasabee.loadNewDefaultOp();
       } else {
         // verify it exists before trying to load
@@ -36,18 +33,14 @@ export default function() {
           );
           window.plugin.wasabee.loadNewDefaultOp();
         } else {
-          console.log("loading most recent");
           window.plugin.wasabee.makeSelectedOperation(toLoad);
         }
       }
-    } else {
-      console.log("returning normal selected op: " + Wasabee._selectedOp.ID);
     }
     return Wasabee._selectedOp;
   };
 
   window.plugin.wasabee.loadNewDefaultOp = () => {
-    console.log("loadNewDefaultOp");
     var newOp = new Operation(PLAYER.nickname, "Default Op", true);
     newOp.store();
     var op = window.plugin.wasabee.makeSelectedOperation(newOp.ID);
@@ -99,7 +92,6 @@ export default function() {
 
   // called when loaded for the first time or when all ops are purged
   window.plugin.wasabee.initOps = () => {
-    console.log("initOps");
     const newop = window.plugin.wasabee.loadNewDefaultOp();
     window.plugin.wasabee.resetOps(); // deletes everything including newop
     newop.update(); // re-saves newop
@@ -122,9 +114,6 @@ export default function() {
     // if the restore ID is not set, set it to the first thing we find
     var rID = window.plugin.wasabee.getRestoreOpID();
     if (rID == null) {
-      console.log(
-        "last loaded op preference is unset, using first available op"
-      );
       rID = ops[0]; // ops cannot be empty due to previous block
       window.plugin.wasabee.setRestoreOpID(rID);
     }
@@ -154,7 +143,6 @@ export default function() {
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOps = () => {
-    console.log("resetOps");
     var ops = window.plugin.wasabee.opsList();
     ops.forEach(function(opID) {
       window.plugin.wasabee.removeOperation(opID);
