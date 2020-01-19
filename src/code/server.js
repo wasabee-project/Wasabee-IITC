@@ -1,7 +1,7 @@
-import Agent from "./agent";
+import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
-import Operation from "./operation";
-import Team from "./team";
+import WasabeeOp from "./operation";
+import WasabeeTeam from "./team";
 import store from "../lib/store";
 
 const Wasabee = window.plugin.Wasabee;
@@ -130,7 +130,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            var team = Team.create(req.response);
+            var team = WasabeeTeam.create(req.response);
             Wasabee.teams.set(teamid, team);
             resolve(team);
             break;
@@ -173,7 +173,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            newop = Operation.create(req.response);
+            newop = WasabeeOp.create(req.response);
             newop.localchanged = false;
             resolve(newop);
             break;
@@ -246,7 +246,7 @@ export default function() {
         switch (req.status) {
           case 200:
             // console.log(req.response);
-            resolve(Agent.create(req.response));
+            resolve(WasabeeAgent.create(req.response));
             break;
           case 401:
             reject("not logged in");

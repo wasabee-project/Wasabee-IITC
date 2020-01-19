@@ -1,5 +1,5 @@
 import { Feature } from "./leafletDrawImports";
-import Operation from "./operation";
+import WasabeeOp from "./operation";
 
 const NewopButtonControl = Feature.extend({
   statics: {
@@ -46,7 +46,7 @@ const NewopButtonControl = Feature.extend({
         );
         if (promptAction !== null && promptAction !== "") {
           console.log("promptaction -> " + promptAction);
-          var newop = new Operation(PLAYER.nickname, promptAction, true);
+          var newop = new WasabeeOp(PLAYER.nickname, promptAction, true);
           newop.store();
           window.plugin.wasabee.makeSelectedOperation(newop.ID);
           newop.update();

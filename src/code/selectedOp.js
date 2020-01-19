@@ -1,5 +1,5 @@
 import store from "../lib/store";
-import Operation from "./operation";
+import WasabeeOp from "./operation";
 
 // needs Wasabee.Constants from scopes.js
 
@@ -21,7 +21,7 @@ export default function() {
 
   window.plugin.wasabee.initSelectedOperation = () => {
     if (Wasabee._selectedOp == null) {
-      var toLoad = window.plugin.wasabee.getRestoreOpID();
+      const toLoad = window.plugin.wasabee.getRestoreOpID();
       if (toLoad == null) {
         window.plugin.wasabee.loadNewDefaultOp();
       } else {
@@ -41,9 +41,9 @@ export default function() {
   };
 
   window.plugin.wasabee.loadNewDefaultOp = () => {
-    var newOp = new Operation(PLAYER.nickname, "Default Op", true);
+    const newOp = new WasabeeOp(PLAYER.nickname, "Default Op", true);
     newOp.store();
-    var op = window.plugin.wasabee.makeSelectedOperation(newOp.ID);
+    const op = window.plugin.wasabee.makeSelectedOperation(newOp.ID);
     return op;
   };
 
@@ -81,7 +81,7 @@ export default function() {
       } else {
         // we can pass v directly, but this catches if the json is malformed
         var o = JSON.parse(v);
-        op = Operation.create(o);
+        op = WasabeeOp.create(o);
       }
     } catch (e) {
       console.log(e);

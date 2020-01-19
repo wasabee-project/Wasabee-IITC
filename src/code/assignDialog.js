@@ -1,5 +1,5 @@
-import Link from "./link";
-import Marker from "./marker";
+import WasabeeLink from "./link";
+import WasabeeMarker from "./marker";
 import Team from "./team";
 
 export default class AssignDialog {
@@ -15,13 +15,13 @@ export default class AssignDialog {
     note.innerHTML =
       "If the menu is empty, close and reopen this assignment, this is a known bug";
 
-    if (target instanceof Link) {
+    if (target instanceof WasabeeLink) {
       this._type = "Link";
       const portal = operation.getPortal(target.fromPortalId);
       this._name = "Assign link from: " + portal.name;
     }
 
-    if (target instanceof Marker) {
+    if (target instanceof WasabeeMarker) {
       this._type = "Marker";
       const portal = operation.getPortal(target.portalId);
       this._name = "Assign marker for: " + portal.name;

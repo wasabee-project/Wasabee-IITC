@@ -1,7 +1,6 @@
-// import Operation from "./operation";
 import { generateId } from "./auxiliar";
 
-export default class Link {
+export default class WasabeeLink {
   //ID <- randomly generated alpha-numeric ID for the link
   //fromPortal <- portal the link is from
   //toPortal <- portal the link is to
@@ -36,7 +35,7 @@ export default class Link {
   }
 
   static create(obj, operation) {
-    var link = new Link(operation);
+    var link = new WasabeeLink(operation);
     for (var prop in obj) {
       if (link.hasOwnProperty(prop)) {
         link[prop] = obj[prop];

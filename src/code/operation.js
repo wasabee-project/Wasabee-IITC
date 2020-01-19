@@ -1,11 +1,11 @@
-import Link from "./link";
-import Marker from "./marker";
+import WasabeeLink from "./link";
+import WasabeeMarker from "./marker";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
-export default class Operation {
+export default class WasabeeOp {
   //ID <- randomly generated alpha-numeric ID for the operation
   //name <- name of operation
   //creator <- agent who created it
@@ -270,7 +270,7 @@ export default class Operation {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    var link = new Link(this, fromPortal.id, toPortal.id, description);
+    var link = new WasabeeLink(this, fromPortal.id, toPortal.id, description);
     if (!this.containsLink(link)) {
       this.links.push(link);
     } else {
@@ -361,7 +361,7 @@ export default class Operation {
         if (!this.containsPortal(portal)) {
           this.addPortal(portal);
         }
-        var marker = new Marker(markerType, portal.id, comment);
+        var marker = new WasabeeMarker(markerType, portal.id, comment);
         this.markers.push(marker);
         this.update();
       } else {
@@ -409,10 +409,10 @@ export default class Operation {
   convertLinksToObjs(links) {
     const tempLinks = Array();
     for (let link_ in links) {
-      if (links[link_] instanceof Link) {
+      if (links[link_] instanceof WasabeeLink) {
         tempLinks.push(links[link_]);
       } else {
-        tempLinks.push(Link.create(links[link_], this));
+        tempLinks.push(WasabeeLink.create(links[link_], this));
       }
     }
     return tempLinks;
@@ -421,10 +421,10 @@ export default class Operation {
   convertMarkersToObjs(markers) {
     const tmpMarkers = Array();
     for (let marker_ in markers) {
-      if (markers[marker_] instanceof Marker) {
+      if (markers[marker_] instanceof WasabeeMarker) {
         tmpMarkers.push(markers[marker_]);
       } else {
-        tmpMarkers.push(Marker.create(markers[marker_]));
+        tmpMarkers.push(WasabeeMarker.create(markers[marker_]));
       }
     }
     return tmpMarkers;
@@ -505,7 +505,7 @@ export default class Operation {
   }
 
   static create(obj) {
-    if (obj instanceof Operation) {
+    if (obj instanceof WasabeeOp) {
       console.log("do not call Operation.create() on an Operation");
       console.log(new Error().stack);
       return obj;
@@ -513,7 +513,7 @@ export default class Operation {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    const operation = new Operation();
+    const operation = new WasabeeOp();
     for (var prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {

@@ -29,7 +29,7 @@ export default function(selectedOp) {
       this._addWasabeeButton(map, container);
       this._addOpsButton(map, container);
       this._addQuickDrawButton(map, container, outerDiv);
-      this._addMultimaxButton(map, container);
+      // this._addMultimaxButton(map, container);
       this._addLinkDialogButton(map, container);
       this._addMarkerButton(map, container);
       this._addNewopButton(map, container);

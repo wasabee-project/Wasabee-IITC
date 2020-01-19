@@ -1,6 +1,6 @@
 import { generateId } from "./auxiliar";
 
-export default class Marker {
+export default class WasabeeMarker {
   constructor(type, portalId, comment) {
     this.ID = generateId();
     this.portalId = portalId;
@@ -13,13 +13,13 @@ export default class Marker {
   }
 
   static create(obj) {
-    if (obj instanceof Marker) {
+    if (obj instanceof WasabeeMarker) {
       console.log("do not call Marker.create() on a Marker");
       console.log(new Error().stack);
       return obj;
     }
 
-    const marker = new Marker();
+    const marker = new WasabeeMarker();
     for (var prop in obj) {
       if (marker.hasOwnProperty(prop)) {
         marker[prop] = obj[prop];

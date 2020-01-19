@@ -1,6 +1,6 @@
 import UiHelper from "./uiHelper.js";
 import { getPopupBodyWithType } from "./mapDrawing";
-import Operation from "./operation";
+import WasabeeOp from "./operation";
 import LinkListDialog from "./linkListDialog";
 
 //This methos helps with commonly used UI data getting functions
@@ -14,7 +14,7 @@ export default {
       return void alert("Please select a portal first!");
     }
 
-    if (operation instanceof Operation) {
+    if (operation instanceof WasabeeOp) {
       operation.addPortal(sentPortal);
     } else {
       alert("Operation Invalid");

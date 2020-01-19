@@ -1,6 +1,6 @@
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
-import Operation from "./operation";
+import WasabeeOp from "./operation";
 import { getColorMarker } from "./mapDrawing";
 import WasabeeMe from "./me";
 import { SendAccessTokenAsync, GetWasabeeServer } from "./server";
@@ -140,7 +140,7 @@ export default function() {
         alert("Wasabee doesn't support stock intel draw imports");
       } else {
         const data = JSON.parse(string);
-        const importedOp = Operation.create(data);
+        const importedOp = WasabeeOp.create(data);
         importedOp.store();
         window.plugin.wasabee.loadOp(importedOp.ID);
         console.log("WasabeeTools: reset and imported drawn items");

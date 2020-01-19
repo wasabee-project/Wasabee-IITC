@@ -1,4 +1,4 @@
-export default class Agent {
+export default class WasabeeAgent {
   constructor() {
     this.id = null;
     this.name = null;
@@ -13,7 +13,7 @@ export default class Agent {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    const a = new Agent();
+    const a = new WasabeeAgent();
     for (var prop in obj) {
       if (a.hasOwnProperty(prop)) {
         a[prop] = obj[prop];
