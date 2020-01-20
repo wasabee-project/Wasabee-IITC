@@ -25,7 +25,7 @@ export default class WasabeeMe {
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    if (lsme == null) {
+    if (lsme === null) {
       return false;
     }
     let me = JSON.parse(lsme);
@@ -40,17 +40,18 @@ export default class WasabeeMe {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     let me = null;
-    if (lsme != null) {
+    if (lsme !== null) {
+      console.log(lsme);
       me = JSON.parse(lsme);
     }
     if (
-      me == null ||
+      me === null ||
       me.fetched == undefined ||
       me.fetched < maxCacheAge ||
       force
     ) {
-      if (me != null) {
-        me == null;
+      if (me !== null) {
+        me = null;
         store.remove(Wasabee.Constants.AGENT_INFO_KEY);
       }
       console.log("WasabeeMe.get: pulling from server");
@@ -69,7 +70,7 @@ export default class WasabeeMe {
     }
 
     // convert JSON or obj into WasabeeMe
-    if (me != null && !(me instanceof WasabeeMe)) {
+    if (me !== null && !(me instanceof WasabeeMe)) {
       me = WasabeeMe.create(me);
     }
     return me;
@@ -85,14 +86,18 @@ export default class WasabeeMe {
       if (wme.hasOwnProperty(prop)) {
         switch (prop) {
           case "Teams":
-            data.Teams.forEach(function(team) {
-              wme.Teams.push(team);
-            });
+            if (data.Teams !== null) {
+              data.Teams.forEach(function(team) {
+                wme.Teams.push(team);
+              });
+            }
             break;
           case "Ops":
-            data.Ops.forEach(function(op) {
-              wme.Ops.push(op);
-            });
+            if (data.Ops !== null) {
+              data.Ops.forEach(function(op) {
+                wme.Ops.push(op);
+              });
+            }
             break;
           default:
             wme[prop] = data[prop];
