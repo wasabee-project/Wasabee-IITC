@@ -12,37 +12,35 @@ export default class WasabeeMe {
 
   store() {
     store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(this));
-    // store.observe(Wasabee.Constants.AGENT_INFO_KEY, function() {
-    //  console.log("AGENT_INFO_KEY changed in another window");
-    //});
   }
 
   remove() {
-    // store.unobserve(Wasabee.Constants.AGENT_INFO_KEY);
     store.remove(Wasabee.Constants.AGENT_INFO_KEY);
   }
 
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    if (lsme === null) {
+    if (lsme === null || typeof lsme !== "string") {
+      // console.log("isLoggedIn: false (not in localstore)");
       return false;
     }
     let me = JSON.parse(lsme);
     if (me.fetched > maxCacheAge) {
+      // console.log("isLoggedIn: true");
       return true;
     }
     store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+    // console.log("isLoggedIn: false (expired)");
     return false;
   }
 
   static get(force) {
+    let me = null;
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    let me = null;
-    if (lsme !== null) {
-      console.log(lsme);
-      me = JSON.parse(lsme);
+    if (typeof lsme == "string") {
+      me = WasabeeMe.create(JSON.parse(lsme));
     }
     if (
       me === null ||
@@ -50,38 +48,32 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      if (me !== null) {
-        me = null;
-        store.remove(Wasabee.Constants.AGENT_INFO_KEY);
-      }
-      console.log("WasabeeMe.get: pulling from server");
-      window.plugin.wasabee.mePromise().then(
+      let p = window.plugin.wasabee.mePromise();
+      p.then(
         function(nme) {
+          nme.store();
           me = nme;
-          me.store();
         },
         function(err) {
           console.log(err);
+          store.remove(Wasabee.Constants.AGENT_INFO_KEY);
           me = null;
         }
       );
-    } else {
-      // console.log("WasabeeMe.get: returning from localstore");
-    }
-
-    // convert JSON or obj into WasabeeMe
-    if (me !== null && !(me instanceof WasabeeMe)) {
-      me = WasabeeMe.create(me);
     }
     return me;
   }
 
   static create(data) {
+    if (data === null) {
+      console.log("null passed to WasabeeMe.create");
+      return null;
+    }
     if (typeof data == "string") {
       data = JSON.parse(data);
     }
 
-    let wme = new WasabeeMe();
+    const wme = new WasabeeMe();
     for (var prop in data) {
       if (wme.hasOwnProperty(prop)) {
         switch (prop) {

@@ -2,7 +2,7 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import WasabeeOp from "./operation";
 import { getColorMarker } from "./mapDrawing";
-import WasabeeMe from "./me";
+// import WasabeeMe from "./me";
 import { SendAccessTokenAsync, GetWasabeeServer } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
@@ -170,7 +170,7 @@ export default function() {
         async () => {
           window.gapi.auth2.authorize(
             {
-              prompt: isMobile && !isiOS ? "none" : "select_account",
+              prompt: isMobile ? "none" : "select_account",
               client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
               scope: "email profile openid",
               response_type: "id_token permission"
@@ -182,7 +182,7 @@ export default function() {
                 return;
               }
               await SendAccessTokenAsync(response.access_token);
-              WasabeeMe.get(false);
+              // WasabeeMe.get(); // UIUpdate does this too
               _dialog.dialog("close");
               window.runHooks("wasabeeUIUpdate", this); // or addButtons()?
             }
@@ -218,7 +218,7 @@ export default function() {
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: function() {
         // prime the pump
-        WasabeeMe.get();
+        // WasabeeMe.get(); // addButtons calls this too
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
         selectedOperation.update();
         addButtons(selectedOperation);

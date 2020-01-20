@@ -88,8 +88,8 @@ export default function(selectedOp) {
           window.plugin.wasabee.closeAllDialogs("nothing");
           const so = window.plugin.wasabee.getSelectedOperation();
           try {
-            const me = WasabeeMe.get(true);
-            if (me == null) {
+            const me = WasabeeMe.get(true); // force update of ops list
+            if (me === null) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
               me.Ops.forEach(function(op) {

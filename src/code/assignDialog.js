@@ -1,6 +1,6 @@
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
-import Team from "./team";
+import WasabeeTeam from "./team";
 
 export default class AssignDialog {
   constructor(target, operation) {
@@ -64,7 +64,7 @@ export default class AssignDialog {
           }
         );
       }
-      const tt = window.plugin.Wasabee.teams.get(t.teamid) || new Team();
+      const tt = window.plugin.Wasabee.teams.get(t.teamid) || new WasabeeTeam();
       tt.agents.forEach(function(a) {
         if (alreadyAdded.indexOf(a.id) == -1) {
           alreadyAdded.push(a.id);

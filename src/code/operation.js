@@ -399,7 +399,7 @@ export default class WasabeeOp {
 
   // call update to save the op and redraw everything on the map
   update() {
-    console.log("operation.update (saving/redrawing)");
+    // console.log("operation.update (saving/redrawing)");
     this.cleanPortalList();
     this.cleanAnchorList();
     this.store();

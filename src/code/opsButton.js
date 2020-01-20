@@ -117,9 +117,7 @@ const opsButtonControl = Feature.extend({
   _displayOpInfo: function(context, operation) {
     var opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
     if (!opinfo) {
-      console.log(
-        "unable to get wasabee-dialog-operation-opinfo; skipping display"
-      );
+      // console.log("unable to get wasabee-dialog-operation-opinfo; skipping display");
       return;
     }
     opinfo.innerHTML = ""; // start clean

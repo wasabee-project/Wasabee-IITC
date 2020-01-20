@@ -21,6 +21,8 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
+    const me = WasabeeMe.get(true);
+
     const teamlist = new Sortable();
     teamlist.fields = [
       {
@@ -48,8 +50,7 @@ const WasabeeButtonControl = Feature.extend({
     this.serverInfo.addEventListener("click", this.setServer);
     html.appendChild(teamlist.table);
 
-    let me = WasabeeMe.get(true); // don't cache this, use up-to-date
-    if (me != null && me.GoogleID != undefined) {
+    if (me !== null && me instanceof WasabeeMe) {
       teamlist.items = me.Teams;
       const wbHandler = this;
       this._dialog = window.dialog({
