@@ -221,7 +221,6 @@ export default function() {
       };
 
       req.onerror = function() {
-        console.log(new Error().stack);
         reject(Error("not logged in"));
       };
 
@@ -258,7 +257,6 @@ export default function() {
       };
 
       req.onerror = function() {
-        console.log(new Error().stack);
         reject(Error("not logged in"));
       };
 
