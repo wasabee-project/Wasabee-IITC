@@ -116,6 +116,8 @@ export default class WasabeeOp {
         return this.opportals[portal_];
       }
     }
+    // console.log("getPortal failed for :" + portalID);
+    // console.log(new Error().stack);
     return null;
   }
 

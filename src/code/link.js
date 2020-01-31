@@ -12,20 +12,21 @@ export default class WasabeeLink {
     this.description = description;
     this.assignedTo = null;
     this.throwOrderPos = null;
-    this.populatePortals(operation);
+    // this.populatePortals(operation);
     this.color = "main";
   }
 
+  /* 
   populatePortals(operation) {
     this.fromPortal = operation.getPortal(this.fromPortalId);
     this.toPortal = operation.getPortal(this.toPortalId);
-  }
+  } */
 
   getLatLngs(operation) {
-    var fromPortal = operation.getPortal(this.fromPortalId);
-    var toPortal = operation.getPortal(this.toPortalId);
+    const fromPortal = operation.getPortal(this.fromPortalId);
+    const toPortal = operation.getPortal(this.toPortalId);
     if (fromPortal != null && toPortal != null) {
-      var returnArray = Array();
+      const returnArray = Array();
       returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
       returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
       return returnArray;
@@ -35,7 +36,7 @@ export default class WasabeeLink {
   }
 
   static create(obj, operation) {
-    var link = new WasabeeLink(operation);
+    const link = new WasabeeLink(operation);
     for (var prop in obj) {
       if (link.hasOwnProperty(prop)) {
         link[prop] = obj[prop];

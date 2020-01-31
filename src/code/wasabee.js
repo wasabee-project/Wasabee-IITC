@@ -10,19 +10,17 @@ import store from "../lib/store";
 const Wasabee = window.plugin.Wasabee;
 export default function() {
   //** This function adds all the portals to the layer */
-  window.plugin.wasabee.addAllPortals = function(operation) {
+  window.plugin.wasabee.addAllPortals = operation => {
     const portalList = operation.anchors;
     if (portalList != null) {
       portalList.forEach(function(portalId) {
-        //{"id":"b460fd49ee614b0892388272a5542696.16","name":"Outer Loop Old Road Trail Crossing","lat":"33.052057","lng":"-96.853656"}
         window.plugin.wasabee.addPortal(portalId, operation);
-        //console.log("ADDING PORTAL: " + JSON.stringify(portal));
       });
     }
   };
 
   //** This function resets all the portals and calls addAllPortals to add them */
-  window.plugin.wasabee.resetAllPortals = function(operation) {
+  window.plugin.wasabee.resetAllPortals = operation => {
     for (var guid in window.plugin.wasabee.portalLayers) {
       var portalInLayer = window.plugin.wasabee.portalLayers[guid];
       window.plugin.wasabee.portalLayerGroup.removeLayer(portalInLayer);
@@ -32,7 +30,7 @@ export default function() {
   };
 
   /** This function adds a portal to the portal layer group */
-  window.plugin.wasabee.addPortal = function(portalId, operation) {
+  window.plugin.wasabee.addPortal = (portalId, operation) => {
     const portal = operation.getPortal(portalId);
     const colorMarker = getColorMarker(operation.color);
     const latLng = new L.LatLng(portal.lat, portal.lng);
@@ -48,23 +46,29 @@ export default function() {
       })
     });
 
-    window.registerMarkerForOMS(marker);
-    marker.bindPopup(
-      window.plugin.wasabee.getPortalPopup(marker, portal, latLng, operation)
+    const content = window.plugin.wasabee.getAnchorPopupContent(
+      marker,
+      portalId,
+      operation
     );
-    marker.on("click", marker.togglePopup, marker);
-    marker.on("spiderfiedclick", marker.togglePopup, marker);
+    marker.bindPopup(content).on("click", marker.openPopup, marker);
+
+    // spiderfied clicks
+    // why is this throwing nulls?
+    window.registerMarkerForOMS(marker);
+    marker.on("spiderfiedclick", marker.openPopup, marker);
     window.plugin.wasabee.portalLayers[portal.id] = marker;
     marker.addTo(window.plugin.wasabee.portalLayerGroup);
   };
 
   //** This function gets the portal popup content */
-  window.plugin.wasabee.getPortalPopup = function(
+  window.plugin.wasabee.getAnchorPopupContent = (
     marker,
-    portal,
-    latLng,
+    portalID,
     operation
-  ) {
+  ) => {
+    const portal = operation.getPortal(portalID);
+
     marker.className = "wasabee-dialog wasabee-dialog-ops";
     const content = document.createElement("div");
     const title = content.appendChild(document.createElement("div"));
@@ -102,14 +106,11 @@ export default function() {
       },
       false
     );
-    var popup = L.popup()
-      .setLatLng(latLng)
-      .setContent(content);
-    return popup;
+    return content;
   };
 
   //** This function opens a dialog with a text field to copy */
-  window.plugin.wasabee.importString = function() {
+  window.plugin.wasabee.importString = () => {
     const promptAction = prompt(
       "Press CTRL+V to paste (Wasabee data only).",
       ""
@@ -119,7 +120,7 @@ export default function() {
     }
   };
 
-  window.plugin.wasabee.saveImportString = function(string) {
+  window.plugin.wasabee.saveImportString = string => {
     try {
       const keyIdentifier = "wasabeeShareKey=";
       if (

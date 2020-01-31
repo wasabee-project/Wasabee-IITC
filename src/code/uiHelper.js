@@ -1,6 +1,6 @@
 //This methos helps with commonly used UI data getting functions
 const UiHelper = {
-  getPortal: function(id) {
+  getPortal: id => {
     if (window.portals[id] && window.portals[id].options.data.title) {
       var data = window.portals[id].options.data;
       return {
@@ -22,7 +22,7 @@ const UiHelper = {
       L.latLng(parseFloat(data), parseFloat(angle))
     );
   },
-  getPortalLink: function(data) {
+  getPortalLink: data => {
     var pt = UiHelper.toLatLng(data);
     var v = data.lat + "," + data.lng;
     var e = document.createElement("a");

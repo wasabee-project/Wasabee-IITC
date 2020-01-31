@@ -50,16 +50,17 @@ const addMarker = (target, operation) => {
     })
   });
 
+  // register the marker for spiderfied click
   window.registerMarkerForOMS(wMarker);
   wMarker.bindPopup("loading...");
-  wMarker.off("click", wMarker.togglePopup, wMarker);
+  wMarker.off("click", wMarker.openPopup, wMarker);
   wMarker.on(
     "click",
     () => {
       // IITCs version of leaflet does not have marker.isPopupOpen()
       wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
       wMarker.update();
-      wMarker.togglePopup();
+      wMarker.openPopup();
     },
     wMarker
   );
@@ -68,7 +69,7 @@ const addMarker = (target, operation) => {
     () => {
       wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
       wMarker.update();
-      wMarker.togglePopup();
+      wMarker.openPopup();
     },
     wMarker
   );
@@ -213,10 +214,11 @@ export const drawAgents = op => {
                 popupAnchor: L.point(-1, -48)
               })
             });
+            // spiderfied clicks
             window.registerMarkerForOMS(a_);
             a_.bindPopup(getAgentPopup(agent));
-            a_.off("click", agent.togglePopup, agent);
-            a_.on("spiderfiedclick", a_.togglePopup, a_);
+            a_.off("click", agent.openPopup, agent);
+            a_.on("spiderfiedclick", a_.openPopup, a_);
             window.plugin.wasabee.agentLayers[agent.id] = a_;
             a_.addTo(window.plugin.wasabee.agentLayerGroup);
           }
