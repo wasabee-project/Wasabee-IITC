@@ -13,10 +13,10 @@ export default class WasabeeTeam {
     for (var prop in d) {
       if (team.hasOwnProperty(prop)) {
         if (prop === "agents") {
-          d.agents.forEach(function(agent) {
+          for (const agent of d.agents) {
             team.agents.push(WasabeeAgent.create(agent));
-            // push into Wasabee._agentCache
-          });
+            // WasabeeAgent.create takes care of caching it for us
+          }
         } else {
           team[prop] = d[prop];
         }

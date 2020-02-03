@@ -19,6 +19,9 @@ export default class WasabeeAgent {
         a[prop] = obj[prop];
       }
     }
+
+    // push the new data into the agent cache
+    window.plugin.Wasabee._agentCache.set(a.id, a);
     return a;
   }
 }

@@ -2,8 +2,9 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import { checkAllLinks } from "./crosslinks";
 import WasabeeMe from "./me";
-import { teamPromise } from "./server";
+import { agentPromise, teamPromise } from "./server";
 // import UiHelper from "./uiHelper";
+import AssignDialog from "./assignDialog";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -85,6 +86,22 @@ const getMarkerPopup = (marker, target, operation) => {
   const title = content.appendChild(document.createElement("div"));
   title.className = "desc";
   title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
+
+  const assignment = content.appendChild(document.createElement("div"));
+  if (target.state != "completed" && target.assignedTo) {
+    agentPromise(target.assignedTo, false).then(
+      function(a) {
+        assignment.innerHTML = "Assigned To: " + a.name;
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
+  }
+  if (target.state == "completed" && target.completedBy) {
+    assignment.innerHTML = "Completed By: " + target.completedBy;
+  }
+
   const buttonSet = content.appendChild(document.createElement("div"));
   buttonSet.className = "temp-op-dialog";
   const deleteButton = buttonSet.appendChild(document.createElement("a"));
@@ -98,6 +115,17 @@ const getMarkerPopup = (marker, target, operation) => {
     false
   );
 
+  const assignButton = buttonSet.appendChild(document.createElement("a"));
+  assignButton.textContent = "Assign";
+  assignButton.addEventListener(
+    "click",
+    () => {
+      new AssignDialog(target, operation);
+      marker.closePopup();
+    },
+    false
+  );
+
   return content;
 };
 
@@ -105,16 +133,9 @@ export const getPopupBodyWithType = (portal, target) => {
   if (!Wasabee.markerTypes.has(target.type)) {
     target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
   }
-  let marker = Wasabee.markerTypes.get(target.type);
+  const marker = Wasabee.markerTypes.get(target.type);
   let title = marker.label + ": " + portal.name;
   if (target.comment) title = title + "\n\n" + target.comment;
-  if (target.state != "completed" && target.assignedTo)
-    title =
-      title +
-      "\n\nAssigned To: " +
-      window.plugin.wasabee.getAgent(target.assignedTo);
-  if (target.state == "completed" && target.completedBy)
-    title = title + "\n\nCompleted By: " + target.completedBy; // this should be GID too...
   return title;
 };
 

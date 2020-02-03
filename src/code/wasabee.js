@@ -219,9 +219,9 @@ export default function() {
 
   window.plugin.wasabee.closeAllDialogs = skip => {
     skip = skip || "nothing";
-    Object.values(window.plugin.Wasabee.static.dialogNames).forEach(function(
-      name
-    ) {
+    for (const name of Object.values(
+      window.plugin.Wasabee.static.dialogNames
+    )) {
       if (name != skip) {
         let id = "dialog-" + name;
         if (window.DIALOGS[id]) {
@@ -234,27 +234,18 @@ export default function() {
           }
         }
       }
-    });
+    }
   };
 
-  // how to make this async? I get a syntax error on the obvious decls
+  // don't use this unless you just can't use the promise directly
   window.plugin.wasabee.getAgent = gid => {
-    // prime update the cache with any known teams
-    // probably better to do this on team fetch... doesn't seem too expensive here
-    window.plugin.Wasabee.teams.forEach(function(t) {
-      t.agents.forEach(function(a) {
-        if (!window.plugin.Wasabee._agentCache.has(a.id)) {
-          window.plugin.Wasabee._agentCache.set(a.id, a);
-        }
-      });
-    });
-
+    // when a team is loaded from the server, all agents are pushed into the cache
     if (window.plugin.Wasabee._agentCache.has(gid)) {
       return window.plugin.Wasabee._agentCache.get(gid);
     }
 
     let agent = null;
-    agentPromise(gid).then(
+    agentPromise(gid, false).then(
       function(resolve) {
         agent = resolve;
         window.plugin.Wasabee._agentCache.set(gid, agent);
@@ -263,7 +254,6 @@ export default function() {
         console.log(reject);
       }
     );
-    // this returns early from the promise, giving false nulls. await?
     return agent;
   };
 }

@@ -219,6 +219,7 @@ const opsButtonControl = Feature.extend({
       false
     );
 
+    /*
     const clearAllOpsButton = buttonSection.appendChild(
       document.createElement("a")
     );
@@ -245,7 +246,7 @@ const opsButtonControl = Feature.extend({
         console.log("newOpsButton");
       },
       false
-    );
+    ); */
 
     const deleteButton = buttonSection.appendChild(document.createElement("a"));
     deleteButton.innerHTML = "Delete " + operation.name;

@@ -11,14 +11,15 @@ export default class AssignDialog {
     this._html = document.createElement("div");
     const divtitle = this._html.appendChild(document.createElement("div"));
 
-    const portal = operation.getPortal(target.fromPortalId);
     if (target instanceof WasabeeLink) {
+      const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
       divtitle.innerHTML = portal.name + ": link assignment";
       this._name = "Assign link from: " + portal.name;
     }
 
     if (target instanceof WasabeeMarker) {
+      const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
       divtitle.innerHTML = portal.name + ": marker assignment";
       this._name = "Assign marker for: " + portal.name;
@@ -97,8 +98,8 @@ export default class AssignDialog {
         this._targetID,
         value.srcElement.value
       ).then(
-        function(result) {
-          console.log(result);
+        function() {
+          console.log("assignment processed");
         },
         function(err) {
           console.log(err);
@@ -112,8 +113,8 @@ export default class AssignDialog {
         this._targetID,
         value.srcElement.value
       ).then(
-        function(result) {
-          console.log(result);
+        function() {
+          console.log("assignment processed");
         },
         function(err) {
           console.log(err);

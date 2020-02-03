@@ -236,39 +236,42 @@ export const mePromise = function() {
   });
 };
 
-export const agentPromise = function(GID) {
+export const agentPromise = function(GID, force) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
     if (GID == null) {
       reject(Error("null gid"));
     }
 
-    const url = SERVER_BASE + "/api/v1/agent/" + GID;
-    console.log(url);
-    const req = new XMLHttpRequest();
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
+    if (!force && window.plugin.Wasabee._agentCache.has(GID)) {
+      resolve(window.plugin.Wasabee._agentCache.get(GID));
+    } else {
+      const url = SERVER_BASE + "/api/v1/agent/" + GID;
+      const req = new XMLHttpRequest();
+      req.open("GET", url);
+      req.withCredentials = true;
+      req.crossDomain = true;
 
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(WasabeeAgent.create(req.response));
-          break;
-        case 401:
-          reject("not logged in");
-          break;
-        default:
-          reject(Error(req.statusText));
-          break;
-      }
-    };
+      req.onload = function() {
+        switch (req.status) {
+          case 200:
+            resolve(WasabeeAgent.create(req.response));
+            break;
+          case 401:
+            reject("not logged in");
+            break;
+          default:
+            reject(Error(req.statusText));
+            break;
+        }
+      };
 
-    req.onerror = function() {
-      reject(Error("not logged in"));
-    };
+      req.onerror = function() {
+        reject(Error("not logged in"));
+      };
 
-    req.send();
+      req.send();
+    }
   });
 };
 

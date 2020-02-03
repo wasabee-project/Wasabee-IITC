@@ -28,7 +28,7 @@ export default function(selectedOp) {
       this._modes = {};
 
       this._addWasabeeButton(map, container);
-      this._addOpsButton(map, container);
+      this._addOpsButton(map, container, outerDiv);
       this._addQuickDrawButton(map, container, outerDiv);
       // this._addMultimaxButton(map, container);
       this._addLinkDialogButton(map, container);
@@ -60,7 +60,7 @@ export default function(selectedOp) {
         wb.handler.getIcon() +
         '" style="vertical-align: middle;">';
     },
-    _addOpsButton: function(map, container) {
+    _addOpsButton: function(map, container, outerDiv) {
       let opsButtonHandler = new opsButtonControl(map);
       let type = opsButtonHandler.type;
       this._modes[type] = {};
@@ -72,6 +72,40 @@ export default function(selectedOp) {
         callback: opsButtonHandler.enable,
         context: opsButtonHandler
       });
+      let actionsContainer = this._createActions([
+        {
+          title: "Create a new operation",
+          text: "New Op",
+          callback: opsButtonHandler.disable,
+          context: opsButtonHandler
+        },
+        {
+          title: "Clear all locally stored ops",
+          text: "Clear All",
+          callback: opsButtonHandler.disable,
+          context: opsButtonHandler
+        }
+      ]);
+      actionsContainer.style.top = "24px";
+      L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
+
+      this._modes[type].actionsContainer = actionsContainer;
+
+      opsButtonHandler.on(
+        "enabled",
+        function() {
+          actionsContainer.style.display = "block";
+        },
+        this
+      );
+      opsButtonHandler.on(
+        "disabled",
+        function() {
+          actionsContainer.style.display = "none";
+        },
+        this
+      );
+      outerDiv.appendChild(actionsContainer);
     },
     _addSyncButton: function(map, container) {
       const tmp = {};
@@ -93,7 +127,7 @@ export default function(selectedOp) {
             if (me === null) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
-              me.Ops.forEach(function(op) {
+              for (const op of me.Ops) {
                 opPromise(op.ID).then(
                   function(newop) {
                     if (newop != null) {
@@ -113,7 +147,7 @@ export default function(selectedOp) {
                     window.plugin.wasabee.showMustAuthAlert();
                   }
                 );
-              });
+              }
               alert("Sync Complete");
             }
           } catch (e) {

@@ -25,7 +25,7 @@ export const initFirebase = () => {
 
     const operation = Wasabee._selectedOp;
     if (event.data.data.cmd === "Agent Location Change") {
-      drawAgents();
+      drawAgents(operation);
     }
 
     if (event.data.data.cmd === "Map Change") {

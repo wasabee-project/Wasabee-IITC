@@ -130,10 +130,10 @@ export default function() {
 
   //*** This function resets the local op list
   window.plugin.wasabee.resetOps = () => {
-    var ops = window.plugin.wasabee.opsList();
-    ops.forEach(function(opID) {
+    const ops = window.plugin.wasabee.opsList();
+    for (const opID of ops) {
       window.plugin.wasabee.removeOperation(opID);
-    });
+    }
   };
 
   window.plugin.wasabee.opsList = () => {

@@ -76,16 +76,16 @@ export default class WasabeeMe {
         switch (prop) {
           case "Teams":
             if (data.Teams !== null) {
-              data.Teams.forEach(function(team) {
+              for (const team of data.Teams) {
                 wme.Teams.push(team);
-              });
+              }
             }
             break;
           case "Ops":
             if (data.Ops !== null) {
-              data.Ops.forEach(function(op) {
+              for (const op of data.Ops) {
                 wme.Ops.push(op);
-              });
+              }
             }
             break;
           default:
