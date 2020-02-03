@@ -6,7 +6,7 @@
  */
 
 import { drawAgents } from "./mapDrawing";
-import { GetWasabeeServer } from "./server";
+import { opPromise, GetWasabeeServer } from "./server";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -24,14 +24,12 @@ export const initFirebase = () => {
     if (event.origin.indexOf(server) === -1) return;
 
     const operation = Wasabee._selectedOp;
-    if (
-      event.data.data.cmd === "Agent Location Change" &&
-      operation.teamid == event.data.data.msg
-    ) {
+    if (event.data.data.cmd === "Agent Location Change") {
       drawAgents();
     }
+
     if (event.data.data.cmd === "Map Change") {
-      window.plugin.wasabee.opPromise(event.data.data.opID).then(
+      opPromise(event.data.data.opID).then(
         function(refreshed) {
           refreshed.store();
           if (refreshed.ID == operation.ID) {

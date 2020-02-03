@@ -2,6 +2,7 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import { checkAllLinks } from "./crosslinks";
 import WasabeeMe from "./me";
+import { teamPromise } from "./server";
 // import UiHelper from "./uiHelper";
 
 var Wasabee = window.plugin.Wasabee;
@@ -206,17 +207,17 @@ export const drawAgents = op => {
     }
 
     /* this fetches the team into Wasabee.teams */
-    window.plugin.wasabee.teamPromise(t.teamid).then(
+    teamPromise(t.teamid).then(
       function(team) {
         team.agents.forEach(function(agent) {
-          var agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
+          let agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
           if (agentInLayer != null) {
             window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
             delete window.plugin.wasabee.agentLayers[agent.id];
           }
           if (agent.lat != 0) {
-            var latLng = new L.LatLng(agent.lat, agent.lng);
-            var a_ = L.marker(latLng, {
+            let latLng = new L.LatLng(agent.lat, agent.lng);
+            let a_ = L.marker(latLng, {
               title: agent.name,
               icon: L.icon({
                 iconUrl: agent.pic,
@@ -237,8 +238,7 @@ export const drawAgents = op => {
         });
       },
       function(err) {
-        console.log(err); // promise rejected
-        // you may not have access to every team on the op -- ignore the problems
+        console.log(err);
       }
     );
   } // for t of op.teamlist

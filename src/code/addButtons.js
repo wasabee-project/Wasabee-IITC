@@ -6,6 +6,7 @@ import NewopButtonControl from "./newopButton";
 import LinkDialogButtonControl from "./linkDialogButton";
 import MarkerButtonControl from "./markerButton";
 import MultimaxButtonControl from "./multimaxDialog";
+import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -93,7 +94,7 @@ export default function(selectedOp) {
               window.plugin.wasabee.showMustAuthAlert();
             } else {
               me.Ops.forEach(function(op) {
-                window.plugin.wasabee.opPromise(op.ID).then(
+                opPromise(op.ID).then(
                   function(newop) {
                     if (newop != null) {
                       newop.store();
@@ -163,7 +164,7 @@ export default function(selectedOp) {
           const id = so.ID;
 
           if (so.IsServerOp()) {
-            window.plugin.wasabee.updateOpPromise(so).then(
+            updateOpPromise(so).then(
               function(resolve) {
                 console.log("server accepted the update: " + resolve);
                 alert("Update Successful");
@@ -179,7 +180,7 @@ export default function(selectedOp) {
               }
             );
           } else {
-            window.plugin.wasabee.uploadOpPromise(so).then(
+            uploadOpPromise(so).then(
               function(resolve) {
                 console.log(resolve);
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store

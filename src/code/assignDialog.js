@@ -1,7 +1,7 @@
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
 import WasabeeTeam from "./team";
-import { assignLinkPromise, assignMarkerPromise } from "./server";
+import { assignLinkPromise, assignMarkerPromise, teamPromise } from "./server";
 
 export default class AssignDialog {
   constructor(target, operation) {
@@ -59,7 +59,7 @@ export default class AssignDialog {
     // this needs to make sure not to add the same agent multiple times...
     this._operation.teamlist.forEach(function(t) {
       if (!window.plugin.Wasabee.teams.has(t.teamid)) {
-        window.plugin.wasabee.teamPromise(t.teamid).then(
+        teamPromise(t.teamid).then(
           function(team) {
             console.debug(team);
           },

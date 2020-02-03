@@ -3,7 +3,7 @@ import UiCommands from "./uiCommands.js";
 import WasabeeOp from "./operation";
 import { getColorMarker } from "./mapDrawing";
 // import WasabeeMe from "./me";
-import { SendAccessTokenAsync, GetWasabeeServer } from "./server";
+import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
 
@@ -250,19 +250,17 @@ export default function() {
     });
 
     if (window.plugin.Wasabee._agentCache.has(gid)) {
-      // console.log("found agent in _agentCache");
       return window.plugin.Wasabee._agentCache.get(gid);
     }
 
     let agent = null;
-    window.plugin.wasabee.agentPromise(gid).then(
+    agentPromise(gid).then(
       function(resolve) {
         agent = resolve;
         window.plugin.Wasabee._agentCache.set(gid, agent);
       },
       function(reject) {
         console.log(reject);
-        // alert(reject);
       }
     );
     // this returns early from the promise, giving false nulls. await?

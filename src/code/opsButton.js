@@ -1,6 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
 import WasabeeMe from "./me";
+import { deleteOpPromise } from "./server";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -265,7 +266,7 @@ const opsButtonControl = Feature.extend({
                 " from the *SERVER*?"
             );
             if (confirmedDeleteServerOp) {
-              window.plugin.wasabee.deleteOpPromise(operation.ID).then(
+              deleteOpPromise(operation.ID).then(
                 function() {
                   console.log("delete from server successful");
                 },

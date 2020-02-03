@@ -1,4 +1,5 @@
 import store from "../lib/store";
+import { mePromise } from "./server";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -45,7 +46,7 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      window.plugin.wasabee.mePromise().then(
+      mePromise().then(
         function(nme) {
           nme.store();
           me = nme;
