@@ -19,8 +19,6 @@ export default class WasabeeOp {
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
-    this.pasteKey = null;
-    this.pasteExpireDate = 0;
     this.color = DEFAULT_OPERATION_COLOR;
     this.comment = null;
     this.teamlist = Array();

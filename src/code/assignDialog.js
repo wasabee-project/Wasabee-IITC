@@ -1,33 +1,37 @@
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
 import WasabeeTeam from "./team";
+import { assignLinkPromise, assignMarkerPromise } from "./server";
 
 export default class AssignDialog {
   constructor(target, operation) {
     this._operation = operation;
     this._dialog = null;
-    this._html = "unable to determine target type";
     this._targetID = target.ID;
     this._html = document.createElement("div");
     const divtitle = this._html.appendChild(document.createElement("div"));
-    this._html.appendChild(this._getAgentMenu(target.assignedTo));
-    const note = this._html.appendChild(document.createElement("div"));
-    note.innerHTML =
-      "If the menu is empty, close and reopen this assignment, this is a known bug";
 
+    const portal = operation.getPortal(target.fromPortalId);
     if (target instanceof WasabeeLink) {
       this._type = "Link";
-      const portal = operation.getPortal(target.fromPortalId);
+      divtitle.innerHTML = portal.name + ": link assignment";
       this._name = "Assign link from: " + portal.name;
     }
 
     if (target instanceof WasabeeMarker) {
       this._type = "Marker";
-      const portal = operation.getPortal(target.portalId);
+      divtitle.innerHTML = portal.name + ": marker assignment";
       this._name = "Assign marker for: " + portal.name;
     }
 
-    divtitle.innerHTML = this._name;
+    const menu = this._getAgentMenu(target.assignedTo);
+    this._html.appendChild(menu);
+    menu.style.align = "center";
+
+    const outofdate = this._html.appendChild(document.createElement("div"));
+    outofdate.innerHTML =
+      "<br/><br/>Assignments are pushed to the server real-time.<br/>Make sure the server copy is up-to-date <b>before</b> doing assignments";
+    outofdate.style.textalign = "center";
 
     this._dialog = window.dialog({
       html: this._html,
@@ -88,37 +92,33 @@ export default class AssignDialog {
 
   assign(value) {
     if (this._type == "Marker") {
-      window.plugin.wasabee
-        .assignMarkerPromise(
-          this._operation.ID,
-          this._targetID,
-          value.srcElement.value
-        )
-        .then(
-          function(result) {
-            console.log(result);
-          },
-          function(err) {
-            console.log(err);
-          }
-        );
+      assignMarkerPromise(
+        this._operation.ID,
+        this._targetID,
+        value.srcElement.value
+      ).then(
+        function(result) {
+          console.log(result);
+        },
+        function(err) {
+          console.log(err);
+        }
+      );
       this._operation.assignMarker(this._targetID, value.srcElement.value);
     }
     if (this._type == "Link") {
-      window.plugin.wasabee
-        .assignLinkPromise(
-          this._operation.ID,
-          this._targetID,
-          value.srcElement.value
-        )
-        .then(
-          function(result) {
-            console.log(result);
-          },
-          function(err) {
-            console.log(err);
-          }
-        );
+      assignLinkPromise(
+        this._operation.ID,
+        this._targetID,
+        value.srcElement.value
+      ).then(
+        function(result) {
+          console.log(result);
+        },
+        function(err) {
+          console.log(err);
+        }
+      );
       this._operation.assignLink(this._targetID, value.srcElement.value);
     }
   }

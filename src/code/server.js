@@ -20,7 +20,7 @@ export default function() {
       req.onload = function() {
         switch (req.status) {
           case 200:
-            WasabeeMe.create(req.response); // free update
+            WasabeeMe.create(req.response).store(); // free update
             window.plugin.wasabee.opPromise(operation.ID).then(
               function(newop) {
                 newop.store();
@@ -263,78 +263,75 @@ export default function() {
       req.send();
     });
   };
-
-  window.plugin.wasabee.assignMarkerPromise = (opID, markerID, agentID) => {
-    return new Promise(function(resolve, reject) {
-      const url =
-        SERVER_BASE +
-        "/api/v1/draw/" +
-        opID +
-        "/marker/" +
-        markerID +
-        "/assign";
-      const req = new XMLHttpRequest();
-      req.open("POST", url);
-      req.withCredentials = true;
-      req.crossDomain = true;
-
-      req.onload = function() {
-        switch (req.status) {
-          case 200:
-            resolve(true);
-            break;
-          case 401:
-            reject("not logged in");
-            break;
-          default:
-            reject(Error(req.statusText));
-            break;
-        }
-      };
-
-      req.onerror = function() {
-        reject(Error("Network Error"));
-      };
-
-      const fd = new FormData();
-      fd.append("agent", agentID);
-      req.send(fd);
-    });
-  };
-
-  window.plugin.wasabee.assignLinkPromise = (opID, linkID, agentID) => {
-    return new Promise(function(resolve, reject) {
-      const url =
-        SERVER_BASE + "/api/v1/draw/" + opID + "/link/" + linkID + "/assign";
-      const req = new XMLHttpRequest();
-      req.open("POST", url);
-      req.withCredentials = true;
-      req.crossDomain = true;
-
-      req.onload = function() {
-        switch (req.status) {
-          case 200:
-            resolve(true);
-            break;
-          case 401:
-            reject("not logged in");
-            break;
-          default:
-            reject(Error(req.statusText));
-            break;
-        }
-      };
-
-      req.onerror = function() {
-        reject(Error("Network Error"));
-      };
-
-      const fd = new FormData();
-      fd.append("agent", agentID);
-      req.send(fd);
-    });
-  };
 }
+
+export const assignMarkerPromise = function(opID, markerID, agentID) {
+  const SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+  return new Promise(function(resolve, reject) {
+    const url =
+      SERVER_BASE + "/api/v1/draw/" + opID + "/marker/" + markerID + "/assign";
+    const req = new XMLHttpRequest();
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(Error(req.statusText));
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    const fd = new FormData();
+    fd.append("agent", agentID);
+    req.send(fd);
+  });
+};
+
+export const assignLinkPromise = function(opID, linkID, agentID) {
+  const SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+  return new Promise(function(resolve, reject) {
+    const url =
+      SERVER_BASE + "/api/v1/draw/" + opID + "/link/" + linkID + "/assign";
+    const req = new XMLHttpRequest();
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(Error(req.statusText));
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    const fd = new FormData();
+    fd.append("agent", agentID);
+    req.send(fd);
+  });
+};
 
 export const SendAccessTokenAsync = function(accessToken) {
   const SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);

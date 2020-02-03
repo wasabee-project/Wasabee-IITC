@@ -9,7 +9,7 @@ var Wasabee = window.plugin.Wasabee;
 
 export default class LinkListDialog {
   constructor(operation, portal) {
-    let that = this;
+    const that = this;
     this._operation = operation;
     this._portal = portal;
     this._table = new Sortable();
@@ -127,7 +127,7 @@ export default class LinkListDialog {
         value: link => link.color,
         sort: null,
         format: (list, data, link) => {
-          that.makeColorMenu(list, data, operation, link);
+          that.makeColorMenu(list, data, this._operation, link);
         }
       },
       {
@@ -166,7 +166,7 @@ export default class LinkListDialog {
                 window.renderPortalDetails(that._portal.id);
               }
               let ld = new LinkDialogButtonControl(window.map);
-              ld._operation = that._operation();
+              ld._operation = this._operation;
               ld._displayDialog();
             }
           },

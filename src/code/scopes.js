@@ -4,7 +4,6 @@ export default function() {
   Wasabee.Constants = {
     SELECTED_OP_KEY: "SELECTED_OP_KEY",
     AGENT_INFO_KEY: "AGENT_INFO_KEY",
-    PASTE_LIST_KEY: "PASTE_LIST_KEY",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "Wasabee Server",

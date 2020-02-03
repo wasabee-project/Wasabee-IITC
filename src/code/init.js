@@ -1,6 +1,5 @@
 import { initCrossLinks } from "./crosslinks";
 import initWasabee from "./wasabee";
-import initPaste from "./paste";
 import initServer from "./server";
 import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
@@ -23,7 +22,6 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.agentLayerGroup = null;
 
   Wasabee._selectedOp = null; // the in-memory working op;
-  Wasabee.pasteList = Array();
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
   window.pluginCreateHook("wasabeeUIUpdate");
@@ -38,7 +36,6 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.initSelectedOperation();
   initWasabee();
   initOverflowMenu();
-  initPaste();
   initServer();
 
   window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
@@ -83,12 +80,6 @@ window.plugin.wasabee.init = function() {
 
   // once everything else is done, call update, which triggers wasabeeUIUpdate, drawing things
   Wasabee._selectedOp.update();
-  //window.plugin.wasabee.addScriptToBase(Wasabee.Constants.SCRIPT_URL_NOTY)
-
-  var shareKey = window.plugin.wasabee.getUrlParams("wasabeeShareKey", null);
-  if (shareKey != null) {
-    window.plugin.wasabee.qbin_get(shareKey);
-  }
 };
 
 window.plugin.wasabee.addCSS = content => {

@@ -22,16 +22,13 @@ export default class WasabeeMe {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     if (lsme === null || typeof lsme !== "string") {
-      // console.log("isLoggedIn: false (not in localstore)");
       return false;
     }
     let me = JSON.parse(lsme);
     if (me.fetched > maxCacheAge) {
-      // console.log("isLoggedIn: true");
       return true;
     }
     store.remove(Wasabee.Constants.AGENT_INFO_KEY);
-    // console.log("isLoggedIn: false (expired)");
     return false;
   }
 
@@ -48,8 +45,7 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      let p = window.plugin.wasabee.mePromise();
-      p.then(
+      window.plugin.wasabee.mePromise().then(
         function(nme) {
           nme.store();
           me = nme;

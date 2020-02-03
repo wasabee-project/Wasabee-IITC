@@ -122,18 +122,7 @@ export default function() {
 
   window.plugin.wasabee.saveImportString = string => {
     try {
-      const keyIdentifier = "wasabeeShareKey=";
       if (
-        string.match(
-          new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
-        ) &&
-        string.includes(keyIdentifier)
-      ) {
-        const key = string.substring(
-          string.lastIndexOf(keyIdentifier) + keyIdentifier.length
-        );
-        window.plugin.wasabee.qbin_get(key);
-      } else if (
         string.match(
           new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
         )

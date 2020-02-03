@@ -117,19 +117,6 @@ export default function() {
       rID = ops[0]; // ops cannot be empty due to previous block
       window.plugin.wasabee.setRestoreOpID(rID);
     }
-
-    //This sets up the paste list
-    var pasteList = null;
-    var pasteListObj = store.get(Wasabee.Constants.PASTE_LIST_KEY);
-    if (pasteListObj != null) {
-      pasteList = JSON.parse(pasteListObj);
-    }
-    if (pasteList == null) {
-      var emptyList = [];
-      store.set(Wasabee.Constants.PASTE_LIST_KEY, JSON.stringify(emptyList));
-      pasteList = JSON.parse(store.get(Wasabee.Constants.PASTE_LIST_KEY));
-    }
-    Wasabee.pasteList = pasteList;
   };
 
   //** This function removes an operation from the main list */
