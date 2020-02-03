@@ -27,16 +27,16 @@ const opsButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    var op = window.plugin.wasabee.getSelectedOperation();
-    var content = document.createElement("div");
+    const op = window.plugin.wasabee.getSelectedOperation();
+    const content = document.createElement("div");
     content.id = "wasabee-dialog-operation-content";
-    var opinfo = document.createElement("div");
+    const opinfo = document.createElement("div");
     opinfo.id = "wasabee-dialog-operation-opinfo";
 
     content.appendChild(this._opSelectMenu(this, op));
     content.appendChild(opinfo);
 
-    var obHandler = this;
+    const obHandler = this;
     this._dialog = window.dialog({
       title: "Operations",
       width: "auto",
@@ -58,10 +58,10 @@ const opsButtonControl = Feature.extend({
   },
 
   _opSelectMenuUpdate: function(context, operation) {
-    var dialogcontainer = document.getElementById(
+    let dialogcontainer = document.getElementById(
       "wasabee-dialog-operation-content"
     );
-    var oldspinner = document.getElementById(
+    let oldspinner = document.getElementById(
       "wasabee-dialog-operation-spinner"
     );
     dialogcontainer.replaceChild(
@@ -71,21 +71,21 @@ const opsButtonControl = Feature.extend({
   },
 
   _opSelectMenu: function(context, operation) {
-    var container = document.createElement("div");
+    const container = document.createElement("div");
     container.id = "wasabee-dialog-operation-spinner";
     container.className = "spinner";
     container.innerHTML = "";
     $(container).css({
       "text-align": "center"
     });
-    var operationSelect = document.createElement("select");
+    const operationSelect = document.createElement("select");
     operationSelect.id = "wasabee-operationSelect";
     $(operationSelect).css({
       width: "50%"
     });
-    var ol = window.plugin.wasabee.opsList();
+    const ol = window.plugin.wasabee.opsList();
     ol.forEach(function(opID) {
-      var op = window.plugin.wasabee.getOperationByID(opID);
+      const op = window.plugin.wasabee.getOperationByID(opID);
       $(operationSelect).append(
         $("<option>").prop({
           value: opID,
@@ -96,11 +96,11 @@ const opsButtonControl = Feature.extend({
     // XXX use operationSelect.addEventListener instead of this format
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
-      var newID = $(this).val();
+      let newID = $(this).val();
       window.plugin.wasabee.closeAllDialogs(
         window.plugin.Wasabee.static.dialogNames.opsButton
       );
-      var newop = window.plugin.wasabee.makeSelectedOperation(newID);
+      const newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
       const mbr = newop.mbr();
       if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
@@ -115,15 +115,15 @@ const opsButtonControl = Feature.extend({
   },
 
   _displayOpInfo: function(context, operation) {
-    var opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
+    const opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
     if (!opinfo) {
       // console.log("unable to get wasabee-dialog-operation-opinfo; skipping display");
       return;
     }
     opinfo.innerHTML = ""; // start clean
-    var nameSection = opinfo.appendChild(document.createElement("p"));
+    const nameSection = opinfo.appendChild(document.createElement("p"));
     nameSection.innerHTML = "Operation Name: ";
-    var input = nameSection.appendChild(document.createElement("input"));
+    const input = nameSection.appendChild(document.createElement("input"));
     // input.type = "text";
     input.id = "op-dialog-content-nameinput";
     input.value = operation.name;
@@ -136,16 +136,16 @@ const opsButtonControl = Feature.extend({
         context._opSelectMenuUpdate(context, operation);
       }
     });
-    var colorSection = opinfo.appendChild(document.createElement("p"));
+    const colorSection = opinfo.appendChild(document.createElement("p"));
     colorSection.innerHTML = "Operation Color: ";
-    var operationColor =
+    let operationColor =
       window.plugin.Wasabee.Constants.DEFAULT_OPERATION_COLOR;
     if (operation.color != null) {
       operationColor = operation.color;
     }
-    var opColor = colorSection.appendChild(document.createElement("select"));
+    const opColor = colorSection.appendChild(document.createElement("select"));
     window.plugin.Wasabee.layerTypes.forEach(function(a) {
-      var option = document.createElement("option");
+      const option = document.createElement("option");
       if (a.name == operationColor) {
         option.setAttribute("selected", true);
       }
@@ -158,14 +158,14 @@ const opsButtonControl = Feature.extend({
       operation.update();
     });
 
-    var isServerOp = operation.IsServerOp();
-    var isWritableOp = false;
+    const isServerOp = operation.IsServerOp();
+    let isWritableOp = false;
     if (isServerOp) {
       isWritableOp = operation.IsWritableOp(WasabeeMe.get());
     }
-    var commentInputEnabled = !isServerOp || isWritableOp;
-    var commentSection = opinfo.appendChild(document.createElement("p"));
-    var commentInput = commentSection.appendChild(
+    const commentInputEnabled = !isServerOp || isWritableOp;
+    const commentSection = opinfo.appendChild(document.createElement("p"));
+    const commentInput = commentSection.appendChild(
       document.createElement("textarea")
     );
     commentInput.rows = "3";
@@ -177,10 +177,10 @@ const opsButtonControl = Feature.extend({
       operation.store();
     });
 
-    var buttonSection = opinfo.appendChild(document.createElement("div"));
+    const buttonSection = opinfo.appendChild(document.createElement("div"));
     buttonSection.className = "temp-op-dialog";
-    var exportButton = buttonSection.appendChild(document.createElement("a"));
-    exportButton.innerHTML = "Export";
+    const exportButton = buttonSection.appendChild(document.createElement("a"));
+    exportButton.innerHTML = "Export " + operation.name;
     exportButton.addEventListener(
       "click",
       function() {
@@ -188,12 +188,14 @@ const opsButtonControl = Feature.extend({
       },
       false
     );
-    var clearOpButton = buttonSection.appendChild(document.createElement("a"));
+    const clearOpButton = buttonSection.appendChild(
+      document.createElement("a")
+    );
     clearOpButton.innerHTML = "Clear Portals/Links/Markers";
     clearOpButton.addEventListener(
       "click",
       function() {
-        var confirmClear = confirm(
+        const confirmClear = confirm(
           "Are you sure you want to clear all portals, links, and markers from this operation?"
         );
         if (confirmClear == true) {
@@ -202,21 +204,65 @@ const opsButtonControl = Feature.extend({
       },
       false
     );
-    var deleteButton = buttonSection.appendChild(document.createElement("a"));
-    deleteButton.innerHTML = "Delete";
+
+    const forkButton = buttonSection.appendChild(document.createElement("a"));
+    forkButton.innerHTML = "Change OP ID";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      forkButton.disabled = true;
+    }
+    forkButton.addEventListener(
+      "click",
+      function() {
+        console.log("fork button");
+      },
+      false
+    );
+
+    const clearAllOpsButton = buttonSection.appendChild(
+      document.createElement("a")
+    );
+    clearAllOpsButton.innerHTML = "Clear Local Ops";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      clearAllOpsButton.disabled = true;
+    }
+    clearAllOpsButton.addEventListener(
+      "click",
+      function() {
+        console.log("clearAllOpsButton");
+      },
+      false
+    );
+
+    const newOpsButton = buttonSection.appendChild(document.createElement("a"));
+    newOpsButton.innerHTML = "New Op";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      newOpsButton.disabled = true;
+    }
+    newOpsButton.addEventListener(
+      "click",
+      function() {
+        console.log("newOpsButton");
+      },
+      false
+    );
+
+    const deleteButton = buttonSection.appendChild(document.createElement("a"));
+    deleteButton.innerHTML = "Delete " + operation.name;
     if (window.plugin.wasabee.opsList().size == 0) {
       deleteButton.disabled = true;
     }
     deleteButton.addEventListener(
       "click",
       function() {
-        var confirmed = confirm(
-          "Are you sure you want to *DELETE* this operation?"
+        const confirmed = confirm(
+          "Are you sure you want to *DELETE* " + operation.name + "?"
         );
         if (confirmed == true) {
           if (operation.IsOwnedOp(WasabeeMe.get())) {
-            var confirmedDeleteServerOp = confirm(
-              "Are you sure you want to *DELETE* this operation from the *SERVER*?"
+            const confirmedDeleteServerOp = confirm(
+              "Are you sure you want to *DELETE* " +
+                operation.name +
+                " from the *SERVER*?"
             );
             if (confirmedDeleteServerOp) {
               window.plugin.wasabee.deleteOpPromise(operation.ID).then(
@@ -230,8 +276,8 @@ const opsButtonControl = Feature.extend({
               );
             }
           }
-          var ol = window.plugin.wasabee.opsList();
-          var newopID = ol[0];
+          const ol = window.plugin.wasabee.opsList();
+          let newopID = ol[0];
           console.log(newopID);
           if (newopID == null || newopID == operation.ID) {
             console.log(

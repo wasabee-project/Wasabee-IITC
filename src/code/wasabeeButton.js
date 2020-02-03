@@ -2,7 +2,7 @@ import { Feature } from "./leafletDrawImports";
 import WasabeeMe from "./me";
 import Sortable from "./sortable";
 import store from "../lib/store";
-import { GetWasabeeServer } from "./server";
+import { GetWasabeeServer, SetTeamState } from "./server";
 
 const WasabeeButtonControl = Feature.extend({
   statics: {
@@ -21,7 +21,7 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    const me = WasabeeMe.get(true);
+    let me = WasabeeMe.get(true);
 
     const teamlist = new Sortable();
     teamlist.fields = [
@@ -37,8 +37,16 @@ const WasabeeButtonControl = Feature.extend({
         name: "State",
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
+        format: (a, m, n) => {
+          const link = document.createElement("a");
+          let curstate = n.State;
+          link.innerHTML = curstate;
+          link.onclick = () => {
+            curstate = this.toggleTeam(n.ID, curstate);
+            link.innerHTML = curstate;
+            // this._closeDialog();
+          };
+          a.appendChild(link);
         }
       }
     ];
@@ -73,6 +81,14 @@ const WasabeeButtonControl = Feature.extend({
       this.disable();
       this._dialog = window.plugin.wasabee.showMustAuthAlert();
     }
+  },
+
+  toggleTeam: function(teamID, currentState) {
+    let newState = "Off";
+    if (currentState == "Off") newState = "On";
+
+    SetTeamState(teamID, newState);
+    return newState;
   },
 
   getIcon: function() {

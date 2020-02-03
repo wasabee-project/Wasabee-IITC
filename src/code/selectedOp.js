@@ -73,14 +73,14 @@ export default function() {
   // use this to pull an op from local store by ID
   // wrap it in a try/catch
   window.plugin.wasabee.getOperationByID = opID => {
-    var op = null;
+    let op = null;
     try {
-      var v = store.get(opID);
+      const v = store.get(opID);
       if (v == null) {
-        console.log("no such op in local store: " + opID);
+        console.log("getOperationByID: no such op in local store: " + opID);
       } else {
         // we can pass v directly, but this catches if the json is malformed
-        var o = JSON.parse(v);
+        const o = JSON.parse(v);
         op = WasabeeOp.create(o);
       }
     } catch (e) {

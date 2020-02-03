@@ -337,7 +337,7 @@ export default function() {
 }
 
 export const SendAccessTokenAsync = function(accessToken) {
-  let SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+  const SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
 
   return new Promise((resolve, reject) => {
     const url = SERVER_BASE + "/aptok";
@@ -367,6 +367,39 @@ export const SendAccessTokenAsync = function(accessToken) {
 
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify({ accessToken: accessToken }));
+  });
+};
+
+export const SetTeamState = function(teamID, state) {
+  const SERVER_BASE = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+
+  return new Promise((resolve, reject) => {
+    const url = SERVER_BASE + "/api/v1/me/" + teamID + "?state=" + state;
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        case 401:
+          reject(Error("not logged in"));
+          break;
+        default:
+          reject(Error(req.statusText));
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    req.send();
   });
 };
 
