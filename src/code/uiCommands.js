@@ -65,7 +65,7 @@ export default {
   deleteMarker: (operation, marker, portal) => {
     if (
       confirm(
-        "Do you really want to delete this marker? Marking it complete?\n\n" +
+        "Do you really want to delete this marker?\n" +
           getPopupBodyWithType(portal, marker)
       )
     ) {

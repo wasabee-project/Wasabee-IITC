@@ -139,11 +139,11 @@ export default class WasabeeOp {
   }
 
   setMarkerComment(marker, comment) {
-    this.markers.forEach(function(v) {
+    for (const v of this.markers) {
       if (v.ID == marker.ID) {
         v.comment = comment;
       }
-    });
+    }
     this.update();
   }
 
@@ -372,20 +372,20 @@ export default class WasabeeOp {
 
   // strictly speaking, this doesn't do anything since the server does it all, but this is for UI changes real-time
   assignMarker(id, gid) {
-    this.markers.forEach(function(v) {
+    for (const v of this.markers) {
       if (v.ID == id) {
         v.assignedTo = gid;
       }
-    });
+    }
     this.update();
   }
 
   assignLink(id, gid) {
-    this.links.forEach(function(v) {
+    for (const v of this.links) {
       if (v.ID == id) {
         v.assignedTo = gid;
       }
-    });
+    }
     this.update();
   }
 
@@ -452,10 +452,10 @@ export default class WasabeeOp {
   mbr() {
     const lats = [];
     const lngs = [];
-    this.opportals.forEach(function(a) {
+    for (const a of this.opportals) {
       lats.push(a.lat);
       lngs.push(a.lng);
-    });
+    }
     const minlat = Math.min.apply(null, lats);
     const maxlat = Math.max.apply(null, lats);
     const minlng = Math.min.apply(null, lngs);
@@ -479,11 +479,11 @@ export default class WasabeeOp {
       return false;
     }
 
-    this.teamlist.forEach(function(t) {
+    for (const t of this.teamlist) {
       if (t.role == "write" && me.Teams.includes(t.ID)) {
         return true;
       }
-    });
+    }
     return false;
   }
 

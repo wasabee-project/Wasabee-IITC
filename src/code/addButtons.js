@@ -76,17 +76,31 @@ export default function(selectedOp) {
         {
           title: "Create a new operation",
           text: "New Op",
-          callback: opsButtonHandler.disable,
+          callback: () => {
+            window.plugin.wasabee.closeAllDialogs("nothing");
+            let nb = new NewopButtonControl(map);
+            opsButtonHandler.disable();
+            nb.enable();
+          },
           context: opsButtonHandler
         },
         {
           title: "Clear all locally stored ops",
           text: "Clear All",
-          callback: opsButtonHandler.disable,
+          callback: () => {
+            const confirmed = window.confirm(
+              "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
+            );
+            if (confirmed) {
+              window.plugin.wasabee.closeAllDialogs("nothing");
+              window.plugin.wasabee.resetOps();
+              window.plugin.wasabee.setupLocalStorage();
+            }
+          },
           context: opsButtonHandler
         }
       ]);
-      actionsContainer.style.top = "24px";
+      actionsContainer.style.top = "26px";
       L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
 
       this._modes[type].actionsContainer = actionsContainer;

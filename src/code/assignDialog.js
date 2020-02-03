@@ -58,7 +58,7 @@ export default class AssignDialog {
     const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...
-    this._operation.teamlist.forEach(function(t) {
+    for (const t of this._operation.teamlist) {
       if (!window.plugin.Wasabee.teams.has(t.teamid)) {
         teamPromise(t.teamid).then(
           function(team) {
@@ -70,7 +70,7 @@ export default class AssignDialog {
         );
       }
       const tt = window.plugin.Wasabee.teams.get(t.teamid) || new WasabeeTeam();
-      tt.agents.forEach(function(a) {
+      for (const a of tt.agents) {
         if (alreadyAdded.indexOf(a.id) == -1) {
           alreadyAdded.push(a.id);
           option = document.createElement("option");
@@ -81,8 +81,8 @@ export default class AssignDialog {
           }
           menu.appendChild(option);
         }
-      });
-    });
+      }
+    }
     // ( => ) functions inherit the "this" of the caller
     menu.addEventListener("change", value => {
       this.assign(value);

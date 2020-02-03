@@ -1,8 +1,7 @@
-var markdown = require("markdown").markdown;
+const markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import WasabeeOp from "./operation";
 import { getColorMarker } from "./mapDrawing";
-// import WasabeeMe from "./me";
 import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
@@ -13,9 +12,9 @@ export default function() {
   window.plugin.wasabee.addAllPortals = operation => {
     const portalList = operation.anchors;
     if (portalList != null) {
-      portalList.forEach(function(portalId) {
+      for (const portalId of portalList) {
         window.plugin.wasabee.addPortal(portalId, operation);
-      });
+      }
     }
   };
 

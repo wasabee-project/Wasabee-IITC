@@ -102,29 +102,31 @@ const getMarkerPopup = (marker, target, operation) => {
     assignment.innerHTML = "Completed By: " + target.completedBy;
   }
 
-  const buttonSet = content.appendChild(document.createElement("div"));
-  buttonSet.className = "temp-op-dialog";
-  const deleteButton = buttonSet.appendChild(document.createElement("a"));
-  deleteButton.textContent = "Delete";
-  deleteButton.addEventListener(
-    "click",
-    () => {
-      UiCommands.deleteMarker(operation, target, portal);
-      marker.closePopup();
-    },
-    false
-  );
+  if (operation.IsWritableOp(WasabeeMe.get())) {
+    const buttonSet = content.appendChild(document.createElement("div"));
+    buttonSet.className = "temp-op-dialog";
+    const deleteButton = buttonSet.appendChild(document.createElement("a"));
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener(
+      "click",
+      () => {
+        UiCommands.deleteMarker(operation, target, portal);
+        marker.closePopup();
+      },
+      false
+    );
 
-  const assignButton = buttonSet.appendChild(document.createElement("a"));
-  assignButton.textContent = "Assign";
-  assignButton.addEventListener(
-    "click",
-    () => {
-      new AssignDialog(target, operation);
-      marker.closePopup();
-    },
-    false
-  );
+    const assignButton = buttonSet.appendChild(document.createElement("a"));
+    assignButton.textContent = "Assign";
+    assignButton.addEventListener(
+      "click",
+      () => {
+        new AssignDialog(target, operation);
+        marker.closePopup();
+      },
+      false
+    );
+  }
 
   return content;
 };
