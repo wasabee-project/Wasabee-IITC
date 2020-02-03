@@ -186,9 +186,21 @@ export const drawAgents = op => {
   if (!WasabeeMe.isLoggedIn()) {
     return;
   }
+  const me = WasabeeMe.get();
+  const myTeams = new Array();
+  for (const team of me.Teams) {
+    if (team.State == "On") {
+      myTeams.push(team.ID);
+    }
+  }
 
   /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
-  op.teamlist.forEach(function(t) {
+  for (const t of op.teamlist) {
+    // skip a team if we are not on it & enabled
+    if (myTeams.indexOf(t.teamid) == -1) {
+      continue;
+    }
+    // purge what we have
     if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.teamid)) {
       Wasabee.teams.delete(t.teamid);
     }
@@ -229,7 +241,7 @@ export const drawAgents = op => {
         // you may not have access to every team on the op -- ignore the problems
       }
     );
-  }); // forEach team
+  } // for t of op.teamlist
 };
 
 const getAgentPopup = agent => {
