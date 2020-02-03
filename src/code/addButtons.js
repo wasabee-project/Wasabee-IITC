@@ -278,7 +278,7 @@ export default function(selectedOp) {
           context: quickDrawHandler
         }
       ]);
-      actionsContainer.style.top = "39px";
+      actionsContainer.style.top = "52px";
       L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
 
       this._modes[type].actionsContainer = actionsContainer;
