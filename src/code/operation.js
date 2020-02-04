@@ -257,14 +257,10 @@ export default class WasabeeOp {
 
   addPortal(portal) {
     if (!(portal instanceof WasabeePortal)) {
-      console.log("attempt to add something not a portal as a portal");
-      console.trace();
-      portal = new WasabeePortal(
-        portal.id,
-        portal.name,
-        portal.lat,
-        portal.lng
+      console.log(
+        "something still using old portal type instead of WasabeePortal"
       );
+      portal = WasabeePortal.create(portal);
     }
     if (!this.containsPortal(portal)) {
       this.opportals.push(portal);
@@ -283,18 +279,6 @@ export default class WasabeeOp {
   }
 
   addLink(fromPortal, toPortal, description) {
-    if (!(fromPortal instanceof WasabeePortal)) {
-      console.log("addLink fromPortal not a WasabeePortal");
-      console.log(fromPortal);
-      console.trace;
-      return;
-    }
-    if (!(toPortal instanceof WasabeePortal)) {
-      console.log("addLink toPortal not a WasabeePortal");
-      console.log(toPortal);
-      console.trace;
-      return;
-    }
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."

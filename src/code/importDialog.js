@@ -77,8 +77,7 @@ class ImportDialog {
       console.log("trying to import IITC Drawtools format... wish me luck");
       const newop = this.parseDrawTools(string);
       newop.updatePortalsFromIITCData();
-      console.log(newop);
-      newop.store();
+      // newop.store();
       window.plugin.wasabee.makeSelectedOperation(newop.ID);
       return;
     }

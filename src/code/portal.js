@@ -16,6 +16,22 @@ export default class WasabeePortal {
     this.hardness = hardness;
   }
 
+  static create(obj) {
+    if (!obj || !obj.id) {
+      console.log("can't create WasabeePortal from this");
+      return;
+    }
+    const wp = new WasabeePortal(
+      obj.id,
+      obj.name,
+      obj.lat,
+      obj.lng,
+      obj.comment,
+      obj.hardness
+    );
+    return wp;
+  }
+
   // if the name or location changes, this will catch it
   fullUpdate() {
     if (this.id.length != 35) return; // ignore faked ones from DrawTools imports
