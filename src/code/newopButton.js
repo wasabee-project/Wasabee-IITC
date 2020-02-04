@@ -1,4 +1,5 @@
 import { Feature } from "./leafletDrawImports";
+import { ImportDialogControl } from "./importDialog";
 import WasabeeOp from "./operation";
 
 const NewopButtonControl = Feature.extend({
@@ -18,20 +19,23 @@ const NewopButtonControl = Feature.extend({
   },
 
   _displayDialog: function(noHandler) {
-    var content = document.createElement("div");
+    const content = document.createElement("div");
     content.className = "wasabee-dialog wasabee-dialog-ops";
-    var buttonSet = content.appendChild(document.createElement("div"));
+    const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
-    var addButton = buttonSet.appendChild(document.createElement("a"));
+    const addButton = buttonSet.appendChild(document.createElement("a"));
     addButton.textContent = "Add New Op";
 
-    var importButton = buttonSet.appendChild(document.createElement("a"));
+    const importButton = buttonSet.appendChild(document.createElement("a"));
     importButton.textContent = "Import Op";
     importButton.addEventListener(
       "click",
       () => {
         noHandler._dialog.dialog("close");
-        window.plugin.wasabee.importString();
+        // window.plugin.wasabee.importString();
+        const id = new ImportDialogControl(this._map, null);
+        id.enable();
+        // console.log(id);
       },
       false
     );

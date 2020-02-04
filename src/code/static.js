@@ -35,7 +35,8 @@ Wasabee.static = {
     linkList: "wasabee-linklist",
     markerList: "wasabee-markerlist",
     assign: "wasabee-assign",
-    multimaxButton: "wasabee-multimax"
+    multimaxButton: "wasabee-multimax",
+    importDialog: "wasabee-import"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

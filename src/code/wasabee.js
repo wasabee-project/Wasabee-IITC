@@ -1,6 +1,5 @@
 const markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
-import WasabeeOp from "./operation";
 import { getColorMarker } from "./mapDrawing";
 import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
@@ -106,39 +105,6 @@ export default function() {
       false
     );
     return content;
-  };
-
-  //** This function opens a dialog with a text field to copy */
-  window.plugin.wasabee.importString = () => {
-    const promptAction = prompt(
-      "Press CTRL+V to paste (Wasabee data only).",
-      ""
-    );
-    if (promptAction !== null && promptAction !== "") {
-      window.plugin.wasabee.saveImportString(promptAction);
-    }
-  };
-
-  window.plugin.wasabee.saveImportString = string => {
-    try {
-      if (
-        string.match(
-          new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
-        )
-      ) {
-        alert("Wasabee doesn't support stock intel draw imports");
-      } else {
-        const data = JSON.parse(string);
-        const importedOp = WasabeeOp.create(data);
-        importedOp.store();
-        window.plugin.wasabee.loadOp(importedOp.ID);
-        console.log("WasabeeTools: reset and imported drawn items");
-        alert("Imported Operation: " + importedOp.name + " Successfuly.");
-      }
-    } catch (e) {
-      console.warn("WasabeeTools: failed to import data: " + e);
-      alert("Import Failed.");
-    }
   };
 
   window.plugin.wasabee.showMustAuthAlert = () => {
