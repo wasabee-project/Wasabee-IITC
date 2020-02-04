@@ -1,9 +1,7 @@
 import store from "../lib/store";
 import WasabeeOp from "./operation";
 
-// needs Wasabee.Constants from scopes.js
-
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 export default function() {
   window.plugin.wasabee.setRestoreOpID = opID => {

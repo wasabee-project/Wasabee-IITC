@@ -3,6 +3,8 @@ import WasabeeMarker from "./marker";
 import WasabeeTeam from "./team";
 import { assignLinkPromise, assignMarkerPromise, teamPromise } from "./server";
 
+// XXX CONVERT TO LEAFLET EXTENDS
+
 export default class AssignDialog {
   constructor(target, operation) {
     this._operation = operation;

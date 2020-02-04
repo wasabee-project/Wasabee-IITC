@@ -1,5 +1,7 @@
 var _exportdialogs = [];
 
+// XXX CONVERT TO LEAFLET EXTENDS
+
 export default class ExportDialog {
   constructor(operation) {
     _exportdialogs.push(this);

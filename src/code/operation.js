@@ -1,4 +1,5 @@
 import WasabeeLink from "./link";
+import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
@@ -44,15 +45,20 @@ export default class WasabeeOp {
   }
 
   containsPortal(portal) {
-    if (portal) {
-      if (this.opportals.length == 0) {
-        return false;
-      } else {
-        for (let portal_ in this.opportals) {
-          if (portal_ && portal.id == portal_.id) {
-            return true;
-          }
-        }
+    if (!portal) return false;
+    if (this.opportals.length == 0) return false;
+    for (const opp in this.opportals) {
+      if (opp && portal.id == opp.id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getPortalByLatLng(lat, lng) {
+    for (const portal in this.opportals) {
+      if (portal.lat == lat && portal.lng == lng) {
+        return portal.id;
       }
     }
     return false;
@@ -114,8 +120,6 @@ export default class WasabeeOp {
         return this.opportals[portal_];
       }
     }
-    // console.log("getPortal failed for :" + portalID);
-    // console.log(new Error().stack);
     return null;
   }
 
@@ -430,6 +434,25 @@ export default class WasabeeOp {
     return tmpMarkers;
   }
 
+  convertPortalsToObjs(portals) {
+    const tmpPortals = Array();
+    for (let portal_ in portals) {
+      if (portals[portal_] instanceof WasabeePortal) {
+        tmpPortals.push(portals[portal_]);
+      } else {
+        const np = new WasabeePortal(
+          portals[portal_].id,
+          portals[portal_].name,
+          portals[portal_].lat,
+          portals[portal_].lng
+        );
+        tmpPortals.push(np);
+      }
+    }
+    console.log(tmpPortals);
+    return tmpPortals;
+  }
+
   _ensureCollections() {
     if (!this.markers) {
       this.markers = Array();
@@ -520,6 +543,8 @@ export default class WasabeeOp {
           operation[prop] = operation.convertLinksToObjs(obj[prop]);
         } else if (prop == "markers") {
           operation[prop] = operation.convertMarkersToObjs(obj[prop]);
+        } else if (prop == "opportals") {
+          operation[prop] = operation.convertPortalsToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }
