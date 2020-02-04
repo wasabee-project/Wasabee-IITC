@@ -1,3 +1,5 @@
+// I don't think this file is used any longer
+/*
 const distance = (fromPortal, toPortal) => {
   //How far between portals.
   var R = 6367; // km
@@ -21,3 +23,4 @@ const distance = (fromPortal, toPortal) => {
 };
 
 export default distance;
+*/
