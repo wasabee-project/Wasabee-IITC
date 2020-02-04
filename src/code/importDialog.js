@@ -58,7 +58,7 @@ class ImportDialog {
     this.textarea.rows = 20;
     this.textarea.cols = 80;
     this.textarea.placeholder =
-      "Paste a Wasabee draw export here. Wasabee cannot import stock intel, IITC drawtools, or any other formats.";
+      "Paste a Wasabee draw export here.\n\nWasabee cannot import the stock intel format.\n\nThere is experimental support for importing the IITC DrawTools format.\n\nBefore importing DrawTools format, preview the areas and make sure all the portals load so IITC has them cached. Any portals that are not pre-cached will be faked.\n\nYou will need to use the 'swap' feature to move anchors from the faked portals to the real portals (they should be in the correct location, just not associated with the portal.\n\nCached portals might not be properly named.";
   }
 
   importTextareaAsOp() {
@@ -72,9 +72,12 @@ class ImportDialog {
       return;
     }
 
+    // check to see if it is drawtools
     if (string.match(new RegExp(".*polyline.*"))) {
       console.log("trying to import IITC Drawtools format... wish me luck");
       const newop = this.parseDrawTools(string);
+      newop.updatePortalsFromIITCData();
+      console.log(newop);
       newop.store();
       window.plugin.wasabee.makeSelectedOperation(newop.ID);
       return;
@@ -99,20 +102,15 @@ class ImportDialog {
     const data = JSON.parse(string);
 
     // pass one, try to prime the pump
-    for (const line of data) {
+    /* for (const line of data) {
       if (line.type == "polyline") {
         for (const point of line.latLngs) {
           window.selectPortalByLatLng(point.lat, point.lng);
-          if (!window.map.getBounds().contains(point)) {
-            // window.map.panTo(point);
-            // const status = window.mapDataRequest.getStatus();
-            // console.log(status);
-          }
         }
       }
-    }
+    } */
 
-    // once pump is primed, build a map for fast searching of window.portals
+    // build a hash map for fast searching of window.portals
     const pmap = this.buildWindowPortalMap();
 
     let faked = 0;
@@ -164,7 +162,6 @@ class ImportDialog {
         faked +
         ". Please use the swap feature to move faked portals to the real portals at the same location."
     );
-
     return newop;
   }
 
@@ -185,7 +182,7 @@ class ImportDialog {
       const portalID = pmap.get(key);
       const np = new WasabeePortal(
         portalID,
-        "Found, getting name: " + portalID,
+        "[loading name: " + portalID + "]",
         latLng.lat,
         latLng.lng
       );

@@ -45,10 +45,13 @@ export default class WasabeeOp {
   }
 
   containsPortal(portal) {
-    if (!portal) return false;
+    if (!portal && !portal.id) {
+      console.log("containsPortal w/o args");
+      return false;
+    }
     if (this.opportals.length == 0) return false;
-    for (const opp in this.opportals) {
-      if (opp && portal.id == opp.id) {
+    for (const opp of this.opportals) {
+      if (opp && opp.id == portal.id) {
         return true;
       }
     }
@@ -56,9 +59,9 @@ export default class WasabeeOp {
   }
 
   getPortalByLatLng(lat, lng) {
-    for (const portal in this.opportals) {
+    for (const portal of this.opportals) {
       if (portal.lat == lat && portal.lng == lng) {
-        return portal.id;
+        return portal;
       }
     }
     return false;
@@ -253,6 +256,16 @@ export default class WasabeeOp {
   }
 
   addPortal(portal) {
+    if (!(portal instanceof WasabeePortal)) {
+      console.log("attempt to add something not a portal as a portal");
+      console.trace();
+      portal = new WasabeePortal(
+        portal.id,
+        portal.name,
+        portal.lat,
+        portal.lng
+      );
+    }
     if (!this.containsPortal(portal)) {
       this.opportals.push(portal);
     } else {
@@ -262,8 +275,26 @@ export default class WasabeeOp {
     }
   }
 
+  // this updates all portal data from IITC (if moved/renamed)
+  updatePortalsFromIITCData() {
+    for (const p of this.opportals) {
+      p.fullUpdate();
+    }
+  }
+
   addLink(fromPortal, toPortal, description) {
-    // console.log("addLink " + fromPortal + " " + toPortal);
+    if (!(fromPortal instanceof WasabeePortal)) {
+      console.log("addLink fromPortal not a WasabeePortal");
+      console.log(fromPortal);
+      console.trace;
+      return;
+    }
+    if (!(toPortal instanceof WasabeePortal)) {
+      console.log("addLink toPortal not a WasabeePortal");
+      console.log(toPortal);
+      console.trace;
+      return;
+    }
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."
@@ -301,8 +332,9 @@ export default class WasabeeOp {
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
     }
-
-    this.addPortal(portal);
+    if (!this.containsPortal(portal)) {
+      this.addPortal(portal);
+    }
   }
 
   swapPortal(originalPortal, newPortal) {
@@ -444,12 +476,13 @@ export default class WasabeeOp {
           portals[portal_].id,
           portals[portal_].name,
           portals[portal_].lat,
-          portals[portal_].lng
+          portals[portal_].lng,
+          portals[portal_].comment,
+          portals[portal_].hardness
         );
         tmpPortals.push(np);
       }
     }
-    console.log(tmpPortals);
     return tmpPortals;
   }
 
