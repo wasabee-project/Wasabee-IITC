@@ -107,7 +107,7 @@ const getListDialogContent = operation => {
   const content = new Sortable();
   content.fields = [
     {
-      name: "Portal Name",
+      name: "Portal",
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),
       // format: (a, m) => a.appendChild(UiHelper.getPortalLink(m))
@@ -116,17 +116,9 @@ const getListDialogContent = operation => {
       }
     },
     {
-      name: "Marker Type",
+      name: "Type",
       value: marker =>
         window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
-    },
-    {
-      name: "State",
-      value: marker => marker.state,
       sort: (a, b) => a.localeCompare(b),
       format: (a, m) => {
         a.textContent = m;
@@ -159,11 +151,15 @@ const getListDialogContent = operation => {
       }
     },
     {
-      name: "Completed By",
-      value: marker => marker.completedBy,
+      name: "Done",
+      value: marker => marker.state,
       sort: (a, b) => a.localeCompare(b),
       format: (a, m) => {
-        a.textContent = m;
+        if (m == "completed") {
+          a.textContent = "Yes";
+        } else {
+          a.textContent = "No";
+        }
       }
     },
     {
