@@ -16,14 +16,18 @@ export default class AssignDialog {
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.innerHTML = portal.name + ": link assignment";
+      divtitle.appendChild(target.getLinkDisplay(this._operation));
+      const t = divtitle.appendChild(document.createElement("span"));
+      t.innerHTML = " link assignment";
       this._name = "Assign link from: " + portal.name;
     }
 
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
-      divtitle.innerHTML = portal.name + ": marker assignment";
+      divtitle.appendChild(portal.getPortalLink());
+      const t = divtitle.appendChild(document.createElement("span"));
+      t.innerHTML = " marker assignment";
       this._name = "Assign marker for: " + portal.name;
     }
 
