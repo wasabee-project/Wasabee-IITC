@@ -7,7 +7,7 @@ const UiHelper = {
       var data = window.portals[id].options.data;
       return new WasabeePortal(
         id,
-        name,
+        data.title,
         (data.latE6 / 1e6).toFixed(6).toString(),
         (data.lngE6 / 1e6).toFixed(6).toString()
       );

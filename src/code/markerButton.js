@@ -97,7 +97,6 @@ const MarkerButtonControl = Feature.extend({
 export default MarkerButtonControl;
 
 const markerListUpdate = operation => {
-  console.log("markerListUpdate");
   const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.markerList;
   if (window.DIALOGS[id]) {
     const table = getListDialogContent(operation).table;
