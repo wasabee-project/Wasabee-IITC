@@ -1,6 +1,5 @@
 import { Feature } from "./leafletDrawImports";
 import UiCommands from "./uiCommands.js";
-import UiHelper from "./uiHelper.js";
 import WasabeePortal from "./portal";
 
 const LinkDialogButtonControl = Feature.extend({
@@ -122,10 +121,10 @@ const LinkDialogButtonControl = Feature.extend({
   },
 
   _setPortal: function(event) {
-    var updateID = event.currentTarget.parentNode.parentNode.getAttribute(
+    const updateID = event.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
-    var selectedPortal = WasabeePortal.getSelected();
+    const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
       localStorage["wasabee-portal-" + updateID] = JSON.stringify(
         selectedPortal
@@ -140,7 +139,9 @@ const LinkDialogButtonControl = Feature.extend({
 
   _getPortal: function(name) {
     try {
-      return JSON.parse(localStorage["wasabee-portal-" + name]);
+      return WasabeePortal.create(
+        JSON.parse(localStorage["wasabee-portal-" + name])
+      );
     } catch (b) {
       return null;
     }

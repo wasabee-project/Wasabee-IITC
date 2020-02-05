@@ -1,5 +1,4 @@
 import { Feature } from "./leafletDrawImports";
-import UiHelper from "./uiHelper";
 import multimax from "./multimax";
 import store from "../lib/store";
 import WasabeePortal from "./portal";

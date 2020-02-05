@@ -1,4 +1,3 @@
-import UiHelper from "./uiHelper.js";
 import { Feature } from "./leafletDrawImports";
 import WasabeePortal from "./portal";
 

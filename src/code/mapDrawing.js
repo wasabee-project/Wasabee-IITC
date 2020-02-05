@@ -3,7 +3,6 @@ import UiCommands from "./uiCommands.js";
 import { checkAllLinks } from "./crosslinks";
 import WasabeeMe from "./me";
 import { agentPromise, teamPromise } from "./server";
-// import UiHelper from "./uiHelper";
 import AssignDialog from "./assignDialog";
 
 var Wasabee = window.plugin.Wasabee;

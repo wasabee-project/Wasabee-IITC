@@ -1,4 +1,3 @@
-import UiHelper from "./uiHelper.js";
 import { getPopupBodyWithType } from "./mapDrawing";
 import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";

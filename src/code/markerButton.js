@@ -1,5 +1,4 @@
 import { Feature } from "./leafletDrawImports";
-import UiHelper from "./uiHelper";
 import Sortable from "./sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
@@ -112,9 +111,8 @@ const getListDialogContent = operation => {
       name: "Portal",
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),
-      // format: (a, m) => a.appendChild(m.getPortalLink())
-      format: (a, m) => {
-        a.textContent = m;
+      format: (a, m, marker) => {
+        a.appendChild(operation.getPortal(marker.portalId).getPortalLink());
       }
     },
     {
@@ -130,8 +128,14 @@ const getListDialogContent = operation => {
       name: "Comment",
       value: marker => marker.comment,
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
+      format: (a, m, marker) => {
+        const comment = a.appendChild(document.createElement("a"));
+        comment.innerHTML = m;
+        a.addEventListener("click", () => {
+          const scd = new SetCommentDialog(window.map);
+          scd.setup(marker, operation);
+          scd.enable();
+        });
       }
     },
     {
@@ -148,8 +152,12 @@ const getListDialogContent = operation => {
         return "";
       },
       sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
+      format: (a, m, agent) => {
+        const assigned = a.appendChild(document.createElement("a"));
+        assigned.innerHTML = m;
+        a.addEventListener("click", () => {
+          new AssignDialog(agent, operation);
+        });
       }
     },
     {

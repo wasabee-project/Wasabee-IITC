@@ -104,24 +104,8 @@ export default class WasabeePortal {
   }
 
   static getSelected() {
-    return window.selectedPortal ? WasabeePortal.get(window.selectedPortal) : null,
+    return window.selectedPortal
+      ? WasabeePortal.get(window.selectedPortal)
+      : null;
   }
-}
-
-// deprecated
-export const getPortal = function(id) {
-    if (window.portals[id] && window.portals[id].options.data.title) {
-      const data = window.portals[id].options.data;
-      return new WasabeePortal(
-        id,
-        data.title,
-        (data.latE6 / 1e6).toFixed(6).toString(),
-        (data.lngE6 / 1e6).toFixed(6).toString()
-      );
-    }
-    return null;
-}
-
-export const getSelectedPortal function() {
-    return window.selectedPortal ? getPortal(window.selectedPortal) : null,
 }
