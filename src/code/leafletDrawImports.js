@@ -64,7 +64,7 @@ const Tooltip = L.Class.extend({
 });
 
 export const Feature = L.Handler.extend({
-  includes: L.Evented.prototype || L.Mixin.Events,
+  includes: L.Mixin.Events,
 
   initialize: function(map, options) {
     this._map = map;
@@ -150,7 +150,8 @@ export const Feature = L.Handler.extend({
 });
 
 export const Toolbar = L.Class.extend({
-  includes: L.Evented.prototype || L.Mixin.Events,
+  // includes: L.Evented.prototype || L.Mixin.Events,
+  includes: L.Mixin.Events,
 
   initialize: function(options) {
     L.setOptions(this, options);

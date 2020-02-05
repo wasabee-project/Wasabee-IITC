@@ -2,6 +2,7 @@ import { Feature } from "./leafletDrawImports";
 import UiHelper from "./uiHelper";
 import Sortable from "./sortable";
 import AssignDialog from "./assignDialog";
+import SetCommentDialog from "./setCommentDialog";
 
 const MarkerButtonControl = Feature.extend({
   statics: {
@@ -28,6 +29,7 @@ const MarkerButtonControl = Feature.extend({
     this._marker = null;
 
     const content = document.createElement("div");
+    content.className = "temp-op-dialog";
     this._type = content.appendChild(document.createElement("select"));
     window.plugin.Wasabee.markerTypes.forEach((a, k) => {
       const o = this._type.appendChild(document.createElement("option"));
@@ -181,10 +183,9 @@ const makeMarkerDialogMenu = (list, data) => {
     {
       label: "Set Comment",
       onclick: () => {
-        const reponse = prompt("Marker Comment", data.comment);
-        if (reponse != null) {
-          operation.setMarkerComment(data, reponse);
-        }
+        const scd = new SetCommentDialog(window.map);
+        scd.setup(data, operation);
+        scd.enable();
       }
     },
     {
