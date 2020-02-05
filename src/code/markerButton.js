@@ -108,6 +108,14 @@ const getListDialogContent = operation => {
   const content = new Sortable();
   content.fields = [
     {
+      name: "Order",
+      value: marker => marker.order,
+      // sort: (a, b) => (a < b),
+      format: (a, m) => {
+        a.textContent = m;
+      }
+    },
+    {
       name: "Portal",
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),

@@ -1,5 +1,5 @@
 // import WasabeeOp from "./operation";
-// import WasabeePortal from "./portal";
+import WasabeePortal from "./portal";
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
 import { Feature } from "./leafletDrawImports";
@@ -8,14 +8,28 @@ export const SetCommentDialogControl = Feature.extend({
   setup: function(target, operation) {
     this.operation = operation;
     this.target = target;
+
     if (target instanceof WasabeeLink) {
       this.commentType = "link";
       this.dialogTitle = "Set Link Comment";
+      this.portal = this.operation.getPortal(this.target.fmPortalId);
     }
+
     if (target instanceof WasabeeMarker) {
       this.commentType = "marker";
-      const portal = this.operation.getPortal(this.target.portalId);
-      this.dialogTitle = "Set Marker Comment: " + portal.name;
+      this.portal = this.operation.getPortal(this.target.portalId);
+      this.dialogTitle = "Set Marker Comment: " + this.portal.name;
+    }
+
+    if (target instanceof WasabeePortal) {
+      this.commentType = "portal";
+      this.dialogTitle = "Set Portal Comment: " + target.name;
+      this.portal = this.target;
+    }
+
+    if (!this.commentType) {
+      console.log("comment dialog requested for unknown type");
+      console.log(target);
     }
   },
 
@@ -39,6 +53,10 @@ export const SetCommentDialogControl = Feature.extend({
   },
 
   _displayDialog: function() {
+    if (!this.commentType) {
+      console.log("SetupCommentDialog called before being setup");
+      return;
+    }
     if (!this._map) return;
     const setCommentHandler = this;
     this._dialog = window.dialog({
@@ -58,15 +76,27 @@ export const SetCommentDialogControl = Feature.extend({
   _buildHtml: function() {
     const container = document.createElement("div");
     container.className = "wasabee-dialog wasabee-dialog-ops";
-    const desc = document.createElement("div");
+    const desc = container.appendChild(document.createElement("div"));
     const input = container.appendChild(document.createElement("input"));
     input.placeholder = "comment";
 
     if (this.commentType == "link") {
-      desc.innerHTML = "Set comment for link";
-      if (this.target.comment) input.value = this.target.comment;
-    } else {
-      desc.innerHTML = "Set comment for marker on: " + this.target.name;
+      desc.innerHTML = "Set comment for link: ";
+      desc.appendChild(this.target.getLinkDisplay(this.operation));
+      if (this.target.comment) input.value = this.target.description;
+      input.addEventListener(
+        "change",
+        () => {
+          this.operation.setLinkComment(this.target, input.value);
+        },
+        false
+      );
+    }
+
+    if (this.commentType == "marker") {
+      desc.innerHTML = "Set comment for marker on: ";
+      desc.appendChild(this.portal.getPortalLink());
+
       if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
         "change",
@@ -76,6 +106,23 @@ export const SetCommentDialogControl = Feature.extend({
         false
       );
     }
+
+    if (this.commentType == "portal") {
+      desc.innerHTML = "Set comment for portal: ";
+      desc.appendChild(this.portal.getPortalLink());
+
+      if (this.portal.comment) input.value = this.portal.comment;
+      input.addEventListener(
+        "change",
+        () => {
+          this.operation.setPortalComment(this.target, input.value);
+        },
+        false
+      );
+
+      // add hardness here too
+    }
+
     return container;
   }
 });

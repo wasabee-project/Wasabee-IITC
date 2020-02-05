@@ -1,8 +1,11 @@
 import Sortable from "./sortable";
 import LinkDialogButtonControl from "./linkDialogButton";
 import AssignDialog from "./assignDialog";
+import SetCommentDialog from "./setCommentDialog";
 
 // don't use this _dialog[] any more. Use the new framework.
+// switch over to Feature.extend
+
 var _dialogs = [];
 var Wasabee = window.plugin.Wasabee;
 
@@ -15,11 +18,9 @@ export default class LinkListDialog {
     this._dialog = null;
     this._table.fields = [
       {
-        name: "Throw Order",
+        name: "Order",
         value: link => link.throwOrderPos,
-        sort: (a, b) => {
-          return a - b;
-        },
+        // sort: (a, b) => { return a - b; },
         format: (a, m) => {
           a.textContent = m;
         }
@@ -93,13 +94,23 @@ export default class LinkListDialog {
         }
       },
       {
-        name: "Description",
+        name: "Comment",
         value: link => link.description,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, obj) => {
+        format: (row, obj, link) => {
           row.className = "desc";
           if (obj != null) {
-            row.innerHTML = window.escapeHtmlSpecialChars(obj);
+            const comment = row.appendChild(document.createElement("a"));
+            comment.innerHTML = window.escapeHtmlSpecialChars(obj);
+            row.addEventListener(
+              "click",
+              () => {
+                const scd = new SetCommentDialog(window.map);
+                scd.setup(link, operation);
+                scd.enable();
+              },
+              false
+            );
           }
         }
       },
@@ -117,8 +128,18 @@ export default class LinkListDialog {
           return "";
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
+        format: (a, m, link) => {
+          const assignee = a.appendChild(document.createElement("a"));
+          assignee.innerHTML = m;
+          if (this._operation.IsServerOp()) {
+            a.addEventListener(
+              "click",
+              () => {
+                new AssignDialog(link, this._operation);
+              },
+              false
+            );
+          }
         }
       },
       {
@@ -182,7 +203,7 @@ export default class LinkListDialog {
   }
 
   getLinkLength(link) {
-    var latlngs = link.getLatLngs(this._operation);
+    const latlngs = link.getLatLngs(this._operation);
     return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
   }
 
@@ -200,35 +221,27 @@ export default class LinkListDialog {
     }
   }
 
-  reverseLink(link) {
-    this._operation.reverseLink(link.fromPortalId, link.toPortalId);
-    this._setLinks();
-  }
-
-  setDescription(link) {
-    var promptAction = prompt("Link Description", link.description);
-    if (promptAction !== null) {
-      link.description = promptAction;
-      this._operation.update();
-    }
-    this._setLinks();
-  }
-
   makeMenu(list, data) {
-    const $Wasabee = this;
     const state = new Wasabee.OverflowMenu();
     const options = [
       {
         label: "Reverse",
-        onclick: () => $Wasabee.reverseLink(data)
+        onclick: () => {
+          this._operation.reverseLink(data.fromPortalId, data.toPortalId);
+          this._setLinks();
+        }
       },
       {
         label: "Delete",
-        onclick: () => $Wasabee.deleteLink(data)
+        onclick: () => this.deleteLink(data)
       },
       {
-        label: "Set Description",
-        onclick: () => $Wasabee.setDescription(data)
+        label: "Set Comment",
+        onclick: () => {
+          const scd = new SetCommentDialog(window.map);
+          scd.setup(data, this._operation);
+          scd.enable();
+        }
       }
     ];
     if (this._operation.IsServerOp()) {

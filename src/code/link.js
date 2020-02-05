@@ -44,4 +44,22 @@ export default class WasabeeLink {
     }
     return link;
   }
+
+  getLinkDisplay(operation) {
+    const d = document.createElement("div");
+    d.appendChild(operation.getPortal(this.fromPortalId).getPortalLink());
+    const arrow = d.appendChild(document.createElement("span"));
+    arrow.innerHTML = " ➾ ";
+    arrow.style.color = this.getColorHex();
+    d.appendChild(operation.getPortal(this.toPortalId).getPortalLink());
+    return d;
+  }
+
+  getColorHex() {
+    if (window.plugin.Wasabee.layerTypes.has(this.color)) {
+      const c = window.plugin.Wasabee.layerTypes.get(this.color);
+      return c.color;
+    }
+    return "#333333";
+  }
 }
