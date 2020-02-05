@@ -49,4 +49,79 @@ export default class WasabeePortal {
       }
     );
   }
+
+  // hiding behind too-clever-by-half makes for unmanagable code
+  getPortalLink() {
+    const pt = L.latLng(parseFloat(this.lat), parseFloat(this.lng));
+    const v = this.lat + "," + this.lng;
+    const e = document.createElement("a");
+    return (
+      e.appendChild(document.createTextNode(this.name)),
+      (e.title = this.name),
+      (e.href = "/intel?ll=" + v + "&pll=" + v),
+      e.addEventListener(
+        "click",
+        event => {
+          return (
+            window.selectedPortal != this.id
+              ? window.renderPortalDetails(this.id)
+              : window.map.panTo(pt),
+            event.preventDefault(),
+            false
+          );
+        },
+        false
+      ),
+      e.addEventListener(
+        "dblclick",
+        event => {
+          return (
+            window.map.getBounds().contains(pt)
+              ? (window.portals[this.id] || window.renderPortalDetails(this.id),
+                window.zoomToAndShowPortal(this.id, pt))
+              : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
+            event.preventDefault(),
+            false
+          );
+        },
+        false
+      ),
+      e
+    );
+  }
+
+  static get(id) {
+    if (window.portals[id] && window.portals[id].options.data.title) {
+      const data = window.portals[id].options.data;
+      return new WasabeePortal(
+        id,
+        data.title,
+        (data.latE6 / 1e6).toFixed(6).toString(),
+        (data.lngE6 / 1e6).toFixed(6).toString()
+      );
+    }
+    return null;
+  }
+
+  static getSelected() {
+    return window.selectedPortal ? WasabeePortal.get(window.selectedPortal) : null,
+  }
+}
+
+// deprecated
+export const getPortal = function(id) {
+    if (window.portals[id] && window.portals[id].options.data.title) {
+      const data = window.portals[id].options.data;
+      return new WasabeePortal(
+        id,
+        data.title,
+        (data.latE6 / 1e6).toFixed(6).toString(),
+        (data.lngE6 / 1e6).toFixed(6).toString()
+      );
+    }
+    return null;
+}
+
+export const getSelectedPortal function() {
+    return window.selectedPortal ? getPortal(window.selectedPortal) : null,
 }

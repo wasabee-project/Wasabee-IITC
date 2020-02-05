@@ -2,6 +2,7 @@ import { Feature } from "./leafletDrawImports";
 import UiHelper from "./uiHelper";
 import multimax from "./multimax";
 import store from "../lib/store";
+import WasabeePortal from "./portal";
 
 const MultimaxButtonControl = Feature.extend({
   statics: {
@@ -114,7 +115,7 @@ class MultimaxDialog {
   //***Function to set portal -- called from 'Set' Button
   setPortal(event) {
     const AB = event.currentTarget.parentNode.parentNode.getAttribute("AB");
-    const selectedPortal = UiHelper.getSelectedPortal();
+    const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
       store.set("wasabee-multimax-" + AB, JSON.stringify(selectedPortal));
     } else {
@@ -139,7 +140,7 @@ class MultimaxDialog {
     const viewContainer = this._portals[AB];
     $(viewContainer).empty();
     if (i) {
-      viewContainer.appendChild(UiHelper.getPortalLink(i));
+      viewContainer.appendChild(i.getPortalLink());
     }
   }
 

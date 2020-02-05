@@ -3,6 +3,7 @@ import UiHelper from "./uiHelper";
 import Sortable from "./sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
+import WasabeePortal from "./portal";
 
 const MarkerButtonControl = Feature.extend({
   statics: {
@@ -71,7 +72,7 @@ const MarkerButtonControl = Feature.extend({
   },
 
   _addMarker: function(selectedType, operation, comment) {
-    operation.addMarker(selectedType, UiHelper.getSelectedPortal(), comment);
+    operation.addMarker(selectedType, WasabeePortal.getSelected(), comment);
   },
 
   _listDialog: function(operation) {
@@ -111,7 +112,7 @@ const getListDialogContent = operation => {
       name: "Portal",
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),
-      // format: (a, m) => a.appendChild(UiHelper.getPortalLink(m))
+      // format: (a, m) => a.appendChild(m.getPortalLink())
       format: (a, m) => {
         a.textContent = m;
       }

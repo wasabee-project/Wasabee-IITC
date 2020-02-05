@@ -1,5 +1,6 @@
 import UiHelper from "./uiHelper.js";
 import { Feature } from "./leafletDrawImports";
+import WasabeePortal from "./portal";
 
 const strings = {
   quickdraw: {
@@ -90,7 +91,7 @@ const QuickDrawControl = Feature.extend({
   },
 
   _portalClicked: function() {
-    const selectedPortal = UiHelper.getSelectedPortal();
+    const selectedPortal = WasabeePortal.getSelected();
     if (!selectedPortal) return;
     if (!this._anchor1) {
       this._anchor1 = selectedPortal;

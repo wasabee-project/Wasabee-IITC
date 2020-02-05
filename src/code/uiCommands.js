@@ -1,6 +1,7 @@
 import UiHelper from "./uiHelper.js";
 import { getPopupBodyWithType } from "./mapDrawing";
 import WasabeeOp from "./operation";
+import WasabeePortal from "./portal";
 import LinkListDialog from "./linkListDialog";
 
 //This methos helps with commonly used UI data getting functions
@@ -26,7 +27,7 @@ export default {
     //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
   },
   swapPortal: (operation, portal) => {
-    var selectedPortal = UiHelper.getSelectedPortal();
+    var selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal !== undefined) {
       if (portal.id === selectedPortal.id) {
         alert("Cannot swap a portal with itself! Select a different portal.");

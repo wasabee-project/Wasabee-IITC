@@ -1,6 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import UiCommands from "./uiCommands.js";
 import UiHelper from "./uiHelper.js";
+import WasabeePortal from "./portal";
 
 const LinkDialogButtonControl = Feature.extend({
   statics: {
@@ -124,7 +125,7 @@ const LinkDialogButtonControl = Feature.extend({
     var updateID = event.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
-    var selectedPortal = UiHelper.getSelectedPortal();
+    var selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
       localStorage["wasabee-portal-" + updateID] = JSON.stringify(
         selectedPortal
@@ -151,7 +152,7 @@ const LinkDialogButtonControl = Feature.extend({
     var viewContainer = this._portals[key];
     $(viewContainer).empty();
     if (i) {
-      viewContainer.appendChild(UiHelper.getPortalLink(i));
+      viewContainer.appendChild(i.getPortalLink());
     }
     //***Function to add link between the portals -- called from 'Add' Button next to To portals
   },

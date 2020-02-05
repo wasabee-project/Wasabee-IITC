@@ -1,5 +1,4 @@
 import Sortable from "./sortable";
-import UiHelper from "./uiHelper.js";
 import LinkDialogButtonControl from "./linkDialogButton";
 import AssignDialog from "./assignDialog";
 
@@ -30,14 +29,14 @@ export default class LinkListDialog {
         value: link => that._operation.getPortal(link.fromPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(UiHelper.getPortalLink(data))
+        format: (d, data) => d.appendChild(data.getPortalLink())
       },
       {
         name: "To",
         value: link => that._operation.getPortal(link.toPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(UiHelper.getPortalLink(data))
+        format: (d, data) => d.appendChild(data.getPortalLink())
       },
       {
         name: "Length",

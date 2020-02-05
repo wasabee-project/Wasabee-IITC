@@ -16,52 +16,6 @@ const UiHelper = {
   },
   getSelectedPortal: () =>
     window.selectedPortal ? UiHelper.getPortal(window.selectedPortal) : null,
-  toLatLng: (data, angle) => {
-    return (
-      void 0 === angle &&
-        "object" == typeof data &&
-        ((angle = data.lng), (data = data.lat)),
-      L.latLng(parseFloat(data), parseFloat(angle))
-    );
-  },
-  getPortalLink: data => {
-    var pt = UiHelper.toLatLng(data);
-    var v = data.lat + "," + data.lng;
-    var e = document.createElement("a");
-    return (
-      e.appendChild(document.createTextNode(data.name)),
-      (e.title = data.name),
-      (e.href = "/intel?ll=" + v + "&pll=" + v),
-      e.addEventListener(
-        "click",
-        event => {
-          return (
-            window.selectedPortal != data.id
-              ? window.renderPortalDetails(data.id)
-              : window.map.panTo(pt),
-            event.preventDefault(),
-            false
-          );
-        },
-        false
-      ),
-      e.addEventListener(
-        "dblclick",
-        event => {
-          return (
-            window.map.getBounds().contains(pt)
-              ? (window.portals[data.id] || window.renderPortalDetails(data.id),
-                window.zoomToAndShowPortal(data.id, pt))
-              : (window.map.panTo(pt), window.renderPortalDetails(data.id)),
-            event.preventDefault(),
-            false
-          );
-        },
-        false
-      ),
-      e
-    );
-  }
 };
 
 export default UiHelper;
