@@ -51,7 +51,7 @@ export default class WasabeePortal {
   }
 
   // hiding behind too-clever-by-half makes for unmanagable code
-  getPortalLink() {
+  displayFormat() {
     const pt = L.latLng(parseFloat(this.lat), parseFloat(this.lng));
     const v = this.lat + "," + this.lng;
     const e = document.createElement("a");

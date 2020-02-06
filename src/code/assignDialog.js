@@ -1,5 +1,6 @@
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
+import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import { assignLinkPromise, assignMarkerPromise, teamPromise } from "./server";
 
@@ -16,7 +17,7 @@ export default class AssignDialog {
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.appendChild(target.getLinkDisplay(this._operation));
+      divtitle.appendChild(target.displayFormat(this._operation));
       const t = divtitle.appendChild(document.createElement("span"));
       t.innerHTML = " link assignment";
       this._name = "Assign link from: " + portal.name;
@@ -25,10 +26,19 @@ export default class AssignDialog {
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
-      divtitle.appendChild(portal.getPortalLink());
+      divtitle.appendChild(portal.displayFormat());
       const t = divtitle.appendChild(document.createElement("span"));
       t.innerHTML = " marker assignment";
       this._name = "Assign marker for: " + portal.name;
+    }
+
+    if (target instanceof WasabeeAnchor) {
+      const portal = operation.getPortal(target.portalId);
+      this._type = "Anchor";
+      divtitle.appendChild(portal.displayFormat());
+      const t = divtitle.appendChild(document.createElement("span"));
+      t.innerHTML = " all outbound links";
+      this._name = "Assign all outbound links from: " + portal.name;
     }
 
     const menu = this._getAgentMenu(target.assignedTo);
@@ -127,6 +137,26 @@ export default class AssignDialog {
         }
       );
       this._operation.assignLink(this._targetID, value.srcElement.value);
+    }
+    if (this._type == "Anchor") {
+      const links = this._operation.getLinkListFromPortal(
+        this._operation.getPortal(this._targetID)
+      );
+      for (const l of links) {
+        assignLinkPromise(
+          this._operation.ID,
+          l.ID,
+          value.srcElement.value
+        ).then(
+          function() {
+            console.log("assignment processed");
+          },
+          function(err) {
+            console.log(err);
+          }
+        );
+        this._operation.assignLink(l.ID, value.srcElement.value);
+      }
     }
   }
 }

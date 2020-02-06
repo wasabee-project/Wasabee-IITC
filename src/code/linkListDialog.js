@@ -30,14 +30,14 @@ export default class LinkListDialog {
         value: link => that._operation.getPortal(link.fromPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.getPortalLink())
+        format: (d, data) => d.appendChild(data.displayFormat())
       },
       {
         name: "To",
         value: link => that._operation.getPortal(link.toPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.getPortalLink())
+        format: (d, data) => d.appendChild(data.displayFormat())
       },
       {
         name: "Length",

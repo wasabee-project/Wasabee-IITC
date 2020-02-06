@@ -4,6 +4,8 @@ import { getColorMarker } from "./mapDrawing";
 import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
+import AssignDialog from "./assignDialog";
+import WasabeeAnchor from "./anchor";
 
 const Wasabee = window.plugin.Wasabee;
 export default function() {
@@ -104,6 +106,21 @@ export default function() {
       },
       false
     );
+
+    if (operation.IsServerOp()) {
+      const assignButton = buttonSet.appendChild(document.createElement("a"));
+      assignButton.textContent = "Assign Outbound Links";
+      assignButton.addEventListener(
+        "click",
+        function() {
+          const anchor = new WasabeeAnchor(portalID);
+          new AssignDialog(anchor, operation);
+          marker.closePopup();
+        },
+        false
+      );
+    }
+
     return content;
   };
 

@@ -102,9 +102,9 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
       sort: (a, b) => a.localeCompare(b),
       format: (row, value, thing) => {
         if (thing instanceof WasabeeLink) {
-          row.appendChild(thing.getLinkDisplay(operation));
+          row.appendChild(thing.displayFormat(operation));
         } else {
-          row.appendChild(operation.getPortal(thing.portalId).getPortalLink());
+          row.appendChild(operation.getPortal(thing.portalId).displayFormat());
         }
       }
     },
