@@ -14,4 +14,8 @@ export default class WasabeeAnchor {
   static create(portalId) {
     return new WasabeeAnchor(portalId);
   }
+
+  displayFormat(operation) {
+    return operation.getPortal(this.ID).displayFormat(operation);
+  }
 }

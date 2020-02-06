@@ -153,7 +153,7 @@ const LinkDialogButtonControl = Feature.extend({
     var viewContainer = this._portals[key];
     $(viewContainer).empty();
     if (i) {
-      viewContainer.appendChild(i.displayFormat());
+      viewContainer.appendChild(i.displayFormat(this._operation));
     }
     //***Function to add link between the portals -- called from 'Add' Button next to To portals
   },

@@ -11,7 +11,7 @@ var Wasabee = window.plugin.Wasabee;
 
 export default class LinkListDialog {
   constructor(operation, portal) {
-    const that = this;
+    // const that = this;
     this._operation = operation;
     this._portal = portal;
     this._table = new Sortable();
@@ -20,28 +20,30 @@ export default class LinkListDialog {
       {
         name: "Order",
         value: link => link.order,
-        // sort: (a, b) => { return a - b; },
+        sort: (a, b) => {
+          return a - b;
+        },
         format: (a, m) => {
           a.textContent = m;
         }
       },
       {
         name: "From",
-        value: link => that._operation.getPortal(link.fromPortalId),
+        value: link => this._operation.getPortal(link.fromPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat())
+        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "To",
-        value: link => that._operation.getPortal(link.toPortalId),
+        value: link => this._operation.getPortal(link.toPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat())
+        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "Length",
-        value: obj => that.getLinkLength(obj),
+        value: obj => this.getLinkLength(obj),
         format: (a, m) => {
           a.classList.add("length");
           a.textContent =
@@ -51,7 +53,7 @@ export default class LinkListDialog {
       {
         name: "Min Lvl",
         title: "Minimum level required on source portal",
-        value: obj => that.getLinkLength(obj),
+        value: obj => this.getLinkLength(obj),
         format: (a, b) => {
           var s;
           if (b > 6881280) {
@@ -147,21 +149,21 @@ export default class LinkListDialog {
         value: link => link.color,
         sort: null,
         format: (list, data, link) => {
-          that.makeColorMenu(list, data, this._operation, link);
+          this.makeColorMenu(list, data, this._operation, link);
         }
       },
       {
         name: "",
         sort: null,
         value: link => link,
-        format: (o, e) => that.makeMenu(o, e)
+        format: (o, e) => this.makeMenu(o, e)
       }
     ];
     this._table.sortBy = 0;
     this._setLinks();
     _dialogs.push(this);
     if (this._table.items.length > 0) {
-      let that = this;
+      let that = this; // still necessary?
       this._dialog = window.dialog({
         html: this._table.table,
         dialogClass: "wasabee-dialog wasabee-dialog-linklist",

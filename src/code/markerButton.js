@@ -120,7 +120,9 @@ const getListDialogContent = operation => {
       value: marker => operation.getPortal(marker.portalId).name,
       sort: (a, b) => a.localeCompare(b),
       format: (a, m, marker) => {
-        a.appendChild(operation.getPortal(marker.portalId).displayFormat());
+        a.appendChild(
+          operation.getPortal(marker.portalId).displayFormat(operation)
+        );
       }
     },
     {

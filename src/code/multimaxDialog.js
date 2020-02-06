@@ -139,7 +139,7 @@ class MultimaxDialog {
     const viewContainer = this._portals[AB];
     $(viewContainer).empty();
     if (i) {
-      viewContainer.appendChild(i.displayFormat());
+      viewContainer.appendChild(i.displayFormat(this._operation));
     }
   }
 

@@ -24,4 +24,11 @@ export default class WasabeeAgent {
     window.plugin.Wasabee._agentCache.set(a.id, a);
     return a;
   }
+
+  formatDisplay() {
+    const display = document.createElement("span");
+    display.className = "wasabee-agent-label";
+    display.textContent = this.name;
+    return display;
+  }
 }

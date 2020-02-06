@@ -104,7 +104,9 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
         if (thing instanceof WasabeeLink) {
           row.appendChild(thing.displayFormat(operation));
         } else {
-          row.appendChild(operation.getPortal(thing.portalId).displayFormat());
+          row.appendChild(
+            operation.getPortal(thing.portalId).displayFormat(operation)
+          );
         }
       }
     },

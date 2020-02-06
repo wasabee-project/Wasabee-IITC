@@ -3,6 +3,7 @@ import ExportDialog from "./exportDialog";
 import WasabeeMe from "./me";
 import { deleteOpPromise } from "./server";
 import OperationChecklistDialog from "./operationChecklistDialog";
+import ConfirmDialog from "./confirmDialog";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -196,13 +197,16 @@ const opsButtonControl = Feature.extend({
     clearOpButton.innerHTML = "Clear Portals/Links/Markers";
     clearOpButton.addEventListener(
       "click",
-      function() {
-        const confirmClear = confirm(
-          "Are you sure you want to clear all portals, links, and markers from this operation?"
+      () => {
+        const con = new ConfirmDialog(window.map);
+        con.setup(
+          "Clear: " + operation.name,
+          "Do you want to reset " + operation.name + "?",
+          () => {
+            operation.clearAllItems();
+          }
         );
-        if (confirmClear == true) {
-          operation.clearAllItems();
-        }
+        con.enable();
       },
       false
     );
@@ -272,18 +276,13 @@ const opsButtonControl = Feature.extend({
     }
     deleteButton.addEventListener(
       "click",
-      function() {
-        const confirmed = confirm(
-          "Are you sure you want to *DELETE* " + operation.name + "?"
-        );
-        if (confirmed == true) {
-          if (operation.IsOwnedOp(WasabeeMe.get())) {
-            const confirmedDeleteServerOp = confirm(
-              "Are you sure you want to *DELETE* " +
-                operation.name +
-                " from the *SERVER*?"
-            );
-            if (confirmedDeleteServerOp) {
+      () => {
+        const con = new ConfirmDialog(window.map);
+        con.setup(
+          "Confirm Delete:" + operation.name,
+          "Are you sure you want to delete " + operation.name + "?",
+          () => {
+            if (operation.IsOwnedOp(WasabeeMe.get())) {
               deleteOpPromise(operation.ID).then(
                 function() {
                   console.log("delete from server successful");
@@ -294,33 +293,34 @@ const opsButtonControl = Feature.extend({
                 }
               );
             }
-          }
-          const ol = window.plugin.wasabee.opsList();
-          let newopID = ol[0];
-          console.log(newopID);
-          if (newopID == null || newopID == operation.ID) {
-            console.log(
-              "removing first op in list? I was going to use that...."
-            );
-
-            newopID = ol[1];
+            const ol = window.plugin.wasabee.opsList();
+            let newopID = ol[0];
             console.log(newopID);
-            if (newopID == null) {
-              console.log("not removing last op... fix this");
+            if (newopID == null || newopID == operation.ID) {
+              console.log(
+                "removing first op in list? I was going to use that...."
+              );
+
+              newopID = ol[1];
+              console.log(newopID);
+              if (newopID == null) {
+                console.log("not removing last op... fix this");
+              }
             }
+            let removeid = operation.ID;
+            let operationSelect = document.getElementById(
+              "wasabee-operationSelect"
+            );
+            $(operationSelect).val(newopID);
+            $(operationSelect).change();
+            window.plugin.wasabee.removeOperation(removeid);
+            context._opSelectMenuUpdate(
+              context,
+              window.plugin.wasabee.getSelectedOperation()
+            );
           }
-          let removeid = operation.ID;
-          let operationSelect = document.getElementById(
-            "wasabee-operationSelect"
-          );
-          $(operationSelect).val(newopID);
-          $(operationSelect).change();
-          window.plugin.wasabee.removeOperation(removeid);
-          context._opSelectMenuUpdate(
-            context,
-            window.plugin.wasabee.getSelectedOperation()
-          );
-        }
+        );
+        con.enable();
       },
       false
     );

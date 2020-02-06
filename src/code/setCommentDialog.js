@@ -95,7 +95,7 @@ export const SetCommentDialogControl = Feature.extend({
 
     if (this.commentType == "marker") {
       desc.innerHTML = "Set comment for marker on: ";
-      desc.appendChild(this.portal.displayFormat());
+      desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
@@ -109,7 +109,7 @@ export const SetCommentDialogControl = Feature.extend({
 
     if (this.commentType == "portal") {
       desc.innerHTML = "Set comment for portal: ";
-      desc.appendChild(this.portal.displayFormat());
+      desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.portal.comment) input.value = this.portal.comment;
       input.addEventListener(

@@ -51,7 +51,9 @@ export default class WasabeePortal {
   }
 
   // hiding behind too-clever-by-half makes for unmanagable code
-  displayFormat() {
+  /* eslint-disable no-unused-vars */
+  displayFormat(operation) {
+    /* eslint-enable no-unused-vars */
     const pt = L.latLng(parseFloat(this.lat), parseFloat(this.lng));
     const v = this.lat + "," + this.lng;
     const e = document.createElement("a");

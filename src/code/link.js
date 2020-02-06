@@ -86,11 +86,15 @@ export default class WasabeeLink {
   // returns a DOM object appropriate for display
   displayFormat(operation) {
     const d = document.createElement("div");
-    d.appendChild(operation.getPortal(this.fromPortalId).displayFormat());
+    d.appendChild(
+      operation.getPortal(this.fromPortalId).displayFormat(operation)
+    );
     const arrow = d.appendChild(document.createElement("span"));
     arrow.innerHTML = " ➾ ";
     arrow.style.color = this.getColorHex();
-    d.appendChild(operation.getPortal(this.toPortalId).displayFormat());
+    d.appendChild(
+      operation.getPortal(this.toPortalId).displayFormat(operation)
+    );
     return d;
   }
 
