@@ -83,7 +83,7 @@ export const SetCommentDialogControl = Feature.extend({
     if (this.commentType == "link") {
       desc.innerHTML = "Set comment for link: ";
       desc.appendChild(this.target.getLinkDisplay(this.operation));
-      if (this.target.comment) input.value = this.target.description;
+      if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
         "change",
         () => {

@@ -19,7 +19,7 @@ export default class LinkListDialog {
     this._table.fields = [
       {
         name: "Order",
-        value: link => link.throwOrderPos,
+        value: link => link.order,
         // sort: (a, b) => { return a - b; },
         format: (a, m) => {
           a.textContent = m;
@@ -95,7 +95,7 @@ export default class LinkListDialog {
       },
       {
         name: "Comment",
-        value: link => link.description,
+        value: link => link.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (row, obj, link) => {
           row.className = "desc";

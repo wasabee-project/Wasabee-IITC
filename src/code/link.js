@@ -12,15 +12,53 @@ export default class WasabeeLink {
     this.description = description;
     this.assignedTo = null;
     this.throwOrderPos = null;
-    // this.populatePortals(operation);
     this.color = "main";
+    this.completed = false;
   }
 
-  /* 
-  populatePortals(operation) {
-    this.fromPortal = operation.getPortal(this.fromPortalId);
-    this.toPortal = operation.getPortal(this.toPortalId);
-  } */
+  // for interface consistency, the other types use comment
+  // we can't rename them here w/o making the corresponding changes on the server
+  get comment() {
+    return this.description;
+  }
+
+  set comment(c) {
+    this.description = c;
+  }
+
+  // for interface consistency, other types use order
+  get order() {
+    return this.throwOrderPos;
+  }
+
+  set order(o) {
+    this.throwOrderPos = o;
+  }
+
+  // make the interface match (kinda) what markers do
+  // 'pending','assigned','acknowledged','completed'
+  get state() {
+    if (this.completed) {
+      return "completed";
+    }
+    if (this.assignedTo) {
+      return "assigned";
+    }
+    return "pending";
+  }
+
+  set state(s) {
+    if (s == "completed") {
+      this.completed = true;
+    } else {
+      this.completed = false;
+    }
+  }
+
+  // kludge to make the interface work
+  get portalId() {
+    return this.fromPortalId;
+  }
 
   getLatLngs(operation) {
     const fromPortal = operation.getPortal(this.fromPortalId);

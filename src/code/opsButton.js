@@ -2,6 +2,7 @@ import { Feature } from "./leafletDrawImports";
 import ExportDialog from "./exportDialog";
 import WasabeeMe from "./me";
 import { deleteOpPromise } from "./server";
+import OperationChecklistDialog from "./operationChecklistDialog";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -206,7 +207,7 @@ const opsButtonControl = Feature.extend({
       false
     );
 
-    const forkButton = buttonSection.appendChild(document.createElement("a"));
+    /* const forkButton = buttonSection.appendChild(document.createElement("a"));
     forkButton.innerHTML = "Change OP ID";
     if (window.plugin.wasabee.opsList().size == 0) {
       forkButton.disabled = true;
@@ -215,6 +216,22 @@ const opsButtonControl = Feature.extend({
       "click",
       function() {
         console.log("fork button");
+      },
+      false
+    ); */
+
+    const checklistButton = buttonSection.appendChild(
+      document.createElement("a")
+    );
+    checklistButton.innerHTML = "Operation Checklist";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      checklistButton.disabled = true;
+    }
+    checklistButton.addEventListener(
+      "click",
+      function() {
+        const cl = new OperationChecklistDialog();
+        cl.enable();
       },
       false
     );
