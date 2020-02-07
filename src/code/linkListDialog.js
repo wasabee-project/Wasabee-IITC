@@ -44,7 +44,7 @@ export default class LinkListDialog {
       },
       {
         name: "Length",
-        value: obj => this.getLinkLength(obj),
+        value: link => link.length(this._operation),
         format: (a, m) => {
           a.classList.add("length");
           a.textContent =
@@ -54,7 +54,7 @@ export default class LinkListDialog {
       {
         name: "Min Lvl",
         title: "Minimum level required on source portal",
-        value: obj => this.getLinkLength(obj),
+        value: link => link.length(this._operation),
         format: (a, b) => {
           var s;
           if (b > 6881280) {
@@ -205,18 +205,14 @@ export default class LinkListDialog {
     this._table.items = this._operation.getLinkListFromPortal(this._portal);
   }
 
-  getLinkLength(link) {
-    const latlngs = link.getLatLngs(this._operation);
-    return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
-  }
-
-  deleteLink(link) {
+  // can't move to uiCommands, due to _setLinks();
+  deleteLink(link, operation) {
     const con = new ConfirmDialog(window.map);
     const prompt = document.createElement("div");
     prompt.innerHTML = "Do you really want to delete this link: ";
-    prompt.appendChild(link.displayFormat(this._operation));
+    prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
-      this._operation.removeLink(link.fromPortalId, link.toPortalId);
+      operation.removeLink(link.fromPortalId, link.toPortalId);
       this._setLinks();
     });
     con.enable();
@@ -234,7 +230,7 @@ export default class LinkListDialog {
       },
       {
         label: "Delete",
-        onclick: () => this.deleteLink(data)
+        onclick: () => this.deleteLink(data, this._operation)
       },
       {
         label: "Set Comment",

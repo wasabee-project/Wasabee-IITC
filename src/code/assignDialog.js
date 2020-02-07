@@ -2,12 +2,19 @@ import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
-import { assignLinkPromise, assignMarkerPromise, teamPromise } from "./server";
+import {
+  updateOpPromise,
+  assignLinkPromise,
+  assignMarkerPromise,
+  teamPromise
+} from "./server";
 
 // XXX CONVERT TO LEAFLET EXTENDS
-
+// push current op to server on dialog open, don't risk server being out-of-date
 export default class AssignDialog {
   constructor(target, operation) {
+    this._upload(operation);
+
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
@@ -45,11 +52,6 @@ export default class AssignDialog {
     this._html.appendChild(menu);
     menu.style.align = "center";
 
-    const outofdate = this._html.appendChild(document.createElement("div"));
-    outofdate.innerHTML =
-      "<br/><br/>Assignments are pushed to the server real-time.<br/>Make sure the server copy is up-to-date <b>before</b> doing assignments";
-    outofdate.style.textalign = "center";
-
     this._dialog = window.dialog({
       html: this._html,
       dialogClass: "wasabee-dialog",
@@ -60,10 +62,21 @@ export default class AssignDialog {
     });
   }
 
-  /* no need to do anything
-  update() {
-    console.log("assignDialog.update called");
-  } */
+  _upload(operation) {
+    if (!operation.localchanged) return;
+    updateOpPromise(operation).then(
+      function() {
+        console.log(
+          "modified op: " +
+            operation.name +
+            " uploaded before making assignments."
+        );
+      },
+      function(err) {
+        alert(err);
+      }
+    );
+  }
 
   _getAgentMenu(current) {
     const container = document.createElement("div");

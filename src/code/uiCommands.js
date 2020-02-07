@@ -1,76 +1,69 @@
-import { getPopupBodyWithType } from "./mapDrawing";
-import WasabeeOp from "./operation";
+// import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import LinkListDialog from "./linkListDialog";
+import ConfirmDialog from "./confirmDialog";
 
-//This methos helps with commonly used UI data getting functions
+// wrap operation calls in UI checks
 export default {
-  addPortal: (operation, sentPortal, options, anyContent) => {
-    if (
-      (void 0 === options && (options = ""),
-      void 0 === anyContent && (anyContent = false),
-      !sentPortal)
-    ) {
+  addPortal: (operation, portal) => {
+    if (!portal) {
       return void alert("Please select a portal first!");
     }
-
-    if (operation instanceof WasabeeOp) {
-      operation.addPortal(sentPortal);
-    } else {
-      alert("Operation Invalid");
-    }
-  },
-  /* eslint-disable no-unused-vars */
-  editPortal: (instance, obj, key, value, options) => {
-    /* eslint-enable no-unused-vars */
-    //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
+    operation.addPortal(portal);
   },
   swapPortal: (operation, portal) => {
-    var selectedPortal = WasabeePortal.getSelected();
-    if (selectedPortal !== undefined) {
-      if (portal.id === selectedPortal.id) {
-        alert("Cannot swap a portal with itself! Select a different portal.");
-        return;
-      }
-      if (
-        confirm(
-          "Do you really want to swap these two portals?\n\n" +
-            portal.name +
-            "\n" +
-            selectedPortal.name
-        )
-      ) {
-        Promise.all([operation.swapPortal(portal, selectedPortal)])
-          .then(() => {
-            operation.update();
-          })
-          .catch(data => {
-            throw (alert(data.message), console.log(data), data);
-          });
-      }
-    } else {
+    const selectedPortal = WasabeePortal.getSelected();
+    if (!selectedPortal) {
       alert("You must select a new portal!");
+      return;
     }
+    if (portal.id === selectedPortal.id) {
+      alert("Cannot swap a portal with itself! Select a different portal.");
+      return;
+    }
+
+    const con = new ConfirmDialog(window.map);
+    const prompt = document.createElement("div");
+    prompt.innerHTML = "Do you want to swap: ";
+    prompt.appendChild(portal.displayFormat(operation));
+    prompt.appendChild(document.createElement("span")).innerHTML = " with ";
+    prompt.appendChild(selectedPortal.displayFormat(operation));
+    con.setup("Swap Portal", prompt, () => {
+      operation.swapPortal(portal, selectedPortal);
+    });
+    con.enable();
   },
   deletePortal: (operation, portal) => {
-    if (
-      confirm(
-        "Do you really want to delete this anchor, including all incoming and outgoing links?\n\n" +
-          portal.name
-      )
-    ) {
+    const con = new ConfirmDialog(window.map);
+    const prompt = document.createElement("div");
+    prompt.innerHTML =
+      "Do you want to delete this anchor and all associated links: ";
+    prompt.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Anchor", prompt, () => {
       operation.removeAnchor(portal.id);
-    }
+    });
+    con.enable();
   },
   deleteMarker: (operation, marker, portal) => {
-    if (
-      confirm(
-        "Do you really want to delete this marker?\n" +
-          getPopupBodyWithType(portal, marker)
-      )
-    ) {
+    const con = new ConfirmDialog(window.map);
+    const prompt = document.createElement("div");
+    prompt.innerHTML = "Do you want to delete this marker: ";
+    prompt.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Marker", prompt, () => {
       operation.removeMarker(marker);
-    }
+    });
+    con.enable();
+  },
+  clearAllItems: operation => {
+    const con = new ConfirmDialog(window.map);
+    con.setup(
+      "Clear: " + operation.name,
+      "Do you want to reset " + operation.name + "?",
+      () => {
+        operation.clearAllItems();
+      }
+    );
+    con.enable();
   },
   showLinksDialog: (operation, portal) => {
     LinkListDialog.showDialog(operation, portal, true);

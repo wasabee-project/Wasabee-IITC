@@ -4,6 +4,7 @@ import WasabeeMe from "./me";
 import { deleteOpPromise } from "./server";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import ConfirmDialog from "./confirmDialog";
+import UiCommands from "./uiCommands";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -198,15 +199,7 @@ const opsButtonControl = Feature.extend({
     clearOpButton.addEventListener(
       "click",
       () => {
-        const con = new ConfirmDialog(window.map);
-        con.setup(
-          "Clear: " + operation.name,
-          "Do you want to reset " + operation.name + "?",
-          () => {
-            operation.clearAllItems();
-          }
-        );
-        con.enable();
+        UiCommands.clearAllItems(operation);
       },
       false
     );
@@ -277,6 +270,7 @@ const opsButtonControl = Feature.extend({
     deleteButton.addEventListener(
       "click",
       () => {
+        // this should be moved to uiCommands, but the menu adjustment at the end makes that non-trivial
         const con = new ConfirmDialog(window.map);
         con.setup(
           "Confirm Delete: " + operation.name,

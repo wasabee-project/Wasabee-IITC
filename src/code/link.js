@@ -105,4 +105,9 @@ export default class WasabeeLink {
     }
     return "#333333";
   }
+
+  length(operation) {
+    const latlngs = this.getLatLngs(operation);
+    return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
+  }
 }

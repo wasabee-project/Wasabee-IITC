@@ -224,7 +224,7 @@ const LinkDialogButtonControl = Feature.extend({
           gotPortal => gotPortal.id == sentPortal.id
         )
         ? resolvedLocalData
-        : UiCommands.addPortal(this._operation, sentPortal, "", true)
+        : UiCommands.addPortal(this._operation, sentPortal)
       : Promise.reject("no portal given");
   },
 

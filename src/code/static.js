@@ -1,8 +1,8 @@
 const Wasabee = window.plugin.Wasabee || {};
 Wasabee.static = {
   html: {
-    exampleButton: require("./html/exampleButton.html"),
-    exampleDialog: require("./html/exampleDialog.html")
+    // exampleButton: require("./html/exampleButton.html"),
+    // exampleDialog: require("./html/exampleDialog.html")
   },
   CSS: {
     example: require("./css/styles.css"),
@@ -37,7 +37,8 @@ Wasabee.static = {
     assign: "wasabee-assign",
     multimaxButton: "wasabee-multimax",
     importDialog: "wasabee-import",
-    operationChecklist: "wasabee-operation-checklist"
+    operationChecklist: "wasabee-operation-checklist",
+    blockerList: "wasabee-blockerlist"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };
