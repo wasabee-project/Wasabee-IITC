@@ -10,6 +10,7 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = WasabeeButtonControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },

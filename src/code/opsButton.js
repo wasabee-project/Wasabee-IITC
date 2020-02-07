@@ -20,6 +20,7 @@ const opsButtonControl = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = opsButtonControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },

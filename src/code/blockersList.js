@@ -8,6 +8,7 @@ const BlockerList = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = BlockerList.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },

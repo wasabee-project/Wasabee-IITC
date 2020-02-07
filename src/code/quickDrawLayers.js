@@ -32,6 +32,7 @@ const QuickDrawControl = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = QuickDrawControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },

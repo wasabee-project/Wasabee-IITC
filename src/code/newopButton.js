@@ -1,6 +1,7 @@
 import { Feature } from "./leafletDrawImports";
 import { ImportDialogControl } from "./importDialog";
 import WasabeeOp from "./operation";
+import PromptDialog from "./promptDialog";
 
 const NewopButtonControl = Feature.extend({
   statics: {
@@ -8,6 +9,7 @@ const NewopButtonControl = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = NewopButtonControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
@@ -35,7 +37,6 @@ const NewopButtonControl = Feature.extend({
         // window.plugin.wasabee.importString();
         const id = new ImportDialogControl(this._map, null);
         id.enable();
-        // console.log(id);
       },
       false
     );
@@ -44,20 +45,27 @@ const NewopButtonControl = Feature.extend({
       "click",
       () => {
         noHandler._dialog.dialog("close");
-        var promptAction = prompt(
-          "Enter an operation name.  Must not be empty.",
-          ""
+        const addDialog = new PromptDialog(this._map);
+        addDialog.setup(
+          "New Operation",
+          "Please Set the New Operation Name",
+          () => {
+            if (addDialog.inputField.value) {
+              const newop = new WasabeeOp(
+                PLAYER.nickname,
+                addDialog.inputField.value,
+                true
+              );
+              newop.store();
+              window.plugin.wasabee.makeSelectedOperation(newop.ID);
+              window.runHooks("wasabeeUIUpdate", newop.ID);
+            } else {
+              alert("Operation Name was Unset");
+            }
+          }
         );
-        if (promptAction !== null && promptAction !== "") {
-          console.log("promptaction -> " + promptAction);
-          var newop = new WasabeeOp(PLAYER.nickname, promptAction, true);
-          newop.store();
-          window.plugin.wasabee.makeSelectedOperation(newop.ID);
-          window.runHooks("wasabeeUIUpdate", newop.ID);
-          // newop.update();
-        } else {
-          alert("You must enter a valid Operation name. Try again.");
-        }
+        addDialog.placeholder = "Must Not Be Empty";
+        addDialog.enable();
       },
       false
     );

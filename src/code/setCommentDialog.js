@@ -38,6 +38,7 @@ export const SetCommentDialogControl = Feature.extend({
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = SetCommentDialogControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },

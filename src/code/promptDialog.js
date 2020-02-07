@@ -1,18 +1,19 @@
 import { Feature } from "./leafletDrawImports";
 
-// generic confirmation screen w/ ok and cancel buttons
+// generic prompt screen
 
-const ConfirmDialog = Feature.extend({
+const PromptDialog = Feature.extend({
   statics: {
-    TYPE: "confirmDialog"
+    TYPE: "promptDialog"
   },
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = ConfirmDialog.TYPE;
+    this.type = PromptDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
     this._title = "No title set";
     this._label = "No label set";
+    this.placeholder = "";
   },
 
   addHooks: function() {
@@ -27,7 +28,7 @@ const ConfirmDialog = Feature.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const confirmDialog = this;
+    const promptDialog = this;
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
@@ -36,6 +37,7 @@ const ConfirmDialog = Feature.extend({
       dialogClass: "wasabee-dialog",
       buttons: {
         OK: () => {
+          console.log(this.inputField.value);
           if (this._callback) this._callback();
           this._dialog.dialog("close");
         },
@@ -49,8 +51,8 @@ const ConfirmDialog = Feature.extend({
           "wasabeeUIUpdate",
           window.plugin.wasabee.getSelectedOperation()
         );
-        confirmDialog.disable();
-        delete confirmDialog._dialog;
+        promptDialog.disable();
+        delete promptDialog._dialog;
       }
       // id: window.plugin.Wasabee.static.dialogNames.XXX
     });
@@ -70,8 +72,13 @@ const ConfirmDialog = Feature.extend({
     } else {
       content.appendChild(this._label);
     }
+    const d = content.appendChild(document.createElement("div"));
+    this.inputField = d.appendChild(document.createElement("input"));
+    d.id = "inputField";
+    d.placeholder = this.placeholder;
+
     return content;
   }
 });
 
-export default ConfirmDialog;
+export default PromptDialog;
