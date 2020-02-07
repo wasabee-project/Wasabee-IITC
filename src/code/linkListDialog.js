@@ -2,6 +2,7 @@ import Sortable from "./sortable";
 import LinkDialogButtonControl from "./linkDialogButton";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
+import ConfirmDialog from "./confirmDialog";
 
 // don't use this _dialog[] any more. Use the new framework.
 // switch over to Feature.extend
@@ -210,17 +211,15 @@ export default class LinkListDialog {
   }
 
   deleteLink(link) {
-    if (
-      confirm(
-        "Do you really want to delete the link: " +
-          this._operation.getPortal(link.fromPortalId).name +
-          " -> " +
-          this._operation.getPortal(link.toPortalId).name
-      )
-    ) {
+    const con = new ConfirmDialog(window.map);
+    const prompt = document.createElement("div");
+    prompt.innerHTML = "Do you really want to delete this link: ";
+    prompt.appendChild(link.displayFormat(this._operation));
+    con.setup("Delete Link", prompt, () => {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);
       this._setLinks();
-    }
+    });
+    con.enable();
   }
 
   makeMenu(list, data) {

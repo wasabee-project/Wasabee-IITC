@@ -279,7 +279,7 @@ const opsButtonControl = Feature.extend({
       () => {
         const con = new ConfirmDialog(window.map);
         con.setup(
-          "Confirm Delete:" + operation.name,
+          "Confirm Delete: " + operation.name,
           "Are you sure you want to delete " + operation.name + "?",
           () => {
             if (operation.IsOwnedOp(WasabeeMe.get())) {

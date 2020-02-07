@@ -7,6 +7,7 @@ import LinkDialogButtonControl from "./linkDialogButton";
 import MarkerButtonControl from "./markerButton";
 import MultimaxButtonControl from "./multimaxDialog";
 import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
+import ConfirmDialog from "./confirmDialog";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -86,16 +87,19 @@ export default function(selectedOp) {
         },
         {
           title: "Clear all locally stored ops",
-          text: "Clear All",
+          text: "Clear Local Ops",
           callback: () => {
-            const confirmed = window.confirm(
-              "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
+            const con = new ConfirmDialog(window.map);
+            con.setup(
+              "Clear Local Ops",
+              "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
+              () => {
+                window.plugin.wasabee.closeAllDialogs("nothing");
+                window.plugin.wasabee.resetOps();
+                window.plugin.wasabee.setupLocalStorage();
+              }
             );
-            if (confirmed) {
-              window.plugin.wasabee.closeAllDialogs("nothing");
-              window.plugin.wasabee.resetOps();
-              window.plugin.wasabee.setupLocalStorage();
-            }
+            con.enable();
           },
           context: opsButtonHandler
         }
@@ -179,18 +183,21 @@ export default function(selectedOp) {
         // Feature.prototype.addHooks.call(tmp);
       };
       this._modes[type].button = this._createButton({
-        title: "Clear All Operations",
+        title: "Clear all locally stored ops",
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
         callback: () => {
-          const confirmed = window.confirm(
-            "Are you sure you want to clear ALL operations? (the currently selected op will remain)"
+          const con = new ConfirmDialog(window.map);
+          con.setup(
+            "Clear Local Ops",
+            "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
+            () => {
+              window.plugin.wasabee.closeAllDialogs("nothing");
+              window.plugin.wasabee.resetOps();
+              window.plugin.wasabee.setupLocalStorage();
+            }
           );
-          if (confirmed) {
-            window.plugin.wasabee.closeAllDialogs("nothing");
-            window.plugin.wasabee.resetOps();
-            window.plugin.wasabee.setupLocalStorage();
-          }
+          con.enable();
         }
       });
     },
