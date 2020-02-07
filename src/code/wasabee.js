@@ -192,7 +192,8 @@ export default function() {
         // prime the pump
         // WasabeeMe.get(); // addButtons calls this too
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
-        selectedOperation.update();
+        // selectedOperation.update(); // op.update() marks it as changed, all we want is to draw it
+        window.runHooks("wasabeeUIUpdate", this);
         addButtons(selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth

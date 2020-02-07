@@ -278,7 +278,7 @@ export default class LinkListDialog {
       "change",
       () => {
         link.color = linkColor.value;
-        operation.update();
+        operation.update(); // OK - we change the link and need to let the op know
       },
       false
     );

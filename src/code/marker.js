@@ -12,6 +12,14 @@ export default class WasabeeMarker {
     this.order = 0;
   }
 
+  get opOrder() {
+    return this.order;
+  }
+
+  set opOrder(o) {
+    this.order = Number.parseInt(o, 10);
+  }
+
   static create(obj) {
     if (obj instanceof WasabeeMarker) {
       console.log("do not call Marker.create() on a Marker");

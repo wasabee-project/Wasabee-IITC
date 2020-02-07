@@ -11,6 +11,15 @@ export default class WasabeeAnchor {
     this.order = 0;
   }
 
+  // pointless, since these are never pushed to the server
+  set opOrder(o) {
+    this.order = Number.parseInt(o, 10);
+  }
+
+  get opOrder() {
+    return this.order;
+  }
+
   static create(portalId) {
     return new WasabeeAnchor(portalId);
   }

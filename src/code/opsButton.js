@@ -110,7 +110,8 @@ const opsButtonControl = Feature.extend({
       if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         context._map.fitBounds(mbr);
       }
-      newop.update();
+      window.runHooks("wasabeeUIUpdate", operation.ID);
+      // newop.update(); // just run wasabeeUIUpdate
     });
 
     container.appendChild(operationSelect);
@@ -159,7 +160,7 @@ const opsButtonControl = Feature.extend({
     });
     $(opColor).change(function() {
       operation.color = $(opColor).val();
-      operation.update();
+      operation.update(); // OK - changing color does not trigger
     });
 
     const isServerOp = operation.IsServerOp();

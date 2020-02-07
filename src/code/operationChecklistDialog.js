@@ -77,7 +77,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   content.fields = [
     {
       name: "Order",
-      value: thing => thing.order,
+      value: thing => thing.opOrder,
       sort: (a, b) => a - b,
       format: (row, value, thing) => {
         const oif = document.createElement("input");
@@ -86,8 +86,10 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
         oif.addEventListener(
           "change",
           () => {
-            thing.order = oif.value;
-            operation.update();
+            thing.opOrder = oif.value;
+            // since we are changing the values in the (thing)
+            // let the op know it has changed (save/redraw);
+            operation.update(); // OK - necessary
           },
           false
         );

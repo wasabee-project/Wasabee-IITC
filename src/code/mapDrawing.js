@@ -90,7 +90,8 @@ const getMarkerPopup = (marker, target, operation) => {
   if (target.state != "completed" && target.assignedTo) {
     agentPromise(target.assignedTo, false).then(
       function(a) {
-        assignment.innerHTML = "Assigned To: " + a.name;
+        assignment.innerHTML = "Assigned To: ";
+        assignment.appendChild(a.formatDisplay());
       },
       function(err) {
         console.log(err);
@@ -101,20 +102,20 @@ const getMarkerPopup = (marker, target, operation) => {
     assignment.innerHTML = "Completed By: " + target.completedBy;
   }
 
-  if (operation.IsWritableOp(WasabeeMe.get())) {
-    const buttonSet = content.appendChild(document.createElement("div"));
-    buttonSet.className = "temp-op-dialog";
-    const deleteButton = buttonSet.appendChild(document.createElement("a"));
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener(
-      "click",
-      () => {
-        UiCommands.deleteMarker(operation, target, portal);
-        marker.closePopup();
-      },
-      false
-    );
+  const buttonSet = content.appendChild(document.createElement("div"));
+  buttonSet.className = "temp-op-dialog";
+  const deleteButton = buttonSet.appendChild(document.createElement("a"));
+  deleteButton.textContent = "Delete";
+  deleteButton.addEventListener(
+    "click",
+    () => {
+      UiCommands.deleteMarker(operation, target, portal);
+      marker.closePopup();
+    },
+    false
+  );
 
+  if (operation.IsServerOp()) {
     const assignButton = buttonSet.appendChild(document.createElement("a"));
     assignButton.textContent = "Assign";
     assignButton.addEventListener(
@@ -200,7 +201,7 @@ const addLink = (link, style, operation) => {
     window.plugin.wasabee.linkLayers[link["ID"]] = link_;
     link_.addTo(window.plugin.wasabee.linkLayerGroup);
   } else {
-    console.log("LATLNGS WAS NULL?!");
+    console.log("LatLngs was null: op missing portal data?");
   }
 };
 

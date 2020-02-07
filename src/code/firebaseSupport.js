@@ -33,8 +33,9 @@ export const initFirebase = () => {
         function(refreshed) {
           refreshed.store();
           if (refreshed.ID == operation.ID) {
+            console.log("firebase trigger reload of current op");
             window.plugin.wasabee.makeSelectedOperation(refreshed.ID);
-            refreshed.update();
+            // refreshed.update(); -- makeSelectedOp triggers redraw for us
           }
         },
         function(err) {

@@ -26,11 +26,10 @@ export default class WasabeeOp {
     this.fetched = null;
     this.stored = null;
     this.localchanged = true;
+    this.blockers = Array();
   }
 
   store() {
-    // console.log("pushing to local store: " + this.ID);
-    this._ensureCollections();
     this.stored = Date.now();
     store.set(this.ID, JSON.stringify(this));
     this.localchanged = true;
@@ -135,6 +134,8 @@ export default class WasabeeOp {
         listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId
       );
     });
+    this.cleanAnchorList();
+    this.cleanPortalList();
     this.update();
   }
 
@@ -142,6 +143,7 @@ export default class WasabeeOp {
     this.markers = this.markers.filter(function(listMarker) {
       return listMarker.ID !== marker.ID;
     });
+    this.cleanPortalList();
     this.update();
   }
 
@@ -177,6 +179,7 @@ export default class WasabeeOp {
       }
     }
     this.links = newLinks;
+    this.cleanPortalList();
     this.cleanAnchorList();
     this.update();
   }
@@ -265,18 +268,9 @@ export default class WasabeeOp {
   }
 
   addPortal(portal) {
-    if (!(portal instanceof WasabeePortal)) {
-      console.log(
-        "something still using old portal type instead of WasabeePortal"
-      );
-      portal = WasabeePortal.create(portal);
-    }
     if (!this.containsPortal(portal)) {
       this.opportals.push(portal);
-    } else {
-      console.log(
-        "Portal Already Exists In Operation -> " + JSON.stringify(portal)
-      );
+      this.update();
     }
   }
 
@@ -287,7 +281,7 @@ export default class WasabeeOp {
     }
   }
 
-  addLink(fromPortal, toPortal, description) {
+  addLink(fromPortal, toPortal, description, order) {
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."
@@ -298,9 +292,11 @@ export default class WasabeeOp {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    var link = new WasabeeLink(this, fromPortal.id, toPortal.id, description);
+    const link = new WasabeeLink(this, fromPortal.id, toPortal.id, description);
+    if (order) link.opOrder = order;
     if (!this.containsLink(link)) {
       this.links.push(link);
+      this.update();
     } else {
       console.log(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
@@ -312,7 +308,7 @@ export default class WasabeeOp {
     if (this.anchors.length == 0) {
       return false;
     } else {
-      for (let anchor_ in this.anchors) {
+      for (const anchor_ in this.anchors) {
         if (this.anchors[anchor_] == portalId) {
           return true;
         }
@@ -322,11 +318,13 @@ export default class WasabeeOp {
   }
 
   addAnchor(portal) {
+    // doing this ourselves saves a trip to update();
+    if (!this.containsPortal(portal)) {
+      this.opportals.push(portal);
+    }
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-    }
-    if (!this.containsPortal(portal)) {
-      this.addPortal(portal);
+      this.update();
     }
   }
 
@@ -379,18 +377,14 @@ export default class WasabeeOp {
     }
     // Remove the invalid links from the array (after we are done iterating through it)
     this.links = this.links.filter(element => !linksToRemove.includes(element));
-
-    this.cleanAnchorList();
     this.update();
   }
 
   addMarker(markerType, portal, comment) {
     if (portal) {
       if (!this.containsMarker(portal, markerType)) {
-        if (!this.containsPortal(portal)) {
-          this.addPortal(portal);
-        }
-        var marker = new WasabeeMarker(markerType, portal.id, comment);
+        this.addPortal(portal);
+        const marker = new WasabeeMarker(markerType, portal.id, comment);
         this.markers.push(marker);
         this.update();
       } else {
@@ -428,14 +422,23 @@ export default class WasabeeOp {
 
   // call update to save the op and redraw everything on the map
   update() {
-    // console.log("operation.update (saving/redrawing)");
-    this.cleanPortalList();
-    this.cleanAnchorList();
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
   }
 
   convertLinksToObjs(links) {
+    const tempLinks = Array();
+    for (let link_ in links) {
+      if (links[link_] instanceof WasabeeLink) {
+        tempLinks.push(links[link_]);
+      } else {
+        tempLinks.push(WasabeeLink.create(links[link_], this));
+      }
+    }
+    return tempLinks;
+  }
+
+  convertBlockersToObjs(links) {
     const tempLinks = Array();
     for (let link_ in links) {
       if (links[link_] instanceof WasabeeLink) {
@@ -477,24 +480,6 @@ export default class WasabeeOp {
       }
     }
     return tmpPortals;
-  }
-
-  _ensureCollections() {
-    if (!this.markers) {
-      this.markers = Array();
-    }
-    if (!this.opportals) {
-      this.opportals = Array();
-    }
-    if (!this.links) {
-      this.links = Array();
-    }
-    if (!this.anchors) {
-      this.anchors = Array();
-    }
-    if (!this.teamlist) {
-      this.teamlist = Array();
-    }
   }
 
   // minimum bounds rectangle
@@ -554,11 +539,6 @@ export default class WasabeeOp {
   }
 
   static create(obj) {
-    if (obj instanceof WasabeeOp) {
-      console.log("do not call Operation.create() on an Operation");
-      console.log(new Error().stack);
-      return obj;
-    }
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
@@ -571,12 +551,13 @@ export default class WasabeeOp {
           operation[prop] = operation.convertMarkersToObjs(obj[prop]);
         } else if (prop == "opportals") {
           operation[prop] = operation.convertPortalsToObjs(obj[prop]);
+        } else if (prop == "opportals") {
+          operation[prop] = operation.convertBlockersToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];
         }
       }
     }
-    operation._ensureCollections();
     return operation;
   }
 }

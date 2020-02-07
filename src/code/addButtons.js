@@ -153,7 +153,7 @@ export default function(selectedOp) {
                       // if the op changed out beneath us, use the new
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
-                        newop.update();
+                        // newop.update(); makeSelectedOperation takes care of the re-draw
                       }
                     } else {
                       console.log("opPromise returned null op but no err?");
@@ -239,8 +239,9 @@ export default function(selectedOp) {
               function(resolve) {
                 console.log(resolve);
                 window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
-                const newop = window.plugin.wasabee.getSelectedOperation();
-                newop.update();
+                // makeSelectedOp takes care of redraw, no need to save since already there
+                // const newop = window.plugin.wasabee.getSelectedOperation();
+                // newop.update();
                 alert("Upload Successful");
               },
               function(reject) {

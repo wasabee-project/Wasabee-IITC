@@ -44,6 +44,7 @@ const QuickDrawControl = Feature.extend({
     this._anchor2 = null;
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
+    this._throwOrder = 1;
     let that = this;
     this._portalClickedHook = function() {
       QuickDrawControl.prototype._portalClicked.call(that);
@@ -100,8 +101,12 @@ const QuickDrawControl = Feature.extend({
     if (!this._anchor2) {
       if (selectedPortal.id === this._anchor1.id) return;
       this._anchor2 = selectedPortal;
-      this._operation.addLink(this._anchor1, this._anchor2, "base link");
-      this._operation.update();
+      this._operation.addLink(
+        this._anchor1,
+        this._anchor2,
+        "base link",
+        this._throwOrder++
+      );
       this._tooltip.updateContent(this._getTooltipText());
       return;
     } else {
@@ -109,9 +114,18 @@ const QuickDrawControl = Feature.extend({
         return; //ignore duplicates
       } else {
         this._spinePortals[selectedPortal.id] = selectedPortal;
-        this._operation.addLink(selectedPortal, this._anchor1);
-        this._operation.addLink(selectedPortal, this._anchor2);
-        this._operation.update();
+        this._operation.addLink(
+          selectedPortal,
+          this._anchor1,
+          null,
+          this._throwOrder++
+        );
+        this._operation.addLink(
+          selectedPortal,
+          this._anchor2,
+          null,
+          this._throwOrder++
+        );
         this._tooltip.updateContent(this._getTooltipText());
       }
     }

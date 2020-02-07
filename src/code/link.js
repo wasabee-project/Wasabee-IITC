@@ -11,7 +11,7 @@ export default class WasabeeLink {
     this.toPortalId = toPortalId;
     this.description = description;
     this.assignedTo = null;
-    this.throwOrderPos = null;
+    this.throwOrderPos = 0;
     this.color = "main";
     this.completed = false;
   }
@@ -27,12 +27,12 @@ export default class WasabeeLink {
   }
 
   // for interface consistency, other types use order
-  get order() {
+  get opOrder() {
     return this.throwOrderPos;
   }
 
-  set order(o) {
-    this.throwOrderPos = o;
+  set opOrder(o) {
+    this.throwOrderPos = Number.parseInt(o, 10);
   }
 
   // make the interface match (kinda) what markers do
@@ -62,13 +62,18 @@ export default class WasabeeLink {
 
   getLatLngs(operation) {
     const fromPortal = operation.getPortal(this.fromPortalId);
+    if (!fromPortal)
+      console.log("op missing from portal: " + JSON.stringify(this)); // NUKE ME
     const toPortal = operation.getPortal(this.toPortalId);
+    if (!fromPortal)
+      console.log("op missing to portal: " + JSON.stringify(this)); // NUKE ME
     if (fromPortal != null && toPortal != null) {
       const returnArray = Array();
       returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
       returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
       return returnArray;
     } else {
+      console.log(JSON.stringify(this));
       return null;
     }
   }

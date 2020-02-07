@@ -79,7 +79,8 @@ window.plugin.wasabee.init = function() {
   initCrossLinks();
 
   // once everything else is done, call update, which triggers wasabeeUIUpdate, drawing things
-  Wasabee._selectedOp.update();
+  // Wasabee._selectedOp.update(); // no need to store/trigger hook, just do it ourselves
+  drawThings(Wasabee._selectedOp);
 };
 
 window.plugin.wasabee.addCSS = content => {
