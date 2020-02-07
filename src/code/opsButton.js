@@ -296,15 +296,13 @@ const opsButtonControl = Feature.extend({
               console.log(
                 "removing first op in list? I was going to use that...."
               );
-
               newopID = ol[1];
-              console.log(newopID);
               if (newopID == null) {
                 console.log("not removing last op... fix this");
               }
             }
-            let removeid = operation.ID;
-            let operationSelect = document.getElementById(
+            const removeid = operation.ID;
+            const operationSelect = document.getElementById(
               "wasabee-operationSelect"
             );
             $(operationSelect).val(newopID);

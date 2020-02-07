@@ -5,6 +5,7 @@ import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
 import AssignDialog from "./assignDialog";
+import PromptDialog from "./promptDialog";
 import WasabeeAnchor from "./anchor";
 
 const Wasabee = window.plugin.Wasabee;
@@ -172,14 +173,19 @@ export default function() {
     );
     changeServerButton.innerHTML = "Change Server";
     changeServerButton.addEventListener("click", () => {
-      const promptAction = prompt("Change WASABEE server", GetWasabeeServer());
-      if (promptAction !== null && promptAction !== "") {
-        store.set(
-          window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
-          promptAction
-        );
-        store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
-      }
+      const serverDialog = new PromptDialog(window.map);
+      serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
+        if (serverDialog.inputField.value) {
+          store.set(
+            window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
+            serverDialog.inputField.value
+          );
+          store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+        }
+      });
+      serverDialog.current = GetWasabeeServer();
+      serverDialog.placeholder = "https://server.wasabee.rocks/";
+      serverDialog.enable();
     });
 
     var _dialog = window.dialog({

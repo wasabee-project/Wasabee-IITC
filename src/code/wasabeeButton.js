@@ -3,6 +3,7 @@ import WasabeeMe from "./me";
 import Sortable from "./sortable";
 import store from "../lib/store";
 import { GetWasabeeServer, SetTeamState } from "./server";
+import PromptDialog from "./promptDialog";
 
 const WasabeeButtonControl = Feature.extend({
   statics: {
@@ -22,32 +23,35 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   _displayDialog: function() {
-    let me = WasabeeMe.get(true);
-
+    const me = WasabeeMe.get(true);
     const teamlist = new Sortable();
     teamlist.fields = [
       {
         name: "Team Name",
         value: team => team.Name,
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
+        format: (row, value, team) => {
+          const link = document.createElement("a");
+          link.href =
+            GetWasabeeServer() + "/api/v1/team/" + team.ID + "?json=n";
+          link.innerHTML = value;
+          link.target = "_blank";
+          row.appendChild(link);
         }
       },
       {
         name: "State",
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m, n) => {
+        format: (row, value, obj) => {
           const link = document.createElement("a");
-          let curstate = n.State;
+          let curstate = obj.State;
           link.innerHTML = curstate;
           link.onclick = () => {
-            curstate = this.toggleTeam(n.ID, curstate);
+            curstate = this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
-            // this._closeDialog();
           };
-          a.appendChild(link);
+          row.appendChild(link);
         }
       }
     ];
@@ -118,13 +122,19 @@ const WasabeeButtonControl = Feature.extend({
   },
 
   setServer: function() {
-    const promptAction = prompt("Change WASABEE server", GetWasabeeServer());
-    if (promptAction !== null && promptAction !== "") {
-      // do we need sanity checking here?
-      store.set(window.plugin.Wasabee.Constants.SERVER_BASE_KEY, promptAction);
-      store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
-      this.innerHTML = "Server: " + promptAction + "<br/><br/>";
-    }
+    const serverDialog = new PromptDialog(window.map);
+    serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
+      if (serverDialog.inputField.value) {
+        store.set(
+          window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
+          serverDialog.inputField.value
+        );
+        store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+      }
+    });
+    serverDialog.current = GetWasabeeServer();
+    serverDialog.placeholder = "https://server.wasabee.rocks/";
+    serverDialog.enable();
   }
 });
 

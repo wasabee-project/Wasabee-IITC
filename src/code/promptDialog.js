@@ -14,6 +14,7 @@ const PromptDialog = Feature.extend({
     this._title = "No title set";
     this._label = "No label set";
     this.placeholder = "";
+    this.current = "";
   },
 
   addHooks: function() {
@@ -74,9 +75,9 @@ const PromptDialog = Feature.extend({
     }
     const d = content.appendChild(document.createElement("div"));
     this.inputField = d.appendChild(document.createElement("input"));
-    d.id = "inputField";
-    d.placeholder = this.placeholder;
-
+    this.inputField.id = "inputField";
+    this.inputField.placeholder = this.placeholder;
+    this.inputField.value = this.current;
     return content;
   }
 });
