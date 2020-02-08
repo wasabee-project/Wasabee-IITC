@@ -11,6 +11,11 @@ import { initFirebase } from "./firebaseSupport";
 var Wasabee = window.plugin.Wasabee;
 
 window.plugin.wasabee.init = function() {
+  if (window.plugin.sync)
+    alert(
+      "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee"
+    );
+
   //** LAYER DEFINITIONS */
   window.plugin.wasabee.portalLayers = {};
   window.plugin.wasabee.portalLayerGroup = null;

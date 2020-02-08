@@ -38,7 +38,8 @@ Wasabee.static = {
     multimaxButton: "wasabee-multimax",
     importDialog: "wasabee-import",
     operationChecklist: "wasabee-operation-checklist",
-    blockerList: "wasabee-blockerlist"
+    blockerList: "wasabee-blockerlist",
+    exportDialog: "wasabee-export"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

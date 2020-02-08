@@ -190,7 +190,8 @@ const opsButtonControl = Feature.extend({
     exportButton.addEventListener(
       "click",
       function() {
-        ExportDialog.show(operation);
+        const ed = new ExportDialog(window.map);
+        ed.enable();
       },
       false
     );

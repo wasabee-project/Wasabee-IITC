@@ -1,57 +1,79 @@
-var _exportdialogs = [];
+import { Feature } from "./leafletDrawImports";
 
-// XXX CONVERT TO LEAFLET EXTENDS
+// export screen
+const ExportDialog = Feature.extend({
+  statics: {
+    TYPE: "exportDialog"
+  },
 
-export default class ExportDialog {
-  constructor(operation) {
-    _exportdialogs.push(this);
-    this._operation = operation;
-    this._mainContent = document.createElement("div");
-    this.updateContentPane();
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this.type = ExportDialog.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+    this._operation = window.plugin.wasabee.getSelectedOperation();
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    Feature.prototype.addHooks.call(this);
+    this._displayDialog();
+  },
+
+  removeHooks: function() {
+    Feature.prototype.removeHooks.call(this);
+  },
+
+  _displayDialog: function() {
+    if (!this._map) return;
+    const exportDialog = this;
     this._dialog = window.dialog({
-      title: this._operation.name + " - Export",
+      title: "Export: " + this._operation.name,
       width: "auto",
       height: "auto",
-      html: this._mainContent,
+      html: this._buildContent(),
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
+      buttons: {
+        OK: () => {
+          this._dialog.dialog("close");
+        },
+        "Draw Tools Format": () => {
+          this._drawToolsFormat();
+        }
+      },
       closeCallback: () => {
-        _exportdialogs = [];
-      }
+        exportDialog.disable();
+        delete exportDialog._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.exportDialog
     });
-  }
+  },
 
-  updateContentPane() {
-    const mainContent = this._mainContent;
+  _buildContent: function() {
+    const mainContent = document.createElement("div");
     mainContent.innerHTML = "";
     const textArea = mainContent.appendChild(document.createElement("div"));
     textArea.className = "ui-dialog-wasabee-copy";
     textArea.innerHTML =
       "<p><a onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">Select all</a> and press CTRL+C to copy it.</p>" +
-      "<textarea readonly onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">" +
+      '<textarea readonly onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();" id="wasabee-export-dialog-textarea">' +
       JSON.stringify(this._operation) +
       "</textarea>";
-  }
+    return mainContent;
+  },
 
-  focus() {
-    this._dialog.dialog("open");
-  }
+  _drawToolsFormat: function() {
+    const ta = document.getElementById("wasabee-export-dialog-textarea");
+    const output = new Array();
+    for (const link of this._operation.links) {
+      const l = {};
+      l.type = "polyline";
+      l.color = link.getColorHex();
+      l.latLngs = link.getLatLngs(this._operation);
+      output.push(l);
+    }
 
-  static show(operation) {
-    var parameters = _exportdialogs;
-    let show = true;
-    if (parameters.length != 0) {
-      show = false;
-      for (var index in parameters) {
-        var page = parameters[index];
-        page._operation = operation;
-        page.updateContentPane();
-        return page.focus(), page;
-      }
-    }
-    if (show) {
-      return new ExportDialog(operation);
-    } else {
-      return;
-    }
+    ta.value = JSON.stringify(output);
   }
-}
+});
+
+export default ExportDialog;
