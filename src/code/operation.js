@@ -67,27 +67,24 @@ export default class WasabeeOp {
   }
 
   containsLinkFromTo(fromPortalId, toPortalId) {
-    if (this.links.length == 0) {
-      return false;
-    } else {
-      for (let link_ in this.links) {
-        //THIS TESTS IF ITS THE SAME LINK
-        if (
-          (this.links[link_].fromPortalId == fromPortalId &&
-            this.links[link_].toPortalId == toPortalId) ||
-          (this.links[link_].toPortalId == fromPortalId &&
-            this.links[link_].fromPortalId == toPortalId)
-        ) {
-          return true;
-        }
+    if (this.links.length == 0) return false;
+
+    for (const l in this.links) {
+      if (
+        (this.links[l].fromPortalId == fromPortalId &&
+          this.links[l].toPortalId == toPortalId) ||
+        (this.links[l].toPortalId == fromPortalId &&
+          this.links[l].fromPortalId == toPortalId)
+      ) {
+        return true;
       }
     }
     return false;
   }
 
   containsLink(link) {
-    var fromPortalId = link.fromPortalId;
-    var toPortalId = link.toPortalId;
+    const fromPortalId = link.fromPortalId;
+    const toPortalId = link.toPortalId;
     return this.containsLinkFromTo(fromPortalId, toPortalId);
   }
 
@@ -168,14 +165,14 @@ export default class WasabeeOp {
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
     var newLinks = [];
-    for (let link_ in this.links) {
+    for (let l in this.links) {
       if (
         !(
-          this.links[link_].fromPortalId == startPortal &&
-          this.links[link_].toPortalId == endPortal
+          this.links[l].fromPortalId == startPortal &&
+          this.links[l].toPortalId == endPortal
         )
       ) {
-        newLinks.push(this.links[link_]);
+        newLinks.push(this.links[l]);
       }
     }
     this.links = newLinks;
@@ -186,15 +183,15 @@ export default class WasabeeOp {
 
   reverseLink(startPortalID, endPortalID) {
     var newLinks = [];
-    for (let link_ in this.links) {
+    for (let l in this.links) {
       if (
-        this.links[link_].fromPortalId == startPortalID &&
-        this.links[link_].toPortalId == endPortalID
+        this.links[l].fromPortalId == startPortalID &&
+        this.links[l].toPortalId == endPortalID
       ) {
-        this.links[link_].fromPortalId = endPortalID;
-        this.links[link_].toPortalId = startPortalID;
+        this.links[l].fromPortalId = endPortalID;
+        this.links[l].toPortalId = startPortalID;
       }
-      newLinks.push(this.links[link_]);
+      newLinks.push(this.links[l]);
     }
     this.links = newLinks;
     this.update();
@@ -204,10 +201,10 @@ export default class WasabeeOp {
     var newAnchorList = [];
     for (let anchor_ in this.anchors) {
       var foundAnchor = false;
-      for (let link_ in this.links) {
+      for (let l in this.links) {
         if (
-          this.links[link_].fromPortalId == this.anchors[anchor_] ||
-          this.links[link_].toPortalId == this.anchors[anchor_]
+          this.links[l].fromPortalId == this.anchors[anchor_] ||
+          this.links[l].toPortalId == this.anchors[anchor_]
         ) {
           foundAnchor = true;
         }
@@ -225,10 +222,10 @@ export default class WasabeeOp {
     var newPortals = [];
     for (let portal_ in this.opportals) {
       var foundPortal = false;
-      for (let link_ in this.links) {
+      for (let l in this.links) {
         if (
-          this.opportals[portal_]["id"] == this.links[link_].fromPortalId ||
-          this.opportals[portal_]["id"] == this.links[link_].toPortalId
+          this.opportals[portal_]["id"] == this.links[l].fromPortalId ||
+          this.opportals[portal_]["id"] == this.links[l].toPortalId
         ) {
           foundPortal = true;
         }
@@ -324,6 +321,27 @@ export default class WasabeeOp {
     }
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
+      this.update();
+    }
+  }
+
+  containsBlocker(link) {
+    if (this.blockers.length == 0) return false;
+
+    for (const l in this.blockers) {
+      if (
+        this.blockers[l].fromPortalId == link.fromPortalId &&
+        this.blockers[l].toPortalId == link.toPortalId
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  addBlocker(link) {
+    if (!this.containsBlocker(link)) {
+      this.blockers.push(link);
       this.update();
     }
   }

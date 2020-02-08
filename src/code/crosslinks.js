@@ -1,3 +1,6 @@
+import WasabeePortal from "./portal";
+import WasabeeLink from "./link";
+
 //*** CROSSLINK THINGS */
 const Wasabee = window.plugin.Wasabee;
 
@@ -282,26 +285,19 @@ const showCrossLink = (link, operation) => {
   window.plugin.wasabee.crossLinkLayerGroup[link.options.guid] = blocked;
 };
 
-const testLink = (drawnLinks, drawnMarkers, link, operation) => {
+const testLink = (link, operation) => {
   if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) {
     return;
   }
-  try {
-    drawnLinks.forEach(drawnLink => {
-      var shouldShowCrosslink = testPolyLine(
-        drawnLink,
-        link,
-        drawnMarkers,
-        operation
-      );
-      if (shouldShowCrosslink) {
-        showCrossLink(link, operation);
-        throw Wasabee.Constants.BREAK_EXCEPTION;
-      }
-    });
-  } catch (e) {
-    if (e !== Wasabee.Constants.BREAK_EXCEPTION) {
-      throw e;
+
+  for (const drawnLink of operation.links) {
+    if (testPolyLine(drawnLink, link, operation.markers, operation)) {
+      showCrossLink(link, operation);
+      const fromPortal = WasabeePortal.get(link.options.data.oGuid);
+      const toPortal = WasabeePortal.get(link.options.data.dGuid);
+      const blocker = new WasabeeLink(fromPortal, toPortal);
+      operation.addBlocker(blocker);
+      break;
     }
   }
 };
@@ -310,23 +306,18 @@ export const checkAllLinks = operation => {
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee.crossLinkLayerGroup = {};
 
-  var drawnLinks = operation.links;
-  var drawnMarkers = operation.markers;
-
-  $.each(window.links, (guid, link) => {
-    doLinkTest(link, drawnLinks, drawnMarkers, operation);
-  });
+  for (const guid in window.links) {
+    doLinkTest(window.links[guid], operation);
+  }
 };
 
 const onLinkAdded = data => {
-  var operation = window.plugin.wasabee.getSelectedOperation();
-  var drawnLinks = operation.links;
-  var drawnMarkers = operation.markers;
-  doLinkTest(data.link, drawnLinks, drawnMarkers, operation);
+  const operation = window.plugin.wasabee.getSelectedOperation();
+  doLinkTest(data.link, operation);
 };
 
-const doLinkTest = (finalLink, drawnLinks, drawnMarkers, operation) => {
-  testLink(drawnLinks, drawnMarkers, finalLink, operation);
+const doLinkTest = (finalLink, operation) => {
+  testLink(finalLink, operation);
 };
 
 const testForDeletedLinks = () => {
