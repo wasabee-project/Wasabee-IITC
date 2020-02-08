@@ -293,9 +293,23 @@ const testLink = (link, operation) => {
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation.markers, operation)) {
       showCrossLink(link, operation);
-      const fromPortal = WasabeePortal.get(link.options.data.oGuid);
-      const toPortal = WasabeePortal.get(link.options.data.dGuid);
-      const blocker = new WasabeeLink(fromPortal, toPortal);
+      let fromPortal = WasabeePortal.get(link.options.data.oGuid);
+      if (!fromPortal)
+        fromPortal = WasabeePortal.fake(
+          (link.options.data.oLatE6 / 1e6).toFixed(6).toString(),
+          (link.options.data.oLngE6 / 1e6).toFixed(6).toString(),
+          link.options.data.oGuid
+        );
+      operation.addPortal(fromPortal);
+      let toPortal = WasabeePortal.get(link.options.data.dGuid);
+      if (!toPortal)
+        toPortal = WasabeePortal.fake(
+          (link.options.data.dLatE6 / 1e6).toFixed(6).toString(),
+          (link.options.data.dLngE6 / 1e6).toFixed(6).toString(),
+          link.options.data.dGuid
+        );
+      operation.addPortal(toPortal);
+      const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
       operation.addBlocker(blocker);
       break;
     }

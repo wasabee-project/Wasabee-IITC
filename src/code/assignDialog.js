@@ -1,3 +1,4 @@
+import { Feature } from "./leafletDrawImports";
 import WasabeeLink from "./link";
 import WasabeeMarker from "./marker";
 import WasabeeAnchor from "./anchor";
@@ -9,10 +10,46 @@ import {
   teamPromise
 } from "./server";
 
-// XXX CONVERT TO LEAFLET EXTENDS
-// push current op to server on dialog open, don't risk server being out-of-date
-export default class AssignDialog {
-  constructor(target, operation) {
+const AssignDialog = Feature.extend({
+  statics: {
+    TYPE: "assignDialog"
+  },
+
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this.type = AssignDialog.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    Feature.prototype.addHooks.call(this);
+    this._displayDialog();
+  },
+
+  removeHooks: function() {
+    Feature.prototype.removeHooks.call(this);
+  },
+
+  _displayDialog: function() {
+    if (!this._map) return;
+    const assignDialog = this;
+    this._dialog = window.dialog({
+      title: this._name,
+      width: "auto",
+      height: "auto",
+      html: this._html,
+      dialogClass: "wasabee-dialog",
+      closeCallback: () => {
+        // window.runHooks( "wasabeeUIUpdate", window.plugin.wasabee.getSelectedOperation());
+        assignDialog.disable();
+        delete assignDialog._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.assign
+    });
+  },
+
+  setup: function(target, operation) {
     this._upload(operation);
 
     this._operation = operation;
@@ -51,18 +88,9 @@ export default class AssignDialog {
     const menu = this._getAgentMenu(target.assignedTo);
     this._html.appendChild(menu);
     menu.style.align = "center";
+  },
 
-    this._dialog = window.dialog({
-      html: this._html,
-      dialogClass: "wasabee-dialog",
-      title: this._name,
-      width: "auto",
-      // closeCallback: () => { window.removeHook("wasabeeUIUpdate", this.update); },
-      id: window.plugin.Wasabee.static.dialogNames.assign
-    });
-  }
-
-  _upload(operation) {
+  _upload: function(operation) {
     if (!operation.localchanged) return;
     updateOpPromise(operation).then(
       function() {
@@ -76,9 +104,19 @@ export default class AssignDialog {
         alert(err);
       }
     );
-  }
+  },
 
-  _getAgentMenu(current) {
+  _buildContent: function() {
+    const content = document.createElement("div");
+    if (typeof this._label == "string") {
+      content.innerText = this._label;
+    } else {
+      content.appendChild(this._label);
+    }
+    return content;
+  },
+
+  _getAgentMenu: function(current) {
     const container = document.createElement("div");
     const menu = container.appendChild(document.createElement("select"));
     let option = menu.appendChild(document.createElement("option"));
@@ -118,9 +156,9 @@ export default class AssignDialog {
     });
 
     return container;
-  }
+  },
 
-  assign(value) {
+  assign: function(value) {
     if (this._type == "Marker") {
       assignMarkerPromise(
         this._operation.ID,
@@ -172,4 +210,6 @@ export default class AssignDialog {
       }
     }
   }
-}
+});
+
+export default AssignDialog;

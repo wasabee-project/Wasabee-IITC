@@ -4,6 +4,7 @@ import WasabeeMe from "./me";
 import { deleteOpPromise } from "./server";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import ConfirmDialog from "./confirmDialog";
+import BlockersList from "./blockersList";
 import UiCommands from "./uiCommands";
 
 const opsButtonControl = Feature.extend({
@@ -236,6 +237,22 @@ const opsButtonControl = Feature.extend({
       false
     );
 
+    const blockersButton = buttonSection.appendChild(
+      document.createElement("a")
+    );
+    blockersButton.innerHTML = "Known Blockers";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      blockersButton.disabled = true;
+    }
+    blockersButton.addEventListener(
+      "click",
+      function() {
+        const bl = new BlockersList();
+        bl.enable();
+      },
+      false
+    );
+
     /*
     const clearAllOpsButton = buttonSection.appendChild(
       document.createElement("a")
@@ -292,7 +309,6 @@ const opsButtonControl = Feature.extend({
             }
             const ol = window.plugin.wasabee.opsList();
             let newopID = ol[0];
-            console.log(newopID);
             if (newopID == null || newopID == operation.ID) {
               console.log(
                 "removing first op in list? I was going to use that...."

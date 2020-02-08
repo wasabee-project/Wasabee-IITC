@@ -1,7 +1,6 @@
 import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import { Feature } from "./leafletDrawImports";
-import { generateId } from "./auxiliar";
 
 export const ImportDialogControl = Feature.extend({
   statics: {
@@ -138,13 +137,7 @@ class ImportDialog {
 
         // worst case: fake it
         if (!portal) {
-          const id = generateId();
-          const p = new WasabeePortal(
-            id,
-            "Import Faked Portal: " + id,
-            point.lat,
-            point.lng
-          );
+          const p = WasabeePortal.fake(point.lat, point.lng);
           newop.addPortal(p);
           portal = p;
           faked++;

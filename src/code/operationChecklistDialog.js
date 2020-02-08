@@ -28,6 +28,7 @@ const OperationChecklistDialog = Feature.extend({
   },
 
   _displayDialog: function() {
+    const dd = this;
     this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
     // use () => to inherit "this" context, use var to make sure the removeHook gets the same one
     const callback = newOpData => this.checklistUpdate(newOpData);
@@ -44,6 +45,8 @@ const OperationChecklistDialog = Feature.extend({
       dialogClass: "wasabee-dialog",
       closeCallback: () => {
         window.removeHook("wasabeeUIUpdate", callback);
+        dd.disable();
+        delete dd._listDialogData;
       },
       id: window.plugin.Wasabee.static.dialogNames.operationChecklist
     });

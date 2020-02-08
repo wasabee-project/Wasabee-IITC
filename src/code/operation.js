@@ -340,9 +340,14 @@ export default class WasabeeOp {
   }
 
   addBlocker(link) {
+    if (!link.fromPortalId || !link.toPortalId) {
+      console.log("not fully formed");
+      console.log(link);
+      return;
+    }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      this.update();
+      // this.update();
     }
   }
 

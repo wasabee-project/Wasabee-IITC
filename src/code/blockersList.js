@@ -1,6 +1,6 @@
 import { Feature } from "./leafletDrawImports";
-
-// generic confirmation screen w/ ok and cancel buttons
+import Sortable from "./sortable";
+import ConfirmDialog from "./confirmDialog";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -11,6 +11,7 @@ const BlockerList = Feature.extend({
     if (!map) map = window.map;
     this.type = BlockerList.TYPE;
     Feature.prototype.initialize.call(this, map, options);
+    this._operation = window.plugin.wasabee.getSelectedOperation();
   },
 
   addHooks: function() {
@@ -26,24 +27,60 @@ const BlockerList = Feature.extend({
   _displayDialog: function() {
     if (!this._map) return;
     const blockerList = this;
+
+    this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+
+    // use () => to inherit "this" context, use var to make sure the removeHook gets the same one
+    const callback = newOpData => this.blockerlistUpdate(newOpData);
+
+    window.addHook("wasabeeUIUpdate", callback);
     this._dialog = window.dialog({
-      title: "Blockers",
+      title: "Known Blockers: " + this._operation.name,
       width: "auto",
       height: "auto",
-      html: this._buildContent(),
+      position: {
+        my: "center top",
+        at: "center center"
+      },
+      html: this.sortable.table,
       dialogClass: "wasabee-dialog",
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
+          window.runHooks("wasabeeUIUpdate", this._operation);
         },
         "Auto-Mark": () => {
           alert(
             "Auto-Mark does not work yet... but how awesome will it be to have it?!"
           );
+        },
+        LoadUnloadedPortalData: () => {
+          const c = this._operation.opportals.filter(p => {
+            if (p.name.match("^Faked: .*")) return true;
+            return false;
+          });
+          if (c.length == 0) return;
+
+          window.addHook("portalAdded", listenForAddedPortals);
+
+          const con = new ConfirmDialog();
+          con.setup(
+            "Fetching Data",
+            "Click on the names of the unloaded portals in the blockers list. \n\nLeave this dialog open until you are finished.",
+            () => {
+              window.removeHook("portalAdded", listenForAddedPortals);
+            }
+          );
+          con.enable();
+
+          for (const missing of c) {
+            // XXX do something here to trigger redraw
+            // a lister for load complete, the each time the load is complete, load another missing portal?
+            console.log(missing.id);
+          }
         }
       },
       closeCallback: () => {
-        // window.runHooks( "wasabeeUIUpdate", window.plugin.wasabee.getSelectedOperation());
         blockerList.disable();
         delete blockerList._dialog;
       },
@@ -51,11 +88,98 @@ const BlockerList = Feature.extend({
     });
   },
 
-  _buildContent: function() {
-    const content = document.createElement("div");
-    content.innerText = "This will be a sortable list of all known blockers";
-    return content;
+  // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
+  blockerlistUpdate: function(newOpData) {
+    const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.blockerList;
+    if (window.DIALOGS[id]) {
+      this.sortable = getListDialogContent(
+        newOpData,
+        this.sortable.sortBy,
+        this.sortable.sortAsc
+      );
+      window.DIALOGS[id].replaceChild(
+        this.sortable.table,
+        window.DIALOGS[id].childNodes[0]
+      );
+    }
   }
 });
 
 export default BlockerList;
+
+const getListDialogContent = (operation, sortBy, sortAsc) => {
+  const content = new Sortable();
+  content.fields = [
+    {
+      name: "From Portal",
+      value: blocker => {
+        return operation.getPortal(blocker.fromPortalId).name;
+      },
+      sort: (a, b) => a.localeCompare(b),
+      format: (row, value, blocker) => {
+        const p = operation.getPortal(blocker.fromPortalId);
+        row.appendChild(p.displayFormat(operation));
+      }
+    },
+    {
+      name: "Count",
+      value: blocker => {
+        const c = operation.blockers.filter(
+          b =>
+            b.fromPortalId == blocker.fromPortalId ||
+            b.toPortalID == blocker.fromPortalId
+        );
+        return c.length;
+      },
+      sort: (a, b) => a - b,
+      format: (row, value) => (row.innerHTML = value)
+    },
+    {
+      name: "To Portal",
+      value: blocker => {
+        return operation.getPortal(blocker.toPortalId).name;
+      },
+      sort: (a, b) => a.localeCompare(b),
+      format: (row, value, blocker) => {
+        const p = operation.getPortal(blocker.toPortalId);
+        row.appendChild(p.displayFormat(operation));
+      }
+    },
+    {
+      name: "Count",
+      value: blocker => {
+        const c = operation.blockers.filter(
+          b =>
+            b.fromPortalId == blocker.toPortalId ||
+            b.toPortalId == blocker.toPortalId
+        );
+        return c.length;
+      },
+      sort: (a, b) => a - b,
+      format: (row, value) => (row.innerHTML = value)
+    }
+  ];
+  content.sortBy = sortBy;
+  content.sortAsc = !sortAsc; // I don't know why this flips
+  content.items = operation.blockers;
+  return content;
+};
+
+const listenForAddedPortals = newPortal => {
+  // fast track dataless placeholders
+  if (!newPortal.portal.options.data.title) return;
+
+  const op = window.plugin.wasabee.getSelectedOperation();
+  const c = op.opportals.filter(p => {
+    if (p.name.match("^Faked: .*")) return true;
+    return false;
+  });
+
+  const incomingPortalId = newPortal.portal.options.guid;
+  for (const faked of c) {
+    if (faked.id == incomingPortalId) {
+      faked.name = newPortal.portal.options.data.title;
+      op.update();
+    }
+  }
+};

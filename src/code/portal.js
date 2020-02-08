@@ -1,3 +1,5 @@
+import { generateId } from "./auxiliar";
+
 export default class WasabeePortal {
   constructor(id, name, lat, lng, comment, hardness) {
     this.id = id;
@@ -103,6 +105,18 @@ export default class WasabeePortal {
       );
     }
     return null;
+  }
+
+  static fake(lat, lng, id, name) {
+    if (!lat && !lng) {
+      console.log("WasabeePortal.fake called w/o lat/lng");
+      return null;
+    }
+
+    if (!id) id = generateId();
+    if (!name) name = "Faked: [" + id + "]";
+    const n = new WasabeePortal(id, name, lat, lng);
+    return n;
   }
 
   static getSelected() {
