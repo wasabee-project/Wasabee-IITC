@@ -87,16 +87,10 @@ export default class WasabeeOp {
   }
 
   containsMarker(portal, markerType) {
-    if (this.markers.length == 0) {
-      return false;
-    } else {
-      for (let marker in this.markers) {
-        if (
-          this.markers[marker].portalId == portal.id &&
-          this.markers[marker].type == markerType
-        ) {
-          return true;
-        }
+    if (this.markers.length == 0) return false;
+    for (const m of this.markers) {
+      if (m.portalId == portal.id && m.type == markerType) {
+        return true;
       }
     }
     return false;
@@ -284,13 +278,10 @@ export default class WasabeeOp {
   }
 
   containsAnchor(portalId) {
-    if (this.anchors.length == 0) {
-      return false;
-    } else {
-      for (const anchor_ in this.anchors) {
-        if (this.anchors[anchor_] == portalId) {
-          return true;
-        }
+    if (this.anchors.length == 0) return false;
+    for (const a of this.anchors) {
+      if (a == portalId) {
+        return true;
       }
     }
     return false;
@@ -310,10 +301,10 @@ export default class WasabeeOp {
   containsBlocker(link) {
     if (this.blockers.length == 0) return false;
 
-    for (const l in this.blockers) {
+    for (const l of this.blockers) {
       if (
-        this.blockers[l].fromPortalId == link.fromPortalId &&
-        this.blockers[l].toPortalId == link.toPortalId
+        l.fromPortalId == link.fromPortalId &&
+        l.toPortalId == link.toPortalId
       ) {
         return true;
       }
@@ -346,45 +337,35 @@ export default class WasabeeOp {
       return listAnchor !== originalPortal.id;
     });
     this.addAnchor(newPortal);
-    let linksToRemove = [];
-    for (let link_ = 0; link_ < this.links.length; link_++) {
-      if (this.links[link_].fromPortalId == originalPortal["id"]) {
-        if (this.links[link_].toPortalId === newPortal["id"]) {
+    const linksToRemove = [];
+    for (const l of this.links) {
+      if (l.fromPortalId == originalPortal.id) {
+        if (l.toPortalId === newPortal.id) {
           console.log(
-            `Operation: Removing link '${this.links[link_].ID}' while swapping because it would create a link with the same source and target.`
+            `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
-          linksToRemove.push(this.links[link_]);
-        } else if (
-          !this.containsLinkFromTo(
-            newPortal["id"],
-            this.links[link_].toPortalId
-          )
-        ) {
-          this.links[link_].fromPortalId = newPortal["id"];
+          linksToRemove.push(l);
+        } else if (!this.containsLinkFromTo(newPortal.id, l.toPortalId)) {
+          l.fromPortalId = newPortal.id;
         } else {
           console.log(
-            `Operation: Removing link '${this.links[link_].ID}' while swapping because it would duplicate an existing link in the operation.`
+            `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
-          linksToRemove.push(this.links[link_]);
+          linksToRemove.push(l);
         }
-      } else if (this.links[link_].toPortalId == originalPortal["id"]) {
-        if (this.links[link_].fromPortalId === newPortal["id"]) {
+      } else if (l.toPortalId == originalPortal.id) {
+        if (l.fromPortalId === newPortal.id) {
           console.log(
-            `Operation: Removing link '${this.links[link_].ID}' while swapping because it would create a link with the same source and target.`
+            `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
-          linksToRemove.push(this.links[link_]);
-        } else if (
-          !this.containsLinkFromTo(
-            this.links[link_].fromPortalId,
-            newPortal["id"]
-          )
-        ) {
-          this.links[link_].toPortalId = newPortal["id"];
+          linksToRemove.push(l);
+        } else if (!this.containsLinkFromTo(l.fromPortalId, newPortal.id)) {
+          l.toPortalId = newPortal.id;
         } else {
           console.log(
-            `Operation: Removing link '${this.links[link_].ID}' while swapping because it would duplicate an existing link in the operation.`
+            `Operation: Removing link '$l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
-          linksToRemove.push(this.links[link_]);
+          linksToRemove.push(l);
         }
       }
     }
@@ -440,36 +421,36 @@ export default class WasabeeOp {
   }
 
   convertLinksToObjs(links) {
-    const tempLinks = Array();
-    for (let link_ in links) {
-      if (links[link_] instanceof WasabeeLink) {
-        tempLinks.push(links[link_]);
+    const tempLinks = new Array();
+    for (const l of links) {
+      if (l instanceof WasabeeLink) {
+        tempLinks.push(l);
       } else {
-        tempLinks.push(WasabeeLink.create(links[link_], this));
+        tempLinks.push(WasabeeLink.create(l, this));
       }
     }
     return tempLinks;
   }
 
   convertBlockersToObjs(links) {
-    const tempLinks = Array();
-    for (let link_ in links) {
-      if (links[link_] instanceof WasabeeLink) {
-        tempLinks.push(links[link_]);
+    const tempLinks = new Array();
+    for (const l of links) {
+      if (l instanceof WasabeeLink) {
+        tempLinks.push(l);
       } else {
-        tempLinks.push(WasabeeLink.create(links[link_], this));
+        tempLinks.push(WasabeeLink.create(l, this));
       }
     }
     return tempLinks;
   }
 
   convertMarkersToObjs(markers) {
-    const tmpMarkers = Array();
-    for (let marker_ in markers) {
-      if (markers[marker_] instanceof WasabeeMarker) {
-        tmpMarkers.push(markers[marker_]);
+    const tmpMarkers = new Array();
+    for (const m of markers) {
+      if (m instanceof WasabeeMarker) {
+        tmpMarkers.push(m);
       } else {
-        tmpMarkers.push(WasabeeMarker.create(markers[marker_]));
+        tmpMarkers.push(WasabeeMarker.create(m));
       }
     }
     return tmpMarkers;
@@ -477,17 +458,17 @@ export default class WasabeeOp {
 
   convertPortalsToObjs(portals) {
     const tmpPortals = Array();
-    for (let portal_ in portals) {
-      if (portals[portal_] instanceof WasabeePortal) {
-        tmpPortals.push(portals[portal_]);
+    for (const p of portals) {
+      if (p instanceof WasabeePortal) {
+        tmpPortals.push(p);
       } else {
         const np = new WasabeePortal(
-          portals[portal_].id,
-          portals[portal_].name,
-          portals[portal_].lat,
-          portals[portal_].lng,
-          portals[portal_].comment,
-          portals[portal_].hardness
+          p.id,
+          p.name,
+          p.lat,
+          p.lng,
+          p.comment,
+          p.hardness
         );
         tmpPortals.push(np);
       }
