@@ -77,6 +77,11 @@ const MarkerButtonControl = Feature.extend({
 
   _listDialog: function(operation) {
     window.addHook("wasabeeUIUpdate", markerListUpdate);
+    if (this._operation.fakedPortals.length > 0) {
+      window.addHook("portalAdded", listenForAddedPortals);
+      this._portalAddedListener = true;
+    }
+
     this._listDialogData = window.dialog({
       title: "Marker List: " + operation.name,
       width: "auto",
@@ -88,6 +93,9 @@ const MarkerButtonControl = Feature.extend({
       html: getListDialogContent(operation).table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
+        if (this._portalAddedListener) {
+          window.removeHook("portalAdded", listenForAddedPortals);
+        }
         window.removeHook("wasabeeUIUpdate", markerListUpdate);
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
@@ -223,4 +231,17 @@ const makeMarkerDialogMenu = (list, data) => {
   state.items = options;
   list.className = "menu";
   list.appendChild(state.button);
+};
+
+const listenForAddedPortals = newPortal => {
+  if (!newPortal.portal.options.data.title) return;
+
+  const op = window.plugin.wasabee.getSelectedOperation();
+
+  for (const faked of op.fakedPortals) {
+    if (faked.id == newPortal.portal.options.guid) {
+      faked.name = newPortal.portal.options.data.title;
+      op.update();
+    }
+  }
 };
