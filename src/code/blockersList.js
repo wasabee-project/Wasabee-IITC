@@ -1,6 +1,5 @@
 import { Feature } from "./leafletDrawImports";
 import Sortable from "./sortable";
-import ConfirmDialog from "./confirmDialog";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -34,6 +33,13 @@ const BlockerList = Feature.extend({
     const callback = newOpData => this.blockerlistUpdate(newOpData);
 
     window.addHook("wasabeeUIUpdate", callback);
+
+    // while this dialog is open, inspect every portal addded to IITC and see if we need to finish loading our data
+    if (this._operation.fakedPortals.length > 0) {
+      this._portalAddedHook = true;
+      window.addHook("portalAdded", listenForAddedPortals);
+    }
+
     this._dialog = window.dialog({
       title: "Known Blockers: " + this._operation.name,
       width: "auto",
@@ -54,33 +60,15 @@ const BlockerList = Feature.extend({
             "Auto-Mark does not work yet... but how awesome will it be to have it?!"
           );
         },
-        LoadUnloadedPortalData: () => {
-          const c = this._operation.opportals.filter(p => {
-            if (p.name.match("^Faked: .*")) return true;
-            return false;
-          });
-          if (c.length == 0) return;
-
-          window.addHook("portalAdded", listenForAddedPortals);
-
-          const con = new ConfirmDialog();
-          con.setup(
-            "Fetching Data",
-            "Click on the names of the unloaded portals in the blockers list. \n\nLeave this dialog open until you are finished.",
-            () => {
-              window.removeHook("portalAdded", listenForAddedPortals);
-            }
-          );
-          con.enable();
-
-          for (const missing of c) {
-            // XXX do something here to trigger redraw
-            // a lister for load complete, the each time the load is complete, load another missing portal?
-            console.log(missing.id);
-          }
+        Reset: () => {
+          this._operation.blockers = new Array();
+          this._operation.store();
         }
       },
       closeCallback: () => {
+        if (blockerList._portalAddedHook) {
+          window.removeHook("portalAdded", listenForAddedPortals);
+        }
         blockerList.disable();
         delete blockerList._dialog;
       },
@@ -166,18 +154,12 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
 };
 
 const listenForAddedPortals = newPortal => {
-  // fast track dataless placeholders
   if (!newPortal.portal.options.data.title) return;
 
   const op = window.plugin.wasabee.getSelectedOperation();
-  const c = op.opportals.filter(p => {
-    if (p.name.match("^Faked: .*")) return true;
-    return false;
-  });
 
-  const incomingPortalId = newPortal.portal.options.guid;
-  for (const faked of c) {
-    if (faked.id == incomingPortalId) {
+  for (const faked of op.fakedPortals) {
+    if (faked.id == newPortal.portal.options.guid) {
       faked.name = newPortal.portal.options.data.title;
       op.update();
     }

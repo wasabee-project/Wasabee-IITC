@@ -30,9 +30,16 @@ const OperationChecklistDialog = Feature.extend({
   _displayDialog: function() {
     const dd = this;
     this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+
     // use () => to inherit "this" context, use var to make sure the removeHook gets the same one
     const callback = newOpData => this.checklistUpdate(newOpData);
     window.addHook("wasabeeUIUpdate", callback);
+
+    if (this._operation.fakedPortals.length > 0) {
+      this._portalAddedHook = true;
+      window.addHook("portalAdded", listenForAddedPortals);
+    }
+
     this._listDialogData = window.dialog({
       title: "Operation Checklist: " + this._operation.name,
       width: "auto",
@@ -45,6 +52,9 @@ const OperationChecklistDialog = Feature.extend({
       dialogClass: "wasabee-dialog",
       closeCallback: () => {
         window.removeHook("wasabeeUIUpdate", callback);
+        if (dd._portalAddedHook) {
+          window.removeHook("portalAdded", listenForAddedPortals);
+        }
         dd.disable();
         delete dd._listDialogData;
       },
@@ -181,4 +191,17 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   content.sortAsc = !sortAsc; // I don't know why this flips
   content.items = allThings;
   return content;
+};
+
+const listenForAddedPortals = newPortal => {
+  if (!newPortal.portal.options.data.title) return;
+
+  const op = window.plugin.wasabee.getSelectedOperation();
+
+  for (const faked of op.fakedPortals) {
+    if (faked.id == newPortal.portal.options.guid) {
+      faked.name = newPortal.portal.options.data.title;
+      op.update();
+    }
+  }
 };

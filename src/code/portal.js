@@ -114,7 +114,7 @@ export default class WasabeePortal {
     }
 
     if (!id) id = generateId();
-    if (!name) name = "Faked: [" + id + "]";
+    if (!name) name = "Loading: [" + id + "]";
     const n = new WasabeePortal(id, name, lat, lng);
     return n;
   }

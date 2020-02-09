@@ -69,12 +69,10 @@ export default class WasabeeOp {
   containsLinkFromTo(fromPortalId, toPortalId) {
     if (this.links.length == 0) return false;
 
-    for (const l in this.links) {
+    for (const l of this.links) {
       if (
-        (this.links[l].fromPortalId == fromPortalId &&
-          this.links[l].toPortalId == toPortalId) ||
-        (this.links[l].toPortalId == fromPortalId &&
-          this.links[l].fromPortalId == toPortalId)
+        (l.fromPortalId == fromPortalId && l.toPortalId == toPortalId) ||
+        (l.toPortalId == fromPortalId && l.fromPortalId == toPortalId)
       ) {
         return true;
       }
@@ -114,10 +112,8 @@ export default class WasabeeOp {
   }
 
   getPortal(portalID) {
-    for (let portal_ in this.opportals) {
-      if (portalID == this.opportals[portal_].id) {
-        return this.opportals[portal_];
-      }
+    for (const p of this.opportals) {
+      if (p.id == portalID) return p;
     }
     return null;
   }
@@ -165,14 +161,9 @@ export default class WasabeeOp {
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
     var newLinks = [];
-    for (let l in this.links) {
-      if (
-        !(
-          this.links[l].fromPortalId == startPortal &&
-          this.links[l].toPortalId == endPortal
-        )
-      ) {
-        newLinks.push(this.links[l]);
+    for (const l of this.links) {
+      if (!(l.fromPortalId == startPortal && l.toPortalId == endPortal)) {
+        newLinks.push(l);
       }
     }
     this.links = newLinks;
@@ -183,15 +174,12 @@ export default class WasabeeOp {
 
   reverseLink(startPortalID, endPortalID) {
     var newLinks = [];
-    for (let l in this.links) {
-      if (
-        this.links[l].fromPortalId == startPortalID &&
-        this.links[l].toPortalId == endPortalID
-      ) {
-        this.links[l].fromPortalId = endPortalID;
-        this.links[l].toPortalId = startPortalID;
+    for (const l of this.links) {
+      if (l.fromPortalId == startPortalID && l.toPortalId == endPortalID) {
+        l.fromPortalId = endPortalID;
+        l.toPortalId = startPortalID;
       }
-      newLinks.push(this.links[l]);
+      newLinks.push(l);
     }
     this.links = newLinks;
     this.update();
@@ -199,19 +187,16 @@ export default class WasabeeOp {
 
   cleanAnchorList() {
     var newAnchorList = [];
-    for (let anchor_ in this.anchors) {
+    for (const a of this.anchors) {
       var foundAnchor = false;
-      for (let l in this.links) {
-        if (
-          this.links[l].fromPortalId == this.anchors[anchor_] ||
-          this.links[l].toPortalId == this.anchors[anchor_]
-        ) {
+      for (const l of this.links) {
+        if (l.fromPortalId == a || l.toPortalId == a) {
           foundAnchor = true;
         }
       }
 
       if (foundAnchor) {
-        newAnchorList.push(this.anchors[anchor_]);
+        newAnchorList.push(a);
       }
     }
     this.anchors = newAnchorList;
@@ -220,44 +205,41 @@ export default class WasabeeOp {
   //This removes opportals with no links and removes duplicates
   cleanPortalList() {
     var newPortals = [];
-    for (let portal_ in this.opportals) {
-      var foundPortal = false;
-      for (let l in this.links) {
-        if (
-          this.opportals[portal_]["id"] == this.links[l].fromPortalId ||
-          this.opportals[portal_]["id"] == this.links[l].toPortalId
-        ) {
+    for (const p of this.opportals) {
+      let foundPortal = false;
+      for (const l of this.links) {
+        if (p.id == l.fromPortalId || p.id == l.toPortalId) {
           foundPortal = true;
         }
       }
-      for (let marker_ in this.markers) {
-        if (this.opportals[portal_]["id"] == this.markers[marker_].portalId) {
+      for (const m of this.markers) {
+        if (p.id == m.portalId) {
           foundPortal = true;
         }
       }
-      for (let anchor_ in this.anchors) {
-        if (this.opportals[portal_]["id"] == this.anchors[anchor_]) {
+      for (const a of this.anchors) {
+        if (p.id == a) {
           foundPortal = true;
         }
       }
       if (foundPortal) {
-        newPortals.push(this.opportals[portal_]);
+        newPortals.push(p);
       }
     }
 
-    var finalPortals = [];
-    for (let portal_ in newPortals) {
+    const finalPortals = [];
+    for (const p of newPortals) {
       if (finalPortals.length == 0) {
-        finalPortals.push(newPortals[portal_]);
+        finalPortals.push(p);
       } else {
-        var foundFinalPortal = false;
-        for (let finalPortal_ in finalPortals) {
-          if (newPortals[portal_]["id"] == finalPortals[finalPortal_]["id"]) {
+        let foundFinalPortal = false;
+        for (const fp of finalPortals) {
+          if (p.id == fp.id) {
             foundFinalPortal = true;
           }
         }
-        if (foundFinalPortal == false) {
-          finalPortals.push(newPortals[portal_]);
+        if (!foundFinalPortal) {
+          finalPortals.push(p);
         }
       }
     }
@@ -349,6 +331,14 @@ export default class WasabeeOp {
       this.blockers.push(link);
       // this.update();
     }
+  }
+
+  get fakedPortals() {
+    const c = this.opportals.filter(p => {
+      if (p.name.match("^Loading: .*")) return true;
+      return false;
+    });
+    return c;
   }
 
   swapPortal(originalPortal, newPortal) {
