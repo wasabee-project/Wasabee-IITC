@@ -221,25 +221,26 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
 };
 
 const testPolyLine = (drawnLink, link, markers, operation) => {
-  var a = link.getLatLngs(operation);
-  var start = {};
-  var end = {};
-  var fromPortal = operation.getPortal(drawnLink.fromPortalId);
-  var toPortal = operation.getPortal(drawnLink.toPortalId);
-  if (fromPortal === null || toPortal === null) {
+  const a = link.getLatLngs(operation);
+  const fromPortal = operation.getPortal(drawnLink.fromPortalId);
+  const toPortal = operation.getPortal(drawnLink.toPortalId);
+  if (!fromPortal || !toPortal) {
     console.warn(
       "testPolyLine: Found a null value for fromPortal or toPortal."
     );
     return false;
   }
+
+  // why bother?
+  const start = {};
+  const end = {};
   start.lat = fromPortal.lat;
   start.lng = fromPortal.lng;
   end.lat = toPortal.lat;
   end.lng = toPortal.lng;
 
   if (greatCircleArcIntersect(a[0], a[1], start, end)) {
-    for (let i = 0; i < markers.length; i++) {
-      var marker = markers[i];
+    for (const marker of markers) {
       if (
         marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
         marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS ||
