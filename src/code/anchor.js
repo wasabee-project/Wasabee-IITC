@@ -98,7 +98,9 @@ export default class WasabeeAnchor {
         "click",
         () => {
           const anchor = new WasabeeAnchor(this.ID);
-          new AssignDialog(anchor, operation);
+          const ad = new AssignDialog();
+          ad.setup(anchor, operation);
+          ad.enable();
           marker.closePopup();
         },
         false

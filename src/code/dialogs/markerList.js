@@ -124,7 +124,9 @@ const getListDialogContent = operation => {
         const assigned = a.appendChild(document.createElement("a"));
         assigned.innerHTML = m;
         a.addEventListener("click", () => {
-          new AssignDialog(agent, operation);
+          const ad = new AssignDialog();
+          ad.setup(agent, operation);
+          ad.enable();
         });
       }
     },
@@ -173,7 +175,9 @@ const makeMarkerDialogMenu = (list, data) => {
     options.push({
       label: "Assign",
       onclick: () => {
-        new AssignDialog(data, operation);
+        const ad = new AssignDialog();
+        ad.setup(data, operation);
+        ad.enable();
       }
     });
   }

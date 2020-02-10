@@ -172,7 +172,9 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
         const assigned = row.appendChild(document.createElement("a"));
         assigned.innerHTML = value;
         row.addEventListener("click", () => {
-          new AssignDialog(agent, operation);
+          const ad = new AssignDialog();
+          ad.setup(agent, operation);
+          ad.enable();
         });
       }
     },

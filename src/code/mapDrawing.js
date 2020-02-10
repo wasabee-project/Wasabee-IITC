@@ -112,7 +112,9 @@ const getMarkerPopup = (marker, target, operation) => {
     assignButton.addEventListener(
       "click",
       () => {
-        new AssignDialog(target, operation);
+        const ad = new AssignDialog();
+        ad.setup(target, operation);
+        ad.enable();
         marker.closePopup();
       },
       false
