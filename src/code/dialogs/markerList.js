@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
+import { getAgent } from "../server";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -109,7 +110,7 @@ const getListDialogContent = operation => {
       name: "Assigned To",
       value: marker => {
         if (marker.assignedTo != null && marker.assignedTo != "") {
-          const agent = window.plugin.wasabee.getAgent(marker.assignedTo);
+          const agent = getAgent(marker.assignedTo);
           if (agent != null) {
             return agent.name;
           } else {

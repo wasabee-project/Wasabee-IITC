@@ -8,6 +8,7 @@ import MarkerButtonControl from "./dialogs/markerButton";
 import MultimaxButtonControl from "./dialogs/multimaxDialog";
 import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
 import ConfirmDialog from "./dialogs/confirmDialog";
+import AuthDialog from "./dialogs/authDialog";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -78,7 +79,7 @@ export default function(selectedOp) {
           title: "Create a new operation",
           text: "New Op",
           callback: () => {
-            window.plugin.wasabee.closeAllDialogs("nothing");
+            closeAllDialogs();
             let nb = new NewopButtonControl(map);
             opsButtonHandler.disable();
             nb.enable();
@@ -94,7 +95,7 @@ export default function(selectedOp) {
               "Clear Local Ops",
               "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
               () => {
-                window.plugin.wasabee.closeAllDialogs("nothing");
+                closeAllDialogs();
                 window.plugin.wasabee.resetOps();
                 window.plugin.wasabee.setupLocalStorage();
               }
@@ -138,12 +139,13 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
         callback: () => {
-          window.plugin.wasabee.closeAllDialogs("nothing");
+          // closeAllDialogs();
           const so = window.plugin.wasabee.getSelectedOperation();
           try {
             const me = WasabeeMe.get(true); // force update of ops list
             if (me === null) {
-              window.plugin.wasabee.showMustAuthAlert();
+              const ad = new AuthDialog();
+              ad.enable();
             } else {
               for (const op of me.Ops) {
                 opPromise(op.ID).then(
@@ -155,21 +157,21 @@ export default function(selectedOp) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
                         // newop.update(); makeSelectedOperation takes care of the re-draw
                       }
-                    } else {
-                      console.log("opPromise returned null op but no err?");
-                      window.plugin.wasabee.showMustAuthAlert();
                     }
                   },
                   function(err) {
                     console.log(err);
-                    window.plugin.wasabee.showMustAuthAlert();
+                    const ad = new AuthDialog();
+                    ad.enable();
                   }
                 );
               }
               alert("Sync Complete");
             }
           } catch (e) {
-            window.plugin.wasabee.showMustAuthAlert();
+            // ad = new AuthDialog();
+            // ad.enable();
+            alert(e);
           }
         }
       });
@@ -192,7 +194,7 @@ export default function(selectedOp) {
             "Clear Local Ops",
             "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
             () => {
-              window.plugin.wasabee.closeAllDialogs("nothing");
+              // closeAllDialogs();
               window.plugin.wasabee.resetOps();
               window.plugin.wasabee.setupLocalStorage();
             }
@@ -214,7 +216,7 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
         callback: () => {
-          window.plugin.wasabee.closeAllDialogs("nothing");
+          // closeAllDialogs();
           const so = window.plugin.wasabee.getSelectedOperation();
           const id = so.ID;
 
@@ -227,11 +229,7 @@ export default function(selectedOp) {
               },
               function(reject) {
                 console.log(reject);
-                if (reject == "permission to upload denied") {
-                  window.plugin.wasabee.showMustAuthAlert();
-                } else {
-                  alert(reject);
-                }
+                alert(reject);
               }
             );
           } else {
@@ -246,7 +244,7 @@ export default function(selectedOp) {
               },
               function(reject) {
                 console.log(reject);
-                window.plugin.wasabee.showMustAuthAlert();
+                alert(reject);
               }
             );
           }
@@ -436,3 +434,21 @@ export default function(selectedOp) {
   }
   Wasabee.buttons.update(selectedOp);
 }
+
+const closeAllDialogs = skip => {
+  skip = skip || "nothing";
+  for (const name of Object.values(window.plugin.Wasabee.static.dialogNames)) {
+    if (name != skip) {
+      let id = "dialog-" + name;
+      if (window.DIALOGS[id]) {
+        try {
+          let selector = $(window.DIALOGS[id]);
+          selector.dialog("close");
+          selector.remove();
+        } catch (err) {
+          console.log("closing dialog: " + err);
+        }
+      }
+    }
+  }
+};

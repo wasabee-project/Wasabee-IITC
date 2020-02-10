@@ -122,6 +122,7 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update();
+    window.runHooks("wasabeeCrosslinks", this);
   }
 
   removeMarker(marker) {

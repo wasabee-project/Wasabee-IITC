@@ -421,3 +421,23 @@ export const GetWasabeeServer = function() {
   }
   return server;
 };
+
+// don't use this unless you just can't use the promise directly
+export const getAgent = gid => {
+  // when a team is loaded from the server, all agents are pushed into the cache
+  if (window.plugin.Wasabee._agentCache.has(gid)) {
+    return window.plugin.Wasabee._agentCache.get(gid);
+  }
+
+  let agent = null;
+  agentPromise(gid, false).then(
+    function(resolve) {
+      agent = resolve;
+      window.plugin.Wasabee._agentCache.set(gid, agent);
+    },
+    function(reject) {
+      console.log(reject);
+    }
+  );
+  return agent;
+};

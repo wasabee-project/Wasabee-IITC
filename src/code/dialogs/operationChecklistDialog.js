@@ -3,6 +3,7 @@ import WasabeeLink from "../link";
 import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
+import { getAgent } from "../server";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {
@@ -157,7 +158,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
       name: "Assigned To",
       value: thing => {
         if (thing.assignedTo != null && thing.assignedTo != "") {
-          const agent = window.plugin.wasabee.getAgent(thing.assignedTo);
+          const agent = getAgent(thing.assignedTo);
           if (agent) {
             return agent.name;
           } else {

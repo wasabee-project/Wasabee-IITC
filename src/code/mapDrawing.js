@@ -1,22 +1,15 @@
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import WasabeeMe from "./me";
+import WasabeeAnchor from "./anchor";
 import { agentPromise, teamPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 
 var Wasabee = window.plugin.Wasabee;
 
-export const getColorMarker = colorGroup => {
-  let lt = Wasabee.layerTypes.get("main");
-  if (Wasabee.layerTypes.has(colorGroup)) {
-    lt = Wasabee.layerTypes.get(colorGroup);
-  }
-  return lt.portal.iconUrl;
-};
-
 //** This function draws things on the layers */
 export const drawThings = op => {
-  window.plugin.wasabee.resetAllPortals(op);
+  resetAllAnchors(op);
   resetMarkers(op);
   resetLinks(op);
 };
@@ -230,15 +223,15 @@ export const drawAgents = op => {
     /* this fetches the team into Wasabee.teams */
     teamPromise(t.teamid).then(
       function(team) {
-        team.agents.forEach(function(agent) {
-          let agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
+        for (const agent of team.agents) {
+          const agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
           if (agentInLayer != null) {
             window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
             delete window.plugin.wasabee.agentLayers[agent.id];
           }
           if (agent.lat != 0) {
-            let latLng = new L.LatLng(agent.lat, agent.lng);
-            let a_ = L.marker(latLng, {
+            const latLng = new L.LatLng(agent.lat, agent.lng);
+            const marker = L.marker(latLng, {
               title: agent.name,
               icon: L.icon({
                 iconUrl: agent.pic,
@@ -249,14 +242,15 @@ export const drawAgents = op => {
               })
             });
             // spiderfied clicks
-            window.registerMarkerForOMS(a_);
-            a_.bindPopup(getAgentPopup(agent));
-            a_.off("click", agent.openPopup, agent);
-            a_.on("spiderfiedclick", a_.openPopup, a_);
-            window.plugin.wasabee.agentLayers[agent.id] = a_;
-            a_.addTo(window.plugin.wasabee.agentLayerGroup);
+            marker.bindPopup(agent.getPopup());
+            marker.on("click", agent.openPopup, agent);
+
+            window.registerMarkerForOMS(marker);
+            marker.on("spiderfiedclick", marker.openPopup, marker);
+            window.plugin.wasabee.agentLayers[agent.id] = marker;
+            marker.addTo(window.plugin.wasabee.agentLayerGroup);
           }
-        });
+        }
       },
       function(err) {
         console.log(err);
@@ -265,14 +259,43 @@ export const drawAgents = op => {
   } // for t of op.teamlist
 };
 
-const getAgentPopup = agent => {
-  agent.className = "wasabee-dialog wasabee-dialog-ops";
-  const content = document.createElement("div");
-  const title = content.appendChild(document.createElement("div"));
-  title.className = "desc";
-  title.id = agent.id;
-  title.innerHTML = markdown.toHTML(agent.name);
-  const date = content.appendChild(document.createElement("span"));
-  date.innerHTML = markdown.toHTML("Last update: " + agent.date);
-  return content;
+const addAllAnchors = operation => {
+  for (const portalId of operation.anchors) {
+    addAnchorToMap(portalId, operation);
+  }
+};
+
+//** This function resets all the portals and calls addAllPortals to add them */
+const resetAllAnchors = operation => {
+  for (const guid in window.plugin.wasabee.portalLayers) {
+    const portalInLayer = window.plugin.wasabee.portalLayers[guid];
+    window.plugin.wasabee.portalLayerGroup.removeLayer(portalInLayer);
+    delete window.plugin.wasabee.portalLayers[guid];
+  }
+  addAllAnchors(operation);
+};
+
+/** This function adds a portal to the portal layer group */
+const addAnchorToMap = (portalId, operation) => {
+  const anchor = new WasabeeAnchor(portalId);
+  const marker = L.marker(anchor.latLng, {
+    title: anchor.name,
+    icon: L.icon({
+      iconUrl: anchor.icon,
+      iconAnchor: [12, 41],
+      iconSize: [25, 41],
+      popupAnchor: [0, -35]
+    })
+  });
+
+  const content = anchor.popupContent(marker, operation);
+  marker.bindPopup(content).on("click", marker.openPopup, marker);
+
+  // spiderfied clicks
+  // why is this throwing nulls?
+  // console.log(marker);
+  window.registerMarkerForOMS(marker);
+  marker.on("spiderfiedclick", marker.openPopup, marker);
+  window.plugin.wasabee.portalLayers[anchor.id] = marker;
+  marker.addTo(window.plugin.wasabee.portalLayerGroup);
 };

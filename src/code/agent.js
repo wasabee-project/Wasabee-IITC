@@ -1,3 +1,5 @@
+var markdown = require("markdown").markdown;
+
 export default class WasabeeAgent {
   constructor() {
     this.id = null;
@@ -30,5 +32,17 @@ export default class WasabeeAgent {
     display.className = "wasabee-agent-label";
     display.textContent = this.name;
     return display;
+  }
+
+  getPopup() {
+    // agent.className = "wasabee-dialog wasabee-dialog-ops";
+    const content = document.createElement("div");
+    const title = content.appendChild(document.createElement("div"));
+    title.className = "desc";
+    title.id = this.id;
+    title.innerHTML = markdown.toHTML(this.name);
+    const date = content.appendChild(document.createElement("span"));
+    date.innerHTML = markdown.toHTML("Last update: " + this.date);
+    return content;
   }
 }
