@@ -77,9 +77,9 @@ const MarkerButtonControl = Feature.extend({
 
   _listDialog: function(operation) {
     window.addHook("wasabeeUIUpdate", markerListUpdate);
-    if (this._operation.fakedPortals.length > 0) {
-      window.addHook("portalAdded", listenForAddedPortals);
-      this._portalAddedListener = true;
+    window.addHook("portalAdded", listenForAddedPortals);
+    for (const f of this._operation.fakedPortals) {
+      window.portalDetail.request(f.id);
     }
 
     this._listDialogData = window.dialog({
@@ -93,9 +93,7 @@ const MarkerButtonControl = Feature.extend({
       html: getListDialogContent(operation).table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
-        if (this._portalAddedListener) {
-          window.removeHook("portalAdded", listenForAddedPortals);
-        }
+        window.removeHook("portalAdded", listenForAddedPortals);
         window.removeHook("wasabeeUIUpdate", markerListUpdate);
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
@@ -233,6 +231,7 @@ const makeMarkerDialogMenu = (list, data) => {
   list.appendChild(state.button);
 };
 
+// yes, one defition per dialog type
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 

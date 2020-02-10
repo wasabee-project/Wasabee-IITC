@@ -112,7 +112,7 @@ const opsButtonControl = Feature.extend({
       if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         context._map.fitBounds(mbr);
       }
-      window.runHooks("wasabeeUIUpdate", operation.ID);
+      window.runHooks("wasabeeUIUpdate", operation);
       // newop.update(); // just run wasabeeUIUpdate
     });
 

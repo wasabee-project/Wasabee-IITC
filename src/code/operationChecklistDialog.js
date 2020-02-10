@@ -35,9 +35,9 @@ const OperationChecklistDialog = Feature.extend({
     const callback = newOpData => this.checklistUpdate(newOpData);
     window.addHook("wasabeeUIUpdate", callback);
 
-    if (this._operation.fakedPortals.length > 0) {
-      this._portalAddedHook = true;
-      window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalAdded", listenForAddedPortals);
+    for (const f of this._operation.fakedPortals) {
+      window.portalDetail.request(f.id);
     }
 
     this._listDialogData = window.dialog({
@@ -52,9 +52,7 @@ const OperationChecklistDialog = Feature.extend({
       dialogClass: "wasabee-dialog",
       closeCallback: () => {
         window.removeHook("wasabeeUIUpdate", callback);
-        if (dd._portalAddedHook) {
-          window.removeHook("portalAdded", listenForAddedPortals);
-        }
+        window.removeHook("portalAdded", listenForAddedPortals);
         dd.disable();
         delete dd._listDialogData;
       },
@@ -193,6 +191,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   return content;
 };
 
+// yes, each dialog needs its own definition otherwise closing one dialog clears the callbacks for other open dialogs
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 

@@ -223,7 +223,7 @@ export default function(selectedOp) {
               function(resolve) {
                 console.log("server accepted the update: " + resolve);
                 alert("Update Successful");
-                window.runHooks("wasabeeUIUpdate", this);
+                window.runHooks("wasabeeUIUpdate", so);
               },
               function(reject) {
                 console.log(reject);
@@ -407,10 +407,10 @@ export default function(selectedOp) {
 
       return link;
     },
-    update: function() {
+    update: function(operation) {
       if (
-        selectedOp.IsServerOp() == false ||
-        selectedOp.IsWritableOp(WasabeeMe.get()) == true
+        operation.IsServerOp() == false ||
+        operation.IsWritableOp(WasabeeMe.get()) == true
       ) {
         $("#wasabee_uploadbutton").css("display", "");
       } else {
@@ -434,5 +434,5 @@ export default function(selectedOp) {
       .attr("src", image);
     window.addHook("wasabeeUIUpdate", Wasabee.buttons.update);
   }
-  Wasabee.buttons.update();
+  Wasabee.buttons.update(selectedOp);
 }

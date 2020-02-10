@@ -242,6 +242,9 @@ export default class WasabeeOp {
 
   addPortal(portal) {
     if (!this.containsPortal(portal)) {
+      // this makes sure IITC has the data in its cache
+      // almost free if cached, helpful if not
+      window.portalDetail.request(portal.id);
       this.opportals.push(portal);
       this.update();
     }

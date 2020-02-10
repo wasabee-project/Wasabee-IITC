@@ -72,11 +72,17 @@ window.plugin.wasabee.init = function() {
     true
   );
 
-  window.addHook("mapDataRefreshStart", function() {
+  window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
   });
-  window.addHook("wasabeeUIUpdate", function() {
-    drawThings(Wasabee._selectedOp);
+  window.addHook("wasabeeUIUpdate", operation => {
+    drawThings(operation);
+    if (operation.ID) {
+      console.log("wasabeeUIUpdate called with op: " + operation.ID);
+    } else {
+      console.log("wasabeeUIUpdate called with something other than an op");
+      console.log(operation);
+    }
   });
   addButtons(Wasabee._selectedOp);
 

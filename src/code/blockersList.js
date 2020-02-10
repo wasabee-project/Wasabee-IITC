@@ -34,10 +34,9 @@ const BlockerList = Feature.extend({
 
     window.addHook("wasabeeUIUpdate", callback);
 
-    // while this dialog is open, inspect every portal addded to IITC and see if we need to finish loading our data
-    if (this._operation.fakedPortals.length > 0) {
-      this._portalAddedHook = true;
-      window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalAdded", listenForAddedPortals);
+    for (const f of this._operation.fakedPortals) {
+      window.portalDetail.request(f.id);
     }
 
     this._dialog = window.dialog({
@@ -62,13 +61,14 @@ const BlockerList = Feature.extend({
         },
         Reset: () => {
           this._operation.blockers = new Array();
+          // use this._operation.update() instead?
+          this.blockerlistUpdate(this._operation);
           this._operation.store();
         }
       },
       closeCallback: () => {
-        if (blockerList._portalAddedHook) {
-          window.removeHook("portalAdded", listenForAddedPortals);
-        }
+        window.removeHook("wasabeeUIUpdate", callback);
+        window.removeHook("portalAdded", listenForAddedPortals);
         blockerList.disable();
         delete blockerList._dialog;
       },
@@ -153,6 +153,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   return content;
 };
 
+// yes, one per dialog type otherwise closing removes callbakk registration
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 

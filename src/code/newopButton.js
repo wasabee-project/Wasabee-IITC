@@ -58,7 +58,7 @@ const NewopButtonControl = Feature.extend({
               );
               newop.store();
               window.plugin.wasabee.makeSelectedOperation(newop.ID);
-              window.runHooks("wasabeeUIUpdate", newop.ID);
+              window.runHooks("wasabeeUIUpdate", newop);
             } else {
               alert("Operation Name was Unset");
             }
