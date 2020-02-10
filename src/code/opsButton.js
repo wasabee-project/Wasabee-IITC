@@ -55,8 +55,9 @@ const opsButtonControl = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.opsButton
     });
-    let operationSelect = document.getElementById("wasabee-operationSelect");
-    $(operationSelect).change();
+
+    const operationSelect = document.getElementById("wasabee-operationSelect");
+    $(operationSelect).change(); // otherwise the rest of the dialog does not load
   },
 
   removeHooks: function() {
@@ -102,18 +103,15 @@ const opsButtonControl = Feature.extend({
     // XXX use operationSelect.addEventListener instead of this format
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
-      let newID = $(this).val();
-      window.plugin.wasabee.closeAllDialogs(
-        window.plugin.Wasabee.static.dialogNames.opsButton
-      );
+      const newID = $(this).val();
+      // window.plugin.wasabee.closeAllDialogs( window.plugin.Wasabee.static.dialogNames.opsButton);
       const newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
       const mbr = newop.mbr();
       if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         context._map.fitBounds(mbr);
       }
-      window.runHooks("wasabeeUIUpdate", operation);
-      // newop.update(); // just run wasabeeUIUpdate
+      window.runHooks("wasabeeUIUpdate", newop);
     });
 
     container.appendChild(operationSelect);
