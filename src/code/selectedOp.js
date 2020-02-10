@@ -65,7 +65,7 @@ export default function() {
     // the only place we should change the selected op.
     Wasabee._selectedOp = op;
     window.plugin.wasabee.setRestoreOpID(Wasabee._selectedOp.ID);
-    window.runHooks("wasabeeUIUpdate", op);
+    window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
     return Wasabee._selectedOp;
   };
 
