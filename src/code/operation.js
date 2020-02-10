@@ -81,9 +81,7 @@ export default class WasabeeOp {
   }
 
   containsLink(link) {
-    const fromPortalId = link.fromPortalId;
-    const toPortalId = link.toPortalId;
-    return this.containsLinkFromTo(fromPortalId, toPortalId);
+    return this.containsLinkFromTo(link.fromPortalId, link.toPortalId);
   }
 
   containsMarker(portal, markerType) {
@@ -216,11 +214,22 @@ export default class WasabeeOp {
           foundPortal = true;
         }
       }
+      for (const b of this.blockers) {
+        if (p.id == b.fromPortalId || p.id == b.toPortalId) {
+          foundPortal = true;
+        }
+      }
       if (foundPortal) {
         newPortals.push(p);
       }
     }
 
+    // ensue unique
+    /* this should be faster, test when I get a moment
+     finalPortals = newPortals.filter((value, index, self) => {
+       return self.indexOf(value) === index;
+     });
+     */
     const finalPortals = [];
     for (const p of newPortals) {
       if (finalPortals.length == 0) {
@@ -242,9 +251,7 @@ export default class WasabeeOp {
 
   addPortal(portal) {
     if (!this.containsPortal(portal)) {
-      // this makes sure IITC has the data in its cache
-      // almost free if cached, helpful if not
-      window.portalDetail.request(portal.id);
+      // window.portalDetail.request(portal.id);
       this.opportals.push(portal);
       this.update();
     }
@@ -252,6 +259,10 @@ export default class WasabeeOp {
 
   // this updates all portal data from IITC (if moved/renamed)
   updatePortalsFromIITCData() {
+    // prime the cache -- hopefully
+    for (const p of this.opportals) {
+      window.portalDetail.request(p.id);
+    }
     for (const p of this.opportals) {
       p.fullUpdate();
     }
