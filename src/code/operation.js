@@ -569,7 +569,7 @@ export default class WasabeeOp {
           operation[prop] = operation.convertMarkersToObjs(obj[prop]);
         } else if (prop == "opportals") {
           operation[prop] = operation.convertPortalsToObjs(obj[prop]);
-        } else if (prop == "opportals") {
+        } else if (prop == "blockers") {
           operation[prop] = operation.convertBlockersToObjs(obj[prop]);
         } else {
           operation[prop] = obj[prop];

@@ -1,5 +1,4 @@
 import { initCrossLinks } from "./crosslinks";
-import initWasabee from "./wasabee";
 import initServer from "./server";
 import initSelectedOp from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
@@ -31,6 +30,7 @@ window.plugin.wasabee.init = function() {
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
   window.pluginCreateHook("wasabeeUIUpdate");
+  window.pluginCreateHook("wasabeeCrosslinks");
 
   initGoogleAPI();
 
@@ -40,7 +40,6 @@ window.plugin.wasabee.init = function() {
   initSelectedOp(); // loads the next two
   window.plugin.wasabee.setupLocalStorage();
   window.plugin.wasabee.initSelectedOperation();
-  initWasabee();
   initOverflowMenu();
   initServer();
 

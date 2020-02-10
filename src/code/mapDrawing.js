@@ -9,7 +9,7 @@ var Wasabee = window.plugin.Wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  resetAllAnchors(op);
+  resetAnchors(op);
   resetMarkers(op);
   resetLinks(op);
 };
@@ -266,10 +266,11 @@ const addAllAnchors = operation => {
 };
 
 //** This function resets all the portals and calls addAllPortals to add them */
-const resetAllAnchors = operation => {
+const resetAnchors = operation => {
   for (const guid in window.plugin.wasabee.portalLayers) {
-    const portalInLayer = window.plugin.wasabee.portalLayers[guid];
-    window.plugin.wasabee.portalLayerGroup.removeLayer(portalInLayer);
+    const a = window.plugin.wasabee.portalLayers[guid];
+    // console.log("removing: " + a);
+    window.plugin.wasabee.portalLayerGroup.removeLayer(a);
     delete window.plugin.wasabee.portalLayers[guid];
   }
   addAllAnchors(operation);
@@ -296,6 +297,6 @@ const addAnchorToMap = (portalId, operation) => {
   // console.log(marker);
   window.registerMarkerForOMS(marker);
   marker.on("spiderfiedclick", marker.openPopup, marker);
-  window.plugin.wasabee.portalLayers[anchor.id] = marker;
+  window.plugin.wasabee.portalLayers[portalId] = marker;
   marker.addTo(window.plugin.wasabee.portalLayerGroup);
 };
