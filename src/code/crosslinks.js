@@ -4,7 +4,7 @@ import WasabeeLink from "./link";
 //*** CROSSLINK THINGS */
 const Wasabee = window.plugin.Wasabee;
 
-export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
+export const greatCircleArcIntersect = (existing, drawn) => {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
   // method:
@@ -20,22 +20,11 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
 
   //Dimand: Lets fix the date line issue.
   //always work in the eastern hemisphere. so += 360
+  const a0 = existing[0];
+  const a1 = existing[1];
+  const b0 = drawn[0];
+  const b1 = drawn[1];
 
-  //fuck this object scope
-
-  var a0 = {};
-  var a1 = {};
-  var b0 = {};
-  var b1 = {};
-  a0.lng = ta0.lng;
-  a0.lat = ta0.lat;
-  a1.lng = ta1.lng;
-  a1.lat = ta1.lat;
-  b0.lng = tb0.lng;
-  b0.lat = tb0.lat;
-  b1.lng = tb1.lng;
-  b1.lat = tb1.lat;
-  //debugger;
   // zero length line tests
   if (a0.lat == a1.lat && a0.lng == a1.lng) {
     return false;
@@ -60,8 +49,8 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
 
   // a0.lng<=-90 && a1.lng>=90 dosent suffice... a link from -70 to 179 still crosses
   //if a0.lng-a1.lng >180 or <-180 there is a cross!
-  var aCross = false;
-  var bCross = false;
+  let aCross = false;
+  let bCross = false;
   //this is the real link
   if (a0.lng - a1.lng < -180 || a0.lng - a1.lng > 180) {
     //we have a dateline cross
@@ -220,33 +209,20 @@ export const greatCircleArcIntersect = (ta0, ta1, tb0, tb1) => {
   return true;
 };
 
-const testPolyLine = (drawnLink, link, markers, operation) => {
-  const a = link.getLatLngs(operation);
-  const fromPortal = operation.getPortal(drawnLink.fromPortalId);
-  const toPortal = operation.getPortal(drawnLink.toPortalId);
-  if (!fromPortal || !toPortal) {
-    console.warn(
-      "testPolyLine: Found a null value for fromPortal or toPortal."
-    );
-    return false;
-  }
-
-  // why bother?
-  const start = {};
-  const end = {};
-  start.lat = fromPortal.lat;
-  start.lng = fromPortal.lng;
-  end.lat = toPortal.lat;
-  end.lng = toPortal.lng;
-
-  if (greatCircleArcIntersect(a[0], a[1], start, end)) {
-    for (const marker of markers) {
+const testPolyLine = (wasabeeLink, realLink, operation) => {
+  if (
+    greatCircleArcIntersect(
+      realLink.getLatLngs(),
+      wasabeeLink.getLatLngs(operation)
+    )
+  ) {
+    for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
         marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS ||
         marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
       ) {
-        if (checkMarkerAgainstLink(marker, link, operation)) {
+        if (checkMarkerAgainstLink(marker, realLink, operation)) {
           return false;
         }
       }
@@ -258,7 +234,7 @@ const testPolyLine = (drawnLink, link, markers, operation) => {
 
 /** This checks if a marker is on either side of a link */
 const checkMarkerAgainstLink = (marker, link, operation) => {
-  var latlngs = link.getLatLngs(operation);
+  var latlngs = link.getLatLngs();
   var markerPortal = operation.getPortal(marker.portalId);
   var v = latlngs[0];
   var center = latlngs[1];
@@ -292,7 +268,7 @@ const testLink = (link, operation) => {
   }
 
   for (const drawnLink of operation.links) {
-    if (testPolyLine(drawnLink, link, operation.markers, operation)) {
+    if (testPolyLine(drawnLink, link, operation)) {
       showCrossLink(link, operation);
       let fromPortal = WasabeePortal.get(link.options.data.oGuid);
       if (!fromPortal)
@@ -311,7 +287,7 @@ const testLink = (link, operation) => {
         );
       operation.addPortal(toPortal);
       const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
-      operation.addBlocker(blocker);
+      operation.addBlocker(blocker); // do not call .update(): we are in wasabeeUIUpdate
       break;
     }
   }
