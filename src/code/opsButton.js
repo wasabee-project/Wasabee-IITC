@@ -6,6 +6,7 @@ import OperationChecklistDialog from "./operationChecklistDialog";
 import ConfirmDialog from "./confirmDialog";
 import BlockersList from "./blockersList";
 import UiCommands from "./uiCommands";
+import MarkerList from "./markerList";
 
 const opsButtonControl = Feature.extend({
   statics: {
@@ -112,6 +113,7 @@ const opsButtonControl = Feature.extend({
         context._map.fitBounds(mbr);
       }
       window.runHooks("wasabeeUIUpdate", newop);
+      window.runHooks("wasabeeCrosslinks", newop);
     });
 
     container.appendChild(operationSelect);
@@ -247,6 +249,22 @@ const opsButtonControl = Feature.extend({
       function() {
         const bl = new BlockersList();
         bl.enable();
+      },
+      false
+    );
+
+    const markersButton = buttonSection.appendChild(
+      document.createElement("a")
+    );
+    markersButton.innerHTML = "Markers";
+    if (window.plugin.wasabee.opsList().size == 0) {
+      markersButton.disabled = true;
+    }
+    markersButton.addEventListener(
+      "click",
+      function() {
+        const ml = new MarkerList();
+        ml.enable();
       },
       false
     );

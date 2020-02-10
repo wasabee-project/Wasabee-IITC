@@ -130,6 +130,7 @@ export default class WasabeeOp {
     });
     this.cleanPortalList();
     this.update();
+    window.runHooks("wasabeeCrosslinks", this);
   }
 
   setMarkerComment(marker, comment) {
@@ -162,6 +163,7 @@ export default class WasabeeOp {
     this.cleanPortalList();
     this.cleanAnchorList();
     this.update();
+    window.runHooks("wasabeeCrosslinks", this);
   }
 
   reverseLink(startPortalID, endPortalID) {
@@ -284,6 +286,7 @@ export default class WasabeeOp {
     if (!this.containsLink(link)) {
       this.links.push(link);
       this.update();
+      window.runHooks("wasabeeCrosslinks", this);
     } else {
       console.log(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
@@ -334,8 +337,12 @@ export default class WasabeeOp {
     }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      // this.update();
+      this.update();
     }
+  }
+
+  removeBlocker() {
+    // console.log("remove blocker called... write this");
   }
 
   get fakedPortals() {
@@ -386,6 +393,7 @@ export default class WasabeeOp {
     // Remove the invalid links from the array (after we are done iterating through it)
     this.links = this.links.filter(element => !linksToRemove.includes(element));
     this.update();
+    window.runHooks("wasabeeCrosslinks", this);
   }
 
   addMarker(markerType, portal, comment) {
@@ -395,6 +403,7 @@ export default class WasabeeOp {
         const marker = new WasabeeMarker(markerType, portal.id, comment);
         this.markers.push(marker);
         this.update();
+        window.runHooks("wasabeeCrosslinks", this);
       } else {
         alert("This portal already has a marker. Chose a different portal.");
       }

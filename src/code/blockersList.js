@@ -61,9 +61,9 @@ const BlockerList = Feature.extend({
         },
         Reset: () => {
           this._operation.blockers = new Array();
-          // use this._operation.update() instead?
           this.blockerlistUpdate(this._operation);
-          this._operation.store();
+          this._operation.update();
+          window.runHooks("wasabeeCrosslinks", this._operation);
         }
       },
       closeCallback: () => {

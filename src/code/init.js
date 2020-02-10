@@ -7,6 +7,7 @@ import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import initScopes from "./scopes";
 import { initFirebase } from "./firebaseSupport";
+import { checkAllLinks } from "./crosslinks";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -75,23 +76,27 @@ window.plugin.wasabee.init = function() {
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
   });
+
   window.addHook("wasabeeUIUpdate", operation => {
     drawThings(operation);
-    if (operation.ID) {
-      console.log("wasabeeUIUpdate called with op: " + operation.ID);
-    } else {
+    if (!operation.ID) {
       console.log("wasabeeUIUpdate called with something other than an op");
       console.log(operation);
     }
   });
+
   addButtons(Wasabee._selectedOp);
 
   initFirebase();
   initCrossLinks();
 
-  // once everything else is done, call update, which triggers wasabeeUIUpdate, drawing things
-  // Wasabee._selectedOp.update(); // no need to store/trigger hook, just do it ourselves
+  window.addHook("wasabeeCrosslinks", operation => {
+    checkAllLinks(operation);
+  });
+
+  // once everything else is done, do the initial draw
   drawThings(Wasabee._selectedOp);
+  checkAllLinks(Wasabee._selectedOp);
 };
 
 window.plugin.wasabee.addCSS = content => {

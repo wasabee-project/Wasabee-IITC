@@ -1,6 +1,5 @@
 var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
-import { checkAllLinks } from "./crosslinks";
 import WasabeeMe from "./me";
 import { agentPromise, teamPromise } from "./server";
 import AssignDialog from "./assignDialog";
@@ -20,7 +19,6 @@ export const drawThings = op => {
   window.plugin.wasabee.resetAllPortals(op);
   resetMarkers(op);
   resetLinks(op);
-  checkAllLinks(op);
 };
 
 //** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */

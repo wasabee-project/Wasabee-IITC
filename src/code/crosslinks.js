@@ -277,7 +277,10 @@ const testLink = (link, operation) => {
           (link.options.data.oLngE6 / 1e6).toFixed(6).toString(),
           link.options.data.oGuid
         );
-      operation.addPortal(fromPortal);
+      if (!operation.containsPortal(fromPortal)) {
+        // saves one call to op.update();
+        operation.opportals.push(fromPortal);
+      }
       let toPortal = WasabeePortal.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
@@ -285,9 +288,12 @@ const testLink = (link, operation) => {
           (link.options.data.dLngE6 / 1e6).toFixed(6).toString(),
           link.options.data.dGuid
         );
-      operation.addPortal(toPortal);
+      if (!operation.containsPortal(toPortal)) {
+        // saves one call to op.update();
+        operation.opportals.push(toPortal);
+      }
       const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
-      operation.addBlocker(blocker); // do not call .update(): we are in wasabeeUIUpdate
+      operation.addBlocker(blocker); // op.update() is called here
       break;
     }
   }
@@ -298,32 +304,32 @@ export const checkAllLinks = operation => {
   window.plugin.wasabee.crossLinkLayerGroup = {};
 
   for (const guid in window.links) {
-    doLinkTest(window.links[guid], operation);
+    testLink(window.links[guid], operation);
   }
 };
 
 const onLinkAdded = data => {
   const operation = window.plugin.wasabee.getSelectedOperation();
-  doLinkTest(data.link, operation);
+  testLink(data.link, operation);
 };
 
-const doLinkTest = (finalLink, operation) => {
-  testLink(finalLink, operation);
-};
-
-const testForDeletedLinks = () => {
+const testForDeletedLinks = operation => {
   window.plugin.wasabee.crossLinkLayers.eachLayer(layer => {
     var guid = layer.options.guid;
     if (!window.links[guid]) {
       window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
       delete window.plugin.wasabee.crossLinkLayerGroup[guid];
+
+      operation.removeBlocker();
     }
   });
 };
 
 const onMapDataRefreshEnd = () => {
   window.plugin.wasabee.crossLinkLayers.bringToFront();
-  testForDeletedLinks();
+  const operation = window.plugin.wasabee.getSelectedOperation();
+
+  testForDeletedLinks(operation);
 };
 
 export const initCrossLinks = () => {
