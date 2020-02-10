@@ -1,7 +1,7 @@
 // import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
-import LinkListDialog from "./linkListDialog";
-import ConfirmDialog from "./confirmDialog";
+import LinkListDialog from "./dialogs/linkListDialog";
+import ConfirmDialog from "./dialogs/confirmDialog";
 
 // wrap operation calls in UI checks
 export default {

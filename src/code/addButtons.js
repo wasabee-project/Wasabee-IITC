@@ -1,13 +1,13 @@
 import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
-import WasabeeButtonControl from "./wasabeeButton";
-import opsButtonControl from "./opsButton";
-import NewopButtonControl from "./newopButton";
-import LinkDialogButtonControl from "./linkDialogButton";
-import MarkerButtonControl from "./markerButton";
-import MultimaxButtonControl from "./multimaxDialog";
+import WasabeeButtonControl from "./dialogs/wasabeeButton";
+import opsButtonControl from "./dialogs/opsButton";
+import NewopButtonControl from "./dialogs/newopButton";
+import LinkDialogButtonControl from "./dialogs/linkDialogButton";
+import MarkerButtonControl from "./dialogs/markerButton";
+import MultimaxButtonControl from "./dialogs/multimaxDialog";
 import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
-import ConfirmDialog from "./confirmDialog";
+import ConfirmDialog from "./dialogs/confirmDialog";
 
 const Wasabee = window.plugin.Wasabee;
 

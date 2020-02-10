@@ -4,8 +4,8 @@ import { getColorMarker } from "./mapDrawing";
 import { SendAccessTokenAsync, GetWasabeeServer, agentPromise } from "./server";
 import addButtons from "./addButtons";
 import store from "../lib/store";
-import AssignDialog from "./assignDialog";
-import PromptDialog from "./promptDialog";
+import AssignDialog from "./dialogs/assignDialog";
+import PromptDialog from "./dialogs/promptDialog";
 import WasabeeAnchor from "./anchor";
 
 const Wasabee = window.plugin.Wasabee;

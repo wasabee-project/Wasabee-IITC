@@ -2,7 +2,7 @@ var markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import WasabeeMe from "./me";
 import { agentPromise, teamPromise } from "./server";
-import AssignDialog from "./assignDialog";
+import AssignDialog from "./dialogs/assignDialog";
 
 var Wasabee = window.plugin.Wasabee;
 
