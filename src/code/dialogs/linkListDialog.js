@@ -1,23 +1,59 @@
+import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
-import LinkDialogButtonControl from "./linkDialogButton";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
 
-// don't use this _dialog[] any more. Use the new framework.
-// switch over to Feature.extend
+const LinkListDialog = Feature.extend({
+  statics: {
+    TYPE: "linkListDialog"
+  },
 
-var _dialogs = [];
-var Wasabee = window.plugin.Wasabee;
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this.type = LinkListDialog.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+    this._title = "No title set";
+    this._label = "No label set";
+    this.placeholder = "";
+    this.current = "";
+  },
 
-export default class LinkListDialog {
-  constructor(operation, portal) {
-    // const that = this;
-    this._operation = operation;
+  addHooks: function() {
+    if (!this._map) return;
+    Feature.prototype.addHooks.call(this);
+    this._displayDialog();
+  },
+
+  removeHooks: function() {
+    Feature.prototype.removeHooks.call(this);
+  },
+
+  _displayDialog: function() {
+    if (!this._map) return;
+    const callback = newOpData => updateLinkList(newOpData, this);
+    window.addHook("wasabeeUIUpdate", callback);
+
+    this._dialog = window.dialog({
+      title: this._portal.name + ": Links",
+      width: "auto",
+      height: "auto",
+      html: this._table.table,
+      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      closeCallback: () => {
+        window.removeHook("wasabeeUIUpdate", callback);
+        this.disable();
+        delete this._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.linkList
+    });
+  },
+
+  setup: function(operation, portal) {
     this._portal = portal;
+    this._operation = operation;
     this._table = new Sortable();
-    this._dialog = null;
     this._table.fields = [
       {
         name: "Order",
@@ -153,7 +189,7 @@ export default class LinkListDialog {
         value: link => link.color,
         sort: null,
         format: (list, data, link) => {
-          this.makeColorMenu(list, data, this._operation, link);
+          this.makeColorMenu(list, data, link);
         }
       },
       {
@@ -164,71 +200,27 @@ export default class LinkListDialog {
       }
     ];
     this._table.sortBy = 0;
-    this._setLinks();
-    _dialogs.push(this);
-    if (this._table.items.length > 0) {
-      let that = this; // still necessary?
-      this._dialog = window.dialog({
-        html: this._table.table,
-        dialogClass: "wasabee-dialog wasabee-dialog-linklist",
-        title: this._portal.name + ": Links",
-        width: "auto",
-        closeCallback: () => {
-          _dialogs = [];
-          window.removeHook("wasabeeUIUpdate", that.update);
-        },
-        id: window.plugin.Wasabee.static.dialogNames.linkList
-      });
-      window.addHook("wasabeeUIUpdate", that.update);
-      var buttons = this._dialog.dialog("option", "buttons");
-      this._dialog.dialog(
-        "option",
-        "buttons",
-        $.extend(
-          {},
-          {
-            "Add Links": () => {
-              if (that._portal) {
-                window.renderPortalDetails(that._portal.id);
-              }
-              let ld = new LinkDialogButtonControl(window.map);
-              ld._operation = this._operation;
-              ld._displayDialog();
-            }
-          },
-          buttons
-        )
-      );
-    } else {
-      alert("No links found.");
-    }
-  }
-
-  _setLinks() {
     this._table.items = this._operation.getLinkListFromPortal(this._portal);
-  }
+  },
 
-  // can't move to uiCommands, due to _setLinks();
-  deleteLink(link, operation) {
+  deleteLink: function(link, operation) {
     const con = new ConfirmDialog(window.map);
     const prompt = document.createElement("div");
     prompt.innerHTML = "Do you really want to delete this link: ";
     prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
-      operation.removeLink(link.fromPortalId, link.toPortalId);
-      this._setLinks();
+      this._operation.removeLink(link.fromPortalId, link.toPortalId);
     });
     con.enable();
-  }
+  },
 
-  makeMenu(list, data) {
-    const state = new Wasabee.OverflowMenu();
+  makeMenu: function(list, data) {
+    const state = new window.plugin.Wasabee.OverflowMenu();
     const options = [
       {
         label: "Reverse",
         onclick: () => {
           this._operation.reverseLink(data.fromPortalId, data.toPortalId);
-          this._setLinks();
         }
       },
       {
@@ -257,9 +249,9 @@ export default class LinkListDialog {
     state.items = options;
     list.className = "menu";
     list.appendChild(state.button);
-  }
+  },
 
-  makeColorMenu(list, data, operation, link) {
+  makeColorMenu: function(list, data, link) {
     const colorSection = list.appendChild(document.createElement("div"));
     const linkColor = colorSection.appendChild(
       document.createElement("select")
@@ -283,43 +275,20 @@ export default class LinkListDialog {
       "change",
       () => {
         link.color = linkColor.value;
-        operation.update(); // OK - we change the link and need to let the op know
+        this._operation.update();
       },
       false
     );
   }
+});
 
-  update(operation) {
-    // this is super hacky
-    _dialogs[0]._setLinks(operation, _dialogs[0]._portal);
+const updateLinkList = (operation, ll) => {
+  if (ll._operation.ID == operation.ID) {
+    ll._table.items = operation.getLinkListFromPortal(ll._portal);
+  } else {
+    // the selected operation changed, just bail
+    ll._dialog.dialog("close");
   }
+};
 
-  // this needs a lot of love
-  static showDialog(operation, portal, show) {
-    var p = 0;
-    var parameters = _dialogs;
-    for (; p < parameters.length; p++) {
-      var page = parameters[p];
-      if (page._operation.ID == operation.ID) {
-        page._operation = operation;
-      } else {
-        return page._dialog.dialog("close");
-      }
-      if (!page._operation.containsPortal(page._portal)) {
-        return page._dialog.dialog("close");
-      }
-      page._setLinks();
-      if (portal != null) {
-        page._portal = portal;
-        page._setLinks();
-        page._dialog.dialog("option", "title", portal.name + ": Links");
-        return page._dialog.focus(), page._dialog;
-      }
-    }
-    if (show) {
-      return new LinkListDialog(operation, portal);
-    } else {
-      return;
-    }
-  }
-}
+export default LinkListDialog;

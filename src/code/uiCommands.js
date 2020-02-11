@@ -66,6 +66,8 @@ export default {
     con.enable();
   },
   showLinksDialog: (operation, portal) => {
-    LinkListDialog.showDialog(operation, portal, true);
+    const lld = new LinkListDialog();
+    lld.setup(operation, portal);
+    lld.enable();
   }
 };
