@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-import Sortable from "../sortable";
+import Sortable from "../../lib/sortable";
 
 const BlockerList = Feature.extend({
   statics: {

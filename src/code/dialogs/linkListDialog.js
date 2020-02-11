@@ -1,4 +1,4 @@
-import Sortable from "../sortable";
+import Sortable from "../../lib/sortable";
 import LinkDialogButtonControl from "./linkDialogButton";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";

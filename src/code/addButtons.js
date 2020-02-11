@@ -90,7 +90,7 @@ export default function(selectedOp) {
           title: "Clear all locally stored ops",
           text: "Clear Local Ops",
           callback: () => {
-            const con = new ConfirmDialog(window.map);
+            const con = new ConfirmDialog();
             con.setup(
               "Clear Local Ops",
               "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
@@ -189,7 +189,7 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
         callback: () => {
-          const con = new ConfirmDialog(window.map);
+          const con = new ConfirmDialog();
           con.setup(
             "Clear Local Ops",
             "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",

@@ -1,9 +1,10 @@
 import { Feature } from "../leafletDrawImports";
 import WasabeeMe from "../me";
-import Sortable from "../sortable";
+import Sortable from "../../lib/sortable";
 import store from "../../lib/store";
 import { GetWasabeeServer, SetTeamState } from "../server";
 import PromptDialog from "./promptDialog";
+import AuthDialog from "./authDialog";
 
 const WasabeeButtonControl = Feature.extend({
   statics: {
@@ -84,7 +85,8 @@ const WasabeeButtonControl = Feature.extend({
       });
     } else {
       this.disable();
-      this._dialog = window.plugin.wasabee.showMustAuthAlert();
+      const ad = new AuthDialog();
+      ad.enable();
     }
   },
 

@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-import Sortable from "../sortable";
+import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";

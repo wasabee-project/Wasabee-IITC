@@ -22,7 +22,7 @@ export default {
       return;
     }
 
-    const con = new ConfirmDialog(window.map);
+    const con = new ConfirmDialog();
     const prompt = document.createElement("div");
     prompt.innerHTML = "Do you want to swap: ";
     prompt.appendChild(portal.displayFormat(operation));
@@ -34,7 +34,7 @@ export default {
     con.enable();
   },
   deletePortal: (operation, portal) => {
-    const con = new ConfirmDialog(window.map);
+    const con = new ConfirmDialog();
     const prompt = document.createElement("div");
     prompt.innerHTML =
       "Do you want to delete this anchor and all associated links: ";
@@ -45,7 +45,7 @@ export default {
     con.enable();
   },
   deleteMarker: (operation, marker, portal) => {
-    const con = new ConfirmDialog(window.map);
+    const con = new ConfirmDialog();
     const prompt = document.createElement("div");
     prompt.innerHTML = "Do you want to delete this marker: ";
     prompt.appendChild(portal.displayFormat(operation));
@@ -55,7 +55,7 @@ export default {
     con.enable();
   },
   clearAllItems: operation => {
-    const con = new ConfirmDialog(window.map);
+    const con = new ConfirmDialog();
     con.setup(
       "Clear: " + operation.name,
       "Do you want to reset " + operation.name + "?",

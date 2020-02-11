@@ -34,7 +34,7 @@ const addMarker = (target, operation) => {
   var wMarker = L.marker(latLng, {
     title: targetPortal.name,
     icon: L.icon({
-      iconUrl: getImageFromMarker(target),
+      iconUrl: target.icon,
       shadowUrl: null,
       iconSize: L.point(24, 40),
       iconAnchor: L.point(12, 40),
@@ -134,34 +134,6 @@ export const getPopupBodyWithType = (portal, target) => {
   return title;
 };
 
-//** This function returns the appropriate image for a marker type / state */
-const getImageFromMarker = target => {
-  if (!Wasabee.markerTypes.has(target.type)) {
-    target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
-  }
-  let marker = Wasabee.markerTypes.get(target.type);
-  let img = null;
-  switch (target.state) {
-    case "pending":
-      img = marker.markerIcon;
-      break;
-    case "assigned":
-      img = marker.markerIconAssigned;
-      break;
-    case "completed":
-      img = marker.markerIconDone;
-      break;
-    case "acknowledged":
-      img = marker.markerIconAcknowledged;
-      break;
-  }
-  if (img == null) {
-    console.log("getImageFromMarker: ");
-    console.log(target);
-  }
-  return img;
-};
-
 /** this could be smarter */
 const resetLinks = operation => {
   for (var guid in window.plugin.wasabee.linkLayers) {
@@ -243,12 +215,29 @@ export const drawAgents = op => {
                 popupAnchor: L.point(-1, -48)
               })
             });
-            // spiderfied clicks
-            marker.bindPopup(agent.getPopup());
-            marker.on("click", agent.openPopup, agent);
 
             window.registerMarkerForOMS(marker);
-            marker.on("spiderfiedclick", marker.openPopup, marker);
+            marker.bindPopup(agent.getPopup());
+            marker.off("click", agent.openPopup, agent);
+            marker.on(
+              "click",
+              () => {
+                marker.setPopupContent(agent.getPopup());
+                marker.update();
+                marker.openPopup();
+              },
+              agent
+            );
+            marker.on(
+              "spiderfiedclick",
+              () => {
+                marker.setPopupContent(agent.getPopup());
+                marker.update();
+                marker.openPopup();
+              },
+              marker
+            );
+
             window.plugin.wasabee.agentLayers[agent.id] = marker;
             marker.addTo(window.plugin.wasabee.agentLayerGroup);
           }
@@ -291,14 +280,28 @@ const addAnchorToMap = (portalId, operation) => {
     })
   });
 
-  const content = anchor.popupContent(marker, operation);
-  marker.bindPopup(content).on("click", marker.openPopup, marker);
-
-  // spiderfied clicks
-  // why is this throwing nulls?
-  // console.log(marker);
   window.registerMarkerForOMS(marker);
-  marker.on("spiderfiedclick", marker.openPopup, marker);
+  const content = anchor.popupContent(marker, operation);
+  marker.bindPopup(content);
+  marker.off("click", marker.openPopup, marker);
+  marker.on(
+    "click",
+    () => {
+      marker.setPopupContent(content);
+      marker.update();
+      marker.openPopup();
+    },
+    marker
+  );
+  marker.on(
+    "spiderfiedclick",
+    () => {
+      marker.setPopupContent(content);
+      marker.update();
+      marker.openPopup();
+    },
+    marker
+  );
   window.plugin.wasabee.portalLayers[portalId] = marker;
   marker.addTo(window.plugin.wasabee.portalLayerGroup);
 };

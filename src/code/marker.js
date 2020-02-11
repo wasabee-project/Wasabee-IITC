@@ -35,4 +35,27 @@ export default class WasabeeMarker {
     }
     return marker;
   }
+
+  get icon() {
+    if (!window.plugin.Wasabee.markerTypes.has(this.type)) {
+      this.type = window.plugin.Wasabee.Constants.DEFAULT_MARKER_TYPE;
+    }
+    const marker = window.plugin.Wasabee.markerTypes.get(this.type);
+    let img = marker.markerIcon;
+    switch (this.state) {
+      case "pending":
+        img = marker.markerIcon;
+        break;
+      case "assigned":
+        img = marker.markerIconAssigned;
+        break;
+      case "completed":
+        img = marker.markerIconDone;
+        break;
+      case "acknowledged":
+        img = marker.markerIconAcknowledged;
+        break;
+    }
+    return img;
+  }
 }

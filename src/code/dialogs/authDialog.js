@@ -49,7 +49,6 @@ const AuthDialog = Feature.extend({
               response_type: "id_token permission"
             },
             async response => {
-              console.debug("gapi.auth2.authorize response: ", response);
               if (response.error) {
                 console.error(response.error, response.error_subtype);
                 return;
@@ -76,7 +75,7 @@ const AuthDialog = Feature.extend({
     );
     changeServerButton.innerHTML = "Change Server";
     changeServerButton.addEventListener("click", () => {
-      const serverDialog = new PromptDialog(window.map);
+      const serverDialog = new PromptDialog();
       serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
         if (serverDialog.inputField.value) {
           store.set(
@@ -97,7 +96,7 @@ const AuthDialog = Feature.extend({
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: function() {
+      closeCallback: () => {
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
         window.runHooks("wasabeeUIUpdate", selectedOperation);
         // remove/delete this._dialog
