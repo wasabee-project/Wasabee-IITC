@@ -1,5 +1,3 @@
-var markdown = require("markdown").markdown;
-
 export default class WasabeeAgent {
   constructor() {
     this.id = null;
@@ -29,7 +27,8 @@ export default class WasabeeAgent {
 
   formatDisplay() {
     const display = document.createElement("span");
-    display.className = "wasabee-agent-label";
+    display.classList.add("wasabee-agent-label");
+    display.classList.add("enl");
     display.textContent = this.name;
     return display;
   }
@@ -38,11 +37,27 @@ export default class WasabeeAgent {
     // agent.className = "wasabee-dialog wasabee-dialog-ops";
     const content = document.createElement("div");
     const title = content.appendChild(document.createElement("div"));
-    title.className = "desc";
+    title.classList.add("desc");
     title.id = this.id;
-    title.innerHTML = markdown.toHTML(this.name);
-    const date = content.appendChild(document.createElement("span"));
-    date.innerHTML = markdown.toHTML("Last update: " + this.date);
+    title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
+    const sendTarget = content.appendChild(document.createElement("a"));
+    sendTarget.innerHTML = "send target";
     return content;
+  }
+
+  timeSinceformat() {
+    if (!this.date) return "";
+    const date = new Date(this.date);
+    if (date == 0) return "";
+
+    const seconds = Math.floor((new Date() - date) / 1000);
+    let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
+
+    if (interval > 1) return " (ages ago)";
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) return " (" + interval + " hours ago)";
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) return " (" + interval + " minutes ago)";
+    return " (" + Math.floor(seconds) + " seconds ago)";
   }
 }
