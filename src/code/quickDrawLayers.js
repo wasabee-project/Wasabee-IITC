@@ -45,7 +45,7 @@ const QuickDrawControl = Feature.extend({
     this._anchor2 = null;
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
-    this._throwOrder = 1;
+    this._throwOrder = this._operation.nextOrder;
     let that = this;
     this._portalClickedHook = function() {
       QuickDrawControl.prototype._portalClicked.call(that);
@@ -95,6 +95,7 @@ const QuickDrawControl = Feature.extend({
     const selectedPortal = WasabeePortal.getSelected();
     if (!selectedPortal) return;
     if (!this._anchor1) {
+      this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
       return;

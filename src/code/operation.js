@@ -556,6 +556,17 @@ export default class WasabeeOp {
     return false;
   }
 
+  get nextOrder() {
+    let o = 0;
+    for (const l of this.links) {
+      o = Math.max(o, l.order);
+    }
+    for (const m of this.markers) {
+      o = Math.max(o, m.order);
+    }
+    return ++o;
+  }
+
   static create(obj) {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
