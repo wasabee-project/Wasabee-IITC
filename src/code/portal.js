@@ -4,6 +4,7 @@ export default class WasabeePortal {
   constructor(id, name, lat, lng, comment, hardness) {
     this.id = id;
     this.name = name;
+    // check window.portals[id].options.data for updated name ?
     if (typeof lat == "number") {
       this.lat = lat.toString();
     } else {
@@ -31,6 +32,7 @@ export default class WasabeePortal {
       obj.comment,
       obj.hardness
     );
+
     return wp;
   }
 
@@ -52,46 +54,54 @@ export default class WasabeePortal {
     );
   }
 
-  // hiding behind too-clever-by-half makes for unmanagable code
-  /* eslint-disable no-unused-vars */
-  displayFormat(operation) {
-    /* eslint-enable no-unused-vars */
+  displayFormat() {
     const pt = L.latLng(parseFloat(this.lat), parseFloat(this.lng));
     const v = this.lat + "," + this.lng;
     const e = document.createElement("a");
-    return (
-      e.appendChild(document.createTextNode(this.name)),
-      (e.title = this.name),
-      (e.href = "/intel?ll=" + v + "&pll=" + v),
-      e.addEventListener(
-        "click",
-        event => {
-          return (
-            window.selectedPortal != this.id
-              ? window.renderPortalDetails(this.id)
-              : window.map.panTo(pt),
-            event.preventDefault(),
-            false
-          );
-        },
-        false
-      ),
-      e.addEventListener(
-        "dblclick",
-        event => {
-          return (
-            window.map.getBounds().contains(pt)
-              ? (window.portals[this.id] || window.renderPortalDetails(this.id),
-                window.zoomToAndShowPortal(this.id, pt))
-              : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
-            event.preventDefault(),
-            false
-          );
-        },
-        false
-      ),
-      e
+    e.appendChild(document.createTextNode(this.name));
+
+    if (window.portals[this.id]) {
+      const data = window.portals[this.id].options.data;
+      if (data) {
+        if (data.team == "E") {
+          e.classList.add("enl");
+        }
+        if (data.team == "R") {
+          e.classList.add("res");
+        }
+      }
+    }
+
+    e.title = this.name;
+    e.href = "/intel?ll=" + v + "&pll=" + v;
+    e.addEventListener(
+      "click",
+      event => {
+        return (
+          window.selectedPortal != this.id
+            ? window.renderPortalDetails(this.id)
+            : window.map.panTo(pt),
+          event.preventDefault(),
+          false
+        );
+      },
+      false
     );
+    e.addEventListener(
+      "dblclick",
+      event => {
+        return (
+          window.map.getBounds().contains(pt)
+            ? (window.portals[this.id] || window.renderPortalDetails(this.id),
+              window.zoomToAndShowPortal(this.id, pt))
+            : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
+          event.preventDefault(),
+          false
+        );
+      },
+      false
+    );
+    return e;
   }
 
   static get(id) {
