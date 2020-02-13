@@ -176,6 +176,9 @@ export const drawAgents = op => {
     return;
   }
   const me = WasabeeMe.get();
+  /* const myTeams = me.Teams.filter(t => {
+    return t.State == "On";
+  }); */
   const myTeams = new Array();
   for (const team of me.Teams) {
     if (team.State == "On") {
@@ -272,8 +275,10 @@ const addAnchorToMap = (portalId, operation) => {
   const anchor = new WasabeeAnchor(portalId);
   const marker = L.marker(anchor.latLng, {
     title: anchor.name,
+    alt: anchor.name,
     icon: L.icon({
       iconUrl: anchor.icon,
+      shadowUrl: null,
       iconAnchor: [12, 41],
       iconSize: [25, 41],
       popupAnchor: [0, -35]

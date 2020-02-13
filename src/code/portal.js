@@ -54,8 +54,12 @@ export default class WasabeePortal {
     );
   }
 
+  get latLng() {
+    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+  }
+
   displayFormat() {
-    const pt = L.latLng(parseFloat(this.lat), parseFloat(this.lng));
+    const pt = this.latLng;
     const v = this.lat + "," + this.lng;
     const e = document.createElement("a");
     e.appendChild(document.createTextNode(this.name));
@@ -68,6 +72,9 @@ export default class WasabeePortal {
         }
         if (data.team == "R") {
           e.classList.add("res");
+        }
+        if (data.team == "N") {
+          e.classList.add("unclaimed");
         }
       }
     }

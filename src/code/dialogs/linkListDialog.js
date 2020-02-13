@@ -92,45 +92,8 @@ const LinkListDialog = Feature.extend({
         name: "Min Lvl",
         title: "Minimum level required on source portal",
         value: link => link.length(this._operation),
-        format: (a, b) => {
-          var s;
-          if (b > 6881280) {
-            s = "impossible";
-          } else {
-            if (b > 1966080) {
-              s = "L8+some VRLA";
-              a.title =
-                "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
-              a.classList.add("help");
-            } else {
-              if (b > 655360) {
-                s = "L8+some LA";
-                a.title =
-                  "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
-                a.classList.add("help");
-              } else {
-                var d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);
-                var msd = 8 * (d - Math.floor(d));
-                s = "L" + d;
-                if (0 != msd) {
-                  if (!(1 & msd)) {
-                    s = s + "\u2007";
-                  }
-                  if (!(1 & msd || 2 & msd)) {
-                    s = s + "\u2007";
-                  }
-                  s =
-                    s +
-                    (" = L" +
-                      Math.floor(d) +
-                      "0\u215b\u00bc\u215c\u00bd\u215d\u00be\u215e".charAt(
-                        msd
-                      ));
-                }
-              }
-            }
-          }
-          a.textContent = s;
+        format: (cell, d, link) => {
+          cell.appendChild(link.minLevel(this._operation));
         }
       },
       {
@@ -171,7 +134,7 @@ const LinkListDialog = Feature.extend({
         format: (a, m, link) => {
           const assignee = a.appendChild(document.createElement("a"));
           assignee.innerHTML = m;
-          if (this._operation.IsServerOp()) {
+          if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
             a.addEventListener(
               "click",
               () => {
@@ -236,7 +199,7 @@ const LinkListDialog = Feature.extend({
         }
       }
     ];
-    if (this._operation.IsServerOp()) {
+    if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
       options.push({
         label: "Assign",
         onclick: () => {

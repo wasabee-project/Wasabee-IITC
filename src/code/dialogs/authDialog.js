@@ -1,7 +1,8 @@
 import { Feature } from "../leafletDrawImports";
-import { SendAccessTokenAsync, GetWasabeeServer } from "../server";
+import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
+// import WasabeeMe from "../me";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -34,40 +35,16 @@ const AuthDialog = Feature.extend({
     const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
     const visitButton = buttonSet.appendChild(document.createElement("a"));
-    const isMobile = "undefined" != typeof window.android && window.android;
-    const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
     visitButton.innerHTML = "Log In";
-    if (!isiOS) {
+    const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    if (isiOS) {
       visitButton.addEventListener(
         "click",
-        async () => {
-          window.gapi.auth2.authorize(
-            {
-              prompt: isMobile ? "none" : "select_account",
-              client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
-              scope: "email profile openid",
-              response_type: "id_token permission"
-            },
-            async response => {
-              if (response.error) {
-                console.error(response.error, response.error_subtype);
-                return;
-              }
-              await SendAccessTokenAsync(response.access_token);
-              // WasabeeMe.get(); // UIUpdate does this too
-              this._dialog.dialog("close");
-              window.runHooks(
-                "wasabeeUIUpdate",
-                window.plugin.wasabee.getSelectedOperation()
-              ); // or addButtons()?
-            }
-          );
-        },
+        window.open(GetWasabeeServer()),
         false
       );
     } else {
-      const server = GetWasabeeServer();
-      visitButton.addEventListener("click", window.open(server), false);
+      visitButton.addEventListener("click", () => this.gsapiAuth, false);
     }
 
     const changeServerButton = buttonSet.appendChild(
@@ -103,6 +80,56 @@ const AuthDialog = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
+  },
+
+  gsapiAuth: () => {
+    window.gapi.auth2.authorize(
+      {
+        // prompt: L.Browser.andorid ? "none" : "consent",
+        prompt: "select_account",
+        client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
+        scope: "email profile openid",
+        response_type: "id_token permission",
+        immediate: false
+        // cookie_policy: "https://server.waabee.rocks"
+      },
+      response => {
+        if (response.error) {
+          this._dialog.dialog("close");
+          const err =
+            "error from authorize: " +
+            response.error +
+            " " +
+            response.error_subtype;
+          alert(err);
+          return;
+        }
+        SendAccessTokenAsync(response.access_token).then(
+          async () => {
+            this._dialog.dialog("close");
+            // const me = WasabeeMe.get();
+            // do this by hand to await it
+            try {
+              const me = await mePromise();
+              alert("awaited :" + JSON.stringify(me));
+              store.set(
+                window.plugin.Wasabee.Constants.AGENT_INFO_KEY,
+                JSON.stringify(me)
+              );
+            } catch (e) {
+              alert(e);
+            }
+            window.runHooks(
+              "wasabeeUIUpdate",
+              window.plugin.wasabee.getSelectedOperation()
+            );
+          },
+          reject => {
+            alert("login rejected: " + reject);
+          }
+        );
+      }
+    );
   }
 });
 

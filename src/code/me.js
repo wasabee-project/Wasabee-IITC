@@ -37,6 +37,7 @@ export default class WasabeeMe {
     let me = null;
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+
     if (typeof lsme == "string") {
       me = WasabeeMe.create(JSON.parse(lsme));
     }
@@ -46,12 +47,16 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
+      console.log("pulling /me from server");
       mePromise().then(
         function(nme) {
-          nme.store();
+          store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(nme));
+          alert("me.get got from server:" + JSON.stringify(nme));
+          // nme.store();
           me = nme;
         },
         function(err) {
+          alert(err);
           console.log(err);
           store.remove(Wasabee.Constants.AGENT_INFO_KEY);
           me = null;

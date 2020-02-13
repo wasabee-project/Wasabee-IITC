@@ -46,13 +46,13 @@ export const uploadOpPromise = function(operation) {
           reject(req.response);
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -79,13 +79,13 @@ export const updateOpPromise = function(operation) {
           reject("permission to update denied");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -111,13 +111,13 @@ export const deleteOpPromise = function(opID) {
           reject("permission to delete denied");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.send();
@@ -146,13 +146,13 @@ export const teamPromise = function(teamid) {
           reject("permission denied to team: " + teamid);
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.send();
@@ -192,13 +192,13 @@ export const opPromise = function(opID) {
           reject("not authorized to access op: " + opID);
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.send();
@@ -207,29 +207,34 @@ export const opPromise = function(opID) {
 
 export const mePromise = function() {
   const SERVER_BASE = GetWasabeeServer();
+
+  alert("mePromise pulling /me from: " + SERVER_BASE);
+
   return new Promise(function(resolve, reject) {
     const url = SERVER_BASE + "/me";
     const req = new XMLHttpRequest();
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
+    req.setRequestHeader("If-Modified-Since", 0);
 
     req.onload = function() {
       switch (req.status) {
         case 200:
+          alert("mePromise got: " + req.response);
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject("not logged in");
+          reject("mePromise 401: not logged in");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.status + ": " + req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("not logged in"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.send();
@@ -240,7 +245,7 @@ export const agentPromise = function(GID, force) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
     if (GID == null) {
-      reject(Error("null gid"));
+      reject("null gid");
     }
 
     if (!force && window.plugin.Wasabee._agentCache.has(GID)) {
@@ -261,13 +266,13 @@ export const agentPromise = function(GID, force) {
             reject("not logged in");
             break;
           default:
-            reject(Error(req.statusText));
+            reject(req.statusText);
             break;
         }
       };
 
       req.onerror = function() {
-        reject(Error("not logged in"));
+        reject("Network Error: ${req.statusText}");
       };
 
       req.send();
@@ -294,13 +299,13 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     const fd = new FormData();
@@ -328,13 +333,13 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     const fd = new FormData();
@@ -346,7 +351,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
 export const SendAccessTokenAsync = function(accessToken) {
   const SERVER_BASE = GetWasabeeServer();
 
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     const url = SERVER_BASE + "/aptok";
     const req = new XMLHttpRequest();
 
@@ -357,19 +362,18 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.onload = function() {
       switch (req.status) {
         case 200:
+          console.log("sending auth token to server accepted");
           resolve();
           break;
-        case 401:
-          reject(Error("not logged in"));
-          break;
         default:
-          reject(Error(req.statusText));
+          console.log("sending auth token to server rejected");
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.setRequestHeader("Content-Type", "application/json");
@@ -394,16 +398,16 @@ export const SetTeamState = function(teamID, state) {
           resolve();
           break;
         case 401:
-          reject(Error("not logged in"));
+          reject("not logged in");
           break;
         default:
-          reject(Error(req.statusText));
+          reject(req.statusText);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(Error("Network Error"));
+      reject("Network Error: ${req.statusText}");
     };
 
     req.send();

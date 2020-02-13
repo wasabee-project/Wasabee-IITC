@@ -8,7 +8,7 @@ import ConfirmDialog from "./confirmDialog";
 import BlockersList from "./blockersList";
 import MarkerList from "./markerList";
 
-const opsButtonControl = Feature.extend({
+const OpsDialog = Feature.extend({
   statics: {
     TYPE: "opsButton"
   },
@@ -23,7 +23,7 @@ const opsButtonControl = Feature.extend({
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = opsButtonControl.TYPE;
+    this.type = OpsDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -168,7 +168,7 @@ const opsButtonControl = Feature.extend({
     const isServerOp = operation.IsServerOp();
     let isWritableOp = false;
     if (isServerOp) {
-      isWritableOp = operation.IsWritableOp(WasabeeMe.get());
+      isWritableOp = operation.IsWritableOp();
     }
     const commentInputEnabled = !isServerOp || isWritableOp;
     const commentSection = opinfo.appendChild(document.createElement("p"));
@@ -269,35 +269,6 @@ const opsButtonControl = Feature.extend({
       false
     );
 
-    /*
-    const clearAllOpsButton = buttonSection.appendChild(
-      document.createElement("a")
-    );
-    clearAllOpsButton.innerHTML = "Clear Local Ops";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      clearAllOpsButton.disabled = true;
-    }
-    clearAllOpsButton.addEventListener(
-      "click",
-      function() {
-        console.log("clearAllOpsButton");
-      },
-      false
-    );
-
-    const newOpsButton = buttonSection.appendChild(document.createElement("a"));
-    newOpsButton.innerHTML = "New Op";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      newOpsButton.disabled = true;
-    }
-    newOpsButton.addEventListener(
-      "click",
-      function() {
-        console.log("newOpsButton");
-      },
-      false
-    ); */
-
     const deleteButton = buttonSection.appendChild(document.createElement("a"));
     deleteButton.innerHTML = "Delete " + operation.name;
     if (window.plugin.wasabee.opsList().size == 0) {
@@ -355,4 +326,4 @@ const opsButtonControl = Feature.extend({
   }
 });
 
-export default opsButtonControl;
+export default OpsDialog;

@@ -26,6 +26,10 @@ export default class WasabeeAnchor {
     return this.order;
   }
 
+  get name() {
+    return this._portal.name;
+  }
+
   static create(portalId) {
     return new WasabeeAnchor(portalId);
   }
@@ -35,7 +39,7 @@ export default class WasabeeAnchor {
   }
 
   get latLng() {
-    return new L.LatLng(this._portal.lat, this._portal.lng);
+    return this._portal.latLng;
   }
 
   get icon() {

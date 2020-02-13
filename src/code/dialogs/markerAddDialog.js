@@ -2,14 +2,14 @@ import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
 import MarkerList from "./markerList";
 
-const MarkerButtonControl = Feature.extend({
+const MarkerAddDialog = Feature.extend({
   statics: {
     TYPE: "markerButton"
   },
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = MarkerButtonControl.TYPE;
+    this.type = MarkerAddDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -77,4 +77,4 @@ const MarkerButtonControl = Feature.extend({
   }
 });
 
-export default MarkerButtonControl;
+export default MarkerAddDialog;

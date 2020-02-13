@@ -3,7 +3,7 @@ import WasabeePortal from "../portal";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 
-export const SetCommentDialogControl = Feature.extend({
+export const SetCommentDialog = Feature.extend({
   setup: function(target, operation) {
     this.operation = operation;
     this.target = target;
@@ -38,7 +38,7 @@ export const SetCommentDialogControl = Feature.extend({
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = SetCommentDialogControl.TYPE;
+    this.type = SetCommentDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -127,4 +127,4 @@ export const SetCommentDialogControl = Feature.extend({
   }
 });
 
-export default SetCommentDialogControl;
+export default SetCommentDialog;

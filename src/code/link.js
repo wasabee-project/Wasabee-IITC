@@ -115,4 +115,47 @@ export default class WasabeeLink {
     const latlngs = this.getLatLngs(operation);
     return L.latLng(latlngs[0]).distanceTo(latlngs[1]);
   }
+
+  minLevel(operation) {
+    const b = this.length(operation);
+    let s = "unknown";
+    const a = document.createElement("span");
+
+    if (b > 6881280) {
+      s = "impossible";
+    } else {
+      if (b > 1966080) {
+        s = "L8+some VRLA";
+        a.title =
+          "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+        a.classList.add("help");
+      } else {
+        if (b > 655360) {
+          s = "L8+some LA";
+          a.title =
+            "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+          a.classList.add("help");
+        } else {
+          var d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);
+          var msd = 8 * (d - Math.floor(d));
+          s = "L" + d;
+          if (0 != msd) {
+            if (!(1 & msd)) {
+              s = s + "\u2007";
+            }
+            if (!(1 & msd || 2 & msd)) {
+              s = s + "\u2007";
+            }
+            s =
+              s +
+              (" = L" +
+                Math.floor(d) +
+                "0\u215b\u00bc\u215c\u00bd\u215d\u00be\u215e".charAt(msd));
+          }
+        }
+      }
+    }
+    a.textContent = s;
+    return a;
+  }
 }

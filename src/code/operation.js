@@ -1,6 +1,7 @@
 import WasabeeLink from "./link";
 import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
+import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
 
@@ -470,11 +471,13 @@ export default class WasabeeOp {
 
   convertMarkersToObjs(markers) {
     const tmpMarkers = new Array();
-    for (const m of markers) {
-      if (m instanceof WasabeeMarker) {
-        tmpMarkers.push(m);
-      } else {
-        tmpMarkers.push(WasabeeMarker.create(m));
+    if (markers) {
+      for (const m of markers) {
+        if (m instanceof WasabeeMarker) {
+          tmpMarkers.push(m);
+        } else {
+          tmpMarkers.push(WasabeeMarker.create(m));
+        }
       }
     }
     return tmpMarkers;
@@ -518,8 +521,13 @@ export default class WasabeeOp {
     return bounds;
   }
 
-  IsWritableOp(me) {
-    if (me == null) {
+  IsWritableOp() {
+    if (!WasabeeMe.isLoggedIn()) {
+      return false;
+    }
+
+    const me = WasabeeMe.get();
+    if (me) {
       return false;
     }
 

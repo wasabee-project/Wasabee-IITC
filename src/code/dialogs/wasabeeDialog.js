@@ -6,14 +6,14 @@ import { GetWasabeeServer, SetTeamState } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 
-const WasabeeButtonControl = Feature.extend({
+const WasabeeDialog = Feature.extend({
   statics: {
     TYPE: "wasabeeButton"
   },
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = WasabeeButtonControl.TYPE;
+    this.type = WasabeeDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -140,4 +140,4 @@ const WasabeeButtonControl = Feature.extend({
   }
 });
 
-export default WasabeeButtonControl;
+export default WasabeeDialog;

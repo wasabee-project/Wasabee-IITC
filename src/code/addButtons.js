@@ -1,10 +1,10 @@
 import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
-import WasabeeButtonControl from "./dialogs/wasabeeButton";
-import opsButtonControl from "./dialogs/opsButton";
-import NewopButtonControl from "./dialogs/newopButton";
-import LinkDialogButtonControl from "./dialogs/linkDialogButton";
-import MarkerButtonControl from "./dialogs/markerButton";
+import WasabeeDialog from "./dialogs/wasabeeDialog";
+import OpsDialog from "./dialogs/opsDialog";
+import NewopsDialog from "./dialogs/newopDialog";
+import LinkDialog from "./dialogs/linkDialog";
+import MarkerAddDialog from "./dialogs/markerAddDialog";
 import MultimaxButtonControl from "./dialogs/multimaxDialog";
 import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
 import ConfirmDialog from "./dialogs/confirmDialog";
@@ -35,14 +35,12 @@ export default function(selectedOp) {
       // this._addMultimaxButton(map, container);
       this._addLinkDialogButton(map, container);
       this._addMarkerButton(map, container);
-      this._addNewopButton(map, container);
-      this._addClearButton(map, container);
       this._addSyncButton(map, container);
       this._addUploadButton(map, container);
       return outerDiv;
     },
     _addWasabeeButton: function(map, container) {
-      let wasabeeButtonHandler = new WasabeeButtonControl(map);
+      let wasabeeButtonHandler = new WasabeeDialog(map);
       let image = wasabeeButtonHandler.getIcon();
       let type = wasabeeButtonHandler.type;
       this._modes[type] = {};
@@ -63,7 +61,7 @@ export default function(selectedOp) {
         '" style="vertical-align: middle;">';
     },
     _addOpsButton: function(map, container, outerDiv) {
-      let opsButtonHandler = new opsButtonControl(map);
+      let opsButtonHandler = new OpsDialog(map);
       let type = opsButtonHandler.type;
       this._modes[type] = {};
       this._modes[type].handler = opsButtonHandler;
@@ -80,7 +78,7 @@ export default function(selectedOp) {
           text: "New Op",
           callback: () => {
             closeAllDialogs();
-            let nb = new NewopButtonControl(map);
+            let nb = new NewopsDialog(map);
             opsButtonHandler.disable();
             nb.enable();
           },
@@ -139,7 +137,6 @@ export default function(selectedOp) {
         container: container,
         buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
         callback: () => {
-          // closeAllDialogs();
           const so = window.plugin.wasabee.getSelectedOperation();
           try {
             const me = WasabeeMe.get(true); // force update of ops list
@@ -155,7 +152,6 @@ export default function(selectedOp) {
                       // if the op changed out beneath us, use the new
                       if (newop.ID == so.ID) {
                         window.plugin.wasabee.makeSelectedOperation(newop.ID);
-                        // newop.update(); makeSelectedOperation takes care of the re-draw
                       }
                     }
                   },
@@ -173,33 +169,6 @@ export default function(selectedOp) {
             // ad.enable();
             alert(e);
           }
-        }
-      });
-    },
-    _addClearButton: function(map, container) {
-      const tmp = {};
-      tmp.type = "clear ops";
-      let type = tmp.type;
-      this._modes[type] = {};
-      this._modes[type].handler = () => {
-        // Feature.prototype.addHooks.call(tmp);
-      };
-      this._modes[type].button = this._createButton({
-        title: "Clear all locally stored ops",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_delete,
-        callback: () => {
-          const con = new ConfirmDialog();
-          con.setup(
-            "Clear Local Ops",
-            "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
-            () => {
-              // closeAllDialogs();
-              window.plugin.wasabee.resetOps();
-              window.plugin.wasabee.setupLocalStorage();
-            }
-          );
-          con.enable();
         }
       });
     },
@@ -229,7 +198,7 @@ export default function(selectedOp) {
               },
               function(reject) {
                 console.log(reject);
-                alert(reject);
+                alert("Update Failed: " + JSON.stringify(reject));
               }
             );
           } else {
@@ -244,7 +213,7 @@ export default function(selectedOp) {
               },
               function(reject) {
                 console.log(reject);
-                alert(reject);
+                alert("Upload Failed: " + JSON.stringify(reject));
               }
             );
           }
@@ -260,21 +229,8 @@ export default function(selectedOp) {
       this._modes["upload op"].button.title =
         "Upload " + operation.name + status;
     },
-    _addNewopButton: function(map, container) {
-      let newopButtonHandler = new NewopButtonControl(map);
-      let type = newopButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = newopButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "New Operation",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_plus,
-        callback: newopButtonHandler.enable,
-        context: newopButtonHandler
-      });
-    },
     _addLinkDialogButton: function(map, container) {
-      let ldButtonHandler = new LinkDialogButtonControl(map);
+      let ldButtonHandler = new LinkDialog(map);
       let type = ldButtonHandler.type;
       this._modes[type] = {};
       this._modes[type].handler = ldButtonHandler;
@@ -287,7 +243,7 @@ export default function(selectedOp) {
       });
     },
     _addMarkerButton: function(map, container) {
-      let mButtonHandler = new MarkerButtonControl(map);
+      let mButtonHandler = new MarkerAddDialog(map);
       let type = mButtonHandler.type;
       this._modes[type] = {};
       this._modes[type].handler = mButtonHandler;
@@ -406,10 +362,7 @@ export default function(selectedOp) {
       return link;
     },
     update: function(operation) {
-      if (
-        operation.IsServerOp() == false ||
-        operation.IsWritableOp(WasabeeMe.get()) == true
-      ) {
+      if (operation.IsServerOp() == false || operation.IsWritableOp() == true) {
         $("#wasabee_uploadbutton").css("display", "");
       } else {
         $("#wasabee_uploadbutton").css("display", "none");
@@ -423,7 +376,7 @@ export default function(selectedOp) {
     window.map.addControl(Wasabee.buttons);
   } else {
     // XXX is this redundant with the hook?
-    let type = WasabeeButtonControl.TYPE;
+    let type = WasabeeDialog.TYPE;
     let handler = Wasabee.buttons._modes[type].handler;
     let image = handler.getIcon();
     let button = Wasabee.buttons._modes[type].button;

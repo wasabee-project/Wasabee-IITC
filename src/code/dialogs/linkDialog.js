@@ -2,13 +2,13 @@ import { Feature } from "../leafletDrawImports";
 import UiCommands from "../uiCommands.js";
 import WasabeePortal from "../portal";
 
-const LinkDialogButtonControl = Feature.extend({
+const LinkDialog = Feature.extend({
   statics: {
     TYPE: "linkdialogButton"
   },
 
   initialize: function(map, options) {
-    this.type = LinkDialogButtonControl.TYPE;
+    this.type = LinkDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -242,4 +242,4 @@ const LinkDialogButtonControl = Feature.extend({
   }
 });
 
-export default LinkDialogButtonControl;
+export default LinkDialog;

@@ -3,14 +3,14 @@ import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
 
-const NewopButtonControl = Feature.extend({
+const NewopDialog = Feature.extend({
   statics: {
     TYPE: "newopButton"
   },
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = NewopButtonControl.TYPE;
+    this.type = NewopDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -34,7 +34,6 @@ const NewopButtonControl = Feature.extend({
       "click",
       () => {
         noHandler._dialog.dialog("close");
-        // window.plugin.wasabee.importString();
         const id = new ImportDialogControl(this._map, null);
         id.enable();
       },
@@ -89,4 +88,4 @@ const NewopButtonControl = Feature.extend({
   }
 });
 
-export default NewopButtonControl;
+export default NewopDialog;
