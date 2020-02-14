@@ -110,17 +110,15 @@ const WasabeeButton = WButton.extend({
     return this._createActions(tmp.concat(this._alwaysActions));
   },
 
-  Wupdate: function(container) {
+  Wupdate: function() {
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn != this._lastLoginState) {
       this._lastLoginState = loggedIn;
       this.button.children[0].src = this.getIcon();
-      console.debug(container);
-      /*
+
+      const old = this.actionsContainer;
       this.actionsContainer = this._getActions();
-      L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
-      // replaceChild on this._container w/ new actionsContainer
-       */
+      old.parentNode.replaceChild(this.actionsContainer, old);
     }
   }
 });

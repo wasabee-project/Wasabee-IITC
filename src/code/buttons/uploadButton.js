@@ -39,7 +39,7 @@ const UploadButton = WButton.extend({
 
   _upload: function(container, operation) {
     return this._createButton({
-      title: "Upload Operation",
+      title: `Upload ${operation.name}`,
       container: container,
       buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
       context: this,
@@ -62,7 +62,7 @@ const UploadButton = WButton.extend({
 
   _update: function(container, operation) {
     return this._createButton({
-      title: "Update Operation",
+      title: `Update ${operation.name} (modified)`,
       container: container,
       buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
       context: this,
