@@ -451,6 +451,14 @@ export const WButton = L.Class.extend({
     return link;
   },
 
+  _disposeButton: function(button, callback) {
+    L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
+      .off(button, "mousedown", L.DomEvent.stopPropagation)
+      .off(button, "dblclick", L.DomEvent.stopPropagation)
+      .off(button, "click", L.DomEvent.preventDefault)
+      .off(button, "click", callback);
+  },
+
   _createActions: function(buttons) {
     const container = L.DomUtil.create("ul", "leaflet-draw-actions");
     for (const b of buttons) {

@@ -13,9 +13,11 @@ const fieldCoversPortal = ([a, b, field3], portal) => {
   const p = portal.getLatLng();
   const f3 = field3.getLatLng();
   let c = 0;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, a, b)) c++;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, a, f3)) c++;
-  if (greatCircleArcIntersect(unreachableMapPoint, p, f3, b)) c++;
+
+  if (greatCircleArcIntersect([unreachableMapPoint, p], [a.latLng, b.latLng]))
+    c++;
+  if (greatCircleArcIntersect([unreachableMapPoint, p], [a.latLng, f3])) c++;
+  if (greatCircleArcIntersect([unreachableMapPoint, p], [f3, b.latLng])) c++;
   if (c == 1) return true;
   else return false;
 };
@@ -49,6 +51,7 @@ function longestSequence(poset) {
 }
 
 export default function multimax(a, b, C) {
+  console.log("starting multimax");
   let poset = buildPOSet(a, b, C);
   console.log("multimax done");
   return longestSequence(poset);

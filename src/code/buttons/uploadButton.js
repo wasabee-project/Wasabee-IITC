@@ -13,41 +13,34 @@ const UploadButton = WButton.extend({
     this._lastLoginState = false;
 
     this.type = UploadButton.TYPE;
-    // this.handler = null; // no handler since we do it all in this.Wupdate()
-    this.title = "Upload";
-    this.Wupdate(container);
-  },
+    // this.handler = null;
+    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this.title = `Upload ${this._operation.name}`;
 
-  Wupdate: function(container) {
-    if (!WasabeeMe.isLoggedIn()) {
-      this.button = this._invisible(container);
-      return;
-    }
-
-    const operation = window.plugin.wasabee.getSelectedOperation();
-    if (!operation.IsServerOp()) {
-      this.button = this._upload(container, operation);
-      return;
-    }
-
-    if (!operation.localchanged || !operation.IsWritableOp()) {
-      this.button = this._invisible(container);
-      return;
-    }
-    this.button = this._update(container, operation);
-  },
-
-  _upload: function(container, operation) {
-    return this._createButton({
-      title: `Upload ${operation.name}`,
+    this.button = this._createButton({
+      title: "Upload",
       container: container,
       buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
       context: this,
       callback: () => {
-        uploadOpPromise(operation).then(
+        if (this._operation.isServerOp()) {
+          updateOpPromise(this._operation).then(
+            function(resolve) {
+              console.log(`server accepted the update: ${resolve}`);
+              alert("Update Successful");
+              window.runHooks("wasabeeUIUpdate", this._operation);
+            },
+            function(reject) {
+              console.log(reject);
+              alert(`Update Failed: ${reject}`);
+            }
+          );
+          return;
+        }
+        uploadOpPromise(this._operation).then(
           function(resolve) {
             console.log(resolve);
-            window.plugin.wasabee.makeSelectedOperation(operation.ID); // switch to the new version in local store
+            window.plugin.wasabee.makeSelectedOperation(this._operation.ID); // switch to the new version in local store
             // makeSelectedOp takes care of redraw, no need to save since already there
             alert("Upload Successful");
           },
@@ -60,33 +53,39 @@ const UploadButton = WButton.extend({
     });
   },
 
-  _update: function(container, operation) {
-    return this._createButton({
-      title: `Update ${operation.name} (modified)`,
-      container: container,
-      buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
-      context: this,
-      callback: () => {
-        updateOpPromise(operation).then(
-          function(resolve) {
-            console.log(`server accepted the update: ${resolve}`);
-            alert("Update Successful");
-            window.runHooks("wasabeeUIUpdate", operation);
-          },
-          function(reject) {
-            console.log(reject);
-            alert(`Upload Failed: ${reject}`);
-          }
-        );
-      }
-    });
+  Wupdate: function(container, operation) {
+    if (this._operation.ID != operation.ID) {
+      this._operation = operation;
+      this.title = `Upload ${this._operation.name}`;
+      this.button.title = this.title;
+    }
+
+    if (!WasabeeMe.isLoggedIn()) {
+      this._invisible();
+      return;
+    }
+
+    if (!operation.IsServerOp()) {
+      this._visible();
+      return;
+    }
+
+    if (!operation.localchanged || !operation.IsWritableOp()) {
+      this._invisible();
+      return;
+    }
+
+    this.title = `Update ${this._operation.name}`;
+    this.button.title = this.title;
+    this._visible();
   },
 
-  _invisible: function(container) {
-    const l = L.DomUtil.create("a", "leaflet-draw-actions-bottom", container);
-    l.style.display = "none";
-    return l;
-    // return this._createButton({ container: container, title: "cannot upload", context: this });
+  _visible: function() {
+    this.button.style.display = "block";
+  },
+
+  _invisible: function() {
+    this.button.style.display = "none";
   }
 });
 

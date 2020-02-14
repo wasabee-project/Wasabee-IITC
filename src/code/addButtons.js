@@ -41,10 +41,11 @@ export default function(selectedOp) {
       this._modes[ub.type] = ub;
       return outerDiv;
     },
-    update: function() {
+    update: function(operation) {
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
-          window.plugin.wasabee.buttons.container
+          window.plugin.wasabee.buttons.container,
+          operation
         );
       }
     }

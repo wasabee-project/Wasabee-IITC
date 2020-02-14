@@ -527,10 +527,6 @@ export default class WasabeeOp {
     }
 
     const me = WasabeeMe.get();
-    if (me) {
-      return false;
-    }
-
     if (me.GoogleID == this.creator) {
       return true;
     }

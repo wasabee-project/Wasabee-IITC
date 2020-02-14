@@ -2,23 +2,11 @@ import { Feature } from "../leafletDrawImports";
 import WasabeeMe from "../me";
 import { deleteOpPromise } from "../server";
 import UiCommands from "../uiCommands";
-import ExportDialog from "./exportDialog";
-import OperationChecklistDialog from "./operationChecklistDialog";
 import ConfirmDialog from "./confirmDialog";
-import BlockersList from "./blockersList";
-import MarkerList from "./markerList";
 
 const OpsDialog = Feature.extend({
   statics: {
-    TYPE: "opsButton"
-  },
-
-  options: {
-    icon: new L.Icon({
-      iconSize: new L.Point(16, 16),
-      iconAnchor: new L.Point(0, 0),
-      iconUrl: window.plugin.Wasabee.static.images.toolbar_viewOps
-    })
+    TYPE: "opsDialog"
   },
 
   initialize: function(map, options) {
@@ -89,7 +77,7 @@ const OpsDialog = Feature.extend({
     const operationSelect = document.createElement("select");
     operationSelect.id = "wasabee-operationSelect";
     $(operationSelect).css({
-      width: "50%"
+      width: "90%"
     });
     const ol = window.plugin.wasabee.opsList();
     ol.forEach(function(opID) {
@@ -186,16 +174,7 @@ const OpsDialog = Feature.extend({
 
     const buttonSection = opinfo.appendChild(document.createElement("div"));
     buttonSection.className = "temp-op-dialog";
-    const exportButton = buttonSection.appendChild(document.createElement("a"));
-    exportButton.innerHTML = "Export " + operation.name;
-    exportButton.addEventListener(
-      "click",
-      function() {
-        const ed = new ExportDialog(window.map);
-        ed.enable();
-      },
-      false
-    );
+
     const clearOpButton = buttonSection.appendChild(
       document.createElement("a")
     );
@@ -204,67 +183,6 @@ const OpsDialog = Feature.extend({
       "click",
       () => {
         UiCommands.clearAllItems(operation);
-      },
-      false
-    );
-
-    /* const forkButton = buttonSection.appendChild(document.createElement("a"));
-    forkButton.innerHTML = "Change OP ID";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      forkButton.disabled = true;
-    }
-    forkButton.addEventListener(
-      "click",
-      function() {
-        console.log("fork button");
-      },
-      false
-    ); */
-
-    const checklistButton = buttonSection.appendChild(
-      document.createElement("a")
-    );
-    checklistButton.innerHTML = "Operation Checklist";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      checklistButton.disabled = true;
-    }
-    checklistButton.addEventListener(
-      "click",
-      function() {
-        const cl = new OperationChecklistDialog();
-        cl.enable();
-      },
-      false
-    );
-
-    const blockersButton = buttonSection.appendChild(
-      document.createElement("a")
-    );
-    blockersButton.innerHTML = "Known Blockers";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      blockersButton.disabled = true;
-    }
-    blockersButton.addEventListener(
-      "click",
-      function() {
-        const bl = new BlockersList();
-        bl.enable();
-      },
-      false
-    );
-
-    const markersButton = buttonSection.appendChild(
-      document.createElement("a")
-    );
-    markersButton.innerHTML = "Markers";
-    if (window.plugin.wasabee.opsList().size == 0) {
-      markersButton.disabled = true;
-    }
-    markersButton.addEventListener(
-      "click",
-      function() {
-        const ml = new MarkerList();
-        ml.enable();
       },
       false
     );

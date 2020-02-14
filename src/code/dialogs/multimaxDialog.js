@@ -2,16 +2,11 @@ import { Feature } from "../leafletDrawImports";
 import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
+// generic prompt screen
 
-const MultimaxButtonControl = Feature.extend({
+const MultimaxDialog = Feature.extend({
   statics: {
-    TYPE: "multimaxButton"
-  },
-
-  initialize: function(map, options) {
-    if (!map) map = window.map;
-    this.type = MultimaxButtonControl.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    TYPE: "multimaxDialog"
   },
 
   addHooks: function() {
@@ -26,94 +21,93 @@ const MultimaxButtonControl = Feature.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    this.mmd = new MultimaxDialog();
-    const mmhandler = this;
-    this._dialog = window.dialog({
-      title: "Multimax",
-      width: "auto",
-      height: "auto",
-      html: this.mmd.container,
-      dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: function() {
-        window.runHooks(
-          "wasabeeUIUpdate",
-          window.plugin.wasabee.getSelectedOperation()
-        );
-        mmhandler.disable();
-        delete mmhandler._dialog;
-      },
-      id: window.plugin.Wasabee.static.dialogNames.multimaxButton
-    });
-  }
-});
 
-export default MultimaxButtonControl;
+    const container = document.createElement("div");
+    const rdnTable = container.appendChild(document.createElement("table"));
 
-class MultimaxDialog {
-  constructor() {
-    var self = this;
-    self.clearLocalPortalSelections();
-    this._portals = {};
-    this._links = [];
-    this._operation = window.plugin.wasabee.getSelectedOperation();
-    this.container = document.createElement("div");
-    var tr;
-    var node;
-    var button;
-    var rdnTable = this.container.appendChild(document.createElement("table"));
-
-    // Anchors
     ["A", "B"].forEach(string => {
-      tr = rdnTable.insertRow();
+      const tr = rdnTable.insertRow();
       tr.setAttribute("AB", string);
       // Name
-      node = tr.insertCell();
+      const node = tr.insertCell();
       node.textContent = string;
       // Set button
-      node = tr.insertCell();
-      button = node.appendChild(document.createElement("button"));
+      const nodethree = tr.insertCell();
+      const button = nodethree.appendChild(document.createElement("button"));
       button.textContent = "set";
-      button.addEventListener("click", arg => self.setPortal(arg), false);
+      button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
-      node = tr.insertCell();
-      node.className = "portal portal-" + string;
-      self._portals[string] = node;
-      self.updatePortal(string);
+      const nodetwo = tr.insertCell();
+      nodetwo.className = "portal portal-" + string;
+      this._portals[string] = nodetwo;
+      this.updatePortal(string);
     });
 
     // Bottom buttons bar
-    var element = this.container.appendChild(document.createElement("div"));
+    const element = container.appendChild(document.createElement("div"));
     element.className = "buttonbar";
-    var div = element.appendChild(document.createElement("span"));
+    const div = element.appendChild(document.createElement("span"));
 
     // Enter arrow
-    var opt = div.appendChild(document.createElement("span"));
+    const opt = div.appendChild(document.createElement("span"));
     opt.className = "arrow";
     opt.textContent = "\u21b3";
 
     // Go button
-    button = div.appendChild(document.createElement("button"));
+    const button = div.appendChild(document.createElement("button"));
     button.textContent = "Multimax!";
     button.addEventListener(
       "click",
-      () => self.doMultimax(self._operation),
+      () => {
+        this.doMultimax(this._operation);
+      },
       false
     );
 
     // Close button
-    button = element.appendChild(document.createElement("button"));
-    button.textContent = "close";
-    button.addEventListener("click", () => self._dialog.dialog("close"), false);
-  }
+    const closebutton = element.appendChild(document.createElement("button"));
+    closebutton.textContent = "close";
+    closebutton.addEventListener(
+      "click",
+      () => this._dialog.dialog("close"),
+      false
+    );
+
+    const context = this;
+
+    this._dialog = window.dialog({
+      title: "Multimax",
+      width: "auto",
+      height: "auto",
+      html: container,
+      dialogClass: "wasabee-dialog-mustauth",
+      closeCallback: function() {
+        context.disable();
+        delete context._dialog;
+      },
+      id: window.plugin.Wasabee.static.dialogNames.multimaxButton
+    });
+  },
+
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this.type = MultimaxDialog.TYPE;
+    Feature.prototype.initialize.call(this, map, options);
+    this.title = "Multimax";
+    this.label = "Multimax";
+    this._portals = {};
+    this._links = [];
+    this._operation = window.plugin.wasabee.getSelectedOperation();
+  },
 
   //***Function to clear local selections of portals for the dialog
-  clearLocalPortalSelections() {
+  clearLocalPortalSelections: function() {
     store.remove("wasabee-multimax-A");
     store.remove("wasabee-multimax-B");
-  }
+  },
 
   //***Function to set portal -- called from 'Set' Button
-  setPortal(event) {
+  setPortal: function(event) {
     const AB = event.currentTarget.parentNode.parentNode.getAttribute("AB");
     const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
@@ -123,31 +117,33 @@ class MultimaxDialog {
       store.remove("wasabee-multimax-" + AB);
     }
     this.updatePortal(AB);
-  }
+  },
 
   //***Function to get portal -- called in doMultimax
-  getPortal(AB) {
+  getPortal: function(AB) {
     try {
-      return JSON.parse(store.get("wasabee-multimax-" + AB));
-    } catch (b) {
+      const p = JSON.parse(store.get("wasabee-multimax-" + AB));
+      return WasabeePortal.create(p);
+    } catch (err) {
+      console.log(err);
       return null;
     }
-  }
+  },
 
   //***Function to update portal in the dialog
-  updatePortal(AB) {
+  updatePortal: function(AB) {
     const i = this.getPortal(AB);
     const viewContainer = this._portals[AB];
     $(viewContainer).empty();
     if (i) {
       viewContainer.appendChild(i.displayFormat(this._operation));
     }
-  }
+  },
 
-  doMultimax() {
-    const portalsOnScreen = getAllPortalsOnScreen();
+  doMultimax: function() {
+    const portalsOnScreen = this._getAllPortalsOnScreen();
     const A = this.getPortal("A");
-    const B = this.getPortal("B"); //mmmm
+    const B = this.getPortal("B");
     // Both anchors must have been selected
     if (!A || !B) {
       alert("Please select anchor portals first!");
@@ -160,6 +156,9 @@ class MultimaxDialog {
       return;
     }
     this._operation.addLink(A, B, "multimax base");
+
+    console.log(sequence);
+
     sequence.forEach(node => {
       const p = node.getLatLng();
       if (typeof p["lat"] == "number") {
@@ -172,26 +171,27 @@ class MultimaxDialog {
       this._operation.addLink(p, B, "multimax generated link");
     });
     this._operation.update();
-  }
-}
+  },
 
-const isOnScreen = (ll, bounds) => {
-  return (
-    ll.lat < bounds._northEast.lat &&
-    ll.lng < bounds._northEast.lng &&
-    ll.lat > bounds._southWest.lat &&
-    ll.lng > bounds._southWest.lng
-  );
-};
+  _isOnScreen: function(ll, bounds) {
+    return (
+      ll.lat < bounds._northEast.lat &&
+      ll.lng < bounds._northEast.lng &&
+      ll.lat > bounds._southWest.lat &&
+      ll.lng > bounds._southWest.lng
+    );
+  },
 
-const getAllPortalsOnScreen = () => {
-  const bounds = window.clampLatLngBounds(window.map.getBounds());
-  const x = [];
-  // XXX should just convert from leaflet to wasabee portal format here
-  for (let portal in window.portals) {
-    if (isOnScreen(window.portals[portal].getLatLng(), bounds)) {
-      x.push(window.portals[portal]);
+  _getAllPortalsOnScreen: function() {
+    const bounds = window.clampLatLngBounds(window.map.getBounds());
+    const x = [];
+    for (const portal in window.portals) {
+      if (this._isOnScreen(window.portals[portal].getLatLng(), bounds)) {
+        x.push(window.portals[portal]);
+      }
     }
+    return x;
   }
-  return x;
-};
+});
+
+export default MultimaxDialog;
