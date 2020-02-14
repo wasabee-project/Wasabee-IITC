@@ -377,7 +377,7 @@ export const WButton = L.Class.extend({
     this._map = map;
 
     this.type = WButton.TYPE;
-    this.title = "Unextended Wasabee Button";
+    this.title = "Unextended WButton";
     this.handler = new WButtonHandler(map);
 
     this.button = this._createButton({
@@ -390,11 +390,14 @@ export const WButton = L.Class.extend({
     });
   },
 
-  update: function() {
-    console.log("WButton update called: " + this);
+  Wupdate: function() {
+    // called Wupdate because I think update might conflict with L.*
+    console.log("WButton Wupdate called: " + this);
   },
 
   _createButton: function(options) {
+    console.log("_createButon");
+    console.log(options);
     const link = L.DomUtil.create(
       "a",
       options.className || "",
@@ -436,6 +439,19 @@ export const WButton = L.Class.extend({
       });
     }
     return container;
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    console.log("WButton addHooks");
+    console.log(this);
+    // do stuff
+  },
+
+  removeHooks: function() {
+    if (!this._map) return;
+    console.log("WButton removeHooks");
+    console.log(this);
   }
 });
 
@@ -444,35 +460,36 @@ export const WButtonHandler = L.Evented.extend({
     if (!map) map = window.map;
     this._map = map;
     this._enabled = false;
-    this.type = "unextended W Button Handler";
+    this.type = "Unextended W Button Handler";
     this._options = options;
+    console.log(this);
   },
 
   enable: function() {
+    console.log("WButtonHandler enable");
     if (this._enabled) return;
+    console.log("WButtonHandler doing stuff");
+    console.log(this);
 
     L.Handler.prototype.enable.call(this);
-    this.fire("enabled", { handler: this.type });
-    this._map.fire("draw:drawstart", { layerType: this.type });
   },
 
   disable: function() {
+    console.log("WButtonHandler disable");
     if (!this._enabled) return;
 
     L.Handler.prototype.disable.call(this);
-    this.fire("disabled", { handler: this.type });
-    this._map.fire("draw:drawstop", { layerType: this.type });
   },
 
   addHooks: function() {
     if (!this._map) return;
-    console.log("addHooks");
+    console.log("WButtonHandler addHooks");
     // do stuff
   },
 
   removeHooks: function() {
     if (!this._map) return;
-    console.log("removeHooks");
+    console.log("WButtonHandler removeHooks");
     // do stuff
   }
 });

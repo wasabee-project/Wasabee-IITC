@@ -1,14 +1,12 @@
 import QuickDrawControl from "./quickDrawLayers";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
+import OpsButton from "./buttons/opsButton";
 import WasabeeDialog from "./dialogs/wasabeeDialog";
-import OpsDialog from "./dialogs/opsDialog";
-import NewopsDialog from "./dialogs/newopDialog";
 import LinkDialog from "./dialogs/linkDialog";
 import MarkerAddDialog from "./dialogs/markerAddDialog";
 import MultimaxButtonControl from "./dialogs/multimaxDialog";
 import { updateOpPromise, uploadOpPromise } from "./server";
-import ConfirmDialog from "./dialogs/confirmDialog";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -31,7 +29,7 @@ export default function(selectedOp) {
       this.container = container;
 
       this._addWasabeeButton(map, container);
-      this._addOpsButton(map, container, outerDiv);
+      this._addOpsButton(map, container);
       this._addQuickDrawButton(map, container, outerDiv);
       // this._addMultimaxButton(map, container);
       this._addLinkDialogButton(map, container);
@@ -44,69 +42,9 @@ export default function(selectedOp) {
       const wb = new WasabeeButton(map, container);
       this._modes[wb.type] = wb;
     },
-    _addOpsButton: function(map, container, outerDiv) {
-      let opsButtonHandler = new OpsDialog(map);
-      let type = opsButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = opsButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Operations",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_viewOps,
-        callback: opsButtonHandler.enable,
-        context: opsButtonHandler
-      });
-      let actionsContainer = this._createActions([
-        {
-          title: "Create a new operation",
-          text: "New Op",
-          callback: () => {
-            closeAllDialogs();
-            let nb = new NewopsDialog(map);
-            opsButtonHandler.disable();
-            nb.enable();
-          },
-          context: opsButtonHandler
-        },
-        {
-          title: "Clear all locally stored ops",
-          text: "Clear Local Ops",
-          callback: () => {
-            const con = new ConfirmDialog();
-            con.setup(
-              "Clear Local Ops",
-              "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
-              () => {
-                closeAllDialogs();
-                window.plugin.wasabee.resetOps();
-                window.plugin.wasabee.setupLocalStorage();
-              }
-            );
-            con.enable();
-          },
-          context: opsButtonHandler
-        }
-      ]);
-      actionsContainer.style.top = "26px";
-      L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
-
-      this._modes[type].actionsContainer = actionsContainer;
-
-      opsButtonHandler.on(
-        "enabled",
-        function() {
-          actionsContainer.style.display = "block";
-        },
-        this
-      );
-      opsButtonHandler.on(
-        "disabled",
-        function() {
-          actionsContainer.style.display = "none";
-        },
-        this
-      );
-      outerDiv.appendChild(actionsContainer);
+    _addOpsButton: function(map, container) {
+      const ob = new OpsButton(map, container);
+      this._modes[ob.type] = ob;
     },
     _addSyncButton: function(map, container) {
       const sb = new SyncButton(map, container);
@@ -310,8 +248,8 @@ export default function(selectedOp) {
       Wasabee.buttons._updateUploadButton();
       console.log(window.plugin.wasabee.buttons._modes);
       for (const id in window.plugin.wasabee.buttons._modes) {
-        if (window.plugin.wasabee.buttons._modes[id].update)
-          window.plugin.wasabee.buttons._modes[id].update(this.container);
+        if (window.plugin.wasabee.buttons._modes[id].Wupdate)
+          window.plugin.wasabee.buttons._modes[id].Wupdate(this.container);
       }
     }
   });
@@ -331,21 +269,3 @@ export default function(selectedOp) {
   }
   Wasabee.buttons.update(selectedOp);
 }
-
-const closeAllDialogs = skip => {
-  skip = skip || "nothing";
-  for (const name of Object.values(window.plugin.Wasabee.static.dialogNames)) {
-    if (name != skip) {
-      let id = "dialog-" + name;
-      if (window.DIALOGS[id]) {
-        try {
-          let selector = $(window.DIALOGS[id]);
-          selector.dialog("close");
-          selector.remove();
-        } catch (err) {
-          console.log("closing dialog: " + err);
-        }
-      }
-    }
-  }
-};

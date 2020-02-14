@@ -14,12 +14,12 @@ const SyncButton = WButton.extend({
     this._lastLoginState = false;
 
     this.type = SyncButton.TYPE;
-    // this.handler = null; // no handler since we do it all in this.update()
+    // this.handler = null; // no handler since we do it all in this.Wupdate()
     this.title = "Download Available Operations";
-    this.update(container);
+    this.Wupdate(container);
   },
 
-  update: function(container) {
+  Wupdate: function(container) {
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn != this._lastLoginState) {
       delete this.button;

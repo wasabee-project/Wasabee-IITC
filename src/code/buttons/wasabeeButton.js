@@ -22,28 +22,32 @@ const WasabeeButton = WButton.extend({
       container: container,
       buttonImage: this.getIcon(),
       callback: this.handler,
-      context: this
+      context: this.handler
     });
 
-    this.actionsContainer = this._createActions([
-      {
-        title: "Log In",
-        text: "Log In",
-        callback: () => {
-          const ad = new AuthDialog(this._map);
-          ad.enable();
-        },
-        context: this
+    this._lastLoginState = false;
+
+    this._loginAction = {
+      title: "Log In",
+      text: "Log In",
+      callback: () => {
+        const ad = new AuthDialog(this._map);
+        ad.enable();
       },
-      {
-        title: "Teams",
-        text: "List Wasabee Teams",
-        callback: () => {
-          const wd = new WasabeeDialog(this._map);
-          wd.enable();
-        },
-        context: this
+      context: this.handler
+    };
+
+    this._teamAction = {
+      title: "Teams",
+      text: "List Wasabee Teams",
+      callback: () => {
+        const wd = new WasabeeDialog(this._map);
+        wd.enable();
       },
+      context: this.handler
+    };
+
+    this._alwaysActions = [
       {
         title: "Create a new operation",
         text: "New Op",
@@ -53,7 +57,7 @@ const WasabeeButton = WButton.extend({
           // this.disable();
           nb.enable();
         },
-        context: this
+        context: this.handler
       },
       {
         title: "Clear all locally stored ops",
@@ -71,51 +75,70 @@ const WasabeeButton = WButton.extend({
           );
           con.enable();
         },
-        context: this
+        context: this.handler
       }
-    ]);
+    ];
+
+    this.Wupdate(); // sets the icon and builds the actionsContainer
+
     // this.actionsContainer.style.top = "26px";
     L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
-    container.appendChild(this.actionsContainer);
+    container.parentNode.appendChild(this.actionsContainer);
 
     this.handler.on(
       "enabled",
-      () => {
+      function() {
         this.actionsContainer.style.display = "block";
       },
-      this
+      this.handler
     );
     this.handler.on(
       "disabled",
-      () => {
+      function() {
         this.actionsContainer.style.display = "none";
       },
-      this
+      this.handler
     );
+
+    console.log(this);
   },
 
   getIcon: function() {
-    if (WasabeeMe.isLoggedIn()) {
+    if (this._lastLoginState) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
     } else {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
     }
   },
 
+  getActions: function() {
+    let tmp = [];
+    if (!this._lastLoginState) {
+      tmp = [this._loginAction];
+    } else {
+      tmp = [this._teamAction];
+    }
+    return this._createActions(tmp.concat(this._alwaysActions));
+  },
+
   _displayDialog: function() {
-    if (WasabeeMe.isLoggedIn()) {
+    if (this._lastLoginState) {
       this.handler = new WasabeeDialog(this._map);
     } else {
       this.handler = new AuthDialog(this._map);
     }
     this.handler.enable();
-  }
+  },
 
-  /* update: function() {
-    // const img = this.button. child[0]  // change out the image
-    // img = this.getIcon();
-    // change out the actions
-  }, */
+  Wupdate: function() {
+    const loggedIn = WasabeeMe.get();
+    if (loggedIn != this._lastLoginState) {
+      this._lastLoginState = loggedIn;
+      this.button.children[0].src = this.getIcon();
+      this.actionsContainer = this.getActions();
+      // replaceChild on this.container.parentNode w/ new actionsContainer
+    }
+  }
 });
 
 export default WasabeeButton;
