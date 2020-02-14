@@ -1,7 +1,7 @@
 import store from "../lib/store";
 import { mePromise } from "./server";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.Wasabee;
 
 export default class WasabeeMe {
   constructor() {
@@ -25,7 +25,7 @@ export default class WasabeeMe {
     if (lsme === null || typeof lsme !== "string") {
       return false;
     }
-    let me = JSON.parse(lsme);
+    const me = JSON.parse(lsme);
     if (me.fetched > maxCacheAge) {
       return true;
     }

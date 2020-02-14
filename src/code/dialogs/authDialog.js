@@ -2,7 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
-// import WasabeeMe from "../me";
+import WasabeeMe from "../me";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -77,8 +77,9 @@ const AuthDialog = Feature.extend({
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
-        window.runHooks("wasabeeUIUpdate", selectedOperation);
-        // remove/delete this._dialog
+        if (WasabeeMe.isLoggedIn()) {
+          window.runHooks("wasabeeUIUpdate", selectedOperation);
+        }
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });
@@ -108,9 +109,8 @@ const AuthDialog = Feature.extend({
         }
         SendAccessTokenAsync(response.access_token).then(
           async () => {
-            thisthing._dialog.dialog("close");
-            // const me = WasabeeMe.get();
-            // do this by hand to await it
+            // could be const me = WasabeeMe.get();
+            // but do this by hand to 'await' it
             try {
               const me = await mePromise();
               alert("awaited :" + JSON.stringify(me));
@@ -121,10 +121,7 @@ const AuthDialog = Feature.extend({
             } catch (e) {
               alert(e);
             }
-            window.runHooks(
-              "wasabeeUIUpdate",
-              window.plugin.wasabee.getSelectedOperation()
-            );
+            thisthing._dialog.dialog("close");
           },
           reject => {
             alert("login rejected: " + reject);

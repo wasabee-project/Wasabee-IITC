@@ -1,14 +1,10 @@
-import QuickDrawControl from "./quickDrawLayers";
+import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
 import OpsButton from "./buttons/opsButton";
-import WasabeeDialog from "./dialogs/wasabeeDialog";
-import LinkDialog from "./dialogs/linkDialog";
-import MarkerAddDialog from "./dialogs/markerAddDialog";
-import MultimaxButtonControl from "./dialogs/multimaxDialog";
-import { updateOpPromise, uploadOpPromise } from "./server";
-
-const Wasabee = window.plugin.Wasabee;
+import LinkButton from "./buttons/linkButton";
+import MarkerButton from "./buttons/markerButton";
+import UploadButton from "./buttons/uploadButton";
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
@@ -26,246 +22,39 @@ export default function(selectedOp) {
       const container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
       outerDiv.appendChild(container);
       this._modes = {};
+
       this.container = container;
 
-      this._addWasabeeButton(map, container);
-      this._addOpsButton(map, container);
-      this._addQuickDrawButton(map, container, outerDiv);
-      // this._addMultimaxButton(map, container);
-      this._addLinkDialogButton(map, container);
-      this._addMarkerButton(map, container);
-      this._addSyncButton(map, container);
-      this._addUploadButton(map, container);
-      return outerDiv;
-    },
-    _addWasabeeButton: function(map, container) {
       const wb = new WasabeeButton(map, container);
       this._modes[wb.type] = wb;
-    },
-    _addOpsButton: function(map, container) {
       const ob = new OpsButton(map, container);
       this._modes[ob.type] = ob;
-    },
-    _addSyncButton: function(map, container) {
+      const qb = new QuickdrawButton(map, container);
+      this._modes[qb.type] = qb;
+      const lb = new LinkButton(map, container);
+      this._modes[lb.type] = lb;
+      const mb = new MarkerButton(map, container);
+      this._modes[mb.type] = mb;
       const sb = new SyncButton(map, container);
       this._modes[sb.type] = sb;
+      const ub = new UploadButton(map, container);
+      this._modes[ub.type] = ub;
+      return outerDiv;
     },
-    _addUploadButton: function(map, container) {
-      const tmp = {};
-      tmp.type = "upload op";
-      let type = tmp.type;
-      this._modes[type] = {};
-      this._modes[type].handler = () => {
-        // Feature.prototype.addHooks.call(tmp);
-      };
-      this._modes[type].button = this._createButton({
-        title: "Upload Operation",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
-        callback: () => {
-          // closeAllDialogs();
-          const so = window.plugin.wasabee.getSelectedOperation();
-          const id = so.ID;
-
-          if (so.IsServerOp()) {
-            updateOpPromise(so).then(
-              function(resolve) {
-                console.log("server accepted the update: " + resolve);
-                alert("Update Successful");
-                window.runHooks("wasabeeUIUpdate", so);
-              },
-              function(reject) {
-                console.log(reject);
-                alert("Update Failed: " + JSON.stringify(reject));
-              }
-            );
-          } else {
-            uploadOpPromise(so).then(
-              function(resolve) {
-                console.log(resolve);
-                window.plugin.wasabee.makeSelectedOperation(id); // switch to the new version in local store
-                // makeSelectedOp takes care of redraw, no need to save since already there
-                // const newop = window.plugin.wasabee.getSelectedOperation();
-                // newop.update();
-                alert("Upload Successful");
-              },
-              function(reject) {
-                console.log(reject);
-                alert("Upload Failed: " + JSON.stringify(reject));
-              }
-            );
-          }
-        }
-      });
-    },
-    _updateUploadButton: function() {
-      const operation = window.plugin.wasabee.getSelectedOperation();
-      let status = "";
-      if (operation.localchanged) {
-        status = " (locally modified)";
-      }
-      this._modes["upload op"].button.title =
-        "Upload " + operation.name + status;
-    },
-    _addLinkDialogButton: function(map, container) {
-      let ldButtonHandler = new LinkDialog(map);
-      let type = ldButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = ldButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Add Links",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_addlinks,
-        callback: ldButtonHandler.enable,
-        context: ldButtonHandler
-      });
-    },
-    _addMarkerButton: function(map, container) {
-      let mButtonHandler = new MarkerAddDialog(map);
-      let type = mButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = mButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Add Markers",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_addMarkers,
-        callback: mButtonHandler.enable,
-        context: mButtonHandler
-      });
-    },
-    _addMultimaxButton: function(map, container) {
-      let multimaxButtonHandler = new MultimaxButtonControl(map);
-      let type = multimaxButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = multimaxButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Multimax Draw",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_multimax,
-        callback: multimaxButtonHandler.enable,
-        context: multimaxButtonHandler
-      });
-    },
-    _addQuickDrawButton: function(map, container, outerDiv) {
-      let quickDrawHandler = new QuickDrawControl(map);
-      let type = quickDrawHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = quickDrawHandler;
-      this._modes[type].button = this._createButton({
-        title: "Quick Draw Layers",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_quickdraw,
-        callback: quickDrawHandler.enable,
-        context: quickDrawHandler
-      });
-      let actionsContainer = this._createActions([
-        {
-          title: "Click to stop drawing fields.",
-          text: "End",
-          callback: quickDrawHandler.disable,
-          context: quickDrawHandler
-        }
-      ]);
-      actionsContainer.style.top = "52px";
-      L.DomUtil.addClass(actionsContainer, "leaflet-draw-actions-top");
-
-      this._modes[type].actionsContainer = actionsContainer;
-
-      quickDrawHandler.on(
-        "enabled",
-        function() {
-          actionsContainer.style.display = "block";
-        },
-        this
-      );
-      quickDrawHandler.on(
-        "disabled",
-        function() {
-          actionsContainer.style.display = "none";
-        },
-        this
-      );
-      outerDiv.appendChild(actionsContainer);
-    },
-    _createActions: function(buttons) {
-      var container = L.DomUtil.create("ul", "leaflet-draw-actions"),
-        l = buttons.length,
-        li;
-
-      for (var i = 0; i < l; i++) {
-        li = L.DomUtil.create("li", "", container);
-
-        this._createButton({
-          title: buttons[i].title,
-          text: buttons[i].text,
-          container: li,
-          callback: buttons[i].callback,
-          context: buttons[i].context
-        });
-      }
-
-      return container;
-    },
-    _createButton: function(options) {
-      const link = L.DomUtil.create(
-        "a",
-        options.className || "",
-        options.container
-      );
-      link.href = "#";
-
-      if (options.text) {
-        link.innerHTML = options.text;
-      }
-
-      if (options.buttonImage) {
-        $(link).append(
-          $("<img/>")
-            .prop("src", options.buttonImage)
-            .css("vertical-align", "middle")
-            .css("align", "center")
-        );
-      }
-
-      if (options.title) {
-        link.title = options.title;
-      }
-
-      L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
-        .on(link, "mousedown", L.DomEvent.stopPropagation)
-        .on(link, "dblclick", L.DomEvent.stopPropagation)
-        .on(link, "click", L.DomEvent.preventDefault)
-        .on(link, "click", options.callback, options.context);
-
-      return link;
-    },
-    update: function(operation) {
-      if (operation.IsServerOp() == false || operation.IsWritableOp() == true) {
-        $("#wasabee_uploadbutton").css("display", "");
-      } else {
-        $("#wasabee_uploadbutton").css("display", "none");
-      }
-      Wasabee.buttons._updateUploadButton();
-      console.log(window.plugin.wasabee.buttons._modes);
+    update: function() {
       for (const id in window.plugin.wasabee.buttons._modes) {
-        if (window.plugin.wasabee.buttons._modes[id].Wupdate)
-          window.plugin.wasabee.buttons._modes[id].Wupdate(this.container);
+        window.plugin.wasabee.buttons._modes[id].Wupdate(
+          window.plugin.wasabee.buttons.container
+        );
       }
     }
   });
-  if (typeof Wasabee.buttons === "undefined") {
-    Wasabee.buttons = new ButtonsControl();
-    window.map.addControl(Wasabee.buttons);
-  } else {
-    // XXX is this redundant with the hook?
-    let type = WasabeeDialog.TYPE;
-    let handler = Wasabee.buttons._modes[type].handler;
-    let image = handler.getIcon();
-    let button = Wasabee.buttons._modes[type].button;
-    $(button)
-      .children("img")
-      .attr("src", image);
-    window.addHook("wasabeeUIUpdate", Wasabee.buttons.update);
+
+  if (typeof window.plugin.wasabee.buttons === "undefined") {
+    window.plugin.wasabee.buttons = new ButtonsControl();
+    window.map.addControl(window.plugin.wasabee.buttons);
   }
-  Wasabee.buttons.update(selectedOp);
+
+  window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
+  window.plugin.wasabee.buttons.update(selectedOp);
 }

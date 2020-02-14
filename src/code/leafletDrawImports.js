@@ -372,18 +372,23 @@ export const WButton = L.Class.extend({
     TYPE: "unextendedWButton"
   },
 
+  // always have these
+  _enabled: false,
+  title: "Unset",
+
+  // make sure all these bases are covered in your button
   initialize: function(map, container) {
     if (!map) map = window.map;
     this._map = map;
 
     this.type = WButton.TYPE;
     this.title = "Unextended WButton";
-    this.handler = new WButtonHandler(map);
+    this._container = container;
+    this.handler = this._toggleActions;
 
     this.button = this._createButton({
       container: container,
-      // text: this._title,
-      // buttonImage: this.getIcon(),
+      // buttonImage: null,
       callback: this.handler,
       context: this
       // className: ...,
@@ -392,12 +397,32 @@ export const WButton = L.Class.extend({
 
   Wupdate: function() {
     // called Wupdate because I think update might conflict with L.*
-    console.log("WButton Wupdate called: " + this);
+    // console.log("WButton Wupdate called");
+  },
+
+  _toggleActions: function() {
+    if (this._enabled) {
+      this.disable();
+    } else {
+      this.enable();
+    }
+  },
+
+  disable: function() {
+    this._enabled = false;
+    if (this.actionsContainer) {
+      this.actionsContainer.style.display = "none";
+    }
+  },
+
+  enable: function() {
+    this._enabled = true;
+    if (this.actionsContainer) {
+      this.actionsContainer.style.display = "block";
+    }
   },
 
   _createButton: function(options) {
-    console.log("_createButon");
-    console.log(options);
     const link = L.DomUtil.create(
       "a",
       options.className || "",
@@ -452,44 +477,5 @@ export const WButton = L.Class.extend({
     if (!this._map) return;
     console.log("WButton removeHooks");
     console.log(this);
-  }
-});
-
-export const WButtonHandler = L.Evented.extend({
-  initialize: function(map, options) {
-    if (!map) map = window.map;
-    this._map = map;
-    this._enabled = false;
-    this.type = "Unextended W Button Handler";
-    this._options = options;
-    console.log(this);
-  },
-
-  enable: function() {
-    console.log("WButtonHandler enable");
-    if (this._enabled) return;
-    console.log("WButtonHandler doing stuff");
-    console.log(this);
-
-    L.Handler.prototype.enable.call(this);
-  },
-
-  disable: function() {
-    console.log("WButtonHandler disable");
-    if (!this._enabled) return;
-
-    L.Handler.prototype.disable.call(this);
-  },
-
-  addHooks: function() {
-    if (!this._map) return;
-    console.log("WButtonHandler addHooks");
-    // do stuff
-  },
-
-  removeHooks: function() {
-    if (!this._map) return;
-    console.log("WButtonHandler removeHooks");
-    // do stuff
   }
 });
