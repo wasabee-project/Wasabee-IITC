@@ -1,4 +1,4 @@
-import { WButton, WButtonHandler } from "../leafletDrawImports.js";
+import { WButton } from "../leafletDrawImports.js";
 import WasabeeMe from "../me";
 import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
@@ -15,14 +15,15 @@ const WasabeeButton = WButton.extend({
     this._map = map;
 
     this.type = WasabeeButton.TYPE;
-    this.title = "Wasabee Status";
-    this.handler = new WButtonHandler(map);
+    this.title = "Wasabee";
+    this.handler = this._toggleActions;
+    this._container = container;
 
     this.button = this._createButton({
       container: container,
       buttonImage: this.getIcon(),
       callback: this.handler,
-      context: this.handler
+      context: this
     });
 
     this._lastLoginState = false;
@@ -31,20 +32,22 @@ const WasabeeButton = WButton.extend({
       title: "Log In",
       text: "Log In",
       callback: () => {
+        this.disable();
         const ad = new AuthDialog(this._map);
         ad.enable();
       },
-      context: this.handler
+      context: this
     };
 
     this._teamAction = {
       title: "Teams",
       text: "List Wasabee Teams",
       callback: () => {
+        this.disable();
         const wd = new WasabeeDialog(this._map);
         wd.enable();
       },
-      context: this.handler
+      context: this
     };
 
     this._alwaysActions = [
@@ -52,17 +55,18 @@ const WasabeeButton = WButton.extend({
         title: "Create a new operation",
         text: "New Op",
         callback: () => {
+          this.disable();
           // closeAllDialogs();
           const nb = new NewopDialog(this._map);
-          // this.disable();
           nb.enable();
         },
-        context: this.handler
+        context: this
       },
       {
         title: "Clear all locally stored ops",
         text: "Clear Local Ops",
         callback: () => {
+          this.disable();
           const con = new ConfirmDialog(this._map);
           con.setup(
             "Clear Local Ops",
@@ -75,32 +79,17 @@ const WasabeeButton = WButton.extend({
           );
           con.enable();
         },
-        context: this.handler
+        context: this
       }
     ];
 
-    this.Wupdate(); // sets the icon and builds the actionsContainer
+    // build and display as if not logged in
+    this.actionsContainer = this._getActions();
+    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
+    this._container.appendChild(this.actionsContainer);
 
-    // this.actionsContainer.style.top = "26px";
-    L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
-    container.parentNode.appendChild(this.actionsContainer);
-
-    this.handler.on(
-      "enabled",
-      function() {
-        this.actionsContainer.style.display = "block";
-      },
-      this.handler
-    );
-    this.handler.on(
-      "disabled",
-      function() {
-        this.actionsContainer.style.display = "none";
-      },
-      this.handler
-    );
-
-    console.log(this);
+    // check login state and update if necessary
+    this.Wupdate(this._container);
   },
 
   getIcon: function() {
@@ -111,7 +100,7 @@ const WasabeeButton = WButton.extend({
     }
   },
 
-  getActions: function() {
+  _getActions: function() {
     let tmp = [];
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
@@ -121,22 +110,17 @@ const WasabeeButton = WButton.extend({
     return this._createActions(tmp.concat(this._alwaysActions));
   },
 
-  _displayDialog: function() {
-    if (this._lastLoginState) {
-      this.handler = new WasabeeDialog(this._map);
-    } else {
-      this.handler = new AuthDialog(this._map);
-    }
-    this.handler.enable();
-  },
-
-  Wupdate: function() {
-    const loggedIn = WasabeeMe.get();
+  Wupdate: function(container) {
+    const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn != this._lastLoginState) {
       this._lastLoginState = loggedIn;
       this.button.children[0].src = this.getIcon();
-      this.actionsContainer = this.getActions();
-      // replaceChild on this.container.parentNode w/ new actionsContainer
+      console.debug(container);
+      /*
+      this.actionsContainer = this._getActions();
+      L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
+      // replaceChild on this._container w/ new actionsContainer
+       */
     }
   }
 });

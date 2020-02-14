@@ -18,7 +18,6 @@ const OpsButton = WButton.extend({
     this.title = "Operations";
     this.handler = this._toggleActions;
     this._container = container;
-    this._enabled = false;
 
     const context = this;
 
@@ -83,30 +82,12 @@ const OpsButton = WButton.extend({
     ]);
 
     this.actionsContainer.style.top = "26px";
-    L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
-    console.log(this.actionsContainer);
+    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer); // parentNode
-  },
-
-  _toggleActions: function() {
-    console.log("toggleActions");
-    if (this._enabled) {
-      this.disable();
-    } else {
-      this.enable();
-    }
-  },
-
-  disable: function() {
-    this._enabled = false;
-    this.actionsContainer.style.display = "none";
-  },
-
-  enable: function() {
-    this._enabled = true;
-    this.actionsContainer.style.display = "block";
   }
 
+  // enable: // default is good
+  // disable: // default is good
   // Wupdate: function() { // nothing to do }
 });
 
