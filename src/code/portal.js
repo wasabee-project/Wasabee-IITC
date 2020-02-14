@@ -60,7 +60,7 @@ export default class WasabeePortal {
 
   displayFormat() {
     const pt = this.latLng;
-    const v = this.lat + "," + this.lng;
+    const v = `${this.lat},${this.lng}`;
     const e = document.createElement("a");
     e.appendChild(document.createTextNode(this.name));
 
@@ -80,7 +80,7 @@ export default class WasabeePortal {
     }
 
     e.title = this.name;
-    e.href = "/intel?ll=" + v + "&pll=" + v;
+    e.href = `/intel?ll=${v}&pll=${v}`;
     e.addEventListener(
       "click",
       event => {
@@ -131,7 +131,7 @@ export default class WasabeePortal {
     }
 
     if (!id) id = generateId();
-    if (!name) name = "Loading: [" + id + "]";
+    if (!name) name = `Loading: [${id}]`;
     const n = new WasabeePortal(id, name, lat, lng);
     return n;
   }

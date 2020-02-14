@@ -386,7 +386,7 @@ export default class WasabeeOp {
           l.toPortalId = newPortal.id;
         } else {
           console.log(
-            `Operation: Removing link '$l.ID}' while swapping because it would duplicate an existing link in the operation.`
+            `Operation: Removing link '{$l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
         }
@@ -580,7 +580,7 @@ export default class WasabeeOp {
       obj = JSON.parse(obj);
     }
     const operation = new WasabeeOp();
-    for (var prop in obj) {
+    for (const prop in obj) {
       if (operation.hasOwnProperty(prop)) {
         if (prop == "links") {
           operation[prop] = operation.convertLinksToObjs(obj[prop]);

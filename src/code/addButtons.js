@@ -1,14 +1,14 @@
-import WasabeeMe from "./me";
 import QuickDrawControl from "./quickDrawLayers";
+import WasabeeButton from "./buttons/wasabeeButton";
+import SyncButton from "./buttons/syncButton";
 import WasabeeDialog from "./dialogs/wasabeeDialog";
 import OpsDialog from "./dialogs/opsDialog";
 import NewopsDialog from "./dialogs/newopDialog";
 import LinkDialog from "./dialogs/linkDialog";
 import MarkerAddDialog from "./dialogs/markerAddDialog";
 import MultimaxButtonControl from "./dialogs/multimaxDialog";
-import { opPromise, updateOpPromise, uploadOpPromise } from "./server";
+import { updateOpPromise, uploadOpPromise } from "./server";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import AuthDialog from "./dialogs/authDialog";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -28,6 +28,7 @@ export default function(selectedOp) {
       const container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
       outerDiv.appendChild(container);
       this._modes = {};
+      this.container = container;
 
       this._addWasabeeButton(map, container);
       this._addOpsButton(map, container, outerDiv);
@@ -40,25 +41,8 @@ export default function(selectedOp) {
       return outerDiv;
     },
     _addWasabeeButton: function(map, container) {
-      let wasabeeButtonHandler = new WasabeeDialog(map);
-      let image = wasabeeButtonHandler.getIcon();
-      let type = wasabeeButtonHandler.type;
-      this._modes[type] = {};
-      this._modes[type].handler = wasabeeButtonHandler;
-      this._modes[type].button = this._createButton({
-        title: "Wasabee Status",
-        container: container,
-        buttonImage: image,
-        callback: wasabeeButtonHandler.enable,
-        context: wasabeeButtonHandler
-      });
-    },
-    _updateWasabeeButton: function() {
-      const wb = this._modes["wasabeeButton"]; // yuk hardcoded...
-      wb.button.innerHTML =
-        '<img src="' +
-        wb.handler.getIcon() +
-        '" style="vertical-align: middle;">';
+      const wb = new WasabeeButton(map, container);
+      this._modes[wb.type] = wb;
     },
     _addOpsButton: function(map, container, outerDiv) {
       let opsButtonHandler = new OpsDialog(map);
@@ -125,52 +109,8 @@ export default function(selectedOp) {
       outerDiv.appendChild(actionsContainer);
     },
     _addSyncButton: function(map, container) {
-      const tmp = {};
-      tmp.type = "download all ops";
-      let type = tmp.type;
-      this._modes[type] = {};
-      this._modes[type].handler = () => {
-        // Feature.prototype.addHooks.call(tmp);
-      };
-      this._modes[type].button = this._createButton({
-        title: "Download Available Operations",
-        container: container,
-        buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
-        callback: () => {
-          const so = window.plugin.wasabee.getSelectedOperation();
-          try {
-            const me = WasabeeMe.get(true); // force update of ops list
-            if (me === null) {
-              const ad = new AuthDialog();
-              ad.enable();
-            } else {
-              for (const op of me.Ops) {
-                opPromise(op.ID).then(
-                  function(newop) {
-                    if (newop != null) {
-                      newop.store();
-                      // if the op changed out beneath us, use the new
-                      if (newop.ID == so.ID) {
-                        window.plugin.wasabee.makeSelectedOperation(newop.ID);
-                      }
-                    }
-                  },
-                  function(err) {
-                    console.log(err);
-                    const ad = new AuthDialog();
-                    ad.enable();
-                  }
-                );
-              }
-              alert("Sync Complete");
-            }
-          } catch (e) {
-            // ad = new AuthDialog();
-            // ad.enable();
-            alert(e);
-          }
-        }
-      });
+      const sb = new SyncButton(map, container);
+      this._modes[sb.type] = sb;
     },
     _addUploadButton: function(map, container) {
       const tmp = {};
@@ -368,7 +308,11 @@ export default function(selectedOp) {
         $("#wasabee_uploadbutton").css("display", "none");
       }
       Wasabee.buttons._updateUploadButton();
-      Wasabee.buttons._updateWasabeeButton();
+      console.log(window.plugin.wasabee.buttons._modes);
+      for (const id in window.plugin.wasabee.buttons._modes) {
+        if (window.plugin.wasabee.buttons._modes[id].update)
+          window.plugin.wasabee.buttons._modes[id].update(this.container);
+      }
     }
   });
   if (typeof Wasabee.buttons === "undefined") {

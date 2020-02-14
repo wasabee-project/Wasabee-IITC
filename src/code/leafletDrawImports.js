@@ -366,3 +366,113 @@ export const Toolbar = L.Class.extend({
     );
   }
 });
+
+export const WButton = L.Class.extend({
+  statics: {
+    TYPE: "unextendedWButton"
+  },
+
+  initialize: function(map, container) {
+    if (!map) map = window.map;
+    this._map = map;
+
+    this.type = WButton.TYPE;
+    this.title = "Unextended Wasabee Button";
+    this.handler = new WButtonHandler(map);
+
+    this.button = this._createButton({
+      container: container,
+      // text: this._title,
+      // buttonImage: this.getIcon(),
+      callback: this.handler,
+      context: this
+      // className: ...,
+    });
+  },
+
+  update: function() {
+    console.log("WButton update called: " + this);
+  },
+
+  _createButton: function(options) {
+    const link = L.DomUtil.create(
+      "a",
+      options.className || "",
+      options.container
+    );
+    link.href = "#";
+    if (options.text) {
+      link.innerHTML = options.text;
+    }
+    if (options.buttonImage) {
+      $(link).append(
+        $("<img/>")
+          .prop("src", options.buttonImage)
+          .css("vertical-align", "middle")
+          .css("align", "center")
+      );
+    }
+    if (options.title) {
+      link.title = options.title;
+    }
+    L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
+      .on(link, "mousedown", L.DomEvent.stopPropagation)
+      .on(link, "dblclick", L.DomEvent.stopPropagation)
+      .on(link, "click", L.DomEvent.preventDefault)
+      .on(link, "click", options.callback, options.context);
+    return link;
+  },
+
+  _createActions: function(buttons) {
+    const container = L.DomUtil.create("ul", "leaflet-draw-actions");
+    for (const b of buttons) {
+      const li = L.DomUtil.create("li", "", container);
+      this._createButton({
+        title: b.title,
+        text: b.text,
+        container: li,
+        callback: b.callback,
+        context: b.context
+      });
+    }
+    return container;
+  }
+});
+
+export const WButtonHandler = L.Evented.extend({
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this._map = map;
+    this._enabled = false;
+    this.type = "unextended W Button Handler";
+    this._options = options;
+  },
+
+  enable: function() {
+    if (this._enabled) return;
+
+    L.Handler.prototype.enable.call(this);
+    this.fire("enabled", { handler: this.type });
+    this._map.fire("draw:drawstart", { layerType: this.type });
+  },
+
+  disable: function() {
+    if (!this._enabled) return;
+
+    L.Handler.prototype.disable.call(this);
+    this.fire("disabled", { handler: this.type });
+    this._map.fire("draw:drawstop", { layerType: this.type });
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    console.log("addHooks");
+    // do stuff
+  },
+
+  removeHooks: function() {
+    if (!this._map) return;
+    console.log("removeHooks");
+    // do stuff
+  }
+});

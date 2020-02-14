@@ -13,7 +13,7 @@ export default function() {
 export const uploadOpPromise = function(operation) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/api/v1/draw";
+    const url = `${SERVER_BASE}/api/v1/draw`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
@@ -52,7 +52,7 @@ export const uploadOpPromise = function(operation) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -63,7 +63,7 @@ export const uploadOpPromise = function(operation) {
 export const updateOpPromise = function(operation) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/api/v1/draw/" + operation.ID;
+    const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
     const req = new XMLHttpRequest();
     req.open("PUT", url);
     req.withCredentials = true;
@@ -85,7 +85,7 @@ export const updateOpPromise = function(operation) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -96,7 +96,7 @@ export const updateOpPromise = function(operation) {
 export const deleteOpPromise = function(opID) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/api/v1/draw/" + opID;
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
     req.open("DELETE", url);
     req.withCredentials = true;
@@ -117,7 +117,7 @@ export const deleteOpPromise = function(opID) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.send();
@@ -127,7 +127,7 @@ export const deleteOpPromise = function(opID) {
 export const teamPromise = function(teamid) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/api/v1/team/" + teamid;
+    const url = `${SERVER_BASE}/api/v1/team/${teamid}`;
     const req = new XMLHttpRequest();
     req.open("GET", url);
     req.withCredentials = true;
@@ -152,7 +152,7 @@ export const teamPromise = function(teamid) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.send();
@@ -162,7 +162,7 @@ export const teamPromise = function(teamid) {
 export const opPromise = function(opID) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/api/v1/draw/" + opID;
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
     const localop = window.plugin.wasabee.getOperationByID(opID);
 
@@ -198,7 +198,7 @@ export const opPromise = function(opID) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.send();
@@ -208,33 +208,32 @@ export const opPromise = function(opID) {
 export const mePromise = function() {
   const SERVER_BASE = GetWasabeeServer();
 
-  alert("mePromise pulling /me from: " + SERVER_BASE);
+  alert(`mePromise requesting ${SERVER_BASE}/me`);
 
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/me";
+    const url = `${SERVER_BASE}/me`;
     const req = new XMLHttpRequest();
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
-    req.setRequestHeader("If-Modified-Since", 0);
+    // req.setRequestHeader("If-Modified-Since", 0);
 
     req.onload = function() {
       switch (req.status) {
         case 200:
-          alert("mePromise got: " + req.response);
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject("mePromise 401: not logged in");
+          reject(`mePromise 401: not logged in`);
           break;
         default:
-          reject(req.status + ": " + req.statusText);
+          reject(`mePromise ${req.status}: ${req.statusText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.send();
@@ -251,7 +250,7 @@ export const agentPromise = function(GID, force) {
     if (!force && window.plugin.Wasabee._agentCache.has(GID)) {
       resolve(window.plugin.Wasabee._agentCache.get(GID));
     } else {
-      const url = SERVER_BASE + "/api/v1/agent/" + GID;
+      const url = `${SERVER_BASE}/api/v1/agent/${GID}`;
       const req = new XMLHttpRequest();
       req.open("GET", url);
       req.withCredentials = true;
@@ -272,7 +271,7 @@ export const agentPromise = function(GID, force) {
       };
 
       req.onerror = function() {
-        reject("Network Error: ${req.statusText}");
+        reject(`Network Error: ${req.statusText}`);
       };
 
       req.send();
@@ -283,8 +282,7 @@ export const agentPromise = function(GID, force) {
 export const assignMarkerPromise = function(opID, markerID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url =
-      SERVER_BASE + "/api/v1/draw/" + opID + "/marker/" + markerID + "/assign";
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/assign`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
@@ -305,7 +303,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     const fd = new FormData();
@@ -317,8 +315,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
 export const assignLinkPromise = function(opID, linkID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
-    const url =
-      SERVER_BASE + "/api/v1/draw/" + opID + "/link/" + linkID + "/assign";
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/assign`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
@@ -339,7 +336,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     const fd = new FormData();
@@ -352,7 +349,7 @@ export const SendAccessTokenAsync = function(accessToken) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise(function(resolve, reject) {
-    const url = SERVER_BASE + "/aptok";
+    const url = `${SERVER_BASE}/aptok`;
     const req = new XMLHttpRequest();
 
     req.open("POST", url);
@@ -373,7 +370,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json");
@@ -385,7 +382,7 @@ export const SetTeamState = function(teamID, state) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
-    const url = SERVER_BASE + "/api/v1/me/" + teamID + "?state=" + state;
+    const url = `${SERVER_BASE}/api/v1/me/${teamID}?state=${state}`;
     const req = new XMLHttpRequest();
 
     req.open("GET", url);
@@ -407,7 +404,7 @@ export const SetTeamState = function(teamID, state) {
     };
 
     req.onerror = function() {
-      reject("Network Error: ${req.statusText}");
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.send();

@@ -34,18 +34,20 @@ const AuthDialog = Feature.extend({
       "In order to use the server functionality, you must log in.<br/>";
     const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
-    const visitButton = buttonSet.appendChild(document.createElement("a"));
-    visitButton.innerHTML = "Log In";
-    const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-    if (isiOS) {
-      visitButton.addEventListener(
-        "click",
-        window.open(GetWasabeeServer()),
-        false
-      );
-    } else {
-      visitButton.addEventListener("click", () => this.gsapiAuth, false);
-    }
+
+    // const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    // if iOS do webview, otherwise gsapi
+    const gsapiButton = buttonSet.appendChild(document.createElement("a"));
+    gsapiButton.innerHTML = "Log In (gsapi)";
+    gsapiButton.addEventListener("click", () => this.gsapiAuth(this), false);
+
+    const webviewButton = buttonSet.appendChild(document.createElement("a"));
+    webviewButton.innerHTML = "Log In (webview)";
+    webviewButton.addEventListener(
+      "click",
+      () => window.open(GetWasabeeServer()),
+      false
+    );
 
     const changeServerButton = buttonSet.appendChild(
       document.createElement("a")
@@ -82,7 +84,7 @@ const AuthDialog = Feature.extend({
     });
   },
 
-  gsapiAuth: () => {
+  gsapiAuth: thisthing => {
     window.gapi.auth2.authorize(
       {
         // prompt: L.Browser.andorid ? "none" : "consent",
@@ -95,7 +97,7 @@ const AuthDialog = Feature.extend({
       },
       response => {
         if (response.error) {
-          this._dialog.dialog("close");
+          thisthing._dialog.dialog("close");
           const err =
             "error from authorize: " +
             response.error +
@@ -106,7 +108,7 @@ const AuthDialog = Feature.extend({
         }
         SendAccessTokenAsync(response.access_token).then(
           async () => {
-            this._dialog.dialog("close");
+            thisthing._dialog.dialog("close");
             // const me = WasabeeMe.get();
             // do this by hand to await it
             try {

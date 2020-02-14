@@ -50,10 +50,9 @@ export default class WasabeeMe {
       console.log("pulling /me from server");
       mePromise().then(
         function(nme) {
-          store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(nme));
-          alert("me.get got from server:" + JSON.stringify(nme));
-          // nme.store();
           me = nme;
+          store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
+          // alert("me.get got from server:" + JSON.stringify(nme));
         },
         function(err) {
           alert(err);
