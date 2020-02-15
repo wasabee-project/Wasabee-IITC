@@ -1,3 +1,7 @@
+import WasabeePortal from "./portal";
+import ConfirmDialog from "./dialogs/confirmDialog";
+import { targetPromise } from "./server";
+
 export default class WasabeeAgent {
   constructor() {
     this.id = null;
@@ -42,6 +46,36 @@ export default class WasabeeAgent {
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
     const sendTarget = content.appendChild(document.createElement("a"));
     sendTarget.innerHTML = "send target";
+    sendTarget.addEventListener(
+      "click",
+      () => {
+        const selectedPortal = WasabeePortal.getSelected();
+        if (!selectedPortal) {
+          alert("Select a portal to send");
+          return;
+        }
+
+        const f = selectedPortal.name;
+        const name = this.name;
+        const d = new ConfirmDialog();
+        d.setup(
+          "Send Target",
+          `Do you want to send ${f} target to ${name}?`,
+          () => {
+            targetPromise(this, selectedPortal).then(
+              function() {
+                alert("target sent");
+              },
+              function(reject) {
+                console.log(reject);
+              }
+            );
+          }
+        );
+        d.enable();
+      },
+      false
+    );
     return content;
   }
 

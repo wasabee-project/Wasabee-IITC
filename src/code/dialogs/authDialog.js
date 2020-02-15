@@ -113,7 +113,7 @@ const AuthDialog = Feature.extend({
             // but do this by hand to 'await' it
             try {
               const me = await mePromise();
-              alert("awaited :" + JSON.stringify(me));
+              // alert("awaited :" + JSON.stringify(me));
               store.set(
                 window.plugin.Wasabee.Constants.AGENT_INFO_KEY,
                 JSON.stringify(me)

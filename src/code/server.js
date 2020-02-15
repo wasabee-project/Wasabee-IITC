@@ -342,6 +342,42 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
     req.send(fd);
   });
 };
+export const targetPromise = function(agent, portal) {
+  const SERVER_BASE = GetWasabeeServer();
+  const gid = agent.gid;
+  const ll = portal.lat + "," + portal.lng;
+
+  return new Promise(function(resolve, reject) {
+    const url = `${SERVER_BASE}/api/v1/${gid}/assign/${ll}`;
+    const req = new XMLHttpRequest();
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(req.statusText);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    // const fd = new FormData();
+    // fd.append("agent", agentID);
+    //req.send(fd);
+    req.send();
+  });
+};
 
 export const SendAccessTokenAsync = function(accessToken) {
   const SERVER_BASE = GetWasabeeServer();
