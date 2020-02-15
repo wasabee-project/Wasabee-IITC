@@ -13,11 +13,17 @@ const fieldCoversPortal = ([a, b, field3], portal) => {
   const p = portal.getLatLng();
   const f3 = field3.getLatLng();
 
+  // greatCircleArcIntersect now takes either WasabeeLink or window.link format
+  // needs link.getLatLngs(); and to be an object we can cache in
+
+  const urp = new L.GeodesicPolyline([unreachableMapPoint, p]);
+  const lab = new L.GeodesicPolyline([a.latLng, b.latLng]);
+  const laf = new L.GeodesicPolyline([a.latLng, f3]);
+  const lfb = new L.GeodesicPolyline([f3, b.latLng]);
   let c = 0;
-  if (greatCircleArcIntersect([unreachableMapPoint, p], [a.latLng, b.latLng]))
-    c++;
-  if (greatCircleArcIntersect([unreachableMapPoint, p], [a.latLng, f3])) c++;
-  if (greatCircleArcIntersect([unreachableMapPoint, p], [f3, b.latLng])) c++;
+  if (greatCircleArcIntersect(urp, lab)) c++;
+  if (greatCircleArcIntersect(urp, laf)) c++;
+  if (greatCircleArcIntersect(urp, lfb)) c++;
 
   // console.log(a, b, field3, c);
   return c == 1;
