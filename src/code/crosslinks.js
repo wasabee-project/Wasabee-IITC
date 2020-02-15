@@ -4,6 +4,7 @@ import WasabeeLink from "./link";
 //*** CROSSLINK THINGS */
 const Wasabee = window.plugin.Wasabee;
 
+// takes WasabeeLink or L.geodesicPolyline format
 export const greatCircleArcIntersect = (existing, drawn) => {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
@@ -20,10 +21,13 @@ export const greatCircleArcIntersect = (existing, drawn) => {
 
   //Dimand: Lets fix the date line issue.
   //always work in the eastern hemisphere. so += 360
-  const a0 = existing[0];
-  const a1 = existing[1];
-  const b0 = drawn[0];
-  const b1 = drawn[1];
+
+  const eLL = existing.getLatLngs();
+  const dLL = drawn.getLatLngs();
+  const a0 = eLL[0];
+  const a1 = eLL[1];
+  const b0 = dLL[0];
+  const b1 = dLL[1];
 
   // zero length line tests
   if (a0.lat == a1.lat && a0.lng == a1.lng) {
@@ -113,81 +117,41 @@ export const greatCircleArcIntersect = (existing, drawn) => {
   // 2. calculate each line latitude at each point
   // 3. if latitudes change place between overlapping range, the lines cross
   // class to hold the pre-calculated maths for a geodesic line
-  // TODO: move this outside this function, so it can be pre-calculated once for each line we test
-  class GeodesicLine {
-    constructor(start, end) {
-      var d2r = Math.PI / 180.0;
-      var r2d = 180.0 / Math.PI; //eslint-disable-line
-      // maths based on http://williams.best.vwh.net/avform.htm#Int
-      if (start.lng == end.lng) {
-        throw "Error: cannot calculate latitude for meridians";
-      }
-      // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
-      this.lat1 = start.lat * d2r;
-      this.lat2 = end.lat * d2r;
-      this.lng1 = start.lng * d2r;
-      this.lng2 = end.lng * d2r;
-      var dLng = this.lng1 - this.lng2;
-      var sinLat1 = Math.sin(this.lat1);
-      var sinLat2 = Math.sin(this.lat2);
-      var cosLat1 = Math.cos(this.lat1);
-      var cosLat2 = Math.cos(this.lat2);
-      this.sinLat1CosLat2 = sinLat1 * cosLat2;
-      this.sinLat2CosLat1 = sinLat2 * cosLat1;
-      this.cosLat1CosLat2SinDLng = cosLat1 * cosLat2 * Math.sin(dLng);
-    }
-
-    isMeridian() {
-      return this.lng1 == this.lng2;
-    }
-
-    latAtLng(lng) {
-      lng = (lng * Math.PI) / 180; //to radians
-      var lat;
-      // if we're testing the start/end point, return that directly rather than calculating
-      // 1. this may be fractionally faster, no complex maths
-      // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
-      if (lng == this.lng1) {
-        lat = this.lat1;
-      } else if (lng == this.lng2) {
-        lat = this.lat2;
-      } else {
-        lat = Math.atan(
-          (this.sinLat1CosLat2 * Math.sin(lng - this.lng2) -
-            this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) /
-            this.cosLat1CosLat2SinDLng
-        );
-      }
-      return (lat * 180) / Math.PI; // return value in degrees
-    }
-  }
 
   // calculate the longitude of the overlapping region
-  var leftLng = Math.max(Math.min(a0.lng, a1.lng), Math.min(b0.lng, b1.lng));
-  var rightLng = Math.min(Math.max(a0.lng, a1.lng), Math.max(b0.lng, b1.lng));
+  const leftLng = Math.max(Math.min(a0.lng, a1.lng), Math.min(b0.lng, b1.lng));
+  const rightLng = Math.min(Math.max(a0.lng, a1.lng), Math.max(b0.lng, b1.lng));
   //console.log(leftLng);
   //console.log(rightLng);
 
   // calculate the latitudes for each line at left + right longitudes
   // NOTE: need a special case for meridians - as GeodesicLine.latAtLng method is invalid in that case
-  var aLeftLat, aRightLat;
+  let aLeftLat, aRightLat;
   if (a0.lng == a1.lng) {
     // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
     aLeftLat = a0.lat;
     aRightLat = a1.lat;
   } else {
-    var aGeo = new GeodesicLine(a0, a1);
+    let aGeo = existing._crosslinksGL;
+    if (!aGeo) {
+      aGeo = new GeodesicLine(a0, a1);
+      existing._crosslinksGL = aGeo;
+    }
     aLeftLat = aGeo.latAtLng(leftLng);
     aRightLat = aGeo.latAtLng(rightLng);
   }
 
-  var bLeftLat, bRightLat;
+  let bLeftLat, bRightLat;
   if (b0.lng == b1.lng) {
     // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
     bLeftLat = b0.lat;
     bRightLat = b1.lat;
   } else {
-    var bGeo = new GeodesicLine(b0, b1);
+    let bGeo = drawn._crosslinksGL;
+    if (!bGeo) {
+      bGeo = new GeodesicLine(b0, b1);
+      drawn._crosslinksGL = bGeo;
+    }
     bLeftLat = bGeo.latAtLng(leftLng);
     bRightLat = bGeo.latAtLng(rightLng);
   }
@@ -210,12 +174,7 @@ export const greatCircleArcIntersect = (existing, drawn) => {
 };
 
 const testPolyLine = (wasabeeLink, realLink, operation) => {
-  if (
-    greatCircleArcIntersect(
-      realLink.getLatLngs(),
-      wasabeeLink.getLatLngs(operation)
-    )
-  ) {
+  if (greatCircleArcIntersect(realLink, wasabeeLink)) {
     for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
@@ -325,11 +284,19 @@ const testForDeletedLinks = operation => {
   });
 };
 
+const onMapDataRefreshStart = () => {
+  // const operation = window.plugin.wasabee.getSelectedOperation();
+  // disable per-link-add checking, do it in bulk at end
+  window.removeHook("linkAdded", onLinkAdded);
+};
+
 const onMapDataRefreshEnd = () => {
   window.plugin.wasabee.crossLinkLayers.bringToFront();
   const operation = window.plugin.wasabee.getSelectedOperation();
 
+  checkAllLinks(operation);
   testForDeletedLinks(operation);
+  window.addHook("linkAdded", onLinkAdded);
 };
 
 export const initCrossLinks = () => {
@@ -356,8 +323,56 @@ export const initCrossLinks = () => {
     }
   });
 
-  window.addHook("linkAdded", onLinkAdded);
+  // window.addHook("linkAdded", onLinkAdded);
+  window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
 };
 
+class GeodesicLine {
+  constructor(start, end) {
+    let d2r = Math.PI / 180.0;
+    // let r2d = 180.0 / Math.PI; //eslint-disable-line
+    // maths based on http://williams.best.vwh.net/avform.htm#Int
+    if (start.lng == end.lng) {
+      throw "Error: cannot calculate latitude for meridians";
+    }
+    // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
+    this.lat1 = start.lat * d2r;
+    this.lat2 = end.lat * d2r;
+    this.lng1 = start.lng * d2r;
+    this.lng2 = end.lng * d2r;
+    let dLng = this.lng1 - this.lng2;
+    let sinLat1 = Math.sin(this.lat1);
+    let sinLat2 = Math.sin(this.lat2);
+    let cosLat1 = Math.cos(this.lat1);
+    let cosLat2 = Math.cos(this.lat2);
+    this.sinLat1CosLat2 = sinLat1 * cosLat2;
+    this.sinLat2CosLat1 = sinLat2 * cosLat1;
+    this.cosLat1CosLat2SinDLng = cosLat1 * cosLat2 * Math.sin(dLng);
+  }
+
+  isMeridian() {
+    return this.lng1 == this.lng2;
+  }
+
+  latAtLng(lng) {
+    lng = (lng * Math.PI) / 180; //to radians
+    let lat;
+    // if we're testing the start/end point, return that directly rather than calculating
+    // 1. this may be fractionally faster, no complex maths
+    // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
+    if (lng == this.lng1) {
+      lat = this.lat1;
+    } else if (lng == this.lng2) {
+      lat = this.lat2;
+    } else {
+      lat = Math.atan(
+        (this.sinLat1CosLat2 * Math.sin(lng - this.lng2) -
+          this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) /
+          this.cosLat1CosLat2SinDLng
+      );
+    }
+    return (lat * 180) / Math.PI; // return value in degrees
+  }
+}
 //*** END CROSSLINK THINGS */'

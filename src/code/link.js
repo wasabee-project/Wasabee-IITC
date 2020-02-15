@@ -61,12 +61,15 @@ export default class WasabeeLink {
   }
 
   getLatLngs(operation) {
+    // for crosslinks.js
+    if (!operation) operation = window.plugin.wasabee.getSelectedOperation();
+
     const fromPortal = operation.getPortal(this.fromPortalId);
     if (!fromPortal)
-      console.log("op missing from portal: " + JSON.stringify(this)); // NUKE ME
+      console.log("op missing 'from' portal: " + JSON.stringify(this)); // NUKE ME
     const toPortal = operation.getPortal(this.toPortalId);
     if (!fromPortal)
-      console.log("op missing to portal: " + JSON.stringify(this)); // NUKE ME
+      console.log("op missing 'to' portal: " + JSON.stringify(this)); // NUKE ME
     if (fromPortal != null && toPortal != null) {
       const returnArray = Array();
       returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));

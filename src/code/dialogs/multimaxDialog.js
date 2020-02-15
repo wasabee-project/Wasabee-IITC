@@ -156,8 +156,7 @@ const MultimaxDialog = Feature.extend({
       return;
     }
 
-    const x = sequence.length;
-    alert(`drawing ${x} layers: this may take a while`);
+    this._operation.startBatchMode(); // bypass save and crosslinks checks
     this._operation.addLink(A, B, "multimax base");
 
     for (const node of sequence) {
@@ -169,6 +168,7 @@ const MultimaxDialog = Feature.extend({
       this._operation.addLink(p, A, "multimax generated link");
       this._operation.addLink(p, B, "multimax generated link");
     }
+    this._operation.endBatchMode(); // save and run crosslinks
   },
 
   _isOnScreen: function(ll, bounds) {

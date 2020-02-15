@@ -362,6 +362,11 @@ export default class WasabeeOp {
     this.addAnchor(newPortal);
     const linksToRemove = [];
     for (const l of this.links) {
+      // purge any crosslink check cache
+      if (l._crosslinksGL) {
+        delete l._crosslinksGL;
+      }
+
       if (l.fromPortalId == originalPortal.id) {
         if (l.toPortalId === newPortal.id) {
           console.log(
