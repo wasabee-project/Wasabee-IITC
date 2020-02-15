@@ -123,7 +123,7 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update();
-    window.runHooks("wasabeeCrosslinks", this);
+    this.runCrosslinks();
   }
 
   removeMarker(marker) {
@@ -132,7 +132,7 @@ export default class WasabeeOp {
     });
     this.cleanPortalList();
     this.update();
-    window.runHooks("wasabeeCrosslinks", this);
+    this.runCrosslinks();
   }
 
   setMarkerComment(marker, comment) {
@@ -165,7 +165,7 @@ export default class WasabeeOp {
     this.cleanPortalList();
     this.cleanAnchorList();
     this.update();
-    window.runHooks("wasabeeCrosslinks", this);
+    this.runCrosslinks();
   }
 
   reverseLink(startPortalID, endPortalID) {
@@ -288,7 +288,7 @@ export default class WasabeeOp {
     if (!this.containsLink(link)) {
       this.links.push(link);
       this.update();
-      window.runHooks("wasabeeCrosslinks", this);
+      this.runCrosslinks();
     } else {
       console.log(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
@@ -395,7 +395,7 @@ export default class WasabeeOp {
     // Remove the invalid links from the array (after we are done iterating through it)
     this.links = this.links.filter(element => !linksToRemove.includes(element));
     this.update();
-    window.runHooks("wasabeeCrosslinks", this);
+    this.runCrosslinks();
   }
 
   addMarker(markerType, portal, comment) {
@@ -405,7 +405,7 @@ export default class WasabeeOp {
         const marker = new WasabeeMarker(markerType, portal.id, comment);
         this.markers.push(marker);
         this.update();
-        window.runHooks("wasabeeCrosslinks", this);
+        this.runCrosslinks();
       } else {
         alert("This portal already has a marker. Chose a different portal.");
       }
@@ -441,8 +441,24 @@ export default class WasabeeOp {
 
   // call update to save the op and redraw everything on the map
   update() {
+    if (this._batchmode) return;
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
+  }
+
+  runCrosslinks() {
+    if (this._batchmode) return;
+    window.runHooks("wasabeeCrosslinks", this);
+  }
+
+  startBatchMode() {
+    this._batchmode = true;
+  }
+
+  endBatchMode() {
+    this._batchmode = false;
+    this.update();
+    this.runCrosslinks();
   }
 
   convertLinksToObjs(links) {
