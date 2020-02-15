@@ -74,10 +74,6 @@ const WasabeeDialog = Feature.extend({
         html: html,
         dialogClass: "wasabee-dialog-mustauth",
         closeCallback: function() {
-          window.runHooks(
-            "wasabeeUIUpdate",
-            window.plugin.wasabee.getSelectedOperation()
-          );
           wbHandler.disable();
           delete wbHandler._dialog;
         },

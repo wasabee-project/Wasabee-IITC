@@ -23,17 +23,17 @@ const LinkListDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
+    window.addHook("wasabeeUIUpdate", this.updateLinkList);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.removeHook("wasabeeUIUpdate", this.updateLinkList);
   },
 
   _displayDialog: function() {
     if (!this._map) return;
-    const callback = newOpData => updateLinkList(newOpData, this);
-    window.addHook("wasabeeUIUpdate", callback);
 
     this._dialog = window.dialog({
       title: this._portal.name + ": Links",
@@ -42,7 +42,6 @@ const LinkListDialog = Feature.extend({
       html: this._table.table,
       dialogClass: "wasabee-dialog wasabee-dialog-linklist",
       closeCallback: () => {
-        window.removeHook("wasabeeUIUpdate", callback);
         this.disable();
         delete this._dialog;
       },
@@ -242,16 +241,16 @@ const LinkListDialog = Feature.extend({
       },
       false
     );
+  },
+
+  updateLinkList: function(operation) {
+    if (this._operation.ID == operation.ID) {
+      this._table.items = operation.getLinkListFromPortal(this._portal);
+    } else {
+      // the selected operation changed, just bail
+      this._dialog.dialog("close");
+    }
   }
 });
-
-const updateLinkList = (operation, ll) => {
-  if (ll._operation.ID == operation.ID) {
-    ll._table.items = operation.getLinkListFromPortal(ll._portal);
-  } else {
-    // the selected operation changed, just bail
-    ll._dialog.dialog("close");
-  }
-};
 
 export default LinkListDialog;

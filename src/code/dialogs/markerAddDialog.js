@@ -1,6 +1,5 @@
 import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
-import MarkerList from "./markerList";
 
 const MarkerAddDialog = Feature.extend({
   statics: {
@@ -59,16 +58,7 @@ const MarkerAddDialog = Feature.extend({
         mHandler.disable();
         delete mHandler._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.markerButton,
-      buttons: {
-        "Operation Marker List": () => mHandler._listDialog(mHandler._operation)
-      }
-    });
-    this._dialog.dialog("option", "buttons", {
-      "Operation Marker List": () => {
-        const ml = new MarkerList();
-        ml.enable();
-      }
+      id: window.plugin.Wasabee.static.dialogNames.markerButton
     });
   },
 

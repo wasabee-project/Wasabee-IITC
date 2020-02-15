@@ -19,16 +19,18 @@ const MarkerList = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = window.plugin.wasabee.getSelectedOperation();
+    window.addHook("wasabeeUIUpdate", markerListUpdate);
+    window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("wasabeeUIUpdate", markerListUpdate);
   },
 
   _displayDialog: function() {
-    window.addHook("wasabeeUIUpdate", markerListUpdate);
-    window.addHook("portalAdded", listenForAddedPortals);
     for (const f of this._operation.fakedPortals) {
       window.portalDetail.request(f.id);
     }
@@ -43,9 +45,9 @@ const MarkerList = Feature.extend({
       },
       html: getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog-alerts",
-      closeCallback: function() {
-        window.removeHook("portalAdded", listenForAddedPortals);
-        window.removeHook("wasabeeUIUpdate", markerListUpdate);
+      closeCallback: () => {
+        this.disable();
+        delete this._listDialogData;
       },
       id: window.plugin.Wasabee.static.dialogNames.markerList
     });

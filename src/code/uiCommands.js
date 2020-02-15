@@ -69,5 +69,17 @@ export default {
     const lld = new LinkListDialog();
     lld.setup(operation, portal);
     lld.enable();
+  },
+  listenForAddedPortals: newPortal => {
+    if (!newPortal.portal.options.data.title) return;
+
+    const op = window.plugin.wasabee.getSelectedOperation();
+
+    for (const faked of op.fakedPortals) {
+      if (faked.id == newPortal.portal.options.guid) {
+        faked.name = newPortal.portal.options.data.title;
+        op.update();
+      }
+    }
   }
 };

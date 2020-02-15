@@ -1,5 +1,4 @@
 import { Feature } from "../leafletDrawImports";
-import WasabeeMe from "../me";
 import { deleteOpPromise } from "../server";
 import UiCommands from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
@@ -201,7 +200,7 @@ const OpsDialog = Feature.extend({
           "Confirm Delete: " + operation.name,
           "Are you sure you want to delete " + operation.name + "?",
           () => {
-            if (operation.IsOwnedOp(WasabeeMe.get())) {
+            if (operation.IsOwnedOp()) {
               deleteOpPromise(operation.ID).then(
                 function() {
                   console.log("delete from server successful");

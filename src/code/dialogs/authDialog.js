@@ -75,11 +75,10 @@ const AuthDialog = Feature.extend({
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: () => {
+      closeCallback: async () => {
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
-        if (WasabeeMe.isLoggedIn()) {
-          window.runHooks("wasabeeUIUpdate", selectedOperation);
-        }
+        await WasabeeMe.get(); // check one more time, free if logged in -- for webview
+        window.runHooks("wasabeeUIUpdate", selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
     });

@@ -222,10 +222,10 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject(`mePromise 401: not logged in`);
+          reject(`${req.status}: not logged in`);
           break;
         default:
-          reject(`mePromise ${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -342,13 +342,14 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
     req.send(fd);
   });
 };
+
 export const targetPromise = function(agent, portal) {
   const SERVER_BASE = GetWasabeeServer();
-  const gid = agent.gid;
   const ll = portal.lat + "," + portal.lng;
+  const id = agent.id;
 
   return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/${gid}/assign/${ll}`;
+    const url = `${SERVER_BASE}/api/v1/agent/${id}/target`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
@@ -358,9 +359,6 @@ export const targetPromise = function(agent, portal) {
       switch (req.status) {
         case 200:
           resolve(true);
-          break;
-        case 401:
-          reject("not logged in");
           break;
         default:
           reject(req.statusText);
@@ -372,10 +370,11 @@ export const targetPromise = function(agent, portal) {
       reject(`Network Error: ${req.statusText}`);
     };
 
-    // const fd = new FormData();
-    // fd.append("agent", agentID);
-    //req.send(fd);
-    req.send();
+    const fd = new FormData();
+    fd.append("id", id);
+    fd.append("portal", portal.name);
+    fd.append("ll", ll);
+    req.send(fd);
   });
 };
 

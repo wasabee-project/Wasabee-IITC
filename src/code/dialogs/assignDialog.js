@@ -41,7 +41,6 @@ const AssignDialog = Feature.extend({
       html: this._html,
       dialogClass: "wasabee-dialog",
       closeCallback: () => {
-        // window.runHooks( "wasabeeUIUpdate", window.plugin.wasabee.getSelectedOperation());
         assignDialog.disable();
         delete assignDialog._dialog;
       },

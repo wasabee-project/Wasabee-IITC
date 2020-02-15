@@ -4,6 +4,7 @@ import BlockersList from "../dialogs/blockersList";
 import MarkerList from "../dialogs/markerList";
 import OperationChecklistDialog from "../dialogs/operationChecklistDialog";
 import ExportDialog from "../dialogs/exportDialog";
+import KeysList from "../dialogs/keysList";
 
 const OpsButton = WButton.extend({
   statics: {
@@ -66,6 +67,16 @@ const OpsButton = WButton.extend({
           this.disable();
           const bl = new BlockersList(map);
           bl.enable();
+        },
+        context: context
+      },
+      {
+        title: "Keys",
+        text: "Keys",
+        callback: () => {
+          this.disable();
+          const kl = new KeysList(map);
+          kl.enable();
         },
         context: context
       },

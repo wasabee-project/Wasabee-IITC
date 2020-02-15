@@ -39,7 +39,8 @@ Wasabee.static = {
     importDialog: "wasabee-import",
     operationChecklist: "wasabee-operation-checklist",
     blockerList: "wasabee-blockerlist",
-    exportDialog: "wasabee-export"
+    exportDialog: "wasabee-export",
+    keysList: "wasabee-keys"
   }
   // Other static data, like: LocalStorage keys, encoded images, texts etc.
 };

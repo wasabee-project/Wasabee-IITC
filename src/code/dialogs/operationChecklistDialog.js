@@ -4,6 +4,7 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
+import UiCommands from "../uiCommands";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {
@@ -20,28 +21,27 @@ const OperationChecklistDialog = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = window.plugin.wasabee.getSelectedOperation();
+    window.addHook("wasabeeUIUpdate", this.checklistUpdate);
+    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
+
+    for (const f of this._operation.fakedPortals) {
+      window.portalDetail.request(f.id);
+    }
+
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.removeHook("wasabeeUIUpdate", this.checklistUpdate);
+    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
   },
 
   _displayDialog: function() {
-    const dd = this;
     this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
-    // use () => to inherit "this" context, use var to make sure the removeHook gets the same one
-    const callback = newOpData => this.checklistUpdate(newOpData);
-    window.addHook("wasabeeUIUpdate", callback);
-
-    window.addHook("portalAdded", listenForAddedPortals);
-    for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
-    }
-
     this._listDialogData = window.dialog({
-      title: "Operation Checklist: " + this._operation.name,
+      title: "Operation Checklist",
       width: "auto",
       height: "auto",
       position: {
@@ -51,17 +51,16 @@ const OperationChecklistDialog = Feature.extend({
       html: this.sortable.table,
       dialogClass: "wasabee-dialog",
       closeCallback: () => {
-        window.removeHook("wasabeeUIUpdate", callback);
-        window.removeHook("portalAdded", listenForAddedPortals);
-        dd.disable();
-        delete dd._listDialogData;
+        this.disable();
+        delete this._listDialogData;
       },
       id: window.plugin.Wasabee.static.dialogNames.operationChecklist
     });
   },
 
-  // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   checklistUpdate: function(newOpData) {
+    console.log("checklistUpdate");
+    console.log(this);
     const id =
       "dialog-" + window.plugin.Wasabee.static.dialogNames.operationChecklist;
     if (window.DIALOGS[id]) {
@@ -191,18 +190,4 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   content.sortAsc = !sortAsc; // I don't know why this flips
   content.items = allThings;
   return content;
-};
-
-// yes, each dialog needs its own definition otherwise closing one dialog clears the callbacks for other open dialogs
-const listenForAddedPortals = newPortal => {
-  if (!newPortal.portal.options.data.title) return;
-
-  const op = window.plugin.wasabee.getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    if (faked.id == newPortal.portal.options.guid) {
-      faked.name = newPortal.portal.options.data.title;
-      op.update();
-    }
-  }
 };

@@ -28,6 +28,7 @@ export default class WasabeeOp {
     this.stored = null;
     this.localchanged = true;
     this.blockers = Array();
+    this.keysonhand = Array();
   }
 
   store() {
@@ -441,6 +442,7 @@ export default class WasabeeOp {
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
+    this.blockers = Array();
     this.update();
   }
 
@@ -479,6 +481,7 @@ export default class WasabeeOp {
   }
 
   convertBlockersToObjs(links) {
+    if (!links || links.length == 0) return;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -538,40 +541,52 @@ export default class WasabeeOp {
     const maxlng = Math.max.apply(null, lngs);
     const min = L.latLng(minlat, minlng);
     const max = L.latLng(maxlat, maxlng);
-    const bounds = L.latLngBounds(min, max);
-    return bounds;
+    return L.latLngBounds(min, max);
   }
 
   IsWritableOp() {
+    // no teams == not sent to server, local-only ops are always editable
+    if (this.teamlist.length != 0) {
+      return true;
+    }
+
+    // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) {
       return false;
     }
 
+    // if current user is op creator, it is always writable
     const me = WasabeeMe.get();
     if (me.GoogleID == this.creator) {
       return true;
     }
 
+    // if the user has no teams enabled, it can't be writable
     if (me.Teams == undefined) {
       return false;
     }
 
+    // if on a write-allowed team, is writable
     for (const t of this.teamlist) {
       if (t.role == "write" && me.Teams.includes(t.ID)) {
         return true;
       }
     }
+
+    // not on a write-access team, must not be
     return false;
   }
 
   IsServerOp() {
+    // no teams means local-only
     if (this.teamlist.length != 0) {
       return true;
     }
     return false;
   }
 
-  IsOwnedOp(me) {
+  IsOwnedOp() {
+    const me = WasabeeMe.get();
     if (me == null) {
       return false;
     }

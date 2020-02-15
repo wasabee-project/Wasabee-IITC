@@ -16,11 +16,15 @@ const BlockerList = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
+    window.addHook("wasabeeUIUpdate", this.blockerlistUpdate);
+    window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.removeHook("wasabeeUIUpdate", this.blockerlistUpdate);
+    window.removeHook("portalAdded", listenForAddedPortals);
   },
 
   _displayDialog: function() {
@@ -29,12 +33,6 @@ const BlockerList = Feature.extend({
 
     this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
-    // use () => to inherit "this" context, use var to make sure the removeHook gets the same one
-    const callback = newOpData => this.blockerlistUpdate(newOpData);
-
-    window.addHook("wasabeeUIUpdate", callback);
-
-    window.addHook("portalAdded", listenForAddedPortals);
     for (const f of this._operation.fakedPortals) {
       window.portalDetail.request(f.id);
     }
@@ -67,8 +65,6 @@ const BlockerList = Feature.extend({
         }
       },
       closeCallback: () => {
-        window.removeHook("wasabeeUIUpdate", callback);
-        window.removeHook("portalAdded", listenForAddedPortals);
         blockerList.disable();
         delete blockerList._dialog;
       },
