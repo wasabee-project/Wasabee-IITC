@@ -152,25 +152,23 @@ const MultimaxDialog = Feature.extend({
     // Calculate the multimax
     const sequence = multimax(A, B, portalsOnScreen);
     if (!Array.isArray(sequence) || !sequence.length) {
-      alert("No portals on screen!");
+      alert("No layers found");
       return;
     }
+
+    const x = sequence.length;
+    alert(`drawing ${x} layers: this may take a while`);
     this._operation.addLink(A, B, "multimax base");
 
-    console.log(sequence);
-
-    sequence.forEach(node => {
-      const p = node.getLatLng();
-      if (typeof p["lat"] == "number") {
-        p["lat"] = p["lat"].toString();
-        p["lng"] = p["lng"].toString();
+    for (const node of sequence) {
+      let p = WasabeePortal.get(node.options.guid);
+      if (!p) {
+        const ll = node.getLatLng();
+        p = WasabeePortal.fake(ll.lat, ll.lng, node.options.guid);
       }
-      p["name"] = node.options.data.title;
-      p["id"] = node.options.guid;
       this._operation.addLink(p, A, "multimax generated link");
       this._operation.addLink(p, B, "multimax generated link");
-    });
-    this._operation.update();
+    }
   },
 
   _isOnScreen: function(ll, bounds) {

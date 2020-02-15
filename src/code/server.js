@@ -208,15 +208,13 @@ export const opPromise = function(opID) {
 export const mePromise = function() {
   const SERVER_BASE = GetWasabeeServer();
 
-  alert(`mePromise requesting ${SERVER_BASE}/me`);
-
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/me`;
     const req = new XMLHttpRequest();
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
-    // req.setRequestHeader("If-Modified-Since", 0);
+    // req.setRequestHeader("If-Modified-Since", 0); // helps in some cases, breaks others
 
     req.onload = function() {
       switch (req.status) {

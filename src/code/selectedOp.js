@@ -79,12 +79,11 @@ export default function() {
         console.log("getOperationByID: no such op in local store: " + opID);
       } else {
         // we can pass v directly, but this catches if the json is malformed
-        const o = JSON.parse(v);
-        op = WasabeeOp.create(o);
+        op = WasabeeOp.create(JSON.parse(v));
       }
     } catch (e) {
       console.log(e);
-      alert(e);
+      alert(JSON.stringify(e));
     }
     return op;
   };

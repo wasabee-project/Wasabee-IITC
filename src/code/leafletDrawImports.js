@@ -470,6 +470,7 @@ export const WButton = L.Class.extend({
         callback: b.callback,
         context: b.context
       });
+      li.style.setProperty("width", "auto", "important");
     }
     return container;
   },

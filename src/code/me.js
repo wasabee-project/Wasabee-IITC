@@ -52,13 +52,12 @@ export default class WasabeeMe {
         function(nme) {
           me = nme;
           store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
-          // alert("me.get got from server:" + JSON.stringify(nme));
         },
         function(err) {
-          alert(err);
           console.log(err);
           store.remove(Wasabee.Constants.AGENT_INFO_KEY);
           me = null;
+          alert(err);
         }
       );
     }
