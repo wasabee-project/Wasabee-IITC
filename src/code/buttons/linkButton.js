@@ -25,7 +25,7 @@ const LinkButton = WButton.extend({
       context: context
     });
 
-    this.actionsContainer = this._createActions([
+    this.actionsContainer = this._createSubActions([
       {
         title: "Add Links Dialog",
         text: "Add Link",

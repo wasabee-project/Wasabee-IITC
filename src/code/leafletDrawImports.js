@@ -470,7 +470,23 @@ export const WButton = L.Class.extend({
         callback: b.callback,
         context: b.context
       });
+    }
+    return container;
+  },
+
+  _createSubActions: function(buttons) {
+    const container = L.DomUtil.create("ul", "leaflet-draw-actions");
+    for (const b of buttons) {
+      const li = L.DomUtil.create("li", "", container);
+      this._createButton({
+        title: b.title,
+        text: b.text,
+        container: li,
+        callback: b.callback,
+        context: b.context
+      });
       li.style.setProperty("width", "auto", "important");
+      li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
   },

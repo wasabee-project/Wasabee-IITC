@@ -469,6 +469,7 @@ export default class WasabeeOp {
   }
 
   convertLinksToObjs(links) {
+    if (!links || links.length == 0) return;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -494,6 +495,7 @@ export default class WasabeeOp {
   }
 
   convertMarkersToObjs(markers) {
+    if (!markers || markers.length == 0) return;
     const tmpMarkers = new Array();
     if (markers) {
       for (const m of markers) {
@@ -508,6 +510,7 @@ export default class WasabeeOp {
   }
 
   convertPortalsToObjs(portals) {
+    if (!portals || portals.length == 0) return;
     const tmpPortals = Array();
     for (const p of portals) {
       if (p instanceof WasabeePortal) {
@@ -529,6 +532,7 @@ export default class WasabeeOp {
 
   // minimum bounds rectangle
   mbr() {
+    if (!this.opportals || this.opportals.length == 0) return null;
     const lats = [];
     const lngs = [];
     for (const a of this.opportals) {
@@ -546,7 +550,7 @@ export default class WasabeeOp {
 
   IsWritableOp() {
     // no teams == not sent to server, local-only ops are always editable
-    if (this.teamlist.length != 0) {
+    if (!this.teamlist || this.teamlist.length != 0) {
       return true;
     }
 

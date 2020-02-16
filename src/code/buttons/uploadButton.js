@@ -23,12 +23,12 @@ const UploadButton = WButton.extend({
       buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
       context: this,
       callback: () => {
-        if (this._operation.isServerOp()) {
+        if (this._operation.IsServerOp()) {
           updateOpPromise(this._operation).then(
             function(resolve) {
               console.log(`server accepted the update: ${resolve}`);
               alert("Update Successful");
-              window.runHooks("wasabeeUIUpdate", this._operation);
+              // window.runHooks("wasabeeUIUpdate", this._operation);
             },
             function(reject) {
               console.log(reject);

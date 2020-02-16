@@ -115,6 +115,25 @@ const getListDialogContent = operation => {
     keys.push(k);
   }
 
+  for (const p of operation.markers.filter(function(marker) {
+    return marker.type == window.plugin.wasabee.Constants.MARKER_TYPE_KEY;
+  })) {
+    const k = {};
+    k.id = p.portalId;
+    k.Required = "[open request]";
+    k.onHand = 0;
+
+    const thesekeys = operation.keysonhand.filter(function(keys) {
+      return keys.portalId == k.id;
+    });
+    if (thesekeys && thesekeys.length > 0) {
+      for (const t of thesekeys) {
+        k.onHand += t.onhand;
+      }
+    }
+    keys.push(k);
+  }
+
   sortable.sortBy = 0;
   sortable.items = keys;
   return sortable;

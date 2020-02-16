@@ -29,7 +29,7 @@ const OpsButton = WButton.extend({
       context: context
     });
 
-    this.actionsContainer = this._createActions([
+    this.actionsContainer = this._createSubActions([
       {
         title: "Show Ops Menu",
         text: "Ops",

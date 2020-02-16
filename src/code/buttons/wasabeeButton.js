@@ -107,7 +107,7 @@ const WasabeeButton = WButton.extend({
     } else {
       tmp = [this._teamAction];
     }
-    return this._createActions(tmp.concat(this._alwaysActions));
+    return this._createSubActions(tmp.concat(this._alwaysActions));
   },
 
   Wupdate: function() {
