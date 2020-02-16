@@ -23,13 +23,19 @@ const LinkListDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    window.addHook("wasabeeUIUpdate", this.updateLinkList);
+    const context = this;
+    window.addHook("wasabeeUIUpdate", newOpData => {
+      context.updateLinkList(newOpData);
+    });
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this.updateLinkList);
+    const context = this;
+    window.removeHook("wasabeeUIUpdate", newOpData => {
+      context.updateLinkList(newOpData);
+    });
   },
 
   _displayDialog: function() {
@@ -244,6 +250,7 @@ const LinkListDialog = Feature.extend({
   },
 
   updateLinkList: function(operation) {
+    if (!this._enabled) return;
     if (this._operation.ID == operation.ID) {
       this._table.items = operation.getLinkListFromPortal(this._portal);
     } else {

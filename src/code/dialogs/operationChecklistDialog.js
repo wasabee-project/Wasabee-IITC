@@ -17,11 +17,24 @@ const OperationChecklistDialog = Feature.extend({
     Feature.prototype.initialize.call(this, map, options);
   },
 
+  // this.checklistUpdate + function() == undefined this
+  // this.checklistUpdate + () => == undefined this
+  // checklistUpdate + function() == undefined this
+  // checklistUpdate + () => == undefined this
+  // () => { checklistUpdate + function == undefined this
+  // () => { checklistUpdate + () => == undefined this
+  // context.checklistUp + function() == undefined this
+  // context.checklistUp + () => == undefined this
+  // () => { context.checklistUp + () => == undefined this
+  // () => { context.checklistUp + function() == works, callback lingers
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
+    const context = this;
     this._operation = window.plugin.wasabee.getSelectedOperation();
-    window.addHook("wasabeeUIUpdate", this.checklistUpdate);
+    window.addHook("wasabeeUIUpdate", newOpData => {
+      context.checklistUpdate(newOpData);
+    });
     window.addHook("portalAdded", UiCommands.listenForAddedPortals);
 
     for (const f of this._operation.fakedPortals) {
@@ -33,7 +46,10 @@ const OperationChecklistDialog = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this.checklistUpdate);
+    const context = this;
+    window.removeHook("wasabeeUIUpdate", newOpData => {
+      context.checklistUpdate(newOpData);
+    });
     window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
   },
 
@@ -59,8 +75,9 @@ const OperationChecklistDialog = Feature.extend({
   },
 
   checklistUpdate: function(newOpData) {
-    console.log("checklistUpdate");
-    console.log(this);
+    console.log("starting checklistUpdate");
+    if (!this._enabled) return; // kludge until I can figure out how to remove the hook properly
+    console.log("running checklistUpdate");
     const id =
       "dialog-" + window.plugin.Wasabee.static.dialogNames.operationChecklist;
     if (window.DIALOGS[id]) {
@@ -79,6 +96,7 @@ const OperationChecklistDialog = Feature.extend({
 
 export default OperationChecklistDialog;
 
+// this can be moved into the class now
 const getListDialogContent = (operation, sortBy, sortAsc) => {
   // collapse markers and links into one array.
   const allThings = operation.links.concat(operation.markers);

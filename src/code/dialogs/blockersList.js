@@ -16,14 +16,20 @@ const BlockerList = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    window.addHook("wasabeeUIUpdate", this.blockerlistUpdate);
+    const context = this;
+    window.addHook("wasabeeUIUpdate", newOpData => {
+      context.blockerlistUpdate(newOpData);
+    });
     window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this.blockerlistUpdate);
+    const context = this;
+    window.removeHook("wasabeeUIUpdate", newOpData => {
+      context.blockerlistUpdate(newOpData);
+    });
     window.removeHook("portalAdded", listenForAddedPortals);
   },
 
@@ -74,6 +80,9 @@ const BlockerList = Feature.extend({
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function(newOpData) {
+    console.log("starting blockerlistUpdate");
+    if (!this._enabled) return;
+    console.log("running blockerslistUpdate");
     const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.blockerList;
     if (window.DIALOGS[id]) {
       this.sortable = getListDialogContent(
