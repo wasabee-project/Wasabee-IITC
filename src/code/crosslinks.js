@@ -175,6 +175,11 @@ export const greatCircleArcIntersect = (existing, drawn) => {
 
 const testPolyLine = (wasabeeLink, realLink, operation) => {
   if (greatCircleArcIntersect(realLink, wasabeeLink)) {
+    if (!operation.markers || operation.markers.length == 0) {
+      return true;
+    }
+
+    // XXX  my gut says there is a way to do this more quickly
     for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
@@ -262,6 +267,7 @@ export const checkAllLinks = operation => {
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee.crossLinkLayerGroup = {};
 
+  if (!operation.links || operation.links.length == 0) return;
   for (const guid in window.links) {
     testLink(window.links[guid], operation);
   }
@@ -274,7 +280,7 @@ const onLinkAdded = data => {
 
 const testForDeletedLinks = operation => {
   window.plugin.wasabee.crossLinkLayers.eachLayer(layer => {
-    var guid = layer.options.guid;
+    const guid = layer.options.guid;
     if (!window.links[guid]) {
       window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
       delete window.plugin.wasabee.crossLinkLayerGroup[guid];

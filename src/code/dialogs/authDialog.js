@@ -98,11 +98,7 @@ const AuthDialog = Feature.extend({
       response => {
         if (response.error) {
           thisthing._dialog.dialog("close");
-          const err =
-            "error from authorize: " +
-            response.error +
-            " " +
-            response.error_subtype;
+          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
         }
@@ -110,16 +106,12 @@ const AuthDialog = Feature.extend({
           async () => {
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
-            try {
-              const me = await mePromise();
-              // alert("awaited :" + JSON.stringify(me));
-              store.set(
-                window.plugin.Wasabee.Constants.AGENT_INFO_KEY,
-                JSON.stringify(me)
-              );
-            } catch (e) {
-              alert(e);
-            }
+            const me = await mePromise();
+            // alert("awaited :" + JSON.stringify(me));
+            store.set(
+              window.plugin.Wasabee.Constants.AGENT_INFO_KEY,
+              JSON.stringify(me)
+            );
             thisthing._dialog.dialog("close");
           },
           reject => {

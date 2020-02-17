@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
-// import { getAgent } from "../server";
+import { opKeyPromise } from "../server";
+import WasabeeMe from "../me";
 
 const KeysList = Feature.extend({
   statics: {
@@ -49,7 +50,6 @@ const KeysList = Feature.extend({
 export default KeysList;
 
 const keyListUpdate = operation => {
-  console.log("key list updating");
   const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keysList;
   if (window.DIALOGS[id]) {
     const table = getListDialogContent(operation).table;
@@ -58,8 +58,10 @@ const keyListUpdate = operation => {
 };
 
 const getListDialogContent = operation => {
+  const me = WasabeeMe.get();
+
   const sortable = new Sortable();
-  sortable.fields = [
+  const always = [
     {
       name: "Portal",
       value: key => operation.getPortal(key.id).name,
@@ -86,6 +88,55 @@ const getListDialogContent = operation => {
     }
   ];
 
+  const ifLoggedIn = [
+    {
+      name: "My Count",
+      value: key => key.iHave,
+      sort: (a, b) => a.localeCompare(b),
+      format: (cell, value, thing) => {
+        const oif = document.createElement("input");
+        oif.value = value;
+        oif.size = 3;
+        oif.addEventListener(
+          "change",
+          () => {
+            opKeyPromise(operation.ID, thing.id, oif.value, thing.capID);
+            // assuming FireBase is working to trigger refresh
+          },
+          false
+        );
+        cell.appendChild(oif);
+      }
+    },
+    {
+      name: "My Capsule ID",
+      value: key => key.capID,
+      sort: (a, b) => a.localeCompare(b),
+      format: (cell, value, thing) => {
+        const oif = document.createElement("input");
+        oif.value = value;
+        oif.size = 8;
+        oif.addEventListener(
+          "change",
+          () => {
+            opKeyPromise(operation.ID, thing.id, thing.iHave, oif.value);
+            // assuming FireBase is working to trigger refresh
+          },
+          false
+        );
+        cell.appendChild(oif);
+      }
+    }
+  ];
+
+  let gid = "no-user";
+  if (me) {
+    gid = me.GoogleID;
+    sortable.fields = always.concat(ifLoggedIn);
+  } else {
+    sortable.fields = always;
+  }
+
   const keys = new Array();
 
   for (const a of operation.anchors) {
@@ -97,6 +148,8 @@ const getListDialogContent = operation => {
     k.id = a;
     k.Required = links.length;
     k.onHand = 0;
+    k.iHave = 0;
+    k.capID = "";
     if (k.Required == 0) continue;
 
     // the server has been sending this, but plugin hasn't been saving it -- this is for compat until all ops can catch up
@@ -110,6 +163,7 @@ const getListDialogContent = operation => {
     if (thesekeys && thesekeys.length > 0) {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
+        if (t.gid == gid) k.iHave = t.onhand;
       }
     }
     keys.push(k);
@@ -122,6 +176,8 @@ const getListDialogContent = operation => {
     k.id = p.portalId;
     k.Required = "[open request]";
     k.onHand = 0;
+    k.iHave = 0;
+    k.capID = "";
 
     const thesekeys = operation.keysonhand.filter(function(keys) {
       return keys.portalId == k.id;
@@ -129,6 +185,7 @@ const getListDialogContent = operation => {
     if (thesekeys && thesekeys.length > 0) {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
+        if (t.gid == gid) k.iHave = t.onhand;
       }
     }
     keys.push(k);

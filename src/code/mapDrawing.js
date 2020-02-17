@@ -136,12 +136,13 @@ export const getPopupBodyWithType = (portal, target) => {
 
 /** this could be smarter */
 const resetLinks = operation => {
-  for (var guid in window.plugin.wasabee.linkLayers) {
-    var linkInLayer = window.plugin.wasabee.linkLayers[guid];
+  for (const guid in window.plugin.wasabee.linkLayers) {
+    const linkInLayer = window.plugin.wasabee.linkLayers[guid];
     window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
     delete window.plugin.wasabee.linkLayers[guid];
   }
 
+  if (!operation.links || operation.links.length == 0) return;
   // pick the right style for the links
   let lt = Wasabee.layerTypes.get("main");
   if (Wasabee.layerTypes.has(operation.color)) {

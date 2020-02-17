@@ -4,6 +4,7 @@ import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
+import { mePromise } from "../server";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -72,12 +73,25 @@ const WasabeeButton = WButton.extend({
             "Clear Local Ops",
             "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
             () => {
-              // closeAllDialogs();
               window.plugin.wasabee.resetOps();
               window.plugin.wasabee.setupLocalStorage();
             }
           );
           con.enable();
+        },
+        context: this
+      },
+      {
+        title: "Force pull of /me from server (TESTING ONLY)",
+        text: "/me",
+        callback: async () => {
+          try {
+            const me = await mePromise();
+            alert(JSON.stringify(me));
+          } catch (e) {
+            alert(e);
+          }
+          this.disable();
         },
         context: this
       }

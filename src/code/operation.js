@@ -319,7 +319,7 @@ export default class WasabeeOp {
   }
 
   containsBlocker(link) {
-    if (this.blockers.length == 0) return false;
+    if (!this.blockers || this.blockers.length == 0) return false;
 
     for (const l of this.blockers) {
       if (
@@ -631,6 +631,13 @@ export default class WasabeeOp {
         }
       }
     }
+    if (!operation.links) operation.links = new Array();
+    if (!operation.markers) operation.markers = new Array();
+    if (!operation.opportals) operation.opportals = new Array();
+    if (!operation.blockers) operation.blockers = new Array();
+    if (!operation.anchors) operation.anchors = new Array();
+    if (!operation.teamlist) operation.teamlist = new Array();
+    if (!operation.keysonhand) operation.keysonhand = new Array();
     return operation;
   }
 }

@@ -46,7 +46,7 @@ export const uploadOpPromise = function(operation) {
           reject(req.response);
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -79,7 +79,7 @@ export const updateOpPromise = function(operation) {
           reject("permission to update denied");
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -111,7 +111,7 @@ export const deleteOpPromise = function(opID) {
           reject("permission to delete denied");
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -146,7 +146,7 @@ export const teamPromise = function(teamid) {
           reject("permission denied to team: " + teamid);
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -192,7 +192,7 @@ export const opPromise = function(opID) {
           reject("not authorized to access op: " + opID);
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -214,9 +214,10 @@ export const mePromise = function() {
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
-    // req.setRequestHeader("If-Modified-Since", 0); // helps in some cases, breaks others
+    req.setRequestHeader("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT"); // helps in some cases, breaks others
 
     req.onload = function() {
+      console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           resolve(WasabeeMe.create(req.response));
@@ -263,7 +264,7 @@ export const agentPromise = function(GID, force) {
             reject("not logged in");
             break;
           default:
-            reject(req.statusText);
+            reject(`${req.status}: ${req.statusText}`);
             break;
         }
       };
@@ -295,7 +296,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -328,7 +329,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -361,7 +362,7 @@ export const targetPromise = function(agent, portal) {
           resolve(true);
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -390,14 +391,17 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
+      console.log("SendAccessToken");
+      console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
-          resolve();
+          resolve(true);
           break;
         default:
           console.log("sending auth token to server rejected");
-          reject(req.statusText);
+          alert(`sending auth token to server rejected: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -431,7 +435,7 @@ export const SetTeamState = function(teamID, state) {
           reject("not logged in");
           break;
         default:
-          reject(req.statusText);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
@@ -441,6 +445,42 @@ export const SetTeamState = function(teamID, state) {
     };
 
     req.send();
+  });
+};
+
+export const opKeyPromise = function(opID, portalID, onhand, capsule) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/portal/${portalID}/keyonhand`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    const fd = new FormData();
+    fd.append("onhand", onhand);
+    fd.append("capsule", capsule);
+    req.send(fd);
   });
 };
 

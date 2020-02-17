@@ -96,7 +96,7 @@ const OpsDialog = Feature.extend({
       const newop = window.plugin.wasabee.makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
       const mbr = newop.mbr();
-      if (isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         context._map.fitBounds(mbr);
       }
       window.runHooks("wasabeeUIUpdate", newop);

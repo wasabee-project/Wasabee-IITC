@@ -17,19 +17,17 @@ const BlockerList = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     const context = this;
-    window.addHook("wasabeeUIUpdate", newOpData => {
+    this._UIUpdateHook = newOpData => {
       context.blockerlistUpdate(newOpData);
-    });
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    const context = this;
-    window.removeHook("wasabeeUIUpdate", newOpData => {
-      context.blockerlistUpdate(newOpData);
-    });
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
   },
 
