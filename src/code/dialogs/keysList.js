@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
+import KeyListPortal from "./keyListPortal";
 
 const KeysList = Feature.extend({
   statics: {
@@ -205,6 +206,7 @@ const getListDialogContent = operation => {
 };
 
 const showKeyByPortal = e => {
-  console.log(e);
-  console.log(e.srcElement.name);
+  const klp = new KeyListPortal();
+  klp.setup(e.srcElement.name);
+  klp.enable();
 };
