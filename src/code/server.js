@@ -477,9 +477,14 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
       reject(`Network Error: ${req.statusText}`);
     };
 
+    console.log(
+      `opKeyPromise sending ${opID}: ${portalID}, ${onhand}, ${capsule}`
+    );
+
     const fd = new FormData();
-    fd.append("onhand", onhand);
-    fd.append("capsule", capsule);
+    fd.append("onhand", onhand ? onhand : "0");
+    fd.append("capsule", capsule ? capsule : "");
+    console.log(fd);
     req.send(fd);
   });
 };

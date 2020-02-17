@@ -7,6 +7,7 @@ import addButtons from "./addButtons";
 import initScopes from "./scopes";
 import { initFirebase } from "./firebaseSupport";
 import { checkAllLinks } from "./crosslinks";
+import { initWasabeeD, drawWasabeeDkeys } from "./wd";
 
 var Wasabee = window.plugin.Wasabee;
 
@@ -51,6 +52,7 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.agentLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.defensiveLayerGroup = new L.LayerGroup();
   window.addLayerGroup(
     "Wasabee Draw Portals",
     window.plugin.wasabee.portalLayerGroup,
@@ -71,9 +73,18 @@ window.plugin.wasabee.init = function() {
     window.plugin.wasabee.agentLayerGroup,
     true
   );
+  window.addLayerGroup(
+    "Wasabee-D Keys",
+    window.plugin.wasabee.defensiveLayerGroup,
+    true
+  );
 
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
+  });
+
+  window.addHook("mapDataRefreshStart", () => {
+    drawWasabeeDkeys();
   });
 
   window.addHook("wasabeeUIUpdate", operation => {
@@ -88,6 +99,7 @@ window.plugin.wasabee.init = function() {
 
   initFirebase();
   initCrossLinks();
+  initWasabeeD();
 
   window.addHook("wasabeeCrosslinks", operation => {
     checkAllLinks(operation);

@@ -39,8 +39,8 @@ const UploadButton = WButton.extend({
         }
         uploadOpPromise(this._operation).then(
           function(resolve) {
-            console.log(resolve);
-            window.plugin.wasabee.makeSelectedOperation(this._operation.ID); // switch to the new version in local store
+            // switch to the new version in local store -- uploadOpPromise stores it
+            window.plugin.wasabee.makeSelectedOperation(resolve.ID);
             // makeSelectedOp takes care of redraw, no need to save since already there
             alert("Upload Successful");
           },

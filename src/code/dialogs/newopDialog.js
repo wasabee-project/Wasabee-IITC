@@ -58,6 +58,7 @@ const NewopDialog = Feature.extend({
               newop.store();
               window.plugin.wasabee.makeSelectedOperation(newop.ID);
               window.runHooks("wasabeeUIUpdate", newop);
+              window.runHooks("wasabeeCrosslinks", newop);
             } else {
               alert("Operation Name was Unset");
             }

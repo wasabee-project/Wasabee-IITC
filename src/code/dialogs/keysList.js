@@ -100,7 +100,7 @@ const getListDialogContent = operation => {
         oif.addEventListener(
           "change",
           () => {
-            opKeyPromise(operation.ID, thing.id, oif.value, thing.capID);
+            opKeyPromise(operation.ID, thing.id, oif.value, thing.capsule);
             // assuming FireBase is working to trigger refresh
           },
           false
@@ -110,7 +110,7 @@ const getListDialogContent = operation => {
     },
     {
       name: "My Capsule ID",
-      value: key => key.capID,
+      value: key => key.capsule,
       sort: (a, b) => a.localeCompare(b),
       format: (cell, value, thing) => {
         const oif = document.createElement("input");
@@ -149,13 +149,8 @@ const getListDialogContent = operation => {
     k.Required = links.length;
     k.onHand = 0;
     k.iHave = 0;
-    k.capID = "";
+    k.capsule = "";
     if (k.Required == 0) continue;
-
-    // the server has been sending this, but plugin hasn't been saving it -- this is for compat until all ops can catch up
-    if (!operation.keysonhand) {
-      operation.keysonhand = new Array();
-    }
 
     const thesekeys = operation.keysonhand.filter(function(keys) {
       return keys.portalId == a;
@@ -163,7 +158,10 @@ const getListDialogContent = operation => {
     if (thesekeys && thesekeys.length > 0) {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
-        if (t.gid == gid) k.iHave = t.onhand;
+        if (t.gid == gid) {
+	  k.iHave = t.onhand;
+	  k.capsule = t.capsule;
+	}
       }
     }
     keys.push(k);
@@ -177,7 +175,7 @@ const getListDialogContent = operation => {
     k.Required = "[open request]";
     k.onHand = 0;
     k.iHave = 0;
-    k.capID = "";
+    k.capsule = "";
 
     const thesekeys = operation.keysonhand.filter(function(keys) {
       return keys.portalId == k.id;
@@ -185,7 +183,10 @@ const getListDialogContent = operation => {
     if (thesekeys && thesekeys.length > 0) {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
-        if (t.gid == gid) k.iHave = t.onhand;
+        if (t.gid == gid) {
+	  k.iHave = t.onhand;
+	  k.capsule = t.capsule;
+	}
       }
     }
     keys.push(k);

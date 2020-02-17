@@ -87,8 +87,8 @@ const AuthDialog = Feature.extend({
   gsapiAuth: thisthing => {
     window.gapi.auth2.authorize(
       {
-        // prompt: L.Browser.andorid ? "none" : "consent",
-        prompt: "select_account",
+        prompt: L.Browser.andorid ? "none" : "select_account", // "consent",
+        // prompt: "select_account",
         client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission",

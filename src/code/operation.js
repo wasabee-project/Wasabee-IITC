@@ -611,6 +611,29 @@ export default class WasabeeOp {
     return ++o;
   }
 
+  // this is only for local display if FireBase doesn't trigger a refresh
+  // KOH always takes place on the server because non-write-access
+  // agents need to make changes & sync
+  keyOnHand(portalId, gid, onhand, capsule) {
+    for (const k of this.keysonhand) {
+      if (k.portalId == portalId && k.gid == gid) {
+        k.onhand = onhand;
+        k.capsule = capsule;
+        this.update();
+        return;
+      }
+    }
+
+    const k = {
+      portalId: portalId,
+      gid: gid,
+      onhand: onhand,
+      capsule: capsule
+    };
+    this.keysonhand.push(k);
+    this.update();
+  }
+
   static create(obj) {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
