@@ -82,49 +82,17 @@ const getListDialogContent = operation => {
       name: "On Hand",
       value: key => key.onHand,
       sort: (a, b) => a.localeCompare(b),
-      format: (cell, value) => {
-        cell.textContent = value;
-      }
-    }
-  ];
+      format: (cell, value, key) => {
+        const a = L.DomUtil.create("a", "");
+        a.name = key.id;
+        L.DomEvent.on(a, "click", L.DomEvent.stopPropagation)
+          .on(a, "mousedown", L.DomEvent.stopPropagation)
+          .on(a, "dblclick", L.DomEvent.stopPropagation)
+          .on(a, "click", L.DomEvent.preventDefault)
+          .on(a, "click", showKeyByPortal, key);
 
-  const ifLoggedIn = [
-    {
-      name: "My Count",
-      value: key => key.iHave,
-      sort: (a, b) => a.localeCompare(b),
-      format: (cell, value, thing) => {
-        const oif = document.createElement("input");
-        oif.value = value;
-        oif.size = 3;
-        oif.addEventListener(
-          "change",
-          () => {
-            opKeyPromise(operation.ID, thing.id, oif.value, thing.capsule);
-            // assuming FireBase is working to trigger refresh
-          },
-          false
-        );
-        cell.appendChild(oif);
-      }
-    },
-    {
-      name: "My Capsule ID",
-      value: key => key.capsule,
-      sort: (a, b) => a.localeCompare(b),
-      format: (cell, value, thing) => {
-        const oif = document.createElement("input");
-        oif.value = value;
-        oif.size = 8;
-        oif.addEventListener(
-          "change",
-          () => {
-            opKeyPromise(operation.ID, thing.id, thing.iHave, oif.value);
-            // assuming FireBase is working to trigger refresh
-          },
-          false
-        );
-        cell.appendChild(oif);
+        a.innerHTML = value;
+        cell.appendChild(a);
       }
     }
   ];
@@ -132,7 +100,46 @@ const getListDialogContent = operation => {
   let gid = "no-user";
   if (me) {
     gid = me.GoogleID;
-    sortable.fields = always.concat(ifLoggedIn);
+    sortable.fields = always.concat([
+      {
+        name: "My Count",
+        value: key => key.iHave,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value, key) => {
+          const oif = document.createElement("input");
+          oif.value = value;
+          oif.size = 3;
+          oif.addEventListener(
+            "change",
+            () => {
+              opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
+              operation.keyOnHand(key.id, gid, oif.value, key.capsule);
+            },
+            false
+          );
+          cell.appendChild(oif);
+        }
+      },
+      {
+        name: "My Capsule ID",
+        value: key => key.capsule,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value, key) => {
+          const oif = document.createElement("input");
+          oif.value = value;
+          oif.size = 8;
+          oif.addEventListener(
+            "change",
+            () => {
+              opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
+              operation.keyOnHand(key.id, gid, key.iHave, oif.value);
+            },
+            false
+          );
+          cell.appendChild(oif);
+        }
+      }
+    ]);
   } else {
     sortable.fields = always;
   }
@@ -159,9 +166,9 @@ const getListDialogContent = operation => {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
         if (t.gid == gid) {
-	  k.iHave = t.onhand;
-	  k.capsule = t.capsule;
-	}
+          k.iHave = t.onhand;
+          k.capsule = t.capsule;
+        }
       }
     }
     keys.push(k);
@@ -184,9 +191,9 @@ const getListDialogContent = operation => {
       for (const t of thesekeys) {
         k.onHand += t.onhand;
         if (t.gid == gid) {
-	  k.iHave = t.onhand;
-	  k.capsule = t.capsule;
-	}
+          k.iHave = t.onhand;
+          k.capsule = t.capsule;
+        }
       }
     }
     keys.push(k);
@@ -195,4 +202,9 @@ const getListDialogContent = operation => {
   sortable.sortBy = 0;
   sortable.items = keys;
   return sortable;
+};
+
+const showKeyByPortal = e => {
+  console.log(e);
+  console.log(e.srcElement.name);
 };
