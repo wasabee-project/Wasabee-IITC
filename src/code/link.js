@@ -93,11 +93,11 @@ export default class WasabeeLink {
 
   // returns a DOM object appropriate for display
   displayFormat(operation) {
-    const d = document.createElement("div");
+    const d = L.DomUtil.create("div", "");
     d.appendChild(
       operation.getPortal(this.fromPortalId).displayFormat(operation)
     );
-    const arrow = d.appendChild(document.createElement("span"));
+    const arrow = L.DomUtil.create("span", "", d);
     arrow.innerHTML = " ➾ ";
     arrow.style.color = this.getColorHex();
     d.appendChild(
@@ -122,7 +122,7 @@ export default class WasabeeLink {
   minLevel(operation) {
     const b = this.length(operation);
     let s = "unknown";
-    const a = document.createElement("span");
+    const a = L.DomUtil.create("span", "");
 
     if (b > 6881280) {
       s = "impossible";
@@ -139,8 +139,8 @@ export default class WasabeeLink {
             "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
           a.classList.add("help");
         } else {
-          var d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);
-          var msd = 8 * (d - Math.floor(d));
+          const d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);
+          const msd = 8 * (d - Math.floor(d));
           s = "L" + d;
           if (0 != msd) {
             if (!(1 & msd)) {

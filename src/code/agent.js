@@ -30,52 +30,46 @@ export default class WasabeeAgent {
   }
 
   formatDisplay() {
-    const display = document.createElement("span");
-    display.classList.add("wasabee-agent-label");
-    display.classList.add("enl");
+    const display = L.DomUtil.create("span", "wasabee-agent-label, enl");
+    // display.classList.add("enl");
     display.textContent = this.name;
     return display;
   }
 
   getPopup() {
     // agent.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = document.createElement("div");
-    const title = content.appendChild(document.createElement("div"));
-    title.classList.add("desc");
+    const content = L.DomUtil.create("div");
+    const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
-    const sendTarget = content.appendChild(document.createElement("a"));
+    const sendTarget = L.DomUtil.create("a", "temp-op-dialog", content);
     sendTarget.innerHTML = "send target";
-    sendTarget.addEventListener(
-      "click",
-      () => {
-        const selectedPortal = WasabeePortal.getSelected();
-        if (!selectedPortal) {
-          alert("Select a portal to send");
-          return;
-        }
+    L.DomEvent.on(sendTarget, "click", () => {
+      const selectedPortal = WasabeePortal.getSelected();
+      if (!selectedPortal) {
+        alert("Select a portal to send");
+        return;
+      }
 
-        const f = selectedPortal.name;
-        const name = this.name;
-        const d = new ConfirmDialog();
-        d.setup(
-          "Send Target",
-          `Do you want to send ${f} target to ${name}?`,
-          () => {
-            targetPromise(this, selectedPortal).then(
-              function() {
-                alert("target sent");
-              },
-              function(reject) {
-                console.log(reject);
-              }
-            );
-          }
-        );
-        d.enable();
-      },
-      false
-    );
+      const f = selectedPortal.name;
+      const name = this.name;
+      const d = new ConfirmDialog();
+      d.setup(
+        "Send Target",
+        `Do you want to send ${f} target to ${name}?`,
+        () => {
+          targetPromise(this, selectedPortal).then(
+            function() {
+              alert("target sent");
+            },
+            function(reject) {
+              console.log(reject);
+            }
+          );
+        }
+      );
+      d.enable();
+    });
     return content;
   }
 

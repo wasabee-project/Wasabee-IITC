@@ -58,57 +58,39 @@ export default class WasabeeAnchor {
 
   popupContent(marker, operation) {
     marker.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = document.createElement("div");
-    const title = content.appendChild(document.createElement("div"));
-    title.className = "desc";
+    const content = L.DomUtil.create("div", "");
+    const title = L.DomUtil.create("div", "desc", content);
     title.innerHTML = markdown.toHTML(this._portal.name);
-    const buttonSet = content.appendChild(document.createElement("div"));
-    buttonSet.className = "temp-op-dialog";
-    const linksButton = buttonSet.appendChild(document.createElement("a"));
+    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
+    const linksButton = L.DomUtil.create("a", "", buttonSet);
     linksButton.textContent = "Links";
-    linksButton.addEventListener(
-      "click",
-      () => {
-        UiCommands.showLinksDialog(operation, this._portal);
-        marker.closePopup();
-      },
-      false
-    );
-    var swapButton = buttonSet.appendChild(document.createElement("a"));
+    L.DomEvent.on(linksButton, "click", () => {
+      UiCommands.showLinksDialog(operation, this._portal);
+      marker.closePopup();
+    });
+    const swapButton = L.DomUtil.create("a", "", buttonSet);
     swapButton.textContent = "Swap";
-    swapButton.addEventListener(
-      "click",
-      () => {
-        UiCommands.swapPortal(operation, this._portal);
-        marker.closePopup();
-      },
-      false
-    );
-    var deleteButton = buttonSet.appendChild(document.createElement("a"));
+    L.DomEvent.on(swapButton, "click", () => {
+      UiCommands.swapPortal(operation, this._portal);
+      marker.closePopup();
+    });
+    const deleteButton = L.DomUtil.create("a", "", buttonSet);
     deleteButton.textContent = "Delete";
-    deleteButton.addEventListener(
-      "click",
-      () => {
-        UiCommands.deletePortal(operation, this._portal);
-        marker.closePopup();
-      },
-      false
-    );
+    L.DomEvent.on(deleteButton, "click", () => {
+      UiCommands.deletePortal(operation, this._portal);
+      marker.closePopup();
+    });
 
     if (operation.IsServerOp()) {
-      const assignButton = buttonSet.appendChild(document.createElement("a"));
+      const assignButton = L.DomUtil.create("a", "", buttonSet);
       assignButton.textContent = "Assign Outbound Links";
-      assignButton.addEventListener(
-        "click",
-        () => {
-          const anchor = new WasabeeAnchor(this.ID);
-          const ad = new AssignDialog();
-          ad.setup(anchor, operation);
-          ad.enable();
-          marker.closePopup();
-        },
-        false
-      );
+      L.DomEvent.on(assignButton, "click", () => {
+        const anchor = new WasabeeAnchor(this.ID);
+        const ad = new AssignDialog();
+        ad.setup(anchor, operation);
+        ad.enable();
+        marker.closePopup();
+      });
     }
 
     return content;

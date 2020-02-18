@@ -69,6 +69,7 @@ const addMarker = (target, operation) => {
   wMarker.addTo(window.plugin.wasabee.markerLayerGroup);
 };
 
+// this belongs in the marker class
 const getMarkerPopup = (marker, target, operation) => {
   const portal = operation.getPortal(target.portalId);
   marker.className = "wasabee-dialog wasabee-dialog-ops";
@@ -92,7 +93,7 @@ const getMarkerPopup = (marker, target, operation) => {
     assignment.innerHTML = "Completed By: " + target.completedBy;
   }
 
-  const buttonSet = L.DomUtil.create("div", "tmp-op-dialog", content);
+  const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
   const deleteButton = L.DomUtil.create("a", "", buttonSet);
   deleteButton.textContent = "Delete";
   L.DomEvent.on(deleteButton, "click", () => {

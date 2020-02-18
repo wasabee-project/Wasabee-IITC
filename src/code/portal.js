@@ -61,7 +61,7 @@ export default class WasabeePortal {
   displayFormat() {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
-    const e = document.createElement("a");
+    const e = L.DomUtil.create("a", "");
     e.appendChild(document.createTextNode(this.name));
 
     if (window.portals[this.id]) {
@@ -81,33 +81,25 @@ export default class WasabeePortal {
 
     e.title = this.name;
     e.href = `/intel?ll=${v}&pll=${v}`;
-    e.addEventListener(
-      "click",
-      event => {
-        return (
-          window.selectedPortal != this.id
-            ? window.renderPortalDetails(this.id)
-            : window.map.panTo(pt),
-          event.preventDefault(),
-          false
-        );
-      },
-      false
-    );
-    e.addEventListener(
-      "dblclick",
-      event => {
-        return (
-          window.map.getBounds().contains(pt)
-            ? (window.portals[this.id] || window.renderPortalDetails(this.id),
-              window.zoomToAndShowPortal(this.id, pt))
-            : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
-          event.preventDefault(),
-          false
-        );
-      },
-      false
-    );
+
+    L.DomEvent.on(e, "click", event => {
+      return (
+        window.selectedPortal != this.id
+          ? window.renderPortalDetails(this.id)
+          : window.map.panTo(pt),
+        event.preventDefault(),
+        false
+      );
+    }).on(e, "dblclick", event => {
+      return (
+        window.map.getBounds().contains(pt)
+          ? (window.portals[this.id] || window.renderPortalDetails(this.id),
+            window.zoomToAndShowPortal(this.id, pt))
+          : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
+        event.preventDefault(),
+        false
+      );
+    });
     return e;
   }
 
