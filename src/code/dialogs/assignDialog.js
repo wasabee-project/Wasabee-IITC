@@ -54,14 +54,14 @@ const AssignDialog = Feature.extend({
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
-    this._html = document.createElement("div");
-    const divtitle = this._html.appendChild(document.createElement("div"));
+    this._html = L.DomUtil.create("div", "temp-op-dialog");
+    const divtitle = L.DomUtil.create("div", "", this._html);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
       divtitle.appendChild(target.displayFormat(this._operation));
-      const t = divtitle.appendChild(document.createElement("span"));
+      const t = L.DomUtil.create("span", "", divtitle);
       t.innerHTML = " link assignment";
       this._name = "Assign link from: " + portal.name;
     }
@@ -70,7 +70,7 @@ const AssignDialog = Feature.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
       divtitle.appendChild(portal.displayFormat());
-      const t = divtitle.appendChild(document.createElement("span"));
+      const t = L.DomUtil.create("span", "", divtitle);
       t.innerHTML = " marker assignment";
       this._name = "Assign marker for: " + portal.name;
     }
@@ -79,7 +79,7 @@ const AssignDialog = Feature.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
       divtitle.appendChild(portal.displayFormat());
-      const t = divtitle.appendChild(document.createElement("span"));
+      const t = L.DomUtil.create("span", "", divtitle);
       t.innerHTML = " all outbound links";
       this._name = "Assign all outbound links from: " + portal.name;
     }
@@ -106,7 +106,7 @@ const AssignDialog = Feature.extend({
   },
 
   _buildContent: function() {
-    const content = document.createElement("div");
+    const content = L.DomUtil.create("div", "");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {
@@ -116,9 +116,9 @@ const AssignDialog = Feature.extend({
   },
 
   _getAgentMenu: function(current) {
-    const container = document.createElement("div");
-    const menu = container.appendChild(document.createElement("select"));
-    let option = menu.appendChild(document.createElement("option"));
+    const container = L.DomUtil.create("div", "");
+    const menu = L.DomUtil.create("select", "", container);
+    let option = menu.appendChild(L.DomUtil.create("option", ""));
     option.setAttribute("value", "");
     option.innerHTML = "Unassigned";
     const alreadyAdded = new Array();
@@ -139,7 +139,7 @@ const AssignDialog = Feature.extend({
       for (const a of tt.agents) {
         if (alreadyAdded.indexOf(a.id) == -1) {
           alreadyAdded.push(a.id);
-          option = document.createElement("option");
+          option = L.DomUtil.create("option", "");
           option.setAttribute("value", a.id);
           option.innerHTML = a.name;
           if (a.id == current) {

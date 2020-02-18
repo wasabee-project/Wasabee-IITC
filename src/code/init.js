@@ -43,10 +43,11 @@ window.plugin.wasabee.init = function() {
   initOverflowMenu();
   initServer();
 
-  window.plugin.wasabee.addCSS(Wasabee.static.CSS.ui);
-  window.plugin.wasabee.addCSS(Wasabee.static.CSS.main);
-  window.plugin.wasabee.addCSS(Wasabee.static.CSS.toastr);
-  window.plugin.wasabee.addCSS(Wasabee.static.CSS.leafletdraw);
+  addCSS(Wasabee.static.CSS.ui);
+  addCSS(Wasabee.static.CSS.main);
+  addCSS(Wasabee.static.CSS.toastr);
+  addCSS(Wasabee.static.CSS.leafletdraw);
+
   window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
   window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
@@ -109,11 +110,11 @@ window.plugin.wasabee.init = function() {
   checkAllLinks(Wasabee._selectedOp);
 };
 
-window.plugin.wasabee.addCSS = content => {
+const addCSS = content => {
   $("head").append('<style type="text/css">\n' + content + "\n</style>");
 };
 
-function initGoogleAPI() {
+const initGoogleAPI = () => {
   if (typeof window.gapi !== "undefined") return;
   const script = document.createElement("script");
   script.type = "text/javascript";
@@ -122,4 +123,4 @@ function initGoogleAPI() {
   (document.body || document.head || document.documentElement).appendChild(
     script
   );
-}
+};

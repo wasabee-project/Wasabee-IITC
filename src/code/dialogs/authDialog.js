@@ -28,34 +28,29 @@ const AuthDialog = Feature.extend({
   },
 
   _displayDialog: function() {
-    const content = document.createElement("div");
-    const title = content.appendChild(document.createElement("div"));
+    const content = L.DomUtil.create("div", "temp-op-dialog");
+    const title = L.DomUtil.create("div", "", content);
     title.className = "desc";
     title.innerHTML =
       "In order to use the server functionality, you must log in.<br/>";
-    const buttonSet = content.appendChild(document.createElement("div"));
-    buttonSet.className = "temp-op-dialog";
+    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
-    const gsapiButton = buttonSet.appendChild(document.createElement("a"));
+    const gsapiButton = L.DomUtil.create("a", "", buttonSet);
     gsapiButton.innerHTML = "Log In (gsapi)";
-    gsapiButton.addEventListener("click", () => this.gsapiAuth(this), false);
+    L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuth(this));
 
+    // webview cannot work on android IITC-M
     if (!L.Browser.android) {
-      // webview cannot work on android IITC-M
-      const webviewButton = buttonSet.appendChild(document.createElement("a"));
+      const webviewButton = L.DomUtil.create("a", "", buttonSet);
       webviewButton.innerHTML = "Log In (webview)";
-      webviewButton.addEventListener(
-        "click",
-        () => window.open(GetWasabeeServer()),
-        false
+      L.DomEvent.on(webviewButton, "click", () =>
+        window.open(GetWasabeeServer())
       );
     }
 
-    const changeServerButton = buttonSet.appendChild(
-      document.createElement("a")
-    );
+    const changeServerButton = L.DomUtil.create("a", "", buttonSet);
     changeServerButton.innerHTML = "Change Server";
-    changeServerButton.addEventListener("click", () => {
+    L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
       serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
         if (serverDialog.inputField.value) {
@@ -67,7 +62,7 @@ const AuthDialog = Feature.extend({
         }
       });
       serverDialog.current = GetWasabeeServer();
-      serverDialog.placeholder = "https://server.wasabee.rocks/";
+      serverDialog.placeholder = "https://server.wasabee.rocks";
       serverDialog.enable();
     });
 
@@ -87,21 +82,17 @@ const AuthDialog = Feature.extend({
     });
   },
 
-  gsapiAuth: thisthing => {
+  gsapiAuth: context => {
     window.gapi.auth2.authorize(
       {
-        // prompt: L.Browser.android ? "none" : "select_account", // "consent",
         prompt: "none",
         client_id: window.plugin.wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
-        // these only make things worse, do not use:
-        // immediate: false
-        // cookie_policy: "https://server.waabee.rocks"
       },
       response => {
         if (response.error) {
-          thisthing._dialog.dialog("close");
+          context._dialog.dialog("close");
           const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
@@ -112,8 +103,7 @@ const AuthDialog = Feature.extend({
             // but do this by hand to 'await' it
             const me = await mePromise();
             me.store();
-            // store.set(window.plugin.wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
-            thisthing._dialog.dialog("close");
+            context._dialog.dialog("close");
           },
           reject => {
             console.log(reject);

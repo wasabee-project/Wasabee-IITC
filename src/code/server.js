@@ -3,6 +3,7 @@ import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
 import store from "../lib/store";
+import { getOperationByID } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -164,7 +165,7 @@ export const opPromise = function(opID) {
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
-    const localop = window.plugin.wasabee.getOperationByID(opID);
+    const localop = getOperationByID(opID);
 
     req.open("GET", url);
 

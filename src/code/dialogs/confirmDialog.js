@@ -62,7 +62,7 @@ const ConfirmDialog = Feature.extend({
   },
 
   _buildContent: function() {
-    const content = document.createElement("div");
+    const content = L.DomUtil.create("div", "");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {

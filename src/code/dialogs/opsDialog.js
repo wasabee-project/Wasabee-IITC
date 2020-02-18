@@ -29,13 +29,11 @@ const OpsDialog = Feature.extend({
 
   _displayDialog: function() {
     const op = getSelectedOperation();
-    const content = document.createElement("div");
+    const content = L.DomUtil.create("div", "temp-op-wasabee");
     content.id = "wasabee-dialog-operation-content";
-    const opinfo = document.createElement("div");
-    opinfo.id = "wasabee-dialog-operation-opinfo";
-
     content.appendChild(this._opSelectMenu(this, op));
-    content.appendChild(opinfo);
+    const opinfo = L.DomUtil.create("div", "", content);
+    opinfo.id = "wasabee-dialog-operation-opinfo";
 
     const obHandler = this;
     this._dialog = window.dialog({
@@ -73,20 +71,19 @@ const OpsDialog = Feature.extend({
   },
 
   _opSelectMenu: function(context, operation) {
-    const container = document.createElement("div");
+    const container = L.DomUtil.create("div", "spinner");
     container.id = "wasabee-dialog-operation-spinner";
-    container.className = "spinner";
-    container.innerHTML = "";
     $(container).css({
       "text-align": "center"
     });
-    const operationSelect = document.createElement("select");
+    const operationSelect = L.DomUtil.create("select", "");
     operationSelect.id = "wasabee-operationSelect";
     $(operationSelect).css({
       width: "90%"
     });
+
     const ol = opsList();
-    ol.forEach(function(opID) {
+    for (const opID of ol) {
       const op = getOperationByID(opID);
       $(operationSelect).append(
         $("<option>").prop({
@@ -94,8 +91,8 @@ const OpsDialog = Feature.extend({
           text: op.name
         })
       );
-    });
-    // XXX use operationSelect.addEventListener instead of this format
+    }
+
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       const newID = $(this).val();
@@ -117,14 +114,12 @@ const OpsDialog = Feature.extend({
   _displayOpInfo: function(context, operation) {
     const opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
     if (!opinfo) {
-      // console.log("unable to get wasabee-dialog-operation-opinfo; skipping display");
       return;
     }
     opinfo.innerHTML = ""; // start clean
-    const nameSection = opinfo.appendChild(document.createElement("p"));
+    const nameSection = L.DomUtil.create("p", "", opinfo);
     nameSection.innerHTML = "Operation Name: ";
-    const input = nameSection.appendChild(document.createElement("input"));
-    // input.type = "text";
+    const input = L.DomUtil.create("input", "", nameSection);
     input.id = "op-dialog-content-nameinput";
     input.value = operation.name;
     $(input).change(function() {
@@ -136,16 +131,14 @@ const OpsDialog = Feature.extend({
         context._opSelectMenuUpdate(context, operation);
       }
     });
-    const colorSection = opinfo.appendChild(document.createElement("p"));
+    const colorSection = L.DomUtil.create("p", "", opinfo);
     colorSection.innerHTML = "Operation Color: ";
-    let operationColor =
-      window.plugin.Wasabee.Constants.DEFAULT_OPERATION_COLOR;
-    if (operation.color != null) {
-      operationColor = operation.color;
-    }
-    const opColor = colorSection.appendChild(document.createElement("select"));
+    const operationColor = operation.color
+      ? operation.color
+      : window.plugin.Wasabee.Constants.DEFAULT_OPERATION_COLOR;
+    const opColor = L.DomUtil.create("select", "", colorSection);
     window.plugin.Wasabee.layerTypes.forEach(function(a) {
-      const option = document.createElement("option");
+      const option = L.DomUtil.create("option", "");
       if (a.name == operationColor) {
         option.setAttribute("selected", true);
       }
@@ -158,16 +151,9 @@ const OpsDialog = Feature.extend({
       operation.update(); // OK - changing color does not trigger
     });
 
-    const isServerOp = operation.IsServerOp();
-    let isWritableOp = false;
-    if (isServerOp) {
-      isWritableOp = operation.IsWritableOp();
-    }
-    const commentInputEnabled = !isServerOp || isWritableOp;
-    const commentSection = opinfo.appendChild(document.createElement("p"));
-    const commentInput = commentSection.appendChild(
-      document.createElement("textarea")
-    );
+    const commentInputEnabled = operation.IsWritableOp();
+    const commentSection = L.DomUtil.create("p", "", opinfo);
+    const commentInput = L.DomUtil.create("textarea", "", commentSection);
     commentInput.rows = "3";
     commentInput.placeholder = "Op Comment";
     commentInput.value = operation.comment;
@@ -177,29 +163,19 @@ const OpsDialog = Feature.extend({
       operation.store();
     });
 
-    const buttonSection = opinfo.appendChild(document.createElement("div"));
-    buttonSection.className = "temp-op-dialog";
-
-    const clearOpButton = buttonSection.appendChild(
-      document.createElement("a")
-    );
+    const buttonSection = L.DomUtil.create("div", "temp-op-dialog", opinfo);
+    const clearOpButton = L.DomUtil.create("a", "", buttonSection);
     clearOpButton.innerHTML = "Clear Portals/Links/Markers";
-    clearOpButton.addEventListener(
-      "click",
-      () => {
-        UiCommands.clearAllItems(operation);
-      },
-      false
-    );
+    L.DomEvent.on(clearOpButton, "click", () => {
+      UiCommands.clearAllItems(operation);
+    });
 
-    const deleteButton = buttonSection.appendChild(document.createElement("a"));
-    deleteButton.innerHTML = "Delete " + operation.name;
-    if (opsList().size == 0) {
+    // only show the delete button if more than 1 op remaining
+    if (opsList().size > 1) {
+      const deleteButton = L.DomUtil.create("a", "", buttonSection);
+      deleteButton.innerHTML = "Delete " + operation.name;
       deleteButton.disabled = true;
-    }
-    deleteButton.addEventListener(
-      "click",
-      () => {
+      L.DomEvent.on(deleteButton, "click", () => {
         // this should be moved to uiCommands, but the menu adjustment at the end makes that non-trivial
         const con = new ConfirmDialog(window.map);
         con.setup(
@@ -239,10 +215,8 @@ const OpsDialog = Feature.extend({
           }
         );
         con.enable();
-      },
-      false
-    );
-    // return opinfo;
+      });
+    }
   }
 });
 
