@@ -5,6 +5,7 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import UiCommands from "../uiCommands";
+import { getSelectedOperation() } from "selectedOp";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {
@@ -21,7 +22,7 @@ const OperationChecklistDialog = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     const context = this;
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     // magic context incantation to make "this" work...
     this._UIUpdateHook = newOpData => {
       context.checklistUpdate(newOpData);

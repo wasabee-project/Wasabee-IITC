@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
+import { makeSelectedOperation } from "./selectedOp";
 
 const NewopDialog = Feature.extend({
   statics: {
@@ -56,7 +57,7 @@ const NewopDialog = Feature.extend({
                 true
               );
               newop.store();
-              window.plugin.wasabee.makeSelectedOperation(newop.ID);
+              makeSelectedOperation(newop.ID);
               window.runHooks("wasabeeUIUpdate", newop);
               window.runHooks("wasabeeCrosslinks", newop);
             } else {

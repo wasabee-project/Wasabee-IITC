@@ -2,6 +2,7 @@ import { WButton } from "../leafletDrawImports.js";
 import { opPromise } from "../server";
 import WasabeeMe from "../me";
 import AuthDialog from "../dialogs/authDialog";
+import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
 
 const SyncButton = WButton.extend({
   statics: {
@@ -38,7 +39,7 @@ const SyncButton = WButton.extend({
       buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
       context: this,
       callback: () => {
-        const so = window.plugin.wasabee.getSelectedOperation();
+        const so = getSelectedOperation();
         try {
           const me = WasabeeMe.get(true); // force update of ops list
           if (me === null) {
@@ -52,7 +53,7 @@ const SyncButton = WButton.extend({
                     newop.store();
                     // if the op changed out beneath us, use the new
                     if (newop.ID == so.ID) {
-                      window.plugin.wasabee.makeSelectedOperation(newop.ID);
+                      makeSelectedOperation(newop.ID);
                     }
                   }
                 },

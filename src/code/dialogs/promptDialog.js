@@ -1,4 +1,5 @@
 import { Feature } from "../leafletDrawImports";
+import { getSelectedOperation } from "./selectedOp";
 
 // generic prompt screen
 
@@ -50,7 +51,7 @@ const PromptDialog = Feature.extend({
       closeCallback: () => {
         window.runHooks(
           "wasabeeUIUpdate",
-          window.plugin.wasabee.getSelectedOperation()
+          getSelectedOperation()
         );
         promptDialog.disable();
         delete promptDialog._dialog;

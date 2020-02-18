@@ -1,5 +1,6 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
+import { getSelectedOperation } from "./selectedOp";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -10,7 +11,7 @@ const BlockerList = Feature.extend({
     if (!map) map = window.map;
     this.type = BlockerList.TYPE;
     Feature.prototype.initialize.call(this, map, options);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
   },
 
   addHooks: function() {
@@ -78,9 +79,7 @@ const BlockerList = Feature.extend({
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function(newOpData) {
-    console.log("starting blockerlistUpdate");
     if (!this._enabled) return;
-    console.log("running blockerslistUpdate");
     const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.blockerList;
     if (window.DIALOGS[id]) {
       this.sortable = getListDialogContent(
@@ -160,7 +159,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 
-  const op = window.plugin.wasabee.getSelectedOperation();
+  const op = getSelectedOperation();
 
   for (const faked of op.fakedPortals) {
     if (faked.id == newPortal.portal.options.guid) {

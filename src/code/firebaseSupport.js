@@ -7,6 +7,7 @@
 
 import { drawAgents } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
+import { makeSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.Wasabee;
 
@@ -34,7 +35,7 @@ export const initFirebase = () => {
           refreshed.store();
           if (refreshed.ID == operation.ID) {
             console.log("firebase trigger reload of current op");
-            window.plugin.wasabee.makeSelectedOperation(refreshed.ID);
+            makeSelectedOperation(refreshed.ID);
             // refreshed.update(); -- makeSelectedOp triggers redraw for us
           }
         },

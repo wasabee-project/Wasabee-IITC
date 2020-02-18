@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-
+import { getSelectedOperation } from "./selectedOp";
 // export screen
 const ExportDialog = Feature.extend({
   statics: {
@@ -10,7 +10,7 @@ const ExportDialog = Feature.extend({
     if (!map) map = window.map;
     this.type = ExportDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
   },
 
   addHooks: function() {

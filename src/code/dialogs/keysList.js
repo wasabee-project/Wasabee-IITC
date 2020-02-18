@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
+import { getSelectedOperation } from "./selectedOp";
 
 const KeysList = Feature.extend({
   statics: {
@@ -18,7 +19,7 @@ const KeysList = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     const context = this;
     this._UIUpdateHook = newOpData => {
       context.keyListUpdate(newOpData);

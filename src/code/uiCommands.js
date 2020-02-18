@@ -2,6 +2,7 @@
 import WasabeePortal from "./portal";
 import LinkListDialog from "./dialogs/linkListDialog";
 import ConfirmDialog from "./dialogs/confirmDialog";
+import { getSelectedOperation } from "./selectedOp";
 
 // wrap operation calls in UI checks
 export default {
@@ -35,8 +36,9 @@ export default {
   },
   deletePortal: (operation, portal) => {
     const con = new ConfirmDialog();
-    const pr = (L.DomUtil.create("div", "").innerHTML =
-      "Do you want to delete this anchor and all associated links: ");
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML =
+      "Do you want to delete this anchor and all associated links: ";
     pr.appendChild(portal.displayFormat(operation));
     con.setup("Delete Anchor", pr, () => {
       operation.removeAnchor(portal.id);
@@ -45,8 +47,8 @@ export default {
   },
   deleteMarker: (operation, marker, portal) => {
     const con = new ConfirmDialog();
-    const pr = (L.DomUtil.create("div", "").innerHTML =
-      "Do you want to delete this marker: ");
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML = "Do you want to delete this marker: ";
     pr.appendChild(portal.displayFormat(operation));
     con.setup("Delete Marker", pr, () => {
       operation.removeMarker(marker);
@@ -72,7 +74,7 @@ export default {
   listenForAddedPortals: newPortal => {
     if (!newPortal.portal.options.data.title) return;
 
-    const op = window.plugin.wasabee.getSelectedOperation();
+    const op = getSelectedOperation();
 
     for (const faked of op.fakedPortals) {
       if (faked.id == newPortal.portal.options.guid) {

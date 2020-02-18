@@ -1,6 +1,6 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
-import initSelectedOp from "./selectedOp";
+import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
@@ -38,9 +38,8 @@ window.plugin.wasabee.init = function() {
   // All of these should eventually export functions.
   // We do this because they still assign them to the global scope.
   initScopes();
-  initSelectedOp(); // loads the next two
-  window.plugin.wasabee.setupLocalStorage();
-  window.plugin.wasabee.initSelectedOperation();
+  setupLocalStorage();
+  initSelectedOperation();
   initOverflowMenu();
   initServer();
 

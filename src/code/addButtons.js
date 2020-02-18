@@ -1,3 +1,4 @@
+import { getSelectedOp } from "./selectedOp";
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
@@ -46,7 +47,7 @@ export default function(selectedOp) {
     },
 
     update: function(operation) {
-      console.log("updating buttons");
+      // console.log("updating buttons");
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
           window.plugin.wasabee.buttons.container,
@@ -63,6 +64,6 @@ export default function(selectedOp) {
 
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
-  selectedOp = selectedOp || window.plugin.wasabee.getSelectedOperation();
+  selectedOp = selectedOp || getSelectedOperation();
   window.plugin.wasabee.buttons.update(selectedOp);
 }

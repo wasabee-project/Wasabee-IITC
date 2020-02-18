@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
+import { getSelectedOperation } from "./selectedOp";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -18,7 +19,7 @@ const MarkerList = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     window.addHook("wasabeeUIUpdate", markerListUpdate);
     window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
@@ -157,7 +158,7 @@ const getListDialogContent = operation => {
 };
 
 const makeMarkerDialogMenu = (list, data) => {
-  const operation = window.plugin.wasabee.getSelectedOperation();
+  const operation = getSelectedOperation();
   const state = new window.plugin.Wasabee.OverflowMenu();
   const options = [
     {
@@ -192,7 +193,7 @@ const makeMarkerDialogMenu = (list, data) => {
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 
-  const op = window.plugin.wasabee.getSelectedOperation();
+  const op = getSelectedOperation();
 
   for (const faked of op.fakedPortals) {
     if (faked.id == newPortal.portal.options.guid) {

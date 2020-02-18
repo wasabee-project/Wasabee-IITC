@@ -1,4 +1,5 @@
 import { Feature } from "../leafletDrawImports";
+import { getSelectedOperation } from "./selectedOp";
 
 // generic confirmation screen w/ ok and cancel buttons
 
@@ -23,6 +24,7 @@ const ConfirmDialog = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
   },
 
   _displayDialog: function() {
@@ -45,10 +47,6 @@ const ConfirmDialog = Feature.extend({
         }
       },
       closeCallback: () => {
-        window.runHooks(
-          "wasabeeUIUpdate",
-          window.plugin.wasabee.getSelectedOperation()
-        );
         confirmDialog.disable();
         delete confirmDialog._dialog;
       }

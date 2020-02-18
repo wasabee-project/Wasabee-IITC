@@ -1,6 +1,7 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { Feature } from "../leafletDrawImports";
+import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
 
 const ImportDialogControl = Feature.extend({
   statics: {
@@ -37,7 +38,7 @@ const ImportDialogControl = Feature.extend({
         this.idialog.importTextareaAsOp();
         window.runHooks(
           "wasabeeUIUpdate",
-          window.plugin.wasabee.getSelectedOperation()
+          getSelectedOperation()
         );
         idhandler.disable();
         delete idhandler._dialog;
@@ -80,7 +81,7 @@ class ImportDialog {
       const newop = this.parseDrawTools(string);
       newop.updatePortalsFromIITCData();
       newop.store();
-      window.plugin.wasabee.makeSelectedOperation(newop.ID);
+      makeSelectedOperation(newop.ID);
       return;
     }
 
@@ -89,7 +90,7 @@ class ImportDialog {
       const data = JSON.parse(string);
       const importedOp = WasabeeOp.create(data);
       importedOp.store();
-      window.plugin.wasabee.makeSelectedOperation(importedOp.ID);
+      makeSelectedOperation(importedOp.ID);
       alert("Imported Operation: " + importedOp.name + " Successfuly.");
     } catch (e) {
       console.warn("WasabeeTools: failed to import data: " + e);

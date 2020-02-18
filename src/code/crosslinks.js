@@ -1,5 +1,6 @@
 import WasabeePortal from "./portal";
 import WasabeeLink from "./link";
+import { getSelectedOperation } from "./selectedOp";
 
 //*** CROSSLINK THINGS */
 const Wasabee = window.plugin.Wasabee;
@@ -274,7 +275,7 @@ export const checkAllLinks = operation => {
 };
 
 const onLinkAdded = data => {
-  const operation = window.plugin.wasabee.getSelectedOperation();
+  const operation = getSelectedOperation();
   testLink(data.link, operation);
 };
 
@@ -291,14 +292,12 @@ const testForDeletedLinks = operation => {
 };
 
 const onMapDataRefreshStart = () => {
-  // const operation = window.plugin.wasabee.getSelectedOperation();
-  // disable per-link-add checking, do it in bulk at end
   window.removeHook("linkAdded", onLinkAdded);
 };
 
 const onMapDataRefreshEnd = () => {
   window.plugin.wasabee.crossLinkLayers.bringToFront();
-  const operation = window.plugin.wasabee.getSelectedOperation();
+  const operation = getSelectedOperation();
 
   checkAllLinks(operation);
   testForDeletedLinks(operation);
@@ -316,7 +315,7 @@ export const initCrossLinks = () => {
 
   window.map.on("layeradd", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      var operation = window.plugin.wasabee.getSelectedOperation();
+      var operation = getSelectedOperation();
       if (operation != null) {
         checkAllLinks(operation);
       }

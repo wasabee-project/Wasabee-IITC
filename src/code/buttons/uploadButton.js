@@ -1,6 +1,7 @@
 import { WButton } from "../leafletDrawImports.js";
 import { uploadOpPromise, updateOpPromise } from "../server";
 import WasabeeMe from "../me";
+import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -14,7 +15,7 @@ const UploadButton = WButton.extend({
 
     this.type = UploadButton.TYPE;
     // this.handler = null;
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this.title = `Upload ${this._operation.name}`;
 
     this.button = this._createButton({
@@ -40,7 +41,7 @@ const UploadButton = WButton.extend({
         uploadOpPromise(this._operation).then(
           function(resolve) {
             // switch to the new version in local store -- uploadOpPromise stores it
-            window.plugin.wasabee.makeSelectedOperation(resolve.ID);
+            makeSelectedOperation(resolve.ID);
             // makeSelectedOp takes care of redraw, no need to save since already there
             alert("Upload Successful");
           },

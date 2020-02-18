@@ -1,6 +1,7 @@
 const markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
+import { getSelectedOperation } from "./selectedOp";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
@@ -13,7 +14,8 @@ export default class WasabeeAnchor {
     this.state = null;
     this.assignedTo = null;
     this.order = 0;
-    const operation = window.plugin.wasabee.getSelectedOperation();
+
+    const operation = getSelectedOperation();
     this._portal = operation.getPortal(this.ID);
   }
 
@@ -43,7 +45,7 @@ export default class WasabeeAnchor {
   }
 
   get icon() {
-    const operation = window.plugin.wasabee.getSelectedOperation();
+    const operation = getSelectedOperation();
     const colorGroup = operation.color;
     let lt = window.plugin.wasabee.layerTypes.get("main");
     if (window.plugin.wasabee.layerTypes.has(colorGroup)) {

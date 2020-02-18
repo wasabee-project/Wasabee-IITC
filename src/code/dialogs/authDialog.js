@@ -3,6 +3,7 @@ import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
 import WasabeeMe from "../me";
+import { getSelectedOperation } from "./selectedOp";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -18,7 +19,7 @@ const AuthDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
@@ -35,12 +36,11 @@ const AuthDialog = Feature.extend({
     const buttonSet = content.appendChild(document.createElement("div"));
     buttonSet.className = "temp-op-dialog";
 
-    // const isiOS = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-    // if iOS do webview, otherwise gsapi
     const gsapiButton = buttonSet.appendChild(document.createElement("a"));
     gsapiButton.innerHTML = "Log In (gsapi)";
     gsapiButton.addEventListener("click", () => this.gsapiAuth(this), false);
 
+    if (!L.Browser.android) { // webview cannot work on android IITC-M
     const webviewButton = buttonSet.appendChild(document.createElement("a"));
     webviewButton.innerHTML = "Log In (webview)";
     webviewButton.addEventListener(
@@ -48,6 +48,7 @@ const AuthDialog = Feature.extend({
       () => window.open(GetWasabeeServer()),
       false
     );
+    }
 
     const changeServerButton = buttonSet.appendChild(
       document.createElement("a")
@@ -76,10 +77,9 @@ const AuthDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: async () => {
-        const selectedOperation = window.plugin.wasabee.getSelectedOperation();
+        const selectedOperation = getSelectedOperation();
         const me = await WasabeeMe.get(); // check one more time, free if logged in -- for webview
-        console.log("close auth dialog");
-        console.log(me);
+        me.store();
         window.runHooks("wasabeeUIUpdate", selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
@@ -89,12 +89,12 @@ const AuthDialog = Feature.extend({
   gsapiAuth: thisthing => {
     window.gapi.auth2.authorize(
       {
-        // prompt: L.Browser.andorid ? "none" : "select_account", // "consent",
-        // prompt: "select_account",
+        // prompt: L.Browser.android ? "none" : "select_account", // "consent",
         prompt: "none",
         client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
+	// these only make things worse, do not use:
         // immediate: false
         // cookie_policy: "https://server.waabee.rocks"
       },
@@ -110,15 +110,12 @@ const AuthDialog = Feature.extend({
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
             const me = await mePromise();
-            // alert("awaited :" + JSON.stringify(me));
-            store.set(
-              window.plugin.Wasabee.Constants.AGENT_INFO_KEY,
-              JSON.stringify(me)
-            );
+	    me.store();
+            // store.set(window.plugin.Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
             thisthing._dialog.dialog("close");
           },
           reject => {
-            alert("login rejected: " + reject);
+            alert(`send access token failed: $(reject)`);
           }
         );
       }

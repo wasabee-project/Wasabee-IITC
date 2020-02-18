@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import { deleteOpPromise } from "../server";
 import UiCommands from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
+import { getSelectedOperation, makeSelectedOperation, opsList, getOperationByID, removeOperation} from "./selectedOp";
 
 const OpsDialog = Feature.extend({
   statics: {
@@ -21,7 +22,7 @@ const OpsDialog = Feature.extend({
   },
 
   _displayDialog: function() {
-    const op = window.plugin.wasabee.getSelectedOperation();
+    const op = getSelectedOperation();
     const content = document.createElement("div");
     content.id = "wasabee-dialog-operation-content";
     const opinfo = document.createElement("div");
@@ -78,9 +79,9 @@ const OpsDialog = Feature.extend({
     $(operationSelect).css({
       width: "90%"
     });
-    const ol = window.plugin.wasabee.opsList();
+    const ol = opsList();
     ol.forEach(function(opID) {
-      const op = window.plugin.wasabee.getOperationByID(opID);
+      const op = getOperationByID(opID);
       $(operationSelect).append(
         $("<option>").prop({
           value: opID,
@@ -92,8 +93,7 @@ const OpsDialog = Feature.extend({
     $(operationSelect).val(operation.ID);
     $(operationSelect).change(function() {
       const newID = $(this).val();
-      // window.plugin.wasabee.closeAllDialogs( window.plugin.Wasabee.static.dialogNames.opsButton);
-      const newop = window.plugin.wasabee.makeSelectedOperation(newID);
+      const newop = makeSelectedOperation(newID);
       context._displayOpInfo(context, newop);
       const mbr = newop.mbr();
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
@@ -188,7 +188,7 @@ const OpsDialog = Feature.extend({
 
     const deleteButton = buttonSection.appendChild(document.createElement("a"));
     deleteButton.innerHTML = "Delete " + operation.name;
-    if (window.plugin.wasabee.opsList().size == 0) {
+    if (opsList().size == 0) {
       deleteButton.disabled = true;
     }
     deleteButton.addEventListener(
@@ -211,7 +211,7 @@ const OpsDialog = Feature.extend({
                 }
               );
             }
-            const ol = window.plugin.wasabee.opsList();
+            const ol = opsList();
             let newopID = ol[0];
             if (newopID == null || newopID == operation.ID) {
               console.log(
@@ -228,10 +228,10 @@ const OpsDialog = Feature.extend({
             );
             $(operationSelect).val(newopID);
             $(operationSelect).change();
-            window.plugin.wasabee.removeOperation(removeid);
+            removeOperation(removeid);
             context._opSelectMenuUpdate(
               context,
-              window.plugin.wasabee.getSelectedOperation()
+              getSelectedOperation()
             );
           }
         );

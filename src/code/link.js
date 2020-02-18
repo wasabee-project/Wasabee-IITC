@@ -1,4 +1,5 @@
 import { generateId } from "./auxiliar";
+import { getSelectedOperation } from "./selectedOp";
 
 export default class WasabeeLink {
   //ID <- randomly generated alpha-numeric ID for the link
@@ -62,7 +63,7 @@ export default class WasabeeLink {
 
   getLatLngs(operation) {
     // for crosslinks.js
-    if (!operation) operation = window.plugin.wasabee.getSelectedOperation();
+    if (!operation) operation = getSelectedOperation();
 
     const fromPortal = operation.getPortal(this.fromPortalId);
     if (!fromPortal)

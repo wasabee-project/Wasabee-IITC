@@ -1,5 +1,6 @@
 import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
+import { getSelectedOperation } from "./selectedOp";
 
 const MarkerAddDialog = Feature.extend({
   statics: {
@@ -15,7 +16,7 @@ const MarkerAddDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._displayDialog();
   },
 

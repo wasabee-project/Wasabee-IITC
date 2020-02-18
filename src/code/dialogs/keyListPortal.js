@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
+import { getSelectedOperation } from "./selectedOp";
 
 const KeyListPortal = Feature.extend({
   statics: {
@@ -31,7 +32,7 @@ const KeyListPortal = Feature.extend({
 
   setup: function(portalID) {
     this._portalID = portalID;
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._portal = this._operation.getPortal(portalID);
     this._sortable = this.getSortable();
   },

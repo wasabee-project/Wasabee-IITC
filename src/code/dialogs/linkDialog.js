@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import UiCommands from "../uiCommands.js";
 import WasabeePortal from "../portal";
+import { getSelectedOperation } from "./selectedOp";
 
 const LinkDialog = Feature.extend({
   statics: {
@@ -15,7 +16,7 @@ const LinkDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._displayDialog();
   },
 

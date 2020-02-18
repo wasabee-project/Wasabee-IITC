@@ -2,7 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
-// generic prompt screen
+import { getSelectedOperation } from "./selectedOp";
 
 const MultimaxDialog = Feature.extend({
   statics: {
@@ -97,7 +97,7 @@ const MultimaxDialog = Feature.extend({
     this.label = "Multimax";
     this._portals = {};
     this._links = [];
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
   },
 
   //***Function to clear local selections of portals for the dialog

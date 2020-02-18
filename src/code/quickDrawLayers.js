@@ -1,5 +1,6 @@
 import { Feature } from "./leafletDrawImports";
 import WasabeePortal from "./portal";
+import { getSelectedOperation } from "./selectedOp";
 
 const strings = {
   quickdraw: {
@@ -40,7 +41,7 @@ const QuickDrawControl = Feature.extend({
   addHooks: function() {
     Feature.prototype.addHooks.call(this);
     if (!this._map) return;
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._anchor1 = null;
     this._anchor2 = null;
     this._spinePortals = {};
