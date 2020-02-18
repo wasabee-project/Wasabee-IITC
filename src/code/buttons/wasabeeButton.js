@@ -4,7 +4,7 @@ import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
-// import { mePromise } from "../server";
+import { resetOps, setupLocalStorage } from "../selectedOp";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -73,8 +73,8 @@ const WasabeeButton = WButton.extend({
             "Clear Local Ops",
             "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
             () => {
-              window.plugin.wasabee.resetOps();
-              window.plugin.wasabee.setupLocalStorage();
+              resetOps();
+              setupLocalStorage();
             }
           );
           con.enable();

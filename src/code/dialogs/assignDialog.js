@@ -125,7 +125,7 @@ const AssignDialog = Feature.extend({
 
     // this needs to make sure not to add the same agent multiple times...
     for (const t of this._operation.teamlist) {
-      if (!window.plugin.Wasabee.teams.has(t.teamid)) {
+      if (!window.plugin.wasabee.teams.has(t.teamid)) {
         teamPromise(t.teamid).then(
           function(team) {
             console.debug(team);
@@ -135,7 +135,7 @@ const AssignDialog = Feature.extend({
           }
         );
       }
-      const tt = window.plugin.Wasabee.teams.get(t.teamid) || new WasabeeTeam();
+      const tt = window.plugin.wasabee.teams.get(t.teamid) || new WasabeeTeam();
       for (const a of tt.agents) {
         if (alreadyAdded.indexOf(a.id) == -1) {
           alreadyAdded.push(a.id);

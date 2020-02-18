@@ -125,7 +125,7 @@ export const removeOperation = opID => {
 };
 
 //*** This function resets the local op list
-const resetOps = () => {
+export const resetOps = () => {
   const ops = opsList();
   for (const opID of ops) {
     removeOperation(opID);

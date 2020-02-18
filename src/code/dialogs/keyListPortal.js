@@ -63,7 +63,7 @@ const KeyListPortal = Feature.extend({
 
   keyListUpdate: function(operation) {
     const id =
-      "dialog-" + window.plugin.Wasabee.static.dialogNames.keyListPortal;
+      "dialog-" + window.plugin.wasabee.static.dialogNames.keyListPortal;
     if (window.DIALOGS[id]) {
       const table = this.getListDialogContent(operation, this._portalID);
       window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);

@@ -106,7 +106,7 @@ export default OpsButton;
 /*
 const closeAllDialogs = skip => {
   skip = skip || "nothing";
-  for (const name of Object.values(window.plugin.Wasabee.static.dialogNames)) {
+  for (const name of Object.values(window.plugin.wasabee.static.dialogNames)) {
     if (name != skip) {
       let id = "dialog-" + name;
       if (window.DIALOGS[id]) {

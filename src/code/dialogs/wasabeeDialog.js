@@ -96,14 +96,14 @@ const WasabeeDialog = Feature.extend({
 
   getIcon: function() {
     if (WasabeeMe.isLoggedIn()) {
-      return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_in;
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
     }
-    return window.plugin.Wasabee.static.images.toolbar_wasabeebutton_out;
+    return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
   },
 
   // unused, here just in case we want to be able to close individual dialogs
   _closeDialog: function() {
-    let id = "dialog-" + window.plugin.Wasabee.static.dialogNames.wasabeeButton;
+    let id = "dialog-" + window.plugin.wasabee.static.dialogNames.wasabeeButton;
     if (window.DIALOGS[id]) {
       try {
         const selector = $(window.DIALOGS[id]);
@@ -124,10 +124,10 @@ const WasabeeDialog = Feature.extend({
     serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
       if (serverDialog.inputField.value) {
         store.set(
-          window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
+          window.plugin.wasabee.Constants.SERVER_BASE_KEY,
           serverDialog.inputField.value
         );
-        store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+        store.remove(window.plugin.wasabee.Constants.AGENT_INFO_KEY);
       }
     });
     serverDialog.current = GetWasabeeServer();

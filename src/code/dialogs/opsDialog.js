@@ -135,9 +135,9 @@ const OpsDialog = Feature.extend({
     colorSection.innerHTML = "Operation Color: ";
     const operationColor = operation.color
       ? operation.color
-      : window.plugin.Wasabee.Constants.DEFAULT_OPERATION_COLOR;
+      : window.plugin.wasabee.Constants.DEFAULT_OPERATION_COLOR;
     const opColor = L.DomUtil.create("select", "", colorSection);
-    window.plugin.Wasabee.layerTypes.forEach(function(a) {
+    window.plugin.wasabee.layerTypes.forEach(function(a) {
       const option = L.DomUtil.create("option", "");
       if (a.name == operationColor) {
         option.setAttribute("selected", true);
@@ -171,7 +171,7 @@ const OpsDialog = Feature.extend({
     });
 
     // only show the delete button if more than 1 op remaining
-    if (opsList().size > 1) {
+    if (opsList().length > 1) {
       const deleteButton = L.DomUtil.create("a", "", buttonSection);
       deleteButton.innerHTML = "Delete " + operation.name;
       deleteButton.disabled = true;

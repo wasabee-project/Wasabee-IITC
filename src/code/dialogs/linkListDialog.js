@@ -181,7 +181,7 @@ const LinkListDialog = Feature.extend({
   },
 
   makeMenu: function(list, data) {
-    const state = new window.plugin.Wasabee.OverflowMenu();
+    const state = new window.plugin.wasabee.OverflowMenu();
     const options = [
       {
         label: "Reverse",
@@ -224,7 +224,7 @@ const LinkListDialog = Feature.extend({
     );
     linkColor.id = link.ID;
 
-    window.plugin.Wasabee.layerTypes.forEach(function(a) {
+    window.plugin.wasabee.layerTypes.forEach(function(a) {
       const option = document.createElement("option");
       option.setAttribute("value", a.name);
       if (a.name == "main") {

@@ -247,8 +247,8 @@ export const agentPromise = function(GID, force) {
       reject("null gid");
     }
 
-    if (!force && window.plugin.Wasabee._agentCache.has(GID)) {
-      resolve(window.plugin.Wasabee._agentCache.get(GID));
+    if (!force && window.plugin.wasabee._agentCache.has(GID)) {
+      resolve(window.plugin.wasabee._agentCache.get(GID));
     } else {
       const url = `${SERVER_BASE}/api/v1/agent/${GID}`;
       const req = new XMLHttpRequest();
@@ -499,15 +499,15 @@ export const GetWasabeeServer = function() {
 // don't use this unless you just can't use the promise directly
 export const getAgent = gid => {
   // when a team is loaded from the server, all agents are pushed into the cache
-  if (window.plugin.Wasabee._agentCache.has(gid)) {
-    return window.plugin.Wasabee._agentCache.get(gid);
+  if (window.plugin.wasabee._agentCache.has(gid)) {
+    return window.plugin.wasabee._agentCache.get(gid);
   }
 
   let agent = null;
   agentPromise(gid, false).then(
     function(resolve) {
       agent = resolve;
-      window.plugin.Wasabee._agentCache.set(gid, agent);
+      window.plugin.wasabee._agentCache.set(gid, agent);
     },
     function(reject) {
       console.log(reject);

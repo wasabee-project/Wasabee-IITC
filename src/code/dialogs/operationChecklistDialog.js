@@ -136,7 +136,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
         } else {
           // push this shit in to the marker class
           return (
-            window.plugin.Wasabee.markerTypes.get(thing.type).label || "unknown"
+            window.plugin.wasabee.markerTypes.get(thing.type).label || "unknown"
           );
         }
       },
