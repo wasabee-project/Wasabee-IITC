@@ -47,7 +47,7 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      console.log("pulling /me from server");
+      // console.log("pulling /me from server");
       mePromise().then(
         function(nme) {
           me = nme;

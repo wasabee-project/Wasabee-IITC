@@ -420,6 +420,10 @@ export const WButton = L.Class.extend({
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
     }
+    for (const m in window.plugin.wasabee.buttons._modes) {
+      if (window.plugin.wasabee.buttons._modes[m].type != this.type)
+        window.plugin.wasabee.buttons._modes[m].disable();
+    }
   },
 
   _createButton: function(options) {

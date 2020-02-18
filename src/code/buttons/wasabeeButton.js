@@ -4,7 +4,7 @@ import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
-import { mePromise } from "../server";
+// import { mePromise } from "../server";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -80,8 +80,8 @@ const WasabeeButton = WButton.extend({
           con.enable();
         },
         context: this
-      },
-      {
+      }
+      /* {
         title: "Force pull of /me from server (TESTING ONLY)",
         text: "/me",
         callback: async () => {
@@ -94,7 +94,7 @@ const WasabeeButton = WButton.extend({
           this.disable();
         },
         context: this
-      }
+      } */
     ];
 
     // build and display as if not logged in

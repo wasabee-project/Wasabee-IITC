@@ -77,7 +77,9 @@ const AuthDialog = Feature.extend({
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: async () => {
         const selectedOperation = window.plugin.wasabee.getSelectedOperation();
-        await WasabeeMe.get(); // check one more time, free if logged in -- for webview
+        const me = await WasabeeMe.get(); // check one more time, free if logged in -- for webview
+        console.log("close auth dialog");
+        console.log(me);
         window.runHooks("wasabeeUIUpdate", selectedOperation);
       },
       id: window.plugin.Wasabee.static.dialogNames.mustauth
@@ -87,12 +89,13 @@ const AuthDialog = Feature.extend({
   gsapiAuth: thisthing => {
     window.gapi.auth2.authorize(
       {
-        prompt: L.Browser.andorid ? "none" : "select_account", // "consent",
+        // prompt: L.Browser.andorid ? "none" : "select_account", // "consent",
         // prompt: "select_account",
+        prompt: "none",
         client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
-        response_type: "id_token permission",
-        immediate: false
+        response_type: "id_token permission"
+        // immediate: false
         // cookie_policy: "https://server.waabee.rocks"
       },
       response => {

@@ -217,7 +217,7 @@ export const mePromise = function() {
     req.setRequestHeader("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT"); // helps in some cases, breaks others
 
     req.onload = function() {
-      console.log(req.getAllResponseHeaders());
+      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           resolve(WasabeeMe.create(req.response));
@@ -391,8 +391,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
-      console.log("SendAccessToken");
-      console.log(req.getAllResponseHeaders());
+      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
@@ -477,14 +476,9 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
       reject(`Network Error: ${req.statusText}`);
     };
 
-    console.log(
-      `opKeyPromise sending ${opID}: ${portalID}, ${onhand}, ${capsule}`
-    );
-
     const fd = new FormData();
     fd.append("onhand", onhand ? onhand : "0");
     fd.append("capsule", capsule ? capsule : "");
-    console.log(fd);
     req.send(fd);
   });
 };

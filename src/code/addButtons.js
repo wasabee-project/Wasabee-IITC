@@ -8,7 +8,10 @@ import UploadButton from "./buttons/uploadButton";
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
-  selectedOp = selectedOp || window.plugin.wasabee.getSelectedOperation();
+  if (window.plugin.wasabee.buttons) {
+    console.log("replacing buttons");
+    delete window.plugin.wasabee.buttons;
+  }
 
   const ButtonsControl = L.Control.extend({
     options: {
@@ -41,7 +44,9 @@ export default function(selectedOp) {
       this._modes[ub.type] = ub;
       return outerDiv;
     },
+
     update: function(operation) {
+      console.log("updating buttons");
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
           window.plugin.wasabee.buttons.container,
@@ -57,5 +62,7 @@ export default function(selectedOp) {
   }
 
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
+
+  selectedOp = selectedOp || window.plugin.wasabee.getSelectedOperation();
   window.plugin.wasabee.buttons.update(selectedOp);
 }

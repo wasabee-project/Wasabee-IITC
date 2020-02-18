@@ -16,19 +16,24 @@ const KeyListPortal = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    window.addHook("wasabeeUIUpdate", keyListUpdate);
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.keyListUpdate(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", keyListUpdate);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   setup: function(portalID) {
     this._portalID = portalID;
     this._operation = window.plugin.wasabee.getSelectedOperation();
     this._portal = this._operation.getPortal(portalID);
+    this._sortable = this.getSortable();
   },
 
   _displayDialog: function() {
@@ -45,7 +50,7 @@ const KeyListPortal = Feature.extend({
         my: "center top",
         at: "center center"
       },
-      html: getListDialogContent(this._operation, this._portalID).table,
+      html: this.getListDialogContent(this._operation, this._portalID),
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: () => {
         delete this._dialog;
@@ -53,61 +58,57 @@ const KeyListPortal = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.keyListPortal
     });
+  },
+
+  keyListUpdate: function(operation) {
+    const id =
+      "dialog-" + window.plugin.Wasabee.static.dialogNames.keyListPortal;
+    if (window.DIALOGS[id]) {
+      const table = this.getListDialogContent(operation, this._portalID);
+      window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
+    }
+  },
+
+  getSortable: function() {
+    const sortable = new Sortable();
+    sortable.fields = [
+      {
+        name: "Agent",
+        value: key => key.gid,
+        sort: (a, b) => a.localeCompare(b),
+        format: async (cell, value, key) => {
+          const agent = await agentPromise(key.gid);
+          cell.textContent = agent.name;
+        }
+      },
+      {
+        name: "On Hand",
+        value: key => key.onhand,
+        sort: (a, b) => a - b,
+        format: (cell, value) => {
+          cell.textContent = value;
+        }
+      },
+      {
+        name: "Capsule",
+        value: key => key.capsule,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value) => {
+          cell.textContent = value;
+        }
+      }
+    ];
+
+    sortable.sortBy = 0;
+    return sortable;
+  },
+
+  getListDialogContent: function(operation, portalID) {
+    this._sortable.items = operation.keysonhand.filter(function(k) {
+      return k.portalId == portalID;
+    });
+    return this._sortable.table;
   }
 });
 
 export default KeyListPortal;
-
-const keyListUpdate = operation => {
-  console.log("update title please");
-
-  const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keyListPortal;
-  if (window.DIALOGS[id]) {
-    const table = getListDialogContent(operation).table;
-    window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
-  }
-};
-
-const getListDialogContent = (operation, portalID) => {
-  const sortable = new Sortable();
-  if (portalID) {
-    sortable._portalID = portalID;
-  } else {
-    portalID = sortable._portalID;
-  }
-
-  sortable.fields = [
-    {
-      name: "Agent",
-      value: key => key.gid,
-      sort: (a, b) => a.localeCompare(b),
-      format: async (cell, value, key) => {
-        const agent = await agentPromise(key.gid);
-        console.log(agent);
-        cell.textContent = agent.name;
-      }
-    },
-    {
-      name: "On Hand",
-      value: key => key.onhand,
-      sort: (a, b) => a.localeCompare(b),
-      format: (cell, value) => {
-        cell.textContent = value;
-      }
-    },
-    {
-      name: "Capsule",
-      value: key => key.capsule,
-      sort: (a, b) => a.localeCompare(b),
-      format: (cell, value) => {
-        cell.textContent = value;
-      }
-    }
-  ];
-
-  sortable.sortBy = 0;
-  sortable.items = operation.keysonhand.filter(function(k) {
-    return k.portalId == portalID;
-  });
-  return sortable;
-};

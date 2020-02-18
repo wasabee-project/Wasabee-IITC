@@ -72,12 +72,11 @@ const addMarker = (target, operation) => {
 const getMarkerPopup = (marker, target, operation) => {
   const portal = operation.getPortal(target.portalId);
   marker.className = "wasabee-dialog wasabee-dialog-ops";
-  const content = document.createElement("div");
-  const title = content.appendChild(document.createElement("div"));
-  title.className = "desc";
+  const content = L.DomUtil.create("div", "");
+  const title = L.DomUtil.create("div", "desc", content);
   title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
 
-  const assignment = content.appendChild(document.createElement("div"));
+  const assignment = L.DomUtil.create("div", "", content);
   if (target.state != "completed" && target.assignedTo) {
     agentPromise(target.assignedTo, false).then(
       function(a) {
@@ -93,32 +92,23 @@ const getMarkerPopup = (marker, target, operation) => {
     assignment.innerHTML = "Completed By: " + target.completedBy;
   }
 
-  const buttonSet = content.appendChild(document.createElement("div"));
-  buttonSet.className = "temp-op-dialog";
-  const deleteButton = buttonSet.appendChild(document.createElement("a"));
+  const buttonSet = L.DomUtil.create("div", "tmp-op-dialog", content);
+  const deleteButton = L.DomUtil.create("a", "", buttonSet);
   deleteButton.textContent = "Delete";
-  deleteButton.addEventListener(
-    "click",
-    () => {
-      UiCommands.deleteMarker(operation, target, portal);
-      marker.closePopup();
-    },
-    false
-  );
+  L.DomEvent.on(deleteButton, "click", () => {
+    UiCommands.deleteMarker(operation, target, portal);
+    marker.closePopup();
+  });
 
   if (operation.IsServerOp()) {
-    const assignButton = buttonSet.appendChild(document.createElement("a"));
+    const assignButton = L.DomUtil.create("a", "", buttonSet);
     assignButton.textContent = "Assign";
-    assignButton.addEventListener(
-      "click",
-      () => {
-        const ad = new AssignDialog();
-        ad.setup(target, operation);
-        ad.enable();
-        marker.closePopup();
-      },
-      false
-    );
+    L.DomEvent.on(assignButton, "click", () => {
+      const ad = new AssignDialog();
+      ad.setup(target, operation);
+      ad.enable();
+      marker.closePopup();
+    });
   }
 
   return content;
@@ -129,8 +119,8 @@ export const getPopupBodyWithType = (portal, target) => {
     target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
   }
   const marker = Wasabee.markerTypes.get(target.type);
-  let title = marker.label + ": " + portal.name;
-  if (target.comment) title = title + "\n\n" + target.comment;
+  let title = `${marker.label}: ${portal.name}`;
+  if (target.comment) title = title + "\n" + target.comment;
   return title;
 };
 

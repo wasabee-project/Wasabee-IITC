@@ -19,13 +19,17 @@ const KeysList = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = window.plugin.wasabee.getSelectedOperation();
-    window.addHook("wasabeeUIUpdate", keyListUpdate);
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.keyListUpdate(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", keyListUpdate);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   _displayDialog: function() {
@@ -45,18 +49,18 @@ const KeysList = Feature.extend({
       },
       id: window.plugin.Wasabee.static.dialogNames.keysList
     });
+  },
+
+  keyListUpdate: function(operation) {
+    const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keysList;
+    if (window.DIALOGS[id]) {
+      const table = getListDialogContent(operation).table;
+      window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
+    }
   }
 });
 
 export default KeysList;
-
-const keyListUpdate = operation => {
-  const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keysList;
-  if (window.DIALOGS[id]) {
-    const table = getListDialogContent(operation).table;
-    window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
-  }
-};
 
 const getListDialogContent = operation => {
   const me = WasabeeMe.get();
@@ -81,8 +85,8 @@ const getListDialogContent = operation => {
     },
     {
       name: "On Hand",
-      value: key => key.onHand,
-      sort: (a, b) => a.localeCompare(b),
+      value: key => parseInt(key.onHand),
+      sort: (a, b) => a - b,
       format: (cell, value, key) => {
         const a = L.DomUtil.create("a", "");
         a.name = key.id;
@@ -104,8 +108,8 @@ const getListDialogContent = operation => {
     sortable.fields = always.concat([
       {
         name: "My Count",
-        value: key => key.iHave,
-        sort: (a, b) => a.localeCompare(b),
+        value: key => parseInt(key.iHave),
+        sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const oif = document.createElement("input");
           oif.value = value;
