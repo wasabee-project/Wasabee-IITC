@@ -23,33 +23,32 @@ export default {
     }
 
     const con = new ConfirmDialog();
-    const prompt = document.createElement("div");
-    prompt.innerHTML = "Do you want to swap: ";
-    prompt.appendChild(portal.displayFormat(operation));
-    prompt.appendChild(document.createElement("span")).innerHTML = " with ";
-    prompt.appendChild(selectedPortal.displayFormat(operation));
-    con.setup("Swap Portal", prompt, () => {
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML = "Do you want to swap: ";
+    pr.appendChild(portal.displayFormat(operation));
+    L.DomUtil.create("span", "", pr).innerHTML = " with ";
+    pr.appendChild(selectedPortal.displayFormat(operation));
+    con.setup("Swap Portal", pr, () => {
       operation.swapPortal(portal, selectedPortal);
     });
     con.enable();
   },
   deletePortal: (operation, portal) => {
     const con = new ConfirmDialog();
-    const prompt = document.createElement("div");
-    prompt.innerHTML =
-      "Do you want to delete this anchor and all associated links: ";
-    prompt.appendChild(portal.displayFormat(operation));
-    con.setup("Delete Anchor", prompt, () => {
+    const pr = (L.DomUtil.create("div", "").innerHTML =
+      "Do you want to delete this anchor and all associated links: ");
+    pr.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Anchor", pr, () => {
       operation.removeAnchor(portal.id);
     });
     con.enable();
   },
   deleteMarker: (operation, marker, portal) => {
     const con = new ConfirmDialog();
-    const prompt = document.createElement("div");
-    prompt.innerHTML = "Do you want to delete this marker: ";
-    prompt.appendChild(portal.displayFormat(operation));
-    con.setup("Delete Marker", prompt, () => {
+    const pr = (L.DomUtil.create("div", "").innerHTML =
+      "Do you want to delete this marker: ");
+    pr.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Marker", pr, () => {
       operation.removeMarker(marker);
     });
     con.enable();
@@ -57,8 +56,8 @@ export default {
   clearAllItems: operation => {
     const con = new ConfirmDialog();
     con.setup(
-      "Clear: " + operation.name,
-      "Do you want to reset " + operation.name + "?",
+      `Clear: {$operation.name}`,
+      `Do you want to reset ${operation.name}?`,
       () => {
         operation.clearAllItems();
       }

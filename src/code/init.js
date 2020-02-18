@@ -116,7 +116,7 @@ window.plugin.wasabee.addCSS = content => {
 
 function initGoogleAPI() {
   if (typeof window.gapi !== "undefined") return;
-  var script = document.createElement("script");
+  const script = document.createElement("script");
   script.type = "text/javascript";
   script.async = true;
   script.src = "https://apis.google.com/js/client:platform:auth2.js";
