@@ -108,8 +108,8 @@ export default class WasabeeLink {
   }
 
   getColorHex() {
-    if (window.plugin.wasabee.layerTypes.has(this.color)) {
-      const c = window.plugin.wasabee.layerTypes.get(this.color);
+    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
+      const c = window.plugin.wasabee.static.layerTypes.get(this.color);
       return c.color;
     }
     return "#333333";

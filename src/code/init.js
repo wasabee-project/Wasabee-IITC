@@ -4,7 +4,6 @@ import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
-import initScopes from "./scopes";
 import { initFirebase } from "./firebaseSupport";
 import { checkAllLinks } from "./crosslinks";
 import { initWasabeeD, drawWasabeeDkeys } from "./wd";
@@ -12,6 +11,8 @@ import { initWasabeeD, drawWasabeeDkeys } from "./wd";
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = function() {
+  Object.freeze(Wasabee.static);
+
   if (window.plugin.sync)
     alert(
       "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee"
@@ -34,10 +35,6 @@ window.plugin.wasabee.init = function() {
   window.pluginCreateHook("wasabeeCrosslinks");
 
   initGoogleAPI();
-
-  // All of these should eventually export functions.
-  // We do this because they still assign them to the global scope.
-  initScopes();
   setupLocalStorage();
   initSelectedOperation();
   initOverflowMenu();

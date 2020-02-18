@@ -485,12 +485,12 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
 };
 
 export const GetWasabeeServer = function() {
-  let server = store.get(Wasabee.Constants.SERVER_BASE_KEY);
+  let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
   if (server == null) {
-    server = Wasabee.Constants.SERVER_BASE_DEFAULT;
+    server = Wasabee.static.constants.SERVER_BASE_DEFAULT;
     store.set(
-      Wasabee.Constants.SERVER_BASE_KEY,
-      Wasabee.Constants.SERVER_BASE_DEFAULT
+      Wasabee.static.constants.SERVER_BASE_KEY,
+      Wasabee.static.constants.SERVER_BASE_DEFAULT
     );
   }
   return server;

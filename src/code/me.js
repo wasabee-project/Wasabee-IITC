@@ -12,16 +12,16 @@ export default class WasabeeMe {
   }
 
   store() {
-    store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(this));
+    store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(this));
   }
 
   remove() {
-    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
   }
 
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
     if (lsme === null || typeof lsme !== "string") {
       return false;
     }
@@ -29,14 +29,14 @@ export default class WasabeeMe {
     if (me.fetched > maxCacheAge) {
       return true;
     }
-    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
     return false;
   }
 
   static get(force) {
     let me = null;
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
 
     if (typeof lsme == "string") {
       me = WasabeeMe.create(JSON.parse(lsme));
@@ -51,11 +51,14 @@ export default class WasabeeMe {
       mePromise().then(
         function(nme) {
           me = nme;
-          store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
+          store.set(
+            Wasabee.static.constants.AGENT_INFO_KEY,
+            JSON.stringify(me)
+          );
         },
         function(err) {
           console.log(err);
-          store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+          store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
           me = null;
           alert(err);
         }

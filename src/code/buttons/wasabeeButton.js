@@ -81,20 +81,18 @@ const WasabeeButton = WButton.extend({
         },
         context: this
       }
-      /* {
-        title: "Force pull of /me from server (TESTING ONLY)",
-        text: "/me",
-        callback: async () => {
-          try {
-            const me = await mePromise();
-            alert(JSON.stringify(me));
-          } catch (e) {
-            alert(e);
-          }
+    ];
+
+    this._Dactions = [
+      {
+        title: "Log Defense Keys",
+        text: "D Keys",
+        callback: () => {
           this.disable();
+          alert("coming soon");
         },
         context: this
-      } */
+      }
     ];
 
     // build and display as if not logged in
@@ -121,11 +119,20 @@ const WasabeeButton = WButton.extend({
     } else {
       tmp = [this._teamAction];
     }
-    return this._createSubActions(tmp.concat(this._alwaysActions));
+
+    tmp = tmp.concat(this._alwaysActions);
+
+    if (this._lastLoginState) {
+      tmp = tmp.concat(this._Dactions);
+    }
+
+    return this._createSubActions(tmp);
   },
 
   Wupdate: function() {
     const loggedIn = WasabeeMe.isLoggedIn();
+
+    // only change the icon if the state changes -- may be overkill trying to save a few cycles
     if (loggedIn != this._lastLoginState) {
       this._lastLoginState = loggedIn;
       this.button.children[0].src = this.getIcon();

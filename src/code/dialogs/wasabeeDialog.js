@@ -124,10 +124,10 @@ const WasabeeDialog = Feature.extend({
     serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
       if (serverDialog.inputField.value) {
         store.set(
-          window.plugin.wasabee.Constants.SERVER_BASE_KEY,
+          window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
           serverDialog.inputField.value
         );
-        store.remove(window.plugin.wasabee.Constants.AGENT_INFO_KEY);
+        store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
       }
     });
     serverDialog.current = GetWasabeeServer();

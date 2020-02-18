@@ -116,10 +116,10 @@ const getMarkerPopup = (marker, target, operation) => {
 };
 
 export const getPopupBodyWithType = (portal, target) => {
-  if (!Wasabee.markerTypes.has(target.type)) {
-    target.type = Wasabee.Constants.DEFAULT_MARKER_TYPE;
+  if (!Wasabee.static.markerTypes.has(target.type)) {
+    target.type = Wasabee.static.constants.DEFAULT_MARKER_TYPE;
   }
-  const marker = Wasabee.markerTypes.get(target.type);
+  const marker = Wasabee.static.markerTypes.get(target.type);
   let title = `${marker.label}: ${portal.name}`;
   if (target.comment) title = title + "\n" + target.comment;
   return title;
@@ -135,9 +135,9 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
   // pick the right style for the links
-  let lt = Wasabee.layerTypes.get("main");
-  if (Wasabee.layerTypes.has(operation.color)) {
-    lt = Wasabee.layerTypes.get(operation.color);
+  let lt = Wasabee.static.layerTypes.get("main");
+  if (Wasabee.static.layerTypes.has(operation.color)) {
+    lt = Wasabee.static.layerTypes.get(operation.color);
   }
   lt.link.color = lt.color;
 
@@ -146,8 +146,8 @@ const resetLinks = operation => {
 
 /** This function adds a portal to the portal layer group */
 const addLink = (link, style, operation) => {
-  if (link.color != "main" && Wasabee.layerTypes.has(link.color)) {
-    const linkLt = Wasabee.layerTypes.get(link.color);
+  if (link.color != "main" && Wasabee.static.layerTypes.has(link.color)) {
+    const linkLt = Wasabee.static.layerTypes.get(link.color);
     style = linkLt.link;
     style.color = linkLt.color;
   }

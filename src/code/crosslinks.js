@@ -183,9 +183,9 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
     // XXX  my gut says there is a way to do this more quickly
     for (const marker of operation.markers) {
       if (
-        marker.type == Wasabee.Constants.MARKER_TYPE_DESTROY ||
-        marker.type == Wasabee.Constants.MARKER_TYPE_VIRUS ||
-        marker.type == Wasabee.Constants.MARKER_TYPE_DECAY
+        marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
+        marker.type == Wasabee.static.constants.MARKER_TYPE_VIRUS ||
+        marker.type == Wasabee.static.constants.MARKER_TYPE_DECAY
       ) {
         if (checkMarkerAgainstLink(marker, realLink, operation)) {
           return false;

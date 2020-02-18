@@ -55,10 +55,10 @@ const AuthDialog = Feature.extend({
       serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
         if (serverDialog.inputField.value) {
           store.set(
-            window.plugin.wasabee.Constants.SERVER_BASE_KEY,
+            window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
             serverDialog.inputField.value
           );
-          store.remove(window.plugin.wasabee.Constants.AGENT_INFO_KEY);
+          store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
         }
       });
       serverDialog.current = GetWasabeeServer();
@@ -86,7 +86,7 @@ const AuthDialog = Feature.extend({
     window.gapi.auth2.authorize(
       {
         prompt: "none",
-        client_id: window.plugin.wasabee.Constants.OAUTH_CLIENT_ID,
+        client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
       },

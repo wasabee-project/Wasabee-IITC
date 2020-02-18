@@ -409,6 +409,7 @@ export const WButton = L.Class.extend({
   },
 
   disable: function() {
+    if (!this._enabled) return;
     this._enabled = false;
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "none";
@@ -416,6 +417,7 @@ export const WButton = L.Class.extend({
   },
 
   enable: function() {
+    if (this._enabled) return;
     this._enabled = true;
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
@@ -493,8 +495,9 @@ export const WButton = L.Class.extend({
       li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
-  },
+  }
 
+  /* 
   addHooks: function() {
     if (!this._map) return;
     console.log("WButton addHooks");
@@ -506,5 +509,5 @@ export const WButton = L.Class.extend({
     if (!this._map) return;
     console.log("WButton removeHooks");
     console.log(this);
-  }
+  } */
 });

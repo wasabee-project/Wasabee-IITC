@@ -25,25 +25,26 @@ export default function(selectedOp) {
         "div",
         "leaflet-draw leaflet-draw-section"
       );
-      const container = L.DomUtil.create("div", "leaflet-arcs leaflet-bar");
-      outerDiv.appendChild(container);
+      this._container = L.DomUtil.create(
+        "div",
+        "leaflet-arcs leaflet-bar",
+        outerDiv
+      );
       this._modes = {};
 
-      this.container = container;
-
-      const wb = new WasabeeButton(map, container);
+      const wb = new WasabeeButton(map, this._container);
       this._modes[wb.type] = wb;
-      const ob = new OpsButton(map, container);
+      const ob = new OpsButton(map, this._container);
       this._modes[ob.type] = ob;
-      const qb = new QuickdrawButton(map, container);
+      const qb = new QuickdrawButton(map, this._container);
       this._modes[qb.type] = qb;
-      const lb = new LinkButton(map, container);
+      const lb = new LinkButton(map, this._container);
       this._modes[lb.type] = lb;
-      const mb = new MarkerButton(map, container);
+      const mb = new MarkerButton(map, this._container);
       this._modes[mb.type] = mb;
-      const sb = new SyncButton(map, container);
+      const sb = new SyncButton(map, this._container);
       this._modes[sb.type] = sb;
-      const ub = new UploadButton(map, container);
+      const ub = new UploadButton(map, this._container);
       this._modes[ub.type] = ub;
       return outerDiv;
     },
@@ -52,7 +53,7 @@ export default function(selectedOp) {
       // console.log("updating buttons");
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
-          window.plugin.wasabee.buttons.container,
+          window.plugin.wasabee.buttons._container,
           operation
         );
       }

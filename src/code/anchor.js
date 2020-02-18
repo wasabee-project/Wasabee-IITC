@@ -47,9 +47,9 @@ export default class WasabeeAnchor {
   get icon() {
     const operation = getSelectedOperation();
     const colorGroup = operation.color;
-    let lt = window.plugin.wasabee.layerTypes.get("main");
-    if (window.plugin.wasabee.layerTypes.has(colorGroup)) {
-      lt = window.plugin.wasabee.layerTypes.get(colorGroup);
+    let lt = window.plugin.wasabee.static.layerTypes.get("main");
+    if (window.plugin.wasabee.static.layerTypes.has(colorGroup)) {
+      lt = window.plugin.wasabee.static.layerTypes.get(colorGroup);
     }
     if (lt.portal.iconUrl) {
       return lt.portal.iconUrl;

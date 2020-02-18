@@ -2,11 +2,11 @@ import store from "../lib/store";
 import WasabeeOp from "./operation";
 
 const setRestoreOpID = opID => {
-  store.set(window.plugin.wasabee.Constants.SELECTED_OP_KEY, opID);
+  store.set(window.plugin.wasabee.static.constants.SELECTED_OP_KEY, opID);
 };
 
 const getRestoreOpID = () => {
-  return store.get(window.plugin.wasabee.Constants.SELECTED_OP_KEY);
+  return store.get(window.plugin.wasabee.static.constants.SELECTED_OP_KEY);
 };
 
 export const getSelectedOperation = () => {
@@ -95,9 +95,11 @@ const initOps = () => {
 
 //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
 export const setupLocalStorage = () => {
-  if (store.get(window.plugin.wasabee.Constants.OP_RESTRUCTURE_KEY) == null) {
+  if (
+    store.get(window.plugin.wasabee.static.constants.OP_RESTRUCTURE_KEY) == null
+  ) {
     initOps();
-    store.set(window.plugin.wasabee.Constants.OP_RESTRUCTURE_KEY, true);
+    store.set(window.plugin.wasabee.static.constants.OP_RESTRUCTURE_KEY, true);
   }
 
   // make sure we have at least one op

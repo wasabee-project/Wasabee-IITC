@@ -89,7 +89,8 @@ const getListDialogContent = operation => {
     {
       name: "Type",
       value: marker =>
-        window.plugin.wasabee.markerTypes.get(marker.type).label || "unknown",
+        window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
+        "unknown",
       sort: (a, b) => a.localeCompare(b),
       format: (a, m) => {
         a.textContent = m;
