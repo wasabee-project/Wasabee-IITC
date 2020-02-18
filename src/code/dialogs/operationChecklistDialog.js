@@ -5,7 +5,7 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import UiCommands from "../uiCommands";
-import { getSelectedOperation() } from "selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {

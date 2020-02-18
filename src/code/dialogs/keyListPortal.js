@@ -1,7 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const KeyListPortal = Feature.extend({
   statics: {

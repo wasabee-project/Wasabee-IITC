@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 // export screen
 const ExportDialog = Feature.extend({
   statics: {

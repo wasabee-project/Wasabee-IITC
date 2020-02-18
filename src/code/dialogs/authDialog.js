@@ -3,7 +3,7 @@ import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
 import WasabeeMe from "../me";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -40,14 +40,15 @@ const AuthDialog = Feature.extend({
     gsapiButton.innerHTML = "Log In (gsapi)";
     gsapiButton.addEventListener("click", () => this.gsapiAuth(this), false);
 
-    if (!L.Browser.android) { // webview cannot work on android IITC-M
-    const webviewButton = buttonSet.appendChild(document.createElement("a"));
-    webviewButton.innerHTML = "Log In (webview)";
-    webviewButton.addEventListener(
-      "click",
-      () => window.open(GetWasabeeServer()),
-      false
-    );
+    if (!L.Browser.android) {
+      // webview cannot work on android IITC-M
+      const webviewButton = buttonSet.appendChild(document.createElement("a"));
+      webviewButton.innerHTML = "Log In (webview)";
+      webviewButton.addEventListener(
+        "click",
+        () => window.open(GetWasabeeServer()),
+        false
+      );
     }
 
     const changeServerButton = buttonSet.appendChild(
@@ -94,7 +95,7 @@ const AuthDialog = Feature.extend({
         client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
-	// these only make things worse, do not use:
+        // these only make things worse, do not use:
         // immediate: false
         // cookie_policy: "https://server.waabee.rocks"
       },
@@ -110,7 +111,7 @@ const AuthDialog = Feature.extend({
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
             const me = await mePromise();
-	    me.store();
+            me.store();
             // store.set(window.plugin.Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
             thisthing._dialog.dialog("close");
           },

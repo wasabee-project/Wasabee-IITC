@@ -2,7 +2,13 @@ import { Feature } from "../leafletDrawImports";
 import { deleteOpPromise } from "../server";
 import UiCommands from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
-import { getSelectedOperation, makeSelectedOperation, opsList, getOperationByID, removeOperation} from "./selectedOp";
+import {
+  getSelectedOperation,
+  makeSelectedOperation,
+  opsList,
+  getOperationByID,
+  removeOperation
+} from "../selectedOp";
 
 const OpsDialog = Feature.extend({
   statics: {
@@ -229,10 +235,7 @@ const OpsDialog = Feature.extend({
             $(operationSelect).val(newopID);
             $(operationSelect).change();
             removeOperation(removeid);
-            context._opSelectMenuUpdate(
-              context,
-              getSelectedOperation()
-            );
+            context._opSelectMenuUpdate(context, getSelectedOperation());
           }
         );
         con.enable();

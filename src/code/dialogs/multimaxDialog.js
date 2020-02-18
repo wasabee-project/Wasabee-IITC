@@ -2,7 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const MultimaxDialog = Feature.extend({
   statics: {

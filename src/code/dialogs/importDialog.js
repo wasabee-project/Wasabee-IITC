@@ -1,7 +1,7 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { Feature } from "../leafletDrawImports";
-import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
+import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const ImportDialogControl = Feature.extend({
   statics: {
@@ -36,10 +36,7 @@ const ImportDialogControl = Feature.extend({
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
         this.idialog.importTextareaAsOp();
-        window.runHooks(
-          "wasabeeUIUpdate",
-          getSelectedOperation()
-        );
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         idhandler.disable();
         delete idhandler._dialog;
       },

@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 // generic confirmation screen w/ ok and cancel buttons
 

@@ -2,7 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
-import { makeSelectedOperation } from "./selectedOp";
+import { makeSelectedOperation } from "../selectedOp";
 
 const NewopDialog = Feature.extend({
   statics: {

@@ -1,6 +1,6 @@
 import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const MarkerAddDialog = Feature.extend({
   statics: {

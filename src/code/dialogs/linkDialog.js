@@ -1,7 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import UiCommands from "../uiCommands.js";
 import WasabeePortal from "../portal";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const LinkDialog = Feature.extend({
   statics: {
