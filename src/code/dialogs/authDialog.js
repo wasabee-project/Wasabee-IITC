@@ -60,10 +60,10 @@ const AuthDialog = Feature.extend({
       serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
         if (serverDialog.inputField.value) {
           store.set(
-            window.plugin.Wasabee.Constants.SERVER_BASE_KEY,
+            window.plugin.wasabee.Constants.SERVER_BASE_KEY,
             serverDialog.inputField.value
           );
-          store.remove(window.plugin.Wasabee.Constants.AGENT_INFO_KEY);
+          store.remove(window.plugin.wasabee.Constants.AGENT_INFO_KEY);
         }
       });
       serverDialog.current = GetWasabeeServer();
@@ -83,7 +83,7 @@ const AuthDialog = Feature.extend({
         me.store();
         window.runHooks("wasabeeUIUpdate", selectedOperation);
       },
-      id: window.plugin.Wasabee.static.dialogNames.mustauth
+      id: window.plugin.wasabee.static.dialogNames.mustauth
     });
   },
 
@@ -92,7 +92,7 @@ const AuthDialog = Feature.extend({
       {
         // prompt: L.Browser.android ? "none" : "select_account", // "consent",
         prompt: "none",
-        client_id: window.plugin.Wasabee.Constants.OAUTH_CLIENT_ID,
+        client_id: window.plugin.wasabee.Constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
         // these only make things worse, do not use:
@@ -112,10 +112,11 @@ const AuthDialog = Feature.extend({
             // but do this by hand to 'await' it
             const me = await mePromise();
             me.store();
-            // store.set(window.plugin.Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
+            // store.set(window.plugin.wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(me));
             thisthing._dialog.dialog("close");
           },
           reject => {
+            console.log(reject);
             alert(`send access token failed: $(reject)`);
           }
         );

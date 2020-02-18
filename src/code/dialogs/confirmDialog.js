@@ -50,7 +50,7 @@ const ConfirmDialog = Feature.extend({
         confirmDialog.disable();
         delete confirmDialog._dialog;
       }
-      // id: window.plugin.Wasabee.static.dialogNames.XXX
+      // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 

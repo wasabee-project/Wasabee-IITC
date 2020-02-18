@@ -44,7 +44,7 @@ const ExportDialog = Feature.extend({
         exportDialog.disable();
         delete exportDialog._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.exportDialog
+      id: window.plugin.wasabee.static.dialogNames.exportDialog
     });
   },
 

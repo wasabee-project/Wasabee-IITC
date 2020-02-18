@@ -60,14 +60,14 @@ const OperationChecklistDialog = Feature.extend({
         this.disable();
         delete this._listDialogData;
       },
-      id: window.plugin.Wasabee.static.dialogNames.operationChecklist
+      id: window.plugin.wasabee.static.dialogNames.operationChecklist
     });
   },
 
   checklistUpdate: function(newOpData) {
     if (!this._enabled) return; // kludge until I can figure out how to remove the hook properly
     const id =
-      "dialog-" + window.plugin.Wasabee.static.dialogNames.operationChecklist;
+      "dialog-" + window.plugin.wasabee.static.dialogNames.operationChecklist;
     if (window.DIALOGS[id]) {
       this.sortable = getListDialogContent(
         newOpData,

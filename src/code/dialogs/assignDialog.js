@@ -44,7 +44,7 @@ const AssignDialog = Feature.extend({
         assignDialog.disable();
         delete assignDialog._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.assign
+      id: window.plugin.wasabee.static.dialogNames.assign
     });
   },
 

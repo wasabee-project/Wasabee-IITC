@@ -1,4 +1,3 @@
-import { getSelectedOp } from "./selectedOp";
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
@@ -6,9 +5,12 @@ import OpsButton from "./buttons/opsButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
+import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
 export default function(selectedOp) {
+  selectedOp = selectedOp || getSelectedOperation();
+
   if (window.plugin.wasabee.buttons) {
     console.log("replacing buttons");
     delete window.plugin.wasabee.buttons;
@@ -64,6 +66,5 @@ export default function(selectedOp) {
 
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
-  selectedOp = selectedOp || getSelectedOperation();
   window.plugin.wasabee.buttons.update(selectedOp);
 }

@@ -25,7 +25,7 @@ export default class WasabeeAgent {
     }
 
     // push the new data into the agent cache
-    window.plugin.Wasabee._agentCache.set(a.id, a);
+    window.plugin.wasabee._agentCache.set(a.id, a);
     return a;
   }
 

@@ -77,7 +77,7 @@ const WasabeeDialog = Feature.extend({
           wbHandler.disable();
           delete wbHandler._dialog;
         },
-        id: window.plugin.Wasabee.static.dialogNames.wasabeeButton
+        id: window.plugin.wasabee.static.dialogNames.wasabeeButton
       });
     } else {
       this.disable();

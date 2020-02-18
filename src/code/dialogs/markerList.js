@@ -50,7 +50,7 @@ const MarkerList = Feature.extend({
         this.disable();
         delete this._listDialogData;
       },
-      id: window.plugin.Wasabee.static.dialogNames.markerList
+      id: window.plugin.wasabee.static.dialogNames.markerList
     });
   }
 });
@@ -58,7 +58,7 @@ const MarkerList = Feature.extend({
 export default MarkerList;
 
 const markerListUpdate = operation => {
-  const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.markerList;
+  const id = "dialog-" + window.plugin.wasabee.static.dialogNames.markerList;
   if (window.DIALOGS[id]) {
     const table = getListDialogContent(operation).table;
     window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
@@ -89,7 +89,7 @@ const getListDialogContent = operation => {
     {
       name: "Type",
       value: marker =>
-        window.plugin.Wasabee.markerTypes.get(marker.type).label || "unknown",
+        window.plugin.wasabee.markerTypes.get(marker.type).label || "unknown",
       sort: (a, b) => a.localeCompare(b),
       format: (a, m) => {
         a.textContent = m;
@@ -159,7 +159,7 @@ const getListDialogContent = operation => {
 
 const makeMarkerDialogMenu = (list, data) => {
   const operation = getSelectedOperation();
-  const state = new window.plugin.Wasabee.OverflowMenu();
+  const state = new window.plugin.wasabee.OverflowMenu();
   const options = [
     {
       label: "Set Comment",

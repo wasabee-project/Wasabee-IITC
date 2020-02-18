@@ -30,12 +30,12 @@ const MarkerAddDialog = Feature.extend({
     const content = document.createElement("div");
     content.className = "temp-op-dialog";
     this._type = content.appendChild(document.createElement("select"));
-    window.plugin.Wasabee.markerTypes.forEach((a, k) => {
+    window.plugin.wasabee.markerTypes.forEach((a, k) => {
       const o = this._type.appendChild(document.createElement("option"));
       o.setAttribute("value", k);
       o.innerHTML = a.label;
     });
-    this._type.value = window.plugin.Wasabee.Constants.DEFAULT_MARKER_TYPE;
+    this._type.value = window.plugin.wasabee.Constants.DEFAULT_MARKER_TYPE;
     this._comment = content.appendChild(document.createElement("input"));
     this._comment.setAttribute("placeholder", "comment");
     const addMarkerButton = content.appendChild(document.createElement("a"));
@@ -59,7 +59,7 @@ const MarkerAddDialog = Feature.extend({
         mHandler.disable();
         delete mHandler._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.markerButton
+      id: window.plugin.wasabee.static.dialogNames.markerButton
     });
   },
 

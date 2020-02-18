@@ -49,7 +49,7 @@ const LinkListDialog = Feature.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.linkList
+      id: window.plugin.wasabee.static.dialogNames.linkList
     });
   },
 

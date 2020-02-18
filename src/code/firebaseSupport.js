@@ -9,7 +9,7 @@ import { drawAgents } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import { makeSelectedOperation } from "./selectedOp";
 
-const Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 export const initFirebase = () => {
   const server = GetWasabeeServer();

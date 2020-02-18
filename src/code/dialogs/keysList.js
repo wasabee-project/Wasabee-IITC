@@ -3,7 +3,7 @@ import Sortable from "../../lib/sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const KeysList = Feature.extend({
   statics: {
@@ -48,12 +48,12 @@ const KeysList = Feature.extend({
         delete this._listDialog;
         this.disable();
       },
-      id: window.plugin.Wasabee.static.dialogNames.keysList
+      id: window.plugin.wasabee.static.dialogNames.keysList
     });
   },
 
   keyListUpdate: function(operation) {
-    const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keysList;
+    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.keysList;
     if (window.DIALOGS[id]) {
       const table = getListDialogContent(operation).table;
       window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);

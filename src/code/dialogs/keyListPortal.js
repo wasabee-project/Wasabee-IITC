@@ -57,7 +57,7 @@ const KeyListPortal = Feature.extend({
         delete this._dialog;
         this.disable();
       },
-      id: window.plugin.Wasabee.static.dialogNames.keyListPortal
+      id: window.plugin.wasabee.static.dialogNames.keyListPortal
     });
   },
 

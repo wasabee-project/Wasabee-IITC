@@ -53,7 +53,7 @@ const PromptDialog = Feature.extend({
         promptDialog.disable();
         delete promptDialog._dialog;
       }
-      // id: window.plugin.Wasabee.static.dialogNames.XXX
+      // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 

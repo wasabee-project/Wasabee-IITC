@@ -1,5 +1,5 @@
 export default function() {
-  const Wasabee = window.plugin.Wasabee || {};
+  const Wasabee = window.plugin.wasabee || {};
 
   Wasabee.Constants = {
     SELECTED_OP_KEY: "SELECTED_OP_KEY",

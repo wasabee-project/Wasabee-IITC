@@ -85,7 +85,7 @@ const MultimaxDialog = Feature.extend({
         context.disable();
         delete context._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.multimaxButton
+      id: window.plugin.wasabee.static.dialogNames.multimaxButton
     });
   },
 

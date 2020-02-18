@@ -48,7 +48,7 @@ const OpsDialog = Feature.extend({
         obHandler.disable();
         delete obHandler._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.opsButton
+      id: window.plugin.wasabee.static.dialogNames.opsButton
     });
 
     const operationSelect = document.getElementById("wasabee-operationSelect");

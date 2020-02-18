@@ -40,7 +40,7 @@ const ImportDialogControl = Feature.extend({
         idhandler.disable();
         delete idhandler._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.importDialog
+      id: window.plugin.wasabee.static.dialogNames.importDialog
     });
   }
 });

@@ -46,7 +46,7 @@ const loadNewDefaultOp = () => {
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-const makeSelectedOperation = opID => {
+export const makeSelectedOperation = opID => {
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
       console.log(
@@ -69,8 +69,7 @@ const makeSelectedOperation = opID => {
 };
 
 // use this to pull an op from local store by ID
-// wrap it in a try/catch
-const getOperationByID = opID => {
+export const getOperationByID = opID => {
   let op = null;
   try {
     const v = store.get(opID);

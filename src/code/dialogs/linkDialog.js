@@ -102,7 +102,7 @@ const LinkDialog = Feature.extend({
         self._clearLocalPortalSelections();
         delete self._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.linkDialogButton
+      id: window.plugin.wasabee.static.dialogNames.linkDialogButton
     });
   },
 

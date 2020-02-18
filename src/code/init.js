@@ -9,7 +9,7 @@ import { initFirebase } from "./firebaseSupport";
 import { checkAllLinks } from "./crosslinks";
 import { initWasabeeD, drawWasabeeDkeys } from "./wd";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = function() {
   if (window.plugin.sync)

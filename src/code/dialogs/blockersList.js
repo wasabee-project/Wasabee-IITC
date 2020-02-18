@@ -73,14 +73,14 @@ const BlockerList = Feature.extend({
         blockerList.disable();
         delete blockerList._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.blockerList
+      id: window.plugin.wasabee.static.dialogNames.blockerList
     });
   },
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function(newOpData) {
     if (!this._enabled) return;
-    const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.blockerList;
+    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.blockerList;
     if (window.DIALOGS[id]) {
       this.sortable = getListDialogContent(
         newOpData,

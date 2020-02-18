@@ -1,4 +1,4 @@
-const Wasabee = window.plugin.Wasabee || {};
+const Wasabee = window.plugin.wasabee || {};
 Wasabee.static = {
   html: {
     // exampleButton: require("./html/exampleButton.html"),

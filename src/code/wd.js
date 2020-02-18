@@ -29,5 +29,4 @@ export const drawWasabeeDkeys = () => {
 
   console.log("running drawWasabeeDkeys");
   console.log(server);
-  //
 };

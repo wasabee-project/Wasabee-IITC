@@ -2,7 +2,7 @@ import { WButton } from "../leafletDrawImports.js";
 import { opPromise } from "../server";
 import WasabeeMe from "../me";
 import AuthDialog from "../dialogs/authDialog";
-import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
+import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const SyncButton = WButton.extend({
   statics: {
@@ -36,7 +36,7 @@ const SyncButton = WButton.extend({
   _loggedInButton: function(container) {
     return this._createButton({
       container: container,
-      buttonImage: window.plugin.Wasabee.static.images.toolbar_download,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_download,
       context: this,
       callback: () => {
         const so = getSelectedOperation();

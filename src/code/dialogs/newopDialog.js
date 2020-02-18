@@ -81,7 +81,7 @@ const NewopDialog = Feature.extend({
         noHandler.disable();
         delete noHandler._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.newopButton
+      id: window.plugin.wasabee.static.dialogNames.newopButton
     });
   },
 

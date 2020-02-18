@@ -5,7 +5,7 @@ import WasabeeAnchor from "./anchor";
 import { agentPromise, teamPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 
-var Wasabee = window.plugin.Wasabee;
+var Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {

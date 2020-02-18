@@ -3,7 +3,7 @@ import WasabeeLink from "./link";
 import { getSelectedOperation } from "./selectedOp";
 
 //*** CROSSLINK THINGS */
-const Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee
 
 // takes WasabeeLink or L.geodesicPolyline format
 export const greatCircleArcIntersect = (existing, drawn) => {

@@ -28,7 +28,7 @@ const QuickDrawControl = Feature.extend({
     icon: new L.Icon({
       iconSize: new L.Point(16, 16),
       iconAnchor: new L.Point(0, 0),
-      iconUrl: window.plugin.Wasabee.static.images.toolbar_quickdraw
+      iconUrl: window.plugin.wasabee.static.images.toolbar_quickdraw
     })
   },
 

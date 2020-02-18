@@ -1,7 +1,7 @@
 import store from "../lib/store";
 import { mePromise } from "./server";
 
-const Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeMe {
   constructor() {

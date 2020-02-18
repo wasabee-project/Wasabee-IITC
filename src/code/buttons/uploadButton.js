@@ -1,7 +1,7 @@
 import { WButton } from "../leafletDrawImports.js";
 import { uploadOpPromise, updateOpPromise } from "../server";
 import WasabeeMe from "../me";
-import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
+import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -21,7 +21,7 @@ const UploadButton = WButton.extend({
     this.button = this._createButton({
       title: "Upload",
       container: container,
-      buttonImage: window.plugin.Wasabee.static.images.toolbar_upload,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_upload,
       context: this,
       callback: () => {
         if (this._operation.IsServerOp()) {

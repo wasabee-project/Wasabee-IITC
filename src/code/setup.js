@@ -1,4 +1,6 @@
-const Wasabee = window.plugin.Wasabee || {};
+/* 
+ * I think this file is unused
+const Wasabee = window.plugin.wasabee || {};
 
 Wasabee.setup = {};
 
@@ -23,17 +25,8 @@ Wasabee.setup.css = function() {
     .appendTo("head");
 };
 
-/*
-Wasabee.setup.leafletLayer = function() {
-	Wasabee.data.leafletLayer = new L.LayerGroup();
-	// FIXME: create Wasabee.data object to store layer reference
-	// FIXME: change Layer name
-	window.addLayerGroup('Layer name', Wasabee.data.leafletLayer, false);
-};
-*/
-
 // wrapper to follow the "standard" way of doing iitc plugins
-/* eslint-disable no-unused-vars */
-var setup = function() {
+const setup = function() {
   Wasabee.setup.run();
 };
+*/

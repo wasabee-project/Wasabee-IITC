@@ -4,7 +4,7 @@ import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
 import store from "../lib/store";
 
-const Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 export default function() {
   return GetWasabeeServer();

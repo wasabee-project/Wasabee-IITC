@@ -69,7 +69,7 @@ export const SetCommentDialog = Feature.extend({
         setCommentHandler.disable();
         delete setCommentHandler._dialog;
       }
-      // id: window.plugin.Wasabee.static.dialogNames.XXX
+      // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 
