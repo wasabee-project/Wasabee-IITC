@@ -47,7 +47,7 @@ export const uploadOpPromise = function(operation) {
           reject(req.response);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -80,7 +80,7 @@ export const updateOpPromise = function(operation) {
           reject("permission to update denied");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -112,7 +112,7 @@ export const deleteOpPromise = function(opID) {
           reject("permission to delete denied");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -147,7 +147,7 @@ export const teamPromise = function(teamid) {
           reject("permission denied to team: " + teamid);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -193,7 +193,7 @@ export const opPromise = function(opID) {
           reject("not authorized to access op: " + opID);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -227,7 +227,7 @@ export const mePromise = function() {
           reject(`${req.status}: not logged in`);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -265,7 +265,7 @@ export const agentPromise = function(GID, force) {
             reject("not logged in");
             break;
           default:
-            reject(`${req.status}: ${req.statusText}`);
+            reject(`${req.status}: ${req.statusText} ${req.response}`);
             break;
         }
       };
@@ -297,7 +297,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -330,7 +330,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           reject("not logged in");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -363,7 +363,7 @@ export const targetPromise = function(agent, portal) {
           resolve(true);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -396,12 +396,15 @@ export const SendAccessTokenAsync = function(accessToken) {
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
+          console.log(req.response);
           resolve(true);
           break;
         default:
           console.log("sending auth token to server rejected");
-          alert(`sending auth token to server rejected: ${req.statusText}`);
-          reject(`${req.status}: ${req.statusText}`);
+          alert(
+            `sending auth token to server rejected: ${req.statusText} ${req.response}`
+          );
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -435,7 +438,7 @@ export const SetTeamState = function(teamID, state) {
           reject("not logged in");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };
@@ -468,7 +471,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
           reject("not logged in");
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
     };

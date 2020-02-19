@@ -39,6 +39,10 @@ const AuthDialog = Feature.extend({
     gsapiButton.innerHTML = "Log In (gsapi)";
     L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuth(this));
 
+    const gsapiButtonToo = L.DomUtil.create("a", "", buttonSet);
+    gsapiButtonToo.innerHTML = "Log In (gsapi, settings two)";
+    L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthToo(this));
+
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
       const webviewButton = L.DomUtil.create("a", "", buttonSet);
@@ -83,12 +87,59 @@ const AuthDialog = Feature.extend({
   },
 
   gsapiAuth: context => {
+    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
+    if (syncLoggedIn) {
+      alert(
+        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
+      );
+    }
+
     window.gapi.auth2.authorize(
       {
         prompt: "none",
         client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
         response_type: "id_token permission"
+      },
+      response => {
+        if (response.error) {
+          context._dialog.dialog("close");
+          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
+          alert(err);
+          return;
+        }
+        SendAccessTokenAsync(response.access_token).then(
+          async () => {
+            // could be const me = WasabeeMe.get();
+            // but do this by hand to 'await' it
+            const me = await mePromise();
+            me.store();
+            context._dialog.dialog("close");
+          },
+          reject => {
+            console.log(reject);
+            alert(`send access token failed: $(reject)`);
+          }
+        );
+      }
+    );
+  },
+
+  gsapiAuthToo: context => {
+    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
+    if (syncLoggedIn) {
+      alert(
+        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
+      );
+    }
+
+    window.gapi.auth2.authorize(
+      {
+        prompt: "consent",
+        client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+        scope: "email profile openid",
+        response_type: "id_token permission",
+        immediate: false
       },
       response => {
         if (response.error) {

@@ -5,6 +5,7 @@ import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import { resetOps, setupLocalStorage } from "../selectedOp";
+import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -89,7 +90,8 @@ const WasabeeButton = WButton.extend({
         text: "D Keys",
         callback: () => {
           this.disable();
-          alert("coming soon");
+          const dkd = new DefensiveKeysDialog();
+          dkd.enable();
         },
         context: this
       }
