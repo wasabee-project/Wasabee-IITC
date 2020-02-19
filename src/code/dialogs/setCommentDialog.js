@@ -74,10 +74,9 @@ export const SetCommentDialog = Feature.extend({
   },
 
   _buildHtml: function() {
-    const container = document.createElement("div");
-    container.className = "wasabee-dialog wasabee-dialog-ops";
-    const desc = container.appendChild(document.createElement("div"));
-    const input = container.appendChild(document.createElement("input"));
+    const container = L.DomUtil.create("div", "wasabee-dialog wasabee-dialog-ops");
+    const desc = L.DomUtil.create("div", "", container);
+    const input = L.DomUtil.create("input", "", container);
     input.placeholder = "comment";
 
     if (this.commentType == "link") {
