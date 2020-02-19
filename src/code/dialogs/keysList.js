@@ -3,7 +3,7 @@ import Sortable from "../../lib/sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const KeysList = Feature.extend({
   statics: {
@@ -48,12 +48,12 @@ const KeysList = Feature.extend({
         delete this._listDialog;
         this.disable();
       },
-      id: window.plugin.Wasabee.static.dialogNames.keysList
+      id: window.plugin.wasabee.static.dialogNames.keysList
     });
   },
 
   keyListUpdate: function(operation) {
-    const id = "dialog-" + window.plugin.Wasabee.static.dialogNames.keysList;
+    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.keysList;
     if (window.DIALOGS[id]) {
       const table = getListDialogContent(operation).table;
       window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
@@ -112,17 +112,13 @@ const getListDialogContent = operation => {
         value: key => parseInt(key.iHave),
         sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          const oif = document.createElement("input");
+          const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 3;
-          oif.addEventListener(
-            "change",
-            () => {
-              opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
-              operation.keyOnHand(key.id, gid, oif.value, key.capsule);
-            },
-            false
-          );
+          L.DomEvent.on(oif, "change", () => {
+            opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
+            operation.keyOnHand(key.id, gid, oif.value, key.capsule);
+          });
           cell.appendChild(oif);
         }
       },
@@ -131,17 +127,13 @@ const getListDialogContent = operation => {
         value: key => key.capsule,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          const oif = document.createElement("input");
+          const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 8;
-          oif.addEventListener(
-            "change",
-            () => {
-              opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
-              operation.keyOnHand(key.id, gid, key.iHave, oif.value);
-            },
-            false
-          );
+          L.DomEvent.on(oif, "change", () => {
+            opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
+            operation.keyOnHand(key.id, gid, key.iHave, oif.value);
+          });
           cell.appendChild(oif);
         }
       }
@@ -181,7 +173,9 @@ const getListDialogContent = operation => {
   }
 
   for (const p of operation.markers.filter(function(marker) {
-    return marker.type == window.plugin.wasabee.Constants.MARKER_TYPE_KEY;
+    return (
+      marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
+    );
   })) {
     const k = {};
     k.id = p.portalId;

@@ -27,21 +27,20 @@ const MarkerAddDialog = Feature.extend({
   _displayDialog: function() {
     this._marker = null;
 
-    const content = document.createElement("div");
-    content.className = "temp-op-dialog";
-    this._type = content.appendChild(document.createElement("select"));
-    window.plugin.wasabee.static.markerTypes.forEach((a, k) => {
-      const o = this._type.appendChild(document.createElement("option"));
+    const content = L.DomUtil.create("div", "temp-op-dialog");
+    this._type = L.DomUtil.create("select", "");
+    for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
+      const o = L.DomUtil.create("option", "", this._type);
       o.setAttribute("value", k);
       o.innerHTML = a.label;
-    });
+    }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
-    this._comment = content.appendChild(document.createElement("input"));
+    this._comment = L.DomUtil.create("input", "", content);
     this._comment.setAttribute("placeholder", "comment");
-    const addMarkerButton = content.appendChild(document.createElement("a"));
+    const addMarkerButton = L.DomUtil.create("a", "", content);
     addMarkerButton.innerHTML = "Add Marker";
-    addMarkerButton.addEventListener("click", () =>
+    L.DomEvent.on(addMarkerButton, "click", () =>
       this._addMarker(this._type.value, this._operation, this._comment.value)
     );
 
