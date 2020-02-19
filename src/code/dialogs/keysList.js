@@ -112,17 +112,13 @@ const getListDialogContent = operation => {
         value: key => parseInt(key.iHave),
         sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          const oif = document.createElement("input");
+          const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 3;
-          oif.addEventListener(
-            "change",
-            () => {
-              opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
-              operation.keyOnHand(key.id, gid, oif.value, key.capsule);
-            },
-            false
-          );
+          L.DomEvent.on(oif, "change", () => {
+            opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
+            operation.keyOnHand(key.id, gid, oif.value, key.capsule);
+          });
           cell.appendChild(oif);
         }
       },
@@ -131,17 +127,13 @@ const getListDialogContent = operation => {
         value: key => key.capsule,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          const oif = document.createElement("input");
+          const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 8;
-          oif.addEventListener(
-            "change",
-            () => {
-              opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
-              operation.keyOnHand(key.id, gid, key.iHave, oif.value);
-            },
-            false
-          );
+          L.DomEvent.on(oif, "change", () => {
+            opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
+            operation.keyOnHand(key.id, gid, key.iHave, oif.value);
+          });
           cell.appendChild(oif);
         }
       }
@@ -181,7 +173,9 @@ const getListDialogContent = operation => {
   }
 
   for (const p of operation.markers.filter(function(marker) {
-    return marker.type == window.plugin.wasabee.Constants.MARKER_TYPE_KEY;
+    return (
+      marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
+    );
   })) {
     const k = {};
     k.id = p.portalId;
