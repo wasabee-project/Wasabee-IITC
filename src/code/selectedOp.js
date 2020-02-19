@@ -73,12 +73,7 @@ export const getOperationByID = opID => {
   let op = null;
   try {
     const v = store.get(opID);
-    if (v == null) {
-      console.log("getOperationByID: no such op in local store: " + opID);
-    } else {
-      // we can pass v directly, but this catches if the json is malformed
-      op = WasabeeOp.create(JSON.parse(v));
-    }
+    if (v) op = WasabeeOp.create(JSON.parse(v));
   } catch (e) {
     console.log(e);
     alert(JSON.stringify(e));

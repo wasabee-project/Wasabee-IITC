@@ -181,9 +181,7 @@ const getListDialogContent = operation => {
   }
 
   for (const p of operation.markers.filter(function(marker) {
-    return (
-      marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
-    );
+    return marker.type == window.plugin.wasabee.Constants.MARKER_TYPE_KEY;
   })) {
     const k = {};
     k.id = p.portalId;

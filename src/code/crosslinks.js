@@ -228,6 +228,10 @@ const showCrossLink = (link, operation) => {
 };
 
 const testLink = (link, operation) => {
+  // if crosslinks are not displayed, do not check
+  if (!window.isLayerGroupDisplayed("Wasabee Cross Links")) return;
+
+  // if the crosslink already exists, do not recheck
   if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) {
     return;
   }
@@ -313,6 +317,7 @@ export const initCrossLinks = () => {
     true
   );
 
+  // rerun crosslinks on re-enable
   window.map.on("layeradd", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       var operation = getSelectedOperation();
@@ -321,6 +326,8 @@ export const initCrossLinks = () => {
       }
     }
   });
+
+  // clear crosslinks on disable
   window.map.on("layerremove", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
@@ -328,7 +335,6 @@ export const initCrossLinks = () => {
     }
   });
 
-  // window.addHook("linkAdded", onLinkAdded);
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
 };

@@ -25,23 +25,20 @@ const LinkDialog = Feature.extend({
     self._clearLocalPortalSelections();
     this._portals = {};
     this._links = [];
-    var container = document.createElement("div");
-    this._desc = container.appendChild(document.createElement("textarea"));
+    const container = L.DomUtil.create("div", "");
+    this._desc = L.DomUtil.create("textarea", "desc", container);
     this._desc.placeholder = "Description (optional)";
-    this._desc.className = "desc";
-    var tr;
-    var node;
-    var button;
-    var filter;
-    var rdnTable = container.appendChild(document.createElement("table"));
+    let node;
+    const rdnTable = L.DomUtil.create("table", "", container);
+
+    // XXX WHY? DEAR GOD WHY!?
     [0, 1, 2].forEach(string => {
-      var type = 0 == string ? "src" : "dst-" + string;
-      tr = rdnTable.insertRow();
+      let type = 0 == string ? "src" : "dst-" + string;
+      const tr = rdnTable.insertRow();
       tr.setAttribute("data-portal", type);
       node = tr.insertCell();
-      if (0 != string) {
-        filter = node.appendChild(document.createElement("input"));
-        // filter.type = "checkbox";
+      if (string != 0) {
+        const filter = L.DomUtil.create("input", "", node);
         filter.checked = true;
         filter.value = type;
         self._links.push(filter);
@@ -49,14 +46,15 @@ const LinkDialog = Feature.extend({
       node = tr.insertCell();
       node.textContent = 0 == string ? "from" : "to (#" + string + ")";
       node = tr.insertCell();
-      button = node.appendChild(document.createElement("button"));
+      const button = L.DomUtil.create("button", "", node);
       button.textContent = "set";
       button.addEventListener("click", arg => self._setPortal(arg), false);
       node = tr.insertCell();
-      if (0 != string) {
-        button = node.appendChild(document.createElement("button"));
-        button.textContent = "add";
-        button.addEventListener(
+      if (string != 0) {
+        const addbutton = L.DomUtil.create("button", "", node);
+        addbutton.textContent = "add";
+        L.DomEvent.on(
+          addbutton,
           "click",
           other => self._addLinkTo(other, self._operation),
           false
@@ -67,29 +65,22 @@ const LinkDialog = Feature.extend({
       self._portals[type] = node;
       self._updatePortal(type);
     });
-    var element = container.appendChild(document.createElement("div"));
-    element.className = "buttonbar";
-    var div = element.appendChild(document.createElement("span"));
-    var opt = div.appendChild(document.createElement("span"));
-    opt.className = "arrow";
+    const element = L.DomUtil.create("div", "buttonbar", container);
+    const div = L.DomUtil.create("span", "arrow", element); // a span named div?
+    const opt = L.DomUtil.create("span", "arrow", div);
     opt.textContent = "\u21b3";
-    button = div.appendChild(document.createElement("button"));
+    const button = L.DomUtil.create("button", "", div);
     button.textContent = "add all";
-    button.addEventListener(
+    L.DomEvent.on(
+      button,
       "click",
       () => self._addAllLinks(self._operation),
       false
     );
-    var cardHeader = element.appendChild(document.createElement("label"));
-    this._reversed = cardHeader.appendChild(document.createElement("input"));
+    const cardHeader = L.DomUtil.create("label", "", element);
+    this._reversed = L.DomUtil.create("input", "", cardHeader);
     this._reversed.type = "checkbox";
     cardHeader.appendChild(document.createTextNode(" reverse"));
-    //var layerSelector = new Wasabee.LayerSelector(this._layerManager, this._operation.data);
-    //layerSelector.label = false;
-    //element.appendChild(layerSelector.container);
-    button = element.appendChild(document.createElement("button"));
-    button.textContent = "close";
-    button.addEventListener("click", () => self._dialog.dialog("close"), false);
 
     this._dialog = window.dialog({
       title: "Add Links",

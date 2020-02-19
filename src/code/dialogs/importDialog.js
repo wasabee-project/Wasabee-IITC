@@ -49,12 +49,10 @@ export default ImportDialogControl;
 
 class ImportDialog {
   constructor() {
-    this.container = document.createElement("div");
+    this.container = L.DomUtil.create("div", "");
 
     // Input area
-    this.textarea = this.container.appendChild(
-      document.createElement("textarea")
-    );
+    this.textarea = L.DomUtil.create("textarea", "", this.container);
     this.textarea.rows = 20;
     this.textarea.cols = 80;
     this.textarea.placeholder =

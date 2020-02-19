@@ -32,12 +32,12 @@ const WasabeeDialog = Feature.extend({
         value: team => team.Name,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
-          const link = document.createElement("a");
+          const link = L.DomUtil.create("a", "", row);
           link.href =
             GetWasabeeServer() + "/api/v1/team/" + team.ID + "?json=n";
           link.innerHTML = value;
           link.target = "_blank";
-          row.appendChild(link);
+          // row.appendChild(link);
         }
       },
       {
@@ -45,26 +45,26 @@ const WasabeeDialog = Feature.extend({
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
-          const link = document.createElement("a");
+          const link = L.DomUtil.create("a", "", row);
           let curstate = obj.State;
           link.innerHTML = curstate;
           link.onclick = () => {
             curstate = this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
           };
-          row.appendChild(link);
+          //row.appendChild(link);
         }
       }
     ];
     teamlist.sortBy = 0;
 
-    const html = document.createElement("div");
-    this.serverInfo = html.appendChild(document.createElement("div"));
+    const html = L.DomUtil.create("div", "temp-op-dialog");
+    this.serverInfo = L.DomUtil.create("div", "", html);
     this.serverInfo.innerHTML = "Server: " + GetWasabeeServer() + "<br/><br/>";
-    this.serverInfo.addEventListener("click", this.setServer);
+    L.DomEvent.on(this.serverInfo, "click", this.setServer);
     html.appendChild(teamlist.table);
 
-    if (me !== null && me instanceof WasabeeMe) {
+    if (me && me instanceof WasabeeMe) {
       teamlist.items = me.Teams;
       const wbHandler = this;
       this._dialog = window.dialog({
@@ -94,26 +94,13 @@ const WasabeeDialog = Feature.extend({
     return newState;
   },
 
+  /*
   getIcon: function() {
     if (WasabeeMe.isLoggedIn()) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
     }
     return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
-  },
-
-  // unused, here just in case we want to be able to close individual dialogs
-  _closeDialog: function() {
-    let id = "dialog-" + window.plugin.wasabee.static.dialogNames.wasabeeButton;
-    if (window.DIALOGS[id]) {
-      try {
-        const selector = $(window.DIALOGS[id]);
-        selector.dialog("close");
-        selector.remove();
-      } catch (err) {
-        console.log("wasabeeButton._closeDialog" + err);
-      }
-    }
-  },
+  }, */
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
