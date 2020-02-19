@@ -22,8 +22,8 @@ const MultimaxDialog = Feature.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = document.createElement("div");
-    const rdnTable = container.appendChild(document.createElement("table"));
+    const container = L.DomUtil.create("div", "");
+    const rdnTable = L.DomUtil.create("table", "", container);
 
     ["A", "B"].forEach(string => {
       const tr = rdnTable.insertRow();
@@ -33,7 +33,7 @@ const MultimaxDialog = Feature.extend({
       node.textContent = string;
       // Set button
       const nodethree = tr.insertCell();
-      const button = nodethree.appendChild(document.createElement("button"));
+      const button = L.DomUtil.create("button", "", nodethree);
       button.textContent = "set";
       button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
@@ -44,37 +44,23 @@ const MultimaxDialog = Feature.extend({
     });
 
     // Bottom buttons bar
-    const element = container.appendChild(document.createElement("div"));
-    element.className = "buttonbar";
-    const div = element.appendChild(document.createElement("span"));
+    const element = L.DomUtil.create("div", "buttonbar", container);
+    const div = L.DomUtil.create("span", "", element);
 
     // Enter arrow
-    const opt = div.appendChild(document.createElement("span"));
-    opt.className = "arrow";
+    const opt = L.DomUtil.create("span", "arrow", div);
     opt.textContent = "\u21b3";
 
     // Go button
-    const button = div.appendChild(document.createElement("button"));
+    const button = L.DomUtil.create("button", "", div);
     button.textContent = "Multimax!";
-    button.addEventListener(
-      "click",
-      () => {
-        this.doMultimax(this._operation);
-      },
-      false
-    );
-
-    // Close button
-    const closebutton = element.appendChild(document.createElement("button"));
-    closebutton.textContent = "close";
-    closebutton.addEventListener(
-      "click",
-      () => this._dialog.dialog("close"),
-      false
-    );
+    L.DomEvent.on(button, "click", () => {
+      this._dialog.dialog("close");
+      this.doMultimax(this._operation);
+      alert("multimax!");
+    });
 
     const context = this;
-
     this._dialog = window.dialog({
       title: "Multimax",
       width: "auto",
