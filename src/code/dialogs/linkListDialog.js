@@ -106,17 +106,13 @@ const LinkListDialog = Feature.extend({
         format: (row, obj, link) => {
           row.className = "desc";
           if (obj != null) {
-            const comment = row.appendChild(document.createElement("a"));
+            const comment = L.DomUtil.create("a", "", row);
             comment.innerHTML = window.escapeHtmlSpecialChars(obj);
-            row.addEventListener(
-              "click",
-              () => {
-                const scd = new SetCommentDialog(window.map);
-                scd.setup(link, operation);
-                scd.enable();
-              },
-              false
-            );
+            L.DomEvent.on(comment, "click", () => {
+              const scd = new SetCommentDialog(window.map);
+              scd.setup(link, operation);
+              scd.enable();
+            });
           }
         }
       },
@@ -135,18 +131,14 @@ const LinkListDialog = Feature.extend({
         },
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, link) => {
-          const assignee = a.appendChild(document.createElement("a"));
+          const assignee = L.DomUtil.create("a", "", a);
           assignee.innerHTML = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-            a.addEventListener(
-              "click",
-              () => {
-                const ad = new AssignDialog();
-                ad.setup(link, this._operation);
-                ad.enable();
-              },
-              false
-            );
+            L.DomEvent.on(assignee, "click", () => {
+              const ad = new AssignDialog();
+              ad.setup(link, this._operation);
+              ad.enable();
+            });
           }
         }
       },
@@ -171,7 +163,7 @@ const LinkListDialog = Feature.extend({
 
   deleteLink: function(link, operation) {
     const con = new ConfirmDialog(window.map);
-    const prompt = document.createElement("div");
+    const prompt = L.DomUtil.create("div", "");
     prompt.innerHTML = "Do you really want to delete this link: ";
     prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
@@ -218,14 +210,12 @@ const LinkListDialog = Feature.extend({
   },
 
   makeColorMenu: function(list, data, link) {
-    const colorSection = list.appendChild(document.createElement("div"));
-    const linkColor = colorSection.appendChild(
-      document.createElement("select")
-    );
+    const colorSection = L.DomUtil.create("div", "", list);
+    const linkColor = L.DomUtil.create("select", "", colorSection);
     linkColor.id = link.ID;
 
     window.plugin.wasabee.static.layerTypes.forEach(function(a) {
-      const option = document.createElement("option");
+      const option = L.DomUtil.create("option", "");
       option.setAttribute("value", a.name);
       if (a.name == "main") {
         a.displayName = "Op Color";
