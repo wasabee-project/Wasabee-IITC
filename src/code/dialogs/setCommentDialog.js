@@ -74,7 +74,10 @@ export const SetCommentDialog = Feature.extend({
   },
 
   _buildHtml: function() {
-    const container = L.DomUtil.create("div", "wasabee-dialog wasabee-dialog-ops");
+    const container = L.DomUtil.create(
+      "div",
+      "wasabee-dialog wasabee-dialog-ops"
+    );
     const desc = L.DomUtil.create("div", "", container);
     const input = L.DomUtil.create("input", "", container);
     input.placeholder = "comment";

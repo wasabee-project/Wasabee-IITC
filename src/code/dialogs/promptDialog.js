@@ -65,14 +65,14 @@ const PromptDialog = Feature.extend({
   },
 
   _buildContent: function() {
-    const content = document.createElement("div");
+    const content = L.DomUtil.create("div", "");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {
       content.appendChild(this._label);
     }
-    const d = content.appendChild(document.createElement("div"));
-    this.inputField = d.appendChild(document.createElement("input"));
+    const d = L.DomUtil.create("div", "", content);
+    this.inputField = L.DomUtil.create("input", "", d);
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.placeholder;
     this.inputField.value = this.current;
