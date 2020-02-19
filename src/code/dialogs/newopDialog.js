@@ -22,54 +22,47 @@ const NewopDialog = Feature.extend({
   },
 
   _displayDialog: function(noHandler) {
-    const content = document.createElement("div");
-    content.className = "wasabee-dialog wasabee-dialog-ops";
-    const buttonSet = content.appendChild(document.createElement("div"));
-    buttonSet.className = "temp-op-dialog";
-    const addButton = buttonSet.appendChild(document.createElement("a"));
+    const content = L.DomUtil.create(
+      "div",
+      "wasabee-dialog wasabee-dialog-ops"
+    );
+    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
+    const addButton = L.DomUtil.create("a", "", buttonSet);
     addButton.textContent = "Add New Op";
 
-    const importButton = buttonSet.appendChild(document.createElement("a"));
+    const importButton = L.DomUtil.create("a", "", buttonSet);
     importButton.textContent = "Import Op";
-    importButton.addEventListener(
-      "click",
-      () => {
-        noHandler._dialog.dialog("close");
-        const id = new ImportDialogControl(this._map, null);
-        id.enable();
-      },
-      false
-    );
+    L.DomEvent.on(importButton, "click", () => {
+      noHandler._dialog.dialog("close");
+      const id = new ImportDialogControl(this._map, null);
+      id.enable();
+    });
 
-    addButton.addEventListener(
-      "click",
-      () => {
-        noHandler._dialog.dialog("close");
-        const addDialog = new PromptDialog(this._map);
-        addDialog.setup(
-          "New Operation",
-          "Please Set the New Operation Name",
-          () => {
-            if (addDialog.inputField.value) {
-              const newop = new WasabeeOp(
-                PLAYER.nickname,
-                addDialog.inputField.value,
-                true
-              );
-              newop.store();
-              makeSelectedOperation(newop.ID);
-              window.runHooks("wasabeeUIUpdate", newop);
-              window.runHooks("wasabeeCrosslinks", newop);
-            } else {
-              alert("Operation Name was Unset");
-            }
+    L.DomEvent.on(addButton, "click", () => {
+      noHandler._dialog.dialog("close");
+      const addDialog = new PromptDialog(this._map);
+      addDialog.setup(
+        "New Operation",
+        "Please Set the New Operation Name",
+        () => {
+          if (addDialog.inputField.value) {
+            const newop = new WasabeeOp(
+              PLAYER.nickname,
+              addDialog.inputField.value,
+              true
+            );
+            newop.store();
+            makeSelectedOperation(newop.ID);
+            window.runHooks("wasabeeUIUpdate", newop);
+            window.runHooks("wasabeeCrosslinks", newop);
+          } else {
+            alert("Operation Name was Unset");
           }
-        );
-        addDialog.placeholder = "Must Not Be Empty";
-        addDialog.enable();
-      },
-      false
-    );
+        }
+      );
+      addDialog.placeholder = "Must Not Be Empty";
+      addDialog.enable();
+    });
 
     this._dialog = window.dialog({
       title: "New Operation",
