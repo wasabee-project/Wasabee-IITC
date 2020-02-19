@@ -96,19 +96,15 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
       value: thing => thing.opOrder,
       sort: (a, b) => a - b,
       format: (row, value, thing) => {
-        const oif = document.createElement("input");
+        const oif = L.DomUtil.create("input", "");
         oif.value = value;
         oif.size = 3;
-        oif.addEventListener(
-          "change",
-          () => {
-            thing.opOrder = oif.value;
-            // since we are changing the values in the (thing)
-            // let the op know it has changed (save/redraw);
-            operation.update(); // OK - necessary
-          },
-          false
-        );
+        L.DomEvent.on(oif, "change", () => {
+          thing.opOrder = oif.value;
+          // since we are changing the values in the (thing)
+          // let the op know it has changed (save/redraw);
+          operation.update(); // OK - necessary
+        });
         row.appendChild(oif);
       }
     },
@@ -151,9 +147,9 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
       value: thing => thing.comment,
       sort: (a, b) => a.localeCompare(b),
       format: (row, value, thing) => {
-        const comment = row.appendChild(document.createElement("a"));
+        const comment = L.DomUtil.create("a", "", row);
         comment.innerHTML = value;
-        row.addEventListener("click", () => {
+        L.DomEvent.on(row, "click", () => {
           const scd = new SetCommentDialog(window.map);
           scd.setup(thing, operation);
           scd.enable();
@@ -175,9 +171,9 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
       },
       sort: (a, b) => a.localeCompare(b),
       format: (row, value, agent) => {
-        const assigned = row.appendChild(document.createElement("a"));
+        const assigned = L.DomUtil.create("a", "", row);
         assigned.innerHTML = value;
-        row.addEventListener("click", () => {
+        L.DomEvent.on(row, "click", () => {
           const ad = new AssignDialog();
           ad.setup(agent, operation);
           ad.enable();
