@@ -11,7 +11,6 @@ const UploadButton = WButton.extend({
   initialize: function(map, container) {
     if (!map) map = window.map;
     this._map = map;
-    this._lastLoginState = false;
 
     this.type = UploadButton.TYPE;
     // this.handler = null;
@@ -57,26 +56,37 @@ const UploadButton = WButton.extend({
   Wupdate: function(container, operation) {
     if (this._operation.ID != operation.ID) {
       this._operation = operation;
-      this.title = `Upload ${this._operation.name}`;
-      this.button.title = this.title;
     }
 
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
+      this.title = "not logged in";
+      this.button.title = this.title;
       return;
     }
 
     if (!operation.IsServerOp()) {
       this._visible();
+      this.title = `UPLOAD ${this._operation.name} (not currently on server)`;
+      this.button.title = this.title;
       return;
     }
 
-    if (!operation.localchanged || !operation.IsWritableOp()) {
+    if (!operation.IsWritableOp()) {
+      this.title = `You do not have permission to modify ${this._operation.name} on the server`;
+      this.button.title = this.title;
       this._invisible();
       return;
     }
 
-    this.title = `Update ${this._operation.name}`;
+    if (!operation.localchanged) {
+      this.title = `${this._operation.name} not changed locally`;
+      this.button.title = this.title;
+      this._invisible();
+      return;
+    }
+
+    this.title = `Update ${this._operation.name} on server`;
     this.button.title = this.title;
     this._visible();
   },
