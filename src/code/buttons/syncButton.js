@@ -9,32 +9,24 @@ const SyncButton = WButton.extend({
     TYPE: "syncButton"
   },
 
+  Wupdate: function() {
+    const loggedIn = WasabeeMe.isLoggedIn();
+    if (loggedIn) {
+      this._syncbutton.style.display = "block";
+    } else {
+      this._syncbutton.style.display = "none";
+    }
+  },
+
   initialize: function(map, container) {
     if (!map) map = window.map;
     this._map = map;
-    this._lastLoginState = false;
 
     this.type = SyncButton.TYPE;
     // this.handler = null; // no handler since we do it all in this.Wupdate()
     this.title = "Download Available Operations";
-    this.Wupdate(container);
-  },
 
-  Wupdate: function(container) {
-    const loggedIn = WasabeeMe.isLoggedIn();
-    if (loggedIn != this._lastLoginState) {
-      delete this.button;
-      this._lastLoginState = loggedIn;
-      if (loggedIn) {
-        this.button = this._loggedInButton(container);
-      } else {
-        this.button = this._loggedOutButton(container);
-      }
-    }
-  },
-
-  _loggedInButton: function(container) {
-    return this._createButton({
+    this._syncbutton = this._createButton({
       container: container,
       buttonImage: window.plugin.wasabee.static.images.toolbar_download,
       context: this,
@@ -59,8 +51,10 @@ const SyncButton = WButton.extend({
                 },
                 function(err) {
                   console.log(err);
-                  const ad = new AuthDialog();
-                  ad.enable();
+                  // const ad = new AuthDialog();
+                  // ad.enable();
+                  alert(err);
+                  window.runHooks("wasabeeUIUpdate", so);
                 }
               );
             }
@@ -71,14 +65,9 @@ const SyncButton = WButton.extend({
         }
       }
     });
-  },
 
-  _loggedOutButton: function(container) {
-    return this._createButton({
-      container: container,
-      title: "not logged in",
-      context: this
-    });
+    // hide or show depeneding on logged in state
+    this.Wupdate();
   }
 });
 
