@@ -550,7 +550,7 @@ export default class WasabeeOp {
 
   IsWritableOp() {
     // no teams == not sent to server, local-only ops are always editable
-    if (!this.teamlist || this.teamlist.length != 0) {
+    if (!this.teamlist || this.teamlist.length == 0) {
       return true;
     }
 
@@ -566,7 +566,7 @@ export default class WasabeeOp {
     }
 
     // if the user has no teams enabled, it can't be writable
-    if (me.Teams == undefined) {
+    if (!me.Teams || me.Teams.length == 0) {
       return false;
     }
 
@@ -583,7 +583,7 @@ export default class WasabeeOp {
 
   IsServerOp() {
     // no teams means local-only
-    if (this.teamlist.length != 0) {
+    if (this.teamlist && this.teamlist.length > 0) {
       return true;
     }
     return false;
