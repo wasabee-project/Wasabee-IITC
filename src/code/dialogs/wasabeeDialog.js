@@ -37,7 +37,6 @@ const WasabeeDialog = Feature.extend({
             GetWasabeeServer() + "/api/v1/team/" + team.ID + "?json=n";
           link.innerHTML = value;
           link.target = "_blank";
-          // row.appendChild(link);
         }
       },
       {
@@ -52,7 +51,6 @@ const WasabeeDialog = Feature.extend({
             curstate = this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
           };
-          //row.appendChild(link);
         }
       }
     ];
@@ -93,14 +91,6 @@ const WasabeeDialog = Feature.extend({
     SetTeamState(teamID, newState);
     return newState;
   },
-
-  /*
-  getIcon: function() {
-    if (WasabeeMe.isLoggedIn()) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
-    }
-    return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
-  }, */
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
