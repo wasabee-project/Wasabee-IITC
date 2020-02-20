@@ -23,7 +23,7 @@ export default class WasabeeMe {
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
-    if (lsme === null || typeof lsme !== "string") {
+    if (!lsme || typeof lsme !== "string") {
       return false;
     }
     const me = JSON.parse(lsme);
@@ -40,6 +40,7 @@ export default class WasabeeMe {
     const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
 
     if (typeof lsme == "string") {
+      // XXX this might be a problem, since create writes it back to the store
       me = WasabeeMe.create(JSON.parse(lsme));
     }
     if (
@@ -69,8 +70,8 @@ export default class WasabeeMe {
   }
 
   static create(data) {
-    if (data === null) {
-      console.log("null passed to WasabeeMe.create");
+    if (!data) {
+      console.log("nothing fed to WasabeeMe.create");
       return null;
     }
     if (typeof data == "string") {
