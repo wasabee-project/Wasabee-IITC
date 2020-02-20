@@ -77,10 +77,8 @@ const AuthDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: async () => {
-        const selectedOperation = getSelectedOperation();
-        const me = await WasabeeMe.get(); // check one more time, free if logged in -- for webview
-        me.store();
-        window.runHooks("wasabeeUIUpdate", selectedOperation);
+        await WasabeeMe.get(); // check one more time, required for webview method
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth
     });
@@ -113,7 +111,8 @@ const AuthDialog = Feature.extend({
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
             const me = await mePromise();
-            me.store();
+            // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
+            console.debug(me);
             context._dialog.dialog("close");
           },
           reject => {
@@ -135,11 +134,11 @@ const AuthDialog = Feature.extend({
 
     window.gapi.auth2.authorize(
       {
-        prompt: "consent",
+        prompt: "select_account",
         client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
         scope: "email profile openid",
-        response_type: "id_token permission",
-        immediate: false
+        response_type: "id_token permission"
+        // immediate: false // this seems to break everything
       },
       response => {
         if (response.error) {
@@ -150,10 +149,8 @@ const AuthDialog = Feature.extend({
         }
         SendAccessTokenAsync(response.access_token).then(
           async () => {
-            // could be const me = WasabeeMe.get();
-            // but do this by hand to 'await' it
             const me = await mePromise();
-            me.store();
+            console.debug(me);
             context._dialog.dialog("close");
           },
           reject => {
