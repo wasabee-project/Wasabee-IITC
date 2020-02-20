@@ -33,10 +33,18 @@ const ImportDialogControl = Feature.extend({
       width: "auto",
       height: "auto",
       html: this.idialog.container,
+      buttons: {
+        OK: () => {
+          this.idialog.importTextareaAsOp();
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+          this._dialog.dialog("close");
+        },
+        "Get existing DrawTools draw": () => {
+          this.idialog.drawToolsFormat();
+        }
+      },
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
-        this.idialog.importTextareaAsOp();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         idhandler.disable();
         delete idhandler._dialog;
       },
@@ -47,6 +55,7 @@ const ImportDialogControl = Feature.extend({
 
 export default ImportDialogControl;
 
+// XXX move all this into the main class, no need for a sub class for this
 class ImportDialog {
   constructor() {
     this.container = L.DomUtil.create("div", "");
@@ -57,6 +66,20 @@ class ImportDialog {
     this.textarea.cols = 80;
     this.textarea.placeholder =
       "Paste a Wasabee draw export here.\n\nWasabee cannot import the stock intel format.\n\nThere is experimental support for importing the IITC DrawTools format.\n\nBefore importing DrawTools format, preview the areas and make sure all the portals load so IITC has them cached. Any portals that are not pre-cached will be faked.\n\nYou will need to use the 'swap' feature to move anchors from the faked portals to the real portals (they should be in the correct location, just not associated with the portal.\n\nCached portals might not be properly named.";
+  }
+
+  drawToolsFormat() {
+    if (window.plugin.drawTools.drawnItems) {
+      /* const tmp = new Array();
+      for (const l of window.plugin.drawTools.drawnItems._layers) {
+        if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
+	}
+      } */
+      // this.textarea.value = JSON.stringify(tmp);
+      this.textarea.value = localStorage["plugin-draw-tools-layer"];
+    } else {
+      this.textarea.placeholder = "No DrawTools drawn items detected";
+    }
   }
 
   importTextareaAsOp() {
