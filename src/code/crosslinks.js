@@ -229,7 +229,8 @@ const showCrossLink = (link, operation) => {
 
 const testLink = (link, operation) => {
   // if crosslinks are not displayed, do not check
-  if (!window.isLayerGroupDisplayed("Wasabee Cross Links")) return;
+  // requires the user to disable and enable the layer once...
+  // if (!window.isLayerGroupDisplayed("Wasabee Cross Links")) return;
 
   // if the crosslink already exists, do not recheck
   if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) {
