@@ -1,5 +1,6 @@
 import store from "../lib/store";
 import { mePromise } from "./server";
+import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -51,16 +52,16 @@ export default class WasabeeMe {
       mePromise().then(
         function(nme) {
           me = nme;
-          store.set(
-            Wasabee.static.constants.AGENT_INFO_KEY,
-            JSON.stringify(me)
-          );
+          // mePromise calls WasabeeMe.create, which calls me.store()
+          // store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(me));
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         function(err) {
           console.log(err);
           store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
           me = null;
           alert(err);
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         }
       );
     }
@@ -77,7 +78,7 @@ export default class WasabeeMe {
     }
 
     const wme = new WasabeeMe();
-    for (var prop in data) {
+    for (const prop in data) {
       if (wme.hasOwnProperty(prop)) {
         switch (prop) {
           case "Teams":
@@ -100,6 +101,7 @@ export default class WasabeeMe {
         }
       }
     }
+    wme.store();
     return wme;
   }
 }
