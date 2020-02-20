@@ -34,7 +34,6 @@ export default class WasabeeOp {
   store() {
     this.stored = Date.now();
     store.set(this.ID, JSON.stringify(this));
-    this.localchanged = true;
   }
 
   getColor() {
@@ -123,7 +122,7 @@ export default class WasabeeOp {
     });
     this.cleanAnchorList();
     this.cleanPortalList();
-    this.update();
+    this.update(true);
     this.runCrosslinks();
   }
 
@@ -132,7 +131,7 @@ export default class WasabeeOp {
       return listMarker.ID !== marker.ID;
     });
     this.cleanPortalList();
-    this.update();
+    this.update(true);
     this.runCrosslinks();
   }
 
@@ -142,7 +141,7 @@ export default class WasabeeOp {
         v.comment = comment;
       }
     }
-    this.update();
+    this.update(true);
   }
 
   setLinkComment(link, comment) {
@@ -151,7 +150,7 @@ export default class WasabeeOp {
         v.description = comment;
       }
     }
-    this.update();
+    this.update(true);
   }
 
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
@@ -165,7 +164,7 @@ export default class WasabeeOp {
     this.links = newLinks;
     this.cleanPortalList();
     this.cleanAnchorList();
-    this.update();
+    this.update(true);
     this.runCrosslinks();
   }
 
@@ -179,7 +178,7 @@ export default class WasabeeOp {
       newLinks.push(l);
     }
     this.links = newLinks;
-    this.update();
+    this.update(true);
   }
 
   cleanAnchorList() {
@@ -258,7 +257,7 @@ export default class WasabeeOp {
     if (!this.containsPortal(portal)) {
       // window.portalDetail.request(portal.id);
       this.opportals.push(portal);
-      this.update();
+      this.update(false); // adding a portal may just be due to a blocker
     }
   }
 
@@ -288,7 +287,7 @@ export default class WasabeeOp {
     if (order) link.opOrder = order;
     if (!this.containsLink(link)) {
       this.links.push(link);
-      this.update();
+      this.update(true);
       this.runCrosslinks();
     } else {
       console.log(
@@ -314,7 +313,7 @@ export default class WasabeeOp {
     }
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-      this.update();
+      this.update(true);
     }
   }
 
@@ -340,7 +339,7 @@ export default class WasabeeOp {
     }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      this.update();
+      this.update(false); // draw, but no need to mark it to send-to-server
     }
   }
 
@@ -400,7 +399,7 @@ export default class WasabeeOp {
     }
     // Remove the invalid links from the array (after we are done iterating through it)
     this.links = this.links.filter(element => !linksToRemove.includes(element));
-    this.update();
+    this.update(true);
     this.runCrosslinks();
   }
 
@@ -410,7 +409,7 @@ export default class WasabeeOp {
         this.addPortal(portal);
         const marker = new WasabeeMarker(markerType, portal.id, comment);
         this.markers.push(marker);
-        this.update();
+        this.update(true);
         this.runCrosslinks();
       } else {
         alert("This portal already has a marker. Chose a different portal.");
@@ -425,7 +424,7 @@ export default class WasabeeOp {
         v.assignedTo = gid;
       }
     }
-    this.update();
+    this.update(true);
   }
 
   assignLink(id, gid) {
@@ -434,7 +433,7 @@ export default class WasabeeOp {
         v.assignedTo = gid;
       }
     }
-    this.update();
+    this.update(true);
   }
 
   clearAllItems() {
@@ -443,12 +442,19 @@ export default class WasabeeOp {
     this.links = Array();
     this.markers = Array();
     this.blockers = Array();
-    this.update();
+    this.update(true);
   }
 
   // call update to save the op and redraw everything on the map
-  update() {
+  update(updateLocalchanged) {
     if (this._batchmode) return;
+    if (updateLocalchanged) {
+      if (window.plugin.wasabee.battleMode) {
+        console.log("would push to server...");
+      } else {
+        this.localchanged = true;
+      }
+    }
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
   }
@@ -464,7 +470,7 @@ export default class WasabeeOp {
 
   endBatchMode() {
     this._batchmode = false;
-    this.update();
+    this.update(false);
     this.runCrosslinks();
   }
 
@@ -619,7 +625,7 @@ export default class WasabeeOp {
       if (k.portalId == portalId && k.gid == gid) {
         k.onhand = onhand;
         k.capsule = capsule;
-        this.update();
+        this.update(false);
         return;
       }
     }
@@ -631,7 +637,7 @@ export default class WasabeeOp {
       capsule: capsule
     };
     this.keysonhand.push(k);
-    this.update();
+    this.update(false);
   }
 
   static create(obj) {
