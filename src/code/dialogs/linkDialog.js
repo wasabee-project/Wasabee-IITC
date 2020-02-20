@@ -171,7 +171,7 @@ const LinkDialog = Feature.extend({
           ? item._addLink(linkTo, source)
           : item._addLink(source, linkTo)
       ])
-        .then(() => operation.update())
+        .then(() => operation.update(true))
         .catch(data => {
           throw (alert(data.message), console.log(data), data);
         });
@@ -201,7 +201,7 @@ const LinkDialog = Feature.extend({
           isReversedChecked
             ? item._addLink(linkTo, source)
             : item._addLink(source, linkTo)
-        ]).then(() => operation.update());
+        ]).then(() => operation.update(true));
       })
     ).catch(data => {
       throw (alert(data.message), console.log(data), data);

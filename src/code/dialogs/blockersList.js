@@ -65,7 +65,7 @@ const BlockerList = Feature.extend({
         Reset: () => {
           this._operation.blockers = new Array();
           this.blockerlistUpdate(this._operation);
-          this._operation.update();
+          this._operation.update(false); // blockers do not need to be sent to server
           window.runHooks("wasabeeCrosslinks", this._operation);
         }
       },
@@ -155,7 +155,7 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   return content;
 };
 
-// yes, one per dialog type otherwise closing removes callbakk registration
+// yes, one per dialog type otherwise closing removes callback registration
 const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 
@@ -164,7 +164,7 @@ const listenForAddedPortals = newPortal => {
   for (const faked of op.fakedPortals) {
     if (faked.id == newPortal.portal.options.guid) {
       faked.name = newPortal.portal.options.data.title;
-      op.update();
+      op.update(true);
     }
   }
 };
