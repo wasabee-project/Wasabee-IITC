@@ -101,37 +101,14 @@ const DefensiveKeysDialog = Feature.extend({
       this._capID.value
     ).then(
       function() {
-        // ;
+        alert("Registered with server");
+        window.runHooks("wasabeeDkeys");
       },
       function(reject) {
         console.log(reject);
         alert(reject);
       }
     );
-
-    alert("Registered with server");
-
-    // add to local data
-    if (window.plugin.wasabee._Dkeys.has(this._selectedPortal.id)) {
-      const l = window.plugin.wasabee._Dkeys.get(this._selectedPortal.id);
-      l.set(this._me.GoogleID, {
-        PortalID: this._selectedPortal.id,
-        GID: this._me.GoogleID,
-        Count: this._count.value,
-        CapID: this._capID.value
-      });
-      window.plugin.wasabee._Dkeys.set(this._selectedPortal.id, l);
-    } else {
-      const l = new Map();
-      l.set(this._me.GoogleID, {
-        PortalID: this._selectedPortal.id,
-        GID: this._me.GoogleID,
-        Count: this._count.value,
-        CapID: this._capID.value
-      });
-      window.plugin.wasabee._Dkeys.set(this._selectedPortal.id, l);
-    }
-    window.runHooks("wasabeeDkeys");
   },
 
   _getMyData(portalID) {
