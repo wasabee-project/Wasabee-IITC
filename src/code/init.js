@@ -27,6 +27,8 @@ window.plugin.wasabee.init = function() {
   window.plugin.wasabee.markerLayerGroup = null;
   window.plugin.wasabee.agentLayers = {};
   window.plugin.wasabee.agentLayerGroup = null;
+  window.plugin.wasabee.defensiveLayers = {};
+  window.plugin.wasabee.defensiveLayerGroup = null;
 
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();

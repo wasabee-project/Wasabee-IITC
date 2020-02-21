@@ -36,20 +36,34 @@ const AuthDialog = Feature.extend({
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
     const gsapiButton = L.DomUtil.create("a", "", buttonSet);
-    gsapiButton.innerHTML = "Log In (gsapi)";
+    gsapiButton.innerHTML = "Log In (quick)";
     L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuth(this));
 
     const gsapiButtonToo = L.DomUtil.create("a", "", buttonSet);
-    gsapiButtonToo.innerHTML = "Log In (gsapi, settings two)";
+    gsapiButtonToo.innerHTML = "Log In (choose account)";
     L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthToo(this));
 
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
       const webviewButton = L.DomUtil.create("a", "", buttonSet);
       webviewButton.innerHTML = "Log In (webview)";
-      L.DomEvent.on(webviewButton, "click", () =>
-        window.open(GetWasabeeServer())
-      );
+      L.DomEvent.on(webviewButton, "click", () => {
+        window.open(GetWasabeeServer());
+        webviewButton.style.display = "none";
+        postwebviewButton.style.display = "block";
+      });
+      const postwebviewButton = L.DomUtil.create("a", "", buttonSet);
+      postwebviewButton.innerHTML = "Verify Webview";
+      postwebviewButton.style.display = "none";
+      L.DomEvent.on(postwebviewButton, "click", async () => {
+        window.runHooks("waabeeUIUpdate", this._operation);
+        const me = await WasabeeMe.get();
+        if (me) {
+          alert("server data: " + JSON.stringify(me));
+        } else {
+          alert("server data: [pending]");
+        }
+      });
     }
 
     const changeServerButton = L.DomUtil.create("a", "", buttonSet);
@@ -76,8 +90,8 @@ const AuthDialog = Feature.extend({
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: async () => {
-        await WasabeeMe.get(); // check one more time, required for webview method
+      closeCallback: () => {
+        // await WasabeeMe.get(); // check one more time, required for webview method
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth

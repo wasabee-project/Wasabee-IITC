@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
 import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
+import { dKeyPromise } from "../server";
 
 const DefensiveKeysDialog = Feature.extend({
   statics: {
@@ -41,8 +42,8 @@ const DefensiveKeysDialog = Feature.extend({
       this._portal.appendChild(this._selectedPortal.displayFormat());
       const mine = this._getMyData(this._selectedPortal.id);
       if (mine) {
-        this._count.value = mine.count;
-        this._capID.value = mine.capID;
+        this._count.value = mine.Count;
+        this._capID.value = mine.CapID;
       } else {
         this._count.value = "";
         this._capID.value = "";
@@ -93,44 +94,51 @@ const DefensiveKeysDialog = Feature.extend({
   },
 
   _addDKey: function() {
-    if (!window.plugin.wasabee._Dkey) {
-      window.plugin.wasabee._Dkey = new Array();
-    }
-
-    const tmp = new Array();
-    let updating = false;
-    for (const k of window.plugin.wasabee._Dkey) {
-      if (
-        k.portalID == this._selectedPortal.id &&
-        k.GoogleID == this._me.GoogleID
-      ) {
-        console.log("updating");
-        updating = true;
-      } else {
-        tmp.push(k);
+    // send it to the server
+    dKeyPromise(
+      this._selectedPortal.id,
+      this._count.value,
+      this._capID.value
+    ).then(
+      function() {
+        // ;
+      },
+      function(reject) {
+        console.log(reject);
+        alert(reject);
       }
-    }
-    window.plugin.wasabee._Dkey = tmp;
+    );
 
-    window.plugin.wasabee._Dkey.push({
-      portalID: this._selectedPortal.id,
-      GoogleID: this._me.GoogleID,
-      count: this._count.value,
-      capID: this._capID.value
-    });
-    alert("added");
-    if (!updating) {
-      // XXX add to map
+    alert("Registered with server");
+
+    // add to local data
+    if (window.plugin.wasabee._Dkeys.has(this._selectedPortal.id)) {
+      const l = window.plugin.wasabee._Dkeys.get(this._selectedPortal.id);
+      l.set(this._me.GoogleID, {
+        PortalID: this._selectedPortal.id,
+        GID: this._me.GoogleID,
+        Count: this._count.value,
+        CapID: this._capID.value
+      });
+      window.plugin.wasabee._Dkeys.set(this._selectedPortal.id, l);
+    } else {
+      const l = new Map();
+      l.set(this._me.GoogleID, {
+        PortalID: this._selectedPortal.id,
+        GID: this._me.GoogleID,
+        Count: this._count.value,
+        CapID: this._capID.value
+      });
+      window.plugin.wasabee._Dkeys.set(this._selectedPortal.id, l);
     }
+    // trigger draw somehow
   },
 
   _getMyData(portalID) {
-    if (!window.plugin.wasabee._Dkey) return;
-    for (const k of window.plugin.wasabee._Dkey) {
-      if (k.portalID == portalID && k.GoogleID == this._me.GoogleID) {
-        return k;
-      }
-    }
+    if (!window.plugin.wasabee._Dkeys) return;
+    if (!window.plugin.wasabee._Dkeys.has(portalID)) return;
+    const l = window.plugin.wasabee._Dkeys.get(portalID);
+    if (l.has(this._me.GoogleID)) return l.get(this._me.GoogleID);
     return;
   }
 });

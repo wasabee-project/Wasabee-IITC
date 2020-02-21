@@ -23,8 +23,7 @@ export const uploadOpPromise = function(operation) {
     req.onload = function() {
       switch (req.status) {
         case 200:
-          // server makes some tweaks, hands it back, we switch to that.
-          WasabeeMe.create(req.response).store(); // free update
+          WasabeeMe.create(req.response); // free update
           opPromise(operation.ID).then(
             function(newop) {
               newop.store();
@@ -215,7 +214,7 @@ export const mePromise = function() {
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
-    req.setRequestHeader("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT"); // helps in some cases, breaks others
+    // req.setRequestHeader("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT"); // helps in some cases, breaks others
 
     req.onload = function() {
       // console.log(req.getAllResponseHeaders());
@@ -224,7 +223,9 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject(`${req.status}: not logged in`);
+          reject(
+            `${req.status}: not logged in ${req.statusText} ${req.response}`
+          );
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -396,7 +397,6 @@ export const SendAccessTokenAsync = function(accessToken) {
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
-          console.log(req.response);
           resolve(true);
           break;
         default:
@@ -484,6 +484,76 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
     fd.append("onhand", onhand ? onhand : "0");
     fd.append("capsule", capsule ? capsule : "");
     req.send(fd);
+  });
+};
+
+export const dKeyPromise = function(portalID, onhand, capsule) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/d`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    const fd = new FormData();
+    fd.append("portalID", portalID ? portalID : "");
+    fd.append("count", onhand ? onhand : "0");
+    fd.append("capID", capsule ? capsule : "");
+    req.send(fd);
+  });
+};
+
+export const dKeylistPromise = function() {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/d`;
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(req.response);
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    req.send();
   });
 };
 

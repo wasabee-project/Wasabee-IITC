@@ -79,7 +79,7 @@ export default {
     for (const faked of op.fakedPortals) {
       if (faked.id == newPortal.portal.options.guid) {
         faked.name = newPortal.portal.options.data.title;
-        op.update();
+        op.update(true);
       }
     }
   }
