@@ -9,15 +9,15 @@
         "dev": {
             "id": "dev-Wasabee",
             "name": "{dev} IITC plugin: Wasabee",
-            "downloadURL": "not-sure",
-            "updateURL": "not-sure-either"
+            "downloadURL": "https://server.wasabee.rocks/static/dev/wasabee.user.js",
+            "updateURL": "https://server.wasabee.rocks/static/dev/wasabee.meta.js"
         },
         "common": {
             "description": "Better DrawTools",
             "author": "Wasabee",
-            "category": "not-sure",
+            "category": "Draw",
             "include": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-            "version": "0.12.0"
+            "version": "0.14.15"
         }
     },
     "releaseFolder": {
