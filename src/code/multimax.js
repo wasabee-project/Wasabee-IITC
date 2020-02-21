@@ -42,7 +42,8 @@ function buildPOSet(anchor1, anchor2, visible) {
   return poset;
 }
 
-function longestSequence(poset) {
+/* 
+function _longestSequence(poset) {
   let depth = 0;
   const alreadyCalculatedSequences = new Map();
   const sequence_from = c => {
@@ -93,6 +94,25 @@ function longestSequence(poset) {
   const x = Array.from(poset.keys());
   console.log(x);
 
+  return Array.from(poset.keys())
+    .map(sequence_from)
+    .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
+} */
+
+function longestSequence(poset) {
+  const alreadyCalculatedSequences = new Map();
+  const sequence_from = c => {
+    if (alreadyCalculatedSequences.get(c) === undefined) {
+      let sequence = poset
+        .get(c)
+        .filter(i => i !== c)
+        .map(sequence_from)
+        .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
+      sequence.push(c);
+      alreadyCalculatedSequences.set(c, sequence);
+    }
+    return alreadyCalculatedSequences.get(c);
+  };
   return Array.from(poset.keys())
     .map(sequence_from)
     .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
