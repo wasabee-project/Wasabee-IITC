@@ -93,6 +93,7 @@ const AuthDialog = Feature.extend({
       closeCallback: () => {
         // await WasabeeMe.get(); // check one more time, required for webview method
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        window.runHooks("wasabeeDkeys");
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth
     });

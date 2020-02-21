@@ -131,7 +131,7 @@ const DefensiveKeysDialog = Feature.extend({
       });
       window.plugin.wasabee._Dkeys.set(this._selectedPortal.id, l);
     }
-    // trigger draw somehow
+    window.runHooks("wasabeeDkeys");
   },
 
   _getMyData(portalID) {

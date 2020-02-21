@@ -19,33 +19,24 @@ export const drawWasabeeDkeys = () => {
   // if (!isDenabled()) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
-  let needtorun = false;
-  if (window.plugin.wasabee._Dkeys.size < 1) needtorun = true;
-  for (const [k, v] of window.plugin.wasabee._Dkeys) {
-    if (!k) needtorun = true; // silence es-lint
-    if (!v.has("details")) needtorun = true; // something new
-  }
-  if (!needtorun) return;
-
   console.log("running drawWasabeeDkeys");
-
-  // add hook
   window.addHook("portalDetailLoaded", dLoadDetails);
 
   dKeylistPromise().then(
     function(data) {
       const list = JSON.parse(data);
+      if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
+        return;
       for (const n of list.DefensiveKeys) {
         if (n.PortalID) {
+          let l;
           if (window.plugin.wasabee._Dkeys.has(n.PortalID)) {
-            const l = window.plugin.wasabee._Dkeys.get(n.PortalID);
-            l.set(n.GID, n); // add user to the sub-map
-            window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+            l = window.plugin.wasabee._Dkeys.get(n.PortalID);
           } else {
-            const l = new Map();
-            l.set(n.GID, n); // set up the sub map
-            window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+            l = new Map();
           }
+          l.set(n.GID, n); // add user to the sub-map
+          window.plugin.wasabee._Dkeys.set(n.PortalID, l);
           window.portalDetail.request(n.PortalID); // listener deals with the replies
         }
       }
@@ -58,11 +49,12 @@ export const drawWasabeeDkeys = () => {
 
 const dLoadDetails = e => {
   if (!e.success) return; // bad load
-  if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
   if (window.plugin.wasabee.defensiveLayers[e.guid]) return; // already drawn
+  if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
 
   const l = window.plugin.wasabee._Dkeys.get(e.guid);
   l.set("details", e.details);
+  window.plugin.wasabee._Dkeys.set(e.guid, l);
 
   const icon = window.plugin.wasabee.static.markerTypes.get(
     "GetKeyPortalMarker"
@@ -112,7 +104,10 @@ const dLoadDetails = e => {
     if (!k) disable = false; // silence es-lint
     if (!v.has("details")) disable = false; // still some waiting to be fetched
   }
-  if (disable) window.removeHook("portalDetailLoaded", dLoadDetails);
+  if (disable) {
+    console.log("disabling portalDetailLoaded listener for WD");
+    window.removeHook("portalDetailLoaded", dLoadDetails);
+  }
 };
 
 const getMarkerPopup = PortalID => {
@@ -126,7 +121,12 @@ const getMarkerPopup = PortalID => {
       if (k != "details") {
         const a = getAgent(v.GID);
         const li = L.DomUtil.create("li", "", ul);
-        li.appendChild(a.formatDisplay());
+        if (a) {
+          li.appendChild(a.formatDisplay());
+        } else {
+          const fake = L.DomUtil.create("span", "", li);
+          fake.innerHTML = "[loading]";
+        }
         const c = L.DomUtil.create("span", "", li);
         c.innerHTML = `:  ${v.Count} ${v.CapID}`;
       }

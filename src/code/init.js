@@ -35,6 +35,7 @@ window.plugin.wasabee.init = function() {
   Wasabee._agentCache = new Map();
   window.pluginCreateHook("wasabeeUIUpdate");
   window.pluginCreateHook("wasabeeCrosslinks");
+  window.pluginCreateHook("wasabeeDkeys");
 
   initGoogleAPI();
   setupLocalStorage();
@@ -82,7 +83,7 @@ window.plugin.wasabee.init = function() {
     drawAgents(Wasabee._selectedOp);
   });
 
-  window.addHook("mapDataRefreshStart", () => {
+  window.addHook("wasabeeDkeys", () => {
     drawWasabeeDkeys();
   });
 
@@ -105,8 +106,9 @@ window.plugin.wasabee.init = function() {
   });
 
   // once everything else is done, do the initial draw
-  drawThings(Wasabee._selectedOp);
-  checkAllLinks(Wasabee._selectedOp);
+  window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
+  window.runHooks("wasabeeDkeys");
 };
 
 const addCSS = content => {
