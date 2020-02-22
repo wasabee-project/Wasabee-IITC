@@ -89,11 +89,10 @@ window.plugin.wasabee.init = function() {
 
   window.addHook("wasabeeUIUpdate", operation => {
     drawThings(operation);
-    if (!operation.ID) {
-      console.log("wasabeeUIUpdate called with something other than an op");
-      console.log(operation);
-    }
   });
+
+  // enable and test in 0.15
+  //window.addResumeFunction(runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp));
 
   addButtons(Wasabee._selectedOp);
 

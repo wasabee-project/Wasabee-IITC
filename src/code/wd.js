@@ -37,6 +37,7 @@ export const drawWasabeeDkeys = () => {
           }
           l.set(n.GID, n); // add user to the sub-map
           window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+          // if we are here early (after a reload?) IITC spams the logs
           window.portalDetail.request(n.PortalID); // listener deals with the replies
         }
       }
