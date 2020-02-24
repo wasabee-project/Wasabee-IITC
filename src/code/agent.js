@@ -31,6 +31,10 @@ export default class WasabeeAgent {
     return a;
   }
 
+  get latLng() {
+    return new L.LatLng(this.lat, this.lng);
+  }
+
   formatDisplay() {
     const display = L.DomUtil.create("span", "wasabee-agent-label, enl");
     // display.classList.add("enl");

@@ -164,6 +164,8 @@ const addLink = (link, style, operation) => {
 
 /** this function fetches and displays agent location */
 export const drawAgents = op => {
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
+
   if (!WasabeeMe.isLoggedIn()) {
     return;
   }
@@ -194,13 +196,12 @@ export const drawAgents = op => {
       function(team) {
         for (const agent of team.agents) {
           const agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
-          if (agentInLayer != null) {
+          if (agentInLayer) {
             window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
             delete window.plugin.wasabee.agentLayers[agent.id];
           }
-          if (agent.lat != 0) {
-            const latLng = new L.LatLng(agent.lat, agent.lng);
-            const marker = L.marker(latLng, {
+          if (agent.lat && agent.lng) {
+            const marker = L.marker(agent.latLng, {
               title: agent.name,
               icon: L.icon({
                 iconUrl: agent.pic,

@@ -645,6 +645,7 @@ export default class WasabeeOp {
       obj = JSON.parse(obj);
     }
     const operation = new WasabeeOp(obj.creator, obj.name);
+    if (obj.ID) operation.ID = obj.ID;
     operation.opportals = operation.convertPortalsToObjs(obj.opportals);
     operation.anchors = obj.anchors ? obj.anchors : Array();
     operation.links = operation.convertLinksToObjs(obj.links);

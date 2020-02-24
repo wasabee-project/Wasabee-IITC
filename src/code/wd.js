@@ -10,13 +10,9 @@ export const initWasabeeD = () => {
   }
 };
 
-export const isDenabled = () => {
-  return window.isLayerGroupDisplayed("Wasabee-D Keys");
-};
-
 // This is the primary hook that is called on map refresh
 export const drawWasabeeDkeys = () => {
-  // if (!isDenabled()) return;
+  if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
   console.log("running drawWasabeeDkeys");
@@ -59,7 +55,7 @@ const dLoadDetails = e => {
 
   const icon = window.plugin.wasabee.static.markerTypes.get(
     "GetKeyPortalMarker"
-  ).markerIconDone;
+  ).markerIconDone.default;
 
   const latLng = new L.LatLng(
     (e.details.latE6 / 1e6).toFixed(6),
