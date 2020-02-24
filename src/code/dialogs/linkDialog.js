@@ -1,21 +1,22 @@
-import { Feature } from "./leafletDrawImports";
-import UiCommands from "./uiCommands.js";
-import UiHelper from "./uiHelper.js";
+import { Feature } from "../leafletDrawImports";
+import UiCommands from "../uiCommands.js";
+import WasabeePortal from "../portal";
+import { getSelectedOperation } from "../selectedOp";
 
-const LinkDialogButtonControl = Feature.extend({
+const LinkDialog = Feature.extend({
   statics: {
     TYPE: "linkdialogButton"
   },
 
   initialize: function(map, options) {
-    this.type = LinkDialogButtonControl.TYPE;
+    this.type = LinkDialog.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
@@ -24,23 +25,20 @@ const LinkDialogButtonControl = Feature.extend({
     self._clearLocalPortalSelections();
     this._portals = {};
     this._links = [];
-    var container = document.createElement("div");
-    this._desc = container.appendChild(document.createElement("textarea"));
+    const container = L.DomUtil.create("div", "");
+    this._desc = L.DomUtil.create("textarea", "desc", container);
     this._desc.placeholder = "Description (optional)";
-    this._desc.className = "desc";
-    var tr;
-    var node;
-    var button;
-    var filter;
-    var rdnTable = container.appendChild(document.createElement("table"));
+    let node;
+    const rdnTable = L.DomUtil.create("table", "", container);
+
+    // XXX WHY? DEAR GOD WHY!?
     [0, 1, 2].forEach(string => {
-      var type = 0 == string ? "src" : "dst-" + string;
-      tr = rdnTable.insertRow();
+      let type = 0 == string ? "src" : "dst-" + string;
+      const tr = rdnTable.insertRow();
       tr.setAttribute("data-portal", type);
       node = tr.insertCell();
-      if (0 != string) {
-        filter = node.appendChild(document.createElement("input"));
-        // filter.type = "checkbox";
+      if (string != 0) {
+        const filter = L.DomUtil.create("input", "", node);
         filter.checked = true;
         filter.value = type;
         self._links.push(filter);
@@ -48,14 +46,15 @@ const LinkDialogButtonControl = Feature.extend({
       node = tr.insertCell();
       node.textContent = 0 == string ? "from" : "to (#" + string + ")";
       node = tr.insertCell();
-      button = node.appendChild(document.createElement("button"));
+      const button = L.DomUtil.create("button", "", node);
       button.textContent = "set";
       button.addEventListener("click", arg => self._setPortal(arg), false);
       node = tr.insertCell();
-      if (0 != string) {
-        button = node.appendChild(document.createElement("button"));
-        button.textContent = "add";
-        button.addEventListener(
+      if (string != 0) {
+        const addbutton = L.DomUtil.create("button", "", node);
+        addbutton.textContent = "add";
+        L.DomEvent.on(
+          addbutton,
           "click",
           other => self._addLinkTo(other, self._operation),
           false
@@ -66,29 +65,22 @@ const LinkDialogButtonControl = Feature.extend({
       self._portals[type] = node;
       self._updatePortal(type);
     });
-    var element = container.appendChild(document.createElement("div"));
-    element.className = "buttonbar";
-    var div = element.appendChild(document.createElement("span"));
-    var opt = div.appendChild(document.createElement("span"));
-    opt.className = "arrow";
+    const element = L.DomUtil.create("div", "buttonbar", container);
+    const div = L.DomUtil.create("span", "arrow", element); // a span named div?
+    const opt = L.DomUtil.create("span", "arrow", div);
     opt.textContent = "\u21b3";
-    button = div.appendChild(document.createElement("button"));
+    const button = L.DomUtil.create("button", "", div);
     button.textContent = "add all";
-    button.addEventListener(
+    L.DomEvent.on(
+      button,
       "click",
       () => self._addAllLinks(self._operation),
       false
     );
-    var cardHeader = element.appendChild(document.createElement("label"));
-    this._reversed = cardHeader.appendChild(document.createElement("input"));
+    const cardHeader = L.DomUtil.create("label", "", element);
+    this._reversed = L.DomUtil.create("input", "", cardHeader);
     this._reversed.type = "checkbox";
     cardHeader.appendChild(document.createTextNode(" reverse"));
-    //var layerSelector = new Wasabee.LayerSelector(this._layerManager, this._operation.data);
-    //layerSelector.label = false;
-    //element.appendChild(layerSelector.container);
-    button = element.appendChild(document.createElement("button"));
-    button.textContent = "close";
-    button.addEventListener("click", () => self._dialog.dialog("close"), false);
 
     this._dialog = window.dialog({
       title: "Add Links",
@@ -101,7 +93,7 @@ const LinkDialogButtonControl = Feature.extend({
         self._clearLocalPortalSelections();
         delete self._dialog;
       },
-      id: window.plugin.Wasabee.static.dialogNames.linkDialogButton
+      id: window.plugin.wasabee.static.dialogNames.linkDialogButton
     });
   },
 
@@ -121,10 +113,10 @@ const LinkDialogButtonControl = Feature.extend({
   },
 
   _setPortal: function(event) {
-    var updateID = event.currentTarget.parentNode.parentNode.getAttribute(
+    const updateID = event.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
-    var selectedPortal = UiHelper.getSelectedPortal();
+    const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
       localStorage["wasabee-portal-" + updateID] = JSON.stringify(
         selectedPortal
@@ -139,7 +131,9 @@ const LinkDialogButtonControl = Feature.extend({
 
   _getPortal: function(name) {
     try {
-      return JSON.parse(localStorage["wasabee-portal-" + name]);
+      return WasabeePortal.create(
+        JSON.parse(localStorage["wasabee-portal-" + name])
+      );
     } catch (b) {
       return null;
     }
@@ -151,7 +145,7 @@ const LinkDialogButtonControl = Feature.extend({
     var viewContainer = this._portals[key];
     $(viewContainer).empty();
     if (i) {
-      viewContainer.appendChild(UiHelper.getPortalLink(i));
+      viewContainer.appendChild(i.displayFormat(this._operation));
     }
     //***Function to add link between the portals -- called from 'Add' Button next to To portals
   },
@@ -177,7 +171,7 @@ const LinkDialogButtonControl = Feature.extend({
           ? item._addLink(linkTo, source)
           : item._addLink(source, linkTo)
       ])
-        .then(() => operation.update())
+        .then(() => operation.update(true))
         .catch(data => {
           throw (alert(data.message), console.log(data), data);
         });
@@ -207,7 +201,7 @@ const LinkDialogButtonControl = Feature.extend({
           isReversedChecked
             ? item._addLink(linkTo, source)
             : item._addLink(source, linkTo)
-        ]).then(() => operation.update());
+        ]).then(() => operation.update(true));
       })
     ).catch(data => {
       throw (alert(data.message), console.log(data), data);
@@ -222,7 +216,7 @@ const LinkDialogButtonControl = Feature.extend({
           gotPortal => gotPortal.id == sentPortal.id
         )
         ? resolvedLocalData
-        : UiCommands.addPortal(this._operation, sentPortal, "", true)
+        : UiCommands.addPortal(this._operation, sentPortal)
       : Promise.reject("no portal given");
   },
 
@@ -240,4 +234,4 @@ const LinkDialogButtonControl = Feature.extend({
   }
 });
 
-export default LinkDialogButtonControl;
+export default LinkDialog;

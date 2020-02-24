@@ -1,6 +1,6 @@
 import { generateId } from "./auxiliar";
 
-export default class Marker {
+export default class WasabeeMarker {
   constructor(type, portalId, comment) {
     this.ID = generateId();
     this.portalId = portalId;
@@ -12,19 +12,50 @@ export default class Marker {
     this.order = 0;
   }
 
+  get opOrder() {
+    return this.order;
+  }
+
+  set opOrder(o) {
+    this.order = Number.parseInt(o, 10);
+  }
+
   static create(obj) {
-    if (obj instanceof Marker) {
+    if (obj instanceof WasabeeMarker) {
       console.log("do not call Marker.create() on a Marker");
       console.log(new Error().stack);
       return obj;
     }
 
-    const marker = new Marker();
+    const marker = new WasabeeMarker();
     for (var prop in obj) {
       if (marker.hasOwnProperty(prop)) {
         marker[prop] = obj[prop];
       }
     }
     return marker;
+  }
+
+  get icon() {
+    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
+      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    }
+    const marker = window.plugin.wasabee.static.markerTypes.get(this.type);
+    let img = marker.markerIcon;
+    switch (this.state) {
+      case "pending":
+        img = marker.markerIcon;
+        break;
+      case "assigned":
+        img = marker.markerIconAssigned;
+        break;
+      case "completed":
+        img = marker.markerIconDone;
+        break;
+      case "acknowledged":
+        img = marker.markerIconAcknowledged;
+        break;
+    }
+    return img;
   }
 }

@@ -1,5 +1,6 @@
-import UiHelper from "./uiHelper.js";
 import { Feature } from "./leafletDrawImports";
+import WasabeePortal from "./portal";
+import { getSelectedOperation } from "./selectedOp";
 
 const strings = {
   quickdraw: {
@@ -27,11 +28,12 @@ const QuickDrawControl = Feature.extend({
     icon: new L.Icon({
       iconSize: new L.Point(16, 16),
       iconAnchor: new L.Point(0, 0),
-      iconUrl: window.plugin.Wasabee.static.images.toolbar_quickdraw
+      iconUrl: window.plugin.wasabee.static.images.toolbar_quickdraw
     })
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = QuickDrawControl.TYPE;
     Feature.prototype.initialize.call(this, map, options);
   },
@@ -39,11 +41,12 @@ const QuickDrawControl = Feature.extend({
   addHooks: function() {
     Feature.prototype.addHooks.call(this);
     if (!this._map) return;
-    this._operation = window.plugin.wasabee.getSelectedOperation();
+    this._operation = getSelectedOperation();
     this._anchor1 = null;
     this._anchor2 = null;
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
+    this._throwOrder = this._operation.nextOrder;
     let that = this;
     this._portalClickedHook = function() {
       QuickDrawControl.prototype._portalClicked.call(that);
@@ -90,9 +93,10 @@ const QuickDrawControl = Feature.extend({
   },
 
   _portalClicked: function() {
-    const selectedPortal = UiHelper.getSelectedPortal();
+    const selectedPortal = WasabeePortal.getSelected();
     if (!selectedPortal) return;
     if (!this._anchor1) {
+      this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
       return;
@@ -100,8 +104,12 @@ const QuickDrawControl = Feature.extend({
     if (!this._anchor2) {
       if (selectedPortal.id === this._anchor1.id) return;
       this._anchor2 = selectedPortal;
-      this._operation.addLink(this._anchor1, this._anchor2, "base link");
-      this._operation.update();
+      this._operation.addLink(
+        this._anchor1,
+        this._anchor2,
+        "base link",
+        this._throwOrder++
+      );
       this._tooltip.updateContent(this._getTooltipText());
       return;
     } else {
@@ -109,9 +117,18 @@ const QuickDrawControl = Feature.extend({
         return; //ignore duplicates
       } else {
         this._spinePortals[selectedPortal.id] = selectedPortal;
-        this._operation.addLink(selectedPortal, this._anchor1);
-        this._operation.addLink(selectedPortal, this._anchor2);
-        this._operation.update();
+        this._operation.addLink(
+          selectedPortal,
+          this._anchor1,
+          null,
+          this._throwOrder++
+        );
+        this._operation.addLink(
+          selectedPortal,
+          this._anchor2,
+          null,
+          this._throwOrder++
+        );
         this._tooltip.updateContent(this._getTooltipText());
       }
     }

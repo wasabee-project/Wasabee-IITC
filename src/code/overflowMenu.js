@@ -1,4 +1,5 @@
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
+
 export default function() {
   Wasabee.OverflowMenu = (function() {
     function init() {

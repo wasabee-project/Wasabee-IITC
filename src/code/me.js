@@ -1,6 +1,8 @@
 import store from "../lib/store";
+import { mePromise } from "./server";
+import { getSelectedOperation } from "./selectedOp";
 
-var Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeMe {
   constructor() {
@@ -11,88 +13,88 @@ export default class WasabeeMe {
   }
 
   store() {
-    store.set(Wasabee.Constants.AGENT_INFO_KEY, JSON.stringify(this));
-    // store.observe(Wasabee.Constants.AGENT_INFO_KEY, function() {
-    //  console.log("AGENT_INFO_KEY changed in another window");
-    //});
+    store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(this));
   }
 
   remove() {
-    // store.unobserve(Wasabee.Constants.AGENT_INFO_KEY);
-    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
   }
 
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
-    if (lsme == null) {
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+    if (!lsme || typeof lsme !== "string") {
       return false;
     }
-    let me = JSON.parse(lsme);
+    const me = JSON.parse(lsme);
     if (me.fetched > maxCacheAge) {
       return true;
     }
-    store.remove(Wasabee.Constants.AGENT_INFO_KEY);
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
     return false;
   }
 
   static get(force) {
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.Constants.AGENT_INFO_KEY);
     let me = null;
-    if (lsme != null) {
-      me = JSON.parse(lsme);
+    const maxCacheAge = Date.now() - 1000 * 60 * 59;
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+
+    if (typeof lsme == "string") {
+      // XXX this might be a problem, since create writes it back to the store
+      me = WasabeeMe.create(JSON.parse(lsme));
     }
     if (
-      me == null ||
+      me === null ||
       me.fetched == undefined ||
       me.fetched < maxCacheAge ||
       force
     ) {
-      if (me != null) {
-        me == null;
-        store.remove(Wasabee.Constants.AGENT_INFO_KEY);
-      }
-      console.log("WasabeeMe.get: pulling from server");
-      window.plugin.wasabee.mePromise().then(
+      // console.log("pulling /me from server");
+      mePromise().then(
         function(nme) {
           me = nme;
-          me.store();
+          // mePromise calls WasabeeMe.create, which calls me.store()
+          // store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(me));
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         function(err) {
           console.log(err);
+          store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
           me = null;
+          alert(err);
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         }
       );
-    } else {
-      // console.log("WasabeeMe.get: returning from localstore");
-    }
-
-    // convert JSON or obj into WasabeeMe
-    if (me != null && !(me instanceof WasabeeMe)) {
-      me = WasabeeMe.create(me);
     }
     return me;
   }
 
   static create(data) {
+    if (!data) {
+      console.log("nothing fed to WasabeeMe.create");
+      return null;
+    }
     if (typeof data == "string") {
       data = JSON.parse(data);
     }
 
-    let wme = new WasabeeMe();
-    for (var prop in data) {
+    const wme = new WasabeeMe();
+    for (const prop in data) {
       if (wme.hasOwnProperty(prop)) {
         switch (prop) {
           case "Teams":
-            data.Teams.forEach(function(team) {
-              wme.Teams.push(team);
-            });
+            if (data.Teams !== null) {
+              for (const team of data.Teams) {
+                wme.Teams.push(team);
+              }
+            }
             break;
           case "Ops":
-            data.Ops.forEach(function(op) {
-              wme.Ops.push(op);
-            });
+            if (data.Ops !== null) {
+              for (const op of data.Ops) {
+                wme.Ops.push(op);
+              }
+            }
             break;
           default:
             wme[prop] = data[prop];
@@ -100,6 +102,7 @@ export default class WasabeeMe {
         }
       }
     }
+    wme.store();
     return wme;
   }
 }

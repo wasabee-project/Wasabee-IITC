@@ -6,9 +6,10 @@
  */
 
 import { drawAgents } from "./mapDrawing";
-import { GetWasabeeServer } from "./server";
+import { opPromise, GetWasabeeServer } from "./server";
+import { makeSelectedOperation } from "./selectedOp";
 
-const Wasabee = window.plugin.Wasabee;
+const Wasabee = window.plugin.wasabee;
 
 export const initFirebase = () => {
   const server = GetWasabeeServer();
@@ -24,19 +25,18 @@ export const initFirebase = () => {
     if (event.origin.indexOf(server) === -1) return;
 
     const operation = Wasabee._selectedOp;
-    if (
-      event.data.data.cmd === "Agent Location Change" &&
-      operation.teamid == event.data.data.msg
-    ) {
-      drawAgents();
+    if (event.data.data.cmd === "Agent Location Change") {
+      drawAgents(operation);
     }
+
     if (event.data.data.cmd === "Map Change") {
-      window.plugin.wasabee.opPromise(event.data.data.opID).then(
+      opPromise(event.data.data.opID).then(
         function(refreshed) {
           refreshed.store();
           if (refreshed.ID == operation.ID) {
-            window.plugin.wasabee.makeSelectedOperation(refreshed.ID);
-            refreshed.update();
+            console.log("firebase trigger reload of current op");
+            makeSelectedOperation(refreshed.ID);
+            // refreshed.update(); -- makeSelectedOp triggers redraw for us
           }
         },
         function(err) {

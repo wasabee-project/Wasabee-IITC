@@ -1,78 +1,86 @@
-import UiHelper from "./uiHelper.js";
-import { getPopupBodyWithType } from "./mapDrawing";
-import Operation from "./operation";
-import LinkListDialog from "./linkListDialog";
+// import WasabeeOp from "./operation";
+import WasabeePortal from "./portal";
+import LinkListDialog from "./dialogs/linkListDialog";
+import ConfirmDialog from "./dialogs/confirmDialog";
+import { getSelectedOperation } from "./selectedOp";
 
-//This methos helps with commonly used UI data getting functions
+// wrap operation calls in UI checks
 export default {
-  addPortal: (operation, sentPortal, options, anyContent) => {
-    if (
-      (void 0 === options && (options = ""),
-      void 0 === anyContent && (anyContent = false),
-      !sentPortal)
-    ) {
+  addPortal: (operation, portal) => {
+    if (!portal) {
       return void alert("Please select a portal first!");
     }
-
-    if (operation instanceof Operation) {
-      operation.addPortal(sentPortal);
-    } else {
-      alert("Operation Invalid");
-    }
-  },
-  /* eslint-disable no-unused-vars */
-  editPortal: (instance, obj, key, value, options) => {
-    /* eslint-enable no-unused-vars */
-    //return obj.layerName = key, obj.description = value, obj.keysFarmed = options, instance.portalService.editPortal(obj, PLAYER.nickname);
+    operation.addPortal(portal);
   },
   swapPortal: (operation, portal) => {
-    var selectedPortal = UiHelper.getSelectedPortal();
-    if (selectedPortal !== undefined) {
-      if (portal.id === selectedPortal.id) {
-        alert("Cannot swap a portal with itself! Select a different portal.");
-        return;
-      }
-      if (
-        confirm(
-          "Do you really want to swap these two portals?\n\n" +
-            portal.name +
-            "\n" +
-            selectedPortal.name
-        )
-      ) {
-        Promise.all([operation.swapPortal(portal, selectedPortal)])
-          .then(() => {
-            operation.update();
-          })
-          .catch(data => {
-            throw (alert(data.message), console.log(data), data);
-          });
-      }
-    } else {
+    const selectedPortal = WasabeePortal.getSelected();
+    if (!selectedPortal) {
       alert("You must select a new portal!");
+      return;
     }
+    if (portal.id === selectedPortal.id) {
+      alert("Cannot swap a portal with itself! Select a different portal.");
+      return;
+    }
+
+    const con = new ConfirmDialog();
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML = "Do you want to swap: ";
+    pr.appendChild(portal.displayFormat(operation));
+    L.DomUtil.create("span", "", pr).innerHTML = " with ";
+    pr.appendChild(selectedPortal.displayFormat(operation));
+    con.setup("Swap Portal", pr, () => {
+      operation.swapPortal(portal, selectedPortal);
+    });
+    con.enable();
   },
   deletePortal: (operation, portal) => {
-    if (
-      confirm(
-        "Do you really want to delete this anchor, including all incoming and outgoing links?\n\n" +
-          portal.name
-      )
-    ) {
+    const con = new ConfirmDialog();
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML =
+      "Do you want to delete this anchor and all associated links: ";
+    pr.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Anchor", pr, () => {
       operation.removeAnchor(portal.id);
-    }
+    });
+    con.enable();
   },
   deleteMarker: (operation, marker, portal) => {
-    if (
-      confirm(
-        "Do you really want to delete this marker? Marking it complete?\n\n" +
-          getPopupBodyWithType(portal, marker)
-      )
-    ) {
+    const con = new ConfirmDialog();
+    const pr = L.DomUtil.create("div", "");
+    pr.innerHTML = "Do you want to delete this marker: ";
+    pr.appendChild(portal.displayFormat(operation));
+    con.setup("Delete Marker", pr, () => {
       operation.removeMarker(marker);
-    }
+    });
+    con.enable();
+  },
+  clearAllItems: operation => {
+    const con = new ConfirmDialog();
+    con.setup(
+      `Clear: {$operation.name}`,
+      `Do you want to reset ${operation.name}?`,
+      () => {
+        operation.clearAllItems();
+      }
+    );
+    con.enable();
   },
   showLinksDialog: (operation, portal) => {
-    LinkListDialog.showDialog(operation, portal, true);
+    const lld = new LinkListDialog();
+    lld.setup(operation, portal);
+    lld.enable();
+  },
+  listenForAddedPortals: newPortal => {
+    if (!newPortal.portal.options.data.title) return;
+
+    const op = getSelectedOperation();
+
+    for (const faked of op.fakedPortals) {
+      if (faked.id == newPortal.portal.options.guid) {
+        faked.name = newPortal.portal.options.data.title;
+        op.update(true);
+      }
+    }
   }
 };

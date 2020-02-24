@@ -1,6 +1,6 @@
-import Agent from "./agent";
+import WasabeeAgent from "./agent";
 
-export default class Team {
+export default class WasabeeTeam {
   constructor() {
     this.name = null;
     this.id = null;
@@ -9,14 +9,14 @@ export default class Team {
 
   static create(data) {
     const d = JSON.parse(data);
-    const team = new Team();
+    const team = new WasabeeTeam();
     for (var prop in d) {
       if (team.hasOwnProperty(prop)) {
         if (prop === "agents") {
-          d.agents.forEach(function(agent) {
-            team.agents.push(Agent.create(agent));
-            // push into Wasabee._agentCache
-          });
+          for (const agent of d.agents) {
+            team.agents.push(WasabeeAgent.create(agent));
+            // WasabeeAgent.create takes care of caching it for us
+          }
         } else {
           team[prop] = d[prop];
         }
