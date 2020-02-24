@@ -40,19 +40,19 @@ export default class WasabeeMarker {
       this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
     }
     const marker = window.plugin.wasabee.static.markerTypes.get(this.type);
-    let img = marker.markerIcon;
+    let img = marker.markerIcon.default;
     switch (this.state) {
       case "pending":
-        img = marker.markerIcon;
+        img = marker.markerIcon.default;
         break;
       case "assigned":
-        img = marker.markerIconAssigned;
+        img = marker.markerIconAssigned.default;
         break;
       case "completed":
-        img = marker.markerIconDone;
+        img = marker.markerIconDone.default;
         break;
       case "acknowledged":
-        img = marker.markerIconAcknowledged;
+        img = marker.markerIconAcknowledged.default;
         break;
     }
     return img;

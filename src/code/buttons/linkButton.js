@@ -20,7 +20,7 @@ const LinkButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_addlinks,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_addlinks.default,
       callback: this._toggleActions,
       context: context
     });

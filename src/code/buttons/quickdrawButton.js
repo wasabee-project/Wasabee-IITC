@@ -18,7 +18,8 @@ const QuickdrawButton = WButton.extend({
     this.button = this._createButton({
       title: "Quick Draw Layers",
       container: container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_quickdraw,
+      buttonImage:
+        window.plugin.wasabee.static.images.toolbar_quickdraw.default,
       callback: this.handler.enable,
       context: this.handler
     });

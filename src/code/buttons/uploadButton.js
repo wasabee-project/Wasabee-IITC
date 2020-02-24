@@ -20,7 +20,7 @@ const UploadButton = WButton.extend({
     this.button = this._createButton({
       title: "Upload",
       container: container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_upload,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_upload.default,
       context: this,
       callback: () => {
         if (this._operation.IsServerOp()) {

@@ -51,11 +51,7 @@ export default class WasabeeAnchor {
     if (window.plugin.wasabee.static.layerTypes.has(colorGroup)) {
       lt = window.plugin.wasabee.static.layerTypes.get(colorGroup);
     }
-    if (lt.portal.iconUrl) {
-      return lt.portal.iconUrl;
-    } else {
-      return window.plugin.wasabee.static.images.marker_layer_groupa;
-    }
+    return lt.portal.iconUrl.default;
   }
 
   popupContent(marker, operation) {

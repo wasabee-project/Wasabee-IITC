@@ -108,9 +108,11 @@ const WasabeeButton = WButton.extend({
 
   getIcon: function() {
     if (this._lastLoginState) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
+        .default;
     } else {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out
+        .default;
     }
   },
 

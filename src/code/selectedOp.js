@@ -28,7 +28,7 @@ export const initSelectedOperation = () => {
         console.log(
           "most recently loaded up not present in local store, starting with new default op"
         );
-        window.plugin.wasabee.loadNewDefaultOp();
+        loadNewDefaultOp();
       } else {
         makeSelectedOperation(toLoad);
       }
