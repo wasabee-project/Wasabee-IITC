@@ -18,11 +18,13 @@ export default class WasabeeAgent {
       obj = JSON.parse(obj);
     }
     const a = new WasabeeAgent();
-    for (var prop in obj) {
-      if (a.hasOwnProperty(prop)) {
-        a[prop] = obj[prop];
-      }
-    }
+    a.id = obj.id;
+    a.name = obj.name;
+    a.lat = obj.lat;
+    a.lng = obj.lng;
+    a.date = obj.date;
+    a.pic = obj.pic;
+    a.cansendto = obj.cansendto;
 
     // push the new data into the agent cache
     window.plugin.wasabee._agentCache.set(a.id, a);

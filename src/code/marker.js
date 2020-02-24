@@ -27,12 +27,11 @@ export default class WasabeeMarker {
       return obj;
     }
 
-    const marker = new WasabeeMarker();
-    for (var prop in obj) {
-      if (marker.hasOwnProperty(prop)) {
-        marker[prop] = obj[prop];
-      }
-    }
+    const marker = new WasabeeMarker(obj.type, obj.portalId, obj.comment);
+    marker.state = obj.state ? obj.state : "pending";
+    marker.completedBy = obj.completedBy ? obj.completedBy : "";
+    marker.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    marker.order = obj.order ? obj.order : 0;
     return marker;
   }
 

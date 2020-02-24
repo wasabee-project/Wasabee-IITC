@@ -41,7 +41,7 @@ export default class WasabeeMe {
 
     if (typeof lsme == "string") {
       // XXX this might be a problem, since create writes it back to the store
-      me = WasabeeMe.create(JSON.parse(lsme));
+      me = WasabeeMe.create(lsme);
     }
     if (
       me === null ||
@@ -49,12 +49,10 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      // console.log("pulling /me from server");
       mePromise().then(
         function(nme) {
           me = nme;
           // mePromise calls WasabeeMe.create, which calls me.store()
-          // store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(me));
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         function(err) {
@@ -70,38 +68,23 @@ export default class WasabeeMe {
   }
 
   static create(data) {
-    if (!data) {
-      console.log("nothing fed to WasabeeMe.create");
-      return null;
-    }
+    if (!data) return null;
     if (typeof data == "string") {
       data = JSON.parse(data);
     }
-
     const wme = new WasabeeMe();
-    for (const prop in data) {
-      if (wme.hasOwnProperty(prop)) {
-        switch (prop) {
-          case "Teams":
-            if (data.Teams !== null) {
-              for (const team of data.Teams) {
-                wme.Teams.push(team);
-              }
-            }
-            break;
-          case "Ops":
-            if (data.Ops !== null) {
-              for (const op of data.Ops) {
-                wme.Ops.push(op);
-              }
-            }
-            break;
-          default:
-            wme[prop] = data[prop];
-            break;
-        }
+    wme.GoogleID = data.GoogleID;
+    if (data.Teams !== null) {
+      for (const team of data.Teams) {
+        wme.Teams.push(team);
       }
     }
+    if (data.Ops !== null) {
+      for (const op of data.Ops) {
+        wme.Ops.push(op);
+      }
+    }
+    wme.fetched = data.fetched ? data.fetched : Date.now();
     wme.store();
     return wme;
   }

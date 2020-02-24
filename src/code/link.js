@@ -17,6 +17,20 @@ export default class WasabeeLink {
     this.completed = false;
   }
 
+  static create(obj, operation) {
+    const link = new WasabeeLink(
+      operation,
+      obj.fromPortalId,
+      obj.toPortalId,
+      obj.description
+    );
+    link.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    link.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    link.color = obj.color ? obj.color : "main";
+    link.completed = obj.completed ? obj.completed : false;
+    return link;
+  }
+
   // for interface consistency, the other types use comment
   // we can't rename them here w/o making the corresponding changes on the server
   get comment() {
@@ -80,16 +94,6 @@ export default class WasabeeLink {
       console.log(JSON.stringify(this));
       return null;
     }
-  }
-
-  static create(obj, operation) {
-    const link = new WasabeeLink(operation);
-    for (var prop in obj) {
-      if (link.hasOwnProperty(prop)) {
-        link[prop] = obj[prop];
-      }
-    }
-    return link;
   }
 
   // returns a DOM object appropriate for display

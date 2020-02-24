@@ -644,29 +644,30 @@ export default class WasabeeOp {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    const operation = new WasabeeOp();
-    for (const prop in obj) {
-      if (operation.hasOwnProperty(prop)) {
-        if (prop == "links") {
-          operation[prop] = operation.convertLinksToObjs(obj[prop]);
-        } else if (prop == "markers") {
-          operation[prop] = operation.convertMarkersToObjs(obj[prop]);
-        } else if (prop == "opportals") {
-          operation[prop] = operation.convertPortalsToObjs(obj[prop]);
-        } else if (prop == "blockers") {
-          operation[prop] = operation.convertBlockersToObjs(obj[prop]);
-        } else {
-          operation[prop] = obj[prop];
-        }
-      }
-    }
+    const operation = new WasabeeOp(obj.creator, obj.name);
+    operation.opportals = operation.convertPortalsToObjs(obj.opportals);
+    operation.anchors = obj.anchors ? obj.anchors : Array();
+    operation.links = operation.convertLinksToObjs(obj.links);
+    operation.markers = operation.convertMarkersToObjs(obj.markers);
+    operation.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
+    operation.comment = obj.comment ? obj.comment : null;
+    operation.teamlist = obj.teamlist ? obj.teamlist : Array();
+    operation.fetched = obj.fetched ? obj.fetched : null;
+    operation.stored = obj.stored ? obj.stored : null;
+    operation.localchanged = obj.localchanged ? obj.localchanged : true;
+    operation.blockers = operation.convertBlockersToObjs(obj.blockers);
+    operation.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
+
+    if (!operation.opportals) operation.opportals = new Array();
     if (!operation.links) operation.links = new Array();
     if (!operation.markers) operation.markers = new Array();
-    if (!operation.opportals) operation.opportals = new Array();
     if (!operation.blockers) operation.blockers = new Array();
-    if (!operation.anchors) operation.anchors = new Array();
-    if (!operation.teamlist) operation.teamlist = new Array();
-    if (!operation.keysonhand) operation.keysonhand = new Array();
+    // if (!operation.teamlist) operation.teamlist = new Array();
+    // if (!operation.keysonhand) operation.keysonhand = new Array();
+
+    operation.cleanAnchorList();
+    operation.cleanPortalList();
+
     return operation;
   }
 }

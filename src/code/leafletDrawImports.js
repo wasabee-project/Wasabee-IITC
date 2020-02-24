@@ -176,7 +176,8 @@ export const Toolbar = L.Class.extend({
   removeToolbar: function() {
     // Dispose each handler
     for (var handlerId in this._modes) {
-      if (this._modes.hasOwnProperty(handlerId)) {
+      //if (this._modes.hasOwnProperty(handlerId)) {
+      if (this._modes[handlerId]) {
         // Unbind handler button
         this._disposeButton(
           this._modes[handlerId].button,
