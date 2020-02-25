@@ -35,7 +35,7 @@ const KeysList = Feature.extend({
 
   _displayDialog: function() {
     this._listDialog = window.dialog({
-      title: "Key List",
+      title: "Key List: " + this._operation.name,
       width: "auto",
       height: "auto",
       position: {
@@ -53,8 +53,11 @@ const KeysList = Feature.extend({
   },
 
   keyListUpdate: function(operation) {
+    if (operation.ID != this._operation.ID) this._operation = operation;
     const id = "dialog-" + window.plugin.wasabee.static.dialogNames.keysList;
     if (window.DIALOGS[id]) {
+      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
+        "Key List: " + operation.name;
       const table = getListDialogContent(operation).table;
       window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
     }

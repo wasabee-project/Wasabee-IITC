@@ -44,10 +44,10 @@ const OperationChecklistDialog = Feature.extend({
   },
 
   _displayDialog: function() {
-    this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+    this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
     this._listDialogData = window.dialog({
-      title: "Operation Checklist",
+      title: "Operation Checklist: " + this._operation.name,
       width: "auto",
       height: "auto",
       position: {
@@ -65,11 +65,13 @@ const OperationChecklistDialog = Feature.extend({
   },
 
   checklistUpdate: function(newOpData) {
-    if (!this._enabled) return; // kludge until I can figure out how to remove the hook properly
+    this._operation = newOpData;
     const id =
       "dialog-" + window.plugin.wasabee.static.dialogNames.operationChecklist;
     if (window.DIALOGS[id]) {
-      this.sortable = getListDialogContent(
+      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
+        "Operation Checklist: " + newOpData.name;
+      this.sortable = this.getListDialogContent(
         newOpData,
         this.sortable.sortBy,
         this.sortable.sortAsc
@@ -79,118 +81,117 @@ const OperationChecklistDialog = Feature.extend({
         window.DIALOGS[id].childNodes[0]
       );
     }
+  },
+
+  getListDialogContent: function(operation, sortBy, sortAsc) {
+    // collapse markers and links into one array.
+    const allThings = operation.links.concat(operation.markers);
+
+    const content = new Sortable();
+    content.fields = [
+      {
+        name: "Order",
+        value: thing => thing.opOrder,
+        sort: (a, b) => a - b,
+        format: (row, value, thing) => {
+          const oif = L.DomUtil.create("input", "");
+          oif.value = value;
+          oif.size = 3;
+          L.DomEvent.on(oif, "change", () => {
+            thing.opOrder = oif.value;
+            // since we are changing the values in the (thing)
+            // let the op know it has changed (save/redraw);
+            operation.update(); // OK - necessary
+          });
+          row.appendChild(oif);
+        }
+      },
+      {
+        name: "Portal",
+        value: thing => {
+          return operation.getPortal(thing.portalId).name;
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, thing) => {
+          if (thing instanceof WasabeeLink) {
+            row.appendChild(thing.displayFormat(operation));
+          } else {
+            row.appendChild(
+              operation.getPortal(thing.portalId).displayFormat(operation)
+            );
+          }
+        }
+      },
+      {
+        name: "Type",
+        value: thing => {
+          if (thing instanceof WasabeeLink) {
+            return "link";
+          } else {
+            // push this shit in to the marker class
+            return (
+              window.plugin.wasabee.static.markerTypes.get(thing.type).label ||
+              "unknown"
+            );
+          }
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value) => {
+          row.innerHTML = value;
+        }
+      },
+      {
+        name: "Comment",
+        value: thing => thing.comment,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, thing) => {
+          const comment = L.DomUtil.create("a", "", row);
+          comment.innerHTML = value;
+          L.DomEvent.on(row, "click", () => {
+            const scd = new SetCommentDialog(window.map);
+            scd.setup(thing, operation);
+            scd.enable();
+          });
+        }
+      },
+      {
+        name: "Assigned To",
+        value: thing => {
+          if (thing.assignedTo != null && thing.assignedTo != "") {
+            const agent = getAgent(thing.assignedTo);
+            if (agent) {
+              return agent.name;
+            } else {
+              return "looking up: [" + thing.assignedTo + "]";
+            }
+          }
+          return "";
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, agent) => {
+          const assigned = L.DomUtil.create("a", "", row);
+          assigned.innerHTML = value;
+          L.DomEvent.on(row, "click", () => {
+            const ad = new AssignDialog();
+            ad.setup(agent, operation);
+            ad.enable();
+          });
+        }
+      },
+      {
+        name: "State",
+        value: thing => thing.state,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value) => {
+          row.textContent = value;
+        }
+      }
+    ];
+    content.sortBy = sortBy;
+    content.sortAsc = !sortAsc; // I don't know why this flips
+    content.items = allThings;
+    return content;
   }
 });
 
 export default OperationChecklistDialog;
-
-// this can be moved into the class now
-const getListDialogContent = (operation, sortBy, sortAsc) => {
-  // collapse markers and links into one array.
-  const allThings = operation.links.concat(operation.markers);
-
-  const content = new Sortable();
-  content.fields = [
-    {
-      name: "Order",
-      value: thing => thing.opOrder,
-      sort: (a, b) => a - b,
-      format: (row, value, thing) => {
-        const oif = L.DomUtil.create("input", "");
-        oif.value = value;
-        oif.size = 3;
-        L.DomEvent.on(oif, "change", () => {
-          thing.opOrder = oif.value;
-          // since we are changing the values in the (thing)
-          // let the op know it has changed (save/redraw);
-          operation.update(); // OK - necessary
-        });
-        row.appendChild(oif);
-      }
-    },
-    {
-      name: "Portal",
-      value: thing => {
-        return operation.getPortal(thing.portalId).name;
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value, thing) => {
-        if (thing instanceof WasabeeLink) {
-          row.appendChild(thing.displayFormat(operation));
-        } else {
-          row.appendChild(
-            operation.getPortal(thing.portalId).displayFormat(operation)
-          );
-        }
-      }
-    },
-    {
-      name: "Type",
-      value: thing => {
-        if (thing instanceof WasabeeLink) {
-          return "link";
-        } else {
-          // push this shit in to the marker class
-          return (
-            window.plugin.wasabee.static.markerTypes.get(thing.type).label ||
-            "unknown"
-          );
-        }
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value) => {
-        row.innerHTML = value;
-      }
-    },
-    {
-      name: "Comment",
-      value: thing => thing.comment,
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value, thing) => {
-        const comment = L.DomUtil.create("a", "", row);
-        comment.innerHTML = value;
-        L.DomEvent.on(row, "click", () => {
-          const scd = new SetCommentDialog(window.map);
-          scd.setup(thing, operation);
-          scd.enable();
-        });
-      }
-    },
-    {
-      name: "Assigned To",
-      value: thing => {
-        if (thing.assignedTo != null && thing.assignedTo != "") {
-          const agent = getAgent(thing.assignedTo);
-          if (agent) {
-            return agent.name;
-          } else {
-            return "looking up: [" + thing.assignedTo + "]";
-          }
-        }
-        return "";
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value, agent) => {
-        const assigned = L.DomUtil.create("a", "", row);
-        assigned.innerHTML = value;
-        L.DomEvent.on(row, "click", () => {
-          const ad = new AssignDialog();
-          ad.setup(agent, operation);
-          ad.enable();
-        });
-      }
-    },
-    {
-      name: "State",
-      value: thing => thing.state,
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value) => {
-        row.textContent = value;
-      }
-    }
-  ];
-  content.sortBy = sortBy;
-  content.sortAsc = !sortAsc; // I don't know why this flips
-  content.items = allThings;
-  return content;
-};

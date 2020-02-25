@@ -79,9 +79,12 @@ const BlockerList = Feature.extend({
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function(newOpData) {
+    this._operation = newOpData;
     if (!this._enabled) return;
     const id = "dialog-" + window.plugin.wasabee.static.dialogNames.blockerList;
     if (window.DIALOGS[id]) {
+      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
+        "Known Blockers: " + newOpData.name;
       this.sortable = getListDialogContent(
         newOpData,
         this.sortable.sortBy,
