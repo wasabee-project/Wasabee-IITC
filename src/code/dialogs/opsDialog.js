@@ -125,7 +125,8 @@ const OpsDialog = Feature.extend({
         ? selectedOp.color
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
       const opColor = L.DomUtil.create("select", "", colorSection);
-      for (const c of window.plugin.wasabee.static.layerTypes) {
+      for (const cd of window.plugin.wasabee.static.layerTypes) {
+        const c = cd[1];
         const option = L.DomUtil.create("option", "", opColor);
         if (c.name == operationColor) option.selected = true;
         option.value = c.name;
@@ -142,6 +143,7 @@ const OpsDialog = Feature.extend({
     if (writable) {
       const commentInput = L.DomUtil.create("textarea", "", commentSection);
       commentInput.rows = "3";
+      commentInput.width = "90%";
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
       L.DomEvent.on(commentInput, "change", () => {
@@ -165,7 +167,7 @@ const OpsDialog = Feature.extend({
 
     if (opsList().length > 1) {
       const deleteButton = L.DomUtil.create("a", "", buttonSection);
-      if (writable) {
+      if (selectedOp.IsOwnedOp()) {
         deleteButton.innerHTML = "Delete " + selectedOp.name;
         if (selectedOp.IsServerOp())
           deleteButton.innerHTML += "<br />(locally and from server)";

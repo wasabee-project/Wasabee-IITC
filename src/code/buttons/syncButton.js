@@ -34,16 +34,15 @@ const SyncButton = WButton.extend({
         const so = getSelectedOperation();
         try {
           const me = WasabeeMe.get(true); // force update of ops list
-          if (me === null) {
+          if (!me) {
             const ad = new AuthDialog();
             ad.enable();
           } else {
             for (const op of me.Ops) {
               opPromise(op.ID).then(
                 function(newop) {
-                  if (newop != null) {
+                  if (newop) {
                     newop.store();
-                    // if the op changed out beneath us, use the new
                     if (newop.ID == so.ID) {
                       makeSelectedOperation(newop.ID);
                     }
@@ -51,8 +50,6 @@ const SyncButton = WButton.extend({
                 },
                 function(err) {
                   console.log(err);
-                  // const ad = new AuthDialog();
-                  // ad.enable();
                   alert(err);
                   window.runHooks("wasabeeUIUpdate", so);
                 }

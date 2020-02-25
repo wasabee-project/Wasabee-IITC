@@ -45,6 +45,15 @@ const LinkButton = WButton.extend({
           mm.enable();
         },
         context: context
+      },
+      {
+        title: "Experimental Maxfield",
+        text: "Maxfield",
+        callback: () => {
+          this.disable();
+          alert("just a placeholder for now");
+        },
+        context: context
       }
     ]);
 

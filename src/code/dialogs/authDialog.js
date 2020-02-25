@@ -116,10 +116,42 @@ const AuthDialog = Feature.extend({
       },
       response => {
         if (response.error) {
-          context._dialog.dialog("close");
-          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
-          alert(err);
-          return;
+          // on immediate_failed, try again with slightly different settings
+          if (response.error == "immediate_failed") {
+            window.gapi.auth2.authorize(
+              {
+                // prompt: "select_account",
+                scope: "email profile openid",
+                response_type: "id_token permission"
+                // immediate: true
+              },
+              response => {
+                if (response.error) {
+                  context._dialog.dialog("close");
+                  const err = `error from authorize (depth 2): ${response.error}: ${response.error_subtype}`;
+                  alert(err);
+                  return;
+                }
+                SendAccessTokenAsync(response.access_token).then(
+                  async () => {
+                    const me = await mePromise();
+                    console.debug(me);
+                    context._dialog.dialog("close");
+                  },
+                  reject => {
+                    console.log(reject);
+                    alert(`send access token failed (depth 2): $(reject)`);
+                  }
+                );
+              }
+            );
+          } else {
+            // error but not immediate_failed
+            context._dialog.dialog("close");
+            const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
+            alert(err);
+            return;
+          }
         }
         SendAccessTokenAsync(response.access_token).then(
           async () => {

@@ -556,26 +556,15 @@ export default class WasabeeOp {
 
   IsWritableOp() {
     // no teams == not sent to server, local-only ops are always editable
-    if (!this.teamlist || this.teamlist.length == 0) {
-      return true;
-    }
-
+    if (!this.teamlist || this.teamlist.length == 0) return true;
     // if it is a server op and not logged in, assume not writable
-    if (!WasabeeMe.isLoggedIn()) {
-      return false;
-    }
-
+    if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.get();
-    if (me.GoogleID == this.creator) {
-      return true;
-    }
-
+    if (!me) return false;
+    if (me.GoogleID == this.creator) return true;
     // if the user has no teams enabled, it can't be writable
-    if (!me.Teams || me.Teams.length == 0) {
-      return false;
-    }
-
+    if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
     for (const t of this.teamlist) {
       if (t.role == "write" && me.Teams.includes(t.ID)) {
@@ -589,20 +578,17 @@ export default class WasabeeOp {
 
   IsServerOp() {
     // no teams means local-only
-    if (this.teamlist && this.teamlist.length > 0) {
-      return true;
-    }
+    if (this.teamlist && this.teamlist.length > 0) return true;
     return false;
   }
 
   IsOwnedOp() {
+    if (!this.teamlist || this.teamlist.length == 0) return true;
+    if (!WasabeeMe.isLoggedIn()) return false;
+
     const me = WasabeeMe.get();
-    if (me == null) {
-      return false;
-    }
-    if (me.GoogleID == this.creator) {
-      return true;
-    }
+    if (!me) return false;
+    if (me.GoogleID == this.creator) return true;
     return false;
   }
 

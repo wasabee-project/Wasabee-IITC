@@ -36,20 +36,18 @@ export default class WasabeeAgent {
   }
 
   formatDisplay() {
-    const display = L.DomUtil.create("span", "wasabee-agent-label, enl");
-    // display.classList.add("enl");
+    const display = L.DomUtil.create("span", "wasabee-agent-label enl");
     display.textContent = this.name;
     return display;
   }
 
   getPopup() {
-    // agent.className = "wasabee-dialog wasabee-dialog-ops";
     const content = L.DomUtil.create("div");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
     const sendTarget = L.DomUtil.create("a", "temp-op-dialog", content);
-    sendTarget.innerHTML = "send target";
+    sendTarget.innerHTML = "Send Target";
     L.DomEvent.on(sendTarget, "click", () => {
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
@@ -87,11 +85,12 @@ export default class WasabeeAgent {
     const seconds = Math.floor((new Date() - date) / 1000);
     let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
 
-    if (interval > 1) return " (ages ago)";
+    if (interval > 1) return ` (ages ago)`;
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) return " (" + interval + " hours ago)";
+    if (interval > 1) return ` (${interval} hours ago)`;
     interval = Math.floor(seconds / 60);
-    if (interval > 1) return " (" + interval + " minutes ago)";
-    return " (" + Math.floor(seconds) + " seconds ago)";
+    if (interval > 1) return ` (${interval} minutes ago)`;
+    interval = Math.floor(seconds);
+    return ` (${interval} seconds ago)`;
   }
 }

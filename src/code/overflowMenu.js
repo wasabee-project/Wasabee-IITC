@@ -52,11 +52,11 @@ export default class OverflowMenu {
     $(this._menu).position({
       my: "bottom right",
       at: "bottom right",
-      of: this._button,
+      of: this._button.parentNode.parentNode.parentNode,
       collision: "flipfit"
     });
 
-    this._button.parentNode.parentNode.appendChild(this._menu);
+    this._button.parentNode.parentNode.parentNode.appendChild(this._menu);
     this._menu.focus();
     this._opened = true;
   }

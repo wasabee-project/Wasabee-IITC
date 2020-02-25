@@ -93,7 +93,6 @@ const OpsButton = WButton.extend({
     ]);
 
     this.actionsContainer.style.top = "26px";
-    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer); // parentNode
   }
 
@@ -103,21 +102,3 @@ const OpsButton = WButton.extend({
 });
 
 export default OpsButton;
-/*
-const closeAllDialogs = skip => {
-  skip = skip || "nothing";
-  for (const name of Object.values(window.plugin.wasabee.static.dialogNames)) {
-    if (name != skip) {
-      let id = "dialog-" + name;
-      if (window.DIALOGS[id]) {
-        try {
-          let selector = $(window.DIALOGS[id]);
-          selector.dialog("close");
-          selector.remove();
-        } catch (err) {
-          console.log("closing dialog: " + err);
-        }
-      }
-    }
-  }
-}; */
