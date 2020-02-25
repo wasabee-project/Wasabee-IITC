@@ -4,6 +4,7 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
+import OverflowMenu from "../overflowMenu";
 
 const LinkListDialog = Feature.extend({
   statics: {
@@ -173,7 +174,7 @@ const LinkListDialog = Feature.extend({
   },
 
   makeMenu: function(list, data) {
-    const state = new window.plugin.wasabee.OverflowMenu();
+    const state = new OverflowMenu();
     const options = [
       {
         label: "Reverse",

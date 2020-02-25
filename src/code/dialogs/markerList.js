@@ -4,6 +4,7 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
+import OverflowMenu from "../overflowMenu";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -160,7 +161,7 @@ const getListDialogContent = operation => {
 
 const makeMarkerDialogMenu = (list, data) => {
   const operation = getSelectedOperation();
-  const state = new window.plugin.wasabee.OverflowMenu();
+  const state = new OverflowMenu();
   const options = [
     {
       label: "Set Comment",

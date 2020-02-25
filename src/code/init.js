@@ -1,7 +1,6 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import initOverflowMenu from "./overflowMenu";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { initFirebase } from "./firebaseSupport";
@@ -40,7 +39,6 @@ window.plugin.wasabee.init = function() {
   initGoogleAPI();
   setupLocalStorage();
   initSelectedOperation();
-  initOverflowMenu();
   initServer();
 
   addCSS(Wasabee.static.CSS.ui);
