@@ -65,6 +65,7 @@ export const makeSelectedOperation = opID => {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
   window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
 };
 
