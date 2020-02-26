@@ -28,6 +28,14 @@ const AuthDialog = Feature.extend({
   },
 
   _displayDialog: function() {
+    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
+    if (syncLoggedIn) {
+      alert(
+        "You have logged in to a plugin that uses a method incompatable with Wasabee"
+      );
+      return;
+    }
+
     const content = L.DomUtil.create("div", "temp-op-dialog");
     const title = L.DomUtil.create("div", "", content);
     title.className = "desc";
@@ -37,11 +45,11 @@ const AuthDialog = Feature.extend({
 
     const gsapiButton = L.DomUtil.create("a", "", buttonSet);
     gsapiButton.innerHTML = "Log In (quick)";
-    L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuth(this));
+    L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
 
     const gsapiButtonToo = L.DomUtil.create("a", "", buttonSet);
     gsapiButtonToo.innerHTML = "Log In (choose account)";
-    L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthToo(this));
+    L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
 
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
@@ -91,7 +99,6 @@ const AuthDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
-        // await WasabeeMe.get(); // check one more time, required for webview method
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },
@@ -99,14 +106,7 @@ const AuthDialog = Feature.extend({
     });
   },
 
-  gsapiAuth: context => {
-    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
-    if (syncLoggedIn) {
-      alert(
-        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
-      );
-    }
-
+  gsapiAuthImmediate: context => {
     window.gapi.auth2.authorize(
       {
         prompt: "none",
@@ -116,39 +116,14 @@ const AuthDialog = Feature.extend({
       },
       response => {
         if (response.error) {
-          // on immediate_failed, try again with slightly different settings
+          // on immediate_failed, try again with "select_account" settings
           if (response.error == "immediate_failed") {
-            window.gapi.auth2.authorize(
-              {
-                // prompt: "select_account",
-                scope: "email profile openid",
-                response_type: "id_token permission"
-                // immediate: true
-              },
-              response => {
-                if (response.error) {
-                  context._dialog.dialog("close");
-                  const err = `error from authorize (depth 2): ${response.error}: ${response.error_subtype}`;
-                  alert(err);
-                  return;
-                }
-                SendAccessTokenAsync(response.access_token).then(
-                  async () => {
-                    const me = await mePromise();
-                    console.debug(me);
-                    context._dialog.dialog("close");
-                  },
-                  reject => {
-                    console.log(reject);
-                    alert(`send access token failed (depth 2): $(reject)`);
-                  }
-                );
-              }
-            );
+            console.log("switching to gsapiAuthChoose");
+            this.gsapiAuthChoose(context);
           } else {
             // error but not immediate_failed
             context._dialog.dialog("close");
-            const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
+            const err = `error from gsapiAuthImmediate: ${response.error}: ${response.error_subtype}`;
             alert(err);
             return;
           }
@@ -158,8 +133,8 @@ const AuthDialog = Feature.extend({
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
             const me = await mePromise();
-            // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
             console.debug(me);
+            // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
             context._dialog.dialog("close");
           },
           reject => {
@@ -171,14 +146,7 @@ const AuthDialog = Feature.extend({
     );
   },
 
-  gsapiAuthToo: context => {
-    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
-    if (syncLoggedIn) {
-      alert(
-        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
-      );
-    }
-
+  gsapiAuthChoose: context => {
     window.gapi.auth2.authorize(
       {
         prompt: "select_account",
@@ -190,19 +158,17 @@ const AuthDialog = Feature.extend({
       response => {
         if (response.error) {
           context._dialog.dialog("close");
-          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
+          const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
         }
         SendAccessTokenAsync(response.access_token).then(
-          async () => {
-            const me = await mePromise();
-            console.debug(me);
+          () => {
             context._dialog.dialog("close");
           },
           reject => {
             console.log(reject);
-            alert(`send access token failed: $(reject)`);
+            alert(`send access token failed (gsapiAuthChoose): $(reject)`);
           }
         );
       }
