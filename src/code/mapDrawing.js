@@ -1,9 +1,6 @@
-var markdown = require("markdown").markdown;
-import UiCommands from "./uiCommands.js";
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
-import { agentPromise, teamPromise } from "./server";
-import AssignDialog from "./dialogs/assignDialog";
+import { teamPromise } from "./server";
 
 var Wasabee = window.plugin.wasabee;
 
@@ -16,22 +13,18 @@ export const drawThings = op => {
 
 //** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */
 const resetMarkers = op => {
-  for (var guid in window.plugin.wasabee.markerLayers) {
-    var m = window.plugin.wasabee.markerLayers[guid];
-    window.plugin.wasabee.markerLayerGroup.removeLayer(m);
-    delete window.plugin.wasabee.markerLayers[guid];
-  }
-  var markerList = op.markers;
-  if (markerList != null) {
-    markerList.forEach(marker => addMarker(marker, op));
+  window.plugin.wasabee.markerLayerGroup.clearLayers();
+  if (op.markers && op.markers.length > 0) {
+    for (const m of op.markers) {
+      addMarker(m, op);
+    }
   }
 };
 
 /** This function adds a Markers to the target layer group */
 const addMarker = (target, operation) => {
-  var targetPortal = operation.getPortal(target.portalId);
-  var latLng = new L.LatLng(targetPortal.lat, targetPortal.lng);
-  var wMarker = L.marker(latLng, {
+  const targetPortal = operation.getPortal(target.portalId);
+  const wMarker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
     icon: L.icon({
       iconUrl: target.icon,
@@ -50,7 +43,7 @@ const addMarker = (target, operation) => {
     "click",
     () => {
       // IITCs version of leaflet does not have marker.isPopupOpen()
-      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
       wMarker.update();
       wMarker.openPopup();
     },
@@ -59,79 +52,18 @@ const addMarker = (target, operation) => {
   wMarker.on(
     "spiderfiedclick",
     () => {
-      wMarker.setPopupContent(getMarkerPopup(wMarker, target, operation));
+      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
       wMarker.update();
       wMarker.openPopup();
     },
     wMarker
   );
-  window.plugin.wasabee.markerLayers[target["ID"]] = wMarker;
   wMarker.addTo(window.plugin.wasabee.markerLayerGroup);
-};
-
-// this belongs in the marker class
-const getMarkerPopup = (marker, target, operation) => {
-  const portal = operation.getPortal(target.portalId);
-  marker.className = "wasabee-dialog wasabee-dialog-ops";
-  const content = L.DomUtil.create("div", "");
-  const title = L.DomUtil.create("div", "desc", content);
-  title.innerHTML = markdown.toHTML(getPopupBodyWithType(portal, target));
-
-  const assignment = L.DomUtil.create("div", "", content);
-  if (target.state != "completed" && target.assignedTo) {
-    agentPromise(target.assignedTo, false).then(
-      function(a) {
-        assignment.innerHTML = "Assigned To: ";
-        assignment.appendChild(a.formatDisplay());
-      },
-      function(err) {
-        console.log(err);
-      }
-    );
-  }
-  if (target.state == "completed" && target.completedBy) {
-    assignment.innerHTML = "Completed By: " + target.completedBy;
-  }
-
-  const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-  const deleteButton = L.DomUtil.create("a", "", buttonSet);
-  deleteButton.textContent = "Delete";
-  L.DomEvent.on(deleteButton, "click", () => {
-    UiCommands.deleteMarker(operation, target, portal);
-    marker.closePopup();
-  });
-
-  if (operation.IsServerOp()) {
-    const assignButton = L.DomUtil.create("a", "", buttonSet);
-    assignButton.textContent = "Assign";
-    L.DomEvent.on(assignButton, "click", () => {
-      const ad = new AssignDialog();
-      ad.setup(target, operation);
-      ad.enable();
-      marker.closePopup();
-    });
-  }
-
-  return content;
-};
-
-export const getPopupBodyWithType = (portal, target) => {
-  if (!Wasabee.static.markerTypes.has(target.type)) {
-    target.type = Wasabee.static.constants.DEFAULT_MARKER_TYPE;
-  }
-  const marker = Wasabee.static.markerTypes.get(target.type);
-  let title = `${marker.label}: ${portal.name}`;
-  if (target.comment) title = title + "\n" + target.comment;
-  return title;
 };
 
 /** this could be smarter */
 const resetLinks = operation => {
-  for (const guid in window.plugin.wasabee.linkLayers) {
-    const linkInLayer = window.plugin.wasabee.linkLayers[guid];
-    window.plugin.wasabee.linkLayerGroup.removeLayer(linkInLayer);
-    delete window.plugin.wasabee.linkLayers[guid];
-  }
+  window.plugin.wasabee.linkLayerGroup.clearLayers();
 
   if (!operation.links || operation.links.length == 0) return;
   // pick the right style for the links
@@ -141,7 +73,9 @@ const resetLinks = operation => {
   }
   lt.link.color = lt.color;
 
-  operation.links.forEach(link => addLink(link, lt.link, operation));
+  for (const l of operation.links) {
+    addLink(l, lt.link, operation);
+  }
 };
 
 /** This function adds a portal to the portal layer group */
@@ -155,7 +89,6 @@ const addLink = (link, style, operation) => {
   const latLngs = link.getLatLngs(operation);
   if (latLngs != null) {
     const link_ = new L.GeodesicPolyline(latLngs, style);
-    window.plugin.wasabee.linkLayers[link["ID"]] = link_;
     link_.addTo(window.plugin.wasabee.linkLayerGroup);
   } else {
     console.log("LatLngs was null: op missing portal data?");
@@ -170,9 +103,6 @@ export const drawAgents = op => {
     return;
   }
   const me = WasabeeMe.get();
-  /* const myTeams = me.Teams.filter(t => {
-    return t.State == "On";
-  }); */
   const myTeams = new Array();
   for (const team of me.Teams) {
     if (team.State == "On") {
@@ -180,7 +110,14 @@ export const drawAgents = op => {
     }
   }
 
-  /* each pull resets these teams  -- put rate limiting here, don't fetch if less than 60 seconds old */
+  const layerMap = new Map();
+  for (const l of window.plugin.wasabee.agentLayerGroup.getLayers()) {
+    layerMap.set(l.options.id, {
+      id: l._leaflet_id,
+      moved: false
+    });
+  }
+
   for (const t of op.teamlist) {
     // skip a team if we are not on it & enabled
     if (myTeams.indexOf(t.teamid) == -1) {
@@ -195,47 +132,58 @@ export const drawAgents = op => {
     teamPromise(t.teamid).then(
       function(team) {
         for (const agent of team.agents) {
-          const agentInLayer = window.plugin.wasabee.agentLayers[agent.id];
-          if (agentInLayer) {
-            window.plugin.wasabee.agentLayerGroup.removeLayer(agentInLayer);
-            delete window.plugin.wasabee.agentLayers[agent.id];
-          }
-          if (agent.lat && agent.lng) {
-            const marker = L.marker(agent.latLng, {
-              title: agent.name,
-              icon: L.icon({
-                iconUrl: agent.pic,
-                shadowUrl: null,
-                iconSize: L.point(41, 41),
-                iconAnchor: L.point(25, 41),
-                popupAnchor: L.point(-1, -48)
-              })
+          if (!layerMap.has(agent.id)) {
+            // new, add to map
+            if (agent.lat && agent.lng) {
+              const marker = L.marker(agent.latLng, {
+                title: agent.name,
+                icon: L.icon({
+                  iconUrl: agent.pic,
+                  shadowUrl: null,
+                  iconSize: L.point(41, 41),
+                  iconAnchor: L.point(25, 41),
+                  popupAnchor: L.point(-1, -48)
+                }),
+                id: agent.id
+              });
+
+              window.registerMarkerForOMS(marker);
+              marker.bindPopup(agent.getPopup());
+              marker.off("click", agent.openPopup, agent);
+              marker.on(
+                "click",
+                () => {
+                  marker.setPopupContent(agent.getPopup());
+                  marker.update();
+                  marker.openPopup();
+                },
+                agent
+              );
+              marker.on(
+                "spiderfiedclick",
+                () => {
+                  marker.setPopupContent(agent.getPopup());
+                  marker.update();
+                  marker.openPopup();
+                },
+                marker
+              );
+
+              layerMap.set(agent.id, {
+                id: 0, // not needed in the next pass
+                moved: true
+              });
+              marker.addTo(window.plugin.wasabee.agentLayerGroup);
+            }
+          } else {
+            // just move existing
+            const a = layerMap.get(agent.id);
+            const al = window.plugin.wasabee.agentLayerGroup.getLayer(a.id);
+            al.setLatLng(agent.latLng);
+            layerMap.set(agent.id, {
+              id: a.id,
+              moved: true
             });
-
-            window.registerMarkerForOMS(marker);
-            marker.bindPopup(agent.getPopup());
-            marker.off("click", agent.openPopup, agent);
-            marker.on(
-              "click",
-              () => {
-                marker.setPopupContent(agent.getPopup());
-                marker.update();
-                marker.openPopup();
-              },
-              agent
-            );
-            marker.on(
-              "spiderfiedclick",
-              () => {
-                marker.setPopupContent(agent.getPopup());
-                marker.update();
-                marker.openPopup();
-              },
-              marker
-            );
-
-            window.plugin.wasabee.agentLayers[agent.id] = marker;
-            marker.addTo(window.plugin.wasabee.agentLayerGroup);
           }
         }
       },
@@ -244,23 +192,23 @@ export const drawAgents = op => {
       }
     );
   } // for t of op.teamlist
-};
 
-const addAllAnchors = operation => {
-  for (const portalId of operation.anchors) {
-    addAnchorToMap(portalId, operation);
+  // remove those not found in this fetch
+  for (const l in layerMap) {
+    console.log(l);
+    if (!l.moved) {
+      window.plugin.wasabee.agentLayerGroup.removeLayer(l.id);
+    }
   }
 };
 
 //** This function resets all the portals and calls addAllPortals to add them */
 const resetAnchors = operation => {
-  for (const guid in window.plugin.wasabee.portalLayers) {
-    const a = window.plugin.wasabee.portalLayers[guid];
-    // console.log("removing: " + a);
-    window.plugin.wasabee.portalLayerGroup.removeLayer(a);
-    delete window.plugin.wasabee.portalLayers[guid];
+  window.plugin.wasabee.portalLayerGroup.clearLayers();
+
+  for (const pid of operation.anchors) {
+    addAnchorToMap(pid, operation);
   }
-  addAllAnchors(operation);
 };
 
 /** This function adds a portal to the portal layer group */
@@ -300,6 +248,5 @@ const addAnchorToMap = (portalId, operation) => {
     },
     marker
   );
-  window.plugin.wasabee.portalLayers[portalId] = marker;
   marker.addTo(window.plugin.wasabee.portalLayerGroup);
 };

@@ -10,6 +10,8 @@ import { initWasabeeD, drawWasabeeDkeys } from "./wd";
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = function() {
+  if (Wasabee._inited) return;
+  Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 
   if (window.plugin.sync)
@@ -18,23 +20,9 @@ window.plugin.wasabee.init = function() {
     );
 
   //** LAYER DEFINITIONS */
-  window.plugin.wasabee.portalLayers = {};
-  window.plugin.wasabee.portalLayerGroup = null;
-  window.plugin.wasabee.linkLayers = {};
-  window.plugin.wasabee.linkLayerGroup = null;
-  window.plugin.wasabee.markerLayers = {};
-  window.plugin.wasabee.markerLayerGroup = null;
-  window.plugin.wasabee.agentLayers = {};
-  window.plugin.wasabee.agentLayerGroup = null;
-  window.plugin.wasabee.defensiveLayers = {};
-  window.plugin.wasabee.defensiveLayerGroup = null;
-
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
-  window.pluginCreateHook("wasabeeUIUpdate");
-  window.pluginCreateHook("wasabeeCrosslinks");
-  window.pluginCreateHook("wasabeeDkeys");
 
   initGoogleAPI();
   setupLocalStorage();
@@ -46,51 +34,36 @@ window.plugin.wasabee.init = function() {
   addCSS(Wasabee.static.CSS.toastr);
   addCSS(Wasabee.static.CSS.leafletdraw);
 
-  window.plugin.wasabee.portalLayerGroup = new L.LayerGroup();
-  window.plugin.wasabee.linkLayerGroup = new L.LayerGroup();
-  window.plugin.wasabee.markerLayerGroup = new L.LayerGroup();
-  window.plugin.wasabee.agentLayerGroup = new L.LayerGroup();
-  window.plugin.wasabee.defensiveLayerGroup = new L.LayerGroup();
-  window.addLayerGroup(
-    "Wasabee Draw Portals",
-    window.plugin.wasabee.portalLayerGroup,
-    true
-  );
-  window.addLayerGroup(
-    "Wasabee Draw Links",
-    window.plugin.wasabee.linkLayerGroup,
-    true
-  );
-  window.addLayerGroup(
-    "Wasabee Draw Markers",
-    window.plugin.wasabee.markerLayerGroup,
-    true
-  );
-  window.addLayerGroup(
-    "Wasabee Agents",
-    window.plugin.wasabee.agentLayerGroup,
-    true
-  );
-  window.addLayerGroup(
-    "Wasabee-D Keys",
-    window.plugin.wasabee.defensiveLayerGroup,
-    true
-  );
+  Wasabee.portalLayerGroup = new L.LayerGroup();
+  Wasabee.linkLayerGroup = new L.LayerGroup();
+  Wasabee.markerLayerGroup = new L.LayerGroup();
+  Wasabee.agentLayerGroup = new L.LayerGroup();
+  Wasabee.defensiveLayerGroup = new L.LayerGroup();
+  window.addLayerGroup("Wasabee Draw Portals", Wasabee.portalLayerGroup, true);
+  window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
+  window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
+  window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
+  window.addLayerGroup("Wasabee-D Keys", Wasabee.defensiveLayerGroup, true);
 
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
   });
 
+  window.pluginCreateHook("wasabeeDkeys");
   window.addHook("wasabeeDkeys", () => {
     drawWasabeeDkeys();
   });
 
+  window.pluginCreateHook("wasabeeUIUpdate");
   window.addHook("wasabeeUIUpdate", operation => {
     drawThings(operation);
   });
+  window.pluginCreateHook("wasabeeCrosslinks");
 
   // enable and test in 0.15
-  //window.addResumeFunction(runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp));
+  window.addResumeFunction(
+    window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp)
+  );
 
   addButtons(Wasabee._selectedOp);
 

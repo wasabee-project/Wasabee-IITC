@@ -1,4 +1,7 @@
 import { generateId } from "./auxiliar";
+import UiCommands from "./uiCommands.js";
+import { agentPromise } from "./server";
+import AssignDialog from "./dialogs/assignDialog";
 
 export default class WasabeeMarker {
   constructor(type, portalId, comment) {
@@ -56,5 +59,61 @@ export default class WasabeeMarker {
         break;
     }
     return img;
+  }
+
+  getMarkerPopup(marker, operation) {
+    const portal = operation.getPortal(this.portalId);
+    marker.className = "wasabee-dialog wasabee-dialog-ops";
+    const content = L.DomUtil.create("div", "");
+    const title = L.DomUtil.create("div", "desc", content);
+    title.innerHTML = this.getPopupBodyWithType(portal);
+
+    const assignment = L.DomUtil.create("div", "", content);
+    if (this.state != "completed" && this.assignedTo) {
+      agentPromise(this.assignedTo, false).then(
+        function(a) {
+          assignment.innerHTML = "Assigned To: ";
+          assignment.appendChild(a.formatDisplay());
+        },
+        function(err) {
+          console.log(err);
+        }
+      );
+    }
+    if (this.state == "completed" && this.completedBy) {
+      assignment.innerHTML = "Completed By: " + this.completedBy;
+    }
+
+    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
+    const deleteButton = L.DomUtil.create("a", "", buttonSet);
+    deleteButton.textContent = "Delete";
+    L.DomEvent.on(deleteButton, "click", () => {
+      UiCommands.deleteMarker(operation, this, portal);
+      marker.closePopup();
+    });
+
+    if (operation.IsServerOp()) {
+      const assignButton = L.DomUtil.create("a", "", buttonSet);
+      assignButton.textContent = "Assign";
+      L.DomEvent.on(assignButton, "click", () => {
+        const ad = new AssignDialog();
+        ad.setup(this, operation);
+        ad.enable();
+        marker.closePopup();
+      });
+    }
+
+    return content;
+  }
+
+  getPopupBodyWithType(portal) {
+    // is this paranoia left from ages past?
+    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
+      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    }
+    const type = window.plugin.wasabee.static.markerTypes.get(this.type);
+    let title = `${type.label}: ${portal.name}`;
+    if (this.comment) title = title + "\n" + this.comment;
+    return title;
   }
 }
