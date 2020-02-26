@@ -61,9 +61,9 @@ window.plugin.wasabee.init = function() {
   window.pluginCreateHook("wasabeeCrosslinks");
 
   // enable and test in 0.15
-  window.addResumeFunction(
-    window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp)
-  );
+  window.addResumeFunction(() => {
+    window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+  });
 
   addButtons(Wasabee._selectedOp);
 
