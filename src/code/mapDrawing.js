@@ -7,17 +7,63 @@ var Wasabee = window.plugin.wasabee;
 //** This function draws things on the layers */
 export const drawThings = op => {
   resetAnchors(op);
-  resetMarkers(op);
+
+  // for smaller ops, just redraw every time; for ops with lots of markers, be smarter
+  // XXX do real testing to decide where the cost/benefit kicks in
+  if (op.markers && op.markers.length < 10) {
+    resetMarkers(op);
+  } else {
+    updateMarkers(op);
+  }
+
   resetLinks(op);
 };
 
 //** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */
 const resetMarkers = op => {
-  window.plugin.wasabee.markerLayerGroup.clearLayers();
+  Wasabee.markerLayerGroup.clearLayers();
   if (op.markers && op.markers.length > 0) {
     for (const m of op.markers) {
       addMarker(m, op);
     }
+  }
+};
+
+/* smarter than resetMarkers, but is it faster in the real-world */
+const updateMarkers = op => {
+  // get a list of every currently drawn marker
+  const layerMap = new Map();
+  for (const l of Wasabee.markerLayerGroup.getLayers()) {
+    layerMap.set(l.options.id, l._leaflet_id);
+  }
+
+  // add any new ones, remove any existing from the list
+  // markers don't change, so this doesn't need to be too smart
+  if (op.markers && op.markers.length > 0) {
+    for (const m of op.markers) {
+      if (layerMap.has(m.portalId)) {
+        const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.portalId));
+        Wasabee.markerLayerGroup.removeLayer(ll);
+        const newicon = L.icon({
+          iconUrl: m.icon,
+          shadowUrl: null,
+          iconSize: L.point(24, 40),
+          iconAnchor: L.point(12, 40),
+          popupAnchor: L.point(-1, -48)
+        });
+        ll.setIcon(newicon);
+        layerMap.delete(m.portalId);
+        ll.addTo(Wasabee.markerLayerGroup);
+      } else {
+        addMarker(m, op);
+      }
+    }
+  }
+
+  // remove any that were not processed
+  for (const [k, v] of layerMap) {
+    console.log("removing marker: " + k);
+    Wasabee.markerLayerGroup.removeLayer(v);
   }
 };
 
@@ -26,6 +72,7 @@ const addMarker = (target, operation) => {
   const targetPortal = operation.getPortal(target.portalId);
   const wMarker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
+    id: target.portalId,
     icon: L.icon({
       iconUrl: target.icon,
       shadowUrl: null,
@@ -58,12 +105,12 @@ const addMarker = (target, operation) => {
     },
     wMarker
   );
-  wMarker.addTo(window.plugin.wasabee.markerLayerGroup);
+  wMarker.addTo(Wasabee.markerLayerGroup);
 };
 
 /** this could be smarter */
 const resetLinks = operation => {
-  window.plugin.wasabee.linkLayerGroup.clearLayers();
+  Wasabee.linkLayerGroup.clearLayers();
 
   if (!operation.links || operation.links.length == 0) return;
   // pick the right style for the links
@@ -89,7 +136,7 @@ const addLink = (link, style, operation) => {
   const latLngs = link.getLatLngs(operation);
   if (latLngs != null) {
     const link_ = new L.GeodesicPolyline(latLngs, style);
-    link_.addTo(window.plugin.wasabee.linkLayerGroup);
+    link_.addTo(Wasabee.linkLayerGroup);
   } else {
     console.log("LatLngs was null: op missing portal data?");
   }
@@ -111,11 +158,8 @@ export const drawAgents = op => {
   }
 
   const layerMap = new Map();
-  for (const l of window.plugin.wasabee.agentLayerGroup.getLayers()) {
-    layerMap.set(l.options.id, {
-      id: l._leaflet_id,
-      moved: false
-    });
+  for (const l of Wasabee.agentLayerGroup.getLayers()) {
+    layerMap.set(l.options.id, l._leaflet_id);
   }
 
   for (const t of op.teamlist) {
@@ -169,21 +213,14 @@ export const drawAgents = op => {
                 marker
               );
 
-              layerMap.set(agent.id, {
-                id: 0, // not needed in the next pass
-                moved: true
-              });
-              marker.addTo(window.plugin.wasabee.agentLayerGroup);
+              marker.addTo(Wasabee.agentLayerGroup);
             }
           } else {
             // just move existing
             const a = layerMap.get(agent.id);
-            const al = window.plugin.wasabee.agentLayerGroup.getLayer(a.id);
+            const al = Wasabee.agentLayerGroup.getLayer(a.id);
             al.setLatLng(agent.latLng);
-            layerMap.set(agent.id, {
-              id: a.id,
-              moved: true
-            });
+            layerMap.delete(agent.id);
           }
         }
       },
@@ -195,16 +232,14 @@ export const drawAgents = op => {
 
   // remove those not found in this fetch
   for (const l in layerMap) {
-    console.log(l);
-    if (!l.moved) {
-      window.plugin.wasabee.agentLayerGroup.removeLayer(l.id);
-    }
+    Wasabee.agentLayerGroup.removeLayer(l);
   }
 };
 
 //** This function resets all the portals and calls addAllPortals to add them */
+// XXX make smarter like updateMarkers -- anchors don't change, just add/remove
 const resetAnchors = operation => {
-  window.plugin.wasabee.portalLayerGroup.clearLayers();
+  Wasabee.portalLayerGroup.clearLayers();
 
   for (const pid of operation.anchors) {
     addAnchorToMap(pid, operation);
@@ -248,5 +283,5 @@ const addAnchorToMap = (portalId, operation) => {
     },
     marker
   );
-  marker.addTo(window.plugin.wasabee.portalLayerGroup);
+  marker.addTo(Wasabee.portalLayerGroup);
 };
