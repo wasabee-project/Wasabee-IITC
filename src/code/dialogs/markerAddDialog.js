@@ -28,11 +28,11 @@ const MarkerAddDialog = Feature.extend({
     this._marker = null;
 
     const content = L.DomUtil.create("div", "temp-op-dialog");
-    this._type = L.DomUtil.create("select", "");
+    this._type = L.DomUtil.create("select", "", content);
     for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", "", this._type);
-      o.setAttribute("value", k);
-      o.innerHTML = a.label;
+      o.setAttribute("value", a);
+      o.innerHTML = k.label;
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
