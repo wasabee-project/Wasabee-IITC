@@ -6,31 +6,28 @@ var Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  resetAnchors(op);
+  console.log("drawThings called: " + op.ID + " by : " + op._uiupdatecaller);
+  console.time("drawThings");
 
-  // for smaller ops, just redraw every time; for ops with lots of markers, be smarter
-  // XXX do real testing to decide where the cost/benefit kicks in
-  if (op.markers && op.markers.length < 10) {
-    resetMarkers(op);
-  } else {
-    updateMarkers(op);
-  }
+  updateAnchors(op);
+  updateMarkers(op);
 
+  /* console.time("updateLinks");
+  updateLinks(op);
+  console.timeEnd("updateLinks"); */
+  // console.time("resetLinks");
   resetLinks(op);
+  // console.timeEnd("resetLinks");
+  console.timeEnd("drawThings");
 };
 
-//** This function resets all the markers ; not too expensive to remove and re-add them all for small number of markers. But this could be smarter */
-const resetMarkers = op => {
-  Wasabee.markerLayerGroup.clearLayers();
-  if (op.markers && op.markers.length > 0) {
-    for (const m of op.markers) {
-      addMarker(m, op);
-    }
-  }
-};
-
-/* smarter than resetMarkers, but is it faster in the real-world */
 const updateMarkers = op => {
+  if (window.isLayerGroupDisplayed("Wasabee Draw Markers") === false) return; // yes, === false, undefined == true
+  if (!op.markers || op.markers.length == 0) {
+    Wasabee.markerLayerGroup.getLayers();
+    return;
+  }
+
   // get a list of every currently drawn marker
   const layerMap = new Map();
   for (const l of Wasabee.markerLayerGroup.getLayers()) {
@@ -39,10 +36,11 @@ const updateMarkers = op => {
 
   // add any new ones, remove any existing from the list
   // markers don't change, so this doesn't need to be too smart
-  if (op.markers && op.markers.length > 0) {
-    for (const m of op.markers) {
-      if (layerMap.has(m.portalId)) {
-        const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.portalId));
+  for (const m of op.markers) {
+    if (layerMap.has(m.portalId)) {
+      const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.portalId));
+      if (m.state != ll.options.state) {
+        // state changed, update icon
         Wasabee.markerLayerGroup.removeLayer(ll);
         const newicon = L.icon({
           iconUrl: m.icon,
@@ -52,17 +50,17 @@ const updateMarkers = op => {
           popupAnchor: L.point(-1, -48)
         });
         ll.setIcon(newicon);
-        layerMap.delete(m.portalId);
         ll.addTo(Wasabee.markerLayerGroup);
-      } else {
-        addMarker(m, op);
       }
+      layerMap.delete(m.portalId);
+    } else {
+      addMarker(m, op);
     }
   }
 
   // remove any that were not processed
+  // eslint-disable-next-line
   for (const [k, v] of layerMap) {
-    console.log("removing marker: " + k);
     Wasabee.markerLayerGroup.removeLayer(v);
   }
 };
@@ -73,6 +71,7 @@ const addMarker = (target, operation) => {
   const wMarker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
     id: target.portalId,
+    state: target.state,
     icon: L.icon({
       iconUrl: target.icon,
       shadowUrl: null,
@@ -108,12 +107,14 @@ const addMarker = (target, operation) => {
   wMarker.addTo(Wasabee.markerLayerGroup);
 };
 
-/** this could be smarter */
+/** reset links is consistently 1ms faster than update, and is far safer */
 const resetLinks = operation => {
+  if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
   Wasabee.linkLayerGroup.clearLayers();
 
   if (!operation.links || operation.links.length == 0) return;
-  // pick the right style for the links
+
+  // pre-fetch the op color outside the loop -- is this actually helpful?
   let lt = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
     lt = Wasabee.static.layerTypes.get(operation.color);
@@ -125,21 +126,72 @@ const resetLinks = operation => {
   }
 };
 
+/** reset links is consistently 1ms faster than update, and is far safer */
+// eslint-disable-next-line
+const updateLinks = operation => {
+  if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
+  if (!operation.links || operation.links.length == 0) {
+    Wasabee.linkLayerGroup.clearLayers();
+    return;
+  }
+
+  const layerMap = new Map();
+  for (const l of Wasabee.linkLayerGroup.getLayers()) {
+    layerMap.set(l.options.id, l._leaflet_id);
+  }
+
+  // pre-fetch the op color outside the loop
+  let lt = Wasabee.static.layerTypes.get("main");
+  if (Wasabee.static.layerTypes.has(operation.color)) {
+    lt = Wasabee.static.layerTypes.get(operation.color);
+  }
+  lt.link.color = lt.color;
+
+  for (const l of operation.links) {
+    if (layerMap.has(l.ID)) {
+      const ll = Wasabee.linkLayerGroup.getLayer(layerMap.get(l.ID));
+      if (
+        l.color != ll.options.Wcolor ||
+        l.fromPortalId != ll.options.fm ||
+        l.toPortalId != ll.options.to
+      ) {
+        Wasabee.linkLayerGroup.removeLayer(ll);
+        addLink(l, lt.link, operation);
+      }
+      layerMap.delete(l.ID);
+    } else {
+      addLink(l, lt.link, operation);
+    }
+  }
+
+  // eslint-disable-next-line
+  for (const [k, v] of layerMap) {
+    Wasabee.linkLayerGroup.removeLayer(v);
+  }
+};
+
 /** This function adds a portal to the portal layer group */
-const addLink = (link, style, operation) => {
-  if (link.color != "main" && Wasabee.static.layerTypes.has(link.color)) {
-    const linkLt = Wasabee.static.layerTypes.get(link.color);
+const addLink = (wlink, style, operation) => {
+  // determine per-link color
+  if (wlink.color != "main" && Wasabee.static.layerTypes.has(wlink.color)) {
+    const linkLt = Wasabee.static.layerTypes.get(wlink.color);
     style = linkLt.link;
     style.color = linkLt.color;
   }
 
-  const latLngs = link.getLatLngs(operation);
-  if (latLngs != null) {
-    const link_ = new L.GeodesicPolyline(latLngs, style);
-    link_.addTo(Wasabee.linkLayerGroup);
-  } else {
+  const latLngs = wlink.getLatLngs(operation);
+  if (!latLngs) {
     console.log("LatLngs was null: op missing portal data?");
+    return;
   }
+  const newlink = new L.GeodesicPolyline(latLngs, style);
+  // these are used for updateLink and can be removed if we get rid of it
+  newlink.options.id = wlink.ID;
+  newlink.options.fm = wlink.fromPortalId;
+  newlink.options.to = wlink.toPortalId;
+  newlink.options.Wcolor = wlink.Wcolor;
+  //
+  newlink.addTo(Wasabee.linkLayerGroup);
 };
 
 /** this function fetches and displays agent location */
@@ -236,22 +288,45 @@ export const drawAgents = op => {
   }
 };
 
-//** This function resets all the portals and calls addAllPortals to add them */
-// XXX make smarter like updateMarkers -- anchors don't change, just add/remove
-const resetAnchors = operation => {
-  Wasabee.portalLayerGroup.clearLayers();
+const updateAnchors = op => {
+  if (window.isLayerGroupDisplayed("Wasabee Draw Portals") === false) return; // yes, === false, undefined == true
+  if (!op.anchors || op.anchors.length == 0) {
+    Wasabee.portalLayerGroup.clearLayers();
+    return;
+  }
 
-  for (const pid of operation.anchors) {
-    addAnchorToMap(pid, operation);
+  const layerMap = new Map();
+  for (const l of Wasabee.portalLayerGroup.getLayers()) {
+    if (l.options.color != op.color) {
+      // if the op color changed, remove and re-add
+      Wasabee.portalLayerGroup.removeLayer(l._leaflet_id);
+    } else {
+      layerMap.set(l.options.id, l._leaflet_id);
+    }
+  }
+
+  for (const a of op.anchors) {
+    if (layerMap.has(a)) {
+      layerMap.delete(a); // no changes
+    } else {
+      addAnchorToMap(a, op);
+    }
+  }
+
+  // eslint-disable-next-line
+  for (const [k, v] of layerMap) {
+    Wasabee.portalLayerGroup.removeLayer(v);
   }
 };
 
 /** This function adds a portal to the portal layer group */
 const addAnchorToMap = (portalId, operation) => {
-  const anchor = new WasabeeAnchor(portalId);
+  const anchor = new WasabeeAnchor(portalId, operation);
   const marker = L.marker(anchor.latLng, {
     title: anchor.name,
     alt: anchor.name,
+    id: portalId,
+    color: anchor.color,
     icon: L.icon({
       iconUrl: anchor.icon,
       shadowUrl: null,
