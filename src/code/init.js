@@ -62,8 +62,6 @@ window.plugin.wasabee.init = function() {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      console.log("enabling layer");
-      console.log(obj);
       window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
     }
   });
@@ -74,19 +72,16 @@ window.plugin.wasabee.init = function() {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      console.log("disabling layer");
-      console.log(obj);
       obj.layer.clearLayers();
     }
   });
-
-  addButtons(Wasabee._selectedOp);
 
   initFirebase();
   initCrossLinks();
   initWasabeeD();
 
   // once everything else is done, do the initial draw
+  addButtons(Wasabee._selectedOp);
   Wasabee._selectedOp._uiupdatecaller = "init";
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
   window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
