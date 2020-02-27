@@ -6,7 +6,7 @@ import { getSelectedOperation } from "./selectedOp";
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
 export default class WasabeeAnchor {
-  constructor(portalId) {
+  constructor(portalId, op) {
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -15,8 +15,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    const operation = getSelectedOperation();
+    const operation = op ? op : getSelectedOperation();
     this._portal = operation.getPortal(this.ID);
+    this.color = operation.color;
   }
 
   // pointless, since these are never pushed to the server
@@ -45,11 +46,9 @@ export default class WasabeeAnchor {
   }
 
   get icon() {
-    const operation = getSelectedOperation();
-    const colorGroup = operation.color;
     let lt = window.plugin.wasabee.static.layerTypes.get("main");
-    if (window.plugin.wasabee.static.layerTypes.has(colorGroup)) {
-      lt = window.plugin.wasabee.static.layerTypes.get(colorGroup);
+    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
+      lt = window.plugin.wasabee.static.layerTypes.get(this.color);
     }
     return lt.portal.iconUrl.default;
   }
