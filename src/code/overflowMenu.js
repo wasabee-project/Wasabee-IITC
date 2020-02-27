@@ -8,9 +8,10 @@ export default class OverflowMenu {
 
     this._buttonText = L.DomUtil.create("span", "", this._button);
     this._buttonText.textContent = "\u22ee";
+    this._button.role = "button";
 
-    this._menu = L.DomUtil.create("span", "wasabee-overflow-button");
-    this._button.role = "buton";
+    this._menu = L.DomUtil.create("span", "wasabee-overflow-menu");
+    this._menu.role = "list";
 
     // put the menu items here
     this.items = []; // { Label: "x", "onclick" () => { y; }}
@@ -28,7 +29,11 @@ export default class OverflowMenu {
       return;
     }
 
-    const menu = L.DomUtil.create("ul", "wasabee-overflow-menu", this._menu); // wasabee-overflow-menu
+    const menu = L.DomUtil.create(
+      "ul",
+      "wasabee-overflow-menuFIXME",
+      this._menu
+    );
     menu.role = "list";
     for (const l of this.items) {
       const menuitem = L.DomUtil.create(
@@ -52,11 +57,11 @@ export default class OverflowMenu {
     $(this._menu).position({
       my: "bottom right",
       at: "bottom right",
-      of: this._button.parentNode.parentNode.parentNode,
+      of: this._button,
       collision: "flipfit"
     });
 
-    this._button.parentNode.parentNode.parentNode.appendChild(this._menu);
+    document.body.appendChild(this._menu);
     this._menu.focus();
     this._opened = true;
   }
@@ -67,9 +72,6 @@ export default class OverflowMenu {
       for (const c of this._menu.children) {
         this._menu.removeChild(c);
       }
-    }
-    if (this._menu && this._menu.parentNode) {
-      this._menu.parentNode.removeChild(this._menu);
     }
   }
 }
