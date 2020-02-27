@@ -266,6 +266,7 @@ const testLink = (link, operation) => {
 };
 
 export const checkAllLinks = operation => {
+  console.time("checkAllLinks");
   console.log("checkAllLinks called: " + operation.ID);
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
@@ -274,6 +275,7 @@ export const checkAllLinks = operation => {
   for (const guid in window.links) {
     testLink(window.links[guid], operation);
   }
+  console.timeEnd("checkAllLinks");
 };
 
 const onLinkAdded = data => {
@@ -332,6 +334,11 @@ export const initCrossLinks = () => {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
       delete window.plugin.wasabee._crosslinkCache;
     }
+  });
+
+  window.pluginCreateHook("wasabeeCrosslinks");
+  window.addHook("wasabeeCrosslinks", operation => {
+    checkAllLinks(operation);
   });
 
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);

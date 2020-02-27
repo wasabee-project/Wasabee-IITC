@@ -5,6 +5,18 @@ import { getAgent } from "./server";
 
 // setup function
 export const initWasabeeD = () => {
+  window.plugin.wasabee.defensiveLayerGroup = new L.LayerGroup();
+  window.addLayerGroup(
+    "Wasabee-D Keys",
+    window.plugin.wasabee.defensiveLayerGroup,
+    true
+  );
+
+  window.pluginCreateHook("wasabeeDkeys");
+  window.addHook("wasabeeDkeys", () => {
+    drawWasabeeDkeys();
+  });
+
   if (!window.plugin.wasabee._Dkey) {
     window.plugin.wasabee._Dkeys = new Map();
   }

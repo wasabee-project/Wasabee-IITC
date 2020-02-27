@@ -4,8 +4,7 @@ import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { initFirebase } from "./firebaseSupport";
-import { checkAllLinks } from "./crosslinks";
-import { initWasabeeD, drawWasabeeDkeys } from "./wd";
+import { initWasabeeD } from "./wd";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -38,31 +37,47 @@ window.plugin.wasabee.init = function() {
   Wasabee.linkLayerGroup = new L.LayerGroup();
   Wasabee.markerLayerGroup = new L.LayerGroup();
   Wasabee.agentLayerGroup = new L.LayerGroup();
-  Wasabee.defensiveLayerGroup = new L.LayerGroup();
   window.addLayerGroup("Wasabee Draw Portals", Wasabee.portalLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
-  window.addLayerGroup("Wasabee-D Keys", Wasabee.defensiveLayerGroup, true);
 
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
-  });
-
-  window.pluginCreateHook("wasabeeDkeys");
-  window.addHook("wasabeeDkeys", () => {
-    drawWasabeeDkeys();
   });
 
   window.pluginCreateHook("wasabeeUIUpdate");
   window.addHook("wasabeeUIUpdate", operation => {
     drawThings(operation);
   });
-  window.pluginCreateHook("wasabeeCrosslinks");
 
-  // enable and test in 0.15
+  // enable and test in 0.15 -- works on IITC-CE but not on iitc.me
   window.addResumeFunction(() => {
     window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+  });
+
+  window.map.on("layeradd", obj => {
+    if (
+      obj.layer === Wasabee.portalLayerGroup ||
+      obj.layer === Wasabee.linkLayerGroup ||
+      obj.layer === Wasabee.markerLayerGroup
+    ) {
+      console.log("enabling layer");
+      console.log(obj);
+      window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+    }
+  });
+
+  window.map.on("layerremove", obj => {
+    if (
+      obj.layer === Wasabee.portalLayerGroup ||
+      obj.layer === Wasabee.linkLayerGroup ||
+      obj.layer === Wasabee.markerLayerGroup
+    ) {
+      console.log("disabling layer");
+      console.log(obj);
+      obj.layer.clearLayers();
+    }
   });
 
   addButtons(Wasabee._selectedOp);
@@ -71,11 +86,8 @@ window.plugin.wasabee.init = function() {
   initCrossLinks();
   initWasabeeD();
 
-  window.addHook("wasabeeCrosslinks", operation => {
-    checkAllLinks(operation);
-  });
-
   // once everything else is done, do the initial draw
+  Wasabee._selectedOp._uiupdatecaller = "init";
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
   window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
   window.runHooks("wasabeeDkeys");
