@@ -26,7 +26,7 @@ export default class WasabeeLink {
     );
     link.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     link.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
-    link.color = obj.color ? obj.color : "main";
+    link.color = obj.color ? obj.color : operation.color;
     link.completed = obj.completed ? obj.completed : false;
     return link;
   }
@@ -76,24 +76,18 @@ export default class WasabeeLink {
   }
 
   getLatLngs(operation) {
-    // for crosslinks.js
     if (!operation) operation = getSelectedOperation();
 
     const fromPortal = operation.getPortal(this.fromPortalId);
-    if (!fromPortal)
-      console.log("op missing 'from' portal: " + JSON.stringify(this)); // NUKE ME
     const toPortal = operation.getPortal(this.toPortalId);
-    if (!fromPortal)
-      console.log("op missing 'to' portal: " + JSON.stringify(this)); // NUKE ME
-    if (fromPortal != null && toPortal != null) {
-      const returnArray = Array();
-      returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
-      returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
-      return returnArray;
-    } else {
-      console.log(JSON.stringify(this));
-      return null;
-    }
+    const returnArray = Array();
+    returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+    returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+    return returnArray;
+  }
+
+  get latLngs() {
+    return this.getLatLngs(getSelectedOperation());
   }
 
   // returns a DOM object appropriate for display
