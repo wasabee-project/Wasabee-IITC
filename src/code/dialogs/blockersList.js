@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
+import UiCommands from "../uiCommands";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -22,14 +23,14 @@ const BlockerList = Feature.extend({
       context.blockerlistUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
   },
 
   _displayDialog: function() {
@@ -55,6 +56,7 @@ const BlockerList = Feature.extend({
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
+          window.plugin.wasabee._selectedOp._uiupdatecaller = "blockerslist.OK";
           window.runHooks("wasabeeUIUpdate", this._operation);
         },
         "Auto-Mark": () => {
@@ -156,18 +158,4 @@ const getListDialogContent = (operation, sortBy, sortAsc) => {
   content.sortAsc = !sortAsc; // I don't know why this flips
   content.items = operation.blockers;
   return content;
-};
-
-// yes, one per dialog type otherwise closing removes callback registration
-const listenForAddedPortals = newPortal => {
-  if (!newPortal.portal.options.data.title) return;
-
-  const op = getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    if (faked.id == newPortal.portal.options.guid) {
-      faked.name = newPortal.portal.options.data.title;
-      op.update(true);
-    }
-  }
 };
