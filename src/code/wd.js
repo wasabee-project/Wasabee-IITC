@@ -5,10 +5,10 @@ import { getAgent } from "./server";
 
 // setup function
 export const initWasabeeD = () => {
-  window.plugin.wasabee.defensiveLayerGroup = new L.LayerGroup();
+  window.plugin.wasabee.defensiveLayers = new L.LayerGroup();
   window.addLayerGroup(
     "Wasabee-D Keys",
-    window.plugin.wasabee.defensiveLayerGroup,
+    window.plugin.wasabee.defensiveLayers,
     true
   );
 
@@ -20,6 +20,22 @@ export const initWasabeeD = () => {
   if (!window.plugin.wasabee._Dkey) {
     window.plugin.wasabee._Dkeys = new Map();
   }
+
+  window.map.on("layeradd", obj => {
+    if (obj.layer === window.plugin.wasabee.defensiveLayers) {
+      window.runHooks("wasabeeDkeys");
+    }
+  });
+
+  window.map.on("layerremove", obj => {
+    if (obj.layer === window.plugin.wasabee.defensiveLayers) {
+      // clearLayers doesn't actually remove the data, just hides it from the map
+      window.plugin.wasabee.defensiveLayers.clearLayers();
+      window.plugin.wasabee._Dkeys.clear();
+    }
+  });
+
+  window.runHooks("wasabeeDkeys");
 };
 
 // This is the primary hook that is called on map refresh
@@ -45,8 +61,25 @@ export const drawWasabeeDkeys = () => {
           }
           l.set(n.GID, n); // add user to the sub-map
           window.plugin.wasabee._Dkeys.set(n.PortalID, l);
-          // if we are here early (after a reload?) IITC spams the logs
-          window.portalDetail.request(n.PortalID); // listener deals with the replies
+          if (
+            window.portals[n.PortalID] &&
+            window.portals[n.PortalID].options.data.title
+          ) {
+            // already fully fetched
+            console.log(n.PortalID + " already loaded");
+            const e = window.portals[n.PortalID].options;
+            e.success = true; // make this look like an event
+            e.details = e.data;
+            dLoadDetails(e);
+          } else {
+            // if we are here early (after a reload?) IITC spams the logs
+            if (!window.requests) {
+              console.log(
+                "window.requests does not exist yet... expect an error"
+              );
+            }
+            window.portalDetail.request(n.PortalID); // listener deals with the replies
+          }
         }
       }
     },
@@ -58,12 +91,19 @@ export const drawWasabeeDkeys = () => {
 
 const dLoadDetails = e => {
   if (!e.success) return; // bad load
-  if (window.plugin.wasabee.defensiveLayers[e.guid]) return; // already drawn
+  if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return; // not enabled
   if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
+  if (
+    window.plugin.wasabee.defensiveLayers[e.guid] &&
+    window.plugin.wasabee.defensiveLayers[e.guid]._leaflet_id
+  )
+    window.plugin.wasabee.defensiveLayers.removeLayer(
+      window.plugin.wasabee.defensiveLayers[e.guid]
+    );
 
-  const l = window.plugin.wasabee._Dkeys.get(e.guid);
-  l.set("details", e.details);
-  window.plugin.wasabee._Dkeys.set(e.guid, l);
+  const submap = window.plugin.wasabee._Dkeys.get(e.guid);
+  submap.set("details", e.details);
+  window.plugin.wasabee._Dkeys.set(e.guid, submap);
 
   const icon = window.plugin.wasabee.static.markerTypes.get(
     "GetKeyPortalMarker"
@@ -84,7 +124,7 @@ const dLoadDetails = e => {
     })
   });
   window.plugin.wasabee.defensiveLayers[e.guid] = marker;
-  marker.addTo(window.plugin.wasabee.defensiveLayerGroup);
+  marker.addTo(window.plugin.wasabee.defensiveLayers);
 
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...");
