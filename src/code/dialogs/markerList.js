@@ -5,6 +5,7 @@ import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import OverflowMenu from "../overflowMenu";
+import UiCommands from "../uiCommands";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -26,13 +27,13 @@ const MarkerList = Feature.extend({
       context.markerListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
@@ -197,17 +198,3 @@ const MarkerList = Feature.extend({
 });
 
 export default MarkerList;
-
-// yes, one defition per dialog type
-const listenForAddedPortals = newPortal => {
-  if (!newPortal.portal.options.data.title) return;
-
-  const op = getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    if (faked.id == newPortal.portal.options.guid) {
-      faked.name = newPortal.portal.options.data.title;
-      op.update(true);
-    }
-  }
-};
