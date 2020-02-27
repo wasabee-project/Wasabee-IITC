@@ -64,7 +64,7 @@ const AuthDialog = Feature.extend({
       postwebviewButton.innerHTML = "Verify Webview";
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
-        window.runHooks("waabeeUIUpdate", this._operation);
+        window.runHooks("wasabeeUIUpdate", this._operation);
         const me = await WasabeeMe.get();
         if (me) {
           alert("server data: " + JSON.stringify(me));
@@ -99,6 +99,7 @@ const AuthDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
+        window.plugin.wasabee._selectedOp._uiupdatecaller = "authdialog.close";
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },
@@ -132,8 +133,8 @@ const AuthDialog = Feature.extend({
           async () => {
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
+            // eslint-disable-next-line
             const me = await mePromise();
-            console.debug(me);
             // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
             context._dialog.dialog("close");
           },
@@ -164,6 +165,7 @@ const AuthDialog = Feature.extend({
         }
         SendAccessTokenAsync(response.access_token).then(
           () => {
+            mePromise();
             context._dialog.dialog("close");
           },
           reject => {
