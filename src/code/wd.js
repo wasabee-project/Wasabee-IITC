@@ -112,8 +112,18 @@ const dLoadDetails = e => {
     (e.details.latE6 / 1e6).toFixed(6),
     (e.details.lngE6 / 1e6).toFixed(6)
   );
+
+  let opacity = 0.3;
+  if (e.details && e.details.team == "E") {
+    if (e.details.resonators && e.details.resonators.length == 8) {
+      opacity = 1.0;
+    } else {
+      opacity = 0.6;
+    }
+  }
   const marker = L.marker(latLng, {
     title: e.details.title,
+    opacity: opacity,
     icon: L.icon({
       iconUrl: icon,
       shadowUrl: null,

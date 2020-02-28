@@ -69,6 +69,12 @@ const TeamMembershipList = Feature.extend({
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay())
       },
       {
+        name: "Squad",
+        value: agent => agent.squad,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value) => (cell.textContent = value)
+      },
+      {
         name: "Location Update",
         value: agent => agent.date,
         sort: (a, b) => a.localeCompare(b),
