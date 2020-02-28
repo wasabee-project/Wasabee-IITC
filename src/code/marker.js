@@ -64,11 +64,11 @@ export default class WasabeeMarker {
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
     marker.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.innerHTML = this.getPopupBodyWithType(portal);
 
-    const assignment = L.DomUtil.create("div", "", content);
+    const assignment = L.DomUtil.create("div", null, content);
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
@@ -85,7 +85,7 @@ export default class WasabeeMarker {
     }
 
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-    const deleteButton = L.DomUtil.create("a", "", buttonSet);
+    const deleteButton = L.DomUtil.create("a", null, buttonSet);
     deleteButton.textContent = "Delete";
     L.DomEvent.on(deleteButton, "click", () => {
       UiCommands.deleteMarker(operation, this, portal);
@@ -93,7 +93,7 @@ export default class WasabeeMarker {
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", "", buttonSet);
+      const assignButton = L.DomUtil.create("a", null, buttonSet);
       assignButton.textContent = "Assign";
       L.DomEvent.on(assignButton, "click", () => {
         const ad = new AssignDialog();

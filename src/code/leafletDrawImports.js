@@ -306,7 +306,7 @@ export const Toolbar = L.Class.extend({
       button;
 
     for (var i = 0; i < l; i++) {
-      li = L.DomUtil.create("li", "", container);
+      li = L.DomUtil.create("li", null, container);
 
       button = this._createButton({
         title: buttons[i].title,
@@ -423,6 +423,7 @@ export const WButton = L.Class.extend({
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
     }
+    // disable all the others
     for (const m in window.plugin.wasabee.buttons._modes) {
       if (window.plugin.wasabee.buttons._modes[m].type != this.type)
         window.plugin.wasabee.buttons._modes[m].disable();
@@ -497,18 +498,4 @@ export const WButton = L.Class.extend({
     }
     return container;
   }
-
-  /* 
-  addHooks: function() {
-    if (!this._map) return;
-    console.log("WButton addHooks");
-    console.log(this);
-    // do stuff
-  },
-
-  removeHooks: function() {
-    if (!this._map) return;
-    console.log("WButton removeHooks");
-    console.log(this);
-  } */
 });

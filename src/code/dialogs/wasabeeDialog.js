@@ -2,9 +2,10 @@ import { Feature } from "../leafletDrawImports";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
 import store from "../../lib/store";
-import { GetWasabeeServer, SetTeamState } from "../server";
+import { GetWasabeeServer, SetTeamState, locationPromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
+import TeamMembershipList from "./teamMembershipList";
 
 const WasabeeDialog = Feature.extend({
   statics: {
@@ -33,10 +34,13 @@ const WasabeeDialog = Feature.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
           const link = L.DomUtil.create("a", "", row);
-          link.href =
-            GetWasabeeServer() + "/api/v1/team/" + team.ID + "?json=n";
+          link.href = "#";
           link.innerHTML = value;
-          link.target = "_blank";
+          L.DomEvent.on(link, "click", () => {
+            const td = new TeamMembershipList();
+            td.setup(team.ID);
+            td.enable();
+          });
         }
       },
       {
@@ -60,9 +64,36 @@ const WasabeeDialog = Feature.extend({
     this.serverInfo = L.DomUtil.create("div", "", html);
     this.serverInfo.innerHTML = "Server: " + GetWasabeeServer() + "<br/><br/>";
     L.DomEvent.on(this.serverInfo, "click", this.setServer);
+
+    const options = L.DomUtil.create("div", "temp-op-dialog", html);
+    const locbutton = L.DomUtil.create("a", null, options);
+    locbutton.style.align = "center";
+    locbutton.textContent = "Send Location";
+    L.DomEvent.on(locbutton, "click", () => {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          locationPromise(
+            position.coords.latitude,
+            position.coords.longitude
+          ).then(
+            () => {
+              alert("location processed");
+            },
+            err => {
+              console.log(err);
+            }
+          );
+        },
+        err => {
+          console.log(err);
+          console.log("unable to get location");
+        }
+      );
+    });
+
     html.appendChild(teamlist.table);
 
-    if (me && me instanceof WasabeeMe) {
+    if (me) {
       teamlist.items = me.Teams;
       const wbHandler = this;
       this._dialog = window.dialog({

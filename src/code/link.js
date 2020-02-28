@@ -92,11 +92,11 @@ export default class WasabeeLink {
 
   // returns a DOM object appropriate for display
   displayFormat(operation) {
-    const d = L.DomUtil.create("div", "");
+    const d = L.DomUtil.create("div", null);
     d.appendChild(
       operation.getPortal(this.fromPortalId).displayFormat(operation)
     );
-    const arrow = L.DomUtil.create("span", "", d);
+    const arrow = L.DomUtil.create("span", null, d);
     arrow.innerHTML = " ➾ ";
     arrow.style.color = this.getColorHex();
     d.appendChild(
@@ -121,7 +121,7 @@ export default class WasabeeLink {
   minLevel(operation) {
     const b = this.length(operation);
     let s = "unknown";
-    const a = L.DomUtil.create("span", "");
+    const a = L.DomUtil.create("span", null);
 
     if (b > 6881280) {
       s = "impossible";

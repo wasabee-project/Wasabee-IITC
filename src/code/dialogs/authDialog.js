@@ -4,6 +4,7 @@ import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
 import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
+import UiCommands from "../uiCommands";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -40,27 +41,36 @@ const AuthDialog = Feature.extend({
     const title = L.DomUtil.create("div", "", content);
     title.className = "desc";
     title.innerHTML =
-      "In order to use the server functionality, you must log in.<br/>";
+      "In order to use the server functionality, you must log in.<br/> On Android or desktop, try 'quick' first. If that fails, try 'choose account'. On iOS, try 'quick', if that fails do a 'webview', log in, do a 'choose account', log in and that should work.";
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
-    const gsapiButton = L.DomUtil.create("a", "", buttonSet);
+    const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
+    const sendLocTitle = L.DomUtil.create("span", null, sendLocDiv);
+    sendLocTitle.textContent = "Send Location: ";
+    this._sendLocCheck = L.DomUtil.create("input", null, sendLocDiv);
+    this._sendLocCheck.type = "checkbox";
+    this._sendLocCheck.checked = window.plugin.wasabee.sendLocation
+      ? window.plugin.wasabee.sendLocation
+      : false;
+
+    const gsapiButton = L.DomUtil.create("a", null, buttonSet);
     gsapiButton.innerHTML = "Log In (quick)";
     L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
 
-    const gsapiButtonToo = L.DomUtil.create("a", "", buttonSet);
+    const gsapiButtonToo = L.DomUtil.create("a", null, buttonSet);
     gsapiButtonToo.innerHTML = "Log In (choose account)";
     L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
 
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
-      const webviewButton = L.DomUtil.create("a", "", buttonSet);
+      const webviewButton = L.DomUtil.create("a", null, buttonSet);
       webviewButton.innerHTML = "Log In (webview)";
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
       });
-      const postwebviewButton = L.DomUtil.create("a", "", buttonSet);
+      const postwebviewButton = L.DomUtil.create("a", null, buttonSet);
       postwebviewButton.innerHTML = "Verify Webview";
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
@@ -99,7 +109,18 @@ const AuthDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
-        window.plugin.wasabee._selectedOp._uiupdatecaller = "authdialog.close";
+        if (this._sendLocCheck && this._sendLocCheck.checked) {
+          window.plugin.wasabee.sendLocation = true;
+          localStorage[
+            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+          ] = true;
+          UiCommands.sendLocation();
+        } else {
+          window.plugin.wasabee.sendLocation = false;
+          localStorage[
+            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+          ] = false;
+        }
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },

@@ -339,12 +339,12 @@ export default class WasabeeOp {
     }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      this.update(false); // draw, but no need to mark it to send-to-server
+      // this.update(false); // can trigger a redraw-storm, just skip
     }
   }
 
   removeBlocker() {
-    // console.log("remove blocker called... write this");
+    // console.log("remove blocker called... write this"); // no need for now
   }
 
   get fakedPortals() {

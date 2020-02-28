@@ -3,6 +3,8 @@ import WasabeePortal from "./portal";
 import LinkListDialog from "./dialogs/linkListDialog";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import { getSelectedOperation } from "./selectedOp";
+import { locationPromise } from "./server";
+import WasabeeMe from "./me";
 
 // wrap operation calls in UI checks
 export default {
@@ -24,10 +26,10 @@ export default {
     }
 
     const con = new ConfirmDialog();
-    const pr = L.DomUtil.create("div", "");
+    const pr = L.DomUtil.create("div", null);
     pr.innerHTML = "Do you want to swap: ";
     pr.appendChild(portal.displayFormat(operation));
-    L.DomUtil.create("span", "", pr).innerHTML = " with ";
+    L.DomUtil.create("span", null, pr).innerHTML = " with ";
     pr.appendChild(selectedPortal.displayFormat(operation));
     con.setup("Swap Portal", pr, () => {
       operation.swapPortal(portal, selectedPortal);
@@ -36,7 +38,7 @@ export default {
   },
   deletePortal: (operation, portal) => {
     const con = new ConfirmDialog();
-    const pr = L.DomUtil.create("div", "");
+    const pr = L.DomUtil.create("div", null);
     pr.innerHTML =
       "Do you want to delete this anchor and all associated links: ";
     pr.appendChild(portal.displayFormat(operation));
@@ -47,7 +49,7 @@ export default {
   },
   deleteMarker: (operation, marker, portal) => {
     const con = new ConfirmDialog();
-    const pr = L.DomUtil.create("div", "");
+    const pr = L.DomUtil.create("div", null);
     pr.innerHTML = "Do you want to delete this marker: ";
     pr.appendChild(portal.displayFormat(operation));
     con.setup("Delete Marker", pr, () => {
@@ -82,5 +84,28 @@ export default {
         op.update(true);
       }
     }
+  },
+  sendLocation: () => {
+    if (!WasabeeMe.isLoggedIn()) return;
+    if (!window.plugin.wasabee.sendLocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        locationPromise(
+          position.coords.latitude,
+          position.coords.longitude
+        ).then(
+          () => {
+            console.log("location processed");
+          },
+          err => {
+            console.log(err);
+          }
+        );
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 };

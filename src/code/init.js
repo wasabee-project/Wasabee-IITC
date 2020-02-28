@@ -5,6 +5,7 @@ import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
+import UiCommands from "./uiCommands";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -52,9 +53,12 @@ window.plugin.wasabee.init = function() {
   });
 
   // enable and test in 0.15 -- works on IITC-CE but not on iitc.me
-  window.addResumeFunction(() => {
-    window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
-  });
+  if (window.addResumeFunction) {
+    window.addResumeFunction(() => {
+      window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+      UiCommands.sendLocation();
+    });
+  }
 
   window.map.on("layeradd", obj => {
     if (
@@ -80,9 +84,15 @@ window.plugin.wasabee.init = function() {
   initCrossLinks();
   initWasabeeD();
 
+  Wasabee.sendLocation =
+    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
+  if (Wasabee.sendLocation === undefined) {
+    window.plugin.wasabee.sendLocation = false;
+    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = false;
+  }
+
   // once everything else is done, do the initial draw
   addButtons(Wasabee._selectedOp);
-  Wasabee._selectedOp._uiupdatecaller = "init";
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
   window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
   window.runHooks("wasabeeDkeys");

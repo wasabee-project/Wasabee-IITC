@@ -66,7 +66,6 @@ export const drawWasabeeDkeys = () => {
             window.portals[n.PortalID].options.data.title
           ) {
             // already fully fetched
-            console.log(n.PortalID + " already loaded");
             const e = window.portals[n.PortalID].options;
             e.success = true; // make this look like an event
             e.details = e.data;
@@ -162,21 +161,21 @@ const dLoadDetails = e => {
 const getMarkerPopup = PortalID => {
   if (!window.plugin.wasabee._Dkeys) return;
 
-  const container = L.DomUtil.create("span", ""); // leaflet-draw-tooltip would be cool
+  const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
   if (window.plugin.wasabee._Dkeys.has(PortalID)) {
-    const ul = L.DomUtil.create("ul", "", container);
+    const ul = L.DomUtil.create("ul", null, container);
     const l = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of l) {
       if (k != "details") {
         const a = getAgent(v.GID);
-        const li = L.DomUtil.create("li", "", ul);
+        const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());
         } else {
-          const fake = L.DomUtil.create("span", "", li);
+          const fake = L.DomUtil.create("span", null, li);
           fake.innerHTML = "[loading]";
         }
-        const c = L.DomUtil.create("span", "", li);
+        const c = L.DomUtil.create("span", null, li);
         c.innerHTML = `:  ${v.Count} ${v.CapID}`;
       }
     }

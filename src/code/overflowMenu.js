@@ -6,7 +6,7 @@ export default class OverflowMenu {
       this._show(event);
     });
 
-    this._buttonText = L.DomUtil.create("span", "", this._button);
+    this._buttonText = L.DomUtil.create("span", null, this._button);
     this._buttonText.textContent = "\u22ee";
     this._button.role = "button";
 

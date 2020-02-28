@@ -61,7 +61,7 @@ export default class WasabeePortal {
   displayFormat() {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
-    const e = L.DomUtil.create("a", "");
+    const e = L.DomUtil.create("a", null);
     e.appendChild(document.createTextNode(this.name));
 
     if (window.portals[this.id]) {

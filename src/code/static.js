@@ -45,6 +45,7 @@ W.static = {
   },
   constants: {
     SELECTED_OP_KEY: "SELECTED_OP_KEY",
+    SEND_LOCATION_KEY: "SEND_LOCATION",
     AGENT_INFO_KEY: "AGENT_INFO_KEY",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",

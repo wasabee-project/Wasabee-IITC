@@ -6,6 +6,7 @@ import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import UiCommands from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
+import WasabeeMe from "../me";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {
@@ -171,11 +172,13 @@ const OperationChecklistDialog = Feature.extend({
         format: (row, value, agent) => {
           const assigned = L.DomUtil.create("a", "", row);
           assigned.innerHTML = value;
-          L.DomEvent.on(row, "click", () => {
-            const ad = new AssignDialog();
-            ad.setup(agent, operation);
-            ad.enable();
-          });
+          if (WasabeeMe.isLoggedIn()) {
+            L.DomEvent.on(row, "click", () => {
+              const ad = new AssignDialog();
+              ad.setup(agent, operation);
+              ad.enable();
+            });
+          }
         }
       },
       {

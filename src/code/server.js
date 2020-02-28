@@ -397,6 +397,7 @@ export const SendAccessTokenAsync = function(accessToken) {
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
+          WasabeeMe.create(req.response); // free update
           resolve(true);
           break;
         default:
@@ -553,6 +554,43 @@ export const dKeylistPromise = function() {
       reject(`Network Error: ${req.statusText}`);
     };
 
+    req.send();
+  });
+};
+
+export const locationPromise = function(lat, lng) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/me?lat=${lat}&lon=${lng}`;
+    const req = new XMLHttpRequest();
+    // r.HandleFunc("/me", meSetAgentLocationRoute).Methods("GET").Queries("lat", "{lat}", "lon", "{lon}")
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(req.response);
+          break;
+        case 401:
+          reject("not logged in");
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    /* const fd = new FormData();
+    fd.append("lat", lat);
+    fd.append("lon", lng); */
     req.send();
   });
 };

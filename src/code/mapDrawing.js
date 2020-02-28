@@ -6,7 +6,7 @@ var Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  console.log("drawThings called: " + op.ID + " by : " + op._uiupdatecaller);
+  console.log("drawThings called: " + op.ID);
   console.time("drawThings");
 
   updateAnchors(op);
@@ -195,18 +195,11 @@ const addLink = (wlink, style, operation) => {
 };
 
 /** this function fetches and displays agent location */
-export const drawAgents = op => {
+export const drawAgents = () => {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
 
   if (!WasabeeMe.isLoggedIn()) {
     return;
-  }
-  const me = WasabeeMe.get();
-  const myTeams = new Array();
-  for (const team of me.Teams) {
-    if (team.State == "On") {
-      myTeams.push(team.ID);
-    }
   }
 
   const layerMap = new Map();
@@ -214,22 +207,23 @@ export const drawAgents = op => {
     layerMap.set(l.options.id, l._leaflet_id);
   }
 
-  for (const t of op.teamlist) {
-    // skip a team if we are not on it & enabled
-    if (myTeams.indexOf(t.teamid) == -1) {
-      continue;
-    }
+  const doneAgents = new Array();
+  const me = WasabeeMe.get();
+  for (const t of me.Teams) {
+    if (t.State != "On") continue;
+
     // purge what we have
-    if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.teamid)) {
-      Wasabee.teams.delete(t.teamid);
+    if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
+      Wasabee.teams.delete(t.ID);
     }
 
     /* this fetches the team into Wasabee.teams */
-    teamPromise(t.teamid).then(
+    teamPromise(t.ID).then(
       function(team) {
         for (const agent of team.agents) {
-          if (!layerMap.has(agent.id)) {
+          if (!layerMap.has(agent.id) && doneAgents.indexOf(agent.id) == -1) {
             // new, add to map
+            doneAgents.push(agent.id);
             if (agent.lat && agent.lng) {
               const marker = L.marker(agent.latLng, {
                 title: agent.name,
@@ -269,10 +263,13 @@ export const drawAgents = op => {
             }
           } else {
             // just move existing
-            const a = layerMap.get(agent.id);
-            const al = Wasabee.agentLayerGroup.getLayer(a.id);
-            al.setLatLng(agent.latLng);
-            layerMap.delete(agent.id);
+            if (doneAgents.indexOf(agent.id) == -1) {
+              const a = layerMap.get(agent.id);
+              const al = Wasabee.agentLayerGroup.getLayer(a);
+              al.setLatLng(agent.latLng);
+              layerMap.delete(agent.id);
+              doneAgents.push(agent.id);
+            }
           }
         }
       },
@@ -280,7 +277,7 @@ export const drawAgents = op => {
         console.log(err);
       }
     );
-  } // for t of op.teamlist
+  } // for t of whichlist
 
   // remove those not found in this fetch
   for (const l in layerMap) {

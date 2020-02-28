@@ -56,7 +56,6 @@ const BlockerList = Feature.extend({
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
-          window.plugin.wasabee._selectedOp._uiupdatecaller = "blockerslist.OK";
           window.runHooks("wasabeeUIUpdate", this._operation);
         },
         "Auto-Mark": () => {

@@ -51,7 +51,6 @@ const SyncButton = WButton.extend({
                 function(err) {
                   console.log(err);
                   alert(err);
-                  window.runHooks("wasabeeUIUpdate", so);
                 }
               );
             }
