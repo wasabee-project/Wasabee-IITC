@@ -31,7 +31,7 @@ const OpPermList = Feature.extend({
     this.setup();
     const html = L.DomUtil.create("div", null);
     html.appendChild(this._table.table);
-    if (this._operation.IsWritableOp()) {
+    if (this._operation.IsOwnedOp()) {
       const addArea = L.DomUtil.create("div", null, html);
       addArea.textContent = "add new perm thing will go here";
     }

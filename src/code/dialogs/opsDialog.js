@@ -213,12 +213,14 @@ const OpsDialog = Feature.extend({
       });
     }
 
-    const permsButton = L.DomUtil.create("a", null, buttonSection);
-    permsButton.innerHTML = "Op Permissions";
-    L.DomEvent.on(permsButton, "click", () => {
-      const opl = new OpPermList();
-      opl.enable();
-    });
+    if (selectedOp.IsServerOp()) {
+      const permsButton = L.DomUtil.create("a", null, buttonSection);
+      permsButton.innerHTML = "Op Permissions";
+      L.DomEvent.on(permsButton, "click", () => {
+        const opl = new OpPermList();
+        opl.enable();
+      });
+    }
 
     this._content = content;
   }
