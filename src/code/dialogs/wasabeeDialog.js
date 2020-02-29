@@ -20,12 +20,12 @@ const WasabeeDialog = Feature.extend({
 
   addHooks: function() {
     if (!this._map) return;
+    this._me = WasabeeMe.get(true);
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  _displayDialog: function() {
-    const me = WasabeeMe.get(true);
+  _buildContent: function() {
     const teamlist = new Sortable();
     teamlist.fields = [
       {
@@ -51,8 +51,8 @@ const WasabeeDialog = Feature.extend({
           const link = L.DomUtil.create("a", "", row);
           let curstate = obj.State;
           link.innerHTML = curstate;
-          link.onclick = () => {
-            curstate = this.toggleTeam(obj.ID, curstate);
+          link.onclick = async () => {
+            curstate = await this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
           };
         }
@@ -92,19 +92,23 @@ const WasabeeDialog = Feature.extend({
     });
 
     html.appendChild(teamlist.table);
+    teamlist.items = this._me.Teams;
+    this._html = html;
+  },
 
-    if (me) {
-      teamlist.items = me.Teams;
-      const wbHandler = this;
+  _displayDialog: function() {
+    this._buildContent();
+
+    if (this._me) {
       this._dialog = window.dialog({
         title: "Current User Information",
         width: "auto",
         height: "auto",
-        html: html,
+        html: this._html,
         dialogClass: "wasabee-dialog-mustauth",
-        closeCallback: function() {
-          wbHandler.disable();
-          delete wbHandler._dialog;
+        closeCallback: () => {
+          this.disable();
+          delete this._dialog;
         },
         id: window.plugin.wasabee.static.dialogNames.wasabeeButton
       });
@@ -115,11 +119,13 @@ const WasabeeDialog = Feature.extend({
     }
   },
 
-  toggleTeam: function(teamID, currentState) {
+  toggleTeam: async function(teamID, currentState) {
     let newState = "Off";
     if (currentState == "Off") newState = "On";
 
     SetTeamState(teamID, newState);
+    this._me = await WasabeeMe.get(true);
+    // instead of just changing the display, trigger a full redraw?
     return newState;
   },
 
