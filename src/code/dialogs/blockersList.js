@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import UiCommands from "../uiCommands";
+import WasabeePortal from "../portal";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -37,7 +38,7 @@ const BlockerList = Feature.extend({
     if (!this._map) return;
     const blockerList = this;
 
-    this.sortable = getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+    this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
     for (const f of this._operation.fakedPortals) {
       window.portalDetail.request(f.id);
@@ -59,9 +60,7 @@ const BlockerList = Feature.extend({
           window.runHooks("wasabeeUIUpdate", this._operation);
         },
         "Auto-Mark": () => {
-          alert(
-            "Auto-Mark does not work yet... but how awesome will it be to have it?!"
-          );
+          this.automark();
         },
         Reset: () => {
           this._operation.blockers = new Array();
@@ -86,8 +85,7 @@ const BlockerList = Feature.extend({
     if (window.DIALOGS[id]) {
       window.DIALOGS[id].parentNode.children[0].children[1].innerText =
         "Known Blockers: " + newOpData.name;
-      this.sortable = getListDialogContent(
-        newOpData,
+      this.sortable = this._getListDialogContent(
         this.sortable.sortBy,
         this.sortable.sortAsc
       );
@@ -96,65 +94,118 @@ const BlockerList = Feature.extend({
         window.DIALOGS[id].childNodes[0]
       );
     }
+  },
+
+  _getListDialogContent(sortBy, sortAsc) {
+    const content = new Sortable();
+    content.fields = [
+      {
+        name: "From Portal",
+        value: blocker => {
+          return this._operation.getPortal(blocker.fromPortalId).name;
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, blocker) => {
+          const p = this._operation.getPortal(blocker.fromPortalId);
+          row.appendChild(p.displayFormat(this._operation));
+        }
+      },
+      {
+        name: "Count",
+        value: blocker => {
+          const c = this._operation.blockers.filter(
+            b =>
+              b.fromPortalId == blocker.fromPortalId ||
+              b.toPortalID == blocker.fromPortalId
+          );
+          return c.length;
+        },
+        sort: (a, b) => a - b,
+        format: (row, value) => (row.innerHTML = value)
+      },
+      {
+        name: "To Portal",
+        value: blocker => {
+          return this._operation.getPortal(blocker.toPortalId).name;
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, blocker) => {
+          const p = this._operation.getPortal(blocker.toPortalId);
+          row.appendChild(p.displayFormat(this._operation));
+        }
+      },
+      {
+        name: "Count",
+        value: blocker => {
+          const c = this._operation.blockers.filter(
+            b =>
+              b.fromPortalId == blocker.toPortalId ||
+              b.toPortalId == blocker.toPortalId
+          );
+          return c.length;
+        },
+        sort: (a, b) => a - b,
+        format: (row, value) => (row.innerHTML = value)
+      }
+    ];
+    content.sortBy = sortBy;
+    content.sortAsc = !sortAsc; // I don't know why this flips
+    content.items = this._operation.blockers;
+    return content;
+  },
+
+  automark() {
+    // build count list
+    const portals = new Array();
+    for (const b of this._operation.blockers) {
+      portals.push(b.fromPortalId);
+      portals.push(b.toPortalId);
+    }
+    const reduced = {};
+    for (const p of portals) {
+      if (!reduced[p]) reduced[p] = 0;
+      reduced[p]++;
+    }
+    const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
+    console.log(sorted);
+
+    if (sorted.length == 0) return;
+
+    const portalId = sorted[0][0];
+    // const count = sorted[0][1];
+
+    // put in some smarts for picking close portals, rather than random ones
+    // when the count gets > 3
+
+    // get WasabeePortal for portalId
+    let wportal = this._operation.getPortal(portalId);
+    if (!wportal) wportal = WasabeePortal.get(portalId);
+    if (!wportal) {
+      alert("Auto-Mark stopped due to portals not being loaded");
+      return;
+    }
+    console.log(wportal);
+
+    // add marker
+    let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
+    if (
+      window.portals[portalId] &&
+      window.portals[portalId].options &&
+      window.portals[portalId].options.data &&
+      window.portals[portalId].options.data.team == "E"
+    ) {
+      type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
+    }
+    this._operation.addMarker(type, wportal, "auto-marked");
+
+    // remove nodes from blocker list
+    this._operation.blockers = this._operation.blockers.filter(b => {
+      if (b.fromPortalId == portalId || b.toPortalId == portalId) return false;
+      return true;
+    });
+    window.runHooks("wasabeeUIUpdate", this._operation);
+    this.automark();
   }
 });
 
 export default BlockerList;
-
-const getListDialogContent = (operation, sortBy, sortAsc) => {
-  const content = new Sortable();
-  content.fields = [
-    {
-      name: "From Portal",
-      value: blocker => {
-        return operation.getPortal(blocker.fromPortalId).name;
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value, blocker) => {
-        const p = operation.getPortal(blocker.fromPortalId);
-        row.appendChild(p.displayFormat(operation));
-      }
-    },
-    {
-      name: "Count",
-      value: blocker => {
-        const c = operation.blockers.filter(
-          b =>
-            b.fromPortalId == blocker.fromPortalId ||
-            b.toPortalID == blocker.fromPortalId
-        );
-        return c.length;
-      },
-      sort: (a, b) => a - b,
-      format: (row, value) => (row.innerHTML = value)
-    },
-    {
-      name: "To Portal",
-      value: blocker => {
-        return operation.getPortal(blocker.toPortalId).name;
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (row, value, blocker) => {
-        const p = operation.getPortal(blocker.toPortalId);
-        row.appendChild(p.displayFormat(operation));
-      }
-    },
-    {
-      name: "Count",
-      value: blocker => {
-        const c = operation.blockers.filter(
-          b =>
-            b.fromPortalId == blocker.toPortalId ||
-            b.toPortalId == blocker.toPortalId
-        );
-        return c.length;
-      },
-      sort: (a, b) => a - b,
-      format: (row, value) => (row.innerHTML = value)
-    }
-  ];
-  content.sortBy = sortBy;
-  content.sortAsc = !sortAsc; // I don't know why this flips
-  content.items = operation.blockers;
-  return content;
-};

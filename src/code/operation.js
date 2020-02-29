@@ -339,7 +339,7 @@ export default class WasabeeOp {
     }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      // this.update(false); // can trigger a redraw-storm, just skip
+      this.update(false); // can trigger a redraw-storm, just skip
     }
   }
 

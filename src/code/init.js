@@ -19,7 +19,8 @@ window.plugin.wasabee.init = function() {
       "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee"
     );
 
-  //** LAYER DEFINITIONS */
+  window.pluginCreateHook("wasabeeUIUpdate");
+
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
@@ -47,7 +48,6 @@ window.plugin.wasabee.init = function() {
     drawAgents(Wasabee._selectedOp);
   });
 
-  window.pluginCreateHook("wasabeeUIUpdate");
   window.addHook("wasabeeUIUpdate", operation => {
     drawThings(operation);
   });
@@ -94,8 +94,11 @@ window.plugin.wasabee.init = function() {
   // once everything else is done, do the initial draw
   addButtons(Wasabee._selectedOp);
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
-  window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
-  window.runHooks("wasabeeDkeys");
+  if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
+    window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
+  if (window.VALID_HOOKS.includes("wasabeeDkeys"))
+    window.runHooks("wasabeeDkeys");
+  console.log("init end");
 };
 
 const addCSS = content => {

@@ -38,10 +38,10 @@ const AuthDialog = Feature.extend({
     }
 
     const content = L.DomUtil.create("div", "temp-op-dialog");
-    const title = L.DomUtil.create("div", "", content);
+    const title = L.DomUtil.create("div", null, content);
     title.className = "desc";
     title.innerHTML =
-      "In order to use the server functionality, you must log in.<br/> On Android or desktop, try 'quick' first. If that fails, try 'choose account'. On iOS, try 'quick', if that fails do a 'webview', log in, do a 'choose account', log in and that should work.";
+      "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'webview', log in; then do a 'choose account'. That SHOULD work.";
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
     const sendLocDiv = L.DomUtil.create("div", null, buttonSet);

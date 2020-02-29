@@ -309,6 +309,11 @@ const onMapDataRefreshEnd = () => {
 };
 
 export const initCrossLinks = () => {
+  window.pluginCreateHook("wasabeeCrosslinks");
+  window.addHook("wasabeeCrosslinks", operation => {
+    checkAllLinks(operation);
+  });
+
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
   window.plugin.wasabee._crosslinkCache = new Map();
   window.addLayerGroup(
@@ -334,11 +339,6 @@ export const initCrossLinks = () => {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
       delete window.plugin.wasabee._crosslinkCache;
     }
-  });
-
-  window.pluginCreateHook("wasabeeCrosslinks");
-  window.addHook("wasabeeCrosslinks", operation => {
-    checkAllLinks(operation);
   });
 
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);

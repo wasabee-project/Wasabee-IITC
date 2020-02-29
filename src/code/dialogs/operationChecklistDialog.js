@@ -172,7 +172,9 @@ const OperationChecklistDialog = Feature.extend({
         format: (row, value, agent) => {
           const assigned = L.DomUtil.create("a", "", row);
           assigned.innerHTML = value;
+          // assigned.appendChild(agent.displayFormat());
           if (WasabeeMe.isLoggedIn()) {
+            // XXX should be writable op
             L.DomEvent.on(row, "click", () => {
               const ad = new AssignDialog();
               ad.setup(agent, operation);
