@@ -24,7 +24,7 @@ export const drawThings = op => {
 const updateMarkers = op => {
   if (window.isLayerGroupDisplayed("Wasabee Draw Markers") === false) return; // yes, === false, undefined == true
   if (!op.markers || op.markers.length == 0) {
-    Wasabee.markerLayerGroup.getLayers();
+    Wasabee.markerLayerGroup.clearLayers();
     return;
   }
 
