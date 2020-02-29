@@ -27,8 +27,8 @@ const UploadButton = WButton.extend({
           updateOpPromise(this._operation).then(
             function(resolve) {
               console.log(`server accepted the update: ${resolve}`);
+              window.runHooks("wasabeeUIUpdate", this._operation);
               alert("Update Successful");
-              // window.runHooks("wasabeeUIUpdate", this._operation);
             },
             function(reject) {
               console.log(reject);
