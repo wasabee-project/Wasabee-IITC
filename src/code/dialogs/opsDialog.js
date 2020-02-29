@@ -9,6 +9,7 @@ import {
   opsList,
   removeOperation
 } from "../selectedOp";
+import OpPermList from "./opPerms";
 
 const OpsDialog = Feature.extend({
   statics: {
@@ -211,6 +212,13 @@ const OpsDialog = Feature.extend({
         con.enable();
       });
     }
+
+    const permsButton = L.DomUtil.create("a", null, buttonSection);
+    permsButton.innerHTML = "Op Permissions";
+    L.DomEvent.on(permsButton, "click", () => {
+      const opl = new OpPermList();
+      opl.enable();
+    });
 
     this._content = content;
   }

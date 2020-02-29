@@ -1,4 +1,5 @@
 import WasabeeAgent from "./agent";
+import { teamPromise } from "./server";
 
 export default class WasabeeTeam {
   constructor() {
@@ -17,5 +18,22 @@ export default class WasabeeTeam {
       // WasabeeAgent.create takes care of caching it for us
     }
     return team;
+  }
+
+  static get(teamID) {
+    if (window.plugin.wasabee.teams.has(teamID)) {
+      return window.plugin.wasabee.teams.get(teamID);
+    }
+    let t = null;
+    teamPromise(teamID).then(
+      team => {
+        console.log(team);
+        t = team;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+    return t;
   }
 }
