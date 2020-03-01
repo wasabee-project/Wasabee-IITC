@@ -43,6 +43,7 @@ export const uploadOpPromise = function(operation) {
           console.log(
             "probably trying to upload an op with an ID already taken... use update"
           );
+          operation.fetched = "0"; // make it look like it came from the server
           reject(req.response);
           break;
         default:
@@ -168,7 +169,7 @@ export const opPromise = function(opID) {
 
     req.open("GET", url);
 
-    if (localop != null && localop.teamlist.length != 0) {
+    if (localop != null && localop.fetched) {
       req.setRequestHeader("If-Modified-Since", localop.fetched);
     }
 
@@ -397,6 +398,7 @@ export const SendAccessTokenAsync = function(accessToken) {
       switch (req.status) {
         case 200:
           console.log("sending auth token to server accepted");
+          console.log(req.getAllResponseHeaders());
           WasabeeMe.create(req.response); // free update
           resolve(true);
           break;

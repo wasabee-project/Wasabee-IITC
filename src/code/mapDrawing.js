@@ -6,9 +6,7 @@ var Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  console.log("drawThings called: " + op.ID);
-  console.time("drawThings");
-
+  // console.time("drawThings");
   updateAnchors(op);
   updateMarkers(op);
 
@@ -18,7 +16,7 @@ export const drawThings = op => {
   // console.time("resetLinks");
   resetLinks(op);
   // console.timeEnd("resetLinks");
-  console.timeEnd("drawThings");
+  //console.timeEnd("drawThings");
 };
 
 const updateMarkers = op => {

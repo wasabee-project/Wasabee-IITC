@@ -77,13 +77,13 @@ const OpsDialog = Feature.extend({
     const content = L.DomUtil.create("div", "temp-op-wasabee");
     const container = L.DomUtil.create("div", "spinner", content);
     container.style.textalign = "center";
-    const operationSelect = L.DomUtil.create("select", "", container);
+    const operationSelect = L.DomUtil.create("select", null, container);
     operationSelect.style.width = "90%";
 
     const ol = opsList();
     for (const opID of ol) {
       const tmpOp = getOperationByID(opID);
-      const option = L.DomUtil.create("option", "", operationSelect);
+      const option = L.DomUtil.create("option", null, operationSelect);
       option.value = opID;
       option.text = tmpOp.name;
       if (opID == selectedOp.ID) option.selected = true;
@@ -101,10 +101,10 @@ const OpsDialog = Feature.extend({
 
     const writable = selectedOp.IsWritableOp();
 
-    const nameSection = L.DomUtil.create("p", "", content);
+    const nameSection = L.DomUtil.create("p", null, content);
     nameSection.innerHTML = "Operation Name: ";
     if (writable) {
-      const input = L.DomUtil.create("input", "", nameSection);
+      const input = L.DomUtil.create("input", null, nameSection);
       input.value = selectedOp.name;
       L.DomEvent.on(input, "change", () => {
         if (!input.value || input.value == "") {
@@ -120,15 +120,15 @@ const OpsDialog = Feature.extend({
     }
 
     if (writable) {
-      const colorSection = L.DomUtil.create("p", "", content);
+      const colorSection = L.DomUtil.create("p", null, content);
       colorSection.innerHTML = "Operation Color: ";
       const operationColor = selectedOp.color
         ? selectedOp.color
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
-      const opColor = L.DomUtil.create("select", "", colorSection);
+      const opColor = L.DomUtil.create("select", null, colorSection);
       for (const cd of window.plugin.wasabee.static.layerTypes) {
         const c = cd[1];
-        const option = L.DomUtil.create("option", "", opColor);
+        const option = L.DomUtil.create("option", null, opColor);
         if (c.name == operationColor) option.selected = true;
         option.value = c.name;
         option.innerHTML = c.displayName;
@@ -140,9 +140,9 @@ const OpsDialog = Feature.extend({
       });
     }
 
-    const commentSection = L.DomUtil.create("p", "", content);
+    const commentSection = L.DomUtil.create("p", null, content);
     if (writable) {
-      const commentInput = L.DomUtil.create("textarea", "", commentSection);
+      const commentInput = L.DomUtil.create("textarea", null, commentSection);
       commentInput.rows = "3";
       commentInput.width = "90%";
       commentInput.placeholder = "Op Comment";
@@ -152,13 +152,13 @@ const OpsDialog = Feature.extend({
         selectedOp.store();
       });
     } else {
-      const commentDisplay = L.DomUtil.create("p", "", commentSection);
+      const commentDisplay = L.DomUtil.create("p", null, commentSection);
       commentDisplay.innerText = selectedOp.comment;
     }
 
     const buttonSection = L.DomUtil.create("div", "temp-op-dialog", content);
     if (writable) {
-      const clearOpButton = L.DomUtil.create("a", "", buttonSection);
+      const clearOpButton = L.DomUtil.create("a", null, buttonSection);
       clearOpButton.innerHTML = "Clear Portals/Links/Markers";
       L.DomEvent.on(clearOpButton, "click", () => {
         UiCommands.clearAllItems(selectedOp);
@@ -167,7 +167,7 @@ const OpsDialog = Feature.extend({
     }
 
     if (opsList().length > 1) {
-      const deleteButton = L.DomUtil.create("a", "", buttonSection);
+      const deleteButton = L.DomUtil.create("a", null, buttonSection);
       if (selectedOp.IsOwnedOp()) {
         deleteButton.innerHTML = "Delete " + selectedOp.name;
         if (selectedOp.IsServerOp())

@@ -61,6 +61,10 @@ const AuthDialog = Feature.extend({
     gsapiButtonToo.innerHTML = "Log In (choose account)";
     L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
 
+    const gsapiButtonThree = L.DomUtil.create("a", null, buttonSet);
+    gsapiButtonThree.innerHTML = "Log In (AxForest)";
+    L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
+
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
       const webviewButton = L.DomUtil.create("a", null, buttonSet);
@@ -162,6 +166,76 @@ const AuthDialog = Feature.extend({
           reject => {
             console.log(reject);
             alert(`send access token failed: $(reject)`);
+          }
+        );
+      }
+    );
+  },
+
+  // this is probably the most correct, but doesn't seem to work properly
+  gsapiAuthThree: context => {
+    console.log("calling AxForest login method");
+    window.gapi.auth2.authorize(
+      {
+        // prompt: "none",
+        // immediate: true,
+        // immediate: false,
+        client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+        scope: "email profile openid",
+        response_type: "id_token permission"
+      },
+      response => {
+        console.log("got from google: ");
+        console.log(response);
+        if (response.error) {
+          if (response.error == "immediate_failed, trying with select") {
+            window.gapi.auth2.authorize(
+              {
+                prompt: "select_account",
+                client_id:
+                  window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+                scope: "email profile openid",
+                response_type: "id_token permission"
+              },
+              responseSelect => {
+                console.log("got from google (select): ");
+                console.log(responseSelect);
+                if (responseSelect.error) {
+                  const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+                  alert(err);
+                  console.log(err);
+                  return;
+                }
+                console.log("sending to Wasabee (select)");
+                SendAccessTokenAsync(responseSelect.access_token).then(
+                  () => {
+                    console.log("not requesting my data from Wasabee");
+                    // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
+                    context._dialog.dialog("close");
+                  },
+                  tokErr => {
+                    alert(tokErr);
+                  }
+                );
+              }
+            );
+          } else {
+            context._dialog.dialog("close");
+            const err = `error from gsapiAuthThree: ${response.error}: ${response.error_subtype}`;
+            console.log(err);
+            alert(err);
+          }
+          return;
+        }
+        console.log("sending to Wasabee");
+        SendAccessTokenAsync(response.access_token).then(
+          () => {
+            console.log("not requesting my data from Wasabee");
+            // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
+            context._dialog.dialog("close");
+          },
+          tokErr => {
+            alert(tokErr);
           }
         );
       }

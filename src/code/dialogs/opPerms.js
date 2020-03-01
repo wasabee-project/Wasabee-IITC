@@ -36,7 +36,6 @@ const OpPermList = Feature.extend({
 
     html.appendChild(this._table.table);
     if (this._operation.IsOwnedOp()) {
-      console.log(this._me);
       const addArea = L.DomUtil.create("div", null, html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {

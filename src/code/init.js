@@ -98,7 +98,6 @@ window.plugin.wasabee.init = function() {
     window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
   if (window.VALID_HOOKS.includes("wasabeeDkeys"))
     window.runHooks("wasabeeDkeys");
-  console.log("init end");
 };
 
 const addCSS = content => {

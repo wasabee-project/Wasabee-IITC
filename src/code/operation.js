@@ -555,8 +555,8 @@ export default class WasabeeOp {
   }
 
   IsWritableOp() {
-    // no teams == not sent to server, local-only ops are always editable
-    if (!this.teamlist || this.teamlist.length == 0) return true;
+    // not from the server, must be writable
+    if (!this.IsServerOp()) return true;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
@@ -577,13 +577,12 @@ export default class WasabeeOp {
   }
 
   IsServerOp() {
-    // no teams means local-only
-    if (this.teamlist && this.teamlist.length > 0) return true;
+    if (this.fetched) return true;
     return false;
   }
 
   IsOwnedOp() {
-    if (!this.teamlist || this.teamlist.length == 0) return true;
+    if (!this.IsServerOp()) return true;
     if (!WasabeeMe.isLoggedIn()) return false;
 
     const me = WasabeeMe.get();
