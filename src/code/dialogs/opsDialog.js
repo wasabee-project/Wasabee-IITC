@@ -182,7 +182,7 @@ const OpsDialog = Feature.extend({
           "Confirm Delete: " + selectedOp.name,
           "Are you sure you want to delete " + selectedOp.name + "?",
           () => {
-            if (selectedOp.IsOwnedOp()) {
+            if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(
                 function() {
                   console.log("delete from server successful");
@@ -202,11 +202,22 @@ const OpsDialog = Feature.extend({
               newopID = ol[1];
               if (newopID == null) {
                 console.log("not removing last op... fix this");
+                // create a new default op and use that -- just call the init/reset functions?
               }
             }
             const removeid = selectedOp.ID;
+            const newop = makeSelectedOperation(newopID);
+            const mbr = newop.mbr();
+            if (
+              mbr &&
+              isFinite(mbr._southWest.lat) &&
+              isFinite(mbr._northEast.lat)
+            ) {
+              this._map.fitBounds(mbr);
+            }
             removeOperation(removeid);
-            window.runHooks("wasabeeUIUpdate", getOperationByID(newopID));
+            window.runHooks("wasabeeUIUpdate", newop);
+            window.runHooks("wasabeeCrosslinks", newop);
           }
         );
         con.enable();
