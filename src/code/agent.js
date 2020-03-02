@@ -42,7 +42,8 @@ export default class WasabeeAgent {
   }
 
   get latLng() {
-    return new L.LatLng(this.lat, this.lng);
+    if (this.lat && this.lng) return new L.LatLng(this.lat, this.lng);
+    return null;
   }
 
   formatDisplay() {

@@ -211,7 +211,9 @@ const AuthDialog = Feature.extend({
                   () => {
                     console.log("not requesting my data from Wasabee");
                     // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
-                    context._dialog.dialog("close");
+                    window.setTimeout(() => {
+                      context._dialog.dialog("close");
+                    }, 1000);
                   },
                   tokErr => {
                     alert(tokErr);
@@ -232,7 +234,9 @@ const AuthDialog = Feature.extend({
           () => {
             console.log("not requesting my data from Wasabee");
             // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
-            context._dialog.dialog("close");
+            window.setTimeout(() => {
+              context._dialog.dialog("close");
+            }, 1000);
           },
           tokErr => {
             alert(tokErr);

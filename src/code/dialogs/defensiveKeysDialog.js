@@ -85,7 +85,7 @@ const DefensiveKeysDialog = Feature.extend({
       },
       html: this._content,
       dialogClass: "wasabee-dialog-alerts",
-      closeCallback: function() {
+      closeCallback: () => {
         this.disable();
         delete this._dialog;
       },

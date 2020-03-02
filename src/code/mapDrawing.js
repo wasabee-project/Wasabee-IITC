@@ -201,23 +201,24 @@ export const drawAgents = () => {
   }
 
   const layerMap = new Map();
-  for (const l of Wasabee.agentLayerGroup.getLayers()) {
-    layerMap.set(l.options.id, l._leaflet_id);
+  for (const agent of Wasabee.agentLayerGroup.getLayers()) {
+    layerMap.set(agent.options.id, agent._leaflet_id);
   }
 
   const doneAgents = new Array();
   const me = WasabeeMe.get();
   for (const t of me.Teams) {
-    if (t.State != "On") continue;
-
-    // purge what we have
+    // remove whatever data we have for this team, start fresh
     if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
       Wasabee.teams.delete(t.ID);
     }
 
-    /* this fetches the team into Wasabee.teams */
+    // only display enabled teams
+    if (t.State != "On") continue;
+
+    /* this also caches the team into Wasabee.teams for uses elsewhere */
     teamPromise(t.ID).then(
-      function(team) {
+      team => {
         for (const agent of team.agents) {
           if (!layerMap.has(agent.id) && doneAgents.indexOf(agent.id) == -1) {
             // new, add to map
@@ -260,7 +261,7 @@ export const drawAgents = () => {
               marker.addTo(Wasabee.agentLayerGroup);
             }
           } else {
-            // just move existing
+            // just move existing if not already moved
             if (doneAgents.indexOf(agent.id) == -1) {
               const a = layerMap.get(agent.id);
               const al = Wasabee.agentLayerGroup.getLayer(a);
@@ -271,15 +272,16 @@ export const drawAgents = () => {
           }
         }
       },
-      function(err) {
+      err => {
         console.log(err);
       }
     );
   } // for t of whichlist
 
   // remove those not found in this fetch
-  for (const l in layerMap) {
-    Wasabee.agentLayerGroup.removeLayer(l);
+  for (const agent in layerMap) {
+    console.log(agent);
+    Wasabee.agentLayerGroup.removeLayer(agent);
   }
 };
 

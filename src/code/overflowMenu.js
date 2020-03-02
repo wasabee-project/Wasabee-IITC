@@ -3,7 +3,18 @@ export default class OverflowMenu {
     this._button = L.DomUtil.create("a", "wasabee-overflow-button");
     this._button.href = "#";
     L.DomEvent.on(this._button, "click", event => {
+      event.preventDefault();
       this._show(event);
+    });
+
+    L.DomEvent.on(this._button, "touchstart", event => {
+      event.preventDefault();
+      this._show(event);
+    });
+
+    L.DomEvent.on(this._button, "touchend", event => {
+      event.preventDefault();
+      this._hide();
     });
 
     this._buttonText = L.DomUtil.create("span", null, this._button);
@@ -48,6 +59,16 @@ export default class OverflowMenu {
         this._hide();
       });
       L.DomEvent.on(menu, "mouseleave", () => {
+        event.preventDefault();
+        this._hide();
+      });
+      L.DomEvent.on(menu, "touchend", () => {
+        event.preventDefault();
+        l.onclick(event);
+        this._hide();
+      });
+      L.DomEvent.on(menu, "touchleave", () => {
+        event.preventDefault();
         this._hide();
       });
     }
