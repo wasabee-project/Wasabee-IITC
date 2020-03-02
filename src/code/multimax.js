@@ -33,7 +33,7 @@ function buildPOSet(anchor1, anchor2, visible) {
   const poset = new Map();
   for (const i of visible) {
     poset.set(
-      i,
+      i.options.guid,
       visible.filter(j => {
         return j == i || fieldCoversPortal(anchor1, anchor2, i, j);
       })
@@ -42,63 +42,47 @@ function buildPOSet(anchor1, anchor2, visible) {
   return poset;
 }
 
-/* 
-function _longestSequence(poset) {
-  let depth = 0;
-  const alreadyCalculatedSequences = new Map();
-  const sequence_from = c => {
-    if (!alreadyCalculatedSequences.has(c)) {
-      const sequence = poset.get(c).filter(i => i != c);
-      depth++;
-      console.log(
-        `${depth}: ${sequence.length} portals would be under a field crowned by ${c.options.data.title}`
-      );
+function longestSequence(poset) {
+  const out = new Array();
 
-      // for (const p of sequence) { console.log(`${depth}: ${p.options.data.title}`); }
-      if (sequence.length == 0) {
-        const p = [c];
-        alreadyCalculatedSequences.set(c, p);
-        console.log(
-          `${depth}: returning from ${c.options.data.title} at bottom`
-        );
-        depth--;
-        console.log(p);
-        return p;
+  // the recursive function
+  const recurse = () => {
+    if (poset.size == 0) return; // hit bottom
+
+    let longest = "";
+    let length = 0;
+
+    // determine the longest
+    for (const [k, v] of poset) {
+      if (v.length > length) {
+        length = v.length;
+        longest = k;
       }
-
-      // recurse down into each...
-      const seq2 = sequence.map(sequence_from);
-
-      console.log(`${depth}: reducing`);
-      console.log(seq2);
-      const seq3 = seq2.reduce((S1, S2) => {
-        if (S1.length > S2.length) return S1;
-        return S2;
-      });
-      console.log(`${depth}: reduced`);
-      console.log(seq3);
-      depth--;
-      alreadyCalculatedSequences.set(c, seq3);
-      console.log(`${depth}: returning from ${c.options.data.title} (seq3)`);
-      console.log(seq3);
-      return seq3;
-    } else {
-      const seq = alreadyCalculatedSequences.get(c);
-      console.log(
-        `${depth}: already have ${c.options.data.title}: ${seq.length}`
-      );
-      return seq;
     }
+    out.push(longest);
+    const thisList = poset.get(longest);
+    poset.delete(longest);
+
+    // remove any portals not under this layer
+    // eslint-disable-next-line
+    for (const [k, v] of poset) {
+      let under = false;
+      for (const l of thisList) {
+        if (l.options.guid == k) under = true;
+      }
+      if (!under) {
+        poset.delete(k);
+      }
+    }
+    if (poset.size == 0) return; // hit bottom
+    recurse(); // keep digging
   };
 
-  const x = Array.from(poset.keys());
-  console.log(x);
+  recurse();
+  return out;
+}
 
-  return Array.from(poset.keys())
-    .map(sequence_from)
-    .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
-} */
-
+/*
 function longestSequence(poset) {
   const alreadyCalculatedSequences = new Map();
   const sequence_from = c => {
@@ -116,7 +100,7 @@ function longestSequence(poset) {
   return Array.from(poset.keys())
     .map(sequence_from)
     .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
-}
+} */
 
 export default function multimax(anchor1, anchor2, visible) {
   console.log("starting multimax");

@@ -146,10 +146,11 @@ const MultimaxDialog = Feature.extend({
     this._operation.addLink(A, B, "multimax base");
 
     for (const node of sequence) {
-      let p = WasabeePortal.get(node.options.guid);
+      let p = WasabeePortal.get(node);
       if (!p) {
-        const ll = node.getLatLng();
-        p = WasabeePortal.fake(ll.lat, ll.lng, node.options.guid);
+        console.log("skipping: " + p);
+        continue;
+        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
       }
       this._operation.addLink(p, A, "multimax generated link");
       this._operation.addLink(p, B, "multimax generated link");
