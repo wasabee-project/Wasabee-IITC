@@ -54,10 +54,21 @@ const MultimaxDialog = Feature.extend({
     // Go button
     const button = L.DomUtil.create("button", "", div);
     button.textContent = "Multimax!";
-    L.DomEvent.on(button, "click", () => {
-      this._dialog.dialog("close");
-      this.doMultimax(this._operation);
-      alert("multimax!");
+    L.DomEvent.on(button, "click", async () => {
+      const context = this;
+      const zzz = alert("working... please be patient");
+
+      this.doMultimax(context).then(
+        total => {
+          zzz.dialog("close");
+          alert(`Multimax found ${total} layers`);
+          this._dialog.dialog("close");
+        },
+        reject => {
+          console.log(reject);
+          alert(reject);
+        }
+      );
     });
 
     const context = this;
@@ -126,36 +137,52 @@ const MultimaxDialog = Feature.extend({
     }
   },
 
-  doMultimax: function() {
-    const portalsOnScreen = this._getAllPortalsOnScreen();
-    const A = this.getPortal("A");
-    const B = this.getPortal("B");
-    // Both anchors must have been selected
-    if (!A || !B) {
-      alert("Please select anchor portals first!");
-      return;
-    }
-    // Calculate the multimax
-    const sequence = multimax(A, B, portalsOnScreen);
-    if (!Array.isArray(sequence) || !sequence.length) {
-      alert("No layers found");
-      return;
-    }
+  doMultimax: context => {
+    return new Promise((resolve, reject) => {
+      const portalsOnScreen = context._getAllPortalsOnScreen();
+      const A = context.getPortal("A");
+      const B = context.getPortal("B");
+      if (!A || !B) reject("Please select anchor portals first!");
 
-    this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(A, B, "multimax base");
+      // Calculate the multimax
+      multimax(A, B, portalsOnScreen).then(
+        sequence => {
+          if (!Array.isArray(sequence) || !sequence.length)
+            reject("No layers found");
 
-    for (const node of sequence) {
-      let p = WasabeePortal.get(node);
-      if (!p) {
-        console.log("skipping: " + p);
-        continue;
-        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
-      }
-      this._operation.addLink(p, A, "multimax generated link");
-      this._operation.addLink(p, B, "multimax generated link");
-    }
-    this._operation.endBatchMode(); // save and run crosslinks
+          context._operation.startBatchMode(); // bypass save and crosslinks checks
+          context._operation.addLink(A, B, "multimax base");
+
+          let order = context._operation.nextOrder;
+          for (const node of sequence) {
+            let p = WasabeePortal.get(node);
+            if (!p) {
+              console.log("skipping: " + node);
+              continue;
+              // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
+            }
+            context._operation.addLink(
+              p,
+              A,
+              "multimax generated link",
+              order++
+            );
+            context._operation.addLink(
+              p,
+              B,
+              "multimax generated link",
+              order++
+            );
+          }
+          context._operation.endBatchMode(); // save and run crosslinks
+          resolve(sequence.length);
+        },
+        err => {
+          console.log(err);
+          reject(err);
+        }
+      );
+    });
   },
 
   _isOnScreen: function(ll, bounds) {

@@ -35,6 +35,7 @@ function buildPOSet(anchor1, anchor2, visible) {
     poset.set(
       i.options.guid,
       visible.filter(j => {
+        // there is a way to reduce the brute factor here
         return j == i || fieldCoversPortal(anchor1, anchor2, i, j);
       })
     );
@@ -82,31 +83,16 @@ function longestSequence(poset) {
   return out;
 }
 
-/*
-function longestSequence(poset) {
-  const alreadyCalculatedSequences = new Map();
-  const sequence_from = c => {
-    if (alreadyCalculatedSequences.get(c) === undefined) {
-      let sequence = poset
-        .get(c)
-        .filter(i => i !== c)
-        .map(sequence_from)
-        .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
-      sequence.push(c);
-      alreadyCalculatedSequences.set(c, sequence);
-    }
-    return alreadyCalculatedSequences.get(c);
-  };
-  return Array.from(poset.keys())
-    .map(sequence_from)
-    .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
-} */
-
 export default function multimax(anchor1, anchor2, visible) {
-  console.log("starting multimax");
-  const poset = buildPOSet(anchor1, anchor2, visible);
-  console.log("finding longest path");
-  const p = longestSequence(poset);
-  console.log("multimax done");
-  return p;
+  return new Promise(function(resolve, reject) {
+    if (!anchor1 || !anchor2 || !visible) reject("invalid request");
+
+    console.log("starting multimax");
+    console.time("buildPOSet");
+    const poset = buildPOSet(anchor1, anchor2, visible);
+    console.timeEnd("buildPOSet");
+    const p = longestSequence(poset);
+    console.log("multimax done");
+    resolve(p);
+  });
 }
