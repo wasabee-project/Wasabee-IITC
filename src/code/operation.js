@@ -567,8 +567,10 @@ export default class WasabeeOp {
     if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
     for (const t of this.teamlist) {
-      if (t.role == "write" && me.Teams.includes(t.ID)) {
-        return true;
+      if (t.role == "write") {
+        for (const m of me.Teams) {
+          if (t.teamid == m.ID && m.State == "On") return true;
+        }
       }
     }
 
