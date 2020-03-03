@@ -265,7 +265,7 @@ export const drawAgents = () => {
             if (doneAgents.indexOf(agent.id) == -1) {
               const a = layerMap.get(agent.id);
               const al = Wasabee.agentLayerGroup.getLayer(a);
-              al.setLatLng(agent.latLng);
+              if (agent.lat && agent.lng) al.setLatLng(agent.latLng);
               layerMap.delete(agent.id);
               doneAgents.push(agent.id);
             }
