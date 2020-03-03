@@ -210,10 +210,9 @@ const AuthDialog = Feature.extend({
                 SendAccessTokenAsync(responseSelect.access_token).then(
                   () => {
                     console.log("not requesting my data from Wasabee");
-                    // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
                     window.setTimeout(() => {
                       context._dialog.dialog("close");
-                    }, 1000);
+                    }, 1500); // give time for the cookie to settle
                   },
                   tokErr => {
                     alert(tokErr);
@@ -232,11 +231,9 @@ const AuthDialog = Feature.extend({
         console.log("sending to Wasabee");
         SendAccessTokenAsync(response.access_token).then(
           () => {
-            console.log("not requesting my data from Wasabee");
-            // mePromise().then( meResolve => { console.log("got /me"); console.log(meResolve); context._dialog.dialog("close"); }, meErr => { alert(meErr); });
             window.setTimeout(() => {
               context._dialog.dialog("close");
-            }, 1000);
+            }, 1500); // give time for the cookie to settle
           },
           tokErr => {
             alert(tokErr);
