@@ -16,11 +16,10 @@ const fieldCoversPortal = (a, b, field3, portal) => {
 
   // greatCircleArcIntersect now takes either WasabeeLink or window.link format
   // needs link.getLatLngs(); and to be an object we can cache in
-
-  const urp = new L.GeodesicPolyline([unreachableMapPoint, p]);
-  const lab = new L.GeodesicPolyline([a.latLng, b.latLng]);
-  const lac = new L.GeodesicPolyline([a.latLng, c]);
-  const lbc = new L.GeodesicPolyline([c, b.latLng]);
+  const urp = L.polyline([unreachableMapPoint, p]);
+  const lab = L.polyline([a.latLng, b.latLng]);
+  const lac = L.polyline([a.latLng, c]);
+  const lbc = L.polyline([c, b.latLng]);
 
   let crossings = 0;
   if (greatCircleArcIntersect(urp, lab)) crossings++;
@@ -36,13 +35,44 @@ function buildPOSet(anchor1, anchor2, visible) {
     poset.set(
       i.options.guid,
       visible.filter(j => {
-        // there is a way to reduce the brute factor here
         return j == i || fieldCoversPortal(anchor1, anchor2, i, j);
       })
     );
   }
   return poset;
 }
+
+/*
+function buildPOSetFaster(a, b, visible) {
+  const poset = new Map();
+  for (const i of visible) {
+    const iCovers = new Array();
+    for (const j of visible) {
+      // console.log(iCovers);
+      if (iCovers.includes(j.options.guid)) {
+        // we've already found this one
+        // console.log("saved some searching");
+        continue;
+      }
+      if (j.options.guid == i.options.guid) {
+        // iCovers.push(j.options.guid);
+        continue;
+      }
+      if (fieldCoversPortal(a, b, i, j)) {
+        iCovers.push(j.options.guid);
+        if (poset.has(j.options.guid)) {
+          // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
+          // console.log("found savings");
+          for (const n of poset.get(j.options.guid)) {
+            if (!iCovers.includes(j.options.guid)) iCovers.push(n);
+          }
+        }
+      }
+    }
+    poset.set(i.options.guid, iCovers);
+  }
+  return poset;
+} */
 
 function longestSequence(poset) {
   const out = new Array();
@@ -89,9 +119,7 @@ export default function multimax(anchor1, anchor2, visible) {
     if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
 
     console.log("starting multimax");
-    console.time("buildPOSet");
     const poset = buildPOSet(anchor1, anchor2, visible);
-    console.timeEnd("buildPOSet");
     const p = longestSequence(poset);
     console.log("multimax done");
     resolve(p);
