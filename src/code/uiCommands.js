@@ -5,33 +5,34 @@ import ConfirmDialog from "./dialogs/confirmDialog";
 import { getSelectedOperation } from "./selectedOp";
 import { locationPromise } from "./server";
 import WasabeeMe from "./me";
+import wX from "./wX";
 
 // wrap operation calls in UI checks
 export default {
   addPortal: (operation, portal) => {
     if (!portal) {
-      return void alert("Please select a portal first!");
+      return void alert(wX("SELECT PORTAL"));
     }
     operation.addPortal(portal);
   },
   swapPortal: (operation, portal) => {
     const selectedPortal = WasabeePortal.getSelected();
     if (!selectedPortal) {
-      alert("You must select a new portal!");
+      alert(wX("SELECT PORTAL"));
       return;
     }
     if (portal.id === selectedPortal.id) {
-      alert("Cannot swap a portal with itself! Select a different portal.");
+      alert(wX("SELF SWAP"));
       return;
     }
 
     const con = new ConfirmDialog();
     const pr = L.DomUtil.create("div", null);
-    pr.innerHTML = "Do you want to swap: ";
+    pr.innerHTML = wX("SWAP PROMPT");
     pr.appendChild(portal.displayFormat(operation));
-    L.DomUtil.create("span", null, pr).innerHTML = " with ";
+    L.DomUtil.create("span", null, pr).innerHTML = wX("SWAP WITH");
     pr.appendChild(selectedPortal.displayFormat(operation));
-    con.setup("Swap Portal", pr, () => {
+    con.setup(wX("SWAP TITLE"), pr, () => {
       operation.swapPortal(portal, selectedPortal);
     });
     con.enable();
@@ -39,10 +40,9 @@ export default {
   deletePortal: (operation, portal) => {
     const con = new ConfirmDialog();
     const pr = L.DomUtil.create("div", null);
-    pr.innerHTML =
-      "Do you want to delete this anchor and all associated links: ";
+    pr.innerHTML = wX("DELETE ANCHOR PROMPT");
     pr.appendChild(portal.displayFormat(operation));
-    con.setup("Delete Anchor", pr, () => {
+    con.setup(wX("DELETE ANCHOR TITLE"), pr, () => {
       operation.removeAnchor(portal.id);
     });
     con.enable();
@@ -50,9 +50,9 @@ export default {
   deleteMarker: (operation, marker, portal) => {
     const con = new ConfirmDialog();
     const pr = L.DomUtil.create("div", null);
-    pr.innerHTML = "Do you want to delete this marker: ";
+    pr.innerHTML = wX("DELETE MARKER PROMPT");
     pr.appendChild(portal.displayFormat(operation));
-    con.setup("Delete Marker", pr, () => {
+    con.setup(wX("DELETE MARKER TITLE"), pr, () => {
       operation.removeMarker(marker);
     });
     con.enable();
@@ -96,7 +96,7 @@ export default {
           position.coords.longitude
         ).then(
           () => {
-            console.log("location processed");
+            console.log(wX("LOCATION SUB"));
           },
           err => {
             console.log(err);

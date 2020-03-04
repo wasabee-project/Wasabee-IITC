@@ -6,6 +6,7 @@ import addButtons from "./addButtons";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import UiCommands from "./uiCommands";
+import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -14,10 +15,7 @@ window.plugin.wasabee.init = function() {
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 
-  if (window.plugin.sync)
-    alert(
-      "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee"
-    );
+  if (window.plugin.sync) alert(wX("DISABLE_SYNC"));
 
   window.pluginCreateHook("wasabeeUIUpdate");
 

@@ -1,5 +1,6 @@
 import store from "../lib/store";
 import WasabeeOp from "./operation";
+import wX from "./wX";
 
 const setRestoreOpID = opID => {
   store.set(window.plugin.wasabee.static.constants.SELECTED_OP_KEY, opID);
@@ -38,7 +39,7 @@ export const initSelectedOperation = () => {
 };
 
 const loadNewDefaultOp = () => {
-  const newOp = new WasabeeOp(PLAYER.nickname, "Default Op", true);
+  const newOp = new WasabeeOp(PLAYER.nickname, wX("DEFAULT OP NAME"), true);
   newOp.store();
   const op = makeSelectedOperation(newOp.ID);
   return op;

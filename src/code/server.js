@@ -4,6 +4,7 @@ import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
 import store from "../lib/store";
 import { getOperationByID } from "./selectedOp";
+import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -37,7 +38,7 @@ export const uploadOpPromise = function(operation) {
           );
           break;
         case 401:
-          reject("permission to upload denied");
+          reject(wX("UPLOAD PERM DENIED"));
           break;
         case 500:
           console.log(
@@ -74,10 +75,10 @@ export const updateOpPromise = function(operation) {
       switch (req.status) {
         case 200:
           operation.localchanged = false;
-          resolve("successfully uploaded");
+          resolve(wX("UPDATED"));
           break;
         case 401:
-          reject("permission to update denied");
+          reject(wX("UPDATE PERM DENIED"));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -106,10 +107,10 @@ export const deleteOpPromise = function(opID) {
     req.onload = function() {
       switch (req.status) {
         case 200:
-          resolve("successfully deleted");
+          resolve(wX("DELETED"));
           break;
         case 401:
-          reject("permission to delete denied");
+          reject(wX("DELETE PERM DENIED"));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -144,7 +145,7 @@ export const teamPromise = function(teamid) {
           resolve(newteam);
           break;
         case 401:
-          reject("permission denied to team: " + teamid);
+          reject(wX("TEAM PERM DENIED", teamid));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -190,7 +191,7 @@ export const opPromise = function(opID) {
           resolve(localop);
           break;
         case 401:
-          reject("not authorized to access op: " + opID);
+          reject(wX("OP PERM DENIED", opID));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -224,9 +225,7 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject(
-            `${req.status}: not logged in ${req.statusText} ${req.response}`
-          );
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -264,7 +263,7 @@ export const agentPromise = function(GID, force) {
             resolve(WasabeeAgent.create(req.response));
             break;
           case 401:
-            reject("not logged in");
+            reject(wX("NOT LOGGED IN", req.statusText, req.response));
             break;
           default:
             reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -296,7 +295,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           resolve(true);
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -329,7 +328,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           resolve(true);
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -397,16 +396,14 @@ export const SendAccessTokenAsync = function(accessToken) {
       // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
-          console.log("sending auth token to server accepted");
-          console.log(req.getAllResponseHeaders());
+          // console.log("sending auth token to server accepted");
+          // console.log(req.getAllResponseHeaders());
           WasabeeMe.create(req.response); // free update
           resolve(true);
           break;
         default:
           console.log("sending auth token to server rejected");
-          alert(
-            `sending auth token to server rejected: ${req.statusText} ${req.response}`
-          );
+          alert(wX("AUTH TOKEN REJECTED", req.statusText, req.response));
           reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
@@ -438,7 +435,7 @@ export const SetTeamState = function(teamID, state) {
           resolve();
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -471,7 +468,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
           resolve();
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -507,7 +504,7 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
           resolve();
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -544,7 +541,7 @@ export const dKeylistPromise = function() {
           resolve(req.response);
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -578,7 +575,7 @@ export const locationPromise = function(lat, lng) {
           resolve(req.response);
           break;
         case 401:
-          reject("not logged in");
+          reject(wX("NOT LOGGED IN", req.statusText, req.response));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);

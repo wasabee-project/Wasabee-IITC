@@ -2,6 +2,7 @@ const markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
+import wX from "./wX";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
@@ -55,32 +56,32 @@ export default class WasabeeAnchor {
 
   popupContent(marker, operation) {
     marker.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.innerHTML = markdown.toHTML(this._portal.name);
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const linksButton = L.DomUtil.create("a", "", buttonSet);
-    linksButton.textContent = "Links";
+    linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", () => {
       UiCommands.showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
-    const swapButton = L.DomUtil.create("a", "", buttonSet);
-    swapButton.textContent = "Swap";
+    const swapButton = L.DomUtil.create("a", null, buttonSet);
+    swapButton.textContent = wX("SWAP");
     L.DomEvent.on(swapButton, "click", () => {
       UiCommands.swapPortal(operation, this._portal);
       marker.closePopup();
     });
-    const deleteButton = L.DomUtil.create("a", "", buttonSet);
-    deleteButton.textContent = "Delete";
+    const deleteButton = L.DomUtil.create("a", null, buttonSet);
+    deleteButton.textContent = wX("DELETE");
     L.DomEvent.on(deleteButton, "click", () => {
       UiCommands.deletePortal(operation, this._portal);
       marker.closePopup();
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", "", buttonSet);
-      assignButton.textContent = "Assign Outbound Links";
+      const assignButton = L.DomUtil.create("a", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", () => {
         const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();

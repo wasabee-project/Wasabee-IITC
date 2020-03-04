@@ -2,6 +2,7 @@ import { generateId } from "./auxiliar";
 import UiCommands from "./uiCommands.js";
 import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
+import wX from "./wX";
 
 export default class WasabeeMarker {
   constructor(type, portalId, comment) {
@@ -24,11 +25,7 @@ export default class WasabeeMarker {
   }
 
   static create(obj) {
-    if (obj instanceof WasabeeMarker) {
-      console.log("do not call Marker.create() on a Marker");
-      console.log(new Error().stack);
-      return obj;
-    }
+    if (obj instanceof WasabeeMarker) return obj; // unnecessary now
 
     const marker = new WasabeeMarker(obj.type, obj.portalId, obj.comment);
     marker.state = obj.state ? obj.state : "pending";
@@ -72,7 +69,7 @@ export default class WasabeeMarker {
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
-          assignment.innerHTML = "Assigned To: ";
+          assignment.innerHTML = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
           assignment.appendChild(a.formatDisplay());
         },
         function(err) {
@@ -81,12 +78,12 @@ export default class WasabeeMarker {
       );
     }
     if (this.state == "completed" && this.completedBy) {
-      assignment.innerHTML = "Completed By: " + this.completedBy;
+      assignment.innerHTML = wX("COMPLETED BY", this.completedBy);
     }
 
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const deleteButton = L.DomUtil.create("a", null, buttonSet);
-    deleteButton.textContent = "Delete";
+    deleteButton.textContent = wX("DELETE");
     L.DomEvent.on(deleteButton, "click", () => {
       UiCommands.deleteMarker(operation, this, portal);
       marker.closePopup();
@@ -94,7 +91,7 @@ export default class WasabeeMarker {
 
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("a", null, buttonSet);
-      assignButton.textContent = "Assign";
+      assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", () => {
         const ad = new AssignDialog();
         ad.setup(this, operation);

@@ -1,5 +1,4 @@
 // this file is loaded by the build system
-
 const W = window.plugin.wasabee || {};
 
 W.static = {
@@ -70,6 +69,8 @@ W.static = {
     SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   }
 };
+
+W.static.strings = require("./translations.json");
 
 W.static.markerTypes = new Map([
   [

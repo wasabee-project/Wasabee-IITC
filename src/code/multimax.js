@@ -3,6 +3,7 @@
   Detailed on:
 */
 import { greatCircleArcIntersect } from "./crosslinks";
+import wX from "./wX";
 
 const fieldCoversPortal = (a, b, field3, portal) => {
   // Let's hope no one ever wants to field over this point!
@@ -85,7 +86,7 @@ function longestSequence(poset) {
 
 export default function multimax(anchor1, anchor2, visible) {
   return new Promise(function(resolve, reject) {
-    if (!anchor1 || !anchor2 || !visible) reject("invalid request");
+    if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
 
     console.log("starting multimax");
     console.time("buildPOSet");

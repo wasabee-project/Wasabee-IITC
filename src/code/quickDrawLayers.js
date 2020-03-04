@@ -1,20 +1,21 @@
 import { Feature } from "./leafletDrawImports";
 import WasabeePortal from "./portal";
 import { getSelectedOperation } from "./selectedOp";
+import wX from "./wX";
 
 const strings = {
   quickdraw: {
     actions: {
       cancel: {
-        title: "Cancel drawing fields",
-        text: "Cancel"
+        title: wX("QDCANCEL"),
+        text: wX("CANCEL")
       }
     },
     tooltip: {
-      start: "Click the first anchor portal.",
-      next: "Click the second anchor portal.",
-      cont: "Click a spine portal to draw a field.",
-      end: "Click again on the same portal to finish drawing."
+      start: wX("QDSTART"),
+      next: wX("QDNEXT"),
+      cont: wX("QDCONT"),
+      end: wX("QDEND")
     }
   }
 };
@@ -107,7 +108,7 @@ const QuickDrawControl = Feature.extend({
       this._operation.addLink(
         this._anchor1,
         this._anchor2,
-        "base link",
+        wX("QDBASE"),
         this._throwOrder++
       );
       this._tooltip.updateContent(this._getTooltipText());

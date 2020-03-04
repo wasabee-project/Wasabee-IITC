@@ -1,6 +1,7 @@
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import { targetPromise, GetWasabeeServer } from "./server";
+import wX from "./wX";
 
 export default class WasabeeAgent {
   constructor() {
@@ -70,31 +71,27 @@ export default class WasabeeAgent {
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
     const sendTarget = L.DomUtil.create("a", "temp-op-dialog", content);
-    sendTarget.textContent = "Send Target";
+    sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", () => {
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
-        alert("Select a portal to send");
+        alert(wX("SELECT PORTAL"));
         return;
       }
 
       const f = selectedPortal.name;
       const name = this.name;
       const d = new ConfirmDialog();
-      d.setup(
-        "Send Target",
-        `Do you want to send ${f} target to ${name}?`,
-        () => {
-          targetPromise(this, selectedPortal).then(
-            function() {
-              alert("target sent");
-            },
-            function(reject) {
-              console.log(reject);
-            }
-          );
-        }
-      );
+      d.setup(wX("SEND TARGET"), wX("SEND TARGET CONFIRM", f, name), () => {
+        targetPromise(this, selectedPortal).then(
+          function() {
+            alert(wX("TARGET SENT"));
+          },
+          function(reject) {
+            console.log(reject);
+          }
+        );
+      });
       d.enable();
     });
     return content;
@@ -108,12 +105,12 @@ export default class WasabeeAgent {
     const seconds = Math.floor((new Date() - date) / 1000);
     let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
 
-    if (interval > 1) return ` (ages ago)`;
+    if (interval > 1) return wX("AGES");
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) return ` (${interval} hours ago)`;
+    if (interval > 1) return wX("HOURS", interval);
     interval = Math.floor(seconds / 60);
-    if (interval > 1) return ` (${interval} minutes ago)`;
+    if (interval > 1) return wX("MINUTES", interval);
     interval = Math.floor(seconds);
-    return ` (${interval} seconds ago)`;
+    return wX("SECONDS", interval);
   }
 }

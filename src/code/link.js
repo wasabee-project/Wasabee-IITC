@@ -1,5 +1,6 @@
 import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
+import wX from "./wX";
 
 export default class WasabeeLink {
   //ID <- randomly generated alpha-numeric ID for the link
@@ -54,12 +55,12 @@ export default class WasabeeLink {
   // 'pending','assigned','acknowledged','completed'
   get state() {
     if (this.completed) {
-      return "completed";
+      return wX("COMPLETED");
     }
     if (this.assignedTo) {
-      return "assigned";
+      return wX("ASSIGNED");
     }
-    return "pending";
+    return wX("PENDING");
   }
 
   set state(s) {
@@ -120,22 +121,20 @@ export default class WasabeeLink {
 
   minLevel(operation) {
     const b = this.length(operation);
-    let s = "unknown";
+    let s = wX("UNKNOWN");
     const a = L.DomUtil.create("span", null);
 
     if (b > 6881280) {
-      s = "impossible";
+      s = wX("IMPOSSIBLE");
     } else {
       if (b > 1966080) {
-        s = "L8+some VRLA";
-        a.title =
-          "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+        s = wX("VRLA");
+        a.title = wX("VRLA DESC");
         a.classList.add("help");
       } else {
         if (b > 655360) {
-          s = "L8+some LA";
-          a.title =
-            "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+          s = wX("LA");
+          a.title = wX("LA DESC");
           a.classList.add("help");
         } else {
           const d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);
