@@ -1,4 +1,3 @@
-const markdown = require("markdown").markdown;
 import UiCommands from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
@@ -58,7 +57,7 @@ export default class WasabeeAnchor {
     marker.className = "wasabee-dialog wasabee-dialog-ops";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = markdown.toHTML(this._portal.name);
+    title.innerHTML = this._portal.name;
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const linksButton = L.DomUtil.create("a", "", buttonSet);
     linksButton.textContent = wX("LINKS");
