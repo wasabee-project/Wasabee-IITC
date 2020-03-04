@@ -187,7 +187,10 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
         marker.type == Wasabee.static.constants.MARKER_TYPE_VIRUS ||
         marker.type == Wasabee.static.constants.MARKER_TYPE_DECAY
       ) {
-        if (checkMarkerAgainstLink(marker, realLink, operation)) {
+        if (
+          marker.portalId == realLink.options.data.dGuid ||
+          marker.portalId == realLink.options.data.oGuid
+        ) {
           return false;
         }
       }
@@ -195,22 +198,6 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
     return true;
   }
   return false;
-};
-
-/** This checks if a marker is on either side of a link */
-const checkMarkerAgainstLink = (marker, link, operation) => {
-  var latlngs = link.getLatLngs();
-  var markerPortal = operation.getPortal(marker.portalId);
-  var v = latlngs[0];
-  var center = latlngs[1];
-  var view = markerPortal;
-  return view
-    ? view.lng == v.lng && view.lat == v.lat
-      ? true
-      : view.lng == center.lng && view.lat == center.lat
-      ? true
-      : false
-    : false;
 };
 
 const showCrossLink = (link, operation) => {
