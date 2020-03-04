@@ -116,5 +116,22 @@
       "LINKS": "Enlaces",
       "DELETE": "Eliminar",
       "ASSIGN OUTBOUND": "Asignar Enlaces Salientes"
+  },
+    "it":
+    {
+      "last edited": "04-03-2020 @Bolina66",
+      "DISABLE_SYNC": "Wasabee non può funzionare se è installato il plugin di sincronizzazione. Disabilita il plugin di sincronizzazione per utilizzare Wasabee.",
+      "SEND TARGET": "Invia obiettivo",
+      "SELECT PORTAL": "Seleziona un portale da inviare",
+      "SEND TARGET CONFIRM": "Vuoi inviare ${value} obiettivo a ${option}?",
+      "TARGET SENT": "Obiettivo inviato",
+      "AGES": " (ultima posizione nota)",
+      "HOURS": " (${value} ore fa)",
+      "MINUTES": " (${value} minuti fa)",
+      "SECONDS": " (${value} secondi fa)",
+      "SWAP": "Scambia",
+      "LINKS": "Collega",
+      "DELETE": "Elimina",
+      "ASSIGN OUTBOUND": "Assegna collegamenti in uscita"
   }
 }
