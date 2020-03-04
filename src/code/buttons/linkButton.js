@@ -1,6 +1,7 @@
 import { WButton } from "../leafletDrawImports.js";
 import MultimaxButtonControl from "../dialogs/multimaxDialog";
 import LinkDialog from "../dialogs/linkDialog";
+import wX from "../wX";
 
 const LinkButton = WButton.extend({
   statics: {
@@ -12,7 +13,7 @@ const LinkButton = WButton.extend({
     this._map = map;
 
     this.type = LinkButton.TYPE;
-    this.title = "Links";
+    this.title = wX("LINKS BUTTON TITLE");
     this.handler = this._toggleActions;
     this._container = container;
 
@@ -27,8 +28,8 @@ const LinkButton = WButton.extend({
 
     this.actionsContainer = this._createSubActions([
       {
-        title: "Add Links Dialog",
-        text: "Add Link",
+        title: wX("ADD LINK TITLE"),
+        text: wX("ADD LINK"),
         callback: () => {
           this.disable();
           const ld = new LinkDialog(map);
@@ -37,8 +38,8 @@ const LinkButton = WButton.extend({
         context: context
       },
       {
-        title: "Experimental Multimax Draw",
-        text: "Multimax",
+        title: wX("MM TITLE"),
+        text: wX("MM"),
         callback: () => {
           this.disable();
           const mm = new MultimaxButtonControl(map);
@@ -47,11 +48,11 @@ const LinkButton = WButton.extend({
         context: context
       },
       {
-        title: "Experimental Maxfield",
-        text: "Maxfield",
+        title: wX("MAX TITLE"),
+        text: wX("MAX"),
         callback: () => {
           this.disable();
-          alert("just a placeholder for now");
+          alert(wX("DISABLED"));
         },
         context: context
       }

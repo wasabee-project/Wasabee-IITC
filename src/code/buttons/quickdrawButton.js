@@ -1,5 +1,6 @@
 import { WButton } from "../leafletDrawImports.js";
 import QuickDrawControl from "../quickDrawLayers";
+import wX from "../wX";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -10,13 +11,13 @@ const QuickdrawButton = WButton.extend({
     if (!map) map = window.map;
     this._map = map;
 
-    this.title = "Quick Draw Layers";
+    this.title = wX("QD TITLE");
     this.handler = new QuickDrawControl(map);
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
     this.button = this._createButton({
-      title: "Quick Draw Layers",
+      title: wX("QD TITLE"),
       container: container,
       buttonImage:
         window.plugin.wasabee.static.images.toolbar_quickdraw.default,
@@ -26,8 +27,8 @@ const QuickdrawButton = WButton.extend({
 
     this.actionsContainer = this._createActions([
       {
-        title: "Click to stop drawing fields.",
-        text: "End",
+        title: wX("QD BUTTON END"),
+        text: wX("QD END"),
         callback: this.handler.disable,
         context: this.handler
       }

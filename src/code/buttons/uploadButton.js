@@ -2,6 +2,7 @@ import { WButton } from "../leafletDrawImports.js";
 import { uploadOpPromise, updateOpPromise } from "../server";
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -28,7 +29,7 @@ const UploadButton = WButton.extend({
             function(resolve) {
               console.log(`server accepted the update: ${resolve}`);
               window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-              alert("Update Successful");
+              alert(wX("UPLOADED"));
             },
             function(reject) {
               console.log(reject);
@@ -42,7 +43,7 @@ const UploadButton = WButton.extend({
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
             window.runHooks("wasabeeUIUpdate", resolve);
-            alert("Upload Successful");
+            alert(wX("UPDATED"));
           },
           function(reject) {
             console.log(reject);
@@ -60,33 +61,33 @@ const UploadButton = WButton.extend({
 
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
-      this.title = "not logged in";
+      this.title = wX("NOT LOGGED IN SHORT");
       this.button.title = this.title;
       return;
     }
 
     if (!operation.IsServerOp()) {
       this._visible();
-      this.title = `UPLOAD ${this._operation.name} (not currently on server)`;
+      this.title = wX("UPLOAD BUTTON HOVER", this._operation.name);
       this.button.title = this.title;
       return;
     }
 
     if (!operation.IsWritableOp()) {
-      this.title = `You do not have permission to modify ${this._operation.name} on the server`;
+      this.title = wX("UPDATE PERM DENIED");
       this.button.title = this.title;
       this._invisible();
       return;
     }
 
     if (!operation.localchanged) {
-      this.title = `${this._operation.name} not changed locally`;
+      this.title = wX("UPDATE HOVER NOT CHANGED", this._operation.name);
       this.button.title = this.title;
       this._invisible();
       return;
     }
 
-    this.title = `Update ${this._operation.name} on server`;
+    this.title = wX("UPDATE HOVER", this._operation.name);
     this.button.title = this.title;
     this._visible();
   },

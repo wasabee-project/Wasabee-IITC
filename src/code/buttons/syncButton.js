@@ -3,6 +3,7 @@ import { opPromise } from "../server";
 import WasabeeMe from "../me";
 import AuthDialog from "../dialogs/authDialog";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const SyncButton = WButton.extend({
   statics: {
@@ -24,7 +25,7 @@ const SyncButton = WButton.extend({
 
     this.type = SyncButton.TYPE;
     // this.handler = null; // no handler since we do it all in this.Wupdate()
-    this.title = "Download Available Operations";
+    this.title = wX("SYNC");
 
     this._syncbutton = this._createButton({
       container: container,
@@ -54,7 +55,7 @@ const SyncButton = WButton.extend({
                 }
               );
             }
-            alert("Sync Complete");
+            alert(wX("SYNC DONE"));
           }
         } catch (e) {
           alert(e);
