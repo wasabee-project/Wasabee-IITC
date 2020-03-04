@@ -220,7 +220,7 @@ export const drawAgents = () => {
     teamPromise(t.ID).then(
       team => {
         for (const agent of team.agents) {
-          if (!layerMap.has(agent.id) && doneAgents.indexOf(agent.id) == -1) {
+          if (!layerMap.has(agent.id) && !doneAgents.includes(agent.id)) {
             // new, add to map
             doneAgents.push(agent.id);
             if (agent.lat && agent.lng) {
@@ -262,7 +262,7 @@ export const drawAgents = () => {
             }
           } else {
             // just move existing if not already moved
-            if (doneAgents.indexOf(agent.id) == -1) {
+            if (!doneAgents.includes(agent.id)) {
               const a = layerMap.get(agent.id);
               const al = Wasabee.agentLayerGroup.getLayer(a);
               if (agent.lat && agent.lng) al.setLatLng(agent.latLng);

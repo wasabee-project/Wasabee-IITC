@@ -137,7 +137,7 @@ const AssignDialog = Feature.extend({
       }
       const tt = window.plugin.wasabee.teams.get(t.teamid) || new WasabeeTeam();
       for (const a of tt.agents) {
-        if (alreadyAdded.indexOf(a.id) == -1) {
+        if (!alreadyAdded.includes(a.id)) {
           alreadyAdded.push(a.id);
           option = L.DomUtil.create("option", "");
           option.setAttribute("value", a.id);
