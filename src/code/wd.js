@@ -47,7 +47,7 @@ export const drawWasabeeDkeys = () => {
   window.addHook("portalDetailLoaded", dLoadDetails);
 
   dKeylistPromise().then(
-    function(data) {
+    data => {
       const list = JSON.parse(data);
       if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
         return;
@@ -82,7 +82,7 @@ export const drawWasabeeDkeys = () => {
         }
       }
     },
-    function(err) {
+    err => {
       console.log(err);
     }
   );
