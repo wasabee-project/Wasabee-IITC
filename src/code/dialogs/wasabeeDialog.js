@@ -5,6 +5,7 @@ import store from "../../lib/store";
 import { GetWasabeeServer, SetTeamState, locationPromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
+import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 
 const WasabeeDialog = Feature.extend({
@@ -106,6 +107,17 @@ const WasabeeDialog = Feature.extend({
         height: "auto",
         html: this._html,
         dialogClass: "wasabee-dialog-mustauth",
+        buttons: {
+          OK: () => {
+            this._dialog.dialog("close");
+          },
+          About: () => {
+            console.log("showing about");
+            const ad = new AboutDialog();
+            ad.enable();
+          }
+        },
+
         closeCallback: () => {
           this.disable();
           delete this._dialog;

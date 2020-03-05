@@ -63,7 +63,7 @@ const AuthDialog = Feature.extend({
     gsapiButtonThree.innerHTML = "Log In (Experimental)";
     const menus = L.DomUtil.create("div", null, buttonSet);
     menus.innerHTML =
-      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>unset</option><option value='none'>none (quick)</option><option value='select_account'>select_account</option><option value='consent'>consent</option></select></span>" +
+      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>unset</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option><option value='consent'>consent</option></select></span>" +
       "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>unset (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
 
     L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
