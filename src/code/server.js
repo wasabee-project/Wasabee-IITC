@@ -44,7 +44,7 @@ export const uploadOpPromise = function(operation) {
           console.log(
             "probably trying to upload an op with an ID already taken... use update"
           );
-          operation.fetched = "0"; // make it look like it came from the server
+          operation.fetched = null; // make it look like it came from the server
           reject(req.response);
           break;
         default:
@@ -393,16 +393,12 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
-      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
-          // console.log("sending auth token to server accepted");
-          // console.log(req.getAllResponseHeaders());
           WasabeeMe.create(req.response); // free update
           resolve(true);
           break;
         default:
-          console.log("sending auth token to server rejected");
           alert(wX("AUTH TOKEN REJECTED", req.statusText, req.response));
           reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
@@ -563,7 +559,6 @@ export const locationPromise = function(lat, lng) {
   return new Promise((resolve, reject) => {
     const url = `${SERVER_BASE}/api/v1/me?lat=${lat}&lon=${lng}`;
     const req = new XMLHttpRequest();
-    // r.HandleFunc("/me", meSetAgentLocationRoute).Methods("GET").Queries("lat", "{lat}", "lon", "{lon}")
 
     req.open("GET", url);
     req.withCredentials = true;
@@ -587,9 +582,6 @@ export const locationPromise = function(lat, lng) {
       reject(`Network Error: ${req.statusText}`);
     };
 
-    /* const fd = new FormData();
-    fd.append("lat", lat);
-    fd.append("lon", lng); */
     req.send();
   });
 };
