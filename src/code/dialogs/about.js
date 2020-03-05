@@ -30,6 +30,10 @@ const AboutDialog = Feature.extend({
     about.innerHTML =
       "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.15: @deviousness</li></ul>";
 
+    const videos = L.DomUtil.create("div", null, html);
+    videos.innerHTML =
+      "<h3>How-To Videos:</h3><ul><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Teams and Permissions</a></li></ul>";
+
     this._dialog = window.dialog({
       title: "About Wasabee",
       width: "auto",
