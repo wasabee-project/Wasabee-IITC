@@ -11,11 +11,14 @@ const wX = (key, arg, option) => {
   if (!s) return "haec notificatio praebibo est";
 
   if (!arg) return s; // simple string, no magic needed
+
+  // one parameter
   if (!option) {
-    // one parameter
     const t = assemble(s, "value");
     return t(arg);
   }
+
+  // two parameters
   const t = assemble(s, "value", "option");
   return t(arg, option);
 };
