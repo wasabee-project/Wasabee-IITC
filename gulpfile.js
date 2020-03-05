@@ -49,12 +49,12 @@ gulp.task("clear", cb => {
 
 // build tasks
 gulp.task("buildheaders", cb => {
-  var content = fs.readFileSync(cfg.src.meta, "utf8"),
+  let content = fs.readFileSync(cfg.src.meta, "utf8"),
     rmHeaders = cfg.headers[status.mode],
     commonHeaders = cfg.headers.common;
 
   // release mode headers
-  for (let k in rmHeaders) {
+  for (const k in rmHeaders) {
     content = content.replace(
       new RegExp(`(//\\s*@${k}\\s+){{}}`),
       `$1${rmHeaders[k]}`
@@ -68,6 +68,9 @@ gulp.task("buildheaders", cb => {
       `$1${commonHeaders[k]}`
     );
   }
+
+  const bd = new Date().toISOString();
+  content = content.replace("BUILDDATE", bd);
 
   status.headers = content;
 
@@ -89,7 +92,7 @@ gulp.task("jest", callback => {
 });
 
 gulp.task("webpack", callback => {
-  var webpackConfig = require("./webpack.config.js");
+  const webpackConfig = require("./webpack.config.js");
   if (status.mode === "dev") {
     webpackConfig.mode = "development";
   }
@@ -110,7 +113,7 @@ gulp.task("webpack", callback => {
 });
 
 gulp.task("buildplugin", cb => {
-  var destination = cfg.releaseFolder[status.mode];
+  const destination = cfg.releaseFolder[status.mode];
 
   gulp
     .src(cfg.src.plugin)
@@ -131,7 +134,7 @@ gulp.task("buildplugin", cb => {
 });
 
 gulp.task("buildmeta", cb => {
-  var path = cfg.releaseFolder[status.mode] + cfg.metaName;
+  const path = cfg.releaseFolder[status.mode] + cfg.metaName;
 
   ensureDirectoryExistence(path);
   fs.writeFile(path, status.headers, err => {
