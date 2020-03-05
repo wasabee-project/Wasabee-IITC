@@ -22,8 +22,11 @@ const MultimaxDialog = Feature.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", "");
-    const rdnTable = L.DomUtil.create("table", "", container);
+    const container = L.DomUtil.create("div", null);
+    const description = L.DomUtil.create("div", null, container);
+    description.textContent =
+      "Select two anchor portals, then zoom in to an area for the spine, wait until the portals are loaded (portals must be on screen to be considered) and press the Multimax button.";
+    const rdnTable = L.DomUtil.create("table", null, container);
 
     ["A", "B"].forEach(string => {
       const tr = rdnTable.insertRow();
@@ -33,7 +36,7 @@ const MultimaxDialog = Feature.extend({
       node.textContent = string;
       // Set button
       const nodethree = tr.insertCell();
-      const button = L.DomUtil.create("button", "", nodethree);
+      const button = L.DomUtil.create("button", null, nodethree);
       button.textContent = "set";
       button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
@@ -45,22 +48,20 @@ const MultimaxDialog = Feature.extend({
 
     // Bottom buttons bar
     const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", "", element);
+    const div = L.DomUtil.create("span", null, element);
 
     // Enter arrow
     const opt = L.DomUtil.create("span", "arrow", div);
     opt.textContent = "\u21b3";
 
     // Go button
-    const button = L.DomUtil.create("button", "", div);
+    const button = L.DomUtil.create("button", null, div);
     button.textContent = "Multimax!";
     L.DomEvent.on(button, "click", async () => {
       const context = this;
-      const zzz = alert("working... please be patient");
 
       this.doMultimax(context).then(
         total => {
-          zzz.dialog("close");
           alert(`Multimax found ${total} layers`);
           this._dialog.dialog("close");
         },
@@ -70,6 +71,16 @@ const MultimaxDialog = Feature.extend({
         }
       );
     });
+
+    const flylinks = L.DomUtil.create("span", null, div);
+    const fllabel = L.DomUtil.create("label", null, flylinks);
+    fllabel.textContent = "Add Fly Links: ";
+    this._flcheck = L.DomUtil.create("input", null, flylinks);
+    this._flcheck.type = "checkbox";
+
+    // do these ever actually get drawn?
+    this._done = L.DomUtil.create("span", null, div);
+    this._total = L.DomUtil.create("span", null, div);
 
     const context = this;
     this._dialog = window.dialog({
@@ -144,18 +155,31 @@ const MultimaxDialog = Feature.extend({
       const B = context.getPortal("B");
       if (!A || !B) reject("Please select anchor portals first!");
 
+      context._total.textContent = `${portalsOnScreen.length} portals visible`;
+
       // Calculate the multimax
-      multimax(A, B, portalsOnScreen).then(
+      multimax(A, B, portalsOnScreen, context._done).then(
         sequence => {
           if (!Array.isArray(sequence) || !sequence.length)
             reject("No layers found");
 
-          context._operation.startBatchMode(); // bypass save and crosslinks checks
-          context._operation.addLink(A, B, "multimax base");
+          let order = sequence.length * (context._flcheck ? 3 : 2);
+          let prev = null;
 
-          let order = context._operation.nextOrder;
+          context._operation.startBatchMode(); // bypass save and crosslinks checks
+          context._operation.addLink(A, B, "multimax base", 1);
+
           for (const node of sequence) {
             let p = WasabeePortal.get(node);
+            if (context._flcheck && prev) {
+              context._operation.addLink(
+                prev,
+                p,
+                "multimax generated flylink",
+                order + 3
+              );
+              order--;
+            }
             if (!p) {
               console.log("skipping: " + node);
               continue;
@@ -165,14 +189,15 @@ const MultimaxDialog = Feature.extend({
               p,
               A,
               "multimax generated link",
-              order++
+              order--
             );
             context._operation.addLink(
               p,
               B,
               "multimax generated link",
-              order++
+              order--
             );
+            prev = p;
           }
           context._operation.endBatchMode(); // save and run crosslinks
           resolve(sequence.length);
