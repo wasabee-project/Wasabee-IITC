@@ -195,37 +195,31 @@ const AuthDialog = Feature.extend({
       console.log("got from google: ");
       console.log(response);
       if (response.error) {
-        if (response.error == "immediate_failed, trying with select") {
-          window.gapi.auth2.authorize(
-            {
-              prompt: "select_account",
-              client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
-              scope: "email profile openid",
-              response_type: "id_token permission"
-            },
-            responseSelect => {
-              console.log("got from google (select): ");
-              console.log(responseSelect);
-              if (responseSelect.error) {
-                const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
-                alert(err);
-                console.log(err);
-                return;
-              }
-              console.log("sending to Wasabee (select)");
-              SendAccessTokenAsync(responseSelect.access_token).then(
-                () => {
-                  console.log("not requesting my data from Wasabee");
-                  window.setTimeout(() => {
-                    context._dialog.dialog("close");
-                  }, 1500); // give time for the cookie to settle
-                },
-                tokErr => {
-                  alert(tokErr);
-                }
-              );
+        if (response.error == "immediate_failed") {
+          options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
+          console.log(options);
+          window.gapi.auth2.authorize(options, responseSelect => {
+            console.log("got from google (select): ");
+            console.log(responseSelect);
+            if (responseSelect.error) {
+              const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+              alert(err);
+              console.log(err);
+              return;
             }
-          );
+            console.log("sending to Wasabee (select)");
+            SendAccessTokenAsync(responseSelect.access_token).then(
+              () => {
+                console.log("not requesting my data from Wasabee");
+                window.setTimeout(() => {
+                  context._dialog.dialog("close");
+                }, 1500); // give time for the cookie to settle
+              },
+              tokErr => {
+                alert(tokErr);
+              }
+            );
+          });
         } else {
           context._dialog.dialog("close");
           const err = `error from gsapiAuthThree: ${response.error}: ${response.error_subtype}`;
