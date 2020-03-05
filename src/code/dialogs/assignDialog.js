@@ -9,6 +9,7 @@ import {
   assignMarkerPromise,
   teamPromise
 } from "../server";
+import wX from "../wX";
 
 const AssignDialog = Feature.extend({
   statics: {
@@ -62,8 +63,8 @@ const AssignDialog = Feature.extend({
       this._type = "Link";
       divtitle.appendChild(target.displayFormat(this._operation));
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " link assignment";
-      this._name = "Assign link from: " + portal.name;
+      t.innerHTML = wX("LINK ASSIGNMENT");
+      this._name = wX("ASSIGN LINK PROMPT", portal.name);
     }
 
     if (target instanceof WasabeeMarker) {
@@ -71,8 +72,8 @@ const AssignDialog = Feature.extend({
       this._type = "Marker";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " marker assignment";
-      this._name = "Assign marker for: " + portal.name;
+      t.innerHTML = wX("MARKER ASSIGNMENT");
+      this._name = wX("ASSIGN MARKER PROMPT", portal.name);
     }
 
     if (target instanceof WasabeeAnchor) {
@@ -80,8 +81,8 @@ const AssignDialog = Feature.extend({
       this._type = "Anchor";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " all outbound links";
-      this._name = "Assign all outbound links from: " + portal.name;
+      t.innerHTML = wX("ANCHOR ASSIGNMENT");
+      this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);
     }
 
     const menu = this._getAgentMenu(target.assignedTo);
@@ -120,7 +121,7 @@ const AssignDialog = Feature.extend({
     const menu = L.DomUtil.create("select", "", container);
     let option = menu.appendChild(L.DomUtil.create("option", ""));
     option.setAttribute("value", "");
-    option.innerHTML = "Unassigned";
+    option.innerHTML = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...

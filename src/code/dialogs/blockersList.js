@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import UiCommands from "../uiCommands";
 import WasabeePortal from "../portal";
+import wX from "../wX";
 
 const BlockerList = Feature.extend({
   statics: {
@@ -45,7 +46,7 @@ const BlockerList = Feature.extend({
     }
 
     this._dialog = window.dialog({
-      title: "Known Blockers: " + this._operation.name,
+      title: wX("KNOWN BLOCKERS", this._operation.name),
       width: "auto",
       height: "auto",
       position: {
@@ -59,7 +60,7 @@ const BlockerList = Feature.extend({
           this._dialog.dialog("close");
           window.runHooks("wasabeeUIUpdate", this._operation);
         },
-        "Auto-Mark": () => {
+        "Auto Mark": () => {
           this.automark();
         },
         Reset: () => {

@@ -5,6 +5,7 @@ import store from "../../lib/store";
 import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import UiCommands from "../uiCommands";
+import wX from "../wX";
 
 const AuthDialog = Feature.extend({
   statics: {
@@ -31,17 +32,14 @@ const AuthDialog = Feature.extend({
   _displayDialog: function() {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
-      alert(
-        "You have logged in to a plugin that uses a method incompatable with Wasabee"
-      );
+      alert(wX("AUTH INCOMPAT"));
       return;
     }
 
     const content = L.DomUtil.create("div", "temp-op-dialog");
     const title = L.DomUtil.create("div", null, content);
     title.className = "desc";
-    title.innerHTML =
-      "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'webview', log in; then do a 'choose account'. That SHOULD work.";
+    title.innerHTML = wX("AUTH DESC");
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
     const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
@@ -62,7 +60,12 @@ const AuthDialog = Feature.extend({
     L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
 
     const gsapiButtonThree = L.DomUtil.create("a", null, buttonSet);
-    gsapiButtonThree.innerHTML = "Log In (AxForest)";
+    gsapiButtonThree.innerHTML = "Log In (Experimental)";
+    const menus = L.DomUtil.create("div", null, buttonSet);
+    menus.innerHTML =
+      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>unset</option><option value='none'>none (quick)</option><option value='select_account'>select_account</option><option value='consent'>consent</option></select></span>" +
+      "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>unset (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
+
     L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
 
     // webview cannot work on android IITC-M
@@ -145,7 +148,7 @@ const AuthDialog = Feature.extend({
           // on immediate_failed, try again with "select_account" settings
           if (response.error == "immediate_failed") {
             console.log("switching to gsapiAuthChoose");
-            this.gsapiAuthChoose(context);
+            context.gsapiAuthChoose(context);
           } else {
             // error but not immediate_failed
             context._dialog.dialog("close");
@@ -174,73 +177,75 @@ const AuthDialog = Feature.extend({
 
   // this is probably the most correct, but doesn't seem to work properly
   gsapiAuthThree: context => {
-    console.log("calling AxForest login method");
-    window.gapi.auth2.authorize(
-      {
-        // prompt: "none",
-        // immediate: true,
-        // immediate: false,
-        client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
-        scope: "email profile openid",
-        response_type: "id_token permission"
-      },
-      response => {
-        console.log("got from google: ");
-        console.log(response);
-        if (response.error) {
-          if (response.error == "immediate_failed, trying with select") {
-            window.gapi.auth2.authorize(
-              {
-                prompt: "select_account",
-                client_id:
-                  window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
-                scope: "email profile openid",
-                response_type: "id_token permission"
-              },
-              responseSelect => {
-                console.log("got from google (select): ");
-                console.log(responseSelect);
-                if (responseSelect.error) {
-                  const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
-                  alert(err);
-                  console.log(err);
-                  return;
-                }
-                console.log("sending to Wasabee (select)");
-                SendAccessTokenAsync(responseSelect.access_token).then(
-                  () => {
-                    console.log("not requesting my data from Wasabee");
-                    window.setTimeout(() => {
-                      context._dialog.dialog("close");
-                    }, 1500); // give time for the cookie to settle
-                  },
-                  tokErr => {
-                    alert(tokErr);
-                  }
-                );
+    console.log("calling Experimental login method");
+    const options = {
+      // prompt: "none",
+      // immediate: false,
+      client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+      scope: "email profile openid",
+      response_type: "id_token permission"
+    };
+    const immediate = document.getElementById("auth-immediate");
+    if (immediate && immediate.value != "unset")
+      options.immediate = immediate.value;
+    const gPrompt = document.getElementById("auth-prompt");
+    if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
+    console.log(options);
+    window.gapi.auth2.authorize(options, response => {
+      console.log("got from google: ");
+      console.log(response);
+      if (response.error) {
+        if (response.error == "immediate_failed, trying with select") {
+          window.gapi.auth2.authorize(
+            {
+              prompt: "select_account",
+              client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+              scope: "email profile openid",
+              response_type: "id_token permission"
+            },
+            responseSelect => {
+              console.log("got from google (select): ");
+              console.log(responseSelect);
+              if (responseSelect.error) {
+                const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+                alert(err);
+                console.log(err);
+                return;
               }
-            );
-          } else {
-            context._dialog.dialog("close");
-            const err = `error from gsapiAuthThree: ${response.error}: ${response.error_subtype}`;
-            console.log(err);
-            alert(err);
-          }
-          return;
+              console.log("sending to Wasabee (select)");
+              SendAccessTokenAsync(responseSelect.access_token).then(
+                () => {
+                  console.log("not requesting my data from Wasabee");
+                  window.setTimeout(() => {
+                    context._dialog.dialog("close");
+                  }, 1500); // give time for the cookie to settle
+                },
+                tokErr => {
+                  alert(tokErr);
+                }
+              );
+            }
+          );
+        } else {
+          context._dialog.dialog("close");
+          const err = `error from gsapiAuthThree: ${response.error}: ${response.error_subtype}`;
+          console.log(err);
+          alert(err);
         }
-        console.log("sending to Wasabee");
-        SendAccessTokenAsync(response.access_token).then(
-          () => {
-            window.setTimeout(() => {
-              context._dialog.dialog("close");
-            }, 1500); // give time for the cookie to settle
-          },
-          tokErr => {
-            alert(tokErr);
-          }
-        );
+        return;
       }
-    );
+      console.log("sending to Wasabee");
+      SendAccessTokenAsync(response.access_token).then(
+        () => {
+          window.setTimeout(() => {
+            context._dialog.dialog("close");
+          }, 1500); // give time for the cookie to settle
+        },
+        tokErr => {
+          alert(tokErr);
+        }
+      );
+    });
   },
 
   gsapiAuthChoose: context => {
