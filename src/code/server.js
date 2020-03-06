@@ -225,7 +225,7 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -263,7 +263,7 @@ export const agentPromise = function(GID, force) {
             resolve(WasabeeAgent.create(req.response));
             break;
           case 401:
-            reject(wX("NOT LOGGED IN", req.statusText, req.response));
+            reject(wX("NOT LOGGED IN", req.statusText));
             break;
           default:
             reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -295,7 +295,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           resolve(true);
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -328,7 +328,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           resolve(true);
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -399,7 +399,7 @@ export const SendAccessTokenAsync = function(accessToken) {
           resolve(true);
           break;
         default:
-          alert(wX("AUTH TOKEN REJECTED", req.statusText, req.response));
+          alert(wX("AUTH TOKEN REJECTED", req.statusText));
           reject(`${req.status}: ${req.statusText} ${req.response}`);
           break;
       }
@@ -431,7 +431,7 @@ export const SetTeamState = function(teamID, state) {
           resolve();
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -464,7 +464,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
           resolve();
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -500,7 +500,7 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
           resolve();
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -537,7 +537,7 @@ export const dKeylistPromise = function() {
           resolve(req.response);
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -570,7 +570,7 @@ export const locationPromise = function(lat, lng) {
           resolve(req.response);
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText, req.response));
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.response}`);
@@ -585,6 +585,47 @@ export const locationPromise = function(lat, lng) {
     req.send();
   });
 };
+
+// r.HandleFunc("/draw/{document}/perms", pDrawPermsAddRoute).Methods("POST")
+// r.HandleFunc("/draw/{document}/perms", pDrawPermsDeleteRoute).Methods("DELETE")
+export const addPermPromise = function(opID, teamID, role) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/perms`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(req.response);
+          break;
+        case 401:
+          reject(wX("NOT LOGGED IN", req.statusText));
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+
+    const fd = new FormData();
+    fd.append("team", teamID);
+    fd.append("role", role);
+    console.log(fd);
+    req.send(fd);
+  });
+};
+
+// r.HandleFunc("/draw/{document}/perms", pDrawPermsAddRoute).Methods("POST")
 
 export const GetWasabeeServer = function() {
   let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
