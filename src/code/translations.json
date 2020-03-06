@@ -47,9 +47,9 @@
       "DELETE PERM DENIED": "Permission to delete denied",
       "TEAM PERM DENIED": "Permission denied to team: ${value}",
       "OP PERM DENIED": "Permission denied to operation: ${value}",
-      "NOT LOGGED IN": "Not Logged in: ${value} ${option}",
+      "NOT LOGGED IN": "Not Logged in: ${value}",
       "NOT LOGGED IN SHORT": "Not Logged in",
-      "AUTH TOKEN REJECTED": "Sending auth token to server rejected: ${value} ${option}",
+      "AUTH TOKEN REJECTED": "Sending auth token to server rejected: ${value}",
       "SELECT PORTAL": "Please select a portal first",
       "SELF SWAP": "Cannot swap a portal with itself! Select a different portal.",
       "SWAP PROMPT": "Do you want to swap: ",
@@ -97,8 +97,17 @@
       "CLEAROPS BUTTON": "Clear Local Ops",
       "CLEAROPS PROMPT": "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
       "WD BUTTON TITLE": "Log Defensive Keys",
-      "WD BUTTON": "W-D Keys"
-
+      "WD BUTTON": "W-D Keys",
+      "UNASSIGNED": "Unassigned",
+      "LINK ASSIGNMENT": " Link Assignment",
+      "ASSIGN LINK PROMPT": "Assign link from: ${value}",
+      "MARKER ASSIGNMENT": " Marker Assignment",
+      "ASSIGN MARKER PROMPT": "Assign marker from: ${value}",
+      "ANCHOR ASSIGNMENT": " all outbound links",
+      "ASSIGN OUTBOUND PROMPT": "Assign all outbound links from: ${value}",
+      "AUTH INCOMPAT": "You have logged in to a plugin that uses a method incompatable with Wasabee",
+      "AUTH DESC": "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'webview', log in; then do a 'choose account'. That SHOULD work.",
+      "KNOWN BLOCKERS": "Known Blockers: ${value}"
     },
     "es":
     {
