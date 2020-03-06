@@ -7,6 +7,7 @@ import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
+import { getSelectedOperation } from "../selectedOp";
 
 const WasabeeDialog = Feature.extend({
   statics: {
@@ -34,14 +35,17 @@ const WasabeeDialog = Feature.extend({
         value: team => team.Name,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
-          const link = L.DomUtil.create("a", "", row);
+          const link = L.DomUtil.create("a", null, row);
           link.href = "#";
           link.innerHTML = value;
-          L.DomEvent.on(link, "click", () => {
-            const td = new TeamMembershipList();
-            td.setup(team.ID);
-            td.enable();
-          });
+          if (team.State == "On") {
+            L.DomUtil.addClass(link, "enl");
+            L.DomEvent.on(link, "click", () => {
+              const td = new TeamMembershipList();
+              td.setup(team.ID);
+              td.enable();
+            });
+          }
         }
       },
       {
@@ -49,12 +53,26 @@ const WasabeeDialog = Feature.extend({
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
-          const link = L.DomUtil.create("a", "", row);
+          const link = L.DomUtil.create("a", null, row);
           let curstate = obj.State;
           link.innerHTML = curstate;
+          if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             curstate = await this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
+          };
+        }
+      },
+      {
+        name: "Remove",
+        value: team => team.State,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, obj) => {
+          const link = L.DomUtil.create("a", null, row);
+          link.innerHTML = "Remove";
+          link.onclick = () => {
+            this.removeFromTeam(obj.ID);
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           };
         }
       }
@@ -143,6 +161,11 @@ const WasabeeDialog = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+  },
+
+  removeFromTeam: function(teamID) {
+    console.log(teamID);
+    alert("not written yet");
   },
 
   setServer: function() {
