@@ -171,7 +171,7 @@ const MultimaxDialog = Feature.extend({
 
           for (const node of sequence) {
             let p = WasabeePortal.get(node);
-            if (context._flcheck && prev) {
+            if (context._flcheck.checked && prev) {
               context._operation.addLink(
                 prev,
                 p,
