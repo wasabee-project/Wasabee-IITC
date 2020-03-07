@@ -50,6 +50,7 @@ const LinkListDialog = Feature.extend({
         this.disable();
         delete this._dialog;
       },
+      resizable: true,
       id: window.plugin.wasabee.static.dialogNames.linkList
     });
   },

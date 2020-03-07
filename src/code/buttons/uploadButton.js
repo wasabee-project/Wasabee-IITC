@@ -9,8 +9,7 @@ const UploadButton = WButton.extend({
     TYPE: "uploadButton"
   },
 
-  initialize: function(map, container) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, container) {
     this._map = map;
 
     this.type = UploadButton.TYPE;
@@ -42,8 +41,9 @@ const UploadButton = WButton.extend({
           function(resolve) {
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
-            window.runHooks("wasabeeUIUpdate", resolve);
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             alert(wX("UPDATED"));
+            this._invisible();
           },
           function(reject) {
             console.log(reject);

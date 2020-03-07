@@ -61,6 +61,7 @@ const OperationChecklistDialog = Feature.extend({
         this.disable();
         delete this._listDialogData;
       },
+      resizable: true,
       id: window.plugin.wasabee.static.dialogNames.operationChecklist
     });
   },

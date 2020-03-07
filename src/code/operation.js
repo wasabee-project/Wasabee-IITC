@@ -447,7 +447,7 @@ export default class WasabeeOp {
 
   // call update to save the op and redraw everything on the map
   update(updateLocalchanged) {
-    if (this._batchmode) return;
+    if (this._batchmode === true) return;
     if (updateLocalchanged) {
       if (window.plugin.wasabee.battleMode) {
         console.log("would push to server...");
@@ -460,7 +460,7 @@ export default class WasabeeOp {
   }
 
   runCrosslinks() {
-    if (this._batchmode) return;
+    if (this._batchmode === true) return;
     window.runHooks("wasabeeCrosslinks", this);
   }
 
@@ -470,7 +470,9 @@ export default class WasabeeOp {
 
   endBatchMode() {
     this._batchmode = false;
-    this.update(false);
+    this.store();
+    this.localchanged = true;
+    window.runHooks("wasabeeUIUpdate", this);
     this.runCrosslinks();
   }
 

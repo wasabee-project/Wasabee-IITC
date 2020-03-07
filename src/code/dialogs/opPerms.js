@@ -3,7 +3,7 @@ import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeTeam from "../team";
 import WasabeeMe from "../me";
-import { addPermPromise } from "../server";
+import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
 
 const OpPermList = Feature.extend({
@@ -22,11 +22,26 @@ const OpPermList = Feature.extend({
     Feature.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._me = WasabeeMe.get();
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.update(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+
     this._displayDialog();
   },
 
   removeHooks: function() {
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     Feature.prototype.removeHooks.call(this);
+  },
+
+  update: function(op) {
+    this._operation = op;
+    this.setup();
+    // the lazy way...
+    this._dialog.dialog("close");
+    this._displayDialog();
   },
 
   _displayDialog: function() {
@@ -34,11 +49,11 @@ const OpPermList = Feature.extend({
 
     this.setup();
 
-    const html = L.DomUtil.create("div", null);
+    this._html = L.DomUtil.create("div", null);
 
-    this._drawnTable = html.appendChild(this._table.table);
+    this._drawnTable = this._html.appendChild(this._table.table);
     if (this._operation.IsOwnedOp()) {
-      const addArea = L.DomUtil.create("div", null, html);
+      const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
         if (t.State != "On") continue;
@@ -66,7 +81,7 @@ const OpPermList = Feature.extend({
       L.DomEvent.on(ab, "click", () => {
         context.addPerm(context._operation, teamMenu.value, permMenu.value);
         context.setup();
-        context._drawnTable = html.replaceChild(
+        context._drawnTable = this._html.replaceChild(
           context._table.table,
           context._drawnTable
         );
@@ -77,7 +92,7 @@ const OpPermList = Feature.extend({
       title: this._operation.name + " permissions",
       width: "auto",
       height: "auto",
-      html: html,
+      html: this._html,
       dialogClass: "wasabee-dialog wasabee-dialog-linklist",
       closeCallback: () => {
         this.disable();
@@ -133,6 +148,7 @@ const OpPermList = Feature.extend({
           teamid: teamID,
           role: role
         });
+        window.runHooks("wasabeeUIUpdate", op);
       },
       err => {
         console.log(err);
@@ -141,8 +157,22 @@ const OpPermList = Feature.extend({
   },
 
   delPerm: function(obj) {
-    console.log(obj);
-    alert("will remove :" + obj.teamid + " - " + obj.role);
+    console.log(
+      "removing: " + this._operation.ID + " " + obj.teamid + " - " + obj.role
+    );
+    delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
+      () => {
+        const n = new Array();
+        for (const p in this._operation.teamlist) {
+          if (p.teamid != obj.teamid && p.role != obj.role) n.push(p);
+        }
+        this._operation.teamlist = n;
+        window.runHooks("wasabeeUIUpdate", this._operation);
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 });
 

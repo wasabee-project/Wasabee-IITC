@@ -2,12 +2,19 @@ import { Feature } from "../leafletDrawImports";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
 import store from "../../lib/store";
-import { GetWasabeeServer, SetTeamState, locationPromise } from "../server";
+import {
+  GetWasabeeServer,
+  SetTeamState,
+  locationPromise,
+  logoutPromise,
+  leaveTeamPromise
+} from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
+import ConfirmDialog from "./confirmDialog";
 
 const WasabeeDialog = Feature.extend({
   statics: {
@@ -64,15 +71,33 @@ const WasabeeDialog = Feature.extend({
         }
       },
       {
-        name: "Remove",
+        name: "Leave",
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.innerHTML = "Remove";
+          link.innerHTML = "Leave";
           link.onclick = () => {
-            this.removeFromTeam(obj.ID);
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            const cd = new ConfirmDialog();
+            cd.setup(
+              `Leave ${obj.Name}?`,
+              `If you leave <span class="enl">${obj.Name}</span> you cannot rejoin unless the owner re-adds you.`,
+              () => {
+                leaveTeamPromise(obj.ID).then(
+                  () => {
+                    // the lazy way
+                    this._me = WasabeeMe.get(true);
+                    this._dialog.dialog("close");
+                    this._displayDialog();
+                  },
+                  err => {
+                    console.log(err);
+                    alert(err);
+                  }
+                );
+              }
+            );
+            cd.enable();
           };
         }
       }
@@ -130,9 +155,15 @@ const WasabeeDialog = Feature.extend({
             this._dialog.dialog("close");
           },
           About: () => {
-            console.log("showing about");
             const ad = new AboutDialog();
             ad.enable();
+          },
+          Logout: async () => {
+            await logoutPromise();
+            //logoutPromise calls WasabeeMe.purge, which runs this, but do it twice just in case
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            window.runHooks("wasabeeDkeys");
+            this._dialog.dialog("close");
           }
         },
 
@@ -161,11 +192,6 @@ const WasabeeDialog = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-  },
-
-  removeFromTeam: function(teamID) {
-    console.log(teamID);
-    alert("not written yet");
   },
 
   setServer: function() {

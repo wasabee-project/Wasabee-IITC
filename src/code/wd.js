@@ -49,6 +49,7 @@ export const drawWasabeeDkeys = () => {
   dKeylistPromise().then(
     data => {
       const list = JSON.parse(data);
+      if (!list) console.log(data); // what does the server send if recently logged out?
       if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
         return;
       for (const n of list.DefensiveKeys) {

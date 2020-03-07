@@ -29,9 +29,12 @@ const fieldCoversPortal = (a, b, field3, portal) => {
 };
 
 // build a map that shows which and how many portals are covered by each possible field
-function buildPOSet(anchor1, anchor2, visible) {
+function buildPOSet(anchor1, anchor2, visible, display) {
   const poset = new Map();
+  let done = 0;
   for (const i of visible) {
+    done++;
+    display.textContent = done + " / ";
     poset.set(
       i.options.guid,
       visible.filter(j => {
@@ -84,12 +87,16 @@ function longestSequence(poset) {
     let longest = "";
     let length = 0;
 
+    // let prev = null;
     // determine the longest
     for (const [k, v] of poset) {
       if (v.length > length) {
         length = v.length;
         longest = k;
+        // TODO build array of all with this same length
+        // TODO determine which is closest to previous
       }
+      // record previous
     }
     out.push(longest);
     const thisList = poset.get(longest);
@@ -114,12 +121,12 @@ function longestSequence(poset) {
   return out;
 }
 
-export default function multimax(anchor1, anchor2, visible) {
+export default function multimax(anchor1, anchor2, visible, display) {
   return new Promise(function(resolve, reject) {
     if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
 
     console.log("starting multimax");
-    const poset = buildPOSet(anchor1, anchor2, visible);
+    const poset = buildPOSet(anchor1, anchor2, visible, display);
     const p = longestSequence(poset);
     console.log("multimax done");
     resolve(p);

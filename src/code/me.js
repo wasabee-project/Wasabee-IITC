@@ -88,4 +88,16 @@ export default class WasabeeMe {
     wme.store();
     return wme;
   }
+
+  static purge() {
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+    if (window.plugin.wasabee._agentCache)
+      window.plugin.wasabee._agentCache.clear();
+    if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();
+    if (window.plugin.wasabee._Dkeys) {
+      window.plugin.wasabee._Dkeys.clear();
+      window.runHooks("wasabeeDkeys");
+    }
+    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+  }
 }

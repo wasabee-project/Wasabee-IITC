@@ -60,7 +60,7 @@ export default {
   clearAllItems: operation => {
     const con = new ConfirmDialog();
     con.setup(
-      `Clear: {$operation.name}`,
+      `Clear: ${operation.name}`,
       `Do you want to reset ${operation.name}?`,
       () => {
         operation.clearAllItems();
