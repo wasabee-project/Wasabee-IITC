@@ -25,12 +25,11 @@ const UploadButton = WButton.extend({
       callback: () => {
         if (this._operation.IsServerOp()) {
           updateOpPromise(this._operation).then(
-            function(resolve) {
-              console.log(`server accepted the update: ${resolve}`);
-              window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-              alert(wX("UPLOADED"));
+            () => {
+              alert(wX("UPDATED"));
+              this._Wupdate();
             },
-            function(reject) {
+            reject => {
               console.log(reject);
               alert(`Update Failed: ${reject}`);
             }
@@ -38,16 +37,26 @@ const UploadButton = WButton.extend({
           return;
         }
         uploadOpPromise(this._operation).then(
-          function(resolve) {
+          resolve => {
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            alert(wX("UPDATED"));
+            alert(wX("UPLOADED"));
+            this._Wupdate();
             this._invisible();
           },
-          function(reject) {
+          reject => {
+            // this shouldn't be necessary, but the UI is behind
+            updateOpPromise(this._operation).then(
+              () => {
+                alert(wX("UPDATED"));
+                this._Wupdate();
+              },
+              reject => {
+                console.log(reject);
+                alert(`Update Failed: ${reject}`);
+              }
+            );
             console.log(reject);
-            alert(`Upload Failed: ${reject}`);
           }
         );
       }
