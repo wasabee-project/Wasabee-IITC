@@ -2,7 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import store from "../../lib/store";
-import WasabeeMe from "../me";
+// import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import UiCommands from "../uiCommands";
 import wX from "../wX";
@@ -55,23 +55,24 @@ const AuthDialog = Feature.extend({
     gsapiButton.innerHTML = "Log In (quick)";
     L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
 
+    /*
     const gsapiButtonToo = L.DomUtil.create("a", null, buttonSet);
     gsapiButtonToo.innerHTML = "Log In (choose account)";
     L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
+ */
 
     const gsapiButtonThree = L.DomUtil.create("a", null, buttonSet);
-    gsapiButtonThree.innerHTML = "Log In (Experimental)";
+    gsapiButtonThree.innerHTML = "Log In (testing)";
     const menus = L.DomUtil.create("div", null, buttonSet);
     menus.innerHTML =
       "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>unset</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option><option value='consent'>consent</option></select></span>" +
       "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>unset (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
-
     L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
 
     // webview cannot work on android IITC-M
     if (!L.Browser.android) {
       const webviewButton = L.DomUtil.create("a", null, buttonSet);
-      webviewButton.innerHTML = "Log In (webview)";
+      webviewButton.innerHTML = "Webview Log In (iOS)";
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
@@ -81,13 +82,14 @@ const AuthDialog = Feature.extend({
       postwebviewButton.innerHTML = "Verify Webview";
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
-        window.runHooks("wasabeeUIUpdate", this._operation);
-        const me = await WasabeeMe.get();
-        if (me) {
-          alert("server data: " + JSON.stringify(me));
-        } else {
-          alert("server data: [pending]");
-        }
+        mePromise().then(
+          () => {
+            this._dialog.dialog("close");
+          },
+          err => {
+            alert(err);
+          }
+        );
       });
     }
 

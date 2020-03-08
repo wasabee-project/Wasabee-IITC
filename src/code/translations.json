@@ -106,7 +106,7 @@
       "ANCHOR ASSIGNMENT": " all outbound links",
       "ASSIGN OUTBOUND PROMPT": "Assign all outbound links from: ${value}",
       "AUTH INCOMPAT": "You have logged in to a plugin that uses a method incompatable with Wasabee",
-      "AUTH DESC": "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'webview', log in; then do a 'choose account'. That SHOULD work.",
+      "AUTH DESC": "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'Webview Log in', log in; then do a 'Verify Webview'. That should work.",
       "KNOWN BLOCKERS": "Known Blockers: ${value}"
     },
     "es":
