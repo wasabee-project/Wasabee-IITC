@@ -38,9 +38,47 @@ const AuthDialog = Feature.extend({
     }
 
     const content = L.DomUtil.create("div", "temp-op-dialog");
+
+    const ua = L.DomUtil.create("div", null, content);
+    // ua.textContent = "Your IITC shows as: " + navigator.userAgent + " (assuming desktop)";
+
+    this._android = false;
+    this._ios = false;
+
+    // "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8"
+    if (navigator.userAgent.search("Iceweasel/") != -1) {
+      this._android = true;
+      ua.innerHTML =
+        "<span class='enl'>IITC-Mobile-Android with fake user agent</span><br/>" +
+        navigator.userAgent;
+    }
+    if (navigator.userAgent.search("Linux; Android") != -1) {
+      this._android = true;
+      ua.innerHTML =
+        "<span class='res'>IITC-Mobile-Andorid without fake UA (check the Fake User Agent box in the IITC-Mobile settings)</span><br/>" +
+        navigator.userAgent;
+    }
+
+    if (
+      navigator.userAgent.search("iPhone") != -1 ||
+      navigator.userAgent.search("iPad") != -1
+    ) {
+      this._ios = true;
+      this._android = false;
+      if (navigator.userAgent.search("Safari/") == -1) {
+        // bad ones do not contain "Safari/
+        ua.innerHTML =
+          "<span class='res'>You must set a custom UserAgent for webviews in the IITC-Mobile settings</span><br/>";
+      } else {
+        ua.innerHTML =
+          "<span class='enl'>IITC-Mobile iOS w/ good custom UserAgent</span><br/>";
+      }
+    }
+
     const title = L.DomUtil.create("div", null, content);
     title.className = "desc";
     title.innerHTML = wX("AUTH DESC");
+
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
     const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
@@ -52,27 +90,24 @@ const AuthDialog = Feature.extend({
       ? window.plugin.wasabee.sendLocation
       : false;
 
-    if (!L.Browser.mobileWebkit) {
-      const gsapiButton = L.DomUtil.create("a", null, buttonSet);
-      gsapiButton.innerHTML = "Log In (quick)";
-      L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
-      /*
-      const gsapiButtonToo = L.DomUtil.create("a", null, buttonSet);
-      gsapiButtonToo.innerHTML = "Log In (choose account)";
-      L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
-     */
+    if (this._android) {
+      const gsapiButtonOLD = L.DomUtil.create("a", null, buttonSet);
+      gsapiButtonOLD.innerHTML = "Log In (quick for android)";
+      L.DomEvent.on(gsapiButtonOLD, "click", () =>
+        this.gsapiAuthImmediate(this)
+      );
     }
 
-    const gsapiButtonThree = L.DomUtil.create("a", null, buttonSet);
-    gsapiButtonThree.innerHTML = "Log In (testing)";
+    const gapiButton = L.DomUtil.create("a", null, buttonSet);
+    gapiButton.innerHTML = "Log In";
     const menus = L.DomUtil.create("div", null, buttonSet);
     menus.innerHTML =
-      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>unset</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option><option value='consent'>consent</option></select></span>" +
-      "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>unset (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
-    L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
+      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>Auto</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option></select></span>" +
+      "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
+    L.DomEvent.on(gapiButton, "click", () => this.gapiAuth(this));
 
     // webview cannot work on android IITC-M
-    if (L.Browser.mobileWebkit) {
+    if (this._ios) {
       const webviewButton = L.DomUtil.create("a", null, buttonSet);
       webviewButton.innerHTML = "Webview Log In (iOS)";
       L.DomEvent.on(webviewButton, "click", () => {
@@ -187,11 +222,9 @@ const AuthDialog = Feature.extend({
   },
 
   // this is probably the most correct, but doesn't seem to work properly
-  gsapiAuthThree: context => {
-    console.log("calling Experimental login method");
+  gapiAuth: context => {
+    console.log("calling new login method");
     const options = {
-      // prompt: "none",
-      // immediate: false,
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
       response_type: "id_token permission"
@@ -203,17 +236,13 @@ const AuthDialog = Feature.extend({
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
     console.log(options);
     window.gapi.auth2.authorize(options, response => {
-      console.log("got from google: ");
-      console.log(response);
       if (response.error) {
         if (response.error == "immediate_failed") {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
           console.log(options);
           window.gapi.auth2.authorize(options, responseSelect => {
-            console.log("got from google (select): ");
-            console.log(responseSelect);
             if (responseSelect.error) {
-              const err = `error from gsapiAuthThree (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+              const err = `error from gapiAuth (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
               alert(err);
               console.log(err);
               return;
@@ -221,10 +250,13 @@ const AuthDialog = Feature.extend({
             console.log("sending to Wasabee (select)");
             SendAccessTokenAsync(responseSelect.access_token).then(
               () => {
-                console.log("not requesting my data from Wasabee");
-                window.setTimeout(() => {
+                if (context._ios) {
+                  window.setTimeout(() => {
+                    context._dialog.dialog("close");
+                  }, 1500); // give time for the cookie to settle
+                } else {
                   context._dialog.dialog("close");
-                }, 1500); // give time for the cookie to settle
+                }
               },
               tokErr => {
                 alert(tokErr);
@@ -233,7 +265,7 @@ const AuthDialog = Feature.extend({
           });
         } else {
           context._dialog.dialog("close");
-          const err = `error from gsapiAuthThree: ${response.error}: ${response.error_subtype}`;
+          const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
           console.log(err);
           alert(err);
         }
@@ -242,9 +274,13 @@ const AuthDialog = Feature.extend({
       console.log("sending to Wasabee");
       SendAccessTokenAsync(response.access_token).then(
         () => {
-          window.setTimeout(() => {
+          if (context._ios) {
+            window.setTimeout(() => {
+              context._dialog.dialog("close");
+            }, 1500); // give time for the cookie to settle
+          } else {
             context._dialog.dialog("close");
-          }, 1500); // give time for the cookie to settle
+          }
         },
         tokErr => {
           alert(tokErr);
