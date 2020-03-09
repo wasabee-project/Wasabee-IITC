@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
+import AboutDialog from "./about";
 import store from "../../lib/store";
 // import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
@@ -51,15 +52,16 @@ const AuthDialog = Feature.extend({
       ? window.plugin.wasabee.sendLocation
       : false;
 
-    const gsapiButton = L.DomUtil.create("a", null, buttonSet);
-    gsapiButton.innerHTML = "Log In (quick)";
-    L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
-
-    /*
-    const gsapiButtonToo = L.DomUtil.create("a", null, buttonSet);
-    gsapiButtonToo.innerHTML = "Log In (choose account)";
-    L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
- */
+    if (!L.Browser.mobileWebkit) {
+      const gsapiButton = L.DomUtil.create("a", null, buttonSet);
+      gsapiButton.innerHTML = "Log In (quick)";
+      L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuthImmediate(this));
+      /*
+      const gsapiButtonToo = L.DomUtil.create("a", null, buttonSet);
+      gsapiButtonToo.innerHTML = "Log In (choose account)";
+      L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthChoose(this));
+     */
+    }
 
     const gsapiButtonThree = L.DomUtil.create("a", null, buttonSet);
     gsapiButtonThree.innerHTML = "Log In (testing)";
@@ -70,7 +72,7 @@ const AuthDialog = Feature.extend({
     L.DomEvent.on(gsapiButtonThree, "click", () => this.gsapiAuthThree(this));
 
     // webview cannot work on android IITC-M
-    if (!L.Browser.android) {
+    if (L.Browser.mobileWebkit) {
       const webviewButton = L.DomUtil.create("a", null, buttonSet);
       webviewButton.innerHTML = "Webview Log In (iOS)";
       L.DomEvent.on(webviewButton, "click", () => {
@@ -109,6 +111,13 @@ const AuthDialog = Feature.extend({
       serverDialog.current = GetWasabeeServer();
       serverDialog.placeholder = "https://server.wasabee.rocks";
       serverDialog.enable();
+    });
+
+    const aboutButton = L.DomUtil.create("a", "", buttonSet);
+    aboutButton.innerHTML = "About Wasabee-IITC";
+    L.DomEvent.on(aboutButton, "click", () => {
+      const ad = new AboutDialog();
+      ad.enable();
     });
 
     this._dialog = window.dialog({
