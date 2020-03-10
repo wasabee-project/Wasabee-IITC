@@ -202,6 +202,7 @@ export default class WasabeeOp {
   cleanPortalList() {
     var newPortals = [];
     for (const p of this.opportals) {
+      // if (!typeof p == "WasabeePortal") continue;
       let foundPortal = false;
       for (const l of this.links) {
         if (p.id == l.fromPortalId || p.id == l.toPortalId) {
@@ -349,7 +350,7 @@ export default class WasabeeOp {
 
   get fakedPortals() {
     const c = this.opportals.filter(p => {
-      if (p.name.match("^Loading: .*")) return true;
+      if (p.name && p.name.match("^Loading: .*")) return true;
       return false;
     });
     return c;
