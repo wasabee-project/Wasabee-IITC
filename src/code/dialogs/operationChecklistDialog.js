@@ -32,7 +32,7 @@ const OperationChecklistDialog = Feature.extend({
     window.addHook("portalAdded", UiCommands.listenForAddedPortals);
 
     for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
+      if (f.id.length != 35) window.portalDetail.request(f.id);
     }
 
     this._displayDialog();

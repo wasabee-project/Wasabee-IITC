@@ -2,6 +2,7 @@ import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { Feature } from "../leafletDrawImports";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import OperationChecklistDialog from "./operationChecklistDialog";
 
 const ImportDialogControl = Feature.extend({
   statics: {
@@ -100,6 +101,9 @@ class ImportDialog {
       newop.updatePortalsFromIITCData();
       newop.store();
       makeSelectedOperation(newop.ID);
+      const checklist = new OperationChecklistDialog();
+      checklist.enable();
+      // this._map.fitBounds(newop.mbr());
       return;
     }
 
@@ -174,7 +178,7 @@ class ImportDialog {
         found +
         " portals. Faked " +
         faked +
-        ". Please use the swap feature to move faked portals to the real portals at the same location."
+        ". Please use the swap feature to move faked portals to the real portals at the same location. Zomming in on the 'Loading' portals in the checklist might force them to load."
     );
     return newop;
   }
@@ -196,7 +200,7 @@ class ImportDialog {
       const portalID = pmap.get(key);
       const np = new WasabeePortal(
         portalID,
-        "[loading name: " + portalID + "]",
+        "Loading: [" + portalID + "]",
         latLng.lat,
         latLng.lng
       );

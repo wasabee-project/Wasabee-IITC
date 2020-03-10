@@ -42,7 +42,7 @@ const BlockerList = Feature.extend({
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
     for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
+      if (f.id.length != 35) window.portalDetail.request(f.id);
     }
 
     this._dialog = window.dialog({

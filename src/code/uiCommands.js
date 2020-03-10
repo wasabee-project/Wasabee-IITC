@@ -79,9 +79,30 @@ export default {
     const op = getSelectedOperation();
 
     for (const faked of op.fakedPortals) {
+      // if we had a GUID -- normal faked
       if (faked.id == newPortal.portal.options.guid) {
         faked.name = newPortal.portal.options.data.title;
         op.update(true);
+        return;
+      }
+
+      // if we only had location -- from drawtools import
+      if (
+        faked.lat ==
+          (newPortal.portal.options.data.latE6 / 1e6).toFixed(6).toString() &&
+        faked.lng ==
+          (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6).toString()
+      ) {
+        const np = new WasabeePortal(
+          newPortal.portal.options.guid,
+          newPortal.portal.options.data.title,
+          (newPortal.portal.options.data.latE6 / 1e6).toFixed(6).toString(),
+          (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6).toString()
+        );
+
+        op.swapPortal(faked, np);
+        op.update(true);
+        return;
       }
     }
   },
