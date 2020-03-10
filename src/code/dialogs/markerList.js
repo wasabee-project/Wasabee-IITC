@@ -39,7 +39,7 @@ const MarkerList = Feature.extend({
 
   _displayDialog: function() {
     for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
+      if (f.id.length != 35) window.portalDetail.request(f.id);
     }
 
     this._listDialogData = window.dialog({
