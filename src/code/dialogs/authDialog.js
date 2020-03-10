@@ -3,7 +3,6 @@ import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AboutDialog from "./about";
 import store from "../../lib/store";
-// import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import UiCommands from "../uiCommands";
 import wX from "../wX";
@@ -55,7 +54,7 @@ const AuthDialog = Feature.extend({
     if (navigator.userAgent.search("Linux; Android") != -1) {
       this._android = true;
       ua.innerHTML =
-        "<span class='res'>IITC-Mobile-Andorid without fake UA (check the Fake User Agent box in the IITC-Mobile settings)</span><br/>" +
+        "<span class='res'>IITC-Mobile-Andorid without fake user agent</span><br/>" +
         navigator.userAgent;
     }
 
@@ -68,10 +67,10 @@ const AuthDialog = Feature.extend({
       if (navigator.userAgent.search("Safari/") == -1) {
         // bad ones do not contain "Safari/
         ua.innerHTML =
-          "<span class='res'>You must set a custom UserAgent for webviews in the IITC-Mobile settings</span><br/>";
+          "<span class='res'>You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail</span><br/>";
       } else {
         ua.innerHTML =
-          "<span class='enl'>IITC-Mobile iOS w/ good custom UserAgent</span><br/>";
+          "Auth Dialog for: <span class='enl'>IITC-Mobile iOS with a custom UserAgent</span><br/>";
       }
     }
 
@@ -130,7 +129,7 @@ const AuthDialog = Feature.extend({
       });
     }
 
-    const changeServerButton = L.DomUtil.create("a", "", buttonSet);
+    const changeServerButton = L.DomUtil.create("a", null, buttonSet);
     changeServerButton.innerHTML = "Change Server";
     L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
@@ -223,7 +222,7 @@ const AuthDialog = Feature.extend({
 
   // this is probably the most correct, but doesn't seem to work properly
   gapiAuth: context => {
-    console.log("calling new login method");
+    console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
@@ -237,17 +236,18 @@ const AuthDialog = Feature.extend({
     console.log(options);
     window.gapi.auth2.authorize(options, response => {
       if (response.error) {
+        console.log(response.error);
         if (response.error == "immediate_failed") {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
           console.log(options);
           window.gapi.auth2.authorize(options, responseSelect => {
             if (responseSelect.error) {
-              const err = `error from gapiAuth (select): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+              const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
               alert(err);
               console.log(err);
               return;
             }
-            console.log("sending to Wasabee (select)");
+            console.log("sending to Wasabee (immediate_failed)");
             SendAccessTokenAsync(responseSelect.access_token).then(
               () => {
                 if (context._ios) {
@@ -259,7 +259,9 @@ const AuthDialog = Feature.extend({
                 }
               },
               tokErr => {
+                console.log(tokErr);
                 alert(tokErr);
+                context._dialog.dialog("close");
               }
             );
           });
@@ -283,7 +285,9 @@ const AuthDialog = Feature.extend({
           }
         },
         tokErr => {
+          console.log(tokErr);
           alert(tokErr);
+          context._dialog.dialog("close");
         }
       );
     });
@@ -307,7 +311,7 @@ const AuthDialog = Feature.extend({
         }
         SendAccessTokenAsync(response.access_token).then(
           () => {
-            mePromise();
+            mePromise(); // needs .then...
             context._dialog.dialog("close");
           },
           reject => {
