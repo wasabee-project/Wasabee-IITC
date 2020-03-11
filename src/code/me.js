@@ -7,9 +7,13 @@ const Wasabee = window.plugin.wasabee;
 export default class WasabeeMe {
   constructor() {
     this.GoogleID = null;
+    this.IngressName = null;
+    this.Level = 0;
+    this.OwnedTeams = Array();
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
+    this.Assignments = Array();
   }
 
   store() {
@@ -103,14 +107,25 @@ export default class WasabeeMe {
     }
     const wme = new WasabeeMe();
     wme.GoogleID = data.GoogleID;
+    wme.IngressName = data.IngressName;
     if (data.Teams !== null) {
       for (const team of data.Teams) {
         wme.Teams.push(team);
       }
     }
-    if (data.Ops !== null) {
+    if (data.OwnedTeams && data.OwnedTeams.length > 0) {
+      for (const team of data.OwnedTeams) {
+        wme.OwnedTeams.push(team);
+      }
+    }
+    if (data.Ops && data.Ops.length > 0) {
       for (const op of data.Ops) {
         wme.Ops.push(op);
+      }
+    }
+    if (data.Assignments && data.Assignments.length > 0) {
+      for (const assignment of data.Assignments) {
+        wme.Assignments.push(assignment);
       }
     }
     wme.fetched = data.fetched ? data.fetched : Date.now();
