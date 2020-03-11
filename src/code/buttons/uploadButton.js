@@ -16,10 +16,11 @@ const UploadButton = WButton.extend({
     // this.handler = null;
     this._operation = getSelectedOperation();
     this.title = `Upload ${this._operation.name}`;
+    this._container = container;
 
     this.button = this._createButton({
       title: "Upload",
-      container: container,
+      container: this._container,
       buttonImage: window.plugin.wasabee.static.images.toolbar_upload.default,
       context: this,
       callback: () => {
@@ -27,7 +28,7 @@ const UploadButton = WButton.extend({
           updateOpPromise(this._operation).then(
             () => {
               alert(wX("UPDATED"));
-              this._Wupdate();
+              this.Wupdate(this._container, this._operation);
             },
             reject => {
               console.log(reject);
@@ -41,7 +42,7 @@ const UploadButton = WButton.extend({
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
             alert(wX("UPLOADED"));
-            this._Wupdate();
+            this.Wupdate(this._container, this._operation);
             this._invisible();
           },
           reject => {
@@ -49,7 +50,7 @@ const UploadButton = WButton.extend({
             updateOpPromise(this._operation).then(
               () => {
                 alert(wX("UPDATED"));
-                this._Wupdate();
+                this.Wupdate(this._container, this._operation);
               },
               reject => {
                 console.log(reject);
