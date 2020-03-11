@@ -102,7 +102,7 @@ export default {
 
         op.swapPortal(faked, np);
         op.update(true);
-        return;
+        // don't bail just yet, more may match
       }
     }
   },

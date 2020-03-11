@@ -91,7 +91,7 @@ const OpsDialog = Feature.extend({
 
     L.DomEvent.on(operationSelect, "change", () => {
       const newop = makeSelectedOperation(operationSelect.value);
-      const mbr = newop.mbr();
+      const mbr = newop.mbr;
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         this._map.fitBounds(mbr);
       }

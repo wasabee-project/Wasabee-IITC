@@ -106,8 +106,20 @@
       "ANCHOR ASSIGNMENT": " all outbound links",
       "ASSIGN OUTBOUND PROMPT": "Assign all outbound links from: ${value}",
       "AUTH INCOMPAT": "You have logged in to a plugin that uses a method incompatable with Wasabee",
-      "AUTH DESC": "In order to use the server functionality, you must log in.<br/>On Android or desktop, try 'quick' first. If that fails, try 'choose account'.<br/>On iOS, try 'quick', if that fails do 'Webview Log in', log in; then do a 'Verify Webview'. That should work.",
-      "KNOWN BLOCKERS": "Known Blockers: ${value}"
+      "AUTH ANDROID": "On Android, try 'quick' first. If that fails, try the main login with 'select_account'.",
+      "AUTH IOS": "On iOS, use the main 'Log In'. if that fails do 'Webview Log in', log in; then use the 'Verify Webview' button to complete the process.",
+      "KNOWN BLOCKERS": "Known Blockers: ${value}",
+      "IOS NEED FAKE UA": "You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail",
+      "SEND LOCATION": "Send Location",
+      "LOG IN QUICK": "Log In (quick; for Android)",
+      "LOG IN": "Log In",
+      "WEBVIEW": "Webview Log In (iOS)",
+      "WEBVIEW VERIFY": "Verify Webview",
+      "CHANGE SERVER": "Change Server",
+      "CHANGE SERVER PROMPT": "New Wasabee Server",
+      "ABOUT WASABEE-IITC": "About Wasabee-IITC",
+      "AUTH REQUIRED": "Authentication Required",
+      "AUTOMARK STOP": "Auto-Mark stopped due to portals not being loaded"
     },
     "es":
     {

@@ -39,8 +39,6 @@ const AuthDialog = Feature.extend({
     const content = L.DomUtil.create("div", "temp-op-dialog");
 
     const ua = L.DomUtil.create("div", null, content);
-    // ua.textContent = "Your IITC shows as: " + navigator.userAgent + " (assuming desktop)";
-
     this._android = false;
     this._ios = false;
 
@@ -66,23 +64,24 @@ const AuthDialog = Feature.extend({
       this._android = false;
       if (navigator.userAgent.search("Safari/") == -1) {
         // bad ones do not contain "Safari/
-        ua.innerHTML =
-          "<span class='res'>You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail</span><br/>";
-      } else {
-        ua.innerHTML =
-          "Auth Dialog for: <span class='enl'>IITC-Mobile iOS with a custom UserAgent</span><br/>";
+        ua.textContent = wX("IOS NEED FAKE UA");
       }
     }
 
     const title = L.DomUtil.create("div", null, content);
     title.className = "desc";
-    title.innerHTML = wX("AUTH DESC");
+    if (this._ios) {
+      title.innerHTML = wX("AUTH IOS");
+    }
+    if (this._andoroid) {
+      title.innerHTML = wX("AUTH ANDROID");
+    }
 
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
     const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
     const sendLocTitle = L.DomUtil.create("span", null, sendLocDiv);
-    sendLocTitle.textContent = "Send Location: ";
+    sendLocTitle.textContent = wX("SEND LOCATION");
     this._sendLocCheck = L.DomUtil.create("input", null, sendLocDiv);
     this._sendLocCheck.type = "checkbox";
     this._sendLocCheck.checked = window.plugin.wasabee.sendLocation
@@ -91,14 +90,14 @@ const AuthDialog = Feature.extend({
 
     if (this._android) {
       const gsapiButtonOLD = L.DomUtil.create("a", null, buttonSet);
-      gsapiButtonOLD.innerHTML = "Log In (quick for android)";
+      gsapiButtonOLD.innerHTML = wX("LOG IN QUICK");
       L.DomEvent.on(gsapiButtonOLD, "click", () =>
         this.gsapiAuthImmediate(this)
       );
     }
 
     const gapiButton = L.DomUtil.create("a", null, buttonSet);
-    gapiButton.innerHTML = "Log In";
+    gapiButton.innerHTML = wX("LOG IN");
     const menus = L.DomUtil.create("div", null, buttonSet);
     menus.innerHTML =
       "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>Auto</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option></select></span>" +
@@ -108,14 +107,14 @@ const AuthDialog = Feature.extend({
     // webview cannot work on android IITC-M
     if (this._ios) {
       const webviewButton = L.DomUtil.create("a", null, buttonSet);
-      webviewButton.innerHTML = "Webview Log In (iOS)";
+      webviewButton.innerHTML = wX("WEBVIEW");
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
       });
       const postwebviewButton = L.DomUtil.create("a", null, buttonSet);
-      postwebviewButton.innerHTML = "Verify Webview";
+      postwebviewButton.innerHTML = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
         mePromise().then(
@@ -130,32 +129,36 @@ const AuthDialog = Feature.extend({
     }
 
     const changeServerButton = L.DomUtil.create("a", null, buttonSet);
-    changeServerButton.innerHTML = "Change Server";
+    changeServerButton.innerHTML = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
-      serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
-        if (serverDialog.inputField.value) {
-          store.set(
-            window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
-            serverDialog.inputField.value
-          );
-          store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+      serverDialog.setup(
+        wX("CHANGE SERVER"),
+        wX("CHANGE SERVER PROMPT"),
+        () => {
+          if (serverDialog.inputField.value) {
+            store.set(
+              window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
+              serverDialog.inputField.value
+            );
+            store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+          }
         }
-      });
+      );
       serverDialog.current = GetWasabeeServer();
       serverDialog.placeholder = "https://server.wasabee.rocks";
       serverDialog.enable();
     });
 
     const aboutButton = L.DomUtil.create("a", "", buttonSet);
-    aboutButton.innerHTML = "About Wasabee-IITC";
+    aboutButton.innerHTML = wX("ABOUT WASABEE-IITC");
     L.DomEvent.on(aboutButton, "click", () => {
       const ad = new AboutDialog();
       ad.enable();
     });
 
     this._dialog = window.dialog({
-      title: "Authentication Required",
+      title: wX("AUTH REQUIRED"),
       width: "auto",
       height: "auto",
       html: content,
@@ -221,7 +224,8 @@ const AuthDialog = Feature.extend({
   },
 
   // this is probably the most correct, but doesn't seem to work properly
-  gapiAuth: context => {
+  // does making it async change anything?
+  gapiAuth: async context => {
     console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
@@ -236,6 +240,7 @@ const AuthDialog = Feature.extend({
     console.log(options);
     window.gapi.auth2.authorize(options, response => {
       if (response.error) {
+        alert(response.error);
         console.log(response.error);
         if (response.error == "immediate_failed") {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection

@@ -37,7 +37,6 @@ const ImportDialogControl = Feature.extend({
       buttons: {
         OK: () => {
           this.idialog.importTextareaAsOp();
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           this._dialog.dialog("close");
         },
         "Get existing DrawTools draw": () => {
@@ -48,6 +47,9 @@ const ImportDialogControl = Feature.extend({
       closeCallback: () => {
         idhandler.disable();
         delete idhandler._dialog;
+        const newop = getSelectedOperation();
+        window.runHooks("wasabeeUIUpdate", newop);
+        window.runHooks("wasabeeCrosslinks", newop);
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog
     });
@@ -103,7 +105,7 @@ class ImportDialog {
       makeSelectedOperation(newop.ID);
       const checklist = new OperationChecklistDialog();
       checklist.enable();
-      // this._map.fitBounds(newop.mbr());
+      this._map.fitBounds(newop.mbr);
       return;
     }
 

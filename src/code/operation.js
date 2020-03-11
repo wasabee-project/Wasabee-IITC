@@ -540,7 +540,7 @@ export default class WasabeeOp {
   }
 
   // minimum bounds rectangle
-  mbr() {
+  get mbr() {
     if (!this.opportals || this.opportals.length == 0) return null;
     const lats = [];
     const lngs = [];
@@ -618,6 +618,10 @@ export default class WasabeeOp {
         this.update(false);
         return;
       }
+    }
+
+    if (typeof onhand == "string") {
+      onhand = Number.parseInt(onhand, 10);
     }
 
     const k = {

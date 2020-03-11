@@ -182,7 +182,7 @@ const BlockerList = Feature.extend({
     let wportal = this._operation.getPortal(portalId);
     if (!wportal) wportal = WasabeePortal.get(portalId);
     if (!wportal) {
-      alert("Auto-Mark stopped due to portals not being loaded");
+      alert(wX("AUTOMARK STOP"));
       return;
     }
     console.log(wportal);
