@@ -20,20 +20,16 @@ export default class WasabeeTeam {
     return team;
   }
 
-  static get(teamID) {
+  static async get(teamID) {
     if (window.plugin.wasabee.teams.has(teamID)) {
       return window.plugin.wasabee.teams.get(teamID);
     }
-    let t = null;
-    teamPromise(teamID).then(
-      team => {
-        console.log(team);
-        t = team;
-      },
-      err => {
-        console.log(err);
-      }
-    );
-    return t;
+    const t = await teamPromise(teamID);
+    if (t instanceof WasabeeTeam) {
+      return t;
+    } else {
+      console.log(t);
+      // alert(t);
+    }
   }
 }
