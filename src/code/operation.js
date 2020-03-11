@@ -557,13 +557,13 @@ export default class WasabeeOp {
     return L.latLngBounds(min, max);
   }
 
-  IsWritableOp() {
+  async IsWritableOp() {
     // not from the server, must be writable
     if (!this.IsServerOp()) return true;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
-    const me = WasabeeMe.get();
+    const me = await WasabeeMe.waitGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
     // if the user has no teams enabled, it can't be writable
@@ -586,11 +586,11 @@ export default class WasabeeOp {
     return false;
   }
 
-  IsOwnedOp() {
+  async IsOwnedOp() {
     if (!this.IsServerOp()) return true;
     if (!WasabeeMe.isLoggedIn()) return false;
 
-    const me = WasabeeMe.get();
+    const me = await WasabeeMe.waitGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
     return false;

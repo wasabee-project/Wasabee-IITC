@@ -67,6 +67,35 @@ export default class WasabeeMe {
     return me;
   }
 
+  static async waitGet(force) {
+    let me = null;
+    const maxCacheAge = Date.now() - 1000 * 60 * 59;
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+
+    if (typeof lsme == "string") {
+      // XXX this might be a problem, since create writes it back to the store
+      me = WasabeeMe.create(lsme);
+    }
+    if (
+      me === null ||
+      me.fetched == undefined ||
+      me.fetched < maxCacheAge ||
+      force
+    ) {
+      const newme = await mePromise();
+      if (newme instanceof WasabeeMe) {
+        me = newme;
+      } else {
+        store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+        console.log(newme);
+        alert(newme);
+        me = null;
+      }
+      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    }
+    return me;
+  }
+
   static create(data) {
     if (!data) return null;
     if (typeof data == "string") {

@@ -17,11 +17,11 @@ const OpPermList = Feature.extend({
     Feature.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: async function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
-    this._me = WasabeeMe.get();
+    this._me = await WasabeeMe.waitGet();
     const context = this;
     this._UIUpdateHook = newOpData => {
       context.update(newOpData);

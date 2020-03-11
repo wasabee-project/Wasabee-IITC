@@ -27,9 +27,9 @@ const WasabeeDialog = Feature.extend({
     Feature.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: async function() {
     if (!this._map) return;
-    this._me = WasabeeMe.get(true);
+    this._me = await WasabeeMe.waitGet(true);
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
   },
@@ -84,9 +84,9 @@ const WasabeeDialog = Feature.extend({
               `If you leave <span class="enl">${obj.Name}</span> you cannot rejoin unless the owner re-adds you.`,
               () => {
                 leaveTeamPromise(obj.ID).then(
-                  () => {
+                  async () => {
                     // the lazy way
-                    this._me = WasabeeMe.get(true);
+                    this._me = await WasabeeMe.waitGet(true);
                     this._dialog.dialog("close");
                     this._displayDialog();
                   },
@@ -185,7 +185,7 @@ const WasabeeDialog = Feature.extend({
     if (currentState == "Off") newState = "On";
 
     SetTeamState(teamID, newState);
-    this._me = await WasabeeMe.get(true);
+    this._me = await WasabeeMe.waitGet(true);
     // instead of just changing the display, trigger a full redraw?
     return newState;
   },

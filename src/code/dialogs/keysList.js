@@ -16,7 +16,7 @@ const KeysList = Feature.extend({
     Feature.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: async function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
@@ -25,7 +25,7 @@ const KeysList = Feature.extend({
       context.keyListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    this._me = WasabeeMe.get();
+    this._me = await WasabeeMe.waitGet();
     this._displayDialog();
   },
 

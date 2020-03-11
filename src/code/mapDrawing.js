@@ -193,7 +193,7 @@ const addLink = (wlink, style, operation) => {
 };
 
 /** this function fetches and displays agent location */
-export const drawAgents = () => {
+export const drawAgents = async () => {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
 
   if (!WasabeeMe.isLoggedIn()) {
@@ -206,7 +206,7 @@ export const drawAgents = () => {
   }
 
   const doneAgents = new Array();
-  const me = WasabeeMe.get();
+  const me = await WasabeeMe.waitGet();
   for (const t of me.Teams) {
     // remove whatever data we have for this team, start fresh
     if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {

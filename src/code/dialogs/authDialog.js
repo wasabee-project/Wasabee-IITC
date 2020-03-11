@@ -209,6 +209,7 @@ const AuthDialog = Feature.extend({
           async () => {
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
+            // not changing to WasabeeMe.waitGet(); because this needs to die
             // eslint-disable-next-line
             const me = await mePromise();
             // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
