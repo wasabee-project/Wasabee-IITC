@@ -11,6 +11,7 @@ const SyncButton = WButton.extend({
   },
 
   Wupdate: function() {
+    // takes container & operation, not needed here
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn) {
       this._syncbutton.style.display = "block";
@@ -64,7 +65,7 @@ const SyncButton = WButton.extend({
     });
 
     // hide or show depeneding on logged in state
-    this.Wupdate();
+    this.Wupdate(); // container & operation not needed
   }
 });
 

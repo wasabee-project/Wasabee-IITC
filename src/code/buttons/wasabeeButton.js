@@ -100,7 +100,7 @@ const WasabeeButton = WButton.extend({
     this._container.appendChild(this.actionsContainer);
 
     // check login state and update if necessary
-    this.Wupdate(this._container);
+    this.Wupdate(); // takes container and operation, not needed here
   },
 
   getIcon: function() {
@@ -131,6 +131,7 @@ const WasabeeButton = WButton.extend({
   },
 
   Wupdate: function() {
+    // takes container and operation as args, but we don't need them
     const loggedIn = WasabeeMe.isLoggedIn();
 
     // only change the icon if the state changes -- may be overkill trying to save a few cycles
