@@ -74,13 +74,9 @@ const MultimaxDialog = Feature.extend({
 
     const flylinks = L.DomUtil.create("span", null, div);
     const fllabel = L.DomUtil.create("label", null, flylinks);
-    fllabel.textContent = "Add Fly Links: ";
+    fllabel.textContent = "Add Back Links: ";
     this._flcheck = L.DomUtil.create("input", null, flylinks);
     this._flcheck.type = "checkbox";
-
-    // do these ever actually get drawn?
-    this._done = L.DomUtil.create("span", null, div);
-    this._total = L.DomUtil.create("span", null, div);
 
     const context = this;
     this._dialog = window.dialog({
@@ -109,10 +105,10 @@ const MultimaxDialog = Feature.extend({
   },
 
   //***Function to clear local selections of portals for the dialog
-  clearLocalPortalSelections: function() {
+  /* clearLocalPortalSelections: function() {
     store.remove("wasabee-multimax-A");
     store.remove("wasabee-multimax-B");
-  },
+  }, */
 
   //***Function to set portal -- called from 'Set' Button
   setPortal: function(event) {
@@ -155,10 +151,8 @@ const MultimaxDialog = Feature.extend({
       const B = context.getPortal("B");
       if (!A || !B) reject("Please select anchor portals first!");
 
-      context._total.textContent = `${portalsOnScreen.length} portals visible`;
-
       // Calculate the multimax
-      multimax(A, B, portalsOnScreen, context._done).then(
+      multimax(A, B, portalsOnScreen).then(
         sequence => {
           if (!Array.isArray(sequence) || !sequence.length)
             reject("No layers found");
@@ -175,7 +169,7 @@ const MultimaxDialog = Feature.extend({
               context._operation.addLink(
                 prev,
                 p,
-                "multimax generated flylink",
+                "multimax generated back link",
                 order + 3
               );
               order--;
