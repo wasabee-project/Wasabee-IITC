@@ -207,7 +207,7 @@ const OpsDialog = Feature.extend({
             }
             const removeid = selectedOp.ID;
             const newop = makeSelectedOperation(newopID);
-            const mbr = newop.mbr();
+            const mbr = newop.mbr;
             if (
               mbr &&
               isFinite(mbr._southWest.lat) &&
