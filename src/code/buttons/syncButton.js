@@ -34,33 +34,32 @@ const SyncButton = WButton.extend({
       context: this,
       callback: async () => {
         const so = getSelectedOperation();
-        try {
-          const me = await WasabeeMe.waitGet(true); // force update of ops list
-          if (!me) {
-            const ad = new AuthDialog();
-            ad.enable();
-          } else {
-            for (const op of me.Ops) {
-              opPromise(op.ID).then(
-                function(newop) {
-                  if (newop) {
-                    newop.store();
-                    if (newop.ID == so.ID) {
-                      makeSelectedOperation(newop.ID);
-                    }
-                  }
-                },
-                function(err) {
-                  console.log(err);
-                  alert(err);
-                }
-              );
+        const me = await WasabeeMe.waitGet(true); // force update of ops list
+        if (!me) {
+          const ad = new AuthDialog();
+          ad.enable();
+          return;
+        }
+
+        const promises = new Array();
+        for (const op of me.Ops) {
+          promises.push(opPromise(op.ID));
+        }
+        Promise.all(promises).then(
+          ops => {
+            for (const newop of ops) {
+              newop.store();
+              if (newop.ID == so.ID) {
+                makeSelectedOperation(newop.ID);
+              }
             }
             alert(wX("SYNC DONE"));
+          },
+          function(err) {
+            console.log(err);
+            alert(err);
           }
-        } catch (e) {
-          alert(e);
-        }
+        );
       }
     });
 
