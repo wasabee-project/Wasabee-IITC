@@ -238,14 +238,10 @@ const AuthDialog = Feature.extend({
       options.immediate = immediate.value;
     const gPrompt = document.getElementById("auth-prompt");
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
-    console.log(options);
     window.gapi.auth2.authorize(options, response => {
       if (response.error) {
-        alert(response.error);
-        console.log(response.error);
         if (response.error == "immediate_failed") {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
-          console.log(options);
           window.gapi.auth2.authorize(options, responseSelect => {
             if (responseSelect.error) {
               const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
