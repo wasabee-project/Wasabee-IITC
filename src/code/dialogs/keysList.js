@@ -25,7 +25,11 @@ const KeysList = Feature.extend({
       context.keyListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    this._me = WasabeeMe.get();
+    if (WasabeeMe.isLoggedIn()) {
+      this._me = WasabeeMe.get();
+    } else {
+      this._me = null;
+    }
     this._displayDialog();
   },
 
