@@ -61,10 +61,21 @@ export default ImportDialogControl;
 // XXX move all this into the main class, no need for a sub class for this
 class ImportDialog {
   constructor() {
-    this.container = L.DomUtil.create("div", "");
+    this.container = L.DomUtil.create("div", null);
+    this.container.style.width = "420px";
+
+    const nameblock = L.DomUtil.create("span", null, this.container);
+    const label = L.DomUtil.create("label", null, nameblock);
+    label.textContent = "Name: ";
+    this._namefield = L.DomUtil.create("input", null, label);
+    this._namefield.value = "Imported Op: " + new Date().toGMTString();
+    this._namefield.placeholder = "noodles";
+    // this._namefield.width = 16;
+    const note = L.DomUtil.create("span", null, nameblock);
+    note.textContent = " (only for DrawTools imports)";
 
     // Input area
-    this.textarea = L.DomUtil.create("textarea", "", this.container);
+    this.textarea = L.DomUtil.create("textarea", null, this.container);
     this.textarea.rows = 20;
     this.textarea.cols = 80;
     this.textarea.placeholder =
@@ -101,6 +112,11 @@ class ImportDialog {
       console.log("trying to import IITC Drawtools format... wish me luck");
       const newop = this.parseDrawTools(string);
       newop.updatePortalsFromIITCData();
+      if (this._namefield.value) {
+        newop.name = this._namefield.value;
+      } else {
+        newop.name = "Imported Op: " + new Date().toGMTString();
+      }
       newop.store();
       makeSelectedOperation(newop.ID);
       const checklist = new OperationChecklistDialog();

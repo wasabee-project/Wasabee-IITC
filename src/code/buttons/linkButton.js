@@ -1,5 +1,6 @@
 import { WButton } from "../leafletDrawImports.js";
 import MultimaxButtonControl from "../dialogs/multimaxDialog";
+import FanfieldDialog from "../dialogs/fanfield";
 import LinkDialog from "../dialogs/linkDialog";
 import wX from "../wX";
 
@@ -52,7 +53,9 @@ const LinkButton = WButton.extend({
         text: wX("MAX"),
         callback: () => {
           this.disable();
-          alert(wX("DISABLED"));
+          // alert(wX("DISABLED"));
+          const ff = new FanfieldDialog(map);
+          ff.enable();
         },
         context: context
       }

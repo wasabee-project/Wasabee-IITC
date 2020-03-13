@@ -6,6 +6,7 @@ export default class WasabeeTeam {
     this.name = null;
     this.id = null;
     this.agents = [];
+    this.fetched = null;
   }
 
   static create(data) {
@@ -13,6 +14,7 @@ export default class WasabeeTeam {
     const team = new WasabeeTeam();
     team.id = d.id;
     team.name = d.name;
+    team.fetched = Date.now();
     for (const agent of d.agents) {
       team.agents.push(WasabeeAgent.create(agent));
       // WasabeeAgent.create takes care of caching it for us

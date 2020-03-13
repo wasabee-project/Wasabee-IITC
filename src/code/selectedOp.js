@@ -39,7 +39,11 @@ export const initSelectedOperation = () => {
 };
 
 const loadNewDefaultOp = () => {
-  const newOp = new WasabeeOp(PLAYER.nickname, wX("DEFAULT OP NAME"), true);
+  const newOp = new WasabeeOp(
+    PLAYER.nickname,
+    wX("DEFAULT OP NAME", new Date().toGMTString()),
+    true
+  );
   newOp.store();
   const op = makeSelectedOperation(newOp.ID);
   return op;

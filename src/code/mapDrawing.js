@@ -207,7 +207,14 @@ export const drawAgents = async () => {
 
   const doneAgents = new Array();
   const me = await WasabeeMe.waitGet();
+  const now = Date.now();
   for (const t of me.Teams) {
+    // must be older than 15 seconds
+    if (t.fetched && now - t.fetched < 15000) {
+      console.log("skipping team");
+      continue;
+    }
+
     // remove whatever data we have for this team, start fresh
     if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
       Wasabee.teams.delete(t.ID);
