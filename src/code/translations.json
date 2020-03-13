@@ -38,7 +38,7 @@
       "QD TITLE": "Quick Draw Layers",
       "QD BUTTON END": "Click to stop drawing fields",
       "QD END": "End",
-      "DEFAULT OP NAME": "Default Op",
+      "DEFAULT OP NAME": "New Op: ${value}",
       "UPLOADED": "Successfully uploaded",
       "UPLOAD PERM DENIED": "Permission to upload denied",
       "UPDATED": "Successfully updated",
