@@ -32,9 +32,10 @@ const SyncButton = WButton.extend({
       container: container,
       buttonImage: window.plugin.wasabee.static.images.toolbar_download.default,
       context: this,
-      callback: async () => {
+      callback: () => {
         const so = getSelectedOperation();
-        const me = await WasabeeMe.waitGet(true); // force update of ops list
+        const me = WasabeeMe.get(true); // force update of ops list
+        // const me = await WasabeeMe.waitGet(true); // force update of ops list
         if (!me) {
           const ad = new AuthDialog();
           ad.enable();
