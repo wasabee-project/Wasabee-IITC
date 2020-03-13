@@ -3,6 +3,7 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
+import UiCommands from "../uiCommands";
 
 const FanfieldDialog = Feature.extend({
   statics: {
@@ -119,7 +120,14 @@ const FanfieldDialog = Feature.extend({
         context.disable();
         delete context._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.fanfieldButton
+      buttons: {
+        OK: () => {
+          this._dialog.dialog("close");
+        },
+        "Clear All": () => {
+          UiCommands.clearAllItems(getSelectedOperation());
+        }
+      }
     });
   },
 
@@ -144,23 +152,36 @@ const FanfieldDialog = Feature.extend({
       return;
     }
 
-    const startAngle = context._angle(context._anchor, context._start);
-    const endAngle = context._angle(context._anchor, context._end);
-    const min = Math.min(startAngle, endAngle);
-    const max = Math.max(startAngle, endAngle);
+    let startAngle = context._angle(context._anchor, context._start, false);
+    let endAngle = context._angle(context._anchor, context._end, false);
+    let min = Math.min(startAngle, endAngle);
+    let max = Math.max(startAngle, endAngle);
+
+    let ccw = false;
+    if (startAngle != min) {
+      console.log("fanfield running counter-clockwise");
+      ccw = true; // must be going counter-clockwise
+      startAngle = context._angle(context._anchor, context._start, true);
+      endAngle = context._angle(context._anchor, context._end, true);
+      min = Math.min(startAngle, endAngle);
+      max = Math.max(startAngle, endAngle);
+    }
+
+    context._angleTwo(context._anchor, context._start, context._end);
 
     const good = new Map();
     for (const p of context._getAllPortalsOnScreen()) {
       if (p.options.guid == context._anchor.id) continue;
-      const pAngle = context._angle(context._anchor, p);
+      const pAngle = context._angle(context._anchor, p, ccw);
+      context._angleTwo(context._anchor, context._start, p);
       if (pAngle < min || pAngle > max) continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
-    // assume counter-clockwise for now
     const sorted = new Map([...good.entries()].sort()); // what ugly is this?
 
     context._operation.startBatchMode();
     let order = 0;
+    let fields = 0;
     for (const [angle, p] of sorted) {
       order++;
       const wp = WasabeePortal.get(p.options.guid);
@@ -182,18 +203,39 @@ const FanfieldDialog = Feature.extend({
         if (!crossed) {
           testlink.throwOrderPos = ++order;
           testlink.description = "fan subfield";
+          fields++;
           context._operation.links.push(testlink);
         }
       }
     }
     context._operation.endBatchMode();
+    let ap = 313 * order + 1250 * fields;
+    alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
-  _angle: function(a, p) {
+  _angle: function(a, p, ccw) {
     const all = a.latLng; // anchor is always a WasabeePortal
-    let pll = p.latLng; // probably not a WasabeePortal (except start/end)
-    if (!pll) pll = p._latlng; // if not, treat as IITC portal
+    const pll = p.latLng || p._latlng; // probably not a WasabeePortal (except start/end)
+    // if (!pll) pll = p._latlng; // if not, treat as IITC portal
+
+    // always return a positive value so the sort() functions work sanely
+    // work in radians since no one sees it and degrees would be slower
+    if (ccw) return 4 - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
     return 2 + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+  },
+
+  _angleTwo: function(anchor, start, check) {
+    // if slow, cache these
+    const ap = L.Projection.LonLat.project(anchor.latLng);
+    const sp = L.Projection.LonLat.project(start.latLng);
+    const cp = L.Projection.LonLat.project(check.latLng || check._latlng);
+
+    const AB = Math.sqrt(Math.pow(sp.x - ap.x, 2) + Math.pow(sp.y - ap.y, 2));
+    const BC = Math.sqrt(Math.pow(sp.x - cp.x, 2) + Math.pow(sp.y - cp.y, 2));
+    const AC = Math.sqrt(Math.pow(cp.x - ap.x, 2) + Math.pow(cp.y - ap.y, 2));
+    const r = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+    if (Number.isNaN(r)) return 0;
+    return r;
   },
 
   _isOnScreen: function(ll, bounds) {
