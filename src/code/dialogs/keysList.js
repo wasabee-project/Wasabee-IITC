@@ -16,7 +16,7 @@ const KeysList = Feature.extend({
     Feature.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: async function() {
+  addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
@@ -25,7 +25,7 @@ const KeysList = Feature.extend({
       context.keyListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    this._me = await WasabeeMe.waitGet();
+    this._me = WasabeeMe.get();
     this._displayDialog();
   },
 
@@ -80,7 +80,7 @@ const KeysList = Feature.extend({
       {
         name: "Required",
         value: key => key.Required,
-        sort: (a, b) => a.localeCompare(b),
+        sort: (a, b) => a - b,
         format: (cell, value) => {
           cell.textContent = value;
         }
