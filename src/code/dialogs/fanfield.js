@@ -26,7 +26,7 @@ const FanfieldDialog = Feature.extend({
     const container = L.DomUtil.create("div", null);
     const description = L.DomUtil.create("div", null, container);
     description.textContent =
-      "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button.";
+      "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button. The current algo does not work well if the anchor is north of both the start and end portals. A fix is in the works.";
     const controls = L.DomUtil.create("div", null, container);
 
     const anchorDiv = L.DomUtil.create("div", null, controls);
@@ -157,6 +157,10 @@ const FanfieldDialog = Feature.extend({
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
 
+    console.log(
+      context._angleTwo(context._anchor, context._start, context._end)
+    );
+
     let ccw = false;
     if (startAngle != min) {
       console.log("fanfield running counter-clockwise");
@@ -167,17 +171,43 @@ const FanfieldDialog = Feature.extend({
       max = Math.max(startAngle, endAngle);
     }
 
-    context._angleTwo(context._anchor, context._start, context._end);
+    // angleTwo only logging for testing now
+    const atwo = context._angleTwo(
+      context._anchor,
+      context._start,
+      context._end
+    );
 
     const good = new Map();
+    // testing only
+    const goodTwo = new Map();
     for (const p of context._getAllPortalsOnScreen()) {
       if (p.options.guid == context._anchor.id) continue;
+      const a = context._angleTwo(context._anchor, context._start, p);
+      const b = context._angleTwo(context._anchor, p, context._end);
+      if (
+        (b > atwo && a > atwo) ||
+        a == 0 ||
+        b == 0 ||
+        (a < atwo % 2 && b < atwo % 2)
+      ) {
+        console.log(
+          `angleTwo permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
+        );
+        goodTwo.set(a, p);
+      }
       const pAngle = context._angle(context._anchor, p, ccw);
-      context._angleTwo(context._anchor, context._start, p);
       if (pAngle < min || pAngle > max) continue;
+      console.log(
+        `angle permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
+      );
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
-    const sorted = new Map([...good.entries()].sort()); // what ugly is this?
+    const sorted = new Map([...good.entries()].sort());
+    const sortedTwo = new Map([...goodTwo.entries()].sort());
+
+    console.log(sorted);
+    console.log(sortedTwo);
 
     context._operation.startBatchMode();
     let order = 0;
@@ -190,8 +220,8 @@ const FanfieldDialog = Feature.extend({
         if (nextangle >= angle) break; // stop if we've gone too far
         const testlink = new WasabeeLink(
           context._operation,
-          check.options.guid,
-          wp.id
+          wp.id,
+          check.options.guid
         );
         let crossed = false;
         for (const real of context._operation.links) {
@@ -216,7 +246,6 @@ const FanfieldDialog = Feature.extend({
   _angle: function(a, p, ccw) {
     const all = a.latLng; // anchor is always a WasabeePortal
     const pll = p.latLng || p._latlng; // probably not a WasabeePortal (except start/end)
-    // if (!pll) pll = p._latlng; // if not, treat as IITC portal
 
     // always return a positive value so the sort() functions work sanely
     // work in radians since no one sees it and degrees would be slower
@@ -224,17 +253,19 @@ const FanfieldDialog = Feature.extend({
     return 2 + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
   },
 
-  _angleTwo: function(anchor, start, check) {
-    // if slow, cache these
-    const ap = L.Projection.LonLat.project(anchor.latLng);
-    const sp = L.Projection.LonLat.project(start.latLng);
-    const cp = L.Projection.LonLat.project(check.latLng || check._latlng);
+  // angleTwo is another attempt, not using cardnal north, fixes problems with the other,
+  // but makes new ones
+  _angleTwo: function(anchor, start, end) {
+    const C = L.Projection.LonLat.project(anchor.latLng);
+    const A = L.Projection.LonLat.project(start.latLng || start._latlng);
+    const B = L.Projection.LonLat.project(end.latLng || end._latlng);
 
-    const AB = Math.sqrt(Math.pow(sp.x - ap.x, 2) + Math.pow(sp.y - ap.y, 2));
-    const BC = Math.sqrt(Math.pow(sp.x - cp.x, 2) + Math.pow(sp.y - cp.y, 2));
-    const AC = Math.sqrt(Math.pow(cp.x - ap.x, 2) + Math.pow(cp.y - ap.y, 2));
-    const r = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    let r = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
     if (Number.isNaN(r)) return 0;
+    // if (r >= 2) r -= 2;
     return r;
   },
 
