@@ -663,6 +663,18 @@ export default class WasabeeOp {
     operation.cleanAnchorList();
     operation.cleanPortalList();
 
+    // this should not be needed past 0.16
+    if (operation.keysonhand.length > 0) {
+      for (const k in operation.keysonhand) {
+        if (typeof operation.keysonhand[k].onhand == "string") {
+          operation.keysonhand[k].onhand = Number.parseInt(
+            operation.keysonhand[k].onhand,
+            10
+          );
+        }
+      }
+    }
+
     return operation;
   }
 }
