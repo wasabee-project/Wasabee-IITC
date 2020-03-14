@@ -109,6 +109,13 @@ const FanfieldDialog = Feature.extend({
       this.fanfield(context);
     });
 
+    const buttonTwo = L.DomUtil.create("button", null, div);
+    buttonTwo.textContent = "EXPERIMENTAL ALGO";
+    L.DomEvent.on(buttonTwo, "click", () => {
+      const context = this;
+      this.fanfieldTwo(context);
+    });
+
     const context = this;
     this._dialog = window.dialog({
       title: "Fanfield",
@@ -157,9 +164,37 @@ const FanfieldDialog = Feature.extend({
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
 
-    console.log(
-      context._angleTwo(context._anchor, context._start, context._end)
-    );
+    let ccw = false;
+    if (startAngle != min) {
+      console.log("fanfield running counter-clockwise");
+      ccw = true; // must be going counter-clockwise
+      startAngle = context._angle(context._anchor, context._start, true);
+      endAngle = context._angle(context._anchor, context._end, true);
+      min = Math.min(startAngle, endAngle);
+      max = Math.max(startAngle, endAngle);
+    }
+
+    const good = new Map();
+    for (const p of context._getAllPortalsOnScreen()) {
+      if (p.options.guid == context._anchor.id) continue;
+      const pAngle = context._angle(context._anchor, p, ccw);
+      if (pAngle < min || pAngle > max) continue;
+      good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
+    }
+    const sorted = new Map([...good.entries()].sort());
+    context._draw(sorted, context);
+  },
+
+  fanfieldTwo: context => {
+    if (!context._anchor || !context._start || !context._end) {
+      alert("Please set the three portals first!");
+      return;
+    }
+
+    let startAngle = context._angle(context._anchor, context._start, false);
+    let endAngle = context._angle(context._anchor, context._end, false);
+    let min = Math.min(startAngle, endAngle);
+    let max = Math.max(startAngle, endAngle);
 
     let ccw = false;
     if (startAngle != min) {
@@ -172,11 +207,13 @@ const FanfieldDialog = Feature.extend({
     }
 
     // angleTwo only logging for testing now
-    const atwo = context._angleTwo(
-      context._anchor,
-      context._start,
-      context._end
-    );
+    let atwo = context._angleTwo(context._anchor, context._start, context._end);
+    let positive = true;
+    if (atwo < 0) {
+      console.log("angleTwo going negative");
+      atwo = Math.abs(atwo % (Math.PI * 2));
+      positive = false;
+    }
 
     const good = new Map();
     // testing only
@@ -185,11 +222,10 @@ const FanfieldDialog = Feature.extend({
       if (p.options.guid == context._anchor.id) continue;
       const a = context._angleTwo(context._anchor, context._start, p);
       const b = context._angleTwo(context._anchor, p, context._end);
+      // console.log(`checking ${a} / ${b} : ${atwo} ${p.options.data.title}`);
       if (
-        (b > atwo && a > atwo) ||
-        a == 0 ||
-        b == 0 ||
-        (a < atwo % 2 && b < atwo % 2)
+        (positive && b >= atwo && a >= atwo) ||
+        (!positive && b >= atwo && a >= atwo)
       ) {
         console.log(
           `angleTwo permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
@@ -209,6 +245,18 @@ const FanfieldDialog = Feature.extend({
     console.log(sorted);
     console.log(sortedTwo);
 
+    for (const [angle, p] of sorted) {
+      console.log(angle + ": " + p.options.data.title);
+    }
+    console.log("... vs ...");
+    for (const [angle, p] of sortedTwo) {
+      console.log(angle + ": " + p.options.data.title);
+    }
+
+    context._draw(sortedTwo, context);
+  },
+
+  _draw: function(sorted, context) {
     context._operation.startBatchMode();
     let order = 0;
     let fields = 0;
@@ -239,7 +287,7 @@ const FanfieldDialog = Feature.extend({
       }
     }
     context._operation.endBatchMode();
-    let ap = 313 * order + 1250 * fields;
+    const ap = 313 * order + 1250 * fields;
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
@@ -249,24 +297,40 @@ const FanfieldDialog = Feature.extend({
 
     // always return a positive value so the sort() functions work sanely
     // work in radians since no one sees it and degrees would be slower
-    if (ccw) return 4 - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
-    return 2 + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+    if (ccw) return 6 - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+    return 6 + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
   },
 
-  // angleTwo is another attempt, not using cardnal north, fixes problems with the other,
-  // but makes new ones
-  _angleTwo: function(anchor, start, end) {
-    const C = L.Projection.LonLat.project(anchor.latLng);
+  /*
+  _angleTwoOld: function(anchor, start, end) {
+    const C = L.Projection.LonLat.project(anchor.latLng); // center
+
     const A = L.Projection.LonLat.project(start.latLng || start._latlng);
     const B = L.Projection.LonLat.project(end.latLng || end._latlng);
 
-    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
-    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
-    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
-    let r = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+    const AC = Math.sqrt(Math.pow(A.x - C.x, 2) + Math.pow(A.y - C.y, 2));
+    const AB = Math.sqrt(Math.pow(A.x - B.x, 2) + Math.pow(A.y - B.y, 2));
+    const BC = Math.sqrt(Math.pow(C.x - B.x, 2) + Math.pow(C.y - B.y, 2));
+    let r = Math.acos(
+      (Math.pow(AC, 2) + Math.pow(AB, 2) - Math.pow(BC, 2)) / (2 * AC * AB)
+    );
     if (Number.isNaN(r)) return 0;
-    // if (r >= 2) r -= 2;
     return r;
+  }, */
+
+  _angleTwo: function(anchor, start, end) {
+    const _anchor = L.Projection.LonLat.project(anchor.latLng); // center
+    const _start = L.Projection.LonLat.project(start.latLng || start._latlng);
+    const _end = L.Projection.LonLat.project(end.latLng || end._latlng);
+
+    const AB = {};
+    AB.x = _start.x - _anchor.x;
+    AB.y = _start.y - _anchor.y;
+    const AC = {};
+    AC.x = _end.x - _anchor.x;
+    AC.y = _end.y - _anchor.y;
+
+    return Math.atan2(AB.x * AC.x + AB.y * AC.y, AB.y * AC.x - AB.x * AC.y);
   },
 
   _isOnScreen: function(ll, bounds) {
