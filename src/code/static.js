@@ -63,6 +63,7 @@ W.static = {
     MARKER_TYPE_RECHARGE: "RechargePortalAlert",
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
+    MARKER_TYPE_EXCLUDE: "ExcludePortalMarker",
     DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
     BREAK_EXCEPTION: {},
     OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
@@ -204,6 +205,18 @@ W.static.markerTypes = new Map([
       markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
       markerIconDone: require("./images/wasabee_markers_virus_done.png")
     }
+  ],
+    [
+      W.static.constants.MARKER_TYPE_EXCLUDE,
+      {
+        name: W.static.constants.MARKER_TYPE_EXCLUDE,
+        label: "exclude",
+        color: "#8920C3",
+        markerIcon: require("./images/wasabee_markers_virus_pending.png"),
+        markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
+        markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
+        markerIconDone: require("./images/wasabee_markers_virus_done.png")
+      }
   ]
 ]);
 
