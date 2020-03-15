@@ -265,7 +265,7 @@ const FanfieldDialog = Feature.extend({
   },
 
   _angleTwo: function(anchor, start, end) {
-    const A = L.Projection.LonLat.project(anchor.latLng || anchor.latLng);
+    const A = L.Projection.LonLat.project(anchor.latLng || anchor._latLng);
     const B = L.Projection.LonLat.project(start.latLng || start._latlng);
     const C = L.Projection.LonLat.project(end.latLng || end._latlng);
 
