@@ -191,68 +191,30 @@ const FanfieldDialog = Feature.extend({
       return;
     }
 
-    let startAngle = context._angle(context._anchor, context._start, false);
-    let endAngle = context._angle(context._anchor, context._end, false);
-    let min = Math.min(startAngle, endAngle);
-    let max = Math.max(startAngle, endAngle);
-
-    let ccw = false;
-    if (startAngle != min) {
-      console.log("fanfield running counter-clockwise");
-      ccw = true; // must be going counter-clockwise
-      startAngle = context._angle(context._anchor, context._start, true);
-      endAngle = context._angle(context._anchor, context._end, true);
-      min = Math.min(startAngle, endAngle);
-      max = Math.max(startAngle, endAngle);
-    }
-
-    // angleTwo only logging for testing now
     let atwo = context._angleTwo(context._anchor, context._start, context._end);
     let positive = true;
     if (atwo < 0) {
       console.log("angleTwo going negative");
-      atwo = Math.abs(atwo % (Math.PI * 2));
       positive = false;
     }
 
-    const good = new Map();
-    // testing only
     const goodTwo = new Map();
     for (const p of context._getAllPortalsOnScreen()) {
       if (p.options.guid == context._anchor.id) continue;
       const a = context._angleTwo(context._anchor, context._start, p);
       const b = context._angleTwo(context._anchor, p, context._end);
-      // console.log(`checking ${a} / ${b} : ${atwo} ${p.options.data.title}`);
+      console.log(`checking ${a} / ${b} : ${atwo} ${p.options.data.title}`);
       if (
-        (positive && b >= atwo && a >= atwo) ||
-        (!positive && b >= atwo && a >= atwo)
+        (positive && a > 0 && b > 0 && b <= atwo && a <= atwo) ||
+        (!positive && a < 0 && b < 0 && b >= atwo && a >= atwo)
       ) {
         console.log(
           `angleTwo permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
         );
         goodTwo.set(a, p);
       }
-      const pAngle = context._angle(context._anchor, p, ccw);
-      if (pAngle < min || pAngle > max) continue;
-      console.log(
-        `angle permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
-      );
-      good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
-    const sorted = new Map([...good.entries()].sort());
     const sortedTwo = new Map([...goodTwo.entries()].sort());
-
-    console.log(sorted);
-    console.log(sortedTwo);
-
-    for (const [angle, p] of sorted) {
-      console.log(angle + ": " + p.options.data.title);
-    }
-    console.log("... vs ...");
-    for (const [angle, p] of sortedTwo) {
-      console.log(angle + ": " + p.options.data.title);
-    }
-
     context._draw(sortedTwo, context);
   },
 
@@ -297,40 +259,24 @@ const FanfieldDialog = Feature.extend({
 
     // always return a positive value so the sort() functions work sanely
     // work in radians since no one sees it and degrees would be slower
-    if (ccw) return 6 - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
-    return 6 + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+    if (ccw)
+      return 2 * Math.PI - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+    return 2 * Math.PI + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
   },
 
-  /*
-  _angleTwoOld: function(anchor, start, end) {
-    const C = L.Projection.LonLat.project(anchor.latLng); // center
-
-    const A = L.Projection.LonLat.project(start.latLng || start._latlng);
-    const B = L.Projection.LonLat.project(end.latLng || end._latlng);
-
-    const AC = Math.sqrt(Math.pow(A.x - C.x, 2) + Math.pow(A.y - C.y, 2));
-    const AB = Math.sqrt(Math.pow(A.x - B.x, 2) + Math.pow(A.y - B.y, 2));
-    const BC = Math.sqrt(Math.pow(C.x - B.x, 2) + Math.pow(C.y - B.y, 2));
-    let r = Math.acos(
-      (Math.pow(AC, 2) + Math.pow(AB, 2) - Math.pow(BC, 2)) / (2 * AC * AB)
-    );
-    if (Number.isNaN(r)) return 0;
-    return r;
-  }, */
-
   _angleTwo: function(anchor, start, end) {
-    const _anchor = L.Projection.LonLat.project(anchor.latLng); // center
-    const _start = L.Projection.LonLat.project(start.latLng || start._latlng);
-    const _end = L.Projection.LonLat.project(end.latLng || end._latlng);
+    const A = L.Projection.LonLat.project(anchor.latLng || anchor.latLng);
+    const B = L.Projection.LonLat.project(start.latLng || start._latlng);
+    const C = L.Projection.LonLat.project(end.latLng || end._latlng);
 
-    const AB = {};
-    AB.x = _start.x - _anchor.x;
-    AB.y = _start.y - _anchor.y;
-    const AC = {};
-    AC.x = _end.x - _anchor.x;
-    AC.y = _end.y - _anchor.y;
+    const AB = Math.atan2(B.x - A.x, B.y - A.y);
+    const AC = Math.atan2(C.x - A.x, C.y - A.y);
 
-    return Math.atan2(AB.x * AC.x + AB.y * AC.y, AB.y * AC.x - AB.x * AC.y);
+    let r = Math.abs(AB) + Math.abs(AC);
+    // if it is bigger than Pi, it must have gone negative
+    if (r > Math.PI) r = 0 - (2 * Math.PI - r);
+    console.log("r: ", r);
+    return r;
   },
 
   _isOnScreen: function(ll, bounds) {
