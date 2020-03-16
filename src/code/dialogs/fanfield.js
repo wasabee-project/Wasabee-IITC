@@ -3,7 +3,7 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
-import UiCommands from "../uiCommands";
+import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
 
 const FanfieldDialog = Feature.extend({
   statics: {
@@ -132,7 +132,7 @@ const FanfieldDialog = Feature.extend({
           this._dialog.dialog("close");
         },
         "Clear All": () => {
-          UiCommands.clearAllItems(getSelectedOperation());
+          clearAllItems(getSelectedOperation());
         }
       }
     });
@@ -175,7 +175,7 @@ const FanfieldDialog = Feature.extend({
     }
 
     const good = new Map();
-    for (const p of context._getAllPortalsOnScreen()) {
+    for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
       const pAngle = context._angle(context._anchor, p, ccw);
       if (pAngle < min || pAngle > max) continue;
@@ -199,7 +199,7 @@ const FanfieldDialog = Feature.extend({
     }
 
     const goodTwo = new Map();
-    for (const p of context._getAllPortalsOnScreen()) {
+    for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
       const a = context._angleTwo(context._anchor, context._start, p);
       const b = context._angleTwo(context._anchor, p, context._end);
@@ -277,45 +277,6 @@ const FanfieldDialog = Feature.extend({
     if (r > Math.PI) r = 0 - (2 * Math.PI - r);
     console.log("r: ", r);
     return r;
-  },
-
-  _isOnScreen: function(ll, bounds) {
-    return (
-      ll.lat < bounds._northEast.lat &&
-      ll.lng < bounds._northEast.lng &&
-      ll.lat > bounds._southWest.lat &&
-      ll.lng > bounds._southWest.lng
-    );
-  },
-
-  _getAllPortalsOnScreen: function() {
-    console.log(this);
-    const bounds = window.clampLatLngBounds(window.map.getBounds());
-    const x = [];
-    for (const portal in window.portals) {
-      if (this._isOnScreen(window.portals[portal].getLatLng(), bounds)) {
-        if (
-          this._hasMarker(
-            window.portals[portal].options.guid,
-            window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
-          )
-        )
-          continue;
-        x.push(window.portals[portal]);
-      }
-    }
-    return x;
-  },
-
-  // operation.constainsMarker expects a WasabeePortal
-  _hasMarker(portalid, markerType) {
-    if (this._operation.markers.length == 0) return false;
-    for (const m of this._operation.markers) {
-      if (m.portalId == portalid && m.type == markerType) {
-        return true;
-      }
-    }
-    return false;
   }
 });
 

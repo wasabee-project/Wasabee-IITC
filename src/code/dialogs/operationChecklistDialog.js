@@ -4,7 +4,7 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
-import UiCommands from "../uiCommands";
+import { listenForAddedPortals } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 
@@ -29,7 +29,7 @@ const OperationChecklistDialog = Feature.extend({
       context.checklistUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.addHook("portalAdded", listenForAddedPortals);
 
     for (const f of this._operation.fakedPortals) {
       if (f.id.length != 35) window.portalDetail.request(f.id);
@@ -41,7 +41,7 @@ const OperationChecklistDialog = Feature.extend({
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.removeHook("portalAdded", listenForAddedPortals);
   },
 
   _displayDialog: function() {

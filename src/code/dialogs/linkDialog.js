@@ -1,5 +1,5 @@
 import { Feature } from "../leafletDrawImports";
-import UiCommands from "../uiCommands.js";
+import { addPortal } from "../uiCommands.js";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 
@@ -216,7 +216,7 @@ const LinkDialog = Feature.extend({
           gotPortal => gotPortal.id == sentPortal.id
         )
         ? resolvedLocalData
-        : UiCommands.addPortal(this._operation, sentPortal)
+        : addPortal(this._operation, sentPortal)
       : Promise.reject("no portal given");
   },
 

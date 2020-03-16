@@ -1,4 +1,4 @@
-import UiCommands from "./uiCommands.js";
+import { showLinksDialog, swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
@@ -62,19 +62,19 @@ export default class WasabeeAnchor {
     const linksButton = L.DomUtil.create("a", "", buttonSet);
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", () => {
-      UiCommands.showLinksDialog(operation, this._portal);
+      showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
     const swapButton = L.DomUtil.create("a", null, buttonSet);
     swapButton.textContent = wX("SWAP");
     L.DomEvent.on(swapButton, "click", () => {
-      UiCommands.swapPortal(operation, this._portal);
+      swapPortal(operation, this._portal);
       marker.closePopup();
     });
     const deleteButton = L.DomUtil.create("a", null, buttonSet);
     deleteButton.textContent = wX("DELETE");
     L.DomEvent.on(deleteButton, "click", () => {
-      UiCommands.deletePortal(operation, this._portal);
+      deletePortal(operation, this._portal);
       marker.closePopup();
     });
 

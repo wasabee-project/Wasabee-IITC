@@ -4,7 +4,7 @@ import PromptDialog from "./promptDialog";
 import AboutDialog from "./about";
 import store from "../../lib/store";
 import { getSelectedOperation } from "../selectedOp";
-import UiCommands from "../uiCommands";
+import { sendLocation } from "../uiCommands";
 import wX from "../wX";
 
 const AuthDialog = Feature.extend({
@@ -169,7 +169,7 @@ const AuthDialog = Feature.extend({
           localStorage[
             window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
           ] = true;
-          UiCommands.sendLocation();
+          sendLocation();
         } else {
           window.plugin.wasabee.sendLocation = false;
           localStorage[

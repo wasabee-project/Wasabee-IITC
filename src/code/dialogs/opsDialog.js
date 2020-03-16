@@ -1,6 +1,6 @@
 import { Feature } from "../leafletDrawImports";
 import { deleteOpPromise } from "../server";
-import UiCommands from "../uiCommands";
+import { clearAllItems } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
 import {
   getSelectedOperation,
@@ -161,7 +161,7 @@ const OpsDialog = Feature.extend({
       const clearOpButton = L.DomUtil.create("a", null, buttonSection);
       clearOpButton.innerHTML = "Clear Portals/Links/Markers";
       L.DomEvent.on(clearOpButton, "click", () => {
-        UiCommands.clearAllItems(selectedOp);
+        clearAllItems(selectedOp);
         selectedOp.store();
       });
     }

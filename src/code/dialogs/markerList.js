@@ -5,7 +5,7 @@ import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import OverflowMenu from "../overflowMenu";
-import UiCommands from "../uiCommands";
+import { listenForAddedPortals } from "../uiCommands";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -27,13 +27,13 @@ const MarkerList = Feature.extend({
       context.markerListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 

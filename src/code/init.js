@@ -5,7 +5,7 @@ import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
-import UiCommands from "./uiCommands";
+import { sendLocation } from "./uiCommands";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -54,7 +54,7 @@ window.plugin.wasabee.init = function() {
   if (window.addResumeFunction) {
     window.addResumeFunction(() => {
       window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
-      UiCommands.sendLocation();
+      sendLocation();
     });
   }
 

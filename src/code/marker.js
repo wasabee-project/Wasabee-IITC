@@ -1,5 +1,5 @@
 import { generateId } from "./auxiliar";
-import UiCommands from "./uiCommands.js";
+import { deleteMarker } from "./uiCommands.js";
 import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 import wX from "./wX";
@@ -85,7 +85,7 @@ export default class WasabeeMarker {
     const deleteButton = L.DomUtil.create("a", null, buttonSet);
     deleteButton.textContent = wX("DELETE");
     L.DomEvent.on(deleteButton, "click", () => {
-      UiCommands.deleteMarker(operation, this, portal);
+      deleteMarker(operation, this, portal);
       marker.closePopup();
     });
 

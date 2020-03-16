@@ -1,7 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
-import UiCommands from "../uiCommands";
+import { listenForAddedPortals } from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
 
@@ -25,14 +25,14 @@ const BlockerList = Feature.extend({
       context.blockerlistUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.removeHook("portalAdded", UiCommands.listenForAddedPortals);
+    window.removeHook("portalAdded", listenForAddedPortals);
   },
 
   _displayDialog: function() {

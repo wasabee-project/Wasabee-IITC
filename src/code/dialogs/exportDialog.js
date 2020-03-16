@@ -55,6 +55,7 @@ const ExportDialog = Feature.extend({
       "ui-dialog-wasabee-copy",
       mainContent
     );
+    this._operation.cleanAll();
     textArea.innerHTML =
       "<p><a onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">Select all</a> and press CTRL+C to copy it.</p>" +
       '<textarea readonly onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();" id="wasabee-export-dialog-textarea">' +
