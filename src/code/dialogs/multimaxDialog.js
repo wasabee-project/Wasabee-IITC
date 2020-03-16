@@ -218,10 +218,30 @@ const MultimaxDialog = Feature.extend({
     const x = [];
     for (const portal in window.portals) {
       if (this._isOnScreen(window.portals[portal].getLatLng(), bounds)) {
+        if (
+          this._hasMarker(
+            window.portals[portal].options.guid,
+            window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+          )
+        ) {
+          console.log("skipping ", window.portals[portal].options.guid);
+          continue;
+        }
         x.push(window.portals[portal]);
       }
     }
     return x;
+  },
+
+  // operation.constainsMarker expects a WasabeePortal
+  _hasMarker(portalid, markerType) {
+    if (this._operation.markers.length == 0) return false;
+    for (const m of this._operation.markers) {
+      if (m.portalId == portalid && m.type == markerType) {
+        return true;
+      }
+    }
+    return false;
   }
 });
 
