@@ -181,6 +181,19 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  cleanAll() {
+    this.cleanAnchorList();
+    this.cleanPortalList();
+    this.cleanCaches();
+    this.store();
+  }
+
+  cleanCaches() {
+    for (const l of this.links) {
+      delete l._crosslinksGL;
+    }
+  }
+
   cleanAnchorList() {
     var newAnchorList = [];
     for (const a of this.anchors) {

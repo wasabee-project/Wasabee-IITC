@@ -14,8 +14,8 @@ const UploadButton = WButton.extend({
 
     this.type = UploadButton.TYPE;
     // this.handler = null;
-    this._operation = getSelectedOperation();
-    this.title = `Upload ${this._operation.name}`;
+    const operation = getSelectedOperation();
+    this.title = `Upload ${operation.name}`;
     this._container = container;
 
     this.button = this._createButton({
@@ -24,11 +24,12 @@ const UploadButton = WButton.extend({
       buttonImage: window.plugin.wasabee.static.images.toolbar_upload.default,
       context: this,
       callback: () => {
-        if (this._operation.IsServerOp()) {
-          updateOpPromise(this._operation).then(
+        const operation = getSelectedOperation();
+        if (operation.IsServerOp()) {
+          updateOpPromise().then(
             () => {
               alert(wX("UPDATED"));
-              this.Wupdate(this._container, this._operation);
+              this.Wupdate(this._container, operation);
             },
             reject => {
               console.log(reject);
@@ -37,20 +38,22 @@ const UploadButton = WButton.extend({
           );
           return;
         }
-        uploadOpPromise(this._operation).then(
+        uploadOpPromise().then(
           resolve => {
+            console.log(resolve);
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
             alert(wX("UPLOADED"));
-            this.Wupdate(this._container, this._operation);
+            this.Wupdate(this._container, resolve);
             this._invisible();
           },
           reject => {
             // this shouldn't be necessary, but the UI is behind
-            updateOpPromise(this._operation).then(
+            updateOpPromise().then(
               () => {
+                const operation = getSelectedOperation();
                 alert(wX("UPDATED"));
-                this.Wupdate(this._container, this._operation);
+                this.Wupdate(this._container, operation);
               },
               reject => {
                 console.log(reject);
@@ -65,10 +68,6 @@ const UploadButton = WButton.extend({
   },
 
   Wupdate: function(container, operation) {
-    if (this._operation.ID != operation.ID) {
-      this._operation = operation;
-    }
-
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
       this.title = wX("NOT LOGGED IN SHORT");
@@ -78,7 +77,7 @@ const UploadButton = WButton.extend({
 
     if (!operation.IsServerOp()) {
       this._visible();
-      this.title = wX("UPLOAD BUTTON HOVER", this._operation.name);
+      this.title = wX("UPLOAD BUTTON HOVER", operation.name);
       this.button.title = this.title;
       return;
     }
@@ -91,13 +90,13 @@ const UploadButton = WButton.extend({
     }
 
     if (!operation.localchanged) {
-      this.title = wX("UPDATE HOVER NOT CHANGED", this._operation.name);
+      this.title = wX("UPDATE HOVER NOT CHANGED", operation.name);
       this.button.title = this.title;
       this._invisible();
       return;
     }
 
-    this.title = wX("UPDATE HOVER", this._operation.name);
+    this.title = wX("UPDATE HOVER", operation.name);
     this.button.title = this.title;
     this._visible();
   },

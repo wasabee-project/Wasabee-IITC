@@ -92,7 +92,7 @@ const AssignDialog = Feature.extend({
 
   _upload: function(operation) {
     if (!operation.localchanged) return;
-    updateOpPromise(operation).then(
+    updateOpPromise().then(
       function() {
         console.log(
           "modified op: " +

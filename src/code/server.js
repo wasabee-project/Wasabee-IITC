@@ -3,7 +3,7 @@ import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
 import store from "../lib/store";
-import { getOperationByID } from "./selectedOp";
+import { getSelectedOperation, getOperationByID } from "./selectedOp";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -12,8 +12,14 @@ export default function() {
   return GetWasabeeServer();
 }
 
-export const uploadOpPromise = function(operation) {
+export const uploadOpPromise = function() {
   const SERVER_BASE = GetWasabeeServer();
+
+  const operation = getSelectedOperation();
+  operation.cleanAll();
+  const json = JSON.stringify(operation);
+  // console.log(json);
+
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw`;
     const req = new XMLHttpRequest();
@@ -27,8 +33,9 @@ export const uploadOpPromise = function(operation) {
           WasabeeMe.create(req.response); // free update
           opPromise(operation.ID).then(
             function(newop) {
-              newop.store();
               newop.localchanged = false;
+              newop.store();
+              console.log(newop);
               resolve(newop);
             },
             function(err) {
@@ -58,12 +65,18 @@ export const uploadOpPromise = function(operation) {
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send(JSON.stringify(operation));
+    req.send(json);
   });
 };
 
-export const updateOpPromise = function(operation) {
+export const updateOpPromise = function() {
   const SERVER_BASE = GetWasabeeServer();
+
+  const operation = getSelectedOperation();
+  operation.cleanAll();
+  const json = JSON.stringify(operation);
+  // console.log(json);
+
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
     const req = new XMLHttpRequest();
@@ -91,7 +104,7 @@ export const updateOpPromise = function(operation) {
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send(JSON.stringify(operation));
+    req.send(json);
   });
 };
 
