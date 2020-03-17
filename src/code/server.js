@@ -728,6 +728,100 @@ export const leaveTeamPromise = function(teamID) {
   });
 };
 
+export const removeAgentFromTeamPromise = function(agentID, teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`;
+    const req = new XMLHttpRequest();
+
+    req.open("DELETE", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+    req.send();
+  });
+};
+
+export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}/squad`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+    const fd = new FormData();
+    fd.append("squad", squad);
+    req.send(fd);
+  });
+};
+
+export const addAgentToTeamPromise = function(agentID, teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        case 302:
+          console.log(req);
+          resolve(true);
+          break;
+        default:
+          console.log(req);
+          reject(`${req.status}: ${req.statusText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.statusText}`);
+    };
+    req.send();
+  });
+};
+
 export const GetWasabeeServer = function() {
   let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
   if (server == null) {
