@@ -15,6 +15,7 @@ import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
+import ManageTeamDialog from "./manageTeamDialog";
 
 const WasabeeDialog = Feature.extend({
   statics: {
@@ -67,6 +68,11 @@ const WasabeeDialog = Feature.extend({
           link.onclick = async () => {
             curstate = await this.toggleTeam(obj.ID, curstate);
             link.innerHTML = curstate;
+            if (curstate == "On") {
+              L.DomUtil.addClass(link, "enl");
+            } else {
+              L.DomUtil.removeClass(link, "enl");
+            }
           };
         }
       },
@@ -77,16 +83,18 @@ const WasabeeDialog = Feature.extend({
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.innerHTML = "Leave";
+          // use L.DomEvent.on
           link.onclick = () => {
             const cd = new ConfirmDialog();
             cd.setup(
               `Leave ${obj.Name}?`,
-              `If you leave <span class="enl">${obj.Name}</span> you cannot rejoin unless the owner re-adds you.`,
+              `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
               () => {
                 leaveTeamPromise(obj.ID).then(
                   async () => {
                     // the lazy way
                     this._me = await WasabeeMe.waitGet(true);
+                    console.log(this);
                     this._dialog.dialog("close");
                     this._displayDialog();
                   },
@@ -99,6 +107,25 @@ const WasabeeDialog = Feature.extend({
             );
             cd.enable();
           };
+        }
+      },
+      {
+        name: "Manage",
+        value: team => team.ID,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, obj) => {
+          row.textContent = "";
+          for (const ot of this._me.OwnedTeams) {
+            if (ot.ID == obj.ID) {
+              const link = L.DomUtil.create("a", "enl", row);
+              link.textContent = "Manage";
+              L.DomEvent.on(link, "click", () => {
+                const mtd = new ManageTeamDialog();
+                mtd.setup(obj);
+                mtd.enable();
+              });
+            }
+          }
         }
       }
     ];
@@ -184,9 +211,8 @@ const WasabeeDialog = Feature.extend({
     let newState = "Off";
     if (currentState == "Off") newState = "On";
 
-    SetTeamState(teamID, newState);
+    await SetTeamState(teamID, newState);
     this._me = await WasabeeMe.waitGet(true);
-    // instead of just changing the display, trigger a full redraw?
     return newState;
   },
 
