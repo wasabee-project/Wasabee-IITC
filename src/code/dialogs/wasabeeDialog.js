@@ -121,7 +121,7 @@ const WasabeeDialog = Feature.extend({
               link.textContent = "Manage";
               L.DomEvent.on(link, "click", () => {
                 const mtd = new ManageTeamDialog();
-                mtd.setup(obj);
+                mtd.setup(ot);
                 mtd.enable();
               });
             }
