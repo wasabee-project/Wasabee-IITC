@@ -186,12 +186,18 @@ const WasabeeDialog = Feature.extend({
             const ad = new AboutDialog();
             ad.enable();
           },
-          "Log out": async () => {
-            await logoutPromise();
-            //logoutPromise calls WasabeeMe.purge, which runs this, but do it twice just in case
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            window.runHooks("wasabeeDkeys");
-            this._dialog.dialog("close");
+          "Log out": () => {
+            logoutPromise().then(
+              () => {
+                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                window.runHooks("wasabeeDkeys");
+                this._dialog.dialog("close");
+              },
+              err => {
+                alert(err);
+                console.log(err);
+              }
+            );
           },
           "New Team": () => {
             const p = new PromptDialog(window.map);

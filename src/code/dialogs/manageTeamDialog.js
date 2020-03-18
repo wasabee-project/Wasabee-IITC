@@ -88,15 +88,14 @@ const ManageTeamDialog = Feature.extend({
       },
       {
         name: "Remove",
-        value: agent => agent.ID,
+        value: agent => agent.id,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value, obj) => {
+        format: (cell, value) => {
           const button = L.DomUtil.create("a", null, cell);
           button.textContent = "remove";
           L.DomEvent.on(button, "click", () => {
-            removeAgentFromTeamPromise(obj.id, this._team.ID).then(
-              resolve => {
-                console.log(resolve);
+            removeAgentFromTeamPromise(value, this._team.ID).then(
+              () => {
                 window.runHooks("wasabeeUIUpdate", getSelectedOperation());
               },
               reject => {

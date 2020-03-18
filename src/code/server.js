@@ -745,7 +745,7 @@ export const removeAgentFromTeamPromise = function(agentID, teamID) {
           resolve(true);
           break;
         default:
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
