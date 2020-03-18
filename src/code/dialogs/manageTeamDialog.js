@@ -3,7 +3,8 @@ import {
   teamPromise,
   removeAgentFromTeamPromise,
   setAgentTeamSquadPromise,
-  addAgentToTeamPromise
+  addAgentToTeamPromise,
+  renameTeamPromise
 } from "../server";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
@@ -167,6 +168,18 @@ const ManageTeamDialog = Feature.extend({
     renameField.value = this._team.Name;
     const renameButton = L.DomUtil.create("button", null, renamelabel);
     renameButton.textContent = "Rename";
+    L.DomEvent.on(renameButton, "click", () => {
+      renameTeamPromise(this._team.ID, renameField.value).then(
+        () => {
+          alert(`renamed to ${renameField.value}`);
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        },
+        reject => {
+          console.log(reject);
+          alert(reject);
+        }
+      );
+    });
 
     const rocks = L.DomUtil.create("div", null, container);
     const rockslabel = L.DomUtil.create("label", null, rocks);
