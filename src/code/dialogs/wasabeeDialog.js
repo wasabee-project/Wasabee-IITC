@@ -17,6 +17,7 @@ import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
+import wX from "../wX";
 
 const WasabeeDialog = Feature.extend({
   statics: {
@@ -40,7 +41,7 @@ const WasabeeDialog = Feature.extend({
     const teamlist = new Sortable();
     teamlist.fields = [
       {
-        name: "Team Name",
+        name: wX("TEAM_NAME"),
         value: team => team.Name,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
@@ -58,7 +59,7 @@ const WasabeeDialog = Feature.extend({
         }
       },
       {
-        name: "State",
+        name: wX("STATE"),
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
@@ -78,7 +79,7 @@ const WasabeeDialog = Feature.extend({
         }
       },
       {
-        name: "Leave",
+        name: wX("LEAVE"),
         value: team => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
@@ -111,7 +112,7 @@ const WasabeeDialog = Feature.extend({
         }
       },
       {
-        name: "Manage",
+        name: wX("MANAGE"),
         value: team => team.ID,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
@@ -119,7 +120,7 @@ const WasabeeDialog = Feature.extend({
           for (const ot of this._me.OwnedTeams) {
             if (ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
-              link.textContent = "Manage";
+              link.textContent = wX("MANAGE");
               L.DomEvent.on(link, "click", () => {
                 const mtd = new ManageTeamDialog();
                 mtd.setup(ot);
@@ -140,7 +141,7 @@ const WasabeeDialog = Feature.extend({
     const options = L.DomUtil.create("div", "temp-op-dialog", html);
     const locbutton = L.DomUtil.create("a", null, options);
     locbutton.style.align = "center";
-    locbutton.textContent = "Send Location";
+    locbutton.textContent = wX("SEND_LOC");
     L.DomEvent.on(locbutton, "click", () => {
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -149,7 +150,7 @@ const WasabeeDialog = Feature.extend({
             position.coords.longitude
           ).then(
             () => {
-              alert("location processed");
+              alert(wX("LOC_PROC"));
             },
             err => {
               console.log(err);
@@ -173,7 +174,7 @@ const WasabeeDialog = Feature.extend({
 
     if (this._me) {
       this._dialog = window.dialog({
-        title: "Current User Information",
+        title: wX("CUR_USER_INFO"),
         width: "auto",
         height: "auto",
         html: this._html,
@@ -201,15 +202,15 @@ const WasabeeDialog = Feature.extend({
           },
           "New Team": () => {
             const p = new PromptDialog(window.map);
-            p.setup("Create New Team", "Name", () => {
+            p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
               const newname = p.inputField.value;
               if (!newname) {
-                alert("name required");
+                alert(wX("NAME_REQ"));
                 return;
               }
               newTeamPromise(newname).then(
                 () => {
-                  alert(`Team ${newname} created`);
+                  alert(wX("TEAM_CREATED"));
                   window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                 },
                 reject => {
@@ -218,8 +219,8 @@ const WasabeeDialog = Feature.extend({
                 }
               );
             });
-            p.current = "New Team Name";
-            p.placeholder = "Amazing team name";
+            p.current = wX("NEW_TEAM_NAME");
+            p.placeholder = wX("AMAZ_TEAM_NAME");
             p.enable();
           }
         },
@@ -252,7 +253,7 @@ const WasabeeDialog = Feature.extend({
 
   setServer: function() {
     const serverDialog = new PromptDialog(window.map);
-    serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
+    serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
       if (serverDialog.inputField.value) {
         store.set(
           window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
@@ -268,3 +269,4 @@ const WasabeeDialog = Feature.extend({
 });
 
 export default WasabeeDialog;
+
