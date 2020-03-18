@@ -7,7 +7,8 @@ import {
   SetTeamState,
   locationPromise,
   logoutPromise,
-  leaveTeamPromise
+  leaveTeamPromise,
+  newTeamPromise
 } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
@@ -185,12 +186,35 @@ const WasabeeDialog = Feature.extend({
             const ad = new AboutDialog();
             ad.enable();
           },
-          Logout: async () => {
+          "Log out": async () => {
             await logoutPromise();
             //logoutPromise calls WasabeeMe.purge, which runs this, but do it twice just in case
             window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             window.runHooks("wasabeeDkeys");
             this._dialog.dialog("close");
+          },
+          "New Team": () => {
+            const p = new PromptDialog(window.map);
+            p.setup("Create New Team", "Name", () => {
+              const newname = p.inputField.value;
+              if (!newname) {
+                alert("name required");
+                return;
+              }
+              newTeamPromise(newname).then(
+                () => {
+                  alert(`Team ${newname} created`);
+                  window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                },
+                reject => {
+                  console.log(reject);
+                  alert(reject);
+                }
+              );
+            });
+            p.current = "New Team Name";
+            p.placeholder = "Amazing team name";
+            p.enable();
           }
         },
 
