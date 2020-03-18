@@ -43,6 +43,7 @@ const WasabeeDialog = Feature.extend({
   },
 
   update: async function() {
+    if (!this._enabled) return;
     // TODO find the edge cases where this isn't set
     if (this._dialog) {
       this._me = await WasabeeMe.waitGet(true);
