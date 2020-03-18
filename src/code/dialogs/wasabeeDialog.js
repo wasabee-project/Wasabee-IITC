@@ -26,6 +26,12 @@ const WasabeeDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = WasabeeDialog.TYPE;
+    // magic context incantation to make "this" work...
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.update(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     Feature.prototype.initialize.call(this, map, options);
   },
 
@@ -34,6 +40,15 @@ const WasabeeDialog = Feature.extend({
     this._me = await WasabeeMe.waitGet(true);
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
+  },
+
+  update: async function() {
+    // TODO find the edge cases where this isn't set
+    if (this._dialog) {
+      this._me = await WasabeeMe.waitGet(true);
+      this._buildContent; // builds this._html;
+      this._dialog.html(this._html);
+    }
   },
 
   _buildContent: function() {
@@ -225,6 +240,7 @@ const WasabeeDialog = Feature.extend({
         },
 
         closeCallback: () => {
+          window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
           this.disable();
           delete this._dialog;
         },
