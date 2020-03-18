@@ -42,8 +42,8 @@ const MarkerList = Feature.extend({
       if (f.id.length != 35) window.portalDetail.request(f.id);
     }
 
-    this._listDialogData = window.dialog({
-      title: "Marker List: " + this._operation.name,
+    this._dialog = window.dialog({
+      title: `Marker List: ${this._operation.name}`,
       width: "auto",
       height: "auto",
       position: {
@@ -54,7 +54,7 @@ const MarkerList = Feature.extend({
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: () => {
         this.disable();
-        delete this._listDialogData;
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerList
     });
@@ -62,13 +62,9 @@ const MarkerList = Feature.extend({
 
   markerListUpdate: function(operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
-    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.markerList;
-    if (window.DIALOGS[id]) {
-      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
-        "Marker List: " + operation.name;
-      const table = this.getListDialogContent(operation).table;
-      window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
-    }
+    const table = this.getListDialogContent(operation).table;
+    this._dialog.html(table);
+    this._dialog.dialog("option", "title", `Marker List: ${operation.name}`);
   },
 
   getListDialogContent: function(operation) {
