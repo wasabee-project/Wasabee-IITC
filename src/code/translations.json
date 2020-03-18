@@ -1,7 +1,4 @@
-{
-    "en":
-    {
-      "last edited": "03-03-2020 @deviousness",
+t edited": "03-03-2020 @deviousness",
       "DISABLE_SYNC": "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee",
       "SEND TARGET": "Send Target",
       "SELECT PORTAL": "Select a portal to send",
@@ -118,18 +115,48 @@
       "CHANGE SERVER": "Change Server",
       "CHANGE SERVER PROMPT": "New Wasabee Server",
       "ABOUT WASABEE-IITC": "About Wasabee-IITC",
+      "ABOUT_WASABEE": "About Wasabee",
       "AUTH REQUIRED": "Authentication Required",
-      "AUTOMARK STOP": "Auto-Mark stopped due to portals not being loaded"
+      "AUTOMARK STOP": "Auto-Mark stopped due to portals not being loaded",
+      "NEW_OP": "New Operation",
+      "SET_NEW_OP": "Please Set the New Operation Name",
+      "OP_NAME_UNSET": "Operation Name was Unset",
+      "MUST_NOT_BE_EMPTY": "Must Not Be Empty",
+      "IMPORT_OP": "Import Operation",
+      "ADD_NEW_OP": "Add New Op",
+      "TEAM_NAME"): "Team Name",
+      "STATE": "State",
+      "LEAVE": "Leave",
+      "MANAGE": "Manage",
+      "SEND_LOC": "Send Location",
+      "LOC_PROC": "location processed",
+      "CUR_USER_INFO": "Current User Information",
+      "NEW_TEAM_NAME": "New Team Name",
+      "AMAZ_TEAM_NAME": "Amazing team name",
+      "CHANGE_WAS_SERVER": "Change Wasabee Server",
+      "NEW_WAS_SERVER": "New Waasbee Server",
+      "CREATE_NEW_TEAM": "Create New Team",
+      "NTNAME": "Name",
+      "NAME_REQ": "name required",
+      "NOT_LOADED": "Not fully loaded, try again.",
+      "AGENT": "Agent",
+      "SQUAD": "Squad",
+      "LOC_UPDATE": "Location Update",
+      "SET_LCOMMENT": "Set Link Comment",
+      "SET_MCOMMENT": "Set Marker Comment: ",
+      "SET_PCOMMENT": "Set Portal Comment: ",
+      "TEAM_CREATED": "Team ${newname} created";
+
     },
     "es":
     {
       "last edited": "03-03-2020 @crystalwizard",
-      "DISABLE_SYNC": "Wasabee no puede funcionar si la sync enchufar está instalada. Deshabilita la sync enchufar para usar Wasabee.",
+      "DISABLE_SYNC": "Wasabee no puede funcionar si la sync enchufar estÃ¡ instalada. Deshabilita la sync enchufar para usar Wasabee.",
       "SEND TARGET": "Enviar objetivo",
       "SELECT PORTAL": "Elija el portal de destino para enviar",
       "SEND TARGET CONFIRM": "Quieres enviar ${value} objetivo para ${option}?",
       "TARGET SENT": "Objetivo enviado",
-      "AGES": " (última ubicación actualizada)",
+      "AGES": " (Ãºltima ubicaciÃ³n actualizada)",
       "HOURS": " (Hace ${value} horas)",
       "MINUTES": " (Hace ${value} minutos)",
       "SECONDS": " (Hace ${value} segundos)",
@@ -141,7 +168,7 @@
     "it":
     {
       "last edited": "04-03-2020 @Bolina66",
-      "DISABLE_SYNC": "Wasabee non può funzionare se è installato il plugin di sincronizzazione. Disabilita il plugin di sincronizzazione per utilizzare Wasabee.",
+      "DISABLE_SYNC": "Wasabee non puÃ² funzionare se Ã¨ installato il plugin di sincronizzazione. Disabilita il plugin di sincronizzazione per utilizzare Wasabee.",
       "SEND TARGET": "Invia obiettivo",
       "SELECT PORTAL": "Seleziona un portale da inviare",
       "SEND TARGET CONFIRM": "Vuoi inviare ${value} obiettivo a ${option}?",
@@ -156,3 +183,4 @@
       "ASSIGN OUTBOUND": "Assegna collegamenti in uscita"
   }
 }
+
