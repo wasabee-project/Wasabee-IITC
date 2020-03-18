@@ -55,13 +55,13 @@ export const uploadOpPromise = function() {
           reject(req.response);
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -94,13 +94,13 @@ export const updateOpPromise = function() {
           reject(wX("UPDATE PERM DENIED"));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -126,13 +126,13 @@ export const deleteOpPromise = function(opID) {
           reject(wX("DELETE PERM DENIED"));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -161,13 +161,13 @@ export const teamPromise = function(teamid) {
           reject(wX("TEAM PERM DENIED", teamid));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -207,13 +207,13 @@ export const opPromise = function(opID) {
           reject(wX("OP PERM DENIED", opID));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -238,16 +238,16 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
+          reject(wX("NOT LOGGED IN", req.responseText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -276,16 +276,16 @@ export const agentPromise = function(GID, force) {
             resolve(WasabeeAgent.create(req.response));
             break;
           case 401:
-            reject(wX("NOT LOGGED IN", req.statusText));
+            reject(wX("NOT LOGGED IN", req.responseText));
             break;
           default:
-            reject(`${req.status}: ${req.statusText} ${req.response}`);
+            reject(`${req.status}: ${req.statusText} ${req.responseText}`);
             break;
         }
       };
 
       req.onerror = function() {
-        reject(`Network Error: ${req.statusText}`);
+        reject(`Network Error: ${req.responseText}`);
       };
 
       req.send();
@@ -311,13 +311,13 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -344,13 +344,13 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -377,13 +377,13 @@ export const targetPromise = function(agent, portal) {
           resolve(true);
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -413,13 +413,13 @@ export const SendAccessTokenAsync = function(accessToken) {
           break;
         default:
           alert(wX("AUTH TOKEN REJECTED", req.statusText));
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json");
@@ -447,13 +447,13 @@ export const SetTeamState = function(teamID, state) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -480,13 +480,13 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -516,13 +516,13 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -553,13 +553,13 @@ export const dKeylistPromise = function() {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -586,13 +586,13 @@ export const locationPromise = function(lat, lng) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -623,7 +623,7 @@ export const logoutPromise = function() {
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     req.send();
@@ -650,13 +650,13 @@ export const addPermPromise = function(opID, teamID, role) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.status}: ${req.statusText} ${req.response}`);
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -689,7 +689,7 @@ export const delPermPromise = function(opID, teamID, role) {
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
 
     const fd = new FormData();
@@ -722,7 +722,7 @@ export const leaveTeamPromise = function(teamID) {
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
@@ -751,7 +751,7 @@ export const removeAgentFromTeamPromise = function(agentID, teamID) {
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
@@ -780,7 +780,7 @@ export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
     const fd = new FormData();
     fd.append("squad", squad);
@@ -809,16 +809,46 @@ export const addAgentToTeamPromise = function(agentID, teamID) {
           resolve(true);
           break;
         default:
-          console.log(req);
-          reject(`${req.status}: ${req.statusText}`);
+          reject(`${req.responseText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.statusText}`);
+      reject(`Network Error: ${req.responseText}`);
     };
     req.send();
+  });
+};
+
+export const renameTeamPromise = function(teamID, name) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}/rename`;
+    const req = new XMLHttpRequest();
+
+    req.open("PUT", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+    const fd = new FormData();
+    fd.append("teamname", name);
+    req.send(fd);
   });
 };
 
