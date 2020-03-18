@@ -4,7 +4,8 @@ import {
   removeAgentFromTeamPromise,
   setAgentTeamSquadPromise,
   addAgentToTeamPromise,
-  renameTeamPromise
+  renameTeamPromise,
+  rocksPromise
 } from "../server";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
@@ -187,16 +188,29 @@ const ManageTeamDialog = Feature.extend({
     const rockscommField = L.DomUtil.create("input", null, rockslabel);
     rockscommField.placeholder = "xxyyzz.com";
     if (this._team.RocksComm) rockscommField.value = this._team.RocksComm;
-    const rockscommButton = L.DomUtil.create("button", null, rockslabel);
-    rockscommButton.textContent = "Set";
-
     const rocksapilabel = L.DomUtil.create("label", null, rocks);
     rocksapilabel.textContent = " api key: ";
     const rocksapiField = L.DomUtil.create("input", null, rocksapilabel);
     rocksapiField.placeholder = "...";
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
-    const rocksapiButton = L.DomUtil.create("button", null, rocksapilabel);
-    rocksapiButton.textContent = "Set";
+    const rocksButton = L.DomUtil.create("button", null, rocks);
+    rocksButton.textContent = "Set";
+    L.DomEvent.on(rocksButton, "click", () => {
+      rocksPromise(
+        this._team.ID,
+        rockscommField.value,
+        rocksapiField.value
+      ).then(
+        () => {
+          alert(`updated rocks info`);
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        },
+        reject => {
+          console.log(reject);
+          alert(reject);
+        }
+      );
+    });
   },
 
   _displayDialog: function() {

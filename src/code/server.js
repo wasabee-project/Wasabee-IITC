@@ -852,6 +852,35 @@ export const renameTeamPromise = function(teamID, name) {
   });
 };
 
+export const rocksPromise = function(teamID, community, apikey) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}/rockscfg?rockscomm=${community}&rockskey=${apikey}`;
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+    req.send();
+  });
+};
+
 export const GetWasabeeServer = function() {
   let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
   if (server == null) {
