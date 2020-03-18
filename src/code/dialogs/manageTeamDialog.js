@@ -5,11 +5,13 @@ import {
   setAgentTeamSquadPromise,
   addAgentToTeamPromise,
   renameTeamPromise,
-  rocksPromise
+  rocksPromise,
+  deleteTeamPromise
 } from "../server";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
+import ConfirmDialog from "./confirmDialog";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = Feature.extend({
@@ -123,12 +125,12 @@ const ManageTeamDialog = Feature.extend({
   },
 
   update: function() {
-    console.log("updating manageTeamDialog");
-    this.setup(this._team);
+    this.setup(this._team); // populate the list
     const container = L.DomUtil.create("div", null);
-    this._dialogContent(container);
+    this._dialogContent(container); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
-    this._dialog.contents(container);
+    this._dialog.html(container);
+    this._dialog.dialog("option", "title", "MANAGE: " + this._team.Name);
   },
 
   _dialogContent: function(container) {
@@ -172,6 +174,7 @@ const ManageTeamDialog = Feature.extend({
       renameTeamPromise(this._team.ID, renameField.value).then(
         () => {
           alert(`renamed to ${renameField.value}`);
+          this._team.Name = renameField.value; // for display
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         reject => {
@@ -202,6 +205,8 @@ const ManageTeamDialog = Feature.extend({
       ).then(
         () => {
           alert(`updated rocks info`);
+          this._team.RocksComm = rockscommField.value; // for display
+          this._team.RocksKey = rocksapiField.value; // for display
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         reject => {
@@ -209,6 +214,32 @@ const ManageTeamDialog = Feature.extend({
           alert(reject);
         }
       );
+    });
+
+    const remove = L.DomUtil.create("div", null, container);
+    const removeLabel = L.DomUtil.create("label", null, remove);
+    removeLabel.textContent = "Remove Team: ";
+    const removeButton = L.DomUtil.create("button", null, removeLabel);
+    removeButton.textContent = "Remove";
+    L.DomEvent.on(removeButton, "click", () => {
+      const cd = new ConfirmDialog();
+      cd.setup(
+        `Remove Team ${this._team.Name}`,
+        `Do you want to permenantly remove ${this._team.Name} from the Wasabee Server?`,
+        () => {
+          deleteTeamPromise(this._team.ID).then(
+            () => {
+              alert(`${this._team.Name} removed`);
+              window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            },
+            reject => {
+              console.log(reject);
+              alert(reject);
+            }
+          );
+        }
+      );
+      cd.enable();
     });
   },
 
