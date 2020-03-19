@@ -52,6 +52,12 @@ const ManageTeamDialog = Feature.extend({
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay())
       },
       {
+        name: "Enabled",
+        value: agent => agent.state,
+        sort: (a, b) => a && !b,
+        format: (cell, value) => (cell.textContent = value)
+      },
+      {
         name: "Squad",
         value: agent => agent.squad,
         sort: (a, b) => a.localeCompare(b),
