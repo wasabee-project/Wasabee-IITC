@@ -172,6 +172,26 @@ const FanfieldDialog = Feature.extend({
       max = Math.max(startAngle, endAngle);
     }
 
+    const text = min + " ... " + max + " " + ccw + " " + (max - min);
+    console.log(text);
+    const anchorlabel = L.marker(context._anchor.latLng, {
+      icon: L.divIcon({
+        className: "plugin-portal-names",
+        iconAnchor: [15],
+        iconSize: [30, 12],
+        html: text
+      }),
+      guid: context._anchor.id
+    });
+    anchorlabel.addTo(context._layerGroup);
+
+    // how to determine if I need to invert?
+    let invert = false;
+    if (max - min > Math.PI) {
+      console.log("going inverted");
+      invert = true;
+    }
+
     const good = new Map();
     for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
@@ -188,7 +208,11 @@ const FanfieldDialog = Feature.extend({
       });
       label.addTo(context._layerGroup);
 
-      if (pAngle < min || pAngle > max) continue;
+      if (
+        (!invert && (pAngle < min || pAngle > max)) ||
+        (invert && pAngle > min && pAngle < max)
+      )
+        continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
     const sorted = new Map([...good.entries()].sort());
@@ -238,12 +262,12 @@ const FanfieldDialog = Feature.extend({
     // work in radians since no one sees it and degrees would be slower
     if (ccw)
       return (
-        (2 * Math.PI - Math.atan2(pll.lng - all.lng, pll.lat - all.lat)) %
-        (2 * Math.PI)
+        (Math.atan2(pll.lng - all.lng, pll.lat - all.lat) % (2 * Math.PI)) +
+        Math.PI * 4
       );
     return (
-      (2 * Math.PI + Math.atan2(pll.lng - all.lng, pll.lat - all.lat)) %
-      (2 * Math.PI)
+      (Math.atan2(pll.lng - all.lng, pll.lat - all.lat) % (2 * Math.PI)) +
+      Math.PI * 2
     );
   }
 });
