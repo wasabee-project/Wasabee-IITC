@@ -164,7 +164,11 @@
     "PORT_FAKE": " portals. Faked ",
     "USE_SWAP_INSTRUCT": ". Please use the swap feature to move faked portals to the real portals at the same location. Zomming in on the 'Loading' portals in the checklist might force them to load.",
     "LOADING1": "Loading: [",
-    "LOADING2": "]"
+    "LOADING2": "]",
+    "OPERATIONS": "Operations",
+    "USE_VALID_NAME": "Please use a valid operation name",
+    "CON_DEL": "Confirm Delete: ",
+    "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
     "last edited": "03-03-2020 @crystalwizard",
