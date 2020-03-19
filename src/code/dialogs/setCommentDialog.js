@@ -1,4 +1,4 @@
-mport { Feature } from "../leafletDrawImports";
+import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
@@ -23,7 +23,7 @@ export const SetCommentDialog = Feature.extend({
 
     if (target instanceof WasabeePortal) {
       this.commentType = "portal";
-      this.dialogTitle = wX("SET_PCOMMENT")s + target.name;
+      this.dialogTitle = wX("SET_PCOMMENT") + target.name;
       this.portal = this.target;
     }
 
@@ -131,4 +131,3 @@ export const SetCommentDialog = Feature.extend({
 });
 
 export default SetCommentDialog;
-

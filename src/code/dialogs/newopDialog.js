@@ -1,4 +1,4 @@
-mport { Feature } from "../leafletDrawImports";
+import { Feature } from "../leafletDrawImports";
 import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
@@ -42,25 +42,21 @@ const NewopDialog = Feature.extend({
     L.DomEvent.on(addButton, "click", () => {
       noHandler._dialog.dialog("close");
       const addDialog = new PromptDialog(this._map);
-      addDialog.setup(
-        wX("NEW_OP"),
-        wX("SET_NEW_OP"),
-        () => {
-          if (addDialog.inputField.value) {
-            const newop = new WasabeeOp(
-              PLAYER.nickname,
-              addDialog.inputField.value,
-              true
-            );
-            newop.store();
-            makeSelectedOperation(newop.ID);
-            window.runHooks("wasabeeUIUpdate", newop);
-            window.runHooks("wasabeeCrosslinks", newop);
-          } else {
-           alert(wX("OP_NAME_UNSET"));
-          }
+      addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {
+        if (addDialog.inputField.value) {
+          const newop = new WasabeeOp(
+            PLAYER.nickname,
+            addDialog.inputField.value,
+            true
+          );
+          newop.store();
+          makeSelectedOperation(newop.ID);
+          window.runHooks("wasabeeUIUpdate", newop);
+          window.runHooks("wasabeeCrosslinks", newop);
+        } else {
+          alert(wX("OP_NAME_UNSET"));
         }
-      );
+      });
       addDialog.placeholder = wX("MUST_NOT_BE_EMPTY");
       addDialog.enable();
     });
@@ -85,4 +81,3 @@ const NewopDialog = Feature.extend({
 });
 
 export default NewopDialog;
-

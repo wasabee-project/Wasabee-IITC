@@ -269,4 +269,3 @@ const WasabeeDialog = Feature.extend({
 });
 
 export default WasabeeDialog;
-

@@ -1,4 +1,4 @@
-mport { Feature } from "../leafletDrawImports";
+import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 // import AssignDialog from "./assignDialog";
 // import SetCommentDialog from "./setCommentDialog";
@@ -88,4 +88,3 @@ const TeamMembershipList = Feature.extend({
 });
 
 export default TeamMembershipList;
-
