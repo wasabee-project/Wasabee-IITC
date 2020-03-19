@@ -14,10 +14,13 @@ const FanfieldDialog = Feature.extend({
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
+    this._layerGroup = new L.LayerGroup();
+    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
+    window.removeLayerGroup(this._layerGroup);
   },
 
   _displayDialog: function() {
@@ -31,7 +34,7 @@ const FanfieldDialog = Feature.extend({
 
     const anchorDiv = L.DomUtil.create("div", null, controls);
     const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
-    anchorLabel.textContent = "Anchor Portal";
+    anchorLabel.textContent = "Anchor Portal ";
     const anchorButton = L.DomUtil.create("button", null, anchorLabel);
     anchorButton.textContent = "set";
     this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
@@ -53,7 +56,7 @@ const FanfieldDialog = Feature.extend({
 
     const startDiv = L.DomUtil.create("div", null, controls);
     const startLabel = L.DomUtil.create("label", null, startDiv);
-    startLabel.textContent = "Start Portal";
+    startLabel.textContent = "Start Portal ";
     const startButton = L.DomUtil.create("button", null, startLabel);
     startButton.textContent = "set";
     this._startDisplay = L.DomUtil.create("span", null, startLabel);
@@ -75,7 +78,7 @@ const FanfieldDialog = Feature.extend({
 
     const endDiv = L.DomUtil.create("div", null, controls);
     const endLabel = L.DomUtil.create("label", null, endDiv);
-    endLabel.textContent = "End Portal";
+    endLabel.textContent = "End Portal ";
     const endButton = L.DomUtil.create("button", null, endLabel);
     endButton.textContent = "set";
     this._endDisplay = L.DomUtil.create("span", null, endLabel);
@@ -107,13 +110,6 @@ const FanfieldDialog = Feature.extend({
     L.DomEvent.on(button, "click", () => {
       const context = this;
       this.fanfield(context);
-    });
-
-    const buttonTwo = L.DomUtil.create("button", null, div);
-    buttonTwo.textContent = "EXPERIMENTAL ALGO";
-    L.DomEvent.on(buttonTwo, "click", () => {
-      const context = this;
-      this.fanfieldTwo(context);
     });
 
     const context = this;
@@ -154,6 +150,8 @@ const FanfieldDialog = Feature.extend({
   },
 
   fanfield: context => {
+    context._layerGroup.clearLayers();
+
     if (!context._anchor || !context._start || !context._end) {
       alert("Please set the three portals first!");
       return;
@@ -163,8 +161,8 @@ const FanfieldDialog = Feature.extend({
     let endAngle = context._angle(context._anchor, context._end, false);
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
-
     let ccw = false;
+
     if (startAngle != min) {
       console.log("fanfield running counter-clockwise");
       ccw = true; // must be going counter-clockwise
@@ -178,44 +176,23 @@ const FanfieldDialog = Feature.extend({
     for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
       const pAngle = context._angle(context._anchor, p, ccw);
+
+      const label = L.marker(p._latlng, {
+        icon: L.divIcon({
+          className: "plugin-portal-names",
+          iconAnchor: [15],
+          iconSize: [30, 12],
+          html: pAngle
+        }),
+        guid: p.options.guid
+      });
+      label.addTo(context._layerGroup);
+
       if (pAngle < min || pAngle > max) continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
     const sorted = new Map([...good.entries()].sort());
     context._draw(sorted, context);
-  },
-
-  fanfieldTwo: context => {
-    if (!context._anchor || !context._start || !context._end) {
-      alert("Please set the three portals first!");
-      return;
-    }
-
-    let atwo = context._angleTwo(context._anchor, context._start, context._end);
-    let positive = true;
-    if (atwo < 0) {
-      console.log("angleTwo going negative");
-      positive = false;
-    }
-
-    const goodTwo = new Map();
-    for (const p of getAllPortalsOnScreen(context._operation)) {
-      if (p.options.guid == context._anchor.id) continue;
-      const a = context._angleTwo(context._anchor, context._start, p);
-      const b = context._angleTwo(context._anchor, p, context._end);
-      console.log(`checking ${a} / ${b} : ${atwo} ${p.options.data.title}`);
-      if (
-        (positive && a > 0 && b > 0 && b <= atwo && a <= atwo) ||
-        (!positive && a < 0 && b < 0 && b >= atwo && a >= atwo)
-      ) {
-        console.log(
-          `angleTwo permitting ${a} / ${b} : ${atwo} ${p.options.data.title}`
-        );
-        goodTwo.set(a, p);
-      }
-    }
-    const sortedTwo = new Map([...goodTwo.entries()].sort());
-    context._draw(sortedTwo, context);
   },
 
   _draw: function(sorted, context) {
@@ -260,23 +237,14 @@ const FanfieldDialog = Feature.extend({
     // always return a positive value so the sort() functions work sanely
     // work in radians since no one sees it and degrees would be slower
     if (ccw)
-      return 2 * Math.PI - Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
-    return 2 * Math.PI + Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
-  },
-
-  _angleTwo: function(anchor, start, end) {
-    const A = L.Projection.LonLat.project(anchor.latLng || anchor._latLng);
-    const B = L.Projection.LonLat.project(start.latLng || start._latlng);
-    const C = L.Projection.LonLat.project(end.latLng || end._latlng);
-
-    const AB = Math.atan2(B.x - A.x, B.y - A.y);
-    const AC = Math.atan2(C.x - A.x, C.y - A.y);
-
-    let r = Math.abs(AB) + Math.abs(AC);
-    // if it is bigger than Pi, it must have gone negative
-    if (r > Math.PI) r = 0 - (2 * Math.PI - r);
-    console.log("r: ", r);
-    return r;
+      return (
+        (2 * Math.PI - Math.atan2(pll.lng - all.lng, pll.lat - all.lat)) %
+        (2 * Math.PI)
+      );
+    return (
+      (2 * Math.PI + Math.atan2(pll.lng - all.lng, pll.lat - all.lat)) %
+      (2 * Math.PI)
+    );
   }
 });
 
