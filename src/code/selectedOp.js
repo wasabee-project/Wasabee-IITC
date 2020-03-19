@@ -14,9 +14,6 @@ export const getSelectedOperation = () => {
   return window.plugin.wasabee._selectedOp;
 };
 
-// I use this all the time in debugging, leave it globally visible
-window.plugin.wasabee.getSelectedOperation = getSelectedOperation;
-
 export const initSelectedOperation = () => {
   if (window.plugin.wasabee._selectedOp == null) {
     const toLoad = getRestoreOpID();
