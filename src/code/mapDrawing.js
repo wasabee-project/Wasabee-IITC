@@ -227,6 +227,7 @@ export const drawAgents = async () => {
     teamPromise(t.ID).then(
       team => {
         for (const agent of team.agents) {
+          if (!agent.status) continue; // ignore disabled agents
           if (!layerMap.has(agent.id) && !doneAgents.includes(agent.id)) {
             // new, add to map
             doneAgents.push(agent.id);
