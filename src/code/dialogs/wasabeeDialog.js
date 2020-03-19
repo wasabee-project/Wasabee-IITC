@@ -44,11 +44,9 @@ const WasabeeDialog = Feature.extend({
 
   update: async function() {
     if (!this._enabled) return;
-    // TODO find the edge cases where this isn't set
-    if (this._dialog) {
-      this._me = await WasabeeMe.waitGet(true);
-      this._buildContent; // builds this._html;
-      this._dialog.html(this._html);
+    this._me = await WasabeeMe.waitGet(true);
+    if (this._dialog && this._dialog.html) {
+      this._dialog.html(this._buildContent());
     }
   },
 
@@ -181,18 +179,16 @@ const WasabeeDialog = Feature.extend({
 
     html.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
-    this._html = html;
+    return html;
   },
 
   _displayDialog: function() {
-    this._buildContent();
-
     if (this._me) {
       this._dialog = window.dialog({
         title: "Current User Information",
         width: "auto",
         height: "auto",
-        html: this._html,
+        html: this._buildContent(),
         dialogClass: "wasabee-dialog-mustauth",
         buttons: {
           OK: () => {
