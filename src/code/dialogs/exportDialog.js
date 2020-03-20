@@ -1,5 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
+
 // export screen
 const ExportDialog = Feature.extend({
   statics: {
@@ -27,7 +29,7 @@ const ExportDialog = Feature.extend({
     if (!this._map) return;
     const exportDialog = this;
     this._dialog = window.dialog({
-      title: "Export: " + this._operation.name,
+      title: wX("EXPORT") + this._operation.name,
       width: "auto",
       height: "auto",
       html: this._buildContent(),
