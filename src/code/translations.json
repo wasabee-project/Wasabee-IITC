@@ -208,6 +208,10 @@
     "MY_CAP_ID": "My Capsule ID",
     "CAPSULE": "Capsule",
     "OPEN_REQUEST": "[open request]",
+    "SELECT_FAN_PORTALS": "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button.",
+    "FANFIELD": "Fanfield!",
+    "FANFIELD2": "Fanfield",
+    "SET_3_PORT": "Please set the three portals first!",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
