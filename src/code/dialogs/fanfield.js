@@ -149,6 +149,7 @@ const FanfieldDialog = Feature.extend({
     if (p) this._end = WasabeePortal.create(p);
   },
 
+  // fanfiled determines the portals between start/end and their angle (and order)
   fanfield: context => {
     context._layerGroup.clearLayers();
 
@@ -161,41 +162,30 @@ const FanfieldDialog = Feature.extend({
     let endAngle = context._angle(context._anchor, context._end, false);
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
-    let ccw = false;
+    context._cw = false;
 
     if (startAngle != min) {
-      console.log("fanfield running counter-clockwise");
-      ccw = true; // must be going counter-clockwise
+      console.log("fanfield running clockwise");
+      context._cw = true; // must be going counter-clockwise
       startAngle = context._angle(context._anchor, context._start, true);
       endAngle = context._angle(context._anchor, context._end, true);
       min = Math.min(startAngle, endAngle);
       max = Math.max(startAngle, endAngle);
     }
 
-    const text = min + " ... " + max + " " + ccw + " " + (max - min);
+    const text = min + " ... " + max + " " + context._cw + " " + (max - min);
     console.log(text);
-    const anchorlabel = L.marker(context._anchor.latLng, {
-      icon: L.divIcon({
-        className: "plugin-portal-names",
-        iconAnchor: [15],
-        iconSize: [30, 12],
-        html: text
-      }),
-      guid: context._anchor.id
-    });
-    anchorlabel.addTo(context._layerGroup);
 
-    // how to determine if I need to invert?
-    let invert = false;
+    context._invert = false;
     if (max - min > Math.PI) {
       console.log("going inverted");
-      invert = true;
+      context._invert = true;
     }
 
     const good = new Map();
     for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
-      const pAngle = context._angle(context._anchor, p, ccw);
+      const pAngle = context._angle(context._anchor, p, context._cw);
 
       const label = L.marker(p._latlng, {
         icon: L.divIcon({
@@ -209,8 +199,8 @@ const FanfieldDialog = Feature.extend({
       label.addTo(context._layerGroup);
 
       if (
-        (!invert && (pAngle < min || pAngle > max)) ||
-        (invert && pAngle > min && pAngle < max)
+        (!context._invert && (pAngle < min || pAngle > max)) ||
+        (context._invert && pAngle > min && pAngle < max)
       )
         continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
@@ -219,6 +209,8 @@ const FanfieldDialog = Feature.extend({
     context._draw(sorted, context);
   },
 
+  // draw takes the sorted list of poratls and draws the links
+  // determining any sub-fields can be added
   _draw: function(sorted, context) {
     context._operation.startBatchMode();
     let order = 0;
@@ -254,20 +246,20 @@ const FanfieldDialog = Feature.extend({
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
-  _angle: function(a, p, ccw) {
+  _angle: function(a, p, cw) {
     const all = a.latLng; // anchor is always a WasabeePortal
     const pll = p.latLng || p._latlng; // probably not a WasabeePortal (except start/end)
 
     // always return a positive value so the sort() functions work sanely
     // work in radians since no one sees it and degrees would be slower
-    if (ccw)
-      return (
-        (Math.atan2(pll.lng - all.lng, pll.lat - all.lat) % (2 * Math.PI)) +
-        Math.PI * 4
+    if (cw)
+      return Math.abs(
+        (Math.atan2(pll.lng - all.lng, pll.lat - all.lat) % (2 * Math.PI)) -
+          Math.PI
       );
     return (
       (Math.atan2(pll.lng - all.lng, pll.lat - all.lat) % (2 * Math.PI)) +
-      Math.PI * 2
+      Math.PI
     );
   }
 });
