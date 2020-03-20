@@ -139,7 +139,7 @@
     "NEW_WAS_SERVER": "New Waasbee Server",
     "CREATE_NEW_TEAM": "Create New Team",
     "NTNAME": "Name",
-    "NAME_REQ": "name required",
+    "NAME_REQ": "Name Required",
     "NOT_LOADED": "Not fully loaded, try again.",
     "AGENT": "Agent",
     "SQUAD": "Squad",
@@ -201,6 +201,13 @@
     "BAT_TOAD": "Battle Toads",
     "RENAME": "Rename",
     "MANAGE_TEAM": "Manage ",
+    "KEY_LIST": "Key List: ",
+    "REQUIRED": "Required",
+    "ON_HAND": "On Hand",
+    "MY_COUNT": "My Count",
+    "MY_CAP_ID": "My Capsule ID",
+    "CAPSULE": "Capsule",
+    "OPEN_REQUEST": "[open request]",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
