@@ -85,7 +85,7 @@ const BlockerList = Feature.extend({
     const id = "dialog-" + window.plugin.wasabee.static.dialogNames.blockerList;
     if (window.DIALOGS[id]) {
       window.DIALOGS[id].parentNode.children[0].children[1].innerText =
-        "Known Blockers: " + newOpData.name;
+        wX("KNOWN_BLOCK") + newOpData.name;
       this.sortable = this._getListDialogContent(
         this.sortable.sortBy,
         this.sortable.sortAsc
@@ -101,7 +101,7 @@ const BlockerList = Feature.extend({
     const content = new Sortable();
     content.fields = [
       {
-        name: "From Portal",
+        name: wX("FROM_PORT"),
         value: blocker => {
           return this._operation.getPortal(blocker.fromPortalId).name;
         },
@@ -112,7 +112,7 @@ const BlockerList = Feature.extend({
         }
       },
       {
-        name: "Count",
+        name: wX("COUNT"),
         value: blocker => {
           const c = this._operation.blockers.filter(
             b =>
@@ -125,7 +125,7 @@ const BlockerList = Feature.extend({
         format: (row, value) => (row.innerHTML = value)
       },
       {
-        name: "To Portal",
+        name: wX("TO_PORT"),
         value: blocker => {
           return this._operation.getPortal(blocker.toPortalId).name;
         },
@@ -136,7 +136,7 @@ const BlockerList = Feature.extend({
         }
       },
       {
-        name: "Count",
+        name: wX("COUNT"),
         value: blocker => {
           const c = this._operation.blockers.filter(
             b =>

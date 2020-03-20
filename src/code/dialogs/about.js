@@ -1,4 +1,5 @@
 import { Feature } from "../leafletDrawImports";
+import wX from "../wX";
 
 const AboutDialog = Feature.extend({
   statics: {
@@ -23,19 +24,17 @@ const AboutDialog = Feature.extend({
   _displayDialog: function() {
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
-    support.innerHTML =
-      "For support, please join the <a href='https://t.me/joinchat/B7_3JE8Qfm_XBgP896sOgQ' target='_new'>The Telegram Channel</a>";
+    support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
       "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.15: @deviousness</li></ul>";
 
     const videos = L.DomUtil.create("div", null, html);
-    videos.innerHTML =
-      "<h3>How-To Videos:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>0.15 Intro</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Old Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Teams and Permissions</a></li></ul>";
+    videos.innerHTML = wX("HOW_TO_VIDS");
 
     this._dialog = window.dialog({
-      title: "About Wasabee",
+      title: wX("ABOUT_WASABEE"),
       width: "auto",
       height: "auto",
       html: html,
