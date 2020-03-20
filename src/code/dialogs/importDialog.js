@@ -115,7 +115,7 @@ class ImportDialog {
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = "Imported Op: " + new Date().toGMTString();
+        newop.name = wX("IMPORT_OP") + new Date().toGMTString();
       }
       newop.store();
       makeSelectedOperation(newop.ID);

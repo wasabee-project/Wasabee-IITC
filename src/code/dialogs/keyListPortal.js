@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const KeyListPortal = Feature.extend({
   statics: {
@@ -78,7 +79,7 @@ const KeyListPortal = Feature.extend({
     const sortable = new Sortable();
     sortable.fields = [
       {
-        name: "Agent",
+        name: wX("AGENT"),
         value: key => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
@@ -87,7 +88,7 @@ const KeyListPortal = Feature.extend({
         }
       },
       {
-        name: "On Hand",
+        name: wX("ON_HAND"),
         value: key => key.onhand,
         sort: (a, b) => a - b,
         format: (cell, value) => {
@@ -95,7 +96,7 @@ const KeyListPortal = Feature.extend({
         }
       },
       {
-        name: "Capsule",
+        name: wX("CAPSULE"),
         value: key => key.capsule,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
