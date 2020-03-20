@@ -29,7 +29,7 @@ const FanfieldDialog = Feature.extend({
     const container = L.DomUtil.create("div", null);
     const description = L.DomUtil.create("div", null, container);
     description.textContent =
-      "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button. The current algo does not work well if the anchor is north of both the start and end portals. A fix is in the works.";
+      "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button.";
     const controls = L.DomUtil.create("div", null, container);
 
     const anchorDiv = L.DomUtil.create("div", null, controls);
@@ -176,16 +176,21 @@ const FanfieldDialog = Feature.extend({
     const text = min + " ... " + max + " " + context._cw + " " + (max - min);
     console.log(text);
 
+    // if we cross 0, rotate 180deg so we don't have to deal with it
     context._invert = false;
     if (max - min > Math.PI) {
       console.log("going inverted");
       context._invert = true;
+      // min = (min + Math.PI) % (2 * Math.PI);
+      // max = (max + Math.PI) % (2 * Math.PI);
     }
 
     const good = new Map();
     for (const p of getAllPortalsOnScreen(context._operation)) {
       if (p.options.guid == context._anchor.id) continue;
-      const pAngle = context._angle(context._anchor, p, context._cw);
+      let pAngle = context._angle(context._anchor, p, context._cw);
+
+      if (context._invert) pAngle = (pAngle + Math.PI) % (2 * Math.PI);
 
       const label = L.marker(p._latlng, {
         icon: L.divIcon({
@@ -198,11 +203,7 @@ const FanfieldDialog = Feature.extend({
       });
       label.addTo(context._layerGroup);
 
-      if (
-        (!context._invert && (pAngle < min || pAngle > max)) ||
-        (context._invert && pAngle > min && pAngle < max)
-      )
-        continue;
+      if (pAngle < min || pAngle > max) continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
     const sorted = new Map([...good.entries()].sort());
