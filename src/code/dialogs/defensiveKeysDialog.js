@@ -3,6 +3,7 @@ import WasabeePortal from "../portal";
 import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
+import wX from "../wX";
 
 const DefensiveKeysDialog = Feature.extend({
   statics: {
@@ -49,7 +50,7 @@ const DefensiveKeysDialog = Feature.extend({
         this._capID.value = "";
       }
     } else {
-      this._portal.innerHTML = "Please select a portal";
+      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
@@ -66,7 +67,7 @@ const DefensiveKeysDialog = Feature.extend({
     this._capID.setAttribute("placeholder", "Capsule ID");
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("a", "", this._content);
-    addDKeyButton.innerHTML = "Update Count";
+    addDKeyButton.innerHTML = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", () => {
       this._addDKey();
     });
@@ -76,7 +77,7 @@ const DefensiveKeysDialog = Feature.extend({
 
   _displayDialog: function() {
     this._dialog = window.dialog({
-      title: "Input Defensive Key Count",
+      title: wX("INPUT_DT_KEY_COUNT"),
       width: "auto",
       height: "auto",
       position: {

@@ -2,6 +2,7 @@ import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
+import wX from "../wX";
 
 export const SetCommentDialog = Feature.extend({
   setup: function(target, operation) {
@@ -10,19 +11,19 @@ export const SetCommentDialog = Feature.extend({
 
     if (target instanceof WasabeeLink) {
       this.commentType = "link";
-      this.dialogTitle = "Set Link Comment";
+      this.dialogTitle = wX("SET_LCOMMENT");
       this.portal = this.operation.getPortal(this.target.fmPortalId);
     }
 
     if (target instanceof WasabeeMarker) {
       this.commentType = "marker";
       this.portal = this.operation.getPortal(this.target.portalId);
-      this.dialogTitle = "Set Marker Comment: " + this.portal.name;
+      this.dialogTitle = wX("SET_MCOMMENT") + this.portal.name;
     }
 
     if (target instanceof WasabeePortal) {
       this.commentType = "portal";
-      this.dialogTitle = "Set Portal Comment: " + target.name;
+      this.dialogTitle = wX("SET_PCOMMENT") + target.name;
       this.portal = this.target;
     }
 

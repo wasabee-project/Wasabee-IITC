@@ -11,6 +11,7 @@ import {
   duplicateOperation
 } from "../selectedOp";
 import OpPermList from "./opPerms";
+import wX from "../wX";
 
 const OpsDialog = Feature.extend({
   statics: {
@@ -45,7 +46,7 @@ const OpsDialog = Feature.extend({
 
     const context = this;
     this._dialog = window.dialog({
-      title: "Operations",
+      title: wX("OPERATIONS"),
       width: "auto",
       height: "auto",
       html: this._content,
@@ -101,7 +102,7 @@ const OpsDialog = Feature.extend({
       input.value = selectedOp.name;
       L.DomEvent.on(input, "change", () => {
         if (!input.value || input.value == "") {
-          alert("Please use a valid operation name");
+          alert(wX("USE_VALID_NAME"));
         } else {
           selectedOp.name = input.value;
           selectedOp.store();
@@ -172,8 +173,8 @@ const OpsDialog = Feature.extend({
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          "Confirm Delete: " + selectedOp.name,
-          "Are you sure you want to delete " + selectedOp.name + "?",
+          wX("CON_DEL") + selectedOp.name,
+          wX("YESNO_DEL") + selectedOp.name + "?",
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(

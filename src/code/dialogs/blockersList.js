@@ -87,14 +87,14 @@ const BlockerList = Feature.extend({
       this.sortable.sortAsc
     );
     this._dialog.html(this.sortable.table);
-    this._dialog.dialog("option", "title", `Known Blockers: ${newOpData.name}`);
+    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name);
   },
 
   _getListDialogContent(sortBy, sortAsc) {
     const content = new Sortable();
     content.fields = [
       {
-        name: "From Portal",
+        name: wX("FROM_PORT"),
         value: blocker => {
           return this._operation.getPortal(blocker.fromPortalId).name;
         },
@@ -105,7 +105,7 @@ const BlockerList = Feature.extend({
         }
       },
       {
-        name: "Count",
+        name: wX("COUNT"),
         value: blocker => {
           const c = this._operation.blockers.filter(
             b =>
@@ -118,7 +118,7 @@ const BlockerList = Feature.extend({
         format: (row, value) => (row.innerHTML = value)
       },
       {
-        name: "To Portal",
+        name: wX("TO_PORT"),
         value: blocker => {
           return this._operation.getPortal(blocker.toPortalId).name;
         },
@@ -129,7 +129,7 @@ const BlockerList = Feature.extend({
         }
       },
       {
-        name: "Count",
+        name: wX("COUNT"),
         value: blocker => {
           const c = this._operation.blockers.filter(
             b =>

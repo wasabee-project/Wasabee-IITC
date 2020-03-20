@@ -3,6 +3,7 @@ import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const MultimaxDialog = Feature.extend({
   statics: {
@@ -24,8 +25,7 @@ const MultimaxDialog = Feature.extend({
 
     const container = L.DomUtil.create("div", null);
     const description = L.DomUtil.create("div", null, container);
-    description.textContent =
-      "Select two anchor portals, then zoom in to an area for the spine, wait until the portals are loaded (portals must be on screen to be considered) and press the Multimax button.";
+    description.textContent = wX("SELECT_INSTRUCTIONS");
     const rdnTable = L.DomUtil.create("table", null, container);
 
     ["A", "B"].forEach(string => {
@@ -56,7 +56,7 @@ const MultimaxDialog = Feature.extend({
 
     // Go button
     const button = L.DomUtil.create("button", null, div);
-    button.textContent = "Multimax!";
+    button.textContent = wX("MULTIMAX");
     L.DomEvent.on(button, "click", async () => {
       const context = this;
 
@@ -74,13 +74,13 @@ const MultimaxDialog = Feature.extend({
 
     const flylinks = L.DomUtil.create("span", null, div);
     const fllabel = L.DomUtil.create("label", null, flylinks);
-    fllabel.textContent = "Add Back Links: ";
+    fllabel.textContent = wX("ADD_BL");
     this._flcheck = L.DomUtil.create("input", null, flylinks);
     this._flcheck.type = "checkbox";
 
     const context = this;
     this._dialog = window.dialog({
-      title: "Multimax",
+      title: wX("MULTI_M"),
       width: "auto",
       height: "auto",
       html: container,
@@ -117,7 +117,7 @@ const MultimaxDialog = Feature.extend({
     if (selectedPortal) {
       store.set("wasabee-multimax-" + AB, JSON.stringify(selectedPortal));
     } else {
-      alert("No Portal Selected.");
+      alert(wX("NO_PORT_SEL"));
       store.remove("wasabee-multimax-" + AB);
     }
     this.updatePortal(AB);
@@ -149,7 +149,7 @@ const MultimaxDialog = Feature.extend({
       const portalsOnScreen = context._getAllPortalsOnScreen();
       const A = context.getPortal("A");
       const B = context.getPortal("B");
-      if (!A || !B) reject("Please select anchor portals first!");
+      if (!A || !B) reject(wX("SEL_PORT_FIRST"));
 
       // Calculate the multimax
       multimax(A, B, portalsOnScreen).then(

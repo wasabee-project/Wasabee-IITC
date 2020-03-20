@@ -7,6 +7,7 @@ import { getAgent } from "../server";
 import { listenForAddedPortals } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
+import wX from "../wX";
 
 const OperationChecklistDialog = Feature.extend({
   statics: {
@@ -48,7 +49,7 @@ const OperationChecklistDialog = Feature.extend({
     this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
     this._listDialogData = window.dialog({
-      title: "Operation Checklist: " + this._operation.name,
+      title: wX("OP_CHECKLIST") + this._operation.name,
       width: "auto",
       height: "auto",
       position: {
@@ -71,7 +72,7 @@ const OperationChecklistDialog = Feature.extend({
     this._dialog.dialog(
       "option",
       "title",
-      `Operation Checklist: ${newOpData.name}`
+      wX("OP_CHECKLIST", newOpData.name)
     );
     this.sortable = this.getListDialogContent(
       newOpData,
@@ -88,7 +89,7 @@ const OperationChecklistDialog = Feature.extend({
     const content = new Sortable();
     content.fields = [
       {
-        name: "Order",
+        name: wX("ORDER"),
         value: thing => thing.opOrder,
         sort: (a, b) => a - b,
         format: (row, value, thing) => {
@@ -105,7 +106,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: "Portal",
+        name: wX("PORTAL"),
         value: thing => {
           return operation.getPortal(thing.portalId).name;
         },
@@ -121,7 +122,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: "Type",
+        name: wX("TYPE"),
         value: thing => {
           if (thing instanceof WasabeeLink) {
             return "link";
@@ -139,7 +140,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: "Comment",
+        name: wX("COMMENT"),
         value: thing => thing.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, thing) => {
@@ -153,7 +154,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: "Assigned To",
+        name: wX("ASS_TO"),
         value: thing => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
             const agent = getAgent(thing.assignedTo);
@@ -181,7 +182,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: "State",
+        name: wX("STATE"),
         value: thing => thing.state,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value) => {

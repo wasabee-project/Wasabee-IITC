@@ -11,6 +11,7 @@ import {
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
+import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
 
 // The update method here is the best so far, bring all the others up to this one
@@ -46,7 +47,7 @@ const ManageTeamDialog = Feature.extend({
     this._table = new Sortable();
     this._table.fields = [
       {
-        name: "Agent",
+        name: wX("AGENT"),
         value: agent => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay())
@@ -58,7 +59,7 @@ const ManageTeamDialog = Feature.extend({
         format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: "Squad",
+        name: wX("Squad"),
         value: agent => agent.squad,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
@@ -85,7 +86,7 @@ const ManageTeamDialog = Feature.extend({
                   }
                 );
               } else {
-                alert("Input a Squad name");
+                alert(wX("INPUT_SQUAD_NAME"));
               }
             });
             squadDialog.current = value;
@@ -95,7 +96,7 @@ const ManageTeamDialog = Feature.extend({
         }
       },
       {
-        name: "Remove",
+        name: wX("REMOVE"),
         value: agent => agent.id,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
@@ -143,22 +144,19 @@ const ManageTeamDialog = Feature.extend({
     const list = L.DomUtil.create("div", null, container);
     list.appendChild(this._table.table);
     const listnote = L.DomUtil.create("div", null, list);
-    listnote.textContent =
-      "Agents who are on the team but do not have the team enabled do not show in this list. The server's web interface can show those not enabled.";
+    listnote.textContent = wX("AGENT_IN_TEAM_INSTR");
 
     const add = L.DomUtil.create("div", null, container);
     const addlabel = L.DomUtil.create("label", null, add);
-    addlabel.textContent = "Add Agent: ";
+    addlabel.textContent = wX("ADD_AGENT");
     const addField = L.DomUtil.create("input", null, addlabel);
-    addField.placeholder = "ingress name or GoogleID";
+    addField.placeholder = wX("INGNAME_GID");
     const addButton = L.DomUtil.create("button", null, addlabel);
-    addButton.textContent = "Add";
+    addButton.textContent = wX("ADD");
     L.DomEvent.on(addButton, "click", () => {
       addAgentToTeamPromise(addField.value, this._team.ID).then(
         () => {
-          alert(
-            "Add successful, they will need to enable the team before they appear in this list"
-          );
+          alert(wX("ADD_SUCC_INSTR"));
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         reject => {
@@ -170,12 +168,12 @@ const ManageTeamDialog = Feature.extend({
 
     const rename = L.DomUtil.create("div", null, container);
     const renamelabel = L.DomUtil.create("label", null, rename);
-    renamelabel.textContent = "Rename Team: ";
+    renamelabel.textContent = wX("RENAME_TEAM");
     const renameField = L.DomUtil.create("input", null, renamelabel);
-    renameField.placeholder = "Battle Toads";
+    renameField.placeholder = wX("BAT_TOAD");
     renameField.value = this._team.Name;
     const renameButton = L.DomUtil.create("button", null, renamelabel);
-    renameButton.textContent = "Rename";
+    renameButton.textContent = wX("RENAME");
     L.DomEvent.on(renameButton, "click", () => {
       renameTeamPromise(this._team.ID, renameField.value).then(
         () => {
@@ -254,8 +252,7 @@ const ManageTeamDialog = Feature.extend({
     this._dialogContent(container);
 
     this._dialog = window.dialog({
-      //title: wX("MANAGE ", this._team.Name),
-      title: "MANAGE: " + this._team.Name,
+      title: wX("MANAGE_TEAM") + this._team.Name,
       width: "auto",
       height: "auto",
       html: container,

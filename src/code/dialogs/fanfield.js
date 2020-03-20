@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import wX from "../wX";
 
 const FanfieldDialog = Feature.extend({
   statics: {
@@ -28,8 +29,8 @@ const FanfieldDialog = Feature.extend({
 
     const container = L.DomUtil.create("div", null);
     const description = L.DomUtil.create("div", null, container);
-    description.textContent =
-      "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button.";
+    description.textContent = wX("SELECT_FAN_PORTALS");
+
     const controls = L.DomUtil.create("div", null, container);
 
     const anchorDiv = L.DomUtil.create("div", null, controls);
@@ -50,7 +51,7 @@ const FanfieldDialog = Feature.extend({
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(this._anchor.displayFormat());
       } else {
-        alert("Please select a portal");
+        alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -72,7 +73,7 @@ const FanfieldDialog = Feature.extend({
         this._startDisplay.textContent = "";
         this._startDisplay.appendChild(this._start.displayFormat());
       } else {
-        alert("Please select a portal");
+        alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -94,7 +95,7 @@ const FanfieldDialog = Feature.extend({
         this._endDisplay.textContent = "";
         this._endDisplay.appendChild(this._end.displayFormat());
       } else {
-        alert("Please select a portal");
+        alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -106,7 +107,7 @@ const FanfieldDialog = Feature.extend({
     opt.textContent = "\u21b3";
     // Go button
     const button = L.DomUtil.create("button", null, div);
-    button.textContent = "Fanfield!";
+    button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", () => {
       const context = this;
       this.fanfield(context);
@@ -114,7 +115,7 @@ const FanfieldDialog = Feature.extend({
 
     const context = this;
     this._dialog = window.dialog({
-      title: "Fanfield",
+      title: wX("FANFIELD2"),
       width: "auto",
       height: "auto",
       html: container,
@@ -154,7 +155,7 @@ const FanfieldDialog = Feature.extend({
     context._layerGroup.clearLayers();
 
     if (!context._anchor || !context._start || !context._end) {
-      alert("Please set the three portals first!");
+      alert(wX("SET_3_PORT"));
       return;
     }
 

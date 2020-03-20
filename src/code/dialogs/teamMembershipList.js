@@ -4,6 +4,7 @@ import Sortable from "../../lib/sortable";
 // import SetCommentDialog from "./setCommentDialog";
 // import ConfirmDialog from "./confirmDialog";
 import { teamPromise } from "../server";
+import wX from "../wX";
 
 const TeamMembershipList = Feature.extend({
   statics: {
@@ -57,25 +58,25 @@ const TeamMembershipList = Feature.extend({
       }
     }
     if (!this._team.name) {
-      alert("Not fully loaded, try again.");
+      alert(wX("NOT_LOADED"));
     }
 
     this._table = new Sortable();
     this._table.fields = [
       {
-        name: "Agent",
+        name: wX("AGENT"),
         value: agent => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay())
       },
       {
-        name: "Squad",
+        name: wX("SQUAD"),
         value: agent => agent.squad,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: "Location Update",
+        name: wX("LOC_UPDATE"),
         value: agent => agent.date,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => (cell.textContent = value)

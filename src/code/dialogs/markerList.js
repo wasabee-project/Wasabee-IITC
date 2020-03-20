@@ -6,6 +6,7 @@ import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import OverflowMenu from "../overflowMenu";
 import { listenForAddedPortals } from "../uiCommands";
+import wX from "../wX";
 
 const MarkerList = Feature.extend({
   statics: {
@@ -43,7 +44,7 @@ const MarkerList = Feature.extend({
     }
 
     this._dialog = window.dialog({
-      title: `Marker List: ${this._operation.name}`,
+      title: wX("MARKER_LIST", this._operation.name),
       width: "auto",
       height: "auto",
       position: {
@@ -64,14 +65,14 @@ const MarkerList = Feature.extend({
     if (operation.ID != this._operation.ID) this._operation = operation;
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
-    this._dialog.dialog("option", "title", `Marker List: ${operation.name}`);
+    this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
   },
 
   getListDialogContent: function(operation) {
     const content = new Sortable();
     content.fields = [
       {
-        name: "Order",
+        name: wX("ORDER"),
         value: marker => marker.order,
         // sort: (a, b) => (a < b),
         format: (a, m) => {
@@ -79,7 +80,7 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        name: "Portal",
+        name: wX("PORTAL"),
         value: marker => operation.getPortal(marker.portalId).name,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, marker) => {
@@ -89,7 +90,7 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        name: "Type",
+        name: wX("TYPE"),
         value: marker =>
           window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
           "unknown",
@@ -99,7 +100,7 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        name: "Comment",
+        name: wX("COMMENT"),
         value: marker => marker.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, marker) => {
@@ -113,7 +114,7 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        name: "Assigned To",
+        name: wX("ASS_TO"),
         value: marker => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
             const agent = getAgent(marker.assignedTo);
@@ -137,14 +138,14 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        name: "Done",
+        name: wX("DONE"),
         value: marker => marker.state,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m) => {
           if (m == "completed") {
-            a.textContent = "Yes";
+            a.textContent = wX("YES");
           } else {
-            a.textContent = "No";
+            a.textContent = wX("NO");
           }
         }
       },
@@ -165,7 +166,7 @@ const MarkerList = Feature.extend({
     const state = new OverflowMenu();
     const options = [
       {
-        label: "Set Comment",
+        label: wX("SET_COMMENT"),
         onclick: () => {
           const scd = new SetCommentDialog(window.map);
           scd.setup(data, operation);
@@ -173,13 +174,13 @@ const MarkerList = Feature.extend({
         }
       },
       {
-        label: "Delete",
+        label: wX("DELETE"),
         onclick: () => operation.removeMarker(data)
       }
     ];
     if (operation.IsServerOp()) {
       options.push({
-        label: "Assign",
+        label: wX("ASSIGN"),
         onclick: () => {
           const ad = new AssignDialog();
           ad.setup(data, operation);

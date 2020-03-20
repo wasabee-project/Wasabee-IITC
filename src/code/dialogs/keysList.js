@@ -4,6 +4,7 @@ import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const KeysList = Feature.extend({
   statics: {
@@ -39,8 +40,8 @@ const KeysList = Feature.extend({
   },
 
   _displayDialog: function() {
-    this._dialog = window.dialog({
-      title: "Key List: " + this._operation.name,
+    this._listDialog = window.dialog({
+      title: wX("KEY_LIST", this._operation.name),
       width: "auto",
       height: "auto",
       position: {
@@ -59,7 +60,7 @@ const KeysList = Feature.extend({
 
   update: function(operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
-    this._dialog.dialog("option", "title", `Key List: ${operation.name}`);
+    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
   },
@@ -68,7 +69,7 @@ const KeysList = Feature.extend({
     const sortable = new Sortable();
     const always = [
       {
-        name: "Portal",
+        name: wX("PORTAL"),
         value: key => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
@@ -78,7 +79,7 @@ const KeysList = Feature.extend({
         }
       },
       {
-        name: "Required",
+        name: wX("REQUIRED"),
         value: key => key.Required,
         sort: (a, b) => a - b,
         format: (cell, value) => {
@@ -86,7 +87,7 @@ const KeysList = Feature.extend({
         }
       },
       {
-        name: "On Hand",
+        name: wX("ON_HAND"),
         value: key => parseInt(key.onHand),
         sort: (a, b) => a - b,
         format: (cell, value, key) => {
@@ -109,7 +110,7 @@ const KeysList = Feature.extend({
       gid = this._me.GoogleID;
       sortable.fields = always.concat([
         {
-          name: "My Count",
+          name: wX("MY_COUNT"),
           value: key => parseInt(key.iHave),
           sort: (a, b) => a - b,
           format: (cell, value, key) => {
@@ -124,7 +125,7 @@ const KeysList = Feature.extend({
           }
         },
         {
-          name: "My Capsule ID",
+          name: wX("MY_CAP_ID"),
           value: key => key.capsule,
           sort: (a, b) => a.localeCompare(b),
           format: (cell, value, key) => {
@@ -180,7 +181,7 @@ const KeysList = Feature.extend({
     })) {
       const k = {};
       k.id = p.portalId;
-      k.Required = "[open request]";
+      k.Required = wX("OPEN_REQUEST");
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
