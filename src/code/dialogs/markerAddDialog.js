@@ -1,6 +1,7 @@
 import { Feature } from "../leafletDrawImports";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const MarkerAddDialog = Feature.extend({
   statics: {
@@ -37,7 +38,7 @@ const MarkerAddDialog = Feature.extend({
       this._portal.innerHTML = "";
       this._portal.appendChild(this._selectedPortal.displayFormat());
     } else {
-      this._portal.innerHTML = "Please select a portal";
+      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
@@ -66,7 +67,7 @@ const MarkerAddDialog = Feature.extend({
 
     const context = this;
     this._dialog = window.dialog({
-      title: "Add Marker",
+      title: wX("ADD_MARKER"),
       width: "auto",
       height: "auto",
       position: {
