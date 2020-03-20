@@ -106,7 +106,7 @@ const OpPermList = Feature.extend({
     this._table = new Sortable();
     this._table.fields = [
       {
-        name: "Team",
+        name: wX("TEAM"),
         value: perm => {
           const t = WasabeeTeam.get(perm.teamid);
           if (t) return t.name;
@@ -119,13 +119,13 @@ const OpPermList = Feature.extend({
         format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: "Role",
+        name: wX("ROLE"),
         value: perm => perm.role,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: "Remove",
+        name: wX("REMOVE"),
         value: () => wX("DELETE"),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
