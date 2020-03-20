@@ -189,6 +189,18 @@
     "YES": "Yes",
     "NO": "No",
     "SET_COMMENT": "Set Comment",
+    "PLEASE_SELECT_PORTAL": "Please select a portal",
+    "ADD_MARKER": "Add Marker",
+    "INPUT_SQUAD_NAME": "Input a Squad name",
+    "AGENT_IN_TEAM_INSTR": "Agents who are on the team but do not have the team enabled do not show in this list. The server's web interface can show those not enabled.",
+    "ADD_AGENT": "Add Agent: ",
+    "INGNAME_GID": "ingress name or GoogleID",
+    "ADD": "Add",
+    "ADD_SUCC_INSTR": "Add successful, they will need to enable the team before they appear in this list",
+    "RENAME_TEAM": "Rename Team: ",
+    "BAT_TOAD": "Battle Toads",
+    "RENAME": "Rename",
+    "MANAGE_TEAM": "Manage ",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
