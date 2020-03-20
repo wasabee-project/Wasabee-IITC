@@ -168,6 +168,15 @@
     "OPERATIONS": "Operations",
     "USE_VALID_NAME": "Please use a valid operation name",
     "CON_DEL": "Confirm Delete: ",
+    "TEAM": "Team",
+    "ROLE": "Role",
+    "REMOVE": "Remove",
+    "OP_CHECKLIST": "Operation Checklist: ",
+    "ORDER": "Order",
+    "PORTAL": "Portal",
+    "TYPE": "Type",
+    "COMMENT": "Comment",
+    "ASS_TO": "Assigned To",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
