@@ -118,6 +118,8 @@
     "CHANGE SERVER PROMPT": "New Wasabee Server",
     "ABOUT WASABEE-IITC": "About Wasabee-IITC",
     "ABOUT_WASABEE": "About Wasabee",
+    "SUPPORT_INSTRUCT": "For support, please join the <a href='https://t.me/joinchat/B7_3JE8Qfm_XBgP896sOgQ' target='_new'>The Telegram Channel</a>",
+    "HOW_TO_VIDS": "<h3>How-To Videos:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>0.15 Intro</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Old Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Teams and Permissions</a></li></ul>",
     "AUTH REQUIRED": "Authentication Required",
     "AUTOMARK STOP": "Auto-Mark stopped due to portals not being loaded",
     "NEW_OP": "New Operation",
@@ -222,6 +224,10 @@
     "TARDEST_DIFF": "Target and destination portals must be different.",
     "PICK_TAR_FIRST": "Please select a target portal first!",
     "PICK_DEST_FIRST": "Please select a destination portal first!",
+    "KNOWN_BLOCK": "Known Blockers: ",
+    "FROM_PORT": "From Portal",
+    "COUNT": "Count",
+    "TO_PORT": "To Portal",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
