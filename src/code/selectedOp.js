@@ -1,6 +1,7 @@
 import store from "../lib/store";
 import WasabeeOp from "./operation";
 import wX from "./wX";
+import { generateId } from "./auxiliar";
 
 const setRestoreOpID = opID => {
   store.set(window.plugin.wasabee.static.constants.SELECTED_OP_KEY, opID);
@@ -13,9 +14,6 @@ const getRestoreOpID = () => {
 export const getSelectedOperation = () => {
   return window.plugin.wasabee._selectedOp;
 };
-
-// I use this all the time in debugging, leave it globally visible
-window.plugin.wasabee.getSelectedOperation = getSelectedOperation;
 
 export const initSelectedOperation = () => {
   if (window.plugin.wasabee._selectedOp == null) {
@@ -146,4 +144,23 @@ export const opsList = () => {
     }
   });
   return out;
+};
+
+export const duplicateOperation = opID => {
+  let op = null;
+  if (opID == window.plugin.wasabee._selectedOp.ID) {
+    op = window.plugin.wasabee._selectedOp;
+    op.store();
+  } else {
+    op = getOperationByID(opID);
+  }
+
+  op.ID = generateId();
+  op.name = op.name + " " + new Date().toGMTString();
+  op.teamlist = null;
+  op.fetched = null;
+  op.keysonhand = new Array();
+  op.cleanAll();
+  op.store();
+  makeSelectedOperation(op.ID);
 };

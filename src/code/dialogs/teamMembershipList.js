@@ -83,7 +83,9 @@ const TeamMembershipList = Feature.extend({
       }
     ];
     this._table.sortBy = 0;
-    this._table.items = this._team.agents;
+    // if team owner, don't show non-enabled agents
+    const a = this._team.agents.filter(agent => agent.state);
+    this._table.items = a;
   }
 });
 

@@ -30,6 +30,7 @@ const FanfieldDialog = Feature.extend({
     const container = L.DomUtil.create("div", null);
     const description = L.DomUtil.create("div", null, container);
     description.textContent = wX("SELECT_FAN_PORTALS");
+
     const controls = L.DomUtil.create("div", null, container);
 
     const anchorDiv = L.DomUtil.create("div", null, controls);

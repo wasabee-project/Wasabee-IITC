@@ -69,21 +69,17 @@ const OperationChecklistDialog = Feature.extend({
 
   checklistUpdate: function(newOpData) {
     this._operation = newOpData;
-    const id =
-      "dialog-" + window.plugin.wasabee.static.dialogNames.operationChecklist;
-    if (window.DIALOGS[id]) {
-      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
-        wX("OP_CHECKLIST") + newOpData.name;
-      this.sortable = this.getListDialogContent(
-        newOpData,
-        this.sortable.sortBy,
-        this.sortable.sortAsc
-      );
-      window.DIALOGS[id].replaceChild(
-        this.sortable.table,
-        window.DIALOGS[id].childNodes[0]
-      );
-    }
+    this._dialog.dialog(
+      "option",
+      "title",
+      wX("OP_CHECKLIST", newOpData.name)
+    );
+    this.sortable = this.getListDialogContent(
+      newOpData,
+      this.sortable.sortBy,
+      this.sortable.sortAsc
+    );
+    this._dialog.html(this.sortable.table);
   },
 
   getListDialogContent: function(operation, sortBy, sortAsc) {

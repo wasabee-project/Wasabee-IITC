@@ -23,7 +23,7 @@ const KeysList = Feature.extend({
     this._operation = getSelectedOperation();
     const context = this;
     this._UIUpdateHook = newOpData => {
-      context.keyListUpdate(newOpData);
+      context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     if (WasabeeMe.isLoggedIn()) {
@@ -41,7 +41,7 @@ const KeysList = Feature.extend({
 
   _displayDialog: function() {
     this._listDialog = window.dialog({
-      title: wX("KEY_LIST") + this._operation.name,
+      title: wX("KEY_LIST", this._operation.name),
       width: "auto",
       height: "auto",
       position: {
@@ -51,22 +51,18 @@ const KeysList = Feature.extend({
       html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: () => {
-        delete this._listDialog;
+        delete this._dialog;
         this.disable();
       },
       id: window.plugin.wasabee.static.dialogNames.keysList
     });
   },
 
-  keyListUpdate: function(operation) {
+  update: function(operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
-    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.keysList;
-    if (window.DIALOGS[id]) {
-      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
-        wX("KEY_LIST") + operation.name;
-      const table = this.getListDialogContent(operation).table;
-      window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
-    }
+    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
+    const table = this.getListDialogContent(operation).table;
+    this._dialog.html(table);
   },
 
   getListDialogContent: function(operation) {

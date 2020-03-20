@@ -229,10 +229,8 @@ export const mePromise = function() {
     req.open("GET", url);
     req.withCredentials = true;
     req.crossDomain = true;
-    // req.setRequestHeader("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT"); // helps in some cases, breaks others
 
     req.onload = function() {
-      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           resolve(WasabeeMe.create(req.response));
@@ -889,6 +887,35 @@ export const newTeamPromise = function(name) {
     const req = new XMLHttpRequest();
 
     req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+    req.send();
+  });
+};
+
+export const deleteTeamPromise = function(teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/team/${teamID}`;
+    const req = new XMLHttpRequest();
+
+    req.open("DELETE", url);
     req.withCredentials = true;
     req.crossDomain = true;
 

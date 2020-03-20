@@ -82,19 +82,12 @@ const BlockerList = Feature.extend({
   blockerlistUpdate: function(newOpData) {
     this._operation = newOpData;
     if (!this._enabled) return;
-    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.blockerList;
-    if (window.DIALOGS[id]) {
-      window.DIALOGS[id].parentNode.children[0].children[1].innerText =
-        wX("KNOWN_BLOCK") + newOpData.name;
-      this.sortable = this._getListDialogContent(
-        this.sortable.sortBy,
-        this.sortable.sortAsc
-      );
-      window.DIALOGS[id].replaceChild(
-        this.sortable.table,
-        window.DIALOGS[id].childNodes[0]
-      );
-    }
+    this.sortable = this._getListDialogContent(
+      this.sortable.sortBy,
+      this.sortable.sortAsc
+    );
+    this._dialog.html(this.sortable.table);
+    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name);
   },
 
   _getListDialogContent(sortBy, sortAsc) {

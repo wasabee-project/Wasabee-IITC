@@ -35,6 +35,18 @@ const WasabeeDialog = Feature.extend({
     this._me = await WasabeeMe.waitGet(true);
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
+    // magic context incantation to make "this" work...
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.update(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+  },
+
+  update: async function() {
+    if (!this._enabled) return;
+    // this._me = await WasabeeMe.waitGet(); // breaks logout
+    this._dialog.html(this._buildContent());
   },
 
   _buildContent: function() {
@@ -68,13 +80,9 @@ const WasabeeDialog = Feature.extend({
           link.innerHTML = curstate;
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            curstate = await this.toggleTeam(obj.ID, curstate);
-            link.innerHTML = curstate;
-            if (curstate == "On") {
-              L.DomUtil.addClass(link, "enl");
-            } else {
-              L.DomUtil.removeClass(link, "enl");
-            }
+            await this.toggleTeam(obj.ID, curstate);
+            this._me = await WasabeeMe.waitGet(true);
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           };
         }
       },
@@ -85,8 +93,7 @@ const WasabeeDialog = Feature.extend({
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.innerHTML = "Leave";
-          // use L.DomEvent.on
-          link.onclick = () => {
+          L.DomEvent.on(link, "click", () => {
             const cd = new ConfirmDialog();
             cd.setup(
               `Leave ${obj.Name}?`,
@@ -94,11 +101,8 @@ const WasabeeDialog = Feature.extend({
               () => {
                 leaveTeamPromise(obj.ID).then(
                   async () => {
-                    // the lazy way
                     this._me = await WasabeeMe.waitGet(true);
-                    console.log(this);
-                    this._dialog.dialog("close");
-                    this._displayDialog();
+                    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                   },
                   err => {
                     console.log(err);
@@ -108,7 +112,7 @@ const WasabeeDialog = Feature.extend({
               }
             );
             cd.enable();
-          };
+          });
         }
       },
       {
@@ -118,7 +122,7 @@ const WasabeeDialog = Feature.extend({
         format: (row, value, obj) => {
           row.textContent = "";
           for (const ot of this._me.OwnedTeams) {
-            if (ot.ID == obj.ID) {
+            if (obj.State == "On" && ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
               link.textContent = wX("MANAGE");
               L.DomEvent.on(link, "click", () => {
@@ -166,18 +170,16 @@ const WasabeeDialog = Feature.extend({
 
     html.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
-    this._html = html;
+    return html;
   },
 
   _displayDialog: function() {
-    this._buildContent();
-
     if (this._me) {
       this._dialog = window.dialog({
         title: wX("CUR_USER_INFO"),
         width: "auto",
         height: "auto",
-        html: this._html,
+        html: this._buildContent(),
         dialogClass: "wasabee-dialog-mustauth",
         buttons: {
           OK: () => {
@@ -226,6 +228,7 @@ const WasabeeDialog = Feature.extend({
         },
 
         closeCallback: () => {
+          // window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
           this.disable();
           delete this._dialog;
         },

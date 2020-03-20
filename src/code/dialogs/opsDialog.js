@@ -7,7 +7,8 @@ import {
   getOperationByID,
   makeSelectedOperation,
   opsList,
-  removeOperation
+  removeOperation,
+  duplicateOperation
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
@@ -26,14 +27,13 @@ const OpsDialog = Feature.extend({
   addHooks: function() {
     if (!this._map) return;
     Feature.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    this._displayDialog();
+
     const context = this;
     this._UIUpdateHook = newOpData => {
       context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-
-    this._displayDialog();
   },
 
   removeHooks: function() {
@@ -42,8 +42,7 @@ const OpsDialog = Feature.extend({
   },
 
   _displayDialog: function() {
-    const op = getSelectedOperation();
-    this.update(op);
+    this.makeContent(getSelectedOperation());
 
     const context = this;
     this._dialog = window.dialog({
@@ -62,15 +61,9 @@ const OpsDialog = Feature.extend({
   },
 
   update: function(selectedOp) {
-    this.makeContent(selectedOp);
-    if (!this._enabled) return;
-    const id = "dialog-" + window.plugin.wasabee.static.dialogNames.opsButton;
-    if (window.DIALOGS[id]) {
+    if (this._enabled && this._dialog && this._dialog.html) {
       this.makeContent(selectedOp);
-      window.DIALOGS[id].replaceChild(
-        this._content,
-        window.DIALOGS[id].childNodes[0]
-      );
+      this._dialog.html(this._content);
     }
   },
 
@@ -233,6 +226,13 @@ const OpsDialog = Feature.extend({
         opl.enable();
       });
     }
+
+    const permsButton = L.DomUtil.create("a", null, buttonSection);
+    permsButton.innerHTML = "Duplicate Operation";
+    L.DomEvent.on(permsButton, "click", () => {
+      duplicateOperation(selectedOp.ID);
+      window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+    });
 
     this._content = content;
   }
