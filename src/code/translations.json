@@ -177,6 +177,18 @@
     "TYPE": "Type",
     "COMMENT": "Comment",
     "ASS_TO": "Assigned To",
+    "SELECT_INSTRUCTIONS": "Select two anchor portals, then zoom in to an area for the spine, wait until the portals are loaded (portals must be on screen to be considered) and press the Multimax button.",
+    "MULTIMAX": "Multimax!",
+    "ADD_BL": "Add Back Links: ",
+    "MULTI_M": "Multimax",
+    "NO_PORT_SEL": "No Portal Selected.",
+    "SEL_PORT_FIRST": "Please select anchor portals first!",
+    "MARKER_LIST": "Marker List: ",
+    "ORDER": "Order",
+    "DONE": "Done",
+    "YES": "Yes",
+    "NO": "No",
+    "SET_COMMENT": "Set Comment",
     "YESNO_DEL": "Are you sure you want to delete "
   },
   "es": {
