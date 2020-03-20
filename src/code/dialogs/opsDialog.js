@@ -7,7 +7,8 @@ import {
   getOperationByID,
   makeSelectedOperation,
   opsList,
-  removeOperation
+  removeOperation,
+  duplicateOperation
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 
@@ -224,6 +225,13 @@ const OpsDialog = Feature.extend({
         opl.enable();
       });
     }
+
+    const permsButton = L.DomUtil.create("a", null, buttonSection);
+    permsButton.innerHTML = "Duplicate Operation";
+    L.DomEvent.on(permsButton, "click", () => {
+      duplicateOperation(selectedOp.ID);
+      window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+    });
 
     this._content = content;
   }
