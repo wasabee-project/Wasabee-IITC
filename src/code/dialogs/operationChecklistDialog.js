@@ -186,7 +186,7 @@ const OperationChecklistDialog = Feature.extend({
         }
       },
       {
-        name: Wx("STATE"),
+        name: wX("STATE"),
         value: thing => thing.state,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value) => {

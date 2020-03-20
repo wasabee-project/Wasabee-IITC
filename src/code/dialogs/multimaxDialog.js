@@ -117,7 +117,7 @@ const MultimaxDialog = Feature.extend({
     if (selectedPortal) {
       store.set("wasabee-multimax-" + AB, JSON.stringify(selectedPortal));
     } else {
-      alert(Wx("NO_PORT_SEL"));
+      alert(wX("NO_PORT_SEL"));
       store.remove("wasabee-multimax-" + AB);
     }
     this.updatePortal(AB);
