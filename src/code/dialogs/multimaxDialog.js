@@ -4,6 +4,7 @@ import store from "../../lib/store";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { getAllPortalsOnScreen } from "../uiCommands";
 
 const MultimaxDialog = Feature.extend({
   statics: {
@@ -146,7 +147,7 @@ const MultimaxDialog = Feature.extend({
 
   doMultimax: context => {
     return new Promise((resolve, reject) => {
-      const portalsOnScreen = context._getAllPortalsOnScreen();
+      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
       const A = context.getPortal("A");
       const B = context.getPortal("B");
       if (!A || !B) reject(wX("SEL_PORT_FIRST"));
@@ -202,46 +203,6 @@ const MultimaxDialog = Feature.extend({
         }
       );
     });
-  },
-
-  _isOnScreen: function(ll, bounds) {
-    return (
-      ll.lat < bounds._northEast.lat &&
-      ll.lng < bounds._northEast.lng &&
-      ll.lat > bounds._southWest.lat &&
-      ll.lng > bounds._southWest.lng
-    );
-  },
-
-  _getAllPortalsOnScreen: function() {
-    const bounds = window.clampLatLngBounds(window.map.getBounds());
-    const x = [];
-    for (const portal in window.portals) {
-      if (this._isOnScreen(window.portals[portal].getLatLng(), bounds)) {
-        if (
-          this._hasMarker(
-            window.portals[portal].options.guid,
-            window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
-          )
-        ) {
-          console.log("skipping ", window.portals[portal].options.guid);
-          continue;
-        }
-        x.push(window.portals[portal]);
-      }
-    }
-    return x;
-  },
-
-  // operation.constainsMarker expects a WasabeePortal
-  _hasMarker(portalid, markerType) {
-    if (this._operation.markers.length == 0) return false;
-    for (const m of this._operation.markers) {
-      if (m.portalId == portalid && m.type == markerType) {
-        return true;
-      }
-    }
-    return false;
   }
 });
 

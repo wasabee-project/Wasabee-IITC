@@ -89,9 +89,7 @@ export const Feature = L.Handler.extend({
     }
 
     L.Handler.prototype.enable.call(this);
-
     this.fire("enabled", { handler: this.type });
-
     this._map.fire("draw:drawstart", { layerType: this.type });
   },
 
@@ -101,9 +99,7 @@ export const Feature = L.Handler.extend({
     }
 
     L.Handler.prototype.disable.call(this);
-
     this.fire("disabled", { handler: this.type });
-
     this._map.fire("draw:drawstop", { layerType: this.type });
   },
 

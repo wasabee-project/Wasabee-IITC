@@ -58,7 +58,6 @@ const QuickDrawControl = Feature.extend({
 
   removeHooks: function() {
     Feature.prototype.removeHooks.call(this);
-
     delete this._anchor1;
     delete this._anchor2;
     delete this._spinePortals;
@@ -67,24 +66,10 @@ const QuickDrawControl = Feature.extend({
     this._map.off("mousemove", this._onMouseMove, this);
   },
 
+  // would using the "sticky" option on the L.tooltip be better?
   _onMouseMove: function(e) {
-    var latlng = e.latlng;
-
-    // Save latlng
-    this._currentLatLng = latlng;
-
-    this._updateTooltip(latlng);
-
-    // Update the mouse marker position
-    //this._mouseMarker.setLatLng(latlng);
-
+    if (e.latlng) this._tooltip.updatePosition(e.latlng);
     L.DomEvent.preventDefault(e.originalEvent);
-  },
-
-  _updateTooltip: function(latLng) {
-    if (latLng) {
-      this._tooltip.updatePosition(latLng);
-    }
   },
 
   _getTooltipText: function() {

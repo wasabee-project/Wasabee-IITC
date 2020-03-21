@@ -162,7 +162,7 @@ const _isOnScreen = function(ll, bounds) {
 
 const _hasMarker = function(portalid, markerType, operation) {
   if (operation.markers.length == 0) return false;
-  for (const m of this._operation.markers) {
+  for (const m of operation.markers) {
     if (m.portalId == portalid && m.type == markerType) {
       return true;
     }
