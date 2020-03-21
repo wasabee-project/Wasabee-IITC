@@ -1,6 +1,6 @@
 {
   "en": {
-    "last edited": "03-03-2020 @deviousness",
+    "last edited": "03-21-2020 @deviousness",
     "DISABLE_SYNC": "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee",
     "SEND TARGET": "Send Target",
     "SELECT PORTAL": "Select a portal to send",
@@ -217,6 +217,7 @@
     "SELECT_FAN_PORTALS": "Select an anchor portals, a start portal, an end portal, then zoom in to an area for the fan field, wait until the portals are loaded (portals must be on screen to be considered) and press the Fanfield button.",
     "FANFIELD": "Fanfield!",
     "FANFIELD2": "Fanfield",
+    "FANFIELD TITLE": "Fanfield",
     "SET_3_PORT": "Please set the three portals first!",
     "DESCRIP_PLACEHOLD": "Description (optional)",
     "ADD_LINKS": "Add Links",
@@ -228,7 +229,9 @@
     "FROM_PORT": "From Portal",
     "COUNT": "Count",
     "TO_PORT": "To Portal",
-    "YESNO_DEL": "Are you sure you want to delete "
+    "YESNO_DEL": "Are you sure you want to delete ",
+    "STARBURST": "Starburst",
+    "STARBURST TITLE": "Starburst "
   },
   "es": {
     "last edited": "03-03-2020 @crystalwizard",

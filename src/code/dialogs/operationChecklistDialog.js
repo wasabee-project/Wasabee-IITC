@@ -48,7 +48,7 @@ const OperationChecklistDialog = Feature.extend({
   _displayDialog: function() {
     this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
-    this._listDialogData = window.dialog({
+    this._dialog = window.dialog({
       title: wX("OP_CHECKLIST") + this._operation.name,
       width: "auto",
       height: "auto",
