@@ -2,7 +2,7 @@ import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import { teamPromise } from "./server";
 
-var Wasabee = window.plugin.wasabee;
+const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
