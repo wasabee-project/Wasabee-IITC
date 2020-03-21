@@ -249,7 +249,9 @@ export const drawAgents = async () => {
               marker.on(
                 "click",
                 () => {
-                  marker.setPopupContent(agent.getPopup());
+                  // get fresh data
+                  const a = window.plugin.wasabee._agentCache.get(agent.id);
+                  marker.setPopupContent(a.getPopup());
                   marker.update();
                   marker.openPopup();
                 },
@@ -258,7 +260,9 @@ export const drawAgents = async () => {
               marker.on(
                 "spiderfiedclick",
                 () => {
-                  marker.setPopupContent(agent.getPopup());
+                  // get fresh data
+                  const a = window.plugin.wasabee._agentCache.get(agent.id);
+                  marker.setPopupContent(a.getPopup());
                   marker.update();
                   marker.openPopup();
                 },
