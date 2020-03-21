@@ -1,6 +1,7 @@
 import { WButton } from "../leafletDrawImports.js";
 import MultimaxButtonControl from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
+import StarburstDialog from "../dialogs/starburst";
 import LinkDialog from "../dialogs/linkDialog";
 import wX from "../wX";
 
@@ -53,9 +54,18 @@ const LinkButton = WButton.extend({
         text: wX("MAX"),
         callback: () => {
           this.disable();
-          // alert(wX("DISABLED"));
           const ff = new FanfieldDialog(map);
           ff.enable();
+        },
+        context: context
+      },
+      {
+        title: wX("STARBURST TITLE"),
+        text: wX("STARBURST"),
+        callback: () => {
+          this.disable();
+          const sb = new StarburstDialog(map);
+          sb.enable();
         },
         context: context
       }
