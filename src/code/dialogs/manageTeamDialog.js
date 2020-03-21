@@ -143,8 +143,6 @@ const ManageTeamDialog = Feature.extend({
   _dialogContent: function(container) {
     const list = L.DomUtil.create("div", null, container);
     list.appendChild(this._table.table);
-    const listnote = L.DomUtil.create("div", null, list);
-    listnote.textContent = wX("AGENT_IN_TEAM_INSTR");
 
     const add = L.DomUtil.create("div", null, container);
     const addlabel = L.DomUtil.create("label", null, add);

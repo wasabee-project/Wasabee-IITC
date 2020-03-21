@@ -40,7 +40,7 @@ const KeysList = Feature.extend({
   },
 
   _displayDialog: function() {
-    this._listDialog = window.dialog({
+    this._dialog = window.dialog({
       title: wX("KEY_LIST", this._operation.name),
       width: "auto",
       height: "auto",
