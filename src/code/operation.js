@@ -96,7 +96,7 @@ export default class WasabeeOp {
   }
 
   getLinkListFromPortal(portal) {
-    var links = this.links.filter(function(listLink) {
+    const links = this.links.filter(function(listLink) {
       return (
         listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id
       );
@@ -155,7 +155,7 @@ export default class WasabeeOp {
 
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
-    var newLinks = [];
+    const newLinks = [];
     for (const l of this.links) {
       if (!(l.fromPortalId == startPortal && l.toPortalId == endPortal)) {
         newLinks.push(l);
@@ -169,7 +169,7 @@ export default class WasabeeOp {
   }
 
   reverseLink(startPortalID, endPortalID) {
-    var newLinks = [];
+    const newLinks = [];
     for (const l of this.links) {
       if (l.fromPortalId == startPortalID && l.toPortalId == endPortalID) {
         l.fromPortalId = endPortalID;
@@ -195,9 +195,9 @@ export default class WasabeeOp {
   }
 
   cleanAnchorList() {
-    var newAnchorList = [];
+    const newAnchorList = [];
     for (const a of this.anchors) {
-      var foundAnchor = false;
+      let foundAnchor = false;
       for (const l of this.links) {
         if (l.fromPortalId == a || l.toPortalId == a) {
           foundAnchor = true;
@@ -213,7 +213,7 @@ export default class WasabeeOp {
 
   //This removes opportals with no links and removes duplicates
   cleanPortalList() {
-    var newPortals = [];
+    const newPortals = [];
     for (const p of this.opportals) {
       // if (!typeof p == "WasabeePortal") continue;
       let foundPortal = false;

@@ -45,10 +45,8 @@ const Tooltip = L.Class.extend({
   },
 
   updatePosition: function(latlng) {
-    var pos = this._map.latLngToLayerPoint(latlng);
-
+    const pos = this._map.latLngToLayerPoint(latlng);
     L.DomUtil.setPosition(this._container, pos);
-
     return this;
   },
 
@@ -171,7 +169,7 @@ export const Toolbar = L.Class.extend({
 
   removeToolbar: function() {
     // Dispose each handler
-    for (var handlerId in this._modes) {
+    for (const handlerId in this._modes) {
       //if (this._modes.hasOwnProperty(handlerId)) {
       if (this._modes[handlerId]) {
         // Unbind handler button
@@ -192,7 +190,7 @@ export const Toolbar = L.Class.extend({
     this._modes = {};
 
     // Dispose the actions toolbar
-    for (var i = 0, l = this._actionButtons.length; i < l; i++) {
+    for (let i = 0, l = this._actionButtons.length; i < l; i++) {
       this._disposeButton(
         this._actionButtons[i].button,
         this._actionButtons[i].callback
@@ -209,12 +207,9 @@ export const Toolbar = L.Class.extend({
     classNamePredix,
     buttonTitle
   ) {
-    var type = handler.type;
-
+    const type = handler.type;
     this._modes[type] = {};
-
     this._modes[type].handler = handler;
-
     this._modes[type].button = this._createButton({
       title: buttonTitle,
       className: classNamePredix + "-" + type,
@@ -222,16 +217,14 @@ export const Toolbar = L.Class.extend({
       callback: this._modes[type].handler.enable,
       context: this._modes[type].handler
     });
-
     this._modes[type].buttonIndex = buttonIndex;
-
     this._modes[type].handler
       .on("enabled", this._handlerActivated, this)
       .on("disabled", this._handlerDeactivated, this);
   },
 
   _createButton: function(options) {
-    var link = L.DomUtil.create(
+    const link = L.DomUtil.create(
       "a",
       options.className || "",
       options.container
@@ -296,15 +289,12 @@ export const Toolbar = L.Class.extend({
   },
 
   _createActions: function(buttons) {
-    var container = L.DomUtil.create("ul", "leaflet-draw-actions"),
-      l = buttons.length,
-      li,
-      button;
+    const container = L.DomUtil.create("ul", "leaflet-draw-actions");
 
-    for (var i = 0; i < l; i++) {
-      li = L.DomUtil.create("li", null, container);
+    for (let i = 0; i < buttons.length; i++) {
+      const li = L.DomUtil.create("li", null, container);
 
-      button = this._createButton({
+      const button = this._createButton({
         title: buttons[i].title,
         text: buttons[i].text,
         container: li,
@@ -322,7 +312,7 @@ export const Toolbar = L.Class.extend({
   },
 
   _showActionsToolbar: function() {
-    var buttonIndex = this._activeMode.buttonIndex,
+    const buttonIndex = this._activeMode.buttonIndex,
       lastButtonIndex = this._lastButtonIndex,
       buttonHeight = 26, // TODO: this should be calculated
       borderHeight = 1, // TODO: this should also be calculated
