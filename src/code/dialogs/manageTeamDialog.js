@@ -59,7 +59,7 @@ const ManageTeamDialog = Feature.extend({
         format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: wX("Squad"),
+        name: wX("SQUAD"),
         value: agent => agent.squad,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {

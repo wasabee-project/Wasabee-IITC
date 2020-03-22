@@ -253,8 +253,8 @@ const testLink = (link, operation) => {
 };
 
 export const checkAllLinks = operation => {
-  console.time("checkAllLinks");
-  console.log("checkAllLinks called: " + operation.ID);
+  // console.time("checkAllLinks");
+  // console.log("checkAllLinks called: " + operation.ID);
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
@@ -262,19 +262,19 @@ export const checkAllLinks = operation => {
   for (const guid in window.links) {
     testLink(window.links[guid], operation);
   }
-  console.timeEnd("checkAllLinks");
+  // console.timeEnd("checkAllLinks");
 };
 
 const onLinkAdded = data => {
   testLink(data.link, getSelectedOperation());
 };
 
-/* probably unused now */
+/* probably unused now -- remove in 0.16 */
 const testForDeletedLinks = () => {
   for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
     const guid = layer.options.guid;
     if (!window.links[guid]) {
-      console.log("testForDeletedLinks found something");
+      console.log("testForDeletedLinks FOUND SOMETHING!!!");
       window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
       window.plugin.wasabee._crosslinkCache.delete(guid);
     }

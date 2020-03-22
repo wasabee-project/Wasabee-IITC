@@ -16,7 +16,7 @@ const FanfieldDialog = Feature.extend({
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
     this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
+    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, false);
   },
 
   removeHooks: function() {

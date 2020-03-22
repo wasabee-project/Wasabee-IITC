@@ -3,6 +3,7 @@ import WasabeePortal from "./portal";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
+/*
 const strings = {
   quickdraw: {
     actions: {
@@ -12,13 +13,10 @@ const strings = {
       }
     },
     tooltip: {
-      start: wX("QDSTART"),
-      next: wX("QDNEXT"),
-      cont: wX("QDCONT"),
       end: wX("QDEND")
     }
   }
-};
+}; */
 
 const QuickDrawControl = Feature.extend({
   statics: {
@@ -48,7 +46,7 @@ const QuickDrawControl = Feature.extend({
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
-    let that = this;
+    const that = this;
     this._portalClickedHook = function() {
       QuickDrawControl.prototype._portalClicked.call(that);
     };
@@ -73,9 +71,9 @@ const QuickDrawControl = Feature.extend({
   },
 
   _getTooltipText: function() {
-    if (!this._anchor1) return { text: strings.quickdraw.tooltip.start };
-    if (!this._anchor2) return { text: strings.quickdraw.tooltip.next };
-    return { text: strings.quickdraw.tooltip.cont };
+    if (!this._anchor1) return { text: wX("QDSTART") };
+    if (!this._anchor2) return { text: wX("QDNEXT") };
+    return { text: wX("QDCONT") };
   },
 
   _portalClicked: function() {
@@ -98,25 +96,25 @@ const QuickDrawControl = Feature.extend({
       );
       this._tooltip.updateContent(this._getTooltipText());
       return;
+    }
+
+    if (selectedPortal.id in this._spinePortals) {
+      return; //ignore duplicates
     } else {
-      if (selectedPortal.id in this._spinePortals) {
-        return; //ignore duplicates
-      } else {
-        this._spinePortals[selectedPortal.id] = selectedPortal;
-        this._operation.addLink(
-          selectedPortal,
-          this._anchor1,
-          null,
-          this._throwOrder++
-        );
-        this._operation.addLink(
-          selectedPortal,
-          this._anchor2,
-          null,
-          this._throwOrder++
-        );
-        this._tooltip.updateContent(this._getTooltipText());
-      }
+      this._spinePortals[selectedPortal.id] = selectedPortal;
+      this._operation.addLink(
+        selectedPortal,
+        this._anchor1,
+        null,
+        this._throwOrder++
+      );
+      this._operation.addLink(
+        selectedPortal,
+        this._anchor2,
+        null,
+        this._throwOrder++
+      );
+      this._tooltip.updateContent(this._getTooltipText());
     }
   }
 });
