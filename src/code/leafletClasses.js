@@ -95,10 +95,7 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function() {
-    // called Wupdate because I think update might conflict with L.*
-    // console.log("WButton Wupdate called");
-  },
+  Wupdate: function() {},
 
   _toggleActions: function() {
     if (this._enabled) {
@@ -136,20 +133,17 @@ export const WButton = L.Class.extend({
       options.container
     );
     link.href = "#";
-    if (options.text) {
-      link.innerHTML = options.text;
-    }
+    if (options.text) link.innerHTML = options.text;
+
     if (options.buttonImage) {
-      $(link).append(
-        $("<img/>")
-          .prop("src", options.buttonImage)
-          .css("vertical-align", "middle")
-          .css("align", "center")
-      );
+      const img = L.DomUtil.create("img", null, link);
+      img.src = options.buttonImage;
+      img.style.verticalAlign = "middle";
+      img.style.align = "center";
     }
-    if (options.title) {
-      link.title = options.title;
-    }
+
+    if (options.title) link.title = options.title;
+
     L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
       .on(link, "mousedown", L.DomEvent.stopPropagation)
       .on(link, "dblclick", L.DomEvent.stopPropagation)
@@ -169,7 +163,7 @@ export const WButton = L.Class.extend({
   _createActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
-      const li = L.DomUtil.create("li", "", container);
+      const li = L.DomUtil.create("li", "wasabee-actions", container);
       this._createButton({
         title: b.title,
         text: b.text,
