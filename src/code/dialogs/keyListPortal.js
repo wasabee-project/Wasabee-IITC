@@ -1,9 +1,10 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
-const KeyListPortal = Feature.extend({
+const KeyListPortal = WDialog.extend({
   statics: {
     TYPE: "keyListPortal"
   },
@@ -11,12 +12,12 @@ const KeyListPortal = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = KeyListPortal.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     const context = this;
     this._UIUpdateHook = newOpData => {
       context.keyListUpdate(newOpData);
@@ -26,7 +27,7 @@ const KeyListPortal = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
@@ -62,19 +63,18 @@ const KeyListPortal = Feature.extend({
   },
 
   keyListUpdate: function(operation) {
-    const id =
-      "dialog-" + window.plugin.wasabee.static.dialogNames.keyListPortal;
-    if (window.DIALOGS[id]) {
-      const table = this.getListDialogContent(operation, this._portalID);
-      window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
+    if (operation.ID != this._operation.ID) {
+      this._dialog.dialog("close"); // op changed, bail
     }
+    const table = this.getListDialogContent(operation, this._portalID);
+    this._dialog.html(table);
   },
 
   getSortable: function() {
     const sortable = new Sortable();
     sortable.fields = [
       {
-        name: "Agent",
+        name: wX("AGENT"),
         value: key => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
@@ -83,7 +83,7 @@ const KeyListPortal = Feature.extend({
         }
       },
       {
-        name: "On Hand",
+        name: wX("ON_HAND"),
         value: key => key.onhand,
         sort: (a, b) => a - b,
         format: (cell, value) => {
@@ -91,7 +91,7 @@ const KeyListPortal = Feature.extend({
         }
       },
       {
-        name: "Capsule",
+        name: wX("CAPSULE"),
         value: key => key.capsule,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {

@@ -1,29 +1,33 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
+import { getAllPortalsOnScreen } from "../uiCommands";
 
-const MultimaxDialog = Feature.extend({
+const MultimaxDialog = WDialog.extend({
   statics: {
     TYPE: "multimaxDialog"
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", "");
-    const rdnTable = L.DomUtil.create("table", "", container);
+    const container = L.DomUtil.create("div", null);
+    const description = L.DomUtil.create("div", null, container);
+    description.textContent = wX("SELECT_INSTRUCTIONS");
+    const rdnTable = L.DomUtil.create("table", null, container);
 
     ["A", "B"].forEach(string => {
       const tr = rdnTable.insertRow();
@@ -33,7 +37,7 @@ const MultimaxDialog = Feature.extend({
       node.textContent = string;
       // Set button
       const nodethree = tr.insertCell();
-      const button = L.DomUtil.create("button", "", nodethree);
+      const button = L.DomUtil.create("button", null, nodethree);
       button.textContent = "set";
       button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
@@ -45,24 +49,39 @@ const MultimaxDialog = Feature.extend({
 
     // Bottom buttons bar
     const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", "", element);
+    const div = L.DomUtil.create("span", null, element);
 
     // Enter arrow
     const opt = L.DomUtil.create("span", "arrow", div);
     opt.textContent = "\u21b3";
 
     // Go button
-    const button = L.DomUtil.create("button", "", div);
-    button.textContent = "Multimax!";
-    L.DomEvent.on(button, "click", () => {
-      this._dialog.dialog("close");
-      this.doMultimax(this._operation);
-      alert("multimax!");
+    const button = L.DomUtil.create("button", null, div);
+    button.textContent = wX("MULTIMAX");
+    L.DomEvent.on(button, "click", async () => {
+      const context = this;
+
+      this.doMultimax(context).then(
+        total => {
+          alert(`Multimax found ${total} layers`);
+          this._dialog.dialog("close");
+        },
+        reject => {
+          console.log(reject);
+          alert(reject);
+        }
+      );
     });
+
+    const flylinks = L.DomUtil.create("span", null, div);
+    const fllabel = L.DomUtil.create("label", null, flylinks);
+    fllabel.textContent = wX("ADD_BL");
+    this._flcheck = L.DomUtil.create("input", null, flylinks);
+    this._flcheck.type = "checkbox";
 
     const context = this;
     this._dialog = window.dialog({
-      title: "Multimax",
+      title: wX("MULTI_M"),
       width: "auto",
       height: "auto",
       html: container,
@@ -78,7 +97,7 @@ const MultimaxDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
     this.title = "Multimax";
     this.label = "Multimax";
     this._portals = {};
@@ -87,10 +106,10 @@ const MultimaxDialog = Feature.extend({
   },
 
   //***Function to clear local selections of portals for the dialog
-  clearLocalPortalSelections: function() {
+  /* clearLocalPortalSelections: function() {
     store.remove("wasabee-multimax-A");
     store.remove("wasabee-multimax-B");
-  },
+  }, */
 
   //***Function to set portal -- called from 'Set' Button
   setPortal: function(event) {
@@ -99,7 +118,7 @@ const MultimaxDialog = Feature.extend({
     if (selectedPortal) {
       store.set("wasabee-multimax-" + AB, JSON.stringify(selectedPortal));
     } else {
-      alert("No Portal Selected.");
+      alert(wX("NO_PORT_SEL"));
       store.remove("wasabee-multimax-" + AB);
     }
     this.updatePortal(AB);
@@ -126,55 +145,64 @@ const MultimaxDialog = Feature.extend({
     }
   },
 
-  doMultimax: function() {
-    const portalsOnScreen = this._getAllPortalsOnScreen();
-    const A = this.getPortal("A");
-    const B = this.getPortal("B");
-    // Both anchors must have been selected
-    if (!A || !B) {
-      alert("Please select anchor portals first!");
-      return;
-    }
-    // Calculate the multimax
-    const sequence = multimax(A, B, portalsOnScreen);
-    if (!Array.isArray(sequence) || !sequence.length) {
-      alert("No layers found");
-      return;
-    }
+  doMultimax: context => {
+    return new Promise((resolve, reject) => {
+      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
+      const A = context.getPortal("A");
+      const B = context.getPortal("B");
+      if (!A || !B) reject(wX("SEL_PORT_FIRST"));
 
-    this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(A, B, "multimax base");
+      // Calculate the multimax
+      multimax(A, B, portalsOnScreen).then(
+        sequence => {
+          if (!Array.isArray(sequence) || !sequence.length)
+            reject("No layers found");
 
-    for (const node of sequence) {
-      let p = WasabeePortal.get(node.options.guid);
-      if (!p) {
-        const ll = node.getLatLng();
-        p = WasabeePortal.fake(ll.lat, ll.lng, node.options.guid);
-      }
-      this._operation.addLink(p, A, "multimax generated link");
-      this._operation.addLink(p, B, "multimax generated link");
-    }
-    this._operation.endBatchMode(); // save and run crosslinks
-  },
+          let order = sequence.length * (context._flcheck ? 3 : 2);
+          let prev = null;
 
-  _isOnScreen: function(ll, bounds) {
-    return (
-      ll.lat < bounds._northEast.lat &&
-      ll.lng < bounds._northEast.lng &&
-      ll.lat > bounds._southWest.lat &&
-      ll.lng > bounds._southWest.lng
-    );
-  },
+          context._operation.startBatchMode(); // bypass save and crosslinks checks
+          context._operation.addLink(A, B, "multimax base", 1);
 
-  _getAllPortalsOnScreen: function() {
-    const bounds = window.clampLatLngBounds(window.map.getBounds());
-    const x = [];
-    for (const portal in window.portals) {
-      if (this._isOnScreen(window.portals[portal].getLatLng(), bounds)) {
-        x.push(window.portals[portal]);
-      }
-    }
-    return x;
+          for (const node of sequence) {
+            let p = WasabeePortal.get(node);
+            if (context._flcheck.checked && prev) {
+              context._operation.addLink(
+                prev,
+                p,
+                "multimax generated back link",
+                order + 3
+              );
+              order--;
+            }
+            if (!p) {
+              console.log("skipping: " + node);
+              continue;
+              // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
+            }
+            context._operation.addLink(
+              p,
+              A,
+              "multimax generated link",
+              order--
+            );
+            context._operation.addLink(
+              p,
+              B,
+              "multimax generated link",
+              order--
+            );
+            prev = p;
+          }
+          context._operation.endBatchMode(); // save and run crosslinks
+          resolve(sequence.length);
+        },
+        err => {
+          console.log(err);
+          reject(err);
+        }
+      );
+    });
   }
 });
 

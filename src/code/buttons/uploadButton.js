@@ -1,52 +1,66 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import { uploadOpPromise, updateOpPromise } from "../server";
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 const UploadButton = WButton.extend({
   statics: {
     TYPE: "uploadButton"
   },
 
-  initialize: function(map, container) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, container) {
     this._map = map;
 
     this.type = UploadButton.TYPE;
     // this.handler = null;
-    this._operation = getSelectedOperation();
-    this.title = `Upload ${this._operation.name}`;
+    const operation = getSelectedOperation();
+    this.title = `Upload ${operation.name}`;
+    this._container = container;
 
     this.button = this._createButton({
       title: "Upload",
-      container: container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_upload,
+      container: this._container,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_upload.default,
       context: this,
       callback: () => {
-        if (this._operation.IsServerOp()) {
-          updateOpPromise(this._operation).then(
-            function(resolve) {
-              console.log(`server accepted the update: ${resolve}`);
-              alert("Update Successful");
-              // window.runHooks("wasabeeUIUpdate", this._operation);
+        const operation = getSelectedOperation();
+        if (operation.IsServerOp()) {
+          updateOpPromise().then(
+            () => {
+              alert(wX("UPDATED"));
+              this.Wupdate(this._container, operation);
             },
-            function(reject) {
+            reject => {
               console.log(reject);
               alert(`Update Failed: ${reject}`);
             }
           );
           return;
         }
-        uploadOpPromise(this._operation).then(
-          function(resolve) {
+        uploadOpPromise().then(
+          resolve => {
+            console.log(resolve);
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
-            // makeSelectedOp takes care of redraw, no need to save since already there
-            alert("Upload Successful");
+            alert(wX("UPLOADED"));
+            this.Wupdate(this._container, resolve);
+            this._invisible();
           },
-          function(reject) {
+          reject => {
+            // this shouldn't be necessary, but the UI is behind
+            updateOpPromise().then(
+              () => {
+                const operation = getSelectedOperation();
+                alert(wX("UPDATED"));
+                this.Wupdate(this._container, operation);
+              },
+              reject => {
+                console.log(reject);
+                alert(`Update Failed: ${reject}`);
+              }
+            );
             console.log(reject);
-            alert(`Upload Failed: ${reject}`);
           }
         );
       }
@@ -54,39 +68,35 @@ const UploadButton = WButton.extend({
   },
 
   Wupdate: function(container, operation) {
-    if (this._operation.ID != operation.ID) {
-      this._operation = operation;
-    }
-
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
-      this.title = "not logged in";
+      this.title = wX("NOT LOGGED IN SHORT");
       this.button.title = this.title;
       return;
     }
 
     if (!operation.IsServerOp()) {
       this._visible();
-      this.title = `UPLOAD ${this._operation.name} (not currently on server)`;
+      this.title = wX("UPLOAD BUTTON HOVER", operation.name);
       this.button.title = this.title;
       return;
     }
 
     if (!operation.IsWritableOp()) {
-      this.title = `You do not have permission to modify ${this._operation.name} on the server`;
+      this.title = wX("UPDATE PERM DENIED");
       this.button.title = this.title;
       this._invisible();
       return;
     }
 
     if (!operation.localchanged) {
-      this.title = `${this._operation.name} not changed locally`;
+      this.title = wX("UPDATE HOVER NOT CHANGED", operation.name);
       this.button.title = this.title;
       this._invisible();
       return;
     }
 
-    this.title = `Update ${this._operation.name} on server`;
+    this.title = wX("UPDATE HOVER", operation.name);
     this.button.title = this.title;
     this._visible();
   },

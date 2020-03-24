@@ -1,20 +1,19 @@
 // Requires
-/* global require: true */
-const fs = require("fs"),
-  path = require("path"),
-  gulp = require("gulp"),
-  injectfile = require("gulp-inject-file"), // https://www.npmjs.com/package/gulp-inject-file
-  rename = require("gulp-rename"), // https://www.npmjs.com/package/gulp-rename
-  contents = require("gulp-inject-string"), // https://www.npmjs.com/package/gulp-inject-string
-  cfg = require("./plugin.config.json"),
-  trimlines = require("gulp-trimlines"),
-  eslint = require("gulp-eslint"),
-  del = require("del"),
-  webpack = require("webpack"),
-  PluginError = require("plugin-error"),
-  log = require("fancy-log"),
-  jest = require("gulp-jest").default,
-  prettier = require("gulp-prettier");
+const fs = require("fs");
+const path = require("path");
+const gulp = require("gulp");
+const injectfile = require("gulp-inject-file"); // https://www.npmjs.com/package/gulp-inject-file
+const rename = require("gulp-rename"); // https://www.npmjs.com/package/gulp-rename
+const contents = require("gulp-inject-string"); // https://www.npmjs.com/package/gulp-inject-string
+const cfg = require("./plugin.config.json");
+const trimlines = require("gulp-trimlines");
+const eslint = require("gulp-eslint");
+const del = require("del");
+const webpack = require("webpack");
+const PluginError = require("plugin-error");
+const log = require("fancy-log");
+const jest = require("gulp-jest").default;
+const prettier = require("gulp-prettier");
 
 const ensureDirectoryExistence = filePath => {
   var dirname = path.dirname(filePath);
@@ -50,12 +49,12 @@ gulp.task("clear", cb => {
 
 // build tasks
 gulp.task("buildheaders", cb => {
-  var content = fs.readFileSync(cfg.src.meta, "utf8"),
+  let content = fs.readFileSync(cfg.src.meta, "utf8"),
     rmHeaders = cfg.headers[status.mode],
     commonHeaders = cfg.headers.common;
 
   // release mode headers
-  for (let k in rmHeaders) {
+  for (const k in rmHeaders) {
     content = content.replace(
       new RegExp(`(//\\s*@${k}\\s+){{}}`),
       `$1${rmHeaders[k]}`
@@ -69,6 +68,9 @@ gulp.task("buildheaders", cb => {
       `$1${commonHeaders[k]}`
     );
   }
+
+  const bd = new Date().toISOString();
+  content = content.replace("BUILDDATE", bd);
 
   status.headers = content;
 
@@ -90,7 +92,7 @@ gulp.task("jest", callback => {
 });
 
 gulp.task("webpack", callback => {
-  var webpackConfig = require("./webpack.config.js");
+  const webpackConfig = require("./webpack.config.js");
   if (status.mode === "dev") {
     webpackConfig.mode = "development";
   }
@@ -111,7 +113,7 @@ gulp.task("webpack", callback => {
 });
 
 gulp.task("buildplugin", cb => {
-  var destination = cfg.releaseFolder[status.mode];
+  const destination = cfg.releaseFolder[status.mode];
 
   gulp
     .src(cfg.src.plugin)
@@ -132,7 +134,7 @@ gulp.task("buildplugin", cb => {
 });
 
 gulp.task("buildmeta", cb => {
-  var path = cfg.releaseFolder[status.mode] + cfg.metaName;
+  const path = cfg.releaseFolder[status.mode] + cfg.metaName;
 
   ensureDirectoryExistence(path);
   fs.writeFile(path, status.headers, err => {

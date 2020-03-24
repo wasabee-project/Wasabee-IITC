@@ -1,12 +1,12 @@
-const markdown = require("markdown").markdown;
-import UiCommands from "./uiCommands.js";
+import { showLinksDialog, swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
+import wX from "./wX";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
 export default class WasabeeAnchor {
-  constructor(portalId) {
+  constructor(portalId, op) {
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -15,8 +15,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    const operation = getSelectedOperation();
+    const operation = op ? op : getSelectedOperation();
     this._portal = operation.getPortal(this.ID);
+    this.color = operation.color;
   }
 
   // pointless, since these are never pushed to the server
@@ -45,47 +46,41 @@ export default class WasabeeAnchor {
   }
 
   get icon() {
-    const operation = getSelectedOperation();
-    const colorGroup = operation.color;
     let lt = window.plugin.wasabee.static.layerTypes.get("main");
-    if (window.plugin.wasabee.static.layerTypes.has(colorGroup)) {
-      lt = window.plugin.wasabee.static.layerTypes.get(colorGroup);
+    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
+      lt = window.plugin.wasabee.static.layerTypes.get(this.color);
     }
-    if (lt.portal.iconUrl) {
-      return lt.portal.iconUrl;
-    } else {
-      return window.plugin.wasabee.static.images.marker_layer_groupa;
-    }
+    return lt.portal.iconUrl.default;
   }
 
   popupContent(marker, operation) {
     marker.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = markdown.toHTML(this._portal.name);
+    title.innerHTML = this._portal.name;
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const linksButton = L.DomUtil.create("a", "", buttonSet);
-    linksButton.textContent = "Links";
+    linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", () => {
-      UiCommands.showLinksDialog(operation, this._portal);
+      showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
-    const swapButton = L.DomUtil.create("a", "", buttonSet);
-    swapButton.textContent = "Swap";
+    const swapButton = L.DomUtil.create("a", null, buttonSet);
+    swapButton.textContent = wX("SWAP");
     L.DomEvent.on(swapButton, "click", () => {
-      UiCommands.swapPortal(operation, this._portal);
+      swapPortal(operation, this._portal);
       marker.closePopup();
     });
-    const deleteButton = L.DomUtil.create("a", "", buttonSet);
-    deleteButton.textContent = "Delete";
+    const deleteButton = L.DomUtil.create("a", null, buttonSet);
+    deleteButton.textContent = wX("DELETE");
     L.DomEvent.on(deleteButton, "click", () => {
-      UiCommands.deletePortal(operation, this._portal);
+      deletePortal(operation, this._portal);
       marker.closePopup();
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", "", buttonSet);
-      assignButton.textContent = "Assign Outbound Links";
+      const assignButton = L.DomUtil.create("a", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", () => {
         const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();

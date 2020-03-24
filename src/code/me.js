@@ -7,9 +7,13 @@ const Wasabee = window.plugin.wasabee;
 export default class WasabeeMe {
   constructor() {
     this.GoogleID = null;
+    this.IngressName = null;
+    this.Level = 0;
+    this.OwnedTeams = Array();
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
+    this.Assignments = Array();
   }
 
   store() {
@@ -41,7 +45,7 @@ export default class WasabeeMe {
 
     if (typeof lsme == "string") {
       // XXX this might be a problem, since create writes it back to the store
-      me = WasabeeMe.create(JSON.parse(lsme));
+      me = WasabeeMe.create(lsme);
     }
     if (
       me === null ||
@@ -49,12 +53,10 @@ export default class WasabeeMe {
       me.fetched < maxCacheAge ||
       force
     ) {
-      // console.log("pulling /me from server");
       mePromise().then(
         function(nme) {
           me = nme;
           // mePromise calls WasabeeMe.create, which calls me.store()
-          // store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(me));
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
         function(err) {
@@ -69,40 +71,77 @@ export default class WasabeeMe {
     return me;
   }
 
-  static create(data) {
-    if (!data) {
-      console.log("nothing fed to WasabeeMe.create");
-      return null;
+  static async waitGet(force) {
+    let me = null;
+    const maxCacheAge = Date.now() - 1000 * 60 * 59;
+    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+
+    if (typeof lsme == "string") {
+      // XXX this might be a problem, since create writes it back to the store
+      me = WasabeeMe.create(lsme);
     }
+    if (
+      me === null ||
+      me.fetched == undefined ||
+      me.fetched < maxCacheAge ||
+      force
+    ) {
+      const newme = await mePromise();
+      if (newme instanceof WasabeeMe) {
+        me = newme;
+      } else {
+        store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+        console.log(newme);
+        alert(newme);
+        me = null;
+      }
+      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    }
+    return me;
+  }
+
+  static create(data) {
+    if (!data) return null;
     if (typeof data == "string") {
       data = JSON.parse(data);
     }
-
     const wme = new WasabeeMe();
-    for (const prop in data) {
-      if (wme.hasOwnProperty(prop)) {
-        switch (prop) {
-          case "Teams":
-            if (data.Teams !== null) {
-              for (const team of data.Teams) {
-                wme.Teams.push(team);
-              }
-            }
-            break;
-          case "Ops":
-            if (data.Ops !== null) {
-              for (const op of data.Ops) {
-                wme.Ops.push(op);
-              }
-            }
-            break;
-          default:
-            wme[prop] = data[prop];
-            break;
-        }
+    wme.GoogleID = data.GoogleID;
+    wme.IngressName = data.IngressName;
+    if (data.Teams !== null) {
+      for (const team of data.Teams) {
+        wme.Teams.push(team);
       }
     }
+    if (data.OwnedTeams && data.OwnedTeams.length > 0) {
+      for (const team of data.OwnedTeams) {
+        wme.OwnedTeams.push(team);
+      }
+    }
+    if (data.Ops && data.Ops.length > 0) {
+      for (const op of data.Ops) {
+        wme.Ops.push(op);
+      }
+    }
+    if (data.Assignments && data.Assignments.length > 0) {
+      for (const assignment of data.Assignments) {
+        wme.Assignments.push(assignment);
+      }
+    }
+    wme.fetched = data.fetched ? data.fetched : Date.now();
     wme.store();
     return wme;
+  }
+
+  static purge() {
+    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+    if (window.plugin.wasabee._agentCache)
+      window.plugin.wasabee._agentCache.clear();
+    if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();
+    if (window.plugin.wasabee._Dkeys) {
+      window.plugin.wasabee._Dkeys.clear();
+      window.runHooks("wasabeeDkeys");
+    }
+    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
   }
 }

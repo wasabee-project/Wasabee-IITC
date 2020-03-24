@@ -96,7 +96,7 @@ export default class WasabeeOp {
   }
 
   getLinkListFromPortal(portal) {
-    var links = this.links.filter(function(listLink) {
+    const links = this.links.filter(function(listLink) {
       return (
         listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id
       );
@@ -155,7 +155,7 @@ export default class WasabeeOp {
 
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
-    var newLinks = [];
+    const newLinks = [];
     for (const l of this.links) {
       if (!(l.fromPortalId == startPortal && l.toPortalId == endPortal)) {
         newLinks.push(l);
@@ -169,7 +169,7 @@ export default class WasabeeOp {
   }
 
   reverseLink(startPortalID, endPortalID) {
-    var newLinks = [];
+    const newLinks = [];
     for (const l of this.links) {
       if (l.fromPortalId == startPortalID && l.toPortalId == endPortalID) {
         l.fromPortalId = endPortalID;
@@ -181,10 +181,23 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  cleanAll() {
+    this.cleanAnchorList();
+    this.cleanPortalList();
+    this.cleanCaches();
+    this.store();
+  }
+
+  cleanCaches() {
+    for (const l of this.links) {
+      delete l._crosslinksGL;
+    }
+  }
+
   cleanAnchorList() {
-    var newAnchorList = [];
+    const newAnchorList = [];
     for (const a of this.anchors) {
-      var foundAnchor = false;
+      let foundAnchor = false;
       for (const l of this.links) {
         if (l.fromPortalId == a || l.toPortalId == a) {
           foundAnchor = true;
@@ -200,8 +213,9 @@ export default class WasabeeOp {
 
   //This removes opportals with no links and removes duplicates
   cleanPortalList() {
-    var newPortals = [];
+    const newPortals = [];
     for (const p of this.opportals) {
+      // if (!typeof p == "WasabeePortal") continue;
       let foundPortal = false;
       for (const l of this.links) {
         if (p.id == l.fromPortalId || p.id == l.toPortalId) {
@@ -339,17 +353,17 @@ export default class WasabeeOp {
     }
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      this.update(false); // draw, but no need to mark it to send-to-server
+      this.update(false); // can trigger a redraw-storm, just skip
     }
   }
 
   removeBlocker() {
-    // console.log("remove blocker called... write this");
+    // console.log("remove blocker called... write this"); // no need for now
   }
 
   get fakedPortals() {
     const c = this.opportals.filter(p => {
-      if (p.name.match("^Loading: .*")) return true;
+      if (p.name && p.name.match("^Loading: .*")) return true;
       return false;
     });
     return c;
@@ -447,7 +461,7 @@ export default class WasabeeOp {
 
   // call update to save the op and redraw everything on the map
   update(updateLocalchanged) {
-    if (this._batchmode) return;
+    if (this._batchmode === true) return;
     if (updateLocalchanged) {
       if (window.plugin.wasabee.battleMode) {
         console.log("would push to server...");
@@ -460,7 +474,7 @@ export default class WasabeeOp {
   }
 
   runCrosslinks() {
-    if (this._batchmode) return;
+    if (this._batchmode === true) return;
     window.runHooks("wasabeeCrosslinks", this);
   }
 
@@ -470,7 +484,9 @@ export default class WasabeeOp {
 
   endBatchMode() {
     this._batchmode = false;
-    this.update(false);
+    this.store();
+    this.localchanged = true;
+    window.runHooks("wasabeeUIUpdate", this);
     this.runCrosslinks();
   }
 
@@ -537,7 +553,7 @@ export default class WasabeeOp {
   }
 
   // minimum bounds rectangle
-  mbr() {
+  get mbr() {
     if (!this.opportals || this.opportals.length == 0) return null;
     const lats = [];
     const lngs = [];
@@ -555,31 +571,22 @@ export default class WasabeeOp {
   }
 
   IsWritableOp() {
-    // no teams == not sent to server, local-only ops are always editable
-    if (!this.teamlist || this.teamlist.length == 0) {
-      return true;
-    }
-
+    // not from the server, must be writable
+    if (!this.IsServerOp()) return true;
     // if it is a server op and not logged in, assume not writable
-    if (!WasabeeMe.isLoggedIn()) {
-      return false;
-    }
-
+    if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.get();
-    if (me.GoogleID == this.creator) {
-      return true;
-    }
-
+    if (!me) return false;
+    if (me.GoogleID == this.creator) return true;
     // if the user has no teams enabled, it can't be writable
-    if (!me.Teams || me.Teams.length == 0) {
-      return false;
-    }
-
+    if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
     for (const t of this.teamlist) {
-      if (t.role == "write" && me.Teams.includes(t.ID)) {
-        return true;
+      if (t.role == "write") {
+        for (const m of me.Teams) {
+          if (t.teamid == m.ID && m.State == "On") return true;
+        }
       }
     }
 
@@ -588,21 +595,17 @@ export default class WasabeeOp {
   }
 
   IsServerOp() {
-    // no teams means local-only
-    if (this.teamlist && this.teamlist.length > 0) {
-      return true;
-    }
+    if (this.fetched) return true;
     return false;
   }
 
   IsOwnedOp() {
+    if (!this.IsServerOp()) return true;
+    if (!WasabeeMe.isLoggedIn()) return false;
+
     const me = WasabeeMe.get();
-    if (me == null) {
-      return false;
-    }
-    if (me.GoogleID == this.creator) {
-      return true;
-    }
+    if (!me) return false;
+    if (me.GoogleID == this.creator) return true;
     return false;
   }
 
@@ -630,6 +633,10 @@ export default class WasabeeOp {
       }
     }
 
+    if (typeof onhand == "string") {
+      onhand = Number.parseInt(onhand, 10);
+    }
+
     const k = {
       portalId: portalId,
       gid: gid,
@@ -644,29 +651,43 @@ export default class WasabeeOp {
     if (typeof obj == "string") {
       obj = JSON.parse(obj);
     }
-    const operation = new WasabeeOp();
-    for (const prop in obj) {
-      if (operation.hasOwnProperty(prop)) {
-        if (prop == "links") {
-          operation[prop] = operation.convertLinksToObjs(obj[prop]);
-        } else if (prop == "markers") {
-          operation[prop] = operation.convertMarkersToObjs(obj[prop]);
-        } else if (prop == "opportals") {
-          operation[prop] = operation.convertPortalsToObjs(obj[prop]);
-        } else if (prop == "blockers") {
-          operation[prop] = operation.convertBlockersToObjs(obj[prop]);
-        } else {
-          operation[prop] = obj[prop];
+    const operation = new WasabeeOp(obj.creator, obj.name);
+    if (obj.ID) operation.ID = obj.ID;
+    operation.opportals = operation.convertPortalsToObjs(obj.opportals);
+    operation.anchors = obj.anchors ? obj.anchors : Array();
+    operation.links = operation.convertLinksToObjs(obj.links);
+    operation.markers = operation.convertMarkersToObjs(obj.markers);
+    operation.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
+    operation.comment = obj.comment ? obj.comment : null;
+    operation.teamlist = obj.teamlist ? obj.teamlist : Array();
+    operation.fetched = obj.fetched ? obj.fetched : null;
+    operation.stored = obj.stored ? obj.stored : null;
+    operation.localchanged = obj.localchanged ? obj.localchanged : true;
+    operation.blockers = operation.convertBlockersToObjs(obj.blockers);
+    operation.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
+
+    if (!operation.opportals) operation.opportals = new Array();
+    if (!operation.links) operation.links = new Array();
+    if (!operation.markers) operation.markers = new Array();
+    if (!operation.blockers) operation.blockers = new Array();
+    // if (!operation.teamlist) operation.teamlist = new Array();
+    // if (!operation.keysonhand) operation.keysonhand = new Array();
+
+    operation.cleanAnchorList();
+    operation.cleanPortalList();
+
+    // this should not be needed past 0.16
+    if (operation.keysonhand.length > 0) {
+      for (const k in operation.keysonhand) {
+        if (typeof operation.keysonhand[k].onhand == "string") {
+          operation.keysonhand[k].onhand = Number.parseInt(
+            operation.keysonhand[k].onhand,
+            10
+          );
         }
       }
     }
-    if (!operation.links) operation.links = new Array();
-    if (!operation.markers) operation.markers = new Array();
-    if (!operation.opportals) operation.opportals = new Array();
-    if (!operation.blockers) operation.blockers = new Array();
-    if (!operation.anchors) operation.anchors = new Array();
-    if (!operation.teamlist) operation.teamlist = new Array();
-    if (!operation.keysonhand) operation.keysonhand = new Array();
+
     return operation;
   }
 }

@@ -1,10 +1,11 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import OpsDialog from "../dialogs/opsDialog";
 import BlockersList from "../dialogs/blockersList";
 import MarkerList from "../dialogs/markerList";
 import OperationChecklistDialog from "../dialogs/operationChecklistDialog";
 import ExportDialog from "../dialogs/exportDialog";
 import KeysList from "../dialogs/keysList";
+import wX from "../wX";
 
 const OpsButton = WButton.extend({
   statics: {
@@ -16,7 +17,7 @@ const OpsButton = WButton.extend({
     this._map = map;
 
     this.type = OpsButton.TYPE;
-    this.title = "Operations";
+    this.title = wX("OPS BUTTON TITLE");
     this.handler = this._toggleActions;
     this._container = container;
 
@@ -24,15 +25,15 @@ const OpsButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_viewOps,
+      buttonImage: window.plugin.wasabee.static.images.toolbar_viewOps.default,
       callback: this._toggleActions,
       context: context
     });
 
     this.actionsContainer = this._createSubActions([
       {
-        title: "Show Ops Menu",
-        text: "Ops",
+        title: wX("OPS BUTTON TITLE"),
+        text: wX("OPS BUTTON"),
         callback: () => {
           this.disable();
           const od = new OpsDialog(map);
@@ -41,8 +42,8 @@ const OpsButton = WButton.extend({
         context: context
       },
       {
-        title: "Operation Checklist",
-        text: "Checklist",
+        title: wX("CHECKLIST BUTTON TITLE"),
+        text: wX("CHECKLIST BUTTON"),
         callback: () => {
           this.disable();
           const cl = new OperationChecklistDialog(map);
@@ -51,8 +52,8 @@ const OpsButton = WButton.extend({
         context: context
       },
       {
-        title: "Show all markers",
-        text: "Markers",
+        title: wX("MARKER LIST TITLE"),
+        text: wX("MARKER LIST"),
         callback: () => {
           this.disable();
           const md = new MarkerList(map);
@@ -61,8 +62,8 @@ const OpsButton = WButton.extend({
         context: context
       },
       {
-        title: "Show all blockers",
-        text: "Blockers",
+        title: wX("BLOCKER LIST TITLE"),
+        text: wX("BLOCKER TITLE"),
         callback: () => {
           this.disable();
           const bl = new BlockersList(map);
@@ -71,8 +72,8 @@ const OpsButton = WButton.extend({
         context: context
       },
       {
-        title: "Keys",
-        text: "Keys",
+        title: wX("KEYS"),
+        text: wX("KEYS"),
         callback: () => {
           this.disable();
           const kl = new KeysList(map);
@@ -81,8 +82,8 @@ const OpsButton = WButton.extend({
         context: context
       },
       {
-        title: "Export current op",
-        text: "Export",
+        title: wX("EXPORT OP TITLE"),
+        text: wX("EXPORT OP"),
         callback: () => {
           this.disable();
           const ed = new ExportDialog(map);
@@ -93,7 +94,6 @@ const OpsButton = WButton.extend({
     ]);
 
     this.actionsContainer.style.top = "26px";
-    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer); // parentNode
   }
 
@@ -103,21 +103,3 @@ const OpsButton = WButton.extend({
 });
 
 export default OpsButton;
-/*
-const closeAllDialogs = skip => {
-  skip = skip || "nothing";
-  for (const name of Object.values(window.plugin.wasabee.static.dialogNames)) {
-    if (name != skip) {
-      let id = "dialog-" + name;
-      if (window.DIALOGS[id]) {
-        try {
-          let selector = $(window.DIALOGS[id]);
-          selector.dialog("close");
-          selector.remove();
-        } catch (err) {
-          console.log("closing dialog: " + err);
-        }
-      }
-    }
-  }
-}; */

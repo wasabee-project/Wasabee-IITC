@@ -1,6 +1,7 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import MarkerAddDialog from "../dialogs/markerAddDialog";
 import MarkerList from "../dialogs/markerList";
+import wX from "../wX";
 
 const MarkerButton = WButton.extend({
   statics: {
@@ -12,7 +13,7 @@ const MarkerButton = WButton.extend({
     this._map = map;
 
     this.type = MarkerButton.TYPE;
-    this.title = "Markers";
+    this.title = wX("MARKERS BUTTON TITLE");
     this.handler = this._toggleActions;
     this._container = container;
 
@@ -20,15 +21,16 @@ const MarkerButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_addMarkers,
+      buttonImage:
+        window.plugin.wasabee.static.images.toolbar_addMarkers.default,
       callback: this._toggleActions,
       context: context
     });
 
     this.actionsContainer = this._createSubActions([
       {
-        title: "Add Markers Dialog",
-        text: "Add Markers",
+        title: wX("ADD MARKER TITLE"),
+        text: wX("ADD MARKER"),
         callback: () => {
           this.disable();
           const md = new MarkerAddDialog(map);
@@ -37,8 +39,8 @@ const MarkerButton = WButton.extend({
         context: context
       },
       {
-        title: "Markers List",
-        text: "List",
+        title: wX("MARKER LIST TITLE"),
+        text: wX("MARKER LIST"),
         callback: () => {
           this.disable();
           const ml = new MarkerList(map);

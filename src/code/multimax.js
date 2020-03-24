@@ -3,6 +3,7 @@
   Detailed on:
 */
 import { greatCircleArcIntersect } from "./crosslinks";
+import wX from "./wX";
 
 const fieldCoversPortal = (a, b, field3, portal) => {
   // Let's hope no one ever wants to field over this point!
@@ -15,11 +16,10 @@ const fieldCoversPortal = (a, b, field3, portal) => {
 
   // greatCircleArcIntersect now takes either WasabeeLink or window.link format
   // needs link.getLatLngs(); and to be an object we can cache in
-
-  const urp = new L.GeodesicPolyline([unreachableMapPoint, p]);
-  const lab = new L.GeodesicPolyline([a.latLng, b.latLng]);
-  const lac = new L.GeodesicPolyline([a.latLng, c]);
-  const lbc = new L.GeodesicPolyline([c, b.latLng]);
+  const urp = L.polyline([unreachableMapPoint, p]);
+  const lab = L.polyline([a.latLng, b.latLng]);
+  const lac = L.polyline([a.latLng, c]);
+  const lbc = L.polyline([c, b.latLng]);
 
   let crossings = 0;
   if (greatCircleArcIntersect(urp, lab)) crossings++;
@@ -33,7 +33,7 @@ function buildPOSet(anchor1, anchor2, visible) {
   const poset = new Map();
   for (const i of visible) {
     poset.set(
-      i,
+      i.options.guid,
       visible.filter(j => {
         return j == i || fieldCoversPortal(anchor1, anchor2, i, j);
       })
@@ -42,87 +42,90 @@ function buildPOSet(anchor1, anchor2, visible) {
   return poset;
 }
 
-/* 
-function _longestSequence(poset) {
-  let depth = 0;
-  const alreadyCalculatedSequences = new Map();
-  const sequence_from = c => {
-    if (!alreadyCalculatedSequences.has(c)) {
-      const sequence = poset.get(c).filter(i => i != c);
-      depth++;
-      console.log(
-        `${depth}: ${sequence.length} portals would be under a field crowned by ${c.options.data.title}`
-      );
-
-      // for (const p of sequence) { console.log(`${depth}: ${p.options.data.title}`); }
-      if (sequence.length == 0) {
-        const p = [c];
-        alreadyCalculatedSequences.set(c, p);
-        console.log(
-          `${depth}: returning from ${c.options.data.title} at bottom`
-        );
-        depth--;
-        console.log(p);
-        return p;
+/*
+function buildPOSetFaster(a, b, visible) {
+  const poset = new Map();
+  for (const i of visible) {
+    const iCovers = new Array();
+    for (const j of visible) {
+      // console.log(iCovers);
+      if (iCovers.includes(j.options.guid)) {
+        // we've already found this one
+        // console.log("saved some searching");
+        continue;
       }
-
-      // recurse down into each...
-      const seq2 = sequence.map(sequence_from);
-
-      console.log(`${depth}: reducing`);
-      console.log(seq2);
-      const seq3 = seq2.reduce((S1, S2) => {
-        if (S1.length > S2.length) return S1;
-        return S2;
-      });
-      console.log(`${depth}: reduced`);
-      console.log(seq3);
-      depth--;
-      alreadyCalculatedSequences.set(c, seq3);
-      console.log(`${depth}: returning from ${c.options.data.title} (seq3)`);
-      console.log(seq3);
-      return seq3;
-    } else {
-      const seq = alreadyCalculatedSequences.get(c);
-      console.log(
-        `${depth}: already have ${c.options.data.title}: ${seq.length}`
-      );
-      return seq;
+      if (j.options.guid == i.options.guid) {
+        // iCovers.push(j.options.guid);
+        continue;
+      }
+      if (fieldCoversPortal(a, b, i, j)) {
+        iCovers.push(j.options.guid);
+        if (poset.has(j.options.guid)) {
+          // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
+          // console.log("found savings");
+          for (const n of poset.get(j.options.guid)) {
+            if (!iCovers.includes(j.options.guid)) iCovers.push(n);
+          }
+        }
+      }
     }
-  };
-
-  const x = Array.from(poset.keys());
-  console.log(x);
-
-  return Array.from(poset.keys())
-    .map(sequence_from)
-    .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
+    poset.set(i.options.guid, iCovers);
+  }
+  return poset;
 } */
 
 function longestSequence(poset) {
-  const alreadyCalculatedSequences = new Map();
-  const sequence_from = c => {
-    if (alreadyCalculatedSequences.get(c) === undefined) {
-      let sequence = poset
-        .get(c)
-        .filter(i => i !== c)
-        .map(sequence_from)
-        .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
-      sequence.push(c);
-      alreadyCalculatedSequences.set(c, sequence);
+  const out = new Array();
+
+  // the recursive function
+  const recurse = () => {
+    if (poset.size == 0) return; // hit bottom
+
+    let longest = "";
+    let length = 0;
+
+    // let prev = null;
+    // determine the longest
+    for (const [k, v] of poset) {
+      if (v.length > length) {
+        length = v.length;
+        longest = k;
+        // TODO build array of all with this same length
+        // TODO determine which is closest to previous
+      }
+      // record previous
     }
-    return alreadyCalculatedSequences.get(c);
+    out.push(longest);
+    const thisList = poset.get(longest);
+    poset.delete(longest);
+
+    // remove any portals not under this layer
+    // eslint-disable-next-line
+    for (const [k, v] of poset) {
+      let under = false;
+      for (const l of thisList) {
+        if (l.options.guid == k) under = true;
+      }
+      if (!under) {
+        poset.delete(k);
+      }
+    }
+    if (poset.size == 0) return; // hit bottom
+    recurse(); // keep digging
   };
-  return Array.from(poset.keys())
-    .map(sequence_from)
-    .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
+
+  recurse();
+  return out;
 }
 
 export default function multimax(anchor1, anchor2, visible) {
-  console.log("starting multimax");
-  const poset = buildPOSet(anchor1, anchor2, visible);
-  console.log("finding longest path");
-  const p = longestSequence(poset);
-  console.log("multimax done");
-  return p;
+  return new Promise(function(resolve, reject) {
+    if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
+
+    console.log("starting multimax");
+    const poset = buildPOSet(anchor1, anchor2, visible);
+    const p = longestSequence(poset);
+    console.log("multimax done");
+    resolve(p);
+  });
 }

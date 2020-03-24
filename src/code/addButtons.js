@@ -50,7 +50,6 @@ export default function(selectedOp) {
     },
 
     update: function(operation) {
-      // console.log("updating buttons");
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
           window.plugin.wasabee.buttons._container,

@@ -1,7 +1,9 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
+
 // export screen
-const ExportDialog = Feature.extend({
+const ExportDialog = WDialog.extend({
   statics: {
     TYPE: "exportDialog"
   },
@@ -9,25 +11,25 @@ const ExportDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = ExportDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
     if (!this._map) return;
     const exportDialog = this;
     this._dialog = window.dialog({
-      title: "Export: " + this._operation.name,
+      title: wX("EXPORT") + this._operation.name,
       width: "auto",
       height: "auto",
       html: this._buildContent(),
@@ -55,6 +57,7 @@ const ExportDialog = Feature.extend({
       "ui-dialog-wasabee-copy",
       mainContent
     );
+    this._operation.cleanAll();
     textArea.innerHTML =
       "<p><a onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">Select all</a> and press CTRL+C to copy it.</p>" +
       '<textarea readonly onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();" id="wasabee-export-dialog-textarea">' +

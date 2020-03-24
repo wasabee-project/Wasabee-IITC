@@ -1,10 +1,11 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
-const NewopDialog = Feature.extend({
+const NewopDialog = WDialog.extend({
   statics: {
     TYPE: "newopButton"
   },
@@ -12,12 +13,12 @@ const NewopDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = NewopDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog(this);
   },
 
@@ -28,10 +29,10 @@ const NewopDialog = Feature.extend({
     );
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const addButton = L.DomUtil.create("a", "", buttonSet);
-    addButton.textContent = "Add New Op";
+    addButton.textContent = wX("ADD_NEW_OP");
 
     const importButton = L.DomUtil.create("a", "", buttonSet);
-    importButton.textContent = "Import Op";
+    importButton.textContent = wX("IMPORT_OP");
     L.DomEvent.on(importButton, "click", () => {
       noHandler._dialog.dialog("close");
       const id = new ImportDialogControl(this._map, null);
@@ -41,31 +42,27 @@ const NewopDialog = Feature.extend({
     L.DomEvent.on(addButton, "click", () => {
       noHandler._dialog.dialog("close");
       const addDialog = new PromptDialog(this._map);
-      addDialog.setup(
-        "New Operation",
-        "Please Set the New Operation Name",
-        () => {
-          if (addDialog.inputField.value) {
-            const newop = new WasabeeOp(
-              PLAYER.nickname,
-              addDialog.inputField.value,
-              true
-            );
-            newop.store();
-            makeSelectedOperation(newop.ID);
-            window.runHooks("wasabeeUIUpdate", newop);
-            window.runHooks("wasabeeCrosslinks", newop);
-          } else {
-            alert("Operation Name was Unset");
-          }
+      addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {
+        if (addDialog.inputField.value) {
+          const newop = new WasabeeOp(
+            PLAYER.nickname,
+            addDialog.inputField.value,
+            true
+          );
+          newop.store();
+          makeSelectedOperation(newop.ID);
+          window.runHooks("wasabeeUIUpdate", newop);
+          window.runHooks("wasabeeCrosslinks", newop);
+        } else {
+          alert(wX("OP_NAME_UNSET"));
         }
-      );
-      addDialog.placeholder = "Must Not Be Empty";
+      });
+      addDialog.placeholder = wX("MUST_NOT_BE_EMPTY");
       addDialog.enable();
     });
 
     this._dialog = window.dialog({
-      title: "New Operation",
+      title: wX("NEW_OP"),
       width: "auto",
       height: "auto",
       html: content,
@@ -79,7 +76,7 @@ const NewopDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   }
 });
 

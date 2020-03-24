@@ -1,10 +1,11 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
+import wX from "../wX";
 
-const DefensiveKeysDialog = Feature.extend({
+const DefensiveKeysDialog = WDialog.extend({
   statics: {
     TYPE: "defensiveKeysDialog"
   },
@@ -12,13 +13,13 @@ const DefensiveKeysDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = DefensiveKeysDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: async function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
-    this._me = WasabeeMe.get();
+    WDialog.prototype.addHooks.call(this);
+    this._me = await WasabeeMe.waitGet();
     this._operation = getSelectedOperation();
     const context = this;
     this._pch = portal => {
@@ -31,7 +32,7 @@ const DefensiveKeysDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalSelected", this._pch);
   },
 
@@ -49,7 +50,7 @@ const DefensiveKeysDialog = Feature.extend({
         this._capID.value = "";
       }
     } else {
-      this._portal.innerHTML = "Please select a portal";
+      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
@@ -66,7 +67,7 @@ const DefensiveKeysDialog = Feature.extend({
     this._capID.setAttribute("placeholder", "Capsule ID");
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("a", "", this._content);
-    addDKeyButton.innerHTML = "Update Count";
+    addDKeyButton.innerHTML = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", () => {
       this._addDKey();
     });
@@ -76,7 +77,7 @@ const DefensiveKeysDialog = Feature.extend({
 
   _displayDialog: function() {
     this._dialog = window.dialog({
-      title: "Input Defensive Key Count",
+      title: wX("INPUT_DT_KEY_COUNT"),
       width: "auto",
       height: "auto",
       position: {
@@ -85,7 +86,7 @@ const DefensiveKeysDialog = Feature.extend({
       },
       html: this._content,
       dialogClass: "wasabee-dialog-alerts",
-      closeCallback: function() {
+      closeCallback: () => {
         this.disable();
         delete this._dialog;
       },

@@ -1,9 +1,11 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import OperationChecklistDialog from "./operationChecklistDialog";
+import wX from "../wX";
 
-const ImportDialogControl = Feature.extend({
+const ImportDialogControl = WDialog.extend({
   statics: {
     TYPE: "importDialog"
   },
@@ -11,17 +13,17 @@ const ImportDialogControl = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = ImportDialogControl.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
@@ -29,14 +31,13 @@ const ImportDialogControl = Feature.extend({
     this.idialog = new ImportDialog();
     const idhandler = this;
     this._dialog = window.dialog({
-      title: "Import Wasabee Operation",
+      title: wX("IMP_WAS_OP"),
       width: "auto",
       height: "auto",
       html: this.idialog.container,
       buttons: {
         OK: () => {
           this.idialog.importTextareaAsOp();
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           this._dialog.dialog("close");
         },
         "Get existing DrawTools draw": () => {
@@ -47,6 +48,9 @@ const ImportDialogControl = Feature.extend({
       closeCallback: () => {
         idhandler.disable();
         delete idhandler._dialog;
+        const newop = getSelectedOperation();
+        window.runHooks("wasabeeUIUpdate", newop);
+        window.runHooks("wasabeeCrosslinks", newop);
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog
     });
@@ -58,14 +62,24 @@ export default ImportDialogControl;
 // XXX move all this into the main class, no need for a sub class for this
 class ImportDialog {
   constructor() {
-    this.container = L.DomUtil.create("div", "");
+    this.container = L.DomUtil.create("div", null);
+    this.container.style.width = "420px";
+
+    const nameblock = L.DomUtil.create("span", null, this.container);
+    const label = L.DomUtil.create("label", null, nameblock);
+    label.textContent = wX("NAME");
+    this._namefield = L.DomUtil.create("input", null, label);
+    this._namefield.value = wX("IMPORT_OP") + new Date().toGMTString();
+    this._namefield.placeholder = "noodles";
+    // this._namefield.width = 16;
+    const note = L.DomUtil.create("span", null, nameblock);
+    note.textContent = wX("ONLY_DT_IMP");
 
     // Input area
-    this.textarea = L.DomUtil.create("textarea", "", this.container);
+    this.textarea = L.DomUtil.create("textarea", null, this.container);
     this.textarea.rows = 20;
     this.textarea.cols = 80;
-    this.textarea.placeholder =
-      "Paste a Wasabee draw export here.\n\nWasabee cannot import the stock intel format.\n\nThere is experimental support for importing the IITC DrawTools format.\n\nBefore importing DrawTools format, preview the areas and make sure all the portals load so IITC has them cached. Any portals that are not pre-cached will be faked.\n\nYou will need to use the 'swap' feature to move anchors from the faked portals to the real portals (they should be in the correct location, just not associated with the portal.\n\nCached portals might not be properly named.";
+    this.textarea.placeholder = wX("PASTE_INSTRUCT");
   }
 
   drawToolsFormat() {
@@ -78,7 +92,7 @@ class ImportDialog {
       // this.textarea.value = JSON.stringify(tmp);
       this.textarea.value = localStorage["plugin-draw-tools-layer"];
     } else {
-      this.textarea.placeholder = "No DrawTools drawn items detected";
+      this.textarea.placeholder = wX("NO_DT_ITEMS");
     }
   }
 
@@ -89,7 +103,7 @@ class ImportDialog {
         new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
       )
     ) {
-      alert("Wasabee doesn't support stock intel draw imports");
+      alert(wX("NO_STOCK_INTEL"));
       return;
     }
 
@@ -98,8 +112,16 @@ class ImportDialog {
       console.log("trying to import IITC Drawtools format... wish me luck");
       const newop = this.parseDrawTools(string);
       newop.updatePortalsFromIITCData();
+      if (this._namefield.value) {
+        newop.name = this._namefield.value;
+      } else {
+        newop.name = wX("IMPORT_OP") + new Date().toGMTString();
+      }
       newop.store();
       makeSelectedOperation(newop.ID);
+      const checklist = new OperationChecklistDialog();
+      checklist.enable();
+      this._map.fitBounds(newop.mbr);
       return;
     }
 
@@ -109,16 +131,16 @@ class ImportDialog {
       const importedOp = WasabeeOp.create(data);
       importedOp.store();
       makeSelectedOperation(importedOp.ID);
-      alert("Imported Operation: " + importedOp.name + " Successfuly.");
+      alert(wX("IMPORT_OP2") + importedOp.name + wX("SUCCESS"));
     } catch (e) {
       console.warn("WasabeeTools: failed to import data: " + e);
-      alert("Import Failed.");
+      alert(wX("IMP_NOPE"));
     }
   }
 
   parseDrawTools(string) {
     const newop = new WasabeeOp();
-    newop.name = "Imported Drawtools Op: " + new Date().toGMTString();
+    newop.name = wX("IMP_DT_OP") + new Date().toGMTString();
     const data = JSON.parse(string);
 
     // pass one, try to prime the pump
@@ -170,11 +192,7 @@ class ImportDialog {
       }
     }
     alert(
-      "Import Complete. Found " +
-        found +
-        " portals. Faked " +
-        faked +
-        ". Please use the swap feature to move faked portals to the real portals at the same location."
+      wX("IMP_COMP") + found + wX("PORT_FAKE") + faked + wX("USE_SWAP_INSTRUCT")
     );
     return newop;
   }
@@ -196,7 +214,7 @@ class ImportDialog {
       const portalID = pmap.get(key);
       const np = new WasabeePortal(
         portalID,
-        "[loading name: " + portalID + "]",
+        wX("LOADING1") + portalID + wX("LOADING2"),
         latLng.lat,
         latLng.lng
       );

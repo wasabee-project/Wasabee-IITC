@@ -1,21 +1,22 @@
-import { Feature } from "../leafletDrawImports";
-import UiCommands from "../uiCommands.js";
+import { WDialog } from "../leafletClasses";
+import { addPortal } from "../uiCommands.js";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
-const LinkDialog = Feature.extend({
+const LinkDialog = WDialog.extend({
   statics: {
     TYPE: "linkdialogButton"
   },
 
   initialize: function(map, options) {
     this.type = LinkDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._displayDialog();
   },
@@ -27,7 +28,7 @@ const LinkDialog = Feature.extend({
     this._links = [];
     const container = L.DomUtil.create("div", "");
     this._desc = L.DomUtil.create("textarea", "desc", container);
-    this._desc.placeholder = "Description (optional)";
+    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
     let node;
     const rdnTable = L.DomUtil.create("table", "", container);
 
@@ -83,7 +84,7 @@ const LinkDialog = Feature.extend({
     cardHeader.appendChild(document.createTextNode(" reverse"));
 
     this._dialog = window.dialog({
-      title: "Add Links",
+      title: wX("ADD_LINKS"),
       width: "auto",
       height: "auto",
       html: container,
@@ -122,7 +123,7 @@ const LinkDialog = Feature.extend({
         selectedPortal
       );
     } else {
-      alert("No Portal Selected.");
+      alert(wX("NO_PORT_SEL"));
       delete localStorage["wasabee-portal-" + updateID];
     }
     this._updatePortal(updateID);
@@ -158,11 +159,11 @@ const LinkDialog = Feature.extend({
     var linkTo = this._getPortal(server);
     var source = this._getPortal("src");
     if (!source || !linkTo) {
-      return void alert("Please select target and destination portals first!");
+      return void alert(wX("PICK_TARGETDEST_Portals"));
     }
     var isReversed = this._reversed.checked;
     if (source.id == linkTo.id) {
-      return void alert("Target and destination portals must be different.");
+      return void alert(wX("TARDEST_DIFF"));
     } else {
       Promise.all([
         item._addPortal(source),
@@ -183,13 +184,13 @@ const LinkDialog = Feature.extend({
     var item = this;
     var source = this._getPortal("src");
     if (!source) {
-      return void alert("Please select a target portal first!");
+      return void alert(wX("PICK_TAR_FIRST"));
     }
     var resolvedSourceMapConfigs = this._links
       .map(b => (b.checked ? item._getPortal(b.value) : null))
       .filter(a => null != a);
     if (0 == resolvedSourceMapConfigs.length) {
-      return void alert("Please select a destination portal first!");
+      return void alert(wX("PICK_DEST_FIRST"));
     }
     var isReversedChecked = this._reversed.checked;
     var documentBodyPromise = this._addPortal(source);
@@ -216,7 +217,7 @@ const LinkDialog = Feature.extend({
           gotPortal => gotPortal.id == sentPortal.id
         )
         ? resolvedLocalData
-        : UiCommands.addPortal(this._operation, sentPortal)
+        : addPortal(this._operation, sentPortal)
       : Promise.reject("no portal given");
   },
 
@@ -230,7 +231,7 @@ const LinkDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   }
 });
 

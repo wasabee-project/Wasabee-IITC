@@ -1,11 +1,13 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
+import AboutDialog from "./about";
 import store from "../../lib/store";
-import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
+import { sendLocation } from "../uiCommands";
+import wX from "../wX";
 
-const AuthDialog = Feature.extend({
+const AuthDialog = WDialog.extend({
   statics: {
     TYPE: "authDialog"
   },
@@ -13,85 +15,167 @@ const AuthDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = AuthDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
+    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
+    if (syncLoggedIn) {
+      alert(wX("AUTH INCOMPAT"));
+      return;
+    }
+
     const content = L.DomUtil.create("div", "temp-op-dialog");
-    const title = L.DomUtil.create("div", "", content);
+
+    const ua = L.DomUtil.create("div", null, content);
+    this._android = false;
+    this._ios = false;
+
+    // "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8"
+    if (navigator.userAgent.search("Iceweasel/") != -1) {
+      this._android = true;
+      ua.innerHTML =
+        "<span class='enl'>IITC-Mobile-Android with fake user agent</span><br/>" +
+        navigator.userAgent;
+    }
+    if (navigator.userAgent.search("Linux; Android") != -1) {
+      this._android = true;
+      ua.innerHTML =
+        "<span class='res'>IITC-Mobile-Andorid without fake user agent</span><br/>" +
+        navigator.userAgent;
+    }
+
+    if (
+      navigator.userAgent.search("iPhone") != -1 ||
+      navigator.userAgent.search("iPad") != -1
+    ) {
+      this._ios = true;
+      this._android = false;
+      if (navigator.userAgent.search("Safari/") == -1) {
+        // bad ones do not contain "Safari/
+        ua.textContent = wX("IOS NEED FAKE UA");
+      }
+    }
+
+    const title = L.DomUtil.create("div", null, content);
     title.className = "desc";
-    title.innerHTML =
-      "In order to use the server functionality, you must log in.<br/>";
+    if (this._ios) {
+      title.innerHTML = wX("AUTH IOS");
+    }
+    if (this._andoroid) {
+      title.innerHTML = wX("AUTH ANDROID");
+    }
+
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
 
-    const gsapiButton = L.DomUtil.create("a", "", buttonSet);
-    gsapiButton.innerHTML = "Log In (quick)";
-    L.DomEvent.on(gsapiButton, "click", () => this.gsapiAuth(this));
+    const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
+    const sendLocTitle = L.DomUtil.create("span", null, sendLocDiv);
+    sendLocTitle.textContent = wX("SEND LOCATION");
+    this._sendLocCheck = L.DomUtil.create("input", null, sendLocDiv);
+    this._sendLocCheck.type = "checkbox";
+    this._sendLocCheck.checked = window.plugin.wasabee.sendLocation
+      ? window.plugin.wasabee.sendLocation
+      : false;
 
-    const gsapiButtonToo = L.DomUtil.create("a", "", buttonSet);
-    gsapiButtonToo.innerHTML = "Log In (choose account)";
-    L.DomEvent.on(gsapiButtonToo, "click", () => this.gsapiAuthToo(this));
+    if (this._android) {
+      const gsapiButtonOLD = L.DomUtil.create("a", null, buttonSet);
+      gsapiButtonOLD.innerHTML = wX("LOG IN QUICK");
+      L.DomEvent.on(gsapiButtonOLD, "click", () =>
+        this.gsapiAuthImmediate(this)
+      );
+    }
+
+    const gapiButton = L.DomUtil.create("a", null, buttonSet);
+    gapiButton.innerHTML = wX("LOG IN");
+    const menus = L.DomUtil.create("div", null, buttonSet);
+    menus.innerHTML =
+      "<span>Experimental Login Settions: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>Auto</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option></select></span>" +
+      "<span><label>immediate</label>:<select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
+    L.DomEvent.on(gapiButton, "click", () => this.gapiAuth(this));
 
     // webview cannot work on android IITC-M
-    if (!L.Browser.android) {
-      const webviewButton = L.DomUtil.create("a", "", buttonSet);
-      webviewButton.innerHTML = "Log In (webview)";
+    if (this._ios) {
+      const webviewButton = L.DomUtil.create("a", null, buttonSet);
+      webviewButton.innerHTML = wX("WEBVIEW");
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
       });
-      const postwebviewButton = L.DomUtil.create("a", "", buttonSet);
-      postwebviewButton.innerHTML = "Verify Webview";
+      const postwebviewButton = L.DomUtil.create("a", null, buttonSet);
+      postwebviewButton.innerHTML = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
-        window.runHooks("waabeeUIUpdate", this._operation);
-        const me = await WasabeeMe.get();
-        if (me) {
-          alert("server data: " + JSON.stringify(me));
-        } else {
-          alert("server data: [pending]");
-        }
+        mePromise().then(
+          () => {
+            this._dialog.dialog("close");
+          },
+          err => {
+            alert(err);
+          }
+        );
       });
     }
 
-    const changeServerButton = L.DomUtil.create("a", "", buttonSet);
-    changeServerButton.innerHTML = "Change Server";
+    const changeServerButton = L.DomUtil.create("a", null, buttonSet);
+    changeServerButton.innerHTML = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
-      serverDialog.setup("Change Wasabee Server", "New Waasbee Server", () => {
-        if (serverDialog.inputField.value) {
-          store.set(
-            window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
-            serverDialog.inputField.value
-          );
-          store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+      serverDialog.setup(
+        wX("CHANGE SERVER"),
+        wX("CHANGE SERVER PROMPT"),
+        () => {
+          if (serverDialog.inputField.value) {
+            store.set(
+              window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
+              serverDialog.inputField.value
+            );
+            store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+          }
         }
-      });
+      );
       serverDialog.current = GetWasabeeServer();
       serverDialog.placeholder = "https://server.wasabee.rocks";
       serverDialog.enable();
     });
 
+    const aboutButton = L.DomUtil.create("a", "", buttonSet);
+    aboutButton.innerHTML = wX("ABOUT WASABEE-IITC");
+    L.DomEvent.on(aboutButton, "click", () => {
+      const ad = new AboutDialog();
+      ad.enable();
+    });
+
     this._dialog = window.dialog({
-      title: "Authentication Required",
+      title: wX("AUTH REQUIRED"),
       width: "auto",
       height: "auto",
       html: content,
       dialogClass: "wasabee-dialog-mustauth",
       closeCallback: () => {
-        // await WasabeeMe.get(); // check one more time, required for webview method
+        if (this._sendLocCheck && this._sendLocCheck.checked) {
+          window.plugin.wasabee.sendLocation = true;
+          localStorage[
+            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+          ] = true;
+          sendLocation();
+        } else {
+          window.plugin.wasabee.sendLocation = false;
+          localStorage[
+            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+          ] = false;
+        }
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },
@@ -99,14 +183,7 @@ const AuthDialog = Feature.extend({
     });
   },
 
-  gsapiAuth: context => {
-    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
-    if (syncLoggedIn) {
-      alert(
-        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
-      );
-    }
-
+  gsapiAuthImmediate: context => {
     window.gapi.auth2.authorize(
       {
         prompt: "none",
@@ -116,18 +193,26 @@ const AuthDialog = Feature.extend({
       },
       response => {
         if (response.error) {
-          context._dialog.dialog("close");
-          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
-          alert(err);
-          return;
+          // on immediate_failed, try again with "select_account" settings
+          if (response.error == "immediate_failed") {
+            console.log("switching to gsapiAuthChoose");
+            context.gsapiAuthChoose(context);
+          } else {
+            // error but not immediate_failed
+            context._dialog.dialog("close");
+            const err = `error from gsapiAuthImmediate: ${response.error}: ${response.error_subtype}`;
+            alert(err);
+            return;
+          }
         }
         SendAccessTokenAsync(response.access_token).then(
           async () => {
             // could be const me = WasabeeMe.get();
             // but do this by hand to 'await' it
+            // not changing to WasabeeMe.waitGet(); because this needs to die
+            // eslint-disable-next-line
             const me = await mePromise();
             // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
-            console.debug(me);
             context._dialog.dialog("close");
           },
           reject => {
@@ -139,14 +224,78 @@ const AuthDialog = Feature.extend({
     );
   },
 
-  gsapiAuthToo: context => {
-    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
-    if (syncLoggedIn) {
-      alert(
-        "You have logged in to another plugin--one that uses a method incompatable with Wasabee"
+  // this is probably the most correct, but doesn't seem to work properly
+  // does making it async change anything?
+  gapiAuth: async context => {
+    console.log("calling main log in method");
+    const options = {
+      client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
+      scope: "email profile openid",
+      response_type: "id_token permission"
+    };
+    const immediate = document.getElementById("auth-immediate");
+    if (immediate && immediate.value != "unset")
+      options.immediate = immediate.value;
+    const gPrompt = document.getElementById("auth-prompt");
+    if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
+    window.gapi.auth2.authorize(options, response => {
+      if (response.error) {
+        if (response.error == "immediate_failed") {
+          options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
+          window.gapi.auth2.authorize(options, responseSelect => {
+            if (responseSelect.error) {
+              const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
+              alert(err);
+              console.log(err);
+              return;
+            }
+            console.log("sending to Wasabee (immediate_failed)");
+            SendAccessTokenAsync(responseSelect.access_token).then(
+              () => {
+                if (context._ios) {
+                  window.setTimeout(() => {
+                    context._dialog.dialog("close");
+                  }, 1500); // give time for the cookie to settle
+                } else {
+                  context._dialog.dialog("close");
+                }
+              },
+              tokErr => {
+                console.log(tokErr);
+                alert(tokErr);
+                context._dialog.dialog("close");
+              }
+            );
+          });
+        } else {
+          context._dialog.dialog("close");
+          const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
+          console.log(err);
+          alert(err);
+        }
+        return;
+      }
+      console.log("sending to Wasabee");
+      SendAccessTokenAsync(response.access_token).then(
+        () => {
+          if (context._ios) {
+            window.setTimeout(() => {
+              context._dialog.dialog("close");
+            }, 1500); // give time for the cookie to settle
+          } else {
+            context._dialog.dialog("close");
+          }
+        },
+        tokErr => {
+          console.log(tokErr);
+          alert(tokErr);
+          context._dialog.dialog("close");
+        }
       );
-    }
+    });
+  },
 
+  gsapiAuthChoose: context => {
     window.gapi.auth2.authorize(
       {
         prompt: "select_account",
@@ -158,19 +307,18 @@ const AuthDialog = Feature.extend({
       response => {
         if (response.error) {
           context._dialog.dialog("close");
-          const err = `error from authorize: ${response.error}: ${response.error_subtype}`;
+          const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
         }
         SendAccessTokenAsync(response.access_token).then(
-          async () => {
-            const me = await mePromise();
-            console.debug(me);
+          () => {
+            mePromise(); // needs .then...
             context._dialog.dialog("close");
           },
           reject => {
             console.log(reject);
-            alert(`send access token failed: $(reject)`);
+            alert(`send access token failed (gsapiAuthChoose): $(reject)`);
           }
         );
       }

@@ -20,6 +20,7 @@ export default class WasabeePortal {
   }
 
   static create(obj) {
+    if (typeof obj == "string") obj = JSON.parse(obj);
     if (!obj || !obj.id) {
       console.log("can't create WasabeePortal from this");
       return;
@@ -61,7 +62,7 @@ export default class WasabeePortal {
   displayFormat() {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
-    const e = L.DomUtil.create("a", "");
+    const e = L.DomUtil.create("a", null);
     e.appendChild(document.createTextNode(this.name));
 
     if (window.portals[this.id]) {
@@ -79,7 +80,7 @@ export default class WasabeePortal {
       }
     }
 
-    e.title = this.name;
+    // e.title = this.name;
     e.href = `/intel?ll=${v}&pll=${v}`;
 
     L.DomEvent.on(e, "click", event => {

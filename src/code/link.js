@@ -1,5 +1,6 @@
 import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
+import wX from "./wX";
 
 export default class WasabeeLink {
   //ID <- randomly generated alpha-numeric ID for the link
@@ -15,6 +16,20 @@ export default class WasabeeLink {
     this.throwOrderPos = 0;
     this.color = "main";
     this.completed = false;
+  }
+
+  static create(obj, operation) {
+    const link = new WasabeeLink(
+      operation,
+      obj.fromPortalId,
+      obj.toPortalId,
+      obj.description
+    );
+    link.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    link.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    link.color = obj.color ? obj.color : operation.color;
+    link.completed = obj.completed ? obj.completed : false;
+    return link;
   }
 
   // for interface consistency, the other types use comment
@@ -40,12 +55,12 @@ export default class WasabeeLink {
   // 'pending','assigned','acknowledged','completed'
   get state() {
     if (this.completed) {
-      return "completed";
+      return wX("COMPLETED");
     }
     if (this.assignedTo) {
-      return "assigned";
+      return wX("ASSIGNED");
     }
-    return "pending";
+    return wX("PENDING");
   }
 
   set state(s) {
@@ -62,43 +77,27 @@ export default class WasabeeLink {
   }
 
   getLatLngs(operation) {
-    // for crosslinks.js
     if (!operation) operation = getSelectedOperation();
 
     const fromPortal = operation.getPortal(this.fromPortalId);
-    if (!fromPortal)
-      console.log("op missing 'from' portal: " + JSON.stringify(this)); // NUKE ME
     const toPortal = operation.getPortal(this.toPortalId);
-    if (!fromPortal)
-      console.log("op missing 'to' portal: " + JSON.stringify(this)); // NUKE ME
-    if (fromPortal != null && toPortal != null) {
-      const returnArray = Array();
-      returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
-      returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
-      return returnArray;
-    } else {
-      console.log(JSON.stringify(this));
-      return null;
-    }
+    const returnArray = Array();
+    returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+    returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+    return returnArray;
   }
 
-  static create(obj, operation) {
-    const link = new WasabeeLink(operation);
-    for (var prop in obj) {
-      if (link.hasOwnProperty(prop)) {
-        link[prop] = obj[prop];
-      }
-    }
-    return link;
+  get latLngs() {
+    return this.getLatLngs(getSelectedOperation());
   }
 
   // returns a DOM object appropriate for display
   displayFormat(operation) {
-    const d = L.DomUtil.create("div", "");
+    const d = L.DomUtil.create("div", null);
     d.appendChild(
       operation.getPortal(this.fromPortalId).displayFormat(operation)
     );
-    const arrow = L.DomUtil.create("span", "", d);
+    const arrow = L.DomUtil.create("span", null, d);
     arrow.innerHTML = " ➾ ";
     arrow.style.color = this.getColorHex();
     d.appendChild(
@@ -122,22 +121,20 @@ export default class WasabeeLink {
 
   minLevel(operation) {
     const b = this.length(operation);
-    let s = "unknown";
-    const a = L.DomUtil.create("span", "");
+    let s = wX("UNKNOWN");
+    const a = L.DomUtil.create("span", null);
 
     if (b > 6881280) {
-      s = "impossible";
+      s = wX("IMPOSSIBLE");
     } else {
       if (b > 1966080) {
-        s = "L8+some VRLA";
-        a.title =
-          "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+        s = wX("VRLA");
+        a.title = wX("VRLA DESC");
         a.classList.add("help");
       } else {
         if (b > 655360) {
-          s = "L8+some LA";
-          a.title =
-            "Depending on the number and type Link Amps used, a lower source portal level might suffice.";
+          s = wX("LA");
+          a.title = wX("LA DESC");
           a.classList.add("help");
         } else {
           const d = Math.max(1, Math.ceil(8 * Math.pow(b / 160, 0.25)) / 8);

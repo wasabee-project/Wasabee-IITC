@@ -1,11 +1,14 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
+import OverflowMenu from "../overflowMenu";
+import { listenForAddedPortals } from "../uiCommands";
+import wX from "../wX";
 
-const MarkerList = Feature.extend({
+const MarkerList = WDialog.extend({
   statics: {
     TYPE: "markerList"
   },
@@ -13,193 +16,182 @@ const MarkerList = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = MarkerList.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
-    window.addHook("wasabeeUIUpdate", markerListUpdate);
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.markerListUpdate(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalAdded", listenForAddedPortals);
-    window.removeHook("wasabeeUIUpdate", markerListUpdate);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   _displayDialog: function() {
     for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
+      if (f.id.length != 35) window.portalDetail.request(f.id);
     }
 
-    this._listDialogData = window.dialog({
-      title: "Marker List: " + this._operation.name,
+    this._dialog = window.dialog({
+      title: wX("MARKER_LIST", this._operation.name),
       width: "auto",
       height: "auto",
       position: {
         my: "center top",
         at: "center center"
       },
-      html: getListDialogContent(this._operation).table,
+      html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: () => {
         this.disable();
-        delete this._listDialogData;
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerList
     });
+  },
+
+  markerListUpdate: function(operation) {
+    if (operation.ID != this._operation.ID) this._operation = operation;
+    const table = this.getListDialogContent(operation).table;
+    this._dialog.html(table);
+    this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
+  },
+
+  getListDialogContent: function(operation) {
+    const content = new Sortable();
+    content.fields = [
+      {
+        name: wX("ORDER"),
+        value: marker => marker.order,
+        // sort: (a, b) => (a < b),
+        format: (a, m) => {
+          a.textContent = m;
+        }
+      },
+      {
+        name: wX("PORTAL"),
+        value: marker => operation.getPortal(marker.portalId).name,
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m, marker) => {
+          a.appendChild(
+            operation.getPortal(marker.portalId).displayFormat(operation)
+          );
+        }
+      },
+      {
+        name: wX("TYPE"),
+        value: marker =>
+          window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
+          "unknown",
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m) => {
+          a.textContent = m;
+        }
+      },
+      {
+        name: wX("COMMENT"),
+        value: marker => marker.comment,
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m, marker) => {
+          const comment = L.DomUtil.create("a", "", a);
+          comment.innerHTML = m;
+          L.DomEvent.on(comment, "click", () => {
+            const scd = new SetCommentDialog(window.map);
+            scd.setup(marker, operation);
+            scd.enable();
+          });
+        }
+      },
+      {
+        name: wX("ASS_TO"),
+        value: marker => {
+          if (marker.assignedTo != null && marker.assignedTo != "") {
+            const agent = getAgent(marker.assignedTo);
+            if (agent != null) {
+              return agent.name;
+            } else {
+              return "looking up: [" + marker.assignedTo + "]";
+            }
+          }
+          return "";
+        },
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m, agent) => {
+          const assigned = L.DomUtil.create("a", "", a);
+          assigned.innerHTML = m;
+          L.DomEvent.on(assigned, "click", () => {
+            const ad = new AssignDialog();
+            ad.setup(agent, operation);
+            ad.enable();
+          });
+        }
+      },
+      {
+        name: wX("DONE"),
+        value: marker => marker.state,
+        sort: (a, b) => a.localeCompare(b),
+        format: (a, m) => {
+          if (m == "completed") {
+            a.textContent = wX("YES");
+          } else {
+            a.textContent = wX("NO");
+          }
+        }
+      },
+      {
+        name: "",
+        sort: null,
+        value: m => m,
+        format: (o, e) => this.makeMarkerDialogMenu(o, e)
+      }
+    ];
+    content.sortBy = 0;
+    content.items = operation.markers;
+    return content;
+  },
+
+  makeMarkerDialogMenu: function(list, data) {
+    const operation = getSelectedOperation();
+    const state = new OverflowMenu();
+    const options = [
+      {
+        label: wX("SET_COMMENT"),
+        onclick: () => {
+          const scd = new SetCommentDialog(window.map);
+          scd.setup(data, operation);
+          scd.enable();
+        }
+      },
+      {
+        label: wX("DELETE"),
+        onclick: () => operation.removeMarker(data)
+      }
+    ];
+    if (operation.IsServerOp()) {
+      options.push({
+        label: wX("ASSIGN"),
+        onclick: () => {
+          const ad = new AssignDialog();
+          ad.setup(data, operation);
+          ad.enable();
+        }
+      });
+    }
+    state.items = options;
+    list.className = "menu";
+    list.appendChild(state.button);
   }
 });
 
 export default MarkerList;
-
-const markerListUpdate = operation => {
-  const id = "dialog-" + window.plugin.wasabee.static.dialogNames.markerList;
-  if (window.DIALOGS[id]) {
-    const table = getListDialogContent(operation).table;
-    window.DIALOGS[id].replaceChild(table, window.DIALOGS[id].childNodes[0]);
-  }
-};
-
-const getListDialogContent = operation => {
-  const content = new Sortable();
-  content.fields = [
-    {
-      name: "Order",
-      value: marker => marker.order,
-      // sort: (a, b) => (a < b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
-    },
-    {
-      name: "Portal",
-      value: marker => operation.getPortal(marker.portalId).name,
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m, marker) => {
-        a.appendChild(
-          operation.getPortal(marker.portalId).displayFormat(operation)
-        );
-      }
-    },
-    {
-      name: "Type",
-      value: marker =>
-        window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
-        "unknown",
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        a.textContent = m;
-      }
-    },
-    {
-      name: "Comment",
-      value: marker => marker.comment,
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m, marker) => {
-        const comment = L.DomUtil.create("a", "", a);
-        comment.innerHTML = m;
-        L.DomEvent.on(comment, "click", () => {
-          const scd = new SetCommentDialog(window.map);
-          scd.setup(marker, operation);
-          scd.enable();
-        });
-      }
-    },
-    {
-      name: "Assigned To",
-      value: marker => {
-        if (marker.assignedTo != null && marker.assignedTo != "") {
-          const agent = getAgent(marker.assignedTo);
-          if (agent != null) {
-            return agent.name;
-          } else {
-            return "looking up: [" + marker.assignedTo + "]";
-          }
-        }
-        return "";
-      },
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m, agent) => {
-        const assigned = L.DomUtil.create("a", "", a);
-        assigned.innerHTML = m;
-        L.DomEvent.on(assigned, "click", () => {
-          const ad = new AssignDialog();
-          ad.setup(agent, operation);
-          ad.enable();
-        });
-      }
-    },
-    {
-      name: "Done",
-      value: marker => marker.state,
-      sort: (a, b) => a.localeCompare(b),
-      format: (a, m) => {
-        if (m == "completed") {
-          a.textContent = "Yes";
-        } else {
-          a.textContent = "No";
-        }
-      }
-    },
-    {
-      name: "",
-      sort: null,
-      value: m => m,
-      format: (o, e) => makeMarkerDialogMenu(o, e)
-    }
-  ];
-  content.sortBy = 0;
-  content.items = operation.markers;
-  return content;
-};
-
-const makeMarkerDialogMenu = (list, data) => {
-  const operation = getSelectedOperation();
-  const state = new window.plugin.wasabee.OverflowMenu();
-  const options = [
-    {
-      label: "Set Comment",
-      onclick: () => {
-        const scd = new SetCommentDialog(window.map);
-        scd.setup(data, operation);
-        scd.enable();
-      }
-    },
-    {
-      label: "Delete",
-      onclick: () => operation.removeMarker(data)
-    }
-  ];
-  if (operation.IsServerOp()) {
-    options.push({
-      label: "Assign",
-      onclick: () => {
-        const ad = new AssignDialog();
-        ad.setup(data, operation);
-        ad.enable();
-      }
-    });
-  }
-  state.items = options;
-  list.className = "menu";
-  list.appendChild(state.button);
-};
-
-// yes, one defition per dialog type
-const listenForAddedPortals = newPortal => {
-  if (!newPortal.portal.options.data.title) return;
-
-  const op = getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    if (faked.id == newPortal.portal.options.guid) {
-      faked.name = newPortal.portal.options.data.title;
-      op.update(true);
-    }
-  }
-};

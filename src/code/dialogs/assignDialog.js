@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
@@ -9,8 +9,9 @@ import {
   assignMarkerPromise,
   teamPromise
 } from "../server";
+import wX from "../wX";
 
-const AssignDialog = Feature.extend({
+const AssignDialog = WDialog.extend({
   statics: {
     TYPE: "assignDialog"
   },
@@ -18,17 +19,17 @@ const AssignDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = AssignDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
@@ -62,8 +63,8 @@ const AssignDialog = Feature.extend({
       this._type = "Link";
       divtitle.appendChild(target.displayFormat(this._operation));
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " link assignment";
-      this._name = "Assign link from: " + portal.name;
+      t.innerHTML = wX("LINK ASSIGNMENT");
+      this._name = wX("ASSIGN LINK PROMPT", portal.name);
     }
 
     if (target instanceof WasabeeMarker) {
@@ -71,8 +72,8 @@ const AssignDialog = Feature.extend({
       this._type = "Marker";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " marker assignment";
-      this._name = "Assign marker for: " + portal.name;
+      t.innerHTML = wX("MARKER ASSIGNMENT");
+      this._name = wX("ASSIGN MARKER PROMPT", portal.name);
     }
 
     if (target instanceof WasabeeAnchor) {
@@ -80,8 +81,8 @@ const AssignDialog = Feature.extend({
       this._type = "Anchor";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = " all outbound links";
-      this._name = "Assign all outbound links from: " + portal.name;
+      t.innerHTML = wX("ANCHOR ASSIGNMENT");
+      this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);
     }
 
     const menu = this._getAgentMenu(target.assignedTo);
@@ -91,7 +92,7 @@ const AssignDialog = Feature.extend({
 
   _upload: function(operation) {
     if (!operation.localchanged) return;
-    updateOpPromise(operation).then(
+    updateOpPromise().then(
       function() {
         console.log(
           "modified op: " +
@@ -120,7 +121,7 @@ const AssignDialog = Feature.extend({
     const menu = L.DomUtil.create("select", "", container);
     let option = menu.appendChild(L.DomUtil.create("option", ""));
     option.setAttribute("value", "");
-    option.innerHTML = "Unassigned";
+    option.innerHTML = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...
@@ -137,7 +138,7 @@ const AssignDialog = Feature.extend({
       }
       const tt = window.plugin.wasabee.teams.get(t.teamid) || new WasabeeTeam();
       for (const a of tt.agents) {
-        if (alreadyAdded.indexOf(a.id) == -1) {
+        if (!alreadyAdded.includes(a.id)) {
           alreadyAdded.push(a.id);
           option = L.DomUtil.create("option", "");
           option.setAttribute("value", a.id);

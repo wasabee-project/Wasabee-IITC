@@ -1,6 +1,6 @@
 // Put anything from leaflet-draw that we need in here.
 
-const Tooltip = L.Class.extend({
+export const Tooltip = L.Class.extend({
   initialize: function(map) {
     this._map = map;
     this._popupPane = map._panes.popupPane;
@@ -45,10 +45,8 @@ const Tooltip = L.Class.extend({
   },
 
   updatePosition: function(latlng) {
-    var pos = this._map.latLngToLayerPoint(latlng);
-
+    const pos = this._map.latLngToLayerPoint(latlng);
     L.DomUtil.setPosition(this._container, pos);
-
     return this;
   },
 
@@ -64,89 +62,30 @@ const Tooltip = L.Class.extend({
 });
 
 export const Feature = L.Handler.extend({
+  // includes: L.Evented,
   includes: L.Mixin.Events,
 
   initialize: function(map, options) {
     this._map = map;
     this._container = map._container;
-    this._overlayPane = map._panes.overlayPane;
-    this._popupPane = map._panes.popupPane;
-
-    // Merge default shapeOptions options with custom shapeOptions
-    if (options && options.shapeOptions) {
-      options.shapeOptions = L.Util.extend(
-        {},
-        this.options.shapeOptions,
-        options.shapeOptions
-      );
-    }
     L.Util.extend(this.options, options);
   },
 
   enable: function() {
-    if (this._enabled) {
-      return;
-    }
-
+    if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
-
     this.fire("enabled", { handler: this.type });
-
-    this._map.fire("draw:drawstart", { layerType: this.type });
   },
 
   disable: function() {
-    if (!this._enabled) {
-      return;
-    }
-
+    if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-
     this.fire("disabled", { handler: this.type });
-
-    this._map.fire("draw:drawstop", { layerType: this.type });
   },
 
-  addHooks: function() {
-    if (this._map) {
-      L.DomUtil.disableTextSelection();
+  addHooks: function() {},
 
-      this._tooltip = new Tooltip(this._map);
-
-      L.DomEvent.addListener(
-        this._container,
-        "keyup",
-        this._cancelDrawing,
-        this
-      );
-    }
-  },
-
-  removeHooks: function() {
-    if (this._map) {
-      L.DomUtil.enableTextSelection();
-
-      this._tooltip.dispose();
-      this._tooltip = null;
-
-      L.DomEvent.removeListener(this._container, "keyup", this._cancelDrawing);
-    }
-  },
-
-  setOptions: function(options) {
-    L.setOptions(this, options);
-  },
-
-  _fireCreatedEvent: function(layer) {
-    this._map.fire("draw:created", { layer: layer, layerType: this.type });
-  },
-
-  // Cancel drawing when the escape key is pressed
-  _cancelDrawing: function(e) {
-    if (e.keyCode === 27) {
-      this.disable();
-    }
-  }
+  removeHooks: function() {}
 });
 
 export const Toolbar = L.Class.extend({
@@ -175,8 +114,9 @@ export const Toolbar = L.Class.extend({
 
   removeToolbar: function() {
     // Dispose each handler
-    for (var handlerId in this._modes) {
-      if (this._modes.hasOwnProperty(handlerId)) {
+    for (const handlerId in this._modes) {
+      //if (this._modes.hasOwnProperty(handlerId)) {
+      if (this._modes[handlerId]) {
         // Unbind handler button
         this._disposeButton(
           this._modes[handlerId].button,
@@ -195,7 +135,7 @@ export const Toolbar = L.Class.extend({
     this._modes = {};
 
     // Dispose the actions toolbar
-    for (var i = 0, l = this._actionButtons.length; i < l; i++) {
+    for (let i = 0, l = this._actionButtons.length; i < l; i++) {
       this._disposeButton(
         this._actionButtons[i].button,
         this._actionButtons[i].callback
@@ -212,12 +152,9 @@ export const Toolbar = L.Class.extend({
     classNamePredix,
     buttonTitle
   ) {
-    var type = handler.type;
-
+    const type = handler.type;
     this._modes[type] = {};
-
     this._modes[type].handler = handler;
-
     this._modes[type].button = this._createButton({
       title: buttonTitle,
       className: classNamePredix + "-" + type,
@@ -225,16 +162,14 @@ export const Toolbar = L.Class.extend({
       callback: this._modes[type].handler.enable,
       context: this._modes[type].handler
     });
-
     this._modes[type].buttonIndex = buttonIndex;
-
     this._modes[type].handler
       .on("enabled", this._handlerActivated, this)
       .on("disabled", this._handlerDeactivated, this);
   },
 
   _createButton: function(options) {
-    var link = L.DomUtil.create(
+    const link = L.DomUtil.create(
       "a",
       options.className || "",
       options.container
@@ -299,15 +234,12 @@ export const Toolbar = L.Class.extend({
   },
 
   _createActions: function(buttons) {
-    var container = L.DomUtil.create("ul", "leaflet-draw-actions"),
-      l = buttons.length,
-      li,
-      button;
+    const container = L.DomUtil.create("ul", "leaflet-draw-actions");
 
-    for (var i = 0; i < l; i++) {
-      li = L.DomUtil.create("li", "", container);
+    for (let i = 0; i < buttons.length; i++) {
+      const li = L.DomUtil.create("li", null, container);
 
-      button = this._createButton({
+      const button = this._createButton({
         title: buttons[i].title,
         text: buttons[i].text,
         container: li,
@@ -325,7 +257,7 @@ export const Toolbar = L.Class.extend({
   },
 
   _showActionsToolbar: function() {
-    var buttonIndex = this._activeMode.buttonIndex,
+    const buttonIndex = this._activeMode.buttonIndex,
       lastButtonIndex = this._lastButtonIndex,
       buttonHeight = 26, // TODO: this should be calculated
       borderHeight = 1, // TODO: this should also be calculated
@@ -422,6 +354,7 @@ export const WButton = L.Class.extend({
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
     }
+    // disable all the others
     for (const m in window.plugin.wasabee.buttons._modes) {
       if (window.plugin.wasabee.buttons._modes[m].type != this.type)
         window.plugin.wasabee.buttons._modes[m].disable();
@@ -496,18 +429,4 @@ export const WButton = L.Class.extend({
     }
     return container;
   }
-
-  /* 
-  addHooks: function() {
-    if (!this._map) return;
-    console.log("WButton addHooks");
-    console.log(this);
-    // do stuff
-  },
-
-  removeHooks: function() {
-    if (!this._map) return;
-    console.log("WButton removeHooks");
-    console.log(this);
-  } */
 });

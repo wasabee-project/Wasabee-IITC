@@ -1,28 +1,29 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
+import wX from "../wX";
 
-export const SetCommentDialog = Feature.extend({
+export const SetCommentDialog = WDialog.extend({
   setup: function(target, operation) {
     this.operation = operation;
     this.target = target;
 
     if (target instanceof WasabeeLink) {
       this.commentType = "link";
-      this.dialogTitle = "Set Link Comment";
+      this.dialogTitle = wX("SET_LCOMMENT");
       this.portal = this.operation.getPortal(this.target.fmPortalId);
     }
 
     if (target instanceof WasabeeMarker) {
       this.commentType = "marker";
       this.portal = this.operation.getPortal(this.target.portalId);
-      this.dialogTitle = "Set Marker Comment: " + this.portal.name;
+      this.dialogTitle = wX("SET_MCOMMENT") + this.portal.name;
     }
 
     if (target instanceof WasabeePortal) {
       this.commentType = "portal";
-      this.dialogTitle = "Set Portal Comment: " + target.name;
+      this.dialogTitle = wX("SET_PCOMMENT") + target.name;
       this.portal = this.target;
     }
 
@@ -39,17 +40,17 @@ export const SetCommentDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = SetCommentDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {

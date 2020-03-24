@@ -1,16 +1,19 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
-import UiCommands from "../uiCommands";
+import { clearAllItems } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
 import {
   getSelectedOperation,
+  getOperationByID,
   makeSelectedOperation,
   opsList,
-  getOperationByID,
-  removeOperation
+  removeOperation,
+  duplicateOperation
 } from "../selectedOp";
+import OpPermList from "./opPerms";
+import wX from "../wX";
 
-const OpsDialog = Feature.extend({
+const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog"
   },
@@ -18,172 +21,163 @@ const OpsDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = OpsDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
 
-  _displayDialog: function() {
-    const op = getSelectedOperation();
-    const content = L.DomUtil.create("div", "temp-op-wasabee");
-    content.id = "wasabee-dialog-operation-content";
-    content.appendChild(this._opSelectMenu(this, op));
-    const opinfo = L.DomUtil.create("div", "", content);
-    opinfo.id = "wasabee-dialog-operation-opinfo";
-
-    const obHandler = this;
-    this._dialog = window.dialog({
-      title: "Operations",
-      width: "auto",
-      height: "auto",
-      html: content,
-      dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: function() {
-        obHandler.disable();
-        delete obHandler._dialog;
-      },
-      id: window.plugin.wasabee.static.dialogNames.opsButton
-    });
-
-    const operationSelect = document.getElementById("wasabee-operationSelect");
-    $(operationSelect).change(); // otherwise the rest of the dialog does not load
+    const context = this;
+    this._UIUpdateHook = newOpData => {
+      context.update(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  _opSelectMenuUpdate: function(context, operation) {
-    let dialogcontainer = document.getElementById(
-      "wasabee-dialog-operation-content"
-    );
-    let oldspinner = document.getElementById(
-      "wasabee-dialog-operation-spinner"
-    );
-    dialogcontainer.replaceChild(
-      context._opSelectMenu(context, operation),
-      oldspinner
-    );
+  _displayDialog: function() {
+    this.makeContent(getSelectedOperation());
+
+    const context = this;
+    this._dialog = window.dialog({
+      title: wX("OPERATIONS"),
+      width: "auto",
+      height: "auto",
+      html: this._content,
+      dialogClass: "wasabee-dialog-mustauth",
+      closeCallback: function() {
+        context.disable();
+        delete context._content;
+        delete context._dialog;
+      },
+      id: window.plugin.wasabee.static.dialogNames.opsButton
+    });
   },
 
-  _opSelectMenu: function(context, operation) {
-    const container = L.DomUtil.create("div", "spinner");
-    container.id = "wasabee-dialog-operation-spinner";
-    $(container).css({
-      "text-align": "center"
-    });
-    const operationSelect = L.DomUtil.create("select", "");
-    operationSelect.id = "wasabee-operationSelect";
-    $(operationSelect).css({
-      width: "90%"
-    });
+  update: function(selectedOp) {
+    if (this._enabled && this._dialog && this._dialog.html) {
+      this.makeContent(selectedOp);
+      this._dialog.html(this._content);
+    }
+  },
+
+  makeContent: function(selectedOp) {
+    const content = L.DomUtil.create("div", "temp-op-wasabee");
+    const container = L.DomUtil.create("div", "spinner", content);
+    container.style.textalign = "center";
+    const operationSelect = L.DomUtil.create("select", null, container);
+    operationSelect.style.width = "90%";
 
     const ol = opsList();
     for (const opID of ol) {
-      const op = getOperationByID(opID);
-      $(operationSelect).append(
-        $("<option>").prop({
-          value: opID,
-          text: op.name
-        })
-      );
+      const tmpOp = getOperationByID(opID);
+      const option = L.DomUtil.create("option", null, operationSelect);
+      option.value = opID;
+      option.text = tmpOp.name;
+      if (opID == selectedOp.ID) option.selected = true;
     }
 
-    $(operationSelect).val(operation.ID);
-    $(operationSelect).change(function() {
-      const newID = $(this).val();
-      const newop = makeSelectedOperation(newID);
-      context._displayOpInfo(context, newop);
-      const mbr = newop.mbr();
+    L.DomEvent.on(operationSelect, "change", () => {
+      const newop = makeSelectedOperation(operationSelect.value);
+      const mbr = newop.mbr;
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
-        context._map.fitBounds(mbr);
+        this._map.fitBounds(mbr);
       }
       window.runHooks("wasabeeUIUpdate", newop);
       window.runHooks("wasabeeCrosslinks", newop);
     });
 
-    container.appendChild(operationSelect);
-    context._displayOpInfo(context, operation);
-    return container;
-  },
+    const writable = selectedOp.IsWritableOp();
 
-  _displayOpInfo: function(context, operation) {
-    const opinfo = document.getElementById("wasabee-dialog-operation-opinfo");
-    if (!opinfo) {
-      return;
-    }
-    opinfo.innerHTML = ""; // start clean
-    const nameSection = L.DomUtil.create("p", "", opinfo);
+    const nameSection = L.DomUtil.create("p", null, content);
     nameSection.innerHTML = "Operation Name: ";
-    const input = L.DomUtil.create("input", "", nameSection);
-    input.id = "op-dialog-content-nameinput";
-    input.value = operation.name;
-    $(input).change(function() {
-      if ($(input).val() == null || $(input).val() == "") {
-        alert("That is an invalid operation name");
-      } else {
-        operation.name = $(input).val();
-        operation.store();
-        context._opSelectMenuUpdate(context, operation);
+    if (writable) {
+      const input = L.DomUtil.create("input", null, nameSection);
+      input.value = selectedOp.name;
+      L.DomEvent.on(input, "change", () => {
+        if (!input.value || input.value == "") {
+          alert(wX("USE_VALID_NAME"));
+        } else {
+          selectedOp.name = input.value;
+          selectedOp.store();
+          window.runHooks("wasabeeUIUpdate", selectedOp);
+        }
+      });
+    } else {
+      nameSection.innerHTML += selectedOp.name;
+    }
+
+    if (writable) {
+      const colorSection = L.DomUtil.create("p", null, content);
+      colorSection.innerHTML = "Operation Color: ";
+      const operationColor = selectedOp.color
+        ? selectedOp.color
+        : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
+      const opColor = L.DomUtil.create("select", null, colorSection);
+      for (const cd of window.plugin.wasabee.static.layerTypes) {
+        const c = cd[1];
+        const option = L.DomUtil.create("option", null, opColor);
+        if (c.name == operationColor) option.selected = true;
+        option.value = c.name;
+        option.innerHTML = c.displayName;
       }
-    });
-    const colorSection = L.DomUtil.create("p", "", opinfo);
-    colorSection.innerHTML = "Operation Color: ";
-    const operationColor = operation.color
-      ? operation.color
-      : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
-    const opColor = L.DomUtil.create("select", "", colorSection);
-    window.plugin.wasabee.static.layerTypes.forEach(function(a) {
-      const option = L.DomUtil.create("option", "");
-      if (a.name == operationColor) {
-        option.setAttribute("selected", true);
-      }
-      option.setAttribute("value", a.name);
-      option.innerHTML = a.displayName;
-      opColor.append(option);
-    });
-    $(opColor).change(function() {
-      operation.color = $(opColor).val();
-      operation.update(); // OK - changing color does not trigger
-    });
+      L.DomEvent.on(opColor, "change", () => {
+        selectedOp.color = opColor.value;
+        selectedOp.store();
+        window.runHooks("wasabeeUIUpdate", selectedOp);
+      });
+    }
 
-    const commentInputEnabled = operation.IsWritableOp();
-    const commentSection = L.DomUtil.create("p", "", opinfo);
-    const commentInput = L.DomUtil.create("textarea", "", commentSection);
-    commentInput.rows = "3";
-    commentInput.placeholder = "Op Comment";
-    commentInput.value = operation.comment;
-    $(commentInput).prop("disabled", !commentInputEnabled);
-    $(commentInput).change(function() {
-      operation.comment = $(commentInput).val();
-      operation.store();
-    });
+    const commentSection = L.DomUtil.create("p", null, content);
+    if (writable) {
+      const commentInput = L.DomUtil.create("textarea", null, commentSection);
+      commentInput.rows = "3";
+      commentInput.width = "90%";
+      commentInput.placeholder = "Op Comment";
+      commentInput.value = selectedOp.comment;
+      L.DomEvent.on(commentInput, "change", () => {
+        selectedOp.comment = commentInput.value;
+        selectedOp.store();
+      });
+    } else {
+      const commentDisplay = L.DomUtil.create("p", null, commentSection);
+      commentDisplay.innerText = selectedOp.comment;
+    }
 
-    const buttonSection = L.DomUtil.create("div", "temp-op-dialog", opinfo);
-    const clearOpButton = L.DomUtil.create("a", "", buttonSection);
-    clearOpButton.innerHTML = "Clear Portals/Links/Markers";
-    L.DomEvent.on(clearOpButton, "click", () => {
-      UiCommands.clearAllItems(operation);
-    });
+    const buttonSection = L.DomUtil.create("div", "temp-op-dialog", content);
+    if (writable) {
+      const clearOpButton = L.DomUtil.create("a", null, buttonSection);
+      clearOpButton.innerHTML = "Clear Portals/Links/Markers";
+      L.DomEvent.on(clearOpButton, "click", () => {
+        clearAllItems(selectedOp);
+        selectedOp.store();
+      });
+    }
 
-    // only show the delete button if more than 1 op remaining
     if (opsList().length > 1) {
-      const deleteButton = L.DomUtil.create("a", "", buttonSection);
-      deleteButton.innerHTML = "Delete " + operation.name;
-      deleteButton.disabled = true;
+      const deleteButton = L.DomUtil.create("a", null, buttonSection);
+      if (selectedOp.IsOwnedOp()) {
+        deleteButton.innerHTML = "Delete " + selectedOp.name;
+        if (selectedOp.IsServerOp())
+          deleteButton.innerHTML += "<br />(locally and from server)";
+      } else {
+        deleteButton.innerHTML = "Remove local copy of " + selectedOp.name;
+      }
       L.DomEvent.on(deleteButton, "click", () => {
-        // this should be moved to uiCommands, but the menu adjustment at the end makes that non-trivial
+        // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          "Confirm Delete: " + operation.name,
-          "Are you sure you want to delete " + operation.name + "?",
+          wX("CON_DEL") + selectedOp.name,
+          wX("YESNO_DEL") + selectedOp.name + "?",
           () => {
-            if (operation.IsOwnedOp()) {
-              deleteOpPromise(operation.ID).then(
+            if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
+              deleteOpPromise(selectedOp.ID).then(
                 function() {
                   console.log("delete from server successful");
                 },
@@ -195,28 +189,52 @@ const OpsDialog = Feature.extend({
             }
             const ol = opsList();
             let newopID = ol[0];
-            if (newopID == null || newopID == operation.ID) {
+            if (newopID == null || newopID == selectedOp.ID) {
               console.log(
                 "removing first op in list? I was going to use that...."
               );
               newopID = ol[1];
               if (newopID == null) {
                 console.log("not removing last op... fix this");
+                // create a new default op and use that -- just call the init/reset functions?
               }
             }
-            const removeid = operation.ID;
-            const operationSelect = document.getElementById(
-              "wasabee-operationSelect"
-            );
-            $(operationSelect).val(newopID);
-            $(operationSelect).change();
+            const removeid = selectedOp.ID;
+            const newop = makeSelectedOperation(newopID);
+            const mbr = newop.mbr;
+            if (
+              mbr &&
+              isFinite(mbr._southWest.lat) &&
+              isFinite(mbr._northEast.lat)
+            ) {
+              this._map.fitBounds(mbr);
+            }
             removeOperation(removeid);
-            context._opSelectMenuUpdate(context, getSelectedOperation());
+            window.runHooks("wasabeeUIUpdate", newop);
+            window.runHooks("wasabeeCrosslinks", newop);
           }
         );
         con.enable();
       });
     }
+
+    if (selectedOp.IsServerOp()) {
+      const permsButton = L.DomUtil.create("a", null, buttonSection);
+      permsButton.innerHTML = "Op Permissions";
+      L.DomEvent.on(permsButton, "click", () => {
+        const opl = new OpPermList();
+        opl.enable();
+      });
+    }
+
+    const permsButton = L.DomUtil.create("a", null, buttonSection);
+    permsButton.innerHTML = "Duplicate Operation";
+    L.DomEvent.on(permsButton, "click", () => {
+      duplicateOperation(selectedOp.ID);
+      window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+    });
+
+    this._content = content;
   }
 });
 

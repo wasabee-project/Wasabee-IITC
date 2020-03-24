@@ -1,4 +1,4 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import WasabeeMe from "../me";
 import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
@@ -6,6 +6,7 @@ import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import { resetOps, setupLocalStorage } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
+import wX from "../wX";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -17,7 +18,7 @@ const WasabeeButton = WButton.extend({
     this._map = map;
 
     this.type = WasabeeButton.TYPE;
-    this.title = "Wasabee";
+    this.title = wX("WASABEE BUTTON TITLE");
     this.handler = this._toggleActions;
     this._container = container;
 
@@ -31,8 +32,8 @@ const WasabeeButton = WButton.extend({
     this._lastLoginState = false;
 
     this._loginAction = {
-      title: "Log In",
-      text: "Log In",
+      title: wX("LOG IN"),
+      text: wX("LOG IN"),
       callback: () => {
         this.disable();
         const ad = new AuthDialog(this._map);
@@ -42,8 +43,8 @@ const WasabeeButton = WButton.extend({
     };
 
     this._teamAction = {
-      title: "Teams",
-      text: "List Wasabee Teams",
+      title: wX("TEAMS BUTTON TITLE"),
+      text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
         const wd = new WasabeeDialog(this._map);
@@ -54,8 +55,8 @@ const WasabeeButton = WButton.extend({
 
     this._alwaysActions = [
       {
-        title: "Create a new operation",
-        text: "New Op",
+        title: wX("NEWOP BUTTON TITLE"),
+        text: wX("NEWOP BUTTON"),
         callback: () => {
           this.disable();
           // closeAllDialogs();
@@ -65,19 +66,15 @@ const WasabeeButton = WButton.extend({
         context: this
       },
       {
-        title: "Clear all locally stored ops",
-        text: "Clear Local Ops",
+        title: wX("CLEAROPS BUTTON TITLE"),
+        text: wX("CLEAROPS BUTTON"),
         callback: () => {
           this.disable();
           const con = new ConfirmDialog(this._map);
-          con.setup(
-            "Clear Local Ops",
-            "Are you sure you want to remove all operations from the local storage? Ops stored on the server will be restored at the next sync.",
-            () => {
-              resetOps();
-              setupLocalStorage();
-            }
-          );
+          con.setup(wX("CLEAROPS BUTTON TITLE"), wX("CLEAROPS PROMPT"), () => {
+            resetOps();
+            setupLocalStorage();
+          });
           con.enable();
         },
         context: this
@@ -86,8 +83,8 @@ const WasabeeButton = WButton.extend({
 
     this._Dactions = [
       {
-        title: "Log Defense Keys",
-        text: "D Keys",
+        title: wX("WD BUTTON TITLE"),
+        text: wX("WD BUTTON"),
         callback: () => {
           this.disable();
           const dkd = new DefensiveKeysDialog();
@@ -103,14 +100,16 @@ const WasabeeButton = WButton.extend({
     this._container.appendChild(this.actionsContainer);
 
     // check login state and update if necessary
-    this.Wupdate(this._container);
+    this.Wupdate(); // takes container and operation, not needed here
   },
 
   getIcon: function() {
     if (this._lastLoginState) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in;
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
+        .default;
     } else {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out;
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out
+        .default;
     }
   },
 
@@ -132,6 +131,7 @@ const WasabeeButton = WButton.extend({
   },
 
   Wupdate: function() {
+    // takes container and operation as args, but we don't need them
     const loggedIn = WasabeeMe.isLoggedIn();
 
     // only change the icon if the state changes -- may be overkill trying to save a few cycles

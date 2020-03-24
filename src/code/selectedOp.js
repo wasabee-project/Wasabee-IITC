@@ -1,5 +1,7 @@
 import store from "../lib/store";
 import WasabeeOp from "./operation";
+import wX from "./wX";
+import { generateId } from "./auxiliar";
 
 const setRestoreOpID = opID => {
   store.set(window.plugin.wasabee.static.constants.SELECTED_OP_KEY, opID);
@@ -13,9 +15,6 @@ export const getSelectedOperation = () => {
   return window.plugin.wasabee._selectedOp;
 };
 
-// I use this all the time in debugging, leave it globally visible
-window.plugin.wasabee.getSelectedOperation = getSelectedOperation;
-
 export const initSelectedOperation = () => {
   if (window.plugin.wasabee._selectedOp == null) {
     const toLoad = getRestoreOpID();
@@ -28,7 +27,7 @@ export const initSelectedOperation = () => {
         console.log(
           "most recently loaded up not present in local store, starting with new default op"
         );
-        window.plugin.wasabee.loadNewDefaultOp();
+        loadNewDefaultOp();
       } else {
         makeSelectedOperation(toLoad);
       }
@@ -38,7 +37,11 @@ export const initSelectedOperation = () => {
 };
 
 const loadNewDefaultOp = () => {
-  const newOp = new WasabeeOp(PLAYER.nickname, "Default Op", true);
+  const newOp = new WasabeeOp(
+    PLAYER.nickname,
+    wX("DEFAULT OP NAME", new Date().toGMTString()),
+    true
+  );
   newOp.store();
   const op = makeSelectedOperation(newOp.ID);
   return op;
@@ -64,7 +67,10 @@ export const makeSelectedOperation = opID => {
   // the only place we should change the selected op.
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
-  window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  if (window.VALID_HOOKS.includes("wasabeeUIUpdate"))
+    window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
+    window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
 };
 
@@ -138,4 +144,23 @@ export const opsList = () => {
     }
   });
   return out;
+};
+
+export const duplicateOperation = opID => {
+  let op = null;
+  if (opID == window.plugin.wasabee._selectedOp.ID) {
+    op = window.plugin.wasabee._selectedOp;
+    op.store();
+  } else {
+    op = getOperationByID(opID);
+  }
+
+  op.ID = generateId();
+  op.name = op.name + " " + new Date().toGMTString();
+  op.teamlist = null;
+  op.fetched = null;
+  op.keysonhand = new Array();
+  op.cleanAll();
+  op.store();
+  makeSelectedOperation(op.ID);
 };

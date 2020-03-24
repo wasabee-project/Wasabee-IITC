@@ -1,8 +1,9 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
-const MarkerAddDialog = Feature.extend({
+const MarkerAddDialog = WDialog.extend({
   statics: {
     TYPE: "markerButton"
   },
@@ -10,29 +11,49 @@ const MarkerAddDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = MarkerAddDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
+    const context = this;
+    this._pch = portal => {
+      context._portalClickedHook(portal);
+    };
+    window.addHook("portalSelected", this._pch);
+
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
+    window.removeHook("portalSelected", this._pch);
+  },
+
+  _portalClickedHook: function() {
+    this._selectedPortal = WasabeePortal.getSelected();
+    if (this._selectedPortal) {
+      this._portal.innerHTML = "";
+      this._portal.appendChild(this._selectedPortal.displayFormat());
+    } else {
+      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
+    }
   },
 
   _displayDialog: function() {
     this._marker = null;
 
     const content = L.DomUtil.create("div", "temp-op-dialog");
-    this._type = L.DomUtil.create("select", "");
+    this._portal = L.DomUtil.create("div", null, content);
+    this._portalClickedHook();
+
+    this._type = L.DomUtil.create("select", "", content);
     for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", "", this._type);
-      o.setAttribute("value", k);
-      o.innerHTML = a.label;
+      o.setAttribute("value", a);
+      o.innerHTML = k.label;
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
@@ -44,9 +65,9 @@ const MarkerAddDialog = Feature.extend({
       this._addMarker(this._type.value, this._operation, this._comment.value)
     );
 
-    var mHandler = this;
+    const context = this;
     this._dialog = window.dialog({
-      title: "Add Marker",
+      title: wX("ADD_MARKER"),
       width: "auto",
       height: "auto",
       position: {
@@ -56,8 +77,8 @@ const MarkerAddDialog = Feature.extend({
       html: content,
       dialogClass: "wasabee-dialog-alerts",
       closeCallback: function() {
-        mHandler.disable();
-        delete mHandler._dialog;
+        context.disable();
+        delete context._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerButton
     });

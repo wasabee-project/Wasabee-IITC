@@ -187,7 +187,10 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
         marker.type == Wasabee.static.constants.MARKER_TYPE_VIRUS ||
         marker.type == Wasabee.static.constants.MARKER_TYPE_DECAY
       ) {
-        if (checkMarkerAgainstLink(marker, realLink, operation)) {
+        if (
+          marker.portalId == realLink.options.data.dGuid ||
+          marker.portalId == realLink.options.data.oGuid
+        ) {
           return false;
         }
       }
@@ -195,22 +198,6 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
     return true;
   }
   return false;
-};
-
-/** This checks if a marker is on either side of a link */
-const checkMarkerAgainstLink = (marker, link, operation) => {
-  var latlngs = link.getLatLngs();
-  var markerPortal = operation.getPortal(marker.portalId);
-  var v = latlngs[0];
-  var center = latlngs[1];
-  var view = markerPortal;
-  return view
-    ? view.lng == v.lng && view.lat == v.lat
-      ? true
-      : view.lng == center.lng && view.lat == center.lat
-      ? true
-      : false
-    : false;
 };
 
 const showCrossLink = (link, operation) => {
@@ -224,16 +211,12 @@ const showCrossLink = (link, operation) => {
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
-  window.plugin.wasabee.crossLinkLayerGroup[link.options.guid] = blocked;
+  window.plugin.wasabee._crosslinkCache.set(link.options.guid, blocked);
 };
 
 const testLink = (link, operation) => {
-  // if crosslinks are not displayed, do not check
-  // requires the user to disable and enable the layer once...
-  // if (!window.isLayerGroupDisplayed("Wasabee Cross Links")) return;
-
   // if the crosslink already exists, do not recheck
-  if (window.plugin.wasabee.crossLinkLayerGroup[link.options.guid]) {
+  if (window.plugin.wasabee._crosslinkCache.has(link.options.guid)) {
     return;
   }
 
@@ -270,30 +253,32 @@ const testLink = (link, operation) => {
 };
 
 export const checkAllLinks = operation => {
+  // console.time("checkAllLinks");
+  // console.log("checkAllLinks called: " + operation.ID);
   window.plugin.wasabee.crossLinkLayers.clearLayers();
-  window.plugin.wasabee.crossLinkLayerGroup = {};
+  window.plugin.wasabee._crosslinkCache.clear();
 
   if (!operation.links || operation.links.length == 0) return;
   for (const guid in window.links) {
     testLink(window.links[guid], operation);
   }
+  // console.timeEnd("checkAllLinks");
 };
 
 const onLinkAdded = data => {
-  const operation = getSelectedOperation();
-  testLink(data.link, operation);
+  testLink(data.link, getSelectedOperation());
 };
 
-const testForDeletedLinks = operation => {
-  window.plugin.wasabee.crossLinkLayers.eachLayer(layer => {
+/* probably unused now -- remove in 0.16 */
+const testForDeletedLinks = () => {
+  for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
     const guid = layer.options.guid;
     if (!window.links[guid]) {
+      console.log("testForDeletedLinks FOUND SOMETHING!!!");
       window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
-      delete window.plugin.wasabee.crossLinkLayerGroup[guid];
-
-      operation.removeBlocker();
+      window.plugin.wasabee._crosslinkCache.delete(guid);
     }
-  });
+  }
 };
 
 const onMapDataRefreshStart = () => {
@@ -301,17 +286,23 @@ const onMapDataRefreshStart = () => {
 };
 
 const onMapDataRefreshEnd = () => {
+  if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
   const operation = getSelectedOperation();
 
   checkAllLinks(operation);
-  testForDeletedLinks(operation);
+  testForDeletedLinks();
   window.addHook("linkAdded", onLinkAdded);
 };
 
 export const initCrossLinks = () => {
+  window.pluginCreateHook("wasabeeCrosslinks");
+  window.addHook("wasabeeCrosslinks", operation => {
+    checkAllLinks(operation);
+  });
+
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
-  window.plugin.wasabee.crossLinkLayerGroup = {};
+  window.plugin.wasabee._crosslinkCache = new Map();
   window.addLayerGroup(
     "Wasabee Cross Links",
     window.plugin.wasabee.crossLinkLayers,
@@ -321,8 +312,9 @@ export const initCrossLinks = () => {
   // rerun crosslinks on re-enable
   window.map.on("layeradd", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      var operation = getSelectedOperation();
-      if (operation != null) {
+      window.plugin.wasabee._crosslinkCache = new Map();
+      const operation = getSelectedOperation();
+      if (operation) {
         checkAllLinks(operation);
       }
     }
@@ -332,7 +324,7 @@ export const initCrossLinks = () => {
   window.map.on("layerremove", obj => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
-      window.plugin.wasabee.crossLinkLayerGroup = {};
+      delete window.plugin.wasabee._crosslinkCache;
     }
   });
 
