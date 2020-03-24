@@ -1,87 +1,69 @@
-/* ================================================================== */
-/* Toolbars
-/* ================================================================== */
-
-.leaflet-draw-section {
+.wasabee-section {
   position: relative;
 }
 
-.leaflet-draw-toolbar {
+.wasabee-toolbar {
   margin-top: 12px;
 }
 
-.leaflet-draw-toolbar-top {
+.wasabee-toolbar-top {
   margin-top: 0;
 }
 
-.leaflet-draw-toolbar-notop a:first-child {
+.wasabee-toolbar-notop a:first-child {
   border-top-right-radius: 0;
 }
 
-.leaflet-draw-toolbar-nobottom a:last-child {
+.wasabee-toolbar-nobottom a:last-child {
   border-bottom-right-radius: 0;
 }
 
-/* .leaflet-draw-toolbar a {
-  background-image: url(@@INCLUDEIMAGE:images/draw-spritesheet.png@@);
-  background-repeat: no-repeat;
-}
-
-.leaflet-retina .leaflet-draw-toolbar a {
-  background-image: url(@@INCLUDEIMAGE:images/draw-spritesheet-2x.png@@);
-  background-size: 210px 30px;
-} */
-
-.leaflet-draw a {
+.wasabee a {
   display: block;
   text-align: center;
   text-decoration: none;
 }
 
-/* ================================================================== */
-/* Toolbar actions menu
-/* ================================================================== */
-
-.leaflet-draw-actions {
+.wasabee-actions {
   display: none;
   list-style: none;
   margin: 0;
   padding: 0;
   position: absolute;
-  left: 26px; /* leaflet-draw-toolbar.left + leaflet-draw-toolbar.width */
+  left: 26px; /* wasabee-toolbar.left + wasabee-toolbar.width */
   top: 0;
   white-space: nowrap;
 }
 
-.leaflet-right .leaflet-draw-actions {
+.wasabee-right .wasabee-actions {
   right: 26px;
   left: auto;
 }
 
-.leaflet-draw-actions li {
+.wasabee-actions li {
   display: inline-block;
 }
 
-.leaflet-draw-actions li:first-child a {
+.wasabee-actions li:first-child a {
   border-left: none;
 }
 
-.leaflet-draw-actions li:last-child a {
+.wasabee-actions li:last-child a {
   -webkit-border-radius: 0 4px 4px 0;
   border-radius: 0 4px 4px 0;
 }
 
-.leaflet-right .leaflet-draw-actions li:last-child a {
+.wasabee-right .wasabee-actions li:last-child a {
   -webkit-border-radius: 0;
   border-radius: 0;
 }
 
-.leaflet-right .leaflet-draw-actions li:first-child a {
+.wasabee-right .wasabee-actions li:first-child a {
   -webkit-border-radius: 4px 0 0 4px;
   border-radius: 4px 0 0 4px;
 }
 
-.leaflet-draw-actions a {
+.wasabee-actions a {
   background-color: #919187;
   border-left: 1px solid #aaa;
   color: #fff;
@@ -93,25 +75,25 @@
   height: 28px;
 }
 
-.leaflet-draw-actions-bottom {
+.wasabee-actions-bottom {
   margin-top: 0;
 }
 
-.leaflet-draw-actions-top {
+.wasabee-actions-top {
   margin-top: 1px;
 }
 
-.leaflet-draw-actions-top a,
-.leaflet-draw-actions-bottom a {
+.wasabee-actions-top a,
+.wasabee-actions-bottom a {
   height: 27px;
   line-height: 27px;
 }
 
-.leaflet-draw-actions a:hover {
+.wasabee-actions a:hover {
   background-color: #a0a098;
 }
 
-.leaflet-draw-actions-top.leaflet-draw-actions-bottom a {
+.wasabee-actions-top.wasabee-actions-bottom a {
   height: 26px;
   line-height: 26px;
 }
@@ -120,23 +102,23 @@
 /* Draw toolbar
 /* ================================================================== */
 
-.leaflet-draw-toolbar .leaflet-draw-draw-polyline {
+.wasabee-toolbar .wasabee-draw-polyline {
   background-position: -2px -2px;
 }
 
-.leaflet-draw-toolbar .leaflet-draw-draw-polygon {
+.wasabee-toolbar .wasabee-draw-polygon {
   background-position: -31px -2px;
 }
 
-.leaflet-draw-toolbar .leaflet-draw-draw-rectangle {
+.wasabee-toolbar .wasabee-draw-rectangle {
   background-position: -62px -2px;
 }
 
-.leaflet-draw-toolbar .leaflet-draw-draw-circle {
+.wasabee-toolbar .wasabee-draw-circle {
   background-position: -92px -2px;
 }
 
-.leaflet-draw-toolbar .leaflet-draw-draw-marker {
+.wasabee-toolbar .wasabee-draw-marker {
   background-position: -122px -2px;
 }
 
@@ -144,24 +126,20 @@
 /* Edit toolbar
 /* ================================================================== */
 
-.leaflet-draw-toolbar .leaflet-draw-edit-edit {
+.wasabee-toolbar .wasabee-edit-edit {
   background-position: -152px -2px;
 }
 
-.leaflet-draw-toolbar .leaflet-draw-edit-remove {
+.wasabee-toolbar .wasabee-edit-remove {
   background-position: -182px -2px;
 }
 
-/* ================================================================== */
-/* Drawing styles
-/* ================================================================== */
-
-.leaflet-mouse-marker {
+.wasabee-mouse-marker {
   background-color: #fff;
   cursor: crosshair;
 }
 
-.leaflet-draw-tooltip {
+.wasabee-tooltip {
   background: rgb(54, 54, 54);
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid transparent;
@@ -177,7 +155,7 @@
   z-index: 6;
 }
 
-.leaflet-draw-tooltip:before {
+.wasabee-tooltip:before {
   border-right: 6px solid black;
   border-right-color: rgba(0, 0, 0, 0.5);
   border-top: 6px solid transparent;
@@ -188,47 +166,21 @@
   left: -7px;
 }
 
-.leaflet-error-draw-tooltip {
+.wasabee-error-tooltip {
   background-color: #f2dede;
   border: 1px solid #e6b6bd;
   color: #b94a48;
 }
 
-.leaflet-error-draw-tooltip:before {
+.wasabee-error-tooltip:before {
   border-right-color: #e6b6bd;
 }
 
-.leaflet-draw-tooltip-single {
+.wasabee-tooltip-single {
   margin-top: -12px;
 }
 
-.leaflet-draw-tooltip-subtext {
+.wasabee-tooltip-subtext {
   color: #f8d5e4;
 }
 
-.leaflet-draw-guide-dash {
-  font-size: 1%;
-  opacity: 0.6;
-  position: absolute;
-  width: 5px;
-  height: 5px;
-}
-
-/* ================================================================== */
-/* Edit styles
-/* ================================================================== */
-
-.leaflet-edit-marker-selected {
-  background: rgba(254, 87, 161, 0.1);
-  border: 4px dashed rgba(254, 87, 161, 0.6);
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-}
-
-.leaflet-edit-move {
-  cursor: move;
-}
-
-.leaflet-edit-resize {
-  cursor: pointer;
-}
