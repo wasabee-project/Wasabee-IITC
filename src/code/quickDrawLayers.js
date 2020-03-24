@@ -96,7 +96,6 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  // would using the "sticky" option on the L.tooltip be better?
   _onMouseMove: function(e) {
     if (e.latlng) this._tooltip.updatePosition(e.latlng);
     L.DomEvent.preventDefault(e.originalEvent);
