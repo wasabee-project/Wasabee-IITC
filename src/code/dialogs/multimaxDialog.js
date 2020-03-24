@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import multimax from "../multimax";
 import store from "../../lib/store";
 import WasabeePortal from "../portal";
@@ -6,19 +6,19 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import { getAllPortalsOnScreen } from "../uiCommands";
 
-const MultimaxDialog = Feature.extend({
+const MultimaxDialog = WDialog.extend({
   statics: {
     TYPE: "multimaxDialog"
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {
@@ -97,7 +97,7 @@ const MultimaxDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
     this.title = "Multimax";
     this.label = "Multimax";
     this._portals = {};

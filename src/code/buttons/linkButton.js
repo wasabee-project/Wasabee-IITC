@@ -1,4 +1,4 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import MultimaxButtonControl from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";

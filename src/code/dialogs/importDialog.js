@@ -1,11 +1,11 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
 
-const ImportDialogControl = Feature.extend({
+const ImportDialogControl = WDialog.extend({
   statics: {
     TYPE: "importDialog"
   },
@@ -13,17 +13,17 @@ const ImportDialogControl = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = ImportDialogControl.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {

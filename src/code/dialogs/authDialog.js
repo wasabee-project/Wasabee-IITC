@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AboutDialog from "./about";
@@ -7,7 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
 import wX from "../wX";
 
-const AuthDialog = Feature.extend({
+const AuthDialog = WDialog.extend({
   statics: {
     TYPE: "authDialog"
   },
@@ -15,18 +15,18 @@ const AuthDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = AuthDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {

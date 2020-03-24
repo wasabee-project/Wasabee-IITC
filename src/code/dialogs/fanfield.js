@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
@@ -6,21 +6,21 @@ import WasabeeLink from "../link";
 import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
-const FanfieldDialog = Feature.extend({
+const FanfieldDialog = WDialog.extend({
   statics: {
     TYPE: "FanfieldDialog"
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, false);
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeLayerGroup(this._layerGroup);
   },
 
@@ -138,7 +138,7 @@ const FanfieldDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = FanfieldDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
     this.title = "Fan Field";
     this.label = "Fan Field";
     this._operation = getSelectedOperation();

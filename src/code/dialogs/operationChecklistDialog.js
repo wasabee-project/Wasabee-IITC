@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
@@ -9,7 +9,7 @@ import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import wX from "../wX";
 
-const OperationChecklistDialog = Feature.extend({
+const OperationChecklistDialog = WDialog.extend({
   statics: {
     TYPE: "operationChecklist"
   },
@@ -17,12 +17,12 @@ const OperationChecklistDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = OperationChecklistDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     const context = this;
     this._operation = getSelectedOperation();
     // magic context incantation to make "this" work...
@@ -40,7 +40,7 @@ const OperationChecklistDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
   },

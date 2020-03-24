@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
 import store from "../../lib/store";
@@ -19,7 +19,7 @@ import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
 
-const WasabeeDialog = Feature.extend({
+const WasabeeDialog = WDialog.extend({
   statics: {
     TYPE: "wasabeeButton"
   },
@@ -27,13 +27,13 @@ const WasabeeDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = WasabeeDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: async function() {
     if (!this._map) return;
     this._me = await WasabeeMe.waitGet(true);
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     // magic context incantation to make "this" work...
     const context = this;
@@ -251,7 +251,7 @@ const WasabeeDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   setServer: function() {

@@ -1,4 +1,4 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import MarkerAddDialog from "../dialogs/markerAddDialog";
 import MarkerList from "../dialogs/markerList";
 import wX from "../wX";

@@ -1,4 +1,4 @@
-import { Feature, Tooltip } from "./leafletDrawImports";
+import { WTooltip } from "./leafletClasses";
 import WasabeePortal from "./portal";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
@@ -18,7 +18,9 @@ const strings = {
   }
 }; */
 
-const QuickDrawControl = Feature.extend({
+const QuickDrawControl = L.Handler.extend({
+  includes: L.Mixin.Events,
+
   statics: {
     TYPE: "quickdraw"
   },
@@ -31,18 +33,31 @@ const QuickDrawControl = Feature.extend({
     })
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
+    this._map = map;
+    this._container = map._container;
     this.type = QuickDrawControl.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    L.Handler.prototype.initialize.call(this, map, options);
+    L.Util.extend(this.options, options);
+  },
+
+  enable: function() {
+    if (this._enabled) return;
+    L.Handler.prototype.enable.call(this);
+    this.fire("enabled", { handler: this.type });
+  },
+
+  disable: function() {
+    if (!this._enabled) return;
+    L.Handler.prototype.disable.call(this);
+    this.fire("disabled", { handler: this.type });
   },
 
   addHooks: function() {
-    Feature.prototype.addHooks.call(this);
     if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
-    this._tooltip = new Tooltip(this._map);
+    this._tooltip = new WTooltip(this._map);
     L.DomEvent.addListener(this._container, "keyup", this._cancelDrawing, this);
 
     this._operation = getSelectedOperation();
@@ -61,7 +76,6 @@ const QuickDrawControl = Feature.extend({
 
   removeHooks: function() {
     if (!this._map) return;
-    Feature.prototype.removeHooks.call(this);
     delete this._anchor1;
     delete this._anchor2;
     delete this._spinePortals;

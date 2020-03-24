@@ -1,9 +1,9 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-const MarkerAddDialog = Feature.extend({
+const MarkerAddDialog = WDialog.extend({
   statics: {
     TYPE: "markerButton"
   },
@@ -11,12 +11,12 @@ const MarkerAddDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = MarkerAddDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     const context = this;
     this._pch = portal => {
@@ -28,7 +28,7 @@ const MarkerAddDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalSelected", this._pch);
   },
 

@@ -1,35 +1,48 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 
-// Is there anything in Feature, or can we just use L.Handler now?
-const AboutDialog = Feature.extend({
-  // for dialogs, the static TYPE and this.type are unused, remove them in 0.16
+// This file documents the minimum requirements of a dialog in wasabee
+const AboutDialog = WDialog.extend({
+  // not strictly necessary, but good style
   statics: {
     TYPE: "about"
   },
 
-  // use map=window.map both her and in the Feature class
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  // every leaflet class ought to have an initialize,
+  // inputs defined by leaflet, window.map is defined by IITC
+  // options can extended by callers
+  initialize: function(map = window.map, options) {
+    // always define type, it is used by the parent classes
     this.type = AboutDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    // call the parent classes initialize as well
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
+  // WDialog is a leaflet L.Handler, which takes add/removeHooks
   addHooks: function() {
-    // Feature.addHooks doesn't do anything
-    // does L.Handler.addHooks exist?
-    Feature.prototype.addHooks.call(this);
-    this._displayDialog();
+    // this pulls in the addHooks from the parent class
+    WDialog.prototype.addHooks.call(this);
+    // put any per-open setup here
+    // this is the call to actually do our work
+    if (this._smallScreen) {
+      this._displaySmallDialog();
+    } else {
+      this._displayDialog();
+    }
   },
 
   removeHooks: function() {
-    // Feature.removeHooks doesn't do anything
-    Feature.prototype.removeHooks.call(this);
+    // put any post close teardown here
+    WDialog.prototype.removeHooks.call(this);
   },
 
+  // define our work in _displayDialog
   _displayDialog: function() {
+    // use leaflet's DOM object creation, not bare DOM or Jquery
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
+    // xW is the translation call, looks for strings in translations.json based
+    // on the browser's langauge setting
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const about = L.DomUtil.create("div", null, html);
@@ -39,6 +52,10 @@ const AboutDialog = Feature.extend({
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
 
+    // create a JQueryUI dialog, store it in _dialog
+    // set closeCallback to report that we are done and free up the memory
+    // set id if you want only one instance of this dialog to be displayed at a time
+    // enable/disable are inherited from L.Handler via WDialog
     this._dialog = window.dialog({
       title: wX("ABOUT_WASABEE"),
       width: "auto",
@@ -51,7 +68,14 @@ const AboutDialog = Feature.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.linkList
     });
+  },
+
+  // small-screen versions go in _displaySmallDialog
+  _displaySmallDialog: function() {
+    // for this dialog, the small screen is the same as the normal
+    this._displayDialog();
   }
 });
 
+// this line allows other files to import our dialog
 export default AboutDialog;

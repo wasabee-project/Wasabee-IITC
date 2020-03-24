@@ -1,4 +1,4 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import { opPromise } from "../server";
 import WasabeeMe from "../me";
 import AuthDialog from "../dialogs/authDialog";

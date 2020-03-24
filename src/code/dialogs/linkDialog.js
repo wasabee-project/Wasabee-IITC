@@ -1,22 +1,22 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { addPortal } from "../uiCommands.js";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-const LinkDialog = Feature.extend({
+const LinkDialog = WDialog.extend({
   statics: {
     TYPE: "linkdialogButton"
   },
 
   initialize: function(map, options) {
     this.type = LinkDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._displayDialog();
   },
@@ -231,7 +231,7 @@ const LinkDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   }
 });
 

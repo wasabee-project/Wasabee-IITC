@@ -1,11 +1,11 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import WasabeeOp from "../operation";
 import ImportDialogControl from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-const NewopDialog = Feature.extend({
+const NewopDialog = WDialog.extend({
   statics: {
     TYPE: "newopButton"
   },
@@ -13,12 +13,12 @@ const NewopDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = NewopDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog(this);
   },
 
@@ -76,7 +76,7 @@ const NewopDialog = Feature.extend({
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   }
 });
 

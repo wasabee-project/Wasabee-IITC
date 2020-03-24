@@ -1,9 +1,9 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 
 // generic confirmation screen w/ ok and cancel buttons
 
-const ConfirmDialog = Feature.extend({
+const ConfirmDialog = WDialog.extend({
   statics: {
     TYPE: "confirmDialog"
   },
@@ -11,19 +11,19 @@ const ConfirmDialog = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = ConfirmDialog.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
     this._title = "No title set";
     this._label = "No label set";
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
     window.runHooks("wasabeeUIUpdate", getSelectedOperation());
   },
 

@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 // import AssignDialog from "./assignDialog";
 // import SetCommentDialog from "./setCommentDialog";
@@ -6,7 +6,7 @@ import Sortable from "../../lib/sortable";
 import { teamPromise } from "../server";
 import wX from "../wX";
 
-const TeamMembershipList = Feature.extend({
+const TeamMembershipList = WDialog.extend({
   statics: {
     TYPE: "teamMembershipList"
   },
@@ -14,17 +14,17 @@ const TeamMembershipList = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = TeamMembershipList.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function() {

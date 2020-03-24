@@ -1,4 +1,4 @@
-import { Feature } from "../leafletDrawImports";
+import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeTeam from "../team";
@@ -6,7 +6,7 @@ import WasabeeMe from "../me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
 
-const OpPermList = Feature.extend({
+const OpPermList = WDialog.extend({
   statics: {
     TYPE: "opPermList"
   },
@@ -14,12 +14,12 @@ const OpPermList = Feature.extend({
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = OpPermList.TYPE;
-    Feature.prototype.initialize.call(this, map, options);
+    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: async function() {
     if (!this._map) return;
-    Feature.prototype.addHooks.call(this);
+    WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._me = await WasabeeMe.waitGet();
     const context = this;
@@ -33,7 +33,7 @@ const OpPermList = Feature.extend({
 
   removeHooks: function() {
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-    Feature.prototype.removeHooks.call(this);
+    WDialog.prototype.removeHooks.call(this);
   },
 
   update: function(op) {

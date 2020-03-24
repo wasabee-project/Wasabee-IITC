@@ -1,4 +1,4 @@
-import { WButton } from "../leafletDrawImports.js";
+import { WButton } from "../leafletClasses";
 import QuickDrawControl from "../quickDrawLayers";
 import wX from "../wX";
 
