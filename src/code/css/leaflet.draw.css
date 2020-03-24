@@ -98,40 +98,17 @@
   line-height: 26px;
 }
 
-/* ================================================================== */
-/* Draw toolbar
-/* ================================================================== */
-
-.wasabee-toolbar .wasabee-draw-polyline {
-  background-position: -2px -2px;
-}
-
-.wasabee-toolbar .wasabee-draw-polygon {
-  background-position: -31px -2px;
-}
-
-.wasabee-toolbar .wasabee-draw-rectangle {
-  background-position: -62px -2px;
-}
-
-.wasabee-toolbar .wasabee-draw-circle {
-  background-position: -92px -2px;
-}
-
-.wasabee-toolbar .wasabee-draw-marker {
-  background-position: -122px -2px;
-}
-
-/* ================================================================== */
-/* Edit toolbar
-/* ================================================================== */
-
-.wasabee-toolbar .wasabee-edit-edit {
-  background-position: -152px -2px;
-}
-
-.wasabee-toolbar .wasabee-edit-remove {
-  background-position: -182px -2px;
+.wasabee-subactions li {
+  background-color: #919187;
+  border-left: 1px solid #aaa;
+  color: #fff;
+  font: 11px/19px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  line-height: 28px;
+  text-decoration: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 28px;
+  !width: "auto";
 }
 
 .wasabee-mouse-marker {

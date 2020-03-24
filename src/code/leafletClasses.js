@@ -184,7 +184,7 @@ export const WButton = L.Class.extend({
   _createSubActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
-      const li = L.DomUtil.create("li", "", container);
+      const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
         title: b.title,
         text: b.text,
@@ -192,6 +192,7 @@ export const WButton = L.Class.extend({
         callback: b.callback,
         context: b.context
       });
+      // these should be in the css for wasabee-subactions now
       li.style.setProperty("width", "auto", "important");
       li.firstChild.style.setProperty("width", "auto", "important");
     }
