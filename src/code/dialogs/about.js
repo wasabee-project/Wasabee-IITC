@@ -1,11 +1,14 @@
 import { Feature } from "../leafletDrawImports";
 import wX from "../wX";
 
+// Is there anything in Feature, or can we just use L.Handler now?
 const AboutDialog = Feature.extend({
+  // for dialogs, the static TYPE and this.type are unused, remove them in 0.16
   statics: {
     TYPE: "about"
   },
 
+  // use map=window.map both her and in the Feature class
   initialize: function(map, options) {
     if (!map) map = window.map;
     this.type = AboutDialog.TYPE;
@@ -13,11 +16,14 @@ const AboutDialog = Feature.extend({
   },
 
   addHooks: function() {
+    // Feature.addHooks doesn't do anything
+    // does L.Handler.addHooks exist?
     Feature.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function() {
+    // Feature.removeHooks doesn't do anything
     Feature.prototype.removeHooks.call(this);
   },
 

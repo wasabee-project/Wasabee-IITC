@@ -1,4 +1,4 @@
-import { Feature } from "./leafletDrawImports";
+import { Feature, Tooltip } from "./leafletDrawImports";
 import WasabeePortal from "./portal";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
@@ -40,6 +40,11 @@ const QuickDrawControl = Feature.extend({
   addHooks: function() {
     Feature.prototype.addHooks.call(this);
     if (!this._map) return;
+    L.DomUtil.disableTextSelection();
+
+    this._tooltip = new Tooltip(this._map);
+    L.DomEvent.addListener(this._container, "keyup", this._cancelDrawing, this);
+
     this._operation = getSelectedOperation();
     this._anchor1 = null;
     this._anchor2 = null;
@@ -55,13 +60,26 @@ const QuickDrawControl = Feature.extend({
   },
 
   removeHooks: function() {
+    if (!this._map) return;
     Feature.prototype.removeHooks.call(this);
     delete this._anchor1;
     delete this._anchor2;
     delete this._spinePortals;
     delete this._operation;
+
+    L.DomUtil.enableTextSelection();
+    this._tooltip.dispose();
+    this._tooltip = null;
+    L.DomEvent.removeListener(this._container, "keyup", this._cancelDrawing);
+
     window.removeHook("portalSelected", this._portalClickedHook);
     this._map.off("mousemove", this._onMouseMove, this);
+  },
+
+  _cancelDrawing: function(e) {
+    if (e.keyCode === 27) {
+      this.disable();
+    }
   },
 
   // would using the "sticky" option on the L.tooltip be better?
