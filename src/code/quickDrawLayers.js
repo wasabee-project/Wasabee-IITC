@@ -44,12 +44,14 @@ const QuickDrawControl = L.Handler.extend({
   enable: function() {
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
+    // tell the button to display the "end" option
     this.fire("enabled", { handler: this.type });
   },
 
   disable: function() {
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
+    // revoke button's "end" option
     this.fire("disabled", { handler: this.type });
   },
 
