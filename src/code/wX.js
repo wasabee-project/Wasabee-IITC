@@ -4,11 +4,13 @@ const wX = (key, value, option) => {
   const ll = window.navigator.userLanguage || window.navigator.language || "en";
   let l = ll.substring(0, 2);
 
-  // if chosen langauge does not exist, use english
-  if (!wT[l]) l = "en";
+  const defaultLang = localStorage["wasabee-default-language"] || "en";
 
-  // if this key does not exist in the chosen langauge, use english
-  let s = wT[l][key] || wT["en"][key];
+  // if chosen langauge does not exist, use the default
+  if (!wT[l]) l = defaultLang;
+
+  // if this key does not exist in the chosen langauge, use the default, or English
+  let s = wT[defaultLang][key] || wT[l][key] || wT["en"][key];
 
   // if it doesn't exist in English
   if (!s) return "haec notificatio praebibo est";
