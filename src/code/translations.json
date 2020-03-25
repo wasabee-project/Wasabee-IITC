@@ -605,7 +605,7 @@
     "AUTH INCOMPAT": "May ginagamit kang plugin sa TamperMonkey na hindi angkop sa Wasabee",
     "AUTH ANDROID": "Sa Android, subukan muna ang 'quick'. Kung hindi gumana, subukan ang main login gamit ang 'select_account'.",
     "AUTH IOS": "Sa iOS, subukan muna ang 'Log In'. Kung hindi gumana, gawin ang 'Webview Log in', mag-log in, tapos gamitin ang 'Verify Webview' button para makumpleto ang proseso.",
-    "KNOWN BLOCKERS": "Nakikitang Blockers
+    "KNOWN BLOCKERS": "Nakikitang Blockers: ${value}",
     "IOS NEED FAKE UA": "Kailangang pumili ng 'Custom UserAgent for Webviews' sa IITC-Mobile settings para makapag-login ng maayos",
     "SEND LOCATION": "Ipaladala ang Lokasyon",
     "LOG IN QUICK": "Log In (quick; for Android)",
