@@ -66,6 +66,7 @@ export const clearAllItems = operation => {
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
+      window.runHooks("wasabeeCrosslinks", operation);
     }
   );
   con.enable();
