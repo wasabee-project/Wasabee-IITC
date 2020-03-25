@@ -1,18 +1,15 @@
 export const WTooltip = L.Class.extend({
   initialize: function(map) {
     this._map = map;
-    this._popupPane = map._panes.popupPane;
+    // this._pane = map._panes.popupPane;
+    this._pane = map._panes.tooltipPane;
 
-    this._container = L.DomUtil.create(
-      "div",
-      "wasabee-tooltip",
-      this._popupPane
-    );
+    this._container = L.DomUtil.create("div", "wasabee-tooltip", this._pane);
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
   },
 
   dispose: function() {
-    this._popupPane.removeChild(this._container);
+    this._pane.removeChild(this._container);
     this._container = null;
   },
 

@@ -21,10 +21,7 @@ export default function(selectedOp) {
       position: "topleft"
     },
     onAdd: function(map) {
-      const outerDiv = L.DomUtil.create(
-        "div",
-        "leaflet-draw leaflet-draw-section"
-      );
+      const outerDiv = L.DomUtil.create("div", "wasabee wasabee-section");
       this._container = L.DomUtil.create(
         "div",
         "leaflet-arcs leaflet-bar",

@@ -216,7 +216,9 @@ const LinkListDialog = WDialog.extend({
     const linkColor = L.DomUtil.create("select", "", colorSection);
     linkColor.id = link.ID;
 
-    window.plugin.wasabee.static.layerTypes.forEach(function(a) {
+    for (const style of window.plugin.wasabee.static.layerTypes) {
+      if (style[0] == "SE" || style[0] == "self-block") continue;
+      const a = style[1];
       const option = L.DomUtil.create("option", "");
       option.setAttribute("value", a.name);
       if (a.name == "main") {
@@ -227,7 +229,7 @@ const LinkListDialog = WDialog.extend({
       }
       option.innerHTML = a.displayName;
       linkColor.append(option);
-    });
+    }
 
     linkColor.addEventListener(
       "change",

@@ -113,14 +113,14 @@ const resetLinks = operation => {
   if (!operation.links || operation.links.length == 0) return;
 
   // pre-fetch the op color outside the loop -- is this actually helpful?
-  let lt = Wasabee.static.layerTypes.get("main");
+  let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+    style = Wasabee.static.layerTypes.get(operation.color);
   }
-  lt.link.color = lt.color;
+  style.link.color = style.color;
 
   for (const l of operation.links) {
-    addLink(l, lt.link, operation);
+    addLink(l, style.link, operation);
   }
 };
 
@@ -139,11 +139,12 @@ const updateLinks = operation => {
   }
 
   // pre-fetch the op color outside the loop
-  let lt = Wasabee.static.layerTypes.get("main");
+  let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+    style = Wasabee.static.layerTypes.get(operation.color);
   }
-  lt.link.color = lt.color;
+  // because ... reasons?
+  style.link.color = style.color;
 
   for (const l of operation.links) {
     if (layerMap.has(l.ID)) {
@@ -154,11 +155,11 @@ const updateLinks = operation => {
         l.toPortalId != ll.options.to
       ) {
         Wasabee.linkLayerGroup.removeLayer(ll);
-        addLink(l, lt.link, operation);
+        addLink(l, style.link, operation);
       }
       layerMap.delete(l.ID);
     } else {
-      addLink(l, lt.link, operation);
+      addLink(l, style.link, operation);
     }
   }
 
@@ -177,6 +178,8 @@ const addLink = (wlink, style, operation) => {
     style.color = linkLt.color;
   }
 
+  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
+
   const latLngs = wlink.getLatLngs(operation);
   if (!latLngs) {
     console.log("LatLngs was null: op missing portal data?");
@@ -188,7 +191,6 @@ const addLink = (wlink, style, operation) => {
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
   newlink.options.Wcolor = wlink.Wcolor;
-  //
   newlink.addTo(Wasabee.linkLayerGroup);
 };
 

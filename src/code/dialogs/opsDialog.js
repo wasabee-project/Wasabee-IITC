@@ -121,6 +121,7 @@ const OpsDialog = WDialog.extend({
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
       const opColor = L.DomUtil.create("select", null, colorSection);
       for (const cd of window.plugin.wasabee.static.layerTypes) {
+        if (cd[0] == "SE" || cd[0] == "self-block") continue;
         const c = cd[1];
         const option = L.DomUtil.create("option", null, opColor);
         if (c.name == operationColor) option.selected = true;
