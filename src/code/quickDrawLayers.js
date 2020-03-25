@@ -131,6 +131,9 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
+    localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
+    localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
+
     if (selectedPortal.id in this._spinePortals) {
       return; //ignore duplicates
     } else {
