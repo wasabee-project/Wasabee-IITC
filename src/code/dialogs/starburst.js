@@ -44,7 +44,7 @@ const StarburstDialog = WDialog.extend({
     L.DomEvent.on(anchorButton, "click", () => {
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-fanfield-anchor"] = JSON.stringify(this._anchor);
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(this._anchor.displayFormat());
       } else {
@@ -95,7 +95,7 @@ const StarburstDialog = WDialog.extend({
     this.title = wX("STARBURST");
     this.label = wX("STARBURST TITLE");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-starburst-anchor"];
+    let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
   },
 
