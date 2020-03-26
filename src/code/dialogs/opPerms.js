@@ -79,7 +79,7 @@ const OpPermList = WDialog.extend({
 
       const context = this;
       L.DomEvent.on(ab, "click", () => {
-        context.addPerm(context._operation, teamMenu.value, permMenu.value);
+        context.addPerm(teamMenu.value, permMenu.value);
         context.setup();
         context._drawnTable = this._html.replaceChild(
           context._table.table,
@@ -140,37 +140,44 @@ const OpPermList = WDialog.extend({
     this._table.items = this._operation.teamlist;
   },
 
-  addPerm: function(op, teamID, role) {
-    console.log("adding " + teamID + " " + role);
-    addPermPromise(op.ID, teamID, role).then(
+  addPerm: function(teamID, role) {
+    for (const p of this._operation.teamlist) {
+      if (p.teamid == teamID && p.role == role) {
+        console.log("not adding duplicate");
+        window.runHooks("wasabeeUIUpdate", this._operation);
+        return;
+      }
+    }
+    addPermPromise(this._operation.ID, teamID, role).then(
       () => {
-        op.teamlist.push({
+        this._operation.teamlist.push({
           teamid: teamID,
           role: role
         });
-        window.runHooks("wasabeeUIUpdate", op);
+        this._operation.store();
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       err => {
         console.log(err);
+        alert(err);
       }
     );
   },
 
   delPerm: function(obj) {
-    console.log(
-      "removing: " + this._operation.ID + " " + obj.teamid + " - " + obj.role
-    );
     delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
       () => {
         const n = new Array();
-        for (const p in this._operation.teamlist) {
-          if (p.teamid != obj.teamid && p.role != obj.role) n.push(p);
+        for (const p of this._operation.teamlist) {
+          if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
         }
         this._operation.teamlist = n;
-        window.runHooks("wasabeeUIUpdate", this._operation);
+        this._operation.store();
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       err => {
         console.log(err);
+        alert(err);
       }
     );
   }
