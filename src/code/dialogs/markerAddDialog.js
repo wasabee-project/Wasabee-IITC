@@ -75,7 +75,7 @@ const MarkerAddDialog = WDialog.extend({
         at: "center center+30"
       },
       html: content,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog",
       closeCallback: function() {
         context.disable();
         delete context._dialog;

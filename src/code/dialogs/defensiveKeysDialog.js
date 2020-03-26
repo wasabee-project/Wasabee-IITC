@@ -85,7 +85,7 @@ const DefensiveKeysDialog = WDialog.extend({
         at: "center center+30"
       },
       html: this._content,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

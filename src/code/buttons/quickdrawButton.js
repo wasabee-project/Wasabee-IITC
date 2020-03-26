@@ -34,7 +34,7 @@ const QuickdrawButton = WButton.extend({
       }
     ]);
     this.actionsContainer.style.top = "52px";
-    L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
+    L.DomUtil.addClass(this.actionsContainer, "wasabee-actions-top");
     this._container.appendChild(this.actionsContainer);
 
     this.handler.on(

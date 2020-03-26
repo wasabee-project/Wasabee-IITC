@@ -93,7 +93,7 @@ const OpPermList = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._html,
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

@@ -49,7 +49,7 @@ const KeysList = WDialog.extend({
         at: "center center"
       },
       html: this.getListDialogContent(this._operation).table,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         delete this._dialog;
         this.disable();

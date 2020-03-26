@@ -162,7 +162,7 @@ const AuthDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: content,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         if (this._sendLocCheck && this._sendLocCheck.checked) {
           window.plugin.wasabee.sendLocation = true;

@@ -21,12 +21,8 @@ export default function(selectedOp) {
       position: "topleft"
     },
     onAdd: function(map) {
-      const outerDiv = L.DomUtil.create("div", "wasabee wasabee-section");
-      this._container = L.DomUtil.create(
-        "div",
-        "leaflet-arcs leaflet-bar",
-        outerDiv
-      );
+      const outerDiv = L.DomUtil.create("div", "wasabee-section");
+      this._container = L.DomUtil.create("div", "leaflet-bar", outerDiv);
       this._modes = {};
 
       const wb = new WasabeeButton(map, this._container);

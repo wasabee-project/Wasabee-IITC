@@ -23,10 +23,7 @@ const NewopDialog = WDialog.extend({
   },
 
   _displayDialog: function(noHandler) {
-    const content = L.DomUtil.create(
-      "div",
-      "wasabee-dialog wasabee-dialog-ops"
-    );
+    const content = L.DomUtil.create("div", null);
     const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
     const addButton = L.DomUtil.create("a", "", buttonSet);
     addButton.textContent = wX("ADD_NEW_OP");
@@ -66,7 +63,7 @@ const NewopDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: content,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: function() {
         noHandler.disable();
         delete noHandler._dialog;

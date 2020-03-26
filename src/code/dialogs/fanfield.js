@@ -119,7 +119,7 @@ const FanfieldDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: function() {
         context.disable();
         delete context._dialog;

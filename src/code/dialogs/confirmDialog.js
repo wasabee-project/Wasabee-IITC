@@ -62,7 +62,7 @@ const ConfirmDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", "wasabee-confirm-title");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {

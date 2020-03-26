@@ -44,7 +44,7 @@ const ImportDialogControl = WDialog.extend({
           this.idialog.drawToolsFormat();
         }
       },
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         idhandler.disable();
         delete idhandler._dialog;
