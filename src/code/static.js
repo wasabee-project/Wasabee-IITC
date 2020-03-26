@@ -3,10 +3,7 @@ const W = window.plugin.wasabee || {};
 
 W.static = {
   CSS: {
-    example: require("./css/styles.css"),
-    ui: require("./css/ui.css"),
-    main: require("./css/main.css"),
-    leafletdraw: require("./css/leaflet.draw.css")
+    main: require("./css/wasabee.css"),
   },
   images: {
     toolbar_addlinks: require("./images/toolbar_addlinks.png"),

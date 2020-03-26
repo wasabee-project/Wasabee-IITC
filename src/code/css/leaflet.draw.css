@@ -111,10 +111,10 @@
   !width: "auto";
 }
 
-.wasabee-mouse-marker {
+/* .wasabee-mouse-marker {
   background-color: #fff;
   cursor: crosshair;
-}
+} */
 
 .wasabee-tooltip {
   background: rgb(54, 54, 54);
@@ -156,8 +156,3 @@
 .wasabee-tooltip-single {
   margin-top: -12px;
 }
-
-.wasabee-tooltip-subtext {
-  color: #f8d5e4;
-}
-
