@@ -24,11 +24,11 @@ const NewopDialog = WDialog.extend({
 
   _displayDialog: function(noHandler) {
     const content = L.DomUtil.create("div", null);
-    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-    const addButton = L.DomUtil.create("a", "", buttonSet);
+    const buttonSet = L.DomUtil.create("div", "buttonset", content);
+    const addButton = L.DomUtil.create("button", null, buttonSet);
     addButton.textContent = wX("ADD_NEW_OP");
 
-    const importButton = L.DomUtil.create("a", "", buttonSet);
+    const importButton = L.DomUtil.create("button", null, buttonSet);
     importButton.textContent = wX("IMPORT_OP");
     L.DomEvent.on(importButton, "click", () => {
       noHandler._dialog.dialog("close");
@@ -63,7 +63,7 @@ const NewopDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: content,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-newop",
       closeCallback: function() {
         noHandler.disable();
         delete noHandler._dialog;

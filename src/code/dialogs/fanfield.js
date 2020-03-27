@@ -16,7 +16,7 @@ const FanfieldDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, false);
+    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
@@ -28,7 +28,7 @@ const FanfieldDialog = WDialog.extend({
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
     const controls = L.DomUtil.create("div", null, container);
@@ -119,7 +119,7 @@ const FanfieldDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
       closeCallback: function() {
         context.disable();
         delete context._dialog;

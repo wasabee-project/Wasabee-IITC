@@ -5,35 +5,34 @@
 /* actions are the buttons, subactions are the flyouts from the button */
 /* actions are UL and LI, subactions are LI only */
 .wasabee-actions { display: none; list-style: none; margin: 0; padding: 0; position: absolute; left: 26px; top: 0; white-space: nowrap } 
-.wasabee-actions li { display: inline-block } 
-.wasabee-actions li:first-child a { border-left: none } 
-.wasabee-actions li:last-child a { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0 }
-.wasabee-actions a:hover { background-color: #a0a098 }
-.wasabee-actions a,.wasabee-subactions li {
-    background-color: #919187;
-    border-left: 1px solid #aaa;
-    color: #fff;
-    font: 11px/19px "Helvetica Neue",Arial,Helvetica,sans-serif;
-    line-height: 28px;
+.wasabee-actions li { display: inline-block }
+.wasabee-subactions li { vertical-align: middle }
+.wasabee-subactions a {
+    background-color: rgba(99,99,88,.66);
+    /* line-height: 28px; */
     text-decoration: none;
+    /* font: 11px/19px "Helvetica Neue",Arial,Helvetica,sans-serif; */
     padding-left: 10px;
     padding-right: 10px;
-    height: 28px
+    width: auto !important;
+    border-left: 1px solid #aaa;
+    color: #fff;
+    /* height: 28px; */
+    /* vertical-align: middle; */
 }
-
-/* currently only used by quickdraw */
-.wasabee-actions-top { margin-top: 1px } 
-.wasabee-actions-top a { height: 26px; line-height: 26px }
+.wasabee-subactions a:hover { background-color: #a0a098 }
+.wasabee-subactions li:first-child a { border-left: none } 
+.wasabee-subactions li:last-child a { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0 }
+.wasabee-actions-image { vertical-align: middle; text-align: center }
 
 /* wasabee-tooltip is used for the quickdraw mouse follower */
 .wasabee-tooltip {
-  background: #363636;
-  background: rgba(0,0,0,.5);
+  background: rgba(99,99,88,.66);
   border: 1px solid transparent;
   -webkit-border-radius: 4px;
   border-radius: 4px;
   color: #fff;
-  font: 12px/18px "Helvetica Neue",Arial,Helvetica,sans-serif;
+  /* font: 12px/18px "Helvetica Neue",Arial,Helvetica,sans-serif; */
   margin-left: 20px;
   margin-top: -21px;
   padding: 4px 8px;
@@ -43,7 +42,7 @@
 } 
 .wasabee-tooltip:before {
   border-right: 6px solid #000;
-  border-right-color: rgba(0,0,0,.5);
+  border-right-color: rgba(99,99,88,.66);
   border-top: 6px solid transparent;
   border-bottom: 6px solid transparent;
   content: "";
@@ -69,6 +68,7 @@
 .wasabee-table>thead .sortable.asc:before { content: "\25b2" } 
 .wasabee-table>thead .sortable.desc:before { content: "\25bc" } 
 .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px }
+
 .wasabee-overflow-button span { flex: 0 0 auto; box: 0 0 auto } 
 
 /* defined in agent.js, always on an <a> */
@@ -124,14 +124,17 @@
 .wasabee-dialog-wdkeys { }
 .wasabee-dialog-export { }
 .wasabee-dialog-export textarea { width: 96%; height: 250px; resize: vertical }
+.wasabee-dialog-fanfield { } /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
+.wasabee-dialog-import { }
+.wasabee-dialog-import textarea { width: 96%; height: 250px; resize: vertical }
 
 /* used, but not audited */
 .wasabee-dialog-linklist { max-width: 1000px!important }
+.wasabee-dialog-newop { }
+.wasabee-dialog-newop div.buttonset button { padding: 8px 24px 8px 24px; margin: 24px 8px 24px 8px }
+.wasabee-dialog-newop div.buttonset { display: block }
 
 /* promptDialog divs */
 .wasabee-prompt-label { align-items: center }
 .wasabee-prompt-input { align-items: center }
-
-
-/* .temp-op-dialog>a { display: block; color: #ffce00; border: 1px solid #ffce00; padding: 3px 0; margin: 10px auto; width: 80%; text-align: center; background: rgba(8,48,78,.9) } */
 

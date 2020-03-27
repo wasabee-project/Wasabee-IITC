@@ -44,7 +44,7 @@ const ImportDialogControl = WDialog.extend({
           this.idialog.drawToolsFormat();
         }
       },
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-import",
       closeCallback: () => {
         idhandler.disable();
         delete idhandler._dialog;
@@ -77,8 +77,6 @@ class ImportDialog {
 
     // Input area
     this.textarea = L.DomUtil.create("textarea", null, this.container);
-    this.textarea.rows = 20;
-    this.textarea.cols = 80;
     this.textarea.placeholder = wX("PASTE_INSTRUCT");
   }
 

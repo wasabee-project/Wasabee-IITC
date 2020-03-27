@@ -159,7 +159,7 @@
     "NO_DT_ITEMS": "No DrawTools drawn items detected",
     "ONLY_DT_IMP": " (only for DrawTools imports)",
     "NO_STOCK_INTEL": "Wasabee doesn't support stock intel draw imports",
-    "IMPORT_OP": "Imported Op: ",
+    "IMPORT_OP": "Import Op",
     "IMPORT_OP2": "Imported Operation: ",
     "SUCCESS": " Successfuly.",
     "IMP_NOPE": "Import Failed.",
@@ -729,7 +729,7 @@
     "YESNO_DEL": "Sigurado ka na gusto mo burahin ang ",
     "STARBURST": "Starburst",
     "STARBURST TITLE": "Starburst "
-  }
+  },
  "de": {
     "last edited": "03-26-2020 @AxForest ",
     "DISABLE_SYNC": "Das Standard Synchronisations Plugin ist nicht mit Wasabbe kompatibel - Bitte deaktiveren",
@@ -962,4 +962,5 @@
     "YESNO_DEL": "Bist du dir sicher das du <value> löschen willst?",
     "STARBURST": "Starburst",
     "STARBURST TITLE": "Starburst "
+  }
 }
