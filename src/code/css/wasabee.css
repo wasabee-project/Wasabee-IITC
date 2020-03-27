@@ -127,9 +127,11 @@
 .wasabee-dialog-fanfield { } /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-import { }
 .wasabee-dialog-import textarea { width: 96%; height: 250px; resize: vertical }
-
-/* used, but not audited */
-.wasabee-dialog-linklist { max-width: 1000px!important }
+.wasabee-dialog-keylistportal { }
+.wasabee-dialog-keyslist { }
+.wasabee-dialog-keyslist .enough { color: #fff }
+.wasabee-dialog-keyslist .notenough { color: #900; font-weight: bold; }
+.wasabee-dialog-linklist { }
 .wasabee-dialog-newop { }
 .wasabee-dialog-newop div.buttonset button { padding: 8px 24px 8px 24px; margin: 24px 8px 24px 8px }
 .wasabee-dialog-newop div.buttonset { display: block }

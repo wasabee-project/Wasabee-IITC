@@ -3,7 +3,7 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
-import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
 const FanfieldDialog = WDialog.extend({
@@ -128,8 +128,8 @@ const FanfieldDialog = WDialog.extend({
         OK: () => {
           this._dialog.dialog("close");
         },
-        "Clear All": () => {
-          clearAllItems(getSelectedOperation());
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
         }
       }
     });

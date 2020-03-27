@@ -137,7 +137,7 @@ const ManageTeamDialog = WDialog.extend({
     this._dialogContent(container); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this._dialog.html(container);
-    this._dialog.dialog("option", "title", "MANAGE: " + this._team.Name);
+    this._dialog.dialog("option", "title", wX("MANAGE_TEAM", this._team.Name));
   },
 
   _dialogContent: function(container) {
@@ -250,11 +250,11 @@ const ManageTeamDialog = WDialog.extend({
     this._dialogContent(container);
 
     this._dialog = window.dialog({
-      title: wX("MANAGE_TEAM") + this._team.Name,
+      title: wX("MANAGE_TEAM", this._team.Name),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-manageteam",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

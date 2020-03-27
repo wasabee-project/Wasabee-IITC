@@ -49,7 +49,7 @@ const KeysList = WDialog.extend({
         at: "center center"
       },
       html: this.getListDialogContent(this._operation).table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
         delete this._dialog;
         this.disable();
@@ -82,8 +82,15 @@ const KeysList = WDialog.extend({
         name: wX("REQUIRED"),
         value: key => key.Required,
         sort: (a, b) => a - b,
-        format: (cell, value) => {
+        format: (cell, value, key) => {
           cell.textContent = value;
+          const oh = parseInt(key.onHand);
+          const req = parseInt(key.Required);
+          if (oh >= req) {
+            L.DomUtil.addClass(cell, "enough");
+          } else {
+            L.DomUtil.addClass(cell, "notenough");
+          }
         }
       },
       {
@@ -91,7 +98,7 @@ const KeysList = WDialog.extend({
         value: key => parseInt(key.onHand),
         sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          const a = L.DomUtil.create("a", "");
+          const a = L.DomUtil.create("a");
           a.name = key.id;
           L.DomEvent.on(a, "click", L.DomEvent.stopPropagation)
             .on(a, "mousedown", L.DomEvent.stopPropagation)

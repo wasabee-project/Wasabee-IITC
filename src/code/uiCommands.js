@@ -72,6 +72,19 @@ export const clearAllItems = operation => {
   con.enable();
 };
 
+export const clearAllLinks = operation => {
+  const con = new ConfirmDialog();
+  con.setup(
+    `Clear Links: ${operation.name}`,
+    `Do you want to remove all links from ${operation.name}?`,
+    () => {
+      operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", operation);
+    }
+  );
+  con.enable();
+};
+
 export const showLinksDialog = (operation, portal) => {
   const lld = new LinkListDialog();
   lld.setup(operation, portal);
