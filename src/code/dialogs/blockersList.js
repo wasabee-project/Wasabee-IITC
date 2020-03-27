@@ -54,7 +54,7 @@ const BlockerList = WDialog.extend({
         at: "center center"
       },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
         OK: () => {
           this._dialog.dialog("close");

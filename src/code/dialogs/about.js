@@ -61,7 +61,7 @@ const AboutDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: html,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-about",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

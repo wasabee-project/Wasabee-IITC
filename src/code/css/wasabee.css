@@ -1,9 +1,9 @@
-/* wasabee-section used in addButtonss */
-.wasabee-section { position: relative; display: block; text-align: center; text-decoration: none }
+/* wasabee-buttons used in addButtonss */
+.wasabee-buttons { position: relative; display: block; text-align: center; text-decoration: none }
 
 /* currently applied to both the UL and LI */
 /* actions are the buttons, subactions are the flyouts from the button */
-/* actions are UL and LI, subactionsare LI only */
+/* actions are UL and LI, subactions are LI only */
 .wasabee-actions { display: none; list-style: none; margin: 0; padding: 0; position: absolute; left: 26px; top: 0; white-space: nowrap } 
 .wasabee-actions li { display: inline-block } 
 .wasabee-actions li:first-child a { border-left: none } 
@@ -21,7 +21,7 @@
     height: 28px
 }
 
-/* only used by quickdraw */
+/* currently only used by quickdraw */
 .wasabee-actions-top { margin-top: 1px } 
 .wasabee-actions-top a { height: 26px; line-height: 26px }
 
@@ -88,18 +88,10 @@
 .wasabee-marker-popup { display: flex; align-items: center }
 .wasabee-marker-popup div.desc { padding: 4px 4px }
 .wasabee-marker-buttonset { padding: 2px 2px }
+.wasabee-marker-buttonset button { margin-right: 4px }
 
 .wasabee-agent-popup { display: flex; align-items: center }
 .wasabee-agent-popup div.desc { padding: 4px 4px }
-
-/* assignDialog menu */
-.wasabee-agent-menu { align-items: center }
-
-/* confirmDialog div */
-.wasabee-confirm-title { align-items: center }
-/* promptDialog divs */
-.wasabee-prompt-label { align-items: center }
-.wasabee-prompt-input { align-items: center }
 
 /* used, not audited */
 .wasabee-overflow-menu { border: 1px solid #20a8b1; background: rgba(8,48,78,.9); color: #ffce00; padding: 0; margin: 0; position: absolute; list-style: none; z-index: 30000; max-height: 70%; max-width: 25em; overflow-y: auto; overflow-x: hidden }
@@ -109,20 +101,37 @@
 .wasabee-overflow-button { align-self: stretch; background-color: rgba(8,48,78,.9); border: 1px solid #ffce00; color: #ffce00; padding: 2px }
 .wasabee-overflow-button { display: inline-box; display: inline-flex; min-width: 24px; min-height: 20px; text-align: center; vertical-align: middle; font-weight: 700; text-decoration: none!important; color: #ffce00; cursor: pointer; align-items: center; justify-content: center }
 
-/* used extensively, not audited */
+/* all dialogs get this class */
 .wasabee-dialog .desc em { color: inherit; font-style: italic }
 .wasabee-dialog .desc { margin: 0 }
 .wasabee-dialog .desc ul { padding-left: 1.5em }
 .wasabee-dialog input,.wasabee-dialog textarea { border: 1px solid rgba(99, 255, 0, 0.45); color: #ffce00; background-color: rgba(0,0,0,.3) }
 .wasabee-dialog p { margin: 0 0 6px } 
-.wasabee-dialog .desc textarea { box-sizing: border-box; width: 100%; height: 4.5em; padding: 3px; resize: vertical }
+/* .wasabee-dialog .desc textarea { box-sizing: border-box; width: 100%; height: 4.5em; padding: 3px; resize: vertical } */
+
+/* classes specific to various dialogs */
+.wasabee-dialog-about { }
+.wasabee-dialog-assign { }
+.wasabee-agent-menu { align-items: center }
+.wasabee-dialog-auth { }
+.wasabee-dialog-auth-useragent { }
+.wasabee-dialog-auth div.desc { }
+.wasabee-dialog-auth-buttonset { }
+.wasabee-dialog-auth-buttonset button { margin-right: 4px }
+.wasabee-dialog-blockerlist { }
+.wasabee-dialog-confirm { align-items: center }
+.wasabee-dialog-confirm div.title { }
+.wasabee-dialog-wdkeys { }
+.wasabee-dialog-export { }
+.wasabee-dialog-export textarea { width: 96%; height: 250px; resize: vertical }
 
 /* used, but not audited */
 .wasabee-dialog-linklist { max-width: 1000px!important }
 
-/* used in exportDialog, needs to go away */
-.ui-dialog-wasabee-copy textarea { width: 96%; height: 250px; resize: vertical }
+/* promptDialog divs */
+.wasabee-prompt-label { align-items: center }
+.wasabee-prompt-input { align-items: center }
 
-/* used, needs to go away -- use button not a for buttons */
-.temp-op-dialog>a { display: block; color: #ffce00; border: 1px solid #ffce00; padding: 3px 0; margin: 10px auto; width: 80%; text-align: center; background: rgba(8,48,78,.9) }
+
+/* .temp-op-dialog>a { display: block; color: #ffce00; border: 1px solid #ffce00; padding: 3px 0; margin: 10px auto; width: 80%; text-align: center; background: rgba(8,48,78,.9) } */
 

@@ -35,7 +35,7 @@ const ConfirmDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._buildContent(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-confirm",
       buttons: {
         OK: () => {
           if (this._callback) this._callback();
@@ -62,7 +62,7 @@ const ConfirmDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "wasabee-confirm-title");
+    const content = L.DomUtil.create("div", "title");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {

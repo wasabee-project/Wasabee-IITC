@@ -33,7 +33,7 @@ const ExportDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._buildContent(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-export",
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
@@ -51,23 +51,16 @@ const ExportDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const mainContent = L.DomUtil.create("div", "");
-    const textArea = L.DomUtil.create(
-      "div",
-      "ui-dialog-wasabee-copy",
-      mainContent
-    );
+    const mainContent = L.DomUtil.create("div", null);
+    const textArea = L.DomUtil.create("textarea", null, mainContent);
+    textArea.id = "wasabee-dialog-export-textarea";
     this._operation.cleanAll();
-    textArea.innerHTML =
-      "<p><a onclick=\"$('.ui-dialog-wasabee-copy textarea').select();\">Select all</a> and press CTRL+C to copy it.</p>" +
-      '<textarea readonly onclick="$(\'.ui-dialog-wasabee-copy textarea\').select();" id="wasabee-export-dialog-textarea">' +
-      JSON.stringify(this._operation) +
-      "</textarea>";
+    textArea.value = JSON.stringify(this._operation);
     return mainContent;
   },
 
   _drawToolsFormat: function() {
-    const ta = document.getElementById("wasabee-export-dialog-textarea");
+    const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Array();
     for (const link of this._operation.links) {
       const l = {};

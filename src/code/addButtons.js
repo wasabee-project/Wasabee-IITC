@@ -21,7 +21,7 @@ export default function(selectedOp) {
       position: "topleft"
     },
     onAdd: function(map) {
-      const outerDiv = L.DomUtil.create("div", "wasabee-section");
+      const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
       this._container = L.DomUtil.create("div", "leaflet-bar", outerDiv);
       this._modes = {};
 
