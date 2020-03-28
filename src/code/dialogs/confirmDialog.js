@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 // generic confirmation screen w/ ok and cancel buttons
 

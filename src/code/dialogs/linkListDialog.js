@@ -5,6 +5,7 @@ import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
 import OverflowMenu from "../overflowMenu";
+import wX from "../wX";
 
 const LinkListDialog = WDialog.extend({
   statics: {
