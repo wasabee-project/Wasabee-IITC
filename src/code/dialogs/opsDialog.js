@@ -154,7 +154,7 @@ const OpsDialog = WDialog.extend({
     const buttonSection = L.DomUtil.create("div", "temp-op-dialog", content);
     if (writable) {
       const clearOpButton = L.DomUtil.create("a", null, buttonSection);
-      clearOpButton.innerHTML = "CLEAR_EVERYTHING";
+      clearOpButton.innerHTML = wX("CLEAR_EVERYTHING");
       L.DomEvent.on(clearOpButton, "click", () => {
         clearAllItems(selectedOp);
         selectedOp.store();
