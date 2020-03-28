@@ -96,9 +96,7 @@ const WasabeeButton = WButton.extend({
 
     // build and display as if not logged in
     this.actionsContainer = this._getActions();
-    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer);
-
     // check login state and update if necessary
     this.Wupdate(); // takes container and operation, not needed here
   },

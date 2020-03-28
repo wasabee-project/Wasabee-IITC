@@ -23,7 +23,6 @@ const LinkDialog = WDialog.extend({
 
   _displayDialog: function() {
     var self = this;
-    self._clearLocalPortalSelections();
     this._portals = {};
     this._links = [];
     const container = L.DomUtil.create("div", "");
@@ -88,10 +87,9 @@ const LinkDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: function() {
         self.disable();
-        self._clearLocalPortalSelections();
         delete self._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.linkDialogButton
@@ -105,26 +103,18 @@ const LinkDialog = WDialog.extend({
     //***Function to clear local selections of portals for the dialog
   },
 
-  _clearLocalPortalSelections: function() {
-    delete localStorage["wasabee-portal-dst-1"];
-    delete localStorage["wasabee-portal-dst-2"];
-    delete localStorage["wasabee-portal-dst-3"];
-    delete localStorage["wasabee-portal-src"];
-    //***Function to set portal -- called from 'Set' Button
-  },
-
   _setPortal: function(event) {
     const updateID = event.currentTarget.parentNode.parentNode.getAttribute(
       "data-portal"
     );
     const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
-      localStorage["wasabee-portal-" + updateID] = JSON.stringify(
+      localStorage["wasabee-anchor-" + updateID] = JSON.stringify(
         selectedPortal
       );
     } else {
       alert(wX("NO_PORT_SEL"));
-      delete localStorage["wasabee-portal-" + updateID];
+      delete localStorage["wasabee-anchor-" + updateID];
     }
     this._updatePortal(updateID);
     //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
@@ -133,7 +123,7 @@ const LinkDialog = WDialog.extend({
   _getPortal: function(name) {
     try {
       return WasabeePortal.create(
-        JSON.parse(localStorage["wasabee-portal-" + name])
+        JSON.parse(localStorage["wasabee-anchor-" + name])
       );
     } catch (b) {
       return null;

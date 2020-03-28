@@ -3,7 +3,7 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
-import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
 const FanfieldDialog = WDialog.extend({
@@ -16,7 +16,7 @@ const FanfieldDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, false);
+    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
@@ -28,7 +28,7 @@ const FanfieldDialog = WDialog.extend({
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
     const controls = L.DomUtil.create("div", null, container);
@@ -47,7 +47,7 @@ const FanfieldDialog = WDialog.extend({
     L.DomEvent.on(anchorButton, "click", () => {
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-fanfield-anchor"] = JSON.stringify(this._anchor);
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(this._anchor.displayFormat());
       } else {
@@ -119,7 +119,7 @@ const FanfieldDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
       closeCallback: function() {
         context.disable();
         delete context._dialog;
@@ -128,8 +128,8 @@ const FanfieldDialog = WDialog.extend({
         OK: () => {
           this._dialog.dialog("close");
         },
-        "Clear All": () => {
-          clearAllItems(getSelectedOperation());
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
         }
       }
     });
@@ -142,7 +142,7 @@ const FanfieldDialog = WDialog.extend({
     this.title = "Fan Field";
     this.label = "Fan Field";
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-fanfield-anchor"];
+    let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
     p = localStorage["wasabee-fanfield-start"];
     if (p) this._start = WasabeePortal.create(p);

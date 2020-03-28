@@ -65,7 +65,7 @@ export const SetCommentDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._buildHtml(),
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         setCommentHandler.disable();
         delete setCommentHandler._dialog;
@@ -75,12 +75,9 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   _buildHtml: function() {
-    const container = L.DomUtil.create(
-      "div",
-      "wasabee-dialog wasabee-dialog-ops"
-    );
-    const desc = L.DomUtil.create("div", "", container);
-    const input = L.DomUtil.create("input", "", container);
+    const container = L.DomUtil.create("div", null);
+    const desc = L.DomUtil.create("div", null, container);
+    const input = L.DomUtil.create("input", null, container);
     input.placeholder = "comment";
 
     if (this.commentType == "link") {

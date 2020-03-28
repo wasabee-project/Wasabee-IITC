@@ -108,7 +108,7 @@ const LinkListDialog = WDialog.extend({
         format: (row, obj, link) => {
           row.className = "desc";
           if (obj != null) {
-            const comment = L.DomUtil.create("a", "", row);
+            const comment = L.DomUtil.create("a", null, row);
             comment.innerHTML = window.escapeHtmlSpecialChars(obj);
             L.DomEvent.on(comment, "click", () => {
               const scd = new SetCommentDialog(window.map);
@@ -133,7 +133,7 @@ const LinkListDialog = WDialog.extend({
         },
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, link) => {
-          const assignee = L.DomUtil.create("a", "", a);
+          const assignee = L.DomUtil.create("a", null, a);
           assignee.innerHTML = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
             L.DomEvent.on(assignee, "click", () => {
@@ -165,7 +165,7 @@ const LinkListDialog = WDialog.extend({
 
   deleteLink: function(link, operation) {
     const con = new ConfirmDialog(window.map);
-    const prompt = L.DomUtil.create("div", "");
+    const prompt = L.DomUtil.create("div");
     prompt.innerHTML = "Do you really want to delete this link: ";
     prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
@@ -212,12 +212,14 @@ const LinkListDialog = WDialog.extend({
   },
 
   makeColorMenu: function(list, data, link) {
-    const colorSection = L.DomUtil.create("div", "", list);
-    const linkColor = L.DomUtil.create("select", "", colorSection);
+    const colorSection = L.DomUtil.create("div", null, list);
+    const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
 
-    window.plugin.wasabee.static.layerTypes.forEach(function(a) {
-      const option = L.DomUtil.create("option", "");
+    for (const style of window.plugin.wasabee.static.layerTypes) {
+      if (style[0] == "SE" || style[0] == "self-block") continue;
+      const a = style[1];
+      const option = L.DomUtil.create("option");
       option.setAttribute("value", a.name);
       if (a.name == "main") {
         a.displayName = "Op Color";
@@ -227,7 +229,7 @@ const LinkListDialog = WDialog.extend({
       }
       option.innerHTML = a.displayName;
       linkColor.append(option);
-    });
+    }
 
     linkColor.addEventListener(
       "change",

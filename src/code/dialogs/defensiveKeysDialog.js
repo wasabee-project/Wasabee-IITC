@@ -55,18 +55,18 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    this._content = L.DomUtil.create("div", "temp-op-dialog");
-    this._portal = L.DomUtil.create("div", "", this._content);
+    this._content = L.DomUtil.create("div", null);
+    this._portal = L.DomUtil.create("div", null, this._content);
 
-    const d = L.DomUtil.create("div", "", this._content);
-    this._count = L.DomUtil.create("input", "", d);
+    const d = L.DomUtil.create("div", null, this._content);
+    this._count = L.DomUtil.create("input", null, d);
     this._count.setAttribute("placeholder", "number of keys");
     this._count.size = 3;
-    const dd = L.DomUtil.create("div", "", this._content);
-    this._capID = L.DomUtil.create("input", "", dd);
+    const dd = L.DomUtil.create("div", null, this._content);
+    this._capID = L.DomUtil.create("input", null, dd);
     this._capID.setAttribute("placeholder", "Capsule ID");
     this._capID.size = 8;
-    const addDKeyButton = L.DomUtil.create("a", "", this._content);
+    const addDKeyButton = L.DomUtil.create("button", null, this._content);
     addDKeyButton.innerHTML = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", () => {
       this._addDKey();
@@ -85,7 +85,7 @@ const DefensiveKeysDialog = WDialog.extend({
         at: "center center+30"
       },
       html: this._content,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

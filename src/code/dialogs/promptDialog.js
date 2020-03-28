@@ -39,7 +39,6 @@ const PromptDialog = WDialog.extend({
       dialogClass: "wasabee-dialog",
       buttons: {
         OK: () => {
-          console.log(this.inputField.value);
           if (this._callback) this._callback();
           this._dialog.dialog("close");
         },
@@ -65,14 +64,14 @@ const PromptDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", "wasabee-prompt-label");
     if (typeof this._label == "string") {
       content.innerText = this._label;
     } else {
       content.appendChild(this._label);
     }
-    const d = L.DomUtil.create("div", "", content);
-    this.inputField = L.DomUtil.create("input", "", d);
+    const d = L.DomUtil.create("div", "wasabee-prompt-input", content);
+    this.inputField = L.DomUtil.create("input", null, d);
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.placeholder;
     this.inputField.value = this.current;

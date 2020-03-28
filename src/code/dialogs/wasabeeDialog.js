@@ -180,7 +180,7 @@ const WasabeeDialog = WDialog.extend({
         width: "auto",
         height: "auto",
         html: this._buildContent(),
-        dialogClass: "wasabee-dialog-mustauth",
+        dialogClass: "wasabee-dialog",
         buttons: {
           OK: () => {
             this._dialog.dialog("close");

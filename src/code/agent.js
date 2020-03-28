@@ -66,11 +66,11 @@ export default class WasabeeAgent {
   }
 
   getPopup() {
-    const content = L.DomUtil.create("div", "temp-op-dialog");
+    const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
-    const sendTarget = L.DomUtil.create("a", "temp-op-dialog", content);
+    const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", () => {
       const selectedPortal = WasabeePortal.getSelected();
