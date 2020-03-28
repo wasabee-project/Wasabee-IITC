@@ -53,7 +53,7 @@ const KeyListPortal = WDialog.extend({
         at: "center center"
       },
       html: this.getListDialogContent(this._operation, this._portalID),
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
         delete this._dialog;
         this.disable();

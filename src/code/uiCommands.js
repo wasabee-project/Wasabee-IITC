@@ -66,6 +66,20 @@ export const clearAllItems = operation => {
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
+      window.runHooks("wasabeeCrosslinks", operation);
+    }
+  );
+  con.enable();
+};
+
+export const clearAllLinks = operation => {
+  const con = new ConfirmDialog();
+  con.setup(
+    `Clear Links: ${operation.name}`,
+    `Do you want to remove all links from ${operation.name}?`,
+    () => {
+      operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", operation);
     }
   );
   con.enable();

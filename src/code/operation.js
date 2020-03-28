@@ -459,6 +459,14 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  clearAllLinks() {
+    this.links = Array();
+    this.blockers = Array();
+    this.cleanAnchorList();
+    this.cleanPortalList();
+    this.update(true);
+  }
+
   // call update to save the op and redraw everything on the map
   update(updateLocalchanged) {
     if (this._batchmode === true) return;
