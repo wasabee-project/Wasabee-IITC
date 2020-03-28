@@ -41,7 +41,7 @@ const AboutDialog = WDialog.extend({
     // use leaflet's DOM object creation, not bare DOM or Jquery
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
-    // xW is the translation call, looks for strings in translations.json based
+    // wX is the translation call, looks for strings in translations.json based
     // on the browser's langauge setting
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 

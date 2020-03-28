@@ -139,8 +139,8 @@ const FanfieldDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = FanfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = "Fan Field";
-    this.label = "Fan Field";
+    this.title = wX("FAN_FIELD3");
+    this.label = wX("FAN_FIELD3");
     this._operation = getSelectedOperation();
     let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
