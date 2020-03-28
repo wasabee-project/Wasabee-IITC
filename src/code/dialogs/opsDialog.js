@@ -96,7 +96,7 @@ const OpsDialog = WDialog.extend({
     const writable = selectedOp.IsWritableOp();
 
     const nameSection = L.DomUtil.create("p", null, content);
-    nameSection.innerHTML = "Operation Name: ";
+    nameSection.innerHTML = wX("OPER_NAME");
     if (writable) {
       const input = L.DomUtil.create("input", null, nameSection);
       input.value = selectedOp.name;
@@ -115,7 +115,7 @@ const OpsDialog = WDialog.extend({
 
     if (writable) {
       const colorSection = L.DomUtil.create("p", null, content);
-      colorSection.innerHTML = "Operation Color: ";
+      colorSection.innerHTML = wX("OPER_COLOR");
       const operationColor = selectedOp.color
         ? selectedOp.color
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
@@ -154,7 +154,7 @@ const OpsDialog = WDialog.extend({
     const buttonSection = L.DomUtil.create("div", "temp-op-dialog", content);
     if (writable) {
       const clearOpButton = L.DomUtil.create("a", null, buttonSection);
-      clearOpButton.innerHTML = "Clear Portals/Links/Markers";
+      clearOpButton.innerHTML = "CLEAR_EVERYTHING";
       L.DomEvent.on(clearOpButton, "click", () => {
         clearAllItems(selectedOp);
         selectedOp.store();
@@ -164,11 +164,10 @@ const OpsDialog = WDialog.extend({
     if (opsList().length > 1) {
       const deleteButton = L.DomUtil.create("a", null, buttonSection);
       if (selectedOp.IsOwnedOp()) {
-        deleteButton.innerHTML = "Delete " + selectedOp.name;
-        if (selectedOp.IsServerOp())
-          deleteButton.innerHTML += "<br />(locally and from server)";
+        deleteButton.innerHTML = wX("DELETE") + selectedOp.name;
+        if (selectedOp.IsServerOp()) deleteButton.innerHTML += wX("LOCFRMSER");
       } else {
-        deleteButton.innerHTML = "Remove local copy of " + selectedOp.name;
+        deleteButton.innerHTML = wX("REM_LOC_CP") + selectedOp.name;
       }
       L.DomEvent.on(deleteButton, "click", () => {
         // this should be moved to uiCommands
@@ -221,7 +220,7 @@ const OpsDialog = WDialog.extend({
 
     if (selectedOp.IsServerOp()) {
       const permsButton = L.DomUtil.create("a", null, buttonSection);
-      permsButton.innerHTML = "Op Permissions";
+      permsButton.innerHTML = wX("OP_PERMS");
       L.DomEvent.on(permsButton, "click", () => {
         const opl = new OpPermList();
         opl.enable();
@@ -229,7 +228,7 @@ const OpsDialog = WDialog.extend({
     }
 
     const permsButton = L.DomUtil.create("a", null, buttonSection);
-    permsButton.innerHTML = "Duplicate Operation";
+    permsButton.innerHTML = wX("DUPE_OP");
     L.DomEvent.on(permsButton, "click", () => {
       duplicateOperation(selectedOp.ID);
       window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);

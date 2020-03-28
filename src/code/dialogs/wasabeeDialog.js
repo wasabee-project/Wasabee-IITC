@@ -92,7 +92,7 @@ const WasabeeDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.innerHTML = "Leave";
+          link.innerHTML = wX("LEAVE");
           L.DomEvent.on(link, "click", () => {
             const cd = new ConfirmDialog();
             cd.setup(
@@ -139,7 +139,8 @@ const WasabeeDialog = WDialog.extend({
 
     const html = L.DomUtil.create("div", "temp-op-dialog");
     this.serverInfo = L.DomUtil.create("div", "", html);
-    this.serverInfo.innerHTML = "Server: " + GetWasabeeServer() + "<br/><br/>";
+    this.serverInfo.innerHTML =
+      wX("WSERVER") + GetWasabeeServer() + "LINE_BREAKS";
     L.DomEvent.on(this.serverInfo, "click", this.setServer);
 
     const options = L.DomUtil.create("div", "temp-op-dialog", html);
