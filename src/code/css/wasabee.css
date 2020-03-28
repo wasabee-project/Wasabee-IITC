@@ -132,9 +132,19 @@
 .wasabee-dialog-keyslist .enough { color: #fff }
 .wasabee-dialog-keyslist .notenough { color: #900; font-weight: bold; }
 .wasabee-dialog-linklist { }
+.wasabee-dialog-manageteam { }
 .wasabee-dialog-newop { }
 .wasabee-dialog-newop div.buttonset button { padding: 8px 24px 8px 24px; margin: 24px 8px 24px 8px }
-.wasabee-dialog-newop div.buttonset { display: block }
+.wasabee-dialog-newop div.buttonset { display: grid; grid-template-columns: 1fr; }
+.wasabee-dialog-ops { }
+.wasabee-dialog-ops div.topset { display: grid; grid-template-columns: 1fr 1fr; row-gap: 4px; }
+.wasabee-dialog-ops select { width: auto; grid-column-start: 1; grid-column-end: 3;}
+.wasabee-dialog-ops textarea { grid-column-start: 1; grid-column-end: 3; width: auto; height: 50px; resize: vertical; }
+.wasabee-dialog-ops p.comment { grid-column-start: 1; grid-column-end: 3; }
+.wasabee-dialog-ops input { width: auto; }
+.wasabee-dialog-ops div.buttonset { display: grid; grid-template-columns: 1fr; text-align: center; }
+.wasabee-dialog-ops div.buttonset button { width: 96%; padding: 8px 24px 8px 24px; margin: 2px 2px 2px 2px }
+
 
 /* promptDialog divs */
 .wasabee-prompt-label { align-items: center }

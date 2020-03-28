@@ -50,6 +50,7 @@ const loadNewDefaultOp = () => {
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
 export const makeSelectedOperation = opID => {
+  // _selectedOp is null at first load (or page reload), should never be after that
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
       console.log(
@@ -59,18 +60,24 @@ export const makeSelectedOperation = opID => {
       window.plugin.wasabee._selectedOp.store();
     }
   }
+
+  // get the op from localStorage
   const op = getOperationByID(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
-    throw "attempted to load invalid opID";
+    alert("attempted to load invalid opID");
   }
   // the only place we should change the selected op.
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
-  if (window.VALID_HOOKS.includes("wasabeeUIUpdate"))
-    window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
-  if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
-    window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
+
+  // redraw the screen, old version of IITC might not have set the hooks up yet
+  // so make sure the hooks are there
+  // if (window.VALID_HOOKS.includes("wasabeeUIUpdate"))
+  // VALID_HOOKS seems to be empty now?
+  window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  //if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
+  window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
 };
 
