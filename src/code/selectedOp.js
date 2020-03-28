@@ -4,11 +4,11 @@ import wX from "./wX";
 import { generateId } from "./auxiliar";
 
 const setRestoreOpID = opID => {
-  store.set(window.plugin.wasabee.static.constants.SELECTED_OP_KEY, opID);
+  localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
 };
 
 const getRestoreOpID = () => {
-  return store.get(window.plugin.wasabee.static.constants.SELECTED_OP_KEY);
+  return localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY];
 };
 
 export const getSelectedOperation = () => {
@@ -96,13 +96,6 @@ const initOps = () => {
 
 //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
 export const setupLocalStorage = () => {
-  if (
-    store.get(window.plugin.wasabee.static.constants.OP_RESTRUCTURE_KEY) == null
-  ) {
-    initOps();
-    store.set(window.plugin.wasabee.static.constants.OP_RESTRUCTURE_KEY, true);
-  }
-
   // make sure we have at least one op
   let ops = opsList();
   if (ops == undefined || ops.length == 0) {

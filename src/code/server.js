@@ -2,8 +2,7 @@ import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
-import store from "../lib/store";
-import { getSelectedOperation, getOperationByID } from "./selectedOp";
+import { getSelectedOperation, getOperationByID, resetOps } from "./selectedOp";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -236,6 +235,13 @@ export const mePromise = function() {
           resolve(WasabeeMe.create(req.response));
           break;
         case 401:
+          reject(wX("NOT LOGGED IN", req.responseText));
+          break;
+        case 403:
+          // 403 is a detected RES agent
+          alert(`${req.responseText}`);
+          WasabeeMe.purge();
+          resetOps();
           reject(wX("NOT LOGGED IN", req.responseText));
           break;
         default:
@@ -937,16 +943,20 @@ export const deleteTeamPromise = function(teamID) {
   });
 };
 
-export const GetWasabeeServer = function() {
-  let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
+export const GetWasabeeServer = () => {
+  let server = localStorage[Wasabee.static.constants.SERVER_BASE_KEY];
   if (server == null) {
     server = Wasabee.static.constants.SERVER_BASE_DEFAULT;
-    store.set(
-      Wasabee.static.constants.SERVER_BASE_KEY,
-      Wasabee.static.constants.SERVER_BASE_DEFAULT
-    );
+    localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
   }
   return server;
+};
+
+export const SetWasabeeServer = server => {
+  // sanity checking here please:
+  // starts w/ https://
+  // does not end with /
+  localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
 };
 
 // don't use this unless you just can't use the promise directly

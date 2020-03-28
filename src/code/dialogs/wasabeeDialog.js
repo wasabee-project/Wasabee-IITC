@@ -1,9 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
-import store from "../../lib/store";
 import {
   GetWasabeeServer,
+  SetWasabeeServer,
   SetTeamState,
   locationPromise,
   logoutPromise,
@@ -258,15 +258,13 @@ const WasabeeDialog = WDialog.extend({
     const serverDialog = new PromptDialog(window.map);
     serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
       if (serverDialog.inputField.value) {
-        store.set(
-          window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
-          serverDialog.inputField.value
-        );
-        store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+        SetWasabeeServer(serverDialog.inputField.value);
+        WasabeeMe.purge();
       }
     });
     serverDialog.current = GetWasabeeServer();
-    serverDialog.placeholder = "https://server.wasabee.rocks/";
+    serverDialog.placeholder =
+      window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
     serverDialog.enable();
   }
 });
