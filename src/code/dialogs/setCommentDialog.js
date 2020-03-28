@@ -81,7 +81,7 @@ export const SetCommentDialog = WDialog.extend({
     input.placeholder = "comment";
 
     if (this.commentType == "link") {
-      desc.innerHTML = "Set comment for link: ";
+      desc.innerHTML = wX("SET_LINK_COMMENT");
       desc.appendChild(this.target.displayFormat(this.operation));
       if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
@@ -94,7 +94,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "marker") {
-      desc.innerHTML = "Set comment for marker on: ";
+      desc.innerHTML = wX("SET_MARKER_COMMENT");
       desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.target.comment) input.value = this.target.comment;
@@ -108,7 +108,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "portal") {
-      desc.innerHTML = "Set comment for portal: ";
+      desc.innerHTML = wX("SET_PORT_COMMENT");
       desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.portal.comment) input.value = this.portal.comment;

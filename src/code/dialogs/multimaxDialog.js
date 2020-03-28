@@ -97,8 +97,8 @@ const MultimaxDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = "Multimax";
-    this.label = "Multimax";
+    this.title = wX("MULTIMAX2");
+    this.label = wX("MULTIMAX2");
     this._portals = {};
     this._links = [];
     this._operation = getSelectedOperation();

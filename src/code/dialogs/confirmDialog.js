@@ -12,8 +12,8 @@ const ConfirmDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = ConfirmDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = "No title set";
-    this._label = "No label set";
+    this._title = wX("NO_TITLE");
+    this._label = wX("NO_LABEL");
   },
 
   addHooks: function() {

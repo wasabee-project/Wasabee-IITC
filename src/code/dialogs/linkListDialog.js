@@ -15,8 +15,8 @@ const LinkListDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = LinkListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = "No title set";
-    this._label = "No label set";
+    this._title = wX("NO_TITLE");
+    this._label = wX("NO_LABEL");
     this.placeholder = "";
     this.current = "";
   },
@@ -41,7 +41,7 @@ const LinkListDialog = WDialog.extend({
     if (!this._map) return;
 
     this._dialog = window.dialog({
-      title: this._portal.name + ": Links",
+      title: this._portal.name + wX("LINKS2"),
       width: "auto",
       height: "auto",
       html: this._table.table,
@@ -95,7 +95,7 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "Min Lvl",
-        title: "Minimum level required on source portal",
+        title: wX("MIN_SRC_PORT_LVL"),
         value: link => link.length(this._operation),
         format: (cell, d, link) => {
           cell.appendChild(link.minLevel(this._operation));
@@ -166,7 +166,7 @@ const LinkListDialog = WDialog.extend({
   deleteLink: function(link, operation) {
     const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
-    prompt.innerHTML = "Do you really want to delete this link: ";
+    prompt.innerHTML = wX("CONFIRM_DELETE");
     prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);
