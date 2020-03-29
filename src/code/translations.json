@@ -254,6 +254,7 @@
     "LINKS2": ": Links",
     "MULTIMAX2": "Multimax",
     "PERMS": " permissions",
+    "ALREADY_HAS_MARKER": "This portal already has a marker. Chose a different portal.",
     "STARBURST": "Starburst",
     "STARBURST TITLE": "Starburst ",
     "ALREADY_HAS_MARKER": "This portal already has a marker. Chose a different portal."
@@ -262,6 +263,7 @@
     "Squirrel dialog": "So much silliness. @crystalwizard 3/24/2020",
     "DISABLE_SYNC": "Wasabee and the stock sync plugin do not get along. Please disable sync to use Wasabee",
     "SEND TARGET": "Send Target",
+    "ALREADY_HAS_MARKER": "There are already acorns growing on that tree. Choose a different tree.",
     "SELECT PORTAL": "Select a tree.",
     "SEND TARGET CONFIRM": "Do you want to send ${value} target to ${option}?",
     "TARGET SENT": "Target sent",
