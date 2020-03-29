@@ -52,7 +52,7 @@ const MarkerList = WDialog.extend({
         at: "center center"
       },
       html: this.getListDialogContent(this._operation).table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -65,7 +65,11 @@ const MarkerList = WDialog.extend({
     if (operation.ID != this._operation.ID) this._operation = operation;
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
-    this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("MARKER_LIST", operation.name)
+    );
   },
 
   getListDialogContent: function(operation) {

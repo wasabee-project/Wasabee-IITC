@@ -1,11 +1,16 @@
 import { WDialog } from "../leafletClasses";
-import { SendAccessTokenAsync, GetWasabeeServer, mePromise } from "../server";
+import {
+  SendAccessTokenAsync,
+  GetWasabeeServer,
+  mePromise,
+  SetWasabeeServer
+} from "../server";
 import PromptDialog from "./promptDialog";
 import AboutDialog from "./about";
-import store from "../../lib/store";
 import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
 import wX from "../wX";
+import WasabeeMe from "../me";
 
 const AuthDialog = WDialog.extend({
   statics: {
@@ -144,11 +149,8 @@ const AuthDialog = WDialog.extend({
         wX("CHANGE SERVER PROMPT"),
         () => {
           if (serverDialog.inputField.value) {
-            store.set(
-              window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
-              serverDialog.inputField.value
-            );
-            store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+            SetWasabeeServer(serverDialog.inputField.value);
+            WasabeeMe.purge();
           }
         }
       );

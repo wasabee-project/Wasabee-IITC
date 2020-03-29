@@ -60,7 +60,11 @@ const KeysList = WDialog.extend({
 
   update: function(operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
-    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("KEY_LIST", operation.name)
+    );
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
   },
