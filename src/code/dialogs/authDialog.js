@@ -41,13 +41,9 @@ const AuthDialog = WDialog.extend({
       return;
     }
 
-    const content = L.DomUtil.create("div", null);
+    const content = L.DomUtil.create("div", "content");
 
-    const ua = L.DomUtil.create(
-      "div",
-      "wasabee-dialog-auth-useragent",
-      content
-    );
+    const ua = L.DomUtil.create("div", "useragent", content);
     this._android = false;
     this._ios = false;
 
@@ -85,47 +81,44 @@ const AuthDialog = WDialog.extend({
       title.innerHTML = wX("AUTH ANDROID");
     }
 
-    const buttonSet = L.DomUtil.create(
-      "div",
-      "wasabee-dialog-auth-buttonset",
-      content
-    );
-
-    const sendLocDiv = L.DomUtil.create("div", null, buttonSet);
-    const sendLocTitle = L.DomUtil.create("span", null, sendLocDiv);
+    const sendLocTitle = L.DomUtil.create("label", "sendloc", content);
     sendLocTitle.textContent = wX("SEND LOCATION");
-    this._sendLocCheck = L.DomUtil.create("input", null, sendLocDiv);
+    this._sendLocCheck = L.DomUtil.create("input", "sendloc", content);
     this._sendLocCheck.type = "checkbox";
-    this._sendLocCheck.checked = window.plugin.wasabee.sendLocation
-      ? window.plugin.wasabee.sendLocation
-      : false;
+    const sl =
+      localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
+    if (sl === "true") this._sendLocCheck.checked = true;
 
     if (this._android) {
-      const gsapiButtonOLD = L.DomUtil.create("button", null, buttonSet);
+      const gsapiButtonOLD = L.DomUtil.create("button", "andriod", content);
       gsapiButtonOLD.innerHTML = wX("LOG IN QUICK");
       L.DomEvent.on(gsapiButtonOLD, "click", () =>
         this.gsapiAuthImmediate(this)
       );
     }
 
-    const gapiButton = L.DomUtil.create("button", null, buttonSet);
+    const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.innerHTML = wX("LOG IN");
-    const menus = L.DomUtil.create("div", null, buttonSet);
+
+    // XXX this needs to go away
+    const menus = L.DomUtil.create("div", "options", content);
     menus.innerHTML =
       "<span>Login Settings: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>Auto</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option></select></span> &nbsp; " +
       "<span><label>Immediate</label>: <select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
+    if (!this._android) menus.style.display = "none";
+
     L.DomEvent.on(gapiButton, "click", () => this.gapiAuth(this));
 
     // webview cannot work on android IITC-M
     if (this._ios) {
-      const webviewButton = L.DomUtil.create("button", null, buttonSet);
+      const webviewButton = L.DomUtil.create("button", "webview", content);
       webviewButton.innerHTML = wX("WEBVIEW");
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
       });
-      const postwebviewButton = L.DomUtil.create("button", null, buttonSet);
+      const postwebviewButton = L.DomUtil.create("button", "webview", content);
       postwebviewButton.innerHTML = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
@@ -140,7 +133,7 @@ const AuthDialog = WDialog.extend({
       });
     }
 
-    const changeServerButton = L.DomUtil.create("button", null, buttonSet);
+    const changeServerButton = L.DomUtil.create("button", "server", content);
     changeServerButton.innerHTML = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
@@ -159,7 +152,7 @@ const AuthDialog = WDialog.extend({
       serverDialog.enable();
     });
 
-    const aboutButton = L.DomUtil.create("button", null, buttonSet);
+    const aboutButton = L.DomUtil.create("button", "about", content);
     aboutButton.innerHTML = wX("ABOUT WASABEE-IITC");
     L.DomEvent.on(aboutButton, "click", () => {
       const ad = new AboutDialog();
@@ -174,13 +167,11 @@ const AuthDialog = WDialog.extend({
       dialogClass: "wasabee-dialog wasabee-dialog-auth",
       closeCallback: () => {
         if (this._sendLocCheck && this._sendLocCheck.checked) {
-          window.plugin.wasabee.sendLocation = true;
           localStorage[
             window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
           ] = true;
           sendLocation();
         } else {
-          window.plugin.wasabee.sendLocation = false;
           localStorage[
             window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
           ] = false;

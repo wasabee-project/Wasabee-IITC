@@ -127,7 +127,9 @@ export const listenForAddedPortals = newPortal => {
 
 export const sendLocation = () => {
   if (!WasabeeMe.isLoggedIn()) return;
-  if (!window.plugin.wasabee.sendLocation) return;
+  const sl =
+    localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
+  if (sl !== true) return;
 
   navigator.geolocation.getCurrentPosition(
     position => {
