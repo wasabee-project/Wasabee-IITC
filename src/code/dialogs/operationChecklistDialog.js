@@ -57,7 +57,7 @@ const OperationChecklistDialog = WDialog.extend({
         at: "center center"
       },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;

@@ -52,7 +52,7 @@ const MarkerList = WDialog.extend({
         at: "center center"
       },
       html: this.getListDialogContent(this._operation).table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
