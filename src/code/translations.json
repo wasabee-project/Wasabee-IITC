@@ -1,6 +1,6 @@
 {
   "en": {
-    "last edited": "03-26-2020 @D0BERMAXX",
+    "last edited": "03-29-2020 @D0BERMAXX",
     "DISABLE_SYNC": "The stock Sync plugin is not compatible with Wassabe. Please disable Sync.",
     "SEND TARGET": "Send Target",
     "SELECT PORTAL": "Select a portal to send",
@@ -255,7 +255,8 @@
     "MULTIMAX2": "Multimax",
     "PERMS": " permissions",
     "STARBURST": "Starburst",
-    "STARBURST TITLE": "Starburst "
+    "STARBURST TITLE": "Starburst ",
+    "ALREADY_HAS_MARKER": "This portal already has a marker. Chose a different portal."
   },
   "en_sq": {
     "Squirrel dialog": "So much silliness. @crystalwizard 3/24/2020",
@@ -803,7 +804,8 @@
     "KEY LIST": "Listahan ng Key para sa Portal ${value}",
     "LINKS2": ": Links",
     "MULTIMAX2": "Multimax",
-    "PERMS": " permisyo"
+    "PERMS": " permisyo",
+    "ALREADY_HAS_MARKER": "May Marker ang portal na ito. Pumili ng ibang portal."
   },
   "de": {
     "last edited": "03-26-2020 @AxForest ",
