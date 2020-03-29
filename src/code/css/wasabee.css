@@ -148,6 +148,15 @@
 .wasabee-dialog-keyslist .enough { color: #fff }
 .wasabee-dialog-keyslist .notenough { color: #900; font-weight: bold; }
 .wasabee-dialog-linklist { }
+
+.wasabee-dialog-link { }
+.wasabee-dialog-link div.container { display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; }
+.wasabee-dialog-link label { padding: 4px; grid-column-start: 1; grid-column-end: 2; }
+.wasabee-dialog-link button.set { padding: 4px; grid-column-start: 2; grid-column-end: 3; }
+.wasabee-dialog-link span.portal { grid-column-start: 3; grid-column-end: 4; }
+.wasabee-dialog-link button.add { padding: 4px; grid-column-start: 4; grid-column-end: 5; }
+.wasabee-dialog-link input.desc { padding: 4px; grid-column-start: 4; }
+
 .wasabee-dialog-manageteam { }
 .wasabee-dialog-markeradd { }
 .wasabee-dialog-markeradd div.content { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; }
