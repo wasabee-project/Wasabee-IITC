@@ -27,18 +27,15 @@ const FanfieldDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
+    const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const controls = L.DomUtil.create("div", null, container);
-
-    const anchorDiv = L.DomUtil.create("div", null, controls);
-    const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
+    const anchorLabel = L.DomUtil.create("label", null, container);
     anchorLabel.textContent = "Anchor Portal ";
-    const anchorButton = L.DomUtil.create("button", null, anchorLabel);
+    const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = "set";
-    this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
+    this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(this._anchor.displayFormat());
     } else {
@@ -55,12 +52,11 @@ const FanfieldDialog = WDialog.extend({
       }
     });
 
-    const startDiv = L.DomUtil.create("div", null, controls);
-    const startLabel = L.DomUtil.create("label", null, startDiv);
+    const startLabel = L.DomUtil.create("label", null, container);
     startLabel.textContent = "Start Portal ";
-    const startButton = L.DomUtil.create("button", null, startLabel);
+    const startButton = L.DomUtil.create("button", null, container);
     startButton.textContent = "set";
-    this._startDisplay = L.DomUtil.create("span", null, startLabel);
+    this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
       this._startDisplay.appendChild(this._start.displayFormat());
     } else {
@@ -77,12 +73,11 @@ const FanfieldDialog = WDialog.extend({
       }
     });
 
-    const endDiv = L.DomUtil.create("div", null, controls);
-    const endLabel = L.DomUtil.create("label", null, endDiv);
+    const endLabel = L.DomUtil.create("label", null, container);
     endLabel.textContent = "End Portal ";
-    const endButton = L.DomUtil.create("button", null, endLabel);
+    const endButton = L.DomUtil.create("button", null, container);
     endButton.textContent = "set";
-    this._endDisplay = L.DomUtil.create("span", null, endLabel);
+    this._endDisplay = L.DomUtil.create("span", null, container);
     if (this._end) {
       this._endDisplay.appendChild(this._end.displayFormat());
     } else {
@@ -100,13 +95,11 @@ const FanfieldDialog = WDialog.extend({
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, div);
+    const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", () => {
       const context = this;

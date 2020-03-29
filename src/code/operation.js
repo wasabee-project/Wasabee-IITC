@@ -4,7 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
-import wX from "../wX";
+import wX from "./wX";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 

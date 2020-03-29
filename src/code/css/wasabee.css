@@ -125,6 +125,11 @@
 .wasabee-dialog-export { }
 .wasabee-dialog-export textarea { width: 96%; height: 250px; resize: vertical }
 .wasabee-dialog-fanfield { } /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
+.wasabee-dialog-fanfield div.container { display: grid; grid-template-columns: 1fr 1fr 4fr; }
+.wasabee-dialog-fanfield div.desc { grid-column-start: 1; grid-column-end: 7; padding: 4px; }
+.wasabee-dialog-fanfield label { padding: 4px; }
+.wasabee-dialog-fanfield button { margin: 0px 4px 4px 0px; }
+.wasabee-dialog-fanfield span { padding: 4px; grid-column-start: 3; grid-column-end: 7;}
 .wasabee-dialog-import { }
 .wasabee-dialog-import textarea { width: 96%; height: 250px; resize: vertical }
 .wasabee-dialog-keylistportal { }
