@@ -48,10 +48,7 @@ const KeyListPortal = WDialog.extend({
       title: `Key List for Portal ${this._portal.name}`,
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation, this._portalID),
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {

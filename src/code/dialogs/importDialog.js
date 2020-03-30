@@ -113,7 +113,7 @@ class ImportDialog {
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = wX("IMPORT_OP") + new Date().toGMTString();
+        newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
       }
       newop.store();
       makeSelectedOperation(newop.ID);
@@ -129,7 +129,7 @@ class ImportDialog {
       const importedOp = WasabeeOp.create(data);
       importedOp.store();
       makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP2") + importedOp.name + wX("SUCCESS"));
+      alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
     } catch (e) {
       console.warn("WasabeeTools: failed to import data: " + e);
       alert(wX("IMP_NOPE"));

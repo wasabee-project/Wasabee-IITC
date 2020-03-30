@@ -164,7 +164,7 @@ const OpsDialog = WDialog.extend({
       const deleteDiv = L.DomUtil.create("div", null, buttonSection);
       const deleteButton = L.DomUtil.create("button", null, deleteDiv);
       if (selectedOp.IsOwnedOp()) {
-        deleteButton.textContent = wX("DELETE", selectedOp.name);
+        deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
         if (selectedOp.IsServerOp())
           deleteButton.textContent += wX("LOCFRMSER");
       } else {
@@ -174,8 +174,8 @@ const OpsDialog = WDialog.extend({
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          wX("CON_DEL") + selectedOp.name,
-          wX("YESNO_DEL") + selectedOp.name + "?",
+          wX("CON_DEL", selectedOp.name),
+          wX("YESNO_DEL", selectedOp.name),
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(

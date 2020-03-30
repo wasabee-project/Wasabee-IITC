@@ -49,10 +49,7 @@ const BlockerList = WDialog.extend({
       title: wX("KNOWN BLOCKERS", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
