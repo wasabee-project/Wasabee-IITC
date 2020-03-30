@@ -134,7 +134,7 @@
 .wasabee-dialog-confirm div.title { }
 .wasabee-dialog-wdkeys { }
 .wasabee-dialog-wdkeys div.container { display: grid; }
-.wasabee-dialog-wdkeys div.portal { padding 4px 0px 8px 0px; }
+.wasabee-dialog-wdkeys div.portal { padding: 4px 0px 8px 0px; }
 .wasabee-dialog-wdkeys input { padding: 4px; }
 .wasabee-dialog-wdkeys button { padding: 4px; margin: 4px; }
 

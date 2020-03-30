@@ -75,10 +75,10 @@ const AuthDialog = WDialog.extend({
 
     const title = L.DomUtil.create("div", "desc", content);
     if (this._ios) {
-      title.innerHTML = wX("AUTH IOS");
+      title.textContent = wX("AUTH IOS");
     }
     if (this._andoroid) {
-      title.innerHTML = wX("AUTH ANDROID");
+      title.textContent = wX("AUTH ANDROID");
     }
 
     const sendLocTitle = L.DomUtil.create("label", "sendloc", content);
@@ -91,14 +91,14 @@ const AuthDialog = WDialog.extend({
 
     if (this._android) {
       const gsapiButtonOLD = L.DomUtil.create("button", "andriod", content);
-      gsapiButtonOLD.innerHTML = wX("LOG IN QUICK");
+      gsapiButtonOLD.textContent = wX("LOG IN QUICK");
       L.DomEvent.on(gsapiButtonOLD, "click", () =>
         this.gsapiAuthImmediate(this)
       );
     }
 
     const gapiButton = L.DomUtil.create("button", "gapi", content);
-    gapiButton.innerHTML = wX("LOG IN");
+    gapiButton.textContent = wX("LOG IN");
 
     // XXX this needs to go away
     const menus = L.DomUtil.create("div", "options", content);
@@ -112,14 +112,14 @@ const AuthDialog = WDialog.extend({
     // webview cannot work on android IITC-M
     if (this._ios) {
       const webviewButton = L.DomUtil.create("button", "webview", content);
-      webviewButton.innerHTML = wX("WEBVIEW");
+      webviewButton.textContent = wX("WEBVIEW");
       L.DomEvent.on(webviewButton, "click", () => {
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
       });
       const postwebviewButton = L.DomUtil.create("button", "webview", content);
-      postwebviewButton.innerHTML = wX("WEBVIEW VERIFY");
+      postwebviewButton.textContent = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
       L.DomEvent.on(postwebviewButton, "click", async () => {
         mePromise().then(
@@ -134,7 +134,7 @@ const AuthDialog = WDialog.extend({
     }
 
     const changeServerButton = L.DomUtil.create("button", "server", content);
-    changeServerButton.innerHTML = wX("CHANGE SERVER");
+    changeServerButton.textContent = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", () => {
       const serverDialog = new PromptDialog();
       serverDialog.setup(
@@ -153,7 +153,7 @@ const AuthDialog = WDialog.extend({
     });
 
     const aboutButton = L.DomUtil.create("button", "about", content);
-    aboutButton.innerHTML = wX("ABOUT WASABEE-IITC");
+    aboutButton.textContent = wX("ABOUT WASABEE-IITC");
     L.DomEvent.on(aboutButton, "click", () => {
       const ad = new AboutDialog();
       ad.enable();

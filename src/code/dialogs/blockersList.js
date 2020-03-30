@@ -119,7 +119,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       },
       {
         name: wX("TO_PORT"),
@@ -143,7 +143,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       }
     ];
     content.sortBy = sortBy;

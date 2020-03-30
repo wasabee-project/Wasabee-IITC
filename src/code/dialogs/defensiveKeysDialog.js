@@ -39,7 +39,7 @@ const DefensiveKeysDialog = WDialog.extend({
   _portalClickedHook: function() {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
-      this._portal.innerHTML = "";
+      this._portal.textContent = "";
       this._portal.appendChild(this._selectedPortal.displayFormat());
       const mine = this._getMyData(this._selectedPortal.id);
       if (mine) {
@@ -50,7 +50,7 @@ const DefensiveKeysDialog = WDialog.extend({
         this._capID.value = "";
       }
     } else {
-      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
+      this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
@@ -65,7 +65,7 @@ const DefensiveKeysDialog = WDialog.extend({
     this._capID.setAttribute("placeholder", "Capsule ID");
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("button", null, this._content);
-    addDKeyButton.innerHTML = wX("UPDATE_COUNT");
+    addDKeyButton.textContent = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", () => {
       this._addDKey();
     });

@@ -59,7 +59,7 @@ const WasabeeDialog = WDialog.extend({
         format: (row, value, team) => {
           const link = L.DomUtil.create("a", null, row);
           link.href = "#";
-          link.innerHTML = value;
+          link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
             L.DomEvent.on(link, "click", () => {
@@ -77,7 +77,7 @@ const WasabeeDialog = WDialog.extend({
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           let curstate = obj.State;
-          link.innerHTML = curstate;
+          link.textContent = curstate;
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             await this.toggleTeam(obj.ID, curstate);
@@ -92,7 +92,7 @@ const WasabeeDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.innerHTML = wX("LEAVE");
+          link.textContent = wX("LEAVE");
           L.DomEvent.on(link, "click", () => {
             const cd = new ConfirmDialog();
             cd.setup(

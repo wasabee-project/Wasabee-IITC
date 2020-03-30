@@ -110,7 +110,7 @@ const KeysList = WDialog.extend({
             .on(a, "click", L.DomEvent.preventDefault)
             .on(a, "click", this.showKeyByPortal, key);
 
-          a.innerHTML = value;
+          a.textContent = value;
           cell.appendChild(a);
         }
       }

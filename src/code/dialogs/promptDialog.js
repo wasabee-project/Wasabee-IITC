@@ -68,7 +68,7 @@ const PromptDialog = WDialog.extend({
     const content = L.DomUtil.create("div", "container");
     if (typeof this._label == "string") {
       const label = L.DomUtil.create("label", null, content);
-      label.innerText = this._label;
+      label.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }
