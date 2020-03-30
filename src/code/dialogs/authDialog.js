@@ -50,15 +50,11 @@ const AuthDialog = WDialog.extend({
     // "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8"
     if (navigator.userAgent.search("Iceweasel/") != -1) {
       this._android = true;
-      ua.innerHTML =
-        "<span class='enl'>IITC-Mobile-Android with fake user agent</span><br/>" +
-        navigator.userAgent;
+      // ua.innerHTML = "<span class='enl'>IITC-Mobile-Android with fake user agent</span><br/>" + navigator.userAgent;
     }
     if (navigator.userAgent.search("Linux; Android") != -1) {
       this._android = true;
-      ua.innerHTML =
-        "<span class='res'>IITC-Mobile-Andorid without fake user agent</span><br/>" +
-        navigator.userAgent;
+      // ua.innerHTML = "<span class='res'>IITC-Mobile-Andorid without fake user agent</span><br/>" + navigator.userAgent;
     }
 
     if (
