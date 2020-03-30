@@ -152,6 +152,7 @@ const OpsDialog = WDialog.extend({
     if (writable) {
       const clearOpDiv = L.DomUtil.create("div", null, buttonSection);
       const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
+      // adding a comment so that github will let me create a pull request to fix the issue with CLEAR_EVERYTHING showing up on the button instead of the correct text. Scott, pleae double check the line below this - I left off the wX code in the previous version.
       clearOpButton.innerText = wX("CLEAR_EVERYTHING");
       L.DomEvent.on(clearOpButton, "click", () => {
         clearAllItems(selectedOp);
