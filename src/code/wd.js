@@ -185,7 +185,7 @@ const getMarkerPopup = PortalID => {
         } else {
           const fake = L.DomUtil.create("span", null, li);
           fake.textContent = wX("LOADING");
-       }
+        }
         const c = L.DomUtil.create("span", null, li);
         c.textContent = `:  ${v.Count} ${v.CapID}`;
       }
