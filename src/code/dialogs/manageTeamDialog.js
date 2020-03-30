@@ -230,8 +230,8 @@ const ManageTeamDialog = WDialog.extend({
     L.DomEvent.on(removeButton, "click", () => {
       const cd = new ConfirmDialog();
       cd.setup(
-        `Remove Team ${this._team.Name}`,
-        `Do you want to permenantly remove ${this._team.Name} from the Wasabee Server?`,
+        wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
+        wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
         () => {
           deleteTeamPromise(this._team.ID).then(
             () => {

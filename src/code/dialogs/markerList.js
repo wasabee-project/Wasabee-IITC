@@ -47,10 +47,7 @@ const MarkerList = WDialog.extend({
       title: wX("MARKER_LIST", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
