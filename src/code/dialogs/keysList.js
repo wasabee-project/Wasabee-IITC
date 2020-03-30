@@ -165,7 +165,7 @@ const KeysList = WDialog.extend({
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
-      if (k.Required == 0) continue;
+      // if (k.Required == 0) continue;
 
       const thesekeys = operation.keysonhand.filter(function(keys) {
         return keys.portalId == a;
