@@ -276,7 +276,9 @@
     "READ": "read",
     "WRITE": "write",
     "SEL_SB_ANCHOR": "Select the anchor, zoom to area to add to starburst",
-    "ANCHOR_PORTAL": "Anchor Portal "
+    "ANCHOR_PORTAL": "Anchor Portal ",
+    "REMOVE_TEAM_CONFIRM_TITLE": "Remove Team ${value}",
+    "REMOVE_TEAM_CONFIRM_LABEL": "Do you want to permenantly remove ${value} from the Wasabee Server?"
   },
   "en_sq": {
     "Squirrel dialog": "So much silliness. @crystalwizard 3/24/2020",

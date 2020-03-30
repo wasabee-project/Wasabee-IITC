@@ -2,6 +2,7 @@
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
 import { getAgent } from "./server";
+import wX from "./wX";
 
 // setup function
 export const initWasabeeD = () => {
