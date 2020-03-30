@@ -25,18 +25,16 @@ const StarburstDialog = WDialog.extend({
 
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
-    description.textContent =
-      "Select the anchor, zoom to area to add to starburst";
-
+    description.textContent = wX("SEL_SB_ANCHOR");
     const anchorLabel = L.DomUtil.create("label", null, container);
-    anchorLabel.textContent = "Anchor Portal ";
+    anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
-    anchorButton.textContent = "set";
+    anchorButton.textContent = wX("SET");
     this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(this._anchor.displayFormat());
     } else {
-      this._anchorDisplay.textContent = "not set";
+      this._anchorDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButton, "click", () => {
       this._anchor = WasabeePortal.getSelected();

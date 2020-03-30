@@ -32,14 +32,14 @@ const FanfieldDialog = WDialog.extend({
     description.textContent = wX("SELECT_FAN_PORTALS");
 
     const anchorLabel = L.DomUtil.create("label", null, container);
-    anchorLabel.textContent = "Anchor Portal ";
+    anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
-    anchorButton.textContent = "set";
+    anchorButton.textContent = wX("SET");
     this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(this._anchor.displayFormat());
     } else {
-      this._anchorDisplay.textContent = "not set";
+      this._anchorDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButton, "click", () => {
       this._anchor = WasabeePortal.getSelected();
@@ -53,14 +53,14 @@ const FanfieldDialog = WDialog.extend({
     });
 
     const startLabel = L.DomUtil.create("label", null, container);
-    startLabel.textContent = "Start Portal ";
+    startLabel.textContent = wX("START_PORT");
     const startButton = L.DomUtil.create("button", null, container);
-    startButton.textContent = "set";
+    startButton.textContent = wX("SET");
     this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
       this._startDisplay.appendChild(this._start.displayFormat());
     } else {
-      this._startDisplay.textContent = "not set";
+      this._startDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(startButton, "click", () => {
       this._start = WasabeePortal.getSelected();
@@ -74,14 +74,14 @@ const FanfieldDialog = WDialog.extend({
     });
 
     const endLabel = L.DomUtil.create("label", null, container);
-    endLabel.textContent = "End Portal ";
+    endLabel.textContent = wX("END_PORT");
     const endButton = L.DomUtil.create("button", null, container);
-    endButton.textContent = "set";
+    endButton.textContent = wX("SET");
     this._endDisplay = L.DomUtil.create("span", null, container);
     if (this._end) {
       this._endDisplay.appendChild(this._end.displayFormat());
     } else {
-      this._endDisplay.textContent = "not set";
+      this._endDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(endButton, "click", () => {
       this._end = WasabeePortal.getSelected();

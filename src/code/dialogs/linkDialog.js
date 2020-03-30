@@ -39,14 +39,14 @@ const LinkDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "container");
 
     const sourceLabel = L.DomUtil.create("label", null, container);
-    sourceLabel.textContent = "Source Portal ";
+    sourceLabel.textContent = wX("SOURCE_PORT");
     const sourceButton = L.DomUtil.create("button", "set", container);
-    sourceButton.textContent = "set";
+    sourceButton.textContent = wX("SET");
     this._sourceDisplay = L.DomUtil.create("span", "portal", container);
     if (this._source) {
       this._sourceDisplay.appendChild(this._source.displayFormat());
     } else {
-      this._sourceDisplay.textContent = "not set";
+      this._sourceDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(sourceButton, "click", () => {
       this._source = WasabeePortal.getSelected();
@@ -60,14 +60,14 @@ const LinkDialog = WDialog.extend({
     });
 
     const anchor1Label = L.DomUtil.create("label", null, container);
-    anchor1Label.textContent = "Anchor 1 ";
+    anchor1Label.textContent = wX("ANCHOR1");
     const anchor1Button = L.DomUtil.create("button", null, container);
-    anchor1Button.textContent = "set";
+    anchor1Button.textContent = wX("SET");
     this._anchor1Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor1) {
       this._anchor1Display.appendChild(this._anchor1.displayFormat());
     } else {
-      this._anchor1Display.textContent = "not set";
+      this._anchor1Display.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchor1Button, "click", () => {
       this._anchor1 = WasabeePortal.getSelected();
@@ -80,7 +80,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
-    anchor1AddButton.textContent = "add";
+    anchor1AddButton.textContent = wX("ADD");
     L.DomEvent.on(anchor1AddButton, "click", () => {
       if (this._source && this._anchor1) {
         this._operation.addLink(
@@ -95,14 +95,14 @@ const LinkDialog = WDialog.extend({
     });
 
     const anchor2Label = L.DomUtil.create("label", null, container);
-    anchor2Label.textContent = "Anchor 2 ";
+    anchor2Label.textContent = wX("ANCHOR2");
     const anchor2Button = L.DomUtil.create("button", null, container);
-    anchor2Button.textContent = "set";
+    anchor2Button.textContent = wX("SET");
     this._anchor2Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor2) {
       this._anchor2Display.appendChild(this._anchor2.displayFormat());
     } else {
-      this._anchor2Display.textContent = "not set";
+      this._anchor2Display.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchor2Button, "click", () => {
       this._anchor2 = WasabeePortal.getSelected();
@@ -115,7 +115,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
-    anchor2AddButton.textContent = "add";
+    anchor2AddButton.textContent = wX("ADD");
     L.DomEvent.on(anchor2AddButton, "click", () => {
       if (this._source && this._anchor2) {
         this._operation.addLink(
@@ -125,7 +125,7 @@ const LinkDialog = WDialog.extend({
           this._operation.nextOrder
         );
       } else {
-        alert("Select both Source and Anchor 2");
+        alert(wX("SEL_SRC_ANC2"));
       }
     });
 
@@ -137,7 +137,7 @@ const LinkDialog = WDialog.extend({
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("ADD_LINKS");
     L.DomEvent.on(button, "click", () => {
-      if (!this._source) alert("Select a source portal");
+      if (!this._source) alert(wX("SEL_SRC_PORT"));
       if (this._anchor1) {
         this._operation.addLink(
           this._source,
