@@ -184,14 +184,14 @@ const getMarkerPopup = PortalID => {
           li.appendChild(a.formatDisplay());
         } else {
           const fake = L.DomUtil.create("span", null, li);
-          fake.textContent = "[loading]";
+          fake.textContent = wX("LOADING");
         }
         const c = L.DomUtil.create("span", null, li);
         c.textContent = `:  ${v.Count} ${v.CapID}`;
       }
     }
   } else {
-    container.textContent = "No data";
+    container.textContent = wX("NO_DATA");
   }
   return container;
 };
