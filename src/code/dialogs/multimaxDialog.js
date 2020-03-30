@@ -37,7 +37,7 @@ const MultimaxDialog = WDialog.extend({
       // Set button
       const nodethree = tr.insertCell();
       const button = L.DomUtil.create("button", null, nodethree);
-      button.textContent = "set";
+      button.textContent = wX("SET");
       button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
       const nodetwo = tr.insertCell();
