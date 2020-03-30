@@ -576,7 +576,7 @@
     "ASSIGN OUTBOUND": "Assegna collegamenti in uscita"
   },
   "fil": {
-    "last edited": "03-26-2020 @D0BERMAXX",
+    "last edited": "03-31-2020 @D0BERMAXX",
     "DISABLE_SYNC": "Ang Wasabee at stock sync plugin ay hindi compatible. Paki disable sync para gamitin ang Wasabee",
     "SEND TARGET": "Ipadala ang Target",
     "SELECT PORTAL": "Piliin ang portal na ipapadala",
@@ -830,7 +830,22 @@
     "LINKS2": ": Links",
     "MULTIMAX2": "Multimax",
     "PERMS": "${value} permisyo",
-    "ALREADY_HAS_MARKER": "May Marker ang portal na ito. Pumili ng ibang portal."
+    "ALREADY_HAS_MARKER": "May Marker ang portal na ito. Pumili ng ibang portal.",
+    "END_PORT": "End Portal ",
+    "ANCHOR1": "Anchor 1 ",
+    "ANCHOR2": "Anchor 2 ",
+    "ADD": "dagdag",
+    "SEL_SRC_ANC2": "Piliin ang Panimula at Anchor 2",
+    "SEL_SRC_PORT": "Pumili ng panimulang portal",
+    "REMOVE": "tangalin",
+    "ROCKS_COM": "enl.rocks community: ",
+    "API_KEY": " api key: ",
+    "REMOVE_TEAM": "Tanggalin Pangkat: ",
+    "REMOVE": "Tangalin",
+    "READ": "basahin",
+    "WRITE": "isulat",
+    "SEL_SB_ANCHOR": "Pillin ang anchor, I-zoom sa area para dagdagan sa starburst",
+    "ANCHOR_PORTAL": "Anchor Portal "
   },
   "de": {
     "last edited": "03-26-2020 @AxForest ",
