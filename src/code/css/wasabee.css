@@ -110,17 +110,17 @@
 /* .wasabee-dialog .desc textarea { box-sizing: border-box; width: 100%; height: 4.5em; padding: 3px; resize: vertical } */
 
 /* classes specific to various dialogs */
-.wasabee-dialog-about { }
+.wasabee-dialog-about { max-width: min-content; }
 .wasabee-dialog-assign { }
 .wasabee-agent-menu { align-items: center }
 
-.wasabee-dialog-auth { }
+.wasabee-dialog-auth { max-width: min-content; }
 .wasabee-dialog-auth div.content { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 4px; }
 .wasabee-dialog-auth div.useragent { padding: 4px; grid-column-start: 1; grid-column-end: 5; }
 .wasabee-dialog-auth div.desc { padding: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth label.sendloc { grid-column-start: 1; grid-column-end: 2;}
 .wasabee-dialog-auth input.sendloc { grid-column-start: 2; grid-column-end: 5;}
-.wasabee-dialog-auth button.android { margin: 4px; padding: 4px; grid-column-start: 1; grid-column-end: 5;}
+.wasabee-dialog-auth button.andriod { margin: 4px; padding: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth button.gapi { margin: 4px; padding: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth div.options { margin: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth button.webview { margin: 4px; grid-column-start: 1; grid-column-end: 5;}
