@@ -47,10 +47,7 @@ const MarkerList = WDialog.extend({
       title: wX("MARKER_LIST", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
@@ -109,7 +106,7 @@ const MarkerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, marker) => {
           const comment = L.DomUtil.create("a", "", a);
-          comment.innerHTML = m;
+          comment.textContent = m;
           L.DomEvent.on(comment, "click", () => {
             const scd = new SetCommentDialog(window.map);
             scd.setup(marker, operation);
@@ -133,7 +130,7 @@ const MarkerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, agent) => {
           const assigned = L.DomUtil.create("a", "", a);
-          assigned.innerHTML = m;
+          assigned.textContent = m;
           L.DomEvent.on(assigned, "click", () => {
             const ad = new AssignDialog();
             ad.setup(agent, operation);

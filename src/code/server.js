@@ -141,6 +141,13 @@ export const deleteOpPromise = function(opID) {
 export const teamPromise = function(teamid) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
+    if (teamid == "owned") {
+      const owned = new WasabeeTeam();
+      owned.id = "owned";
+      owned.name = "Owned Ops";
+      resolve(owned);
+    }
+
     const url = `${SERVER_BASE}/api/v1/team/${teamid}`;
     const req = new XMLHttpRequest();
     req.open("GET", url);

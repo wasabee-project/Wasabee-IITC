@@ -35,11 +35,11 @@ const MarkerAddDialog = WDialog.extend({
   _portalClickedHook: function() {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
-      this._portal.innerText = "";
-      this._portal.innerHTML = "";
+      this._portal.textContent = "";
+      this._portal.textContent = "";
       this._portal.appendChild(this._selectedPortal.displayFormat());
     } else {
-      this._portal.innerText = wX("PLEASE_SELECT_PORTAL");
+      this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
@@ -54,14 +54,14 @@ const MarkerAddDialog = WDialog.extend({
     for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", "", this._type);
       o.setAttribute("value", a);
-      o.innerHTML = k.label;
+      o.textContent = k.label;
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
     this._comment = L.DomUtil.create("input", null, content);
     this._comment.setAttribute("placeholder", "comment");
     const addMarkerButton = L.DomUtil.create("button", null, content);
-    addMarkerButton.innerHTML = wX("ADD_MARKER");
+    addMarkerButton.textContent = wX("ADD_MARKER");
     L.DomEvent.on(addMarkerButton, "click", () =>
       this._addMarker(this._type.value, this._operation, this._comment.value)
     );

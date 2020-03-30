@@ -110,7 +110,7 @@ const LinkListDialog = WDialog.extend({
           row.className = "desc";
           if (obj != null) {
             const comment = L.DomUtil.create("a", null, row);
-            comment.innerHTML = window.escapeHtmlSpecialChars(obj);
+            comment.textContent = window.escapeHtmlSpecialChars(obj);
             L.DomEvent.on(comment, "click", () => {
               const scd = new SetCommentDialog(window.map);
               scd.setup(link, operation);
@@ -135,7 +135,7 @@ const LinkListDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, link) => {
           const assignee = L.DomUtil.create("a", null, a);
-          assignee.innerHTML = m;
+          assignee.textContent = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
             L.DomEvent.on(assignee, "click", () => {
               const ad = new AssignDialog();
@@ -167,7 +167,7 @@ const LinkListDialog = WDialog.extend({
   deleteLink: function(link, operation) {
     const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
-    prompt.innerHTML = wX("CONFIRM_DELETE");
+    prompt.textContent = wX("CONFIRM_DELETE");
     prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);

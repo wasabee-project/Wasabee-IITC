@@ -63,7 +63,7 @@ const AssignDialog = WDialog.extend({
       this._type = "Link";
       divtitle.appendChild(target.displayFormat(this._operation));
       const t = L.DomUtil.create("span", null, divtitle);
-      t.innerHTML = wX("LINK ASSIGNMENT");
+      t.textContent = wX("LINK ASSIGNMENT");
       this._name = wX("ASSIGN LINK PROMPT", portal.name);
     }
 
@@ -72,7 +72,7 @@ const AssignDialog = WDialog.extend({
       this._type = "Marker";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", null, divtitle);
-      t.innerHTML = wX("MARKER ASSIGNMENT");
+      t.textContent = wX("MARKER ASSIGNMENT");
       this._name = wX("ASSIGN MARKER PROMPT", portal.name);
     }
 
@@ -81,7 +81,7 @@ const AssignDialog = WDialog.extend({
       this._type = "Anchor";
       divtitle.appendChild(portal.displayFormat());
       const t = L.DomUtil.create("span", null, divtitle);
-      t.innerHTML = wX("ANCHOR ASSIGNMENT");
+      t.textContent = wX("ANCHOR ASSIGNMENT");
       this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);
     }
 
@@ -109,7 +109,7 @@ const AssignDialog = WDialog.extend({
   _buildContent: function() {
     const content = L.DomUtil.create("div", "");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      content.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }
@@ -121,7 +121,7 @@ const AssignDialog = WDialog.extend({
     const menu = L.DomUtil.create("select", null, container);
     let option = menu.appendChild(L.DomUtil.create("option", null));
     option.setAttribute("value", null);
-    option.innerHTML = wX("UNASSIGNED");
+    option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...
@@ -142,7 +142,7 @@ const AssignDialog = WDialog.extend({
           alreadyAdded.push(a.id);
           option = L.DomUtil.create("option", null);
           option.setAttribute("value", a.id);
-          option.innerHTML = a.name;
+          option.textContent = a.name;
           if (a.id == current) {
             option.setAttribute("selected", true);
           }

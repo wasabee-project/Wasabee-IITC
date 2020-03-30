@@ -1,17 +1,26 @@
 import { WDialog } from "../leafletClasses";
-import { addPortal } from "../uiCommands.js";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 const LinkDialog = WDialog.extend({
   statics: {
-    TYPE: "linkdialogButton"
+    TYPE: "linkDialog"
   },
 
   initialize: function(map, options) {
+    if (!map) map = window.map;
     this.type = LinkDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+
+    let p = localStorage["wasabee-link-source"];
+    if (p) this._source = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-1"];
+    if (p) this._anchor1 = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-2"];
+    if (p) this._anchor2 = WasabeePortal.create(p);
+    /* p = localStorage["wasabee-link-prev"];
+    if (p) this._prev = WasabeePortal.create(p); */
   },
 
   addHooks: function() {
@@ -21,207 +30,146 @@ const LinkDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  _displayDialog: function() {
-    var self = this;
-    this._portals = {};
-    this._links = [];
-    const container = L.DomUtil.create("div", "");
-    this._desc = L.DomUtil.create("textarea", "desc", container);
-    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
-    let node;
-    const rdnTable = L.DomUtil.create("table", "", container);
+  removeHooks: function() {
+    WDialog.prototype.removeHooks.call(this);
+  },
 
-    // XXX WHY? DEAR GOD WHY!?
-    [0, 1, 2].forEach(string => {
-      let type = 0 == string ? "src" : "dst-" + string;
-      const tr = rdnTable.insertRow();
-      tr.setAttribute("data-portal", type);
-      node = tr.insertCell();
-      if (string != 0) {
-        const filter = L.DomUtil.create("input", "", node);
-        filter.checked = true;
-        filter.value = type;
-        self._links.push(filter);
+  _displayDialog: function() {
+    if (!this._map) return;
+    const container = L.DomUtil.create("div", "container");
+
+    const sourceLabel = L.DomUtil.create("label", null, container);
+    sourceLabel.textContent = wX("SOURCE_PORT");
+    const sourceButton = L.DomUtil.create("button", "set", container);
+    sourceButton.textContent = wX("SET");
+    this._sourceDisplay = L.DomUtil.create("span", "portal", container);
+    if (this._source) {
+      this._sourceDisplay.appendChild(this._source.displayFormat());
+    } else {
+      this._sourceDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(sourceButton, "click", () => {
+      this._source = WasabeePortal.getSelected();
+      if (this._source) {
+        localStorage["wasabee-link-source"] = JSON.stringify(this._source);
+        this._sourceDisplay.textContent = "";
+        this._sourceDisplay.appendChild(this._source.displayFormat());
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
       }
-      node = tr.insertCell();
-      node.textContent = 0 == string ? "from" : "to (#" + string + ")";
-      node = tr.insertCell();
-      const button = L.DomUtil.create("button", "", node);
-      button.textContent = "set";
-      button.addEventListener("click", arg => self._setPortal(arg), false);
-      node = tr.insertCell();
-      if (string != 0) {
-        const addbutton = L.DomUtil.create("button", "", node);
-        addbutton.textContent = "add";
-        L.DomEvent.on(
-          addbutton,
-          "click",
-          other => self._addLinkTo(other, self._operation),
-          false
+    });
+
+    const anchor1Label = L.DomUtil.create("label", null, container);
+    anchor1Label.textContent = wX("ANCHOR1");
+    const anchor1Button = L.DomUtil.create("button", null, container);
+    anchor1Button.textContent = wX("SET");
+    this._anchor1Display = L.DomUtil.create("span", "portal", container);
+    if (this._anchor1) {
+      this._anchor1Display.appendChild(this._anchor1.displayFormat());
+    } else {
+      this._anchor1Display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchor1Button, "click", () => {
+      this._anchor1 = WasabeePortal.getSelected();
+      if (this._anchor1) {
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
+        this._anchor1Display.textContent = "";
+        this._anchor1Display.appendChild(this._anchor1.displayFormat());
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+    const anchor1AddButton = L.DomUtil.create("button", "add", container);
+    anchor1AddButton.textContent = wX("ADD");
+    L.DomEvent.on(anchor1AddButton, "click", () => {
+      if (this._source && this._anchor1) {
+        this._operation.addLink(
+          this._source,
+          this._anchor1,
+          this._desc.value,
+          this._operation.nextOrder
+        );
+      } else {
+        alert("Select both Source and Anchor 1");
+      }
+    });
+
+    const anchor2Label = L.DomUtil.create("label", null, container);
+    anchor2Label.textContent = wX("ANCHOR2");
+    const anchor2Button = L.DomUtil.create("button", null, container);
+    anchor2Button.textContent = wX("SET");
+    this._anchor2Display = L.DomUtil.create("span", "portal", container);
+    if (this._anchor2) {
+      this._anchor2Display.appendChild(this._anchor2.displayFormat());
+    } else {
+      this._anchor2Display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchor2Button, "click", () => {
+      this._anchor2 = WasabeePortal.getSelected();
+      if (this._anchor2) {
+        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
+        this._anchor2Display.textContent = "";
+        this._anchor2Display.appendChild(this._anchor2.displayFormat());
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+    const anchor2AddButton = L.DomUtil.create("button", "add", container);
+    anchor2AddButton.textContent = wX("ADD");
+    L.DomEvent.on(anchor2AddButton, "click", () => {
+      if (this._source && this._anchor2) {
+        this._operation.addLink(
+          this._source,
+          this._anchor2,
+          this._desc.value,
+          this._operation.nextOrder
+        );
+      } else {
+        alert(wX("SEL_SRC_ANC2"));
+      }
+    });
+
+    // Bottom buttons bar
+    // Enter arrow
+    const opt = L.DomUtil.create("label", "arrow", container);
+    opt.textContent = "\u21b3";
+    // Go button
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("ADD_LINKS");
+    L.DomEvent.on(button, "click", () => {
+      if (!this._source) alert(wX("SEL_SRC_PORT"));
+      if (this._anchor1) {
+        this._operation.addLink(
+          this._source,
+          this._anchor1,
+          this._desc.value,
+          this._operation.nextOrder
         );
       }
-      node = tr.insertCell();
-      node.className = "portal portal-" + type;
-      self._portals[type] = node;
-      self._updatePortal(type);
+      if (this._anchor2) {
+        this._operation.addLink(
+          this._source,
+          this._anchor2,
+          this._desc.value,
+          this._operation.nextOrder
+        );
+      }
     });
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", "arrow", element); // a span named div?
-    const opt = L.DomUtil.create("span", "arrow", div);
-    opt.textContent = "\u21b3";
-    const button = L.DomUtil.create("button", "", div);
-    button.textContent = "add all";
-    L.DomEvent.on(
-      button,
-      "click",
-      () => self._addAllLinks(self._operation),
-      false
-    );
-    const cardHeader = L.DomUtil.create("label", "", element);
-    this._reversed = L.DomUtil.create("input", "", cardHeader);
-    this._reversed.type = "checkbox";
-    cardHeader.appendChild(document.createTextNode(" reverse"));
+    this._desc = L.DomUtil.create("input", "desc", container);
+    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
 
     this._dialog = window.dialog({
       title: wX("ADD_LINKS"),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
-      closeCallback: function() {
-        self.disable();
-        delete self._dialog;
+      dialogClass: "wasabee-dialog wasabee-dialog-link",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.linkDialogButton
     });
-  },
-
-  _onMessage: function(command) {
-    if ("setPortal" === command.data.type) {
-      this._updatePortal(command.data.name);
-    }
-    //***Function to clear local selections of portals for the dialog
-  },
-
-  _setPortal: function(event) {
-    const updateID = event.currentTarget.parentNode.parentNode.getAttribute(
-      "data-portal"
-    );
-    const selectedPortal = WasabeePortal.getSelected();
-    if (selectedPortal) {
-      localStorage["wasabee-anchor-" + updateID] = JSON.stringify(
-        selectedPortal
-      );
-    } else {
-      alert(wX("NO_PORT_SEL"));
-      delete localStorage["wasabee-anchor-" + updateID];
-    }
-    this._updatePortal(updateID);
-    //***Function to get portal -- called in updatePortal, addLinkTo, and addAllLinks
-  },
-
-  _getPortal: function(name) {
-    try {
-      return WasabeePortal.create(
-        JSON.parse(localStorage["wasabee-anchor-" + name])
-      );
-    } catch (b) {
-      return null;
-    }
-    //***Function to update portal in the dialog
-  },
-
-  _updatePortal: function(key) {
-    var i = this._getPortal(key);
-    var viewContainer = this._portals[key];
-    $(viewContainer).empty();
-    if (i) {
-      viewContainer.appendChild(i.displayFormat(this._operation));
-    }
-    //***Function to add link between the portals -- called from 'Add' Button next to To portals
-  },
-
-  _addLinkTo: function(instance, operation) {
-    var item = this;
-    var server = instance.currentTarget.parentNode.parentNode.getAttribute(
-      "data-portal"
-    );
-    var linkTo = this._getPortal(server);
-    var source = this._getPortal("src");
-    if (!source || !linkTo) {
-      return void alert(wX("PICK_TARGETDEST_Portals"));
-    }
-    var isReversed = this._reversed.checked;
-    if (source.id == linkTo.id) {
-      return void alert(wX("TARDEST_DIFF"));
-    } else {
-      Promise.all([
-        item._addPortal(source),
-        item._addPortal(linkTo),
-        isReversed
-          ? item._addLink(linkTo, source)
-          : item._addLink(source, linkTo)
-      ])
-        .then(() => operation.update(true))
-        .catch(data => {
-          throw (alert(data.message), console.log(data), data);
-        });
-    }
-    //***Function to add all the links between the from and all the to portals -- called from 'Add All Links' Button
-  },
-
-  _addAllLinks: function(operation) {
-    var item = this;
-    var source = this._getPortal("src");
-    if (!source) {
-      return void alert(wX("PICK_TAR_FIRST"));
-    }
-    var resolvedSourceMapConfigs = this._links
-      .map(b => (b.checked ? item._getPortal(b.value) : null))
-      .filter(a => null != a);
-    if (0 == resolvedSourceMapConfigs.length) {
-      return void alert(wX("PICK_DEST_FIRST"));
-    }
-    var isReversedChecked = this._reversed.checked;
-    var documentBodyPromise = this._addPortal(source);
-    Promise.all(
-      resolvedSourceMapConfigs.map(linkTo => {
-        return Promise.all([
-          documentBodyPromise,
-          item._addPortal(linkTo),
-          isReversedChecked
-            ? item._addLink(linkTo, source)
-            : item._addLink(source, linkTo)
-        ]).then(() => operation.update(true));
-      })
-    ).catch(data => {
-      throw (alert(data.message), console.log(data), data);
-    });
-    //***Function to add a portal -- called in addLinkTo and addAllLinks functions
-  },
-
-  _addPortal: function(sentPortal) {
-    var resolvedLocalData = Promise.resolve(this._operation.opportals);
-    return sentPortal
-      ? this._operation.opportals.some(
-          gotPortal => gotPortal.id == sentPortal.id
-        )
-        ? resolvedLocalData
-        : addPortal(this._operation, sentPortal)
-      : Promise.reject("no portal given");
-  },
-
-  //***Function to add a single link -- called in addLinkTo and addAllLinks functions
-  _addLink: function(fromPortal, toPortal) {
-    var description = this._desc.value;
-    if (!toPortal || !fromPortal) {
-      return Promise.reject("no portal given");
-    }
-    return this._operation.addLink(fromPortal, toPortal, description);
-  },
-
-  removeHooks: function() {
-    WDialog.prototype.removeHooks.call(this);
   }
 });
 

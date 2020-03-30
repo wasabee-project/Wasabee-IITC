@@ -65,7 +65,7 @@ const ConfirmDialog = WDialog.extend({
   _buildContent: function() {
     const content = L.DomUtil.create("div", "title");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      content.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }

@@ -101,7 +101,7 @@ const ManageTeamDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           const button = L.DomUtil.create("a", null, cell);
-          button.textContent = "remove";
+          button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", () => {
             removeAgentFromTeamPromise(value, this._team.ID).then(
               () => {
@@ -192,17 +192,17 @@ const ManageTeamDialog = WDialog.extend({
 
     const rocks = L.DomUtil.create("div", null, container);
     const rockslabel = L.DomUtil.create("label", null, rocks);
-    rockslabel.textContent = "enl.rocks community: ";
+    rockslabel.textContent = wX("ROCKS_COM");
     const rockscommField = L.DomUtil.create("input", null, rockslabel);
     rockscommField.placeholder = "xxyyzz.com";
     if (this._team.RocksComm) rockscommField.value = this._team.RocksComm;
     const rocksapilabel = L.DomUtil.create("label", null, rocks);
-    rocksapilabel.textContent = " api key: ";
+    rocksapilabel.textContent = wX("API_KEY");
     const rocksapiField = L.DomUtil.create("input", null, rocksapilabel);
     rocksapiField.placeholder = "...";
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
     const rocksButton = L.DomUtil.create("button", null, rocks);
-    rocksButton.textContent = "Set";
+    rocksButton.textContent = wX("SET");
     L.DomEvent.on(rocksButton, "click", () => {
       rocksPromise(
         this._team.ID,
@@ -224,14 +224,14 @@ const ManageTeamDialog = WDialog.extend({
 
     const remove = L.DomUtil.create("div", null, container);
     const removeLabel = L.DomUtil.create("label", null, remove);
-    removeLabel.textContent = "Remove Team: ";
+    removeLabel.textContent = wX("REMOVE_TEAM");
     const removeButton = L.DomUtil.create("button", null, removeLabel);
-    removeButton.textContent = "Remove";
+    removeButton.textContent = wX("REMOVE");
     L.DomEvent.on(removeButton, "click", () => {
       const cd = new ConfirmDialog();
       cd.setup(
-        `Remove Team ${this._team.Name}`,
-        `Do you want to permenantly remove ${this._team.Name} from the Wasabee Server?`,
+        wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
+        wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
         () => {
           deleteTeamPromise(this._team.ID).then(
             () => {

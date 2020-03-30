@@ -13,8 +13,8 @@ const PromptDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = PromptDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE");
-    this._label = wX("NO_LABEL");
+    this._title = wX("NO_TITLE"); // should never be displayed
+    this._label = wX("NO_LABEL"); // should never be displayed
     this.placeholder = "";
     this.current = "";
   },
@@ -37,7 +37,7 @@ const PromptDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._buildContent(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-prompt",
       buttons: {
         OK: () => {
           if (this._callback) this._callback();
@@ -65,14 +65,14 @@ const PromptDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "wasabee-prompt-label");
+    const content = L.DomUtil.create("div", "container");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      const label = L.DomUtil.create("label", null, content);
+      label.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }
-    const d = L.DomUtil.create("div", "wasabee-prompt-input", content);
-    this.inputField = L.DomUtil.create("input", null, d);
+    this.inputField = L.DomUtil.create("input", null, content);
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.placeholder;
     this.inputField.value = this.current;

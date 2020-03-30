@@ -43,7 +43,7 @@ const AboutDialog = WDialog.extend({
     const support = L.DomUtil.create("div", null, html);
     // wX is the translation call, looks for strings in translations.json based
     // on the browser's langauge setting
-    support.innerHTML = wX("SUPPORT_INSTRUCT");
+    support.textContent = wX("SUPPORT_INSTRUCT");
 
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =

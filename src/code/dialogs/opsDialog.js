@@ -94,7 +94,7 @@ const OpsDialog = WDialog.extend({
     const writable = selectedOp.IsWritableOp();
 
     const nameLabel = L.DomUtil.create("label", null, topSet);
-    nameLabel.innerText = wX("OPER_NAME");
+    nameLabel.textContent = wX("OPER_NAME");
     const nameDisplay = L.DomUtil.create("div", null, topSet);
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
@@ -109,12 +109,12 @@ const OpsDialog = WDialog.extend({
         }
       });
     } else {
-      nameDisplay.innerText = selectedOp.name;
+      nameDisplay.textContent = selectedOp.name;
     }
 
     if (writable) {
       const colorLabel = L.DomUtil.create("label", null, topSet);
-      colorLabel.innerText = wX("OPER_COLOR");
+      colorLabel.textContent = wX("OPER_COLOR");
       const operationColor = selectedOp.color
         ? selectedOp.color
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
@@ -126,7 +126,7 @@ const OpsDialog = WDialog.extend({
         const option = L.DomUtil.create("option", null, opColor);
         if (c.name == operationColor) option.selected = true;
         option.value = c.name;
-        option.innerHTML = c.displayName;
+        option.textContent = c.displayName;
       }
       L.DomEvent.on(opColor, "change", () => {
         selectedOp.color = opColor.value;
@@ -145,14 +145,15 @@ const OpsDialog = WDialog.extend({
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
-      commentDisplay.innerText = selectedOp.comment;
+      commentDisplay.textContent = selectedOp.comment;
     }
 
     const buttonSection = L.DomUtil.create("div", "buttonset", content);
     if (writable) {
       const clearOpDiv = L.DomUtil.create("div", null, buttonSection);
       const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
-      clearOpButton.innerText = wX("CLEAR_EVERYTHING");
+      // adding a comment so that github will let me create a pull request to fix the issue with CLEAR_EVERYTHING showing up on the button instead of the correct text. Scott, pleae double check the line below this - I left off the wX code in the previous version.
+      clearOpButton.textContent = wX("CLEAR_EVERYTHING");
       L.DomEvent.on(clearOpButton, "click", () => {
         clearAllItems(selectedOp);
         selectedOp.store();
@@ -163,17 +164,18 @@ const OpsDialog = WDialog.extend({
       const deleteDiv = L.DomUtil.create("div", null, buttonSection);
       const deleteButton = L.DomUtil.create("button", null, deleteDiv);
       if (selectedOp.IsOwnedOp()) {
-        deleteButton.innerHTML = wX("DELETE") + selectedOp.name;
-        if (selectedOp.IsServerOp()) deleteButton.innerHTML += wX("LOCFRMSER");
+        deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
+        if (selectedOp.IsServerOp())
+          deleteButton.textContent += wX("LOCFRMSER");
       } else {
-        deleteButton.innerHTML = wX("REM_LOC_CP") + selectedOp.name;
+        deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
       }
       L.DomEvent.on(deleteButton, "click", () => {
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          wX("CON_DEL") + selectedOp.name,
-          wX("YESNO_DEL") + selectedOp.name + "?",
+          wX("CON_DEL", selectedOp.name),
+          wX("YESNO_DEL", selectedOp.name),
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(
@@ -220,7 +222,7 @@ const OpsDialog = WDialog.extend({
     if (selectedOp.IsServerOp()) {
       const permsDiv = L.DomUtil.create("div", null, buttonSection);
       const permsButton = L.DomUtil.create("button", null, permsDiv);
-      permsButton.innerHTML = wX("OP_PERMS");
+      permsButton.textContent = wX("OP_PERMS");
       L.DomEvent.on(permsButton, "click", () => {
         const opl = new OpPermList();
         opl.enable();
@@ -229,7 +231,7 @@ const OpsDialog = WDialog.extend({
 
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
-    dupeButton.innerHTML = wX("DUPE_OP");
+    dupeButton.textContent = wX("DUPE_OP");
     L.DomEvent.on(dupeButton, "click", () => {
       duplicateOperation(selectedOp.ID);
       window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);

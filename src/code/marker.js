@@ -69,7 +69,7 @@ export default class WasabeeMarker {
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
-          assignment.innerHTML = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
+          assignment.textContent = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
           assignment.appendChild(a.formatDisplay());
         },
         function(err) {

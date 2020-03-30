@@ -27,22 +27,19 @@ const FanfieldDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
+    const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const controls = L.DomUtil.create("div", null, container);
-
-    const anchorDiv = L.DomUtil.create("div", null, controls);
-    const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
-    anchorLabel.textContent = "Anchor Portal ";
-    const anchorButton = L.DomUtil.create("button", null, anchorLabel);
-    anchorButton.textContent = "set";
-    this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
+    const anchorLabel = L.DomUtil.create("label", null, container);
+    anchorLabel.textContent = wX("ANCHOR_PORTAL");
+    const anchorButton = L.DomUtil.create("button", null, container);
+    anchorButton.textContent = wX("SET");
+    this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(this._anchor.displayFormat());
     } else {
-      this._anchorDisplay.textContent = "not set";
+      this._anchorDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButton, "click", () => {
       this._anchor = WasabeePortal.getSelected();
@@ -55,16 +52,15 @@ const FanfieldDialog = WDialog.extend({
       }
     });
 
-    const startDiv = L.DomUtil.create("div", null, controls);
-    const startLabel = L.DomUtil.create("label", null, startDiv);
-    startLabel.textContent = "Start Portal ";
-    const startButton = L.DomUtil.create("button", null, startLabel);
-    startButton.textContent = "set";
-    this._startDisplay = L.DomUtil.create("span", null, startLabel);
+    const startLabel = L.DomUtil.create("label", null, container);
+    startLabel.textContent = wX("START_PORT");
+    const startButton = L.DomUtil.create("button", null, container);
+    startButton.textContent = wX("SET");
+    this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
       this._startDisplay.appendChild(this._start.displayFormat());
     } else {
-      this._startDisplay.textContent = "not set";
+      this._startDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(startButton, "click", () => {
       this._start = WasabeePortal.getSelected();
@@ -77,16 +73,15 @@ const FanfieldDialog = WDialog.extend({
       }
     });
 
-    const endDiv = L.DomUtil.create("div", null, controls);
-    const endLabel = L.DomUtil.create("label", null, endDiv);
-    endLabel.textContent = "End Portal ";
-    const endButton = L.DomUtil.create("button", null, endLabel);
-    endButton.textContent = "set";
-    this._endDisplay = L.DomUtil.create("span", null, endLabel);
+    const endLabel = L.DomUtil.create("label", null, container);
+    endLabel.textContent = wX("END_PORT");
+    const endButton = L.DomUtil.create("button", null, container);
+    endButton.textContent = wX("SET");
+    this._endDisplay = L.DomUtil.create("span", null, container);
     if (this._end) {
       this._endDisplay.appendChild(this._end.displayFormat());
     } else {
-      this._endDisplay.textContent = "not set";
+      this._endDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(endButton, "click", () => {
       this._end = WasabeePortal.getSelected();
@@ -100,13 +95,11 @@ const FanfieldDialog = WDialog.extend({
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, div);
+    const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", () => {
       const context = this;
