@@ -65,7 +65,7 @@ export const SetCommentDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._buildHtml(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
       closeCallback: () => {
         setCommentHandler.disable();
         delete setCommentHandler._dialog;
@@ -75,13 +75,13 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   _buildHtml: function() {
-    const container = L.DomUtil.create("div", null);
-    const desc = L.DomUtil.create("div", null, container);
+    const container = L.DomUtil.create("div", "container");
+    const desc = L.DomUtil.create("div", "desc", container);
     const input = L.DomUtil.create("input", null, container);
     input.placeholder = "comment";
 
     if (this.commentType == "link") {
-      desc.innerHTML = wX("SET_LINK_COMMENT");
+      desc.textContent = wX("SET_LINK_COMMENT");
       desc.appendChild(this.target.displayFormat(this.operation));
       if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
@@ -94,7 +94,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "marker") {
-      desc.innerHTML = wX("SET_MARKER_COMMENT");
+      desc.textContent = wX("SET_MARKER_COMMENT");
       desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.target.comment) input.value = this.target.comment;
@@ -108,7 +108,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "portal") {
-      desc.innerHTML = wX("SET_PORT_COMMENT");
+      desc.textContent = wX("SET_PORT_COMMENT");
       desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.portal.comment) input.value = this.portal.comment;

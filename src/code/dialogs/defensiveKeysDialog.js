@@ -55,15 +55,13 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    this._content = L.DomUtil.create("div", null);
-    this._portal = L.DomUtil.create("div", null, this._content);
+    this._content = L.DomUtil.create("div", "container");
+    this._portal = L.DomUtil.create("div", "portal", this._content);
 
-    const d = L.DomUtil.create("div", null, this._content);
-    this._count = L.DomUtil.create("input", null, d);
+    this._count = L.DomUtil.create("input", null, this._content);
     this._count.setAttribute("placeholder", "number of keys");
     this._count.size = 3;
-    const dd = L.DomUtil.create("div", null, this._content);
-    this._capID = L.DomUtil.create("input", null, dd);
+    this._capID = L.DomUtil.create("input", null, this._content);
     this._capID.setAttribute("placeholder", "Capsule ID");
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("button", null, this._content);
@@ -80,10 +78,7 @@ const DefensiveKeysDialog = WDialog.extend({
       title: wX("INPUT_DT_KEY_COUNT"),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center+30"
-      },
+      // position: { my: "center top", at: "center center+30" },
       html: this._content,
       dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
       closeCallback: () => {

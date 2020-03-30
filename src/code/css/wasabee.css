@@ -133,6 +133,11 @@
 .wasabee-dialog-confirm { align-items: center }
 .wasabee-dialog-confirm div.title { }
 .wasabee-dialog-wdkeys { }
+.wasabee-dialog-wdkeys div.container { display: grid; }
+.wasabee-dialog-wdkeys div.portal { padding 4px 0px 8px 0px; }
+.wasabee-dialog-wdkeys input { padding: 4px; }
+.wasabee-dialog-wdkeys button { padding: 4px; margin: 4px; }
+
 .wasabee-dialog-export { }
 .wasabee-dialog-export textarea { width: 96%; height: 250px; resize: vertical }
 .wasabee-dialog-fanfield { } /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
@@ -148,7 +153,6 @@
 .wasabee-dialog-keyslist .enough { color: #fff }
 .wasabee-dialog-keyslist .notenough { color: #900; font-weight: bold; }
 .wasabee-dialog-linklist { }
-
 .wasabee-dialog-link { }
 .wasabee-dialog-link div.container { display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; }
 .wasabee-dialog-link label { padding: 4px; grid-column-start: 1; grid-column-end: 2; }
@@ -156,7 +160,6 @@
 .wasabee-dialog-link span.portal { grid-column-start: 3; grid-column-end: 4; }
 .wasabee-dialog-link button.add { padding: 4px; grid-column-start: 4; grid-column-end: 5; }
 .wasabee-dialog-link input.desc { padding: 4px; grid-column-start: 4; }
-
 .wasabee-dialog-manageteam { }
 .wasabee-dialog-markeradd { }
 .wasabee-dialog-markeradd div.content { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; }
@@ -178,9 +181,21 @@
 .wasabee-dialog-ops div.buttonset button { width: 96%; padding: 8px 24px 8px 24px; margin: 2px 2px 2px 2px }
 .wasabee-dialog-checklist { }
 .wasabee-dialog-perms { }
-
-
-/* promptDialog divs */
-.wasabee-prompt-label { align-items: center }
-.wasabee-prompt-input { align-items: center }
-
+.wasabee-dialog-prompt {}
+.wasabee-dialog-prompt div.container { display: grid }
+.wasabee-dialog-prompt label { padding: 4px; }
+.wasabee-dialog-prompt input { padding: 4px; }
+.wasabee-dialog-setcomment { }
+.wasabee-dialog-setcomment div.container { display: grid; }
+.wasabee-dialog-setcomment div.desc { padding: 4px; }
+.wasabee-dialog-setcomment input { padding: 4px; width: 96%; }
+.wasabee-dialog-starburst { }
+.wasabee-dialog-starburst div.container { display: grid; grid-template-columns: 1fr 1fr 2fr; }
+.wasabee-dialog-starburst div.desc { padding: 4px; grid-column-start: 1; grid-column-end: 4; }
+.wasabee-dialog-starburst label { padding: 4px; }
+.wasabee-dialog-starburst button { padding: 4px; }
+.wasabee-dialog-starburst div.anchor { padding: 4px; }
+.wasabee-dialog-wasabee { }
+.wasabee-dialog-wasabee div.container { display: grid; }
+.wasabee-dialog-wasabee button.server { padding: 4px; margin: 4px; grid-column-start: 1;  }
+.wasabee-dialog-wasabee button.sendloc { padding: 4px; margin: 4px; grid-column-start: 1; }

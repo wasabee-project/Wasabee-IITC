@@ -137,15 +137,13 @@ const WasabeeDialog = WDialog.extend({
     ];
     teamlist.sortBy = 0;
 
-    const html = L.DomUtil.create("div", "temp-op-dialog");
-    this.serverInfo = L.DomUtil.create("div", "", html);
-    this.serverInfo.innerHTML =
-      wX("WSERVER") + GetWasabeeServer() + "LINE_BREAKS";
-    L.DomEvent.on(this.serverInfo, "click", this.setServer);
+    const container = L.DomUtil.create("div", "container");
+    const serverInfo = L.DomUtil.create("button", "server", container);
+    serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
+    serverInfo.href = "#";
+    L.DomEvent.on(serverInfo, "click", this.setServer);
 
-    const options = L.DomUtil.create("div", "temp-op-dialog", html);
-    const locbutton = L.DomUtil.create("a", null, options);
-    locbutton.style.align = "center";
+    const locbutton = L.DomUtil.create("button", "sendloc", container);
     locbutton.textContent = wX("SEND_LOC");
     L.DomEvent.on(locbutton, "click", () => {
       navigator.geolocation.getCurrentPosition(
@@ -164,14 +162,13 @@ const WasabeeDialog = WDialog.extend({
         },
         err => {
           console.log(err);
-          console.log("unable to get location");
         }
       );
     });
 
-    html.appendChild(teamlist.table);
+    container.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
-    return html;
+    return container;
   },
 
   _displayDialog: function() {
@@ -181,7 +178,7 @@ const WasabeeDialog = WDialog.extend({
         width: "auto",
         height: "auto",
         html: this._buildContent(),
-        dialogClass: "wasabee-dialog",
+        dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
         buttons: {
           OK: () => {
             this._dialog.dialog("close");

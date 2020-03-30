@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 // import WasabeeLink from "../link";
-import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
 const StarburstDialog = WDialog.extend({
@@ -23,19 +23,16 @@ const StarburstDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent =
       "Select the anchor, zoom to area to add to starburst";
 
-    const controls = L.DomUtil.create("div", null, container);
-
-    const anchorDiv = L.DomUtil.create("div", null, controls);
-    const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
+    const anchorLabel = L.DomUtil.create("label", null, container);
     anchorLabel.textContent = "Anchor Portal ";
-    const anchorButton = L.DomUtil.create("button", null, anchorLabel);
+    const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = "set";
-    this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
+    this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(this._anchor.displayFormat());
     } else {
@@ -53,13 +50,11 @@ const StarburstDialog = WDialog.extend({
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("div", "arrow", container);
     opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, div);
+    const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("STARBURST");
     L.DomEvent.on(button, "click", () => {
       const context = this;
@@ -72,7 +67,7 @@ const StarburstDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-starburst",
       closeCallback: function() {
         context.disable();
         delete context._dialog;
@@ -81,8 +76,8 @@ const StarburstDialog = WDialog.extend({
         OK: () => {
           this._dialog.dialog("close");
         },
-        "Clear All": () => {
-          clearAllItems(getSelectedOperation());
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
         }
       }
     });
