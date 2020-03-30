@@ -89,7 +89,7 @@ const OpPermList = WDialog.extend({
     }
 
     this._dialog = window.dialog({
-      title: this._operation.name + wX("PERMS"),
+      title: wX("PERMS", this._operation.name),
       width: "auto",
       height: "auto",
       html: this._html,

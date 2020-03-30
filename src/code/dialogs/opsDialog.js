@@ -174,8 +174,8 @@ const OpsDialog = WDialog.extend({
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          wX("CON_DEL") + selectedOp.name,
-          wX("YESNO_DEL") + selectedOp.name + "?",
+          wX("CON_DEL", selectedOp.name),
+          wX("YESNO_DEL", selectedOp.name),
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(
