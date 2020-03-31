@@ -59,7 +59,8 @@ const SettingsDialog = WDialog.extend({
     langLabel.textContent = wX("LANG");
     const langMenu = L.DomUtil.create("select", null, container);
 
-    const current = localStorage["wasabee-default-language"];
+    const current =
+      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
     for (const l in window.plugin.wasabee.static.strings) {
       const option = L.DomUtil.create("option", null, langMenu);
       option.value = l;
@@ -73,7 +74,8 @@ const SettingsDialog = WDialog.extend({
       if (l == current) option.selected = true;
     }
     L.DomEvent.on(langMenu, "change", () => {
-      localStorage["wasabee-default-language"] = langMenu.value;
+      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
+        langMenu.value;
       addButtons(getSelectedOperation());
       window.runHooks("wasabeeUIUpdate", getSelectedOperation());
     });

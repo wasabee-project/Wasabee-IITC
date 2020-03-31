@@ -5,12 +5,14 @@ const wX = (key, value, option) => {
 
   // load the selected language, or use English if not set
   // storage named "default-language" for historic reasons
-  let lang = localStorage["wasabee-default-language"] || "English";
+  let lang =
+    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 
   // if the langauge doesn't exist in either list, clear it and use English
   if (!strings[lang] && !silly[lang]) {
-    delete localStorage["wasabee-default-language"];
-    lang = "English";
+    delete localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
+    lang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
   }
 
   let s = null;
@@ -18,7 +20,11 @@ const wX = (key, value, option) => {
   // if that fails, check the silly list. Use English as a last resort
   if (strings[lang] && strings[lang][key]) s = strings[lang][key];
   if (!s && silly[lang] && silly[lang][key]) s = silly[lang][key];
-  if (!s && strings["English"][key]) s = strings["English"][key];
+  if (
+    !s &&
+    strings[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key]
+  )
+    s = strings[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key];
   if (!s) s = "haec notificatio praebibo est";
 
   // do any necessary replacements

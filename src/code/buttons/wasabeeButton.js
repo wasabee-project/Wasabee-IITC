@@ -117,7 +117,9 @@ const WasabeeButton = WButton.extend({
   },
 
   getIcon: function() {
-    const lang = localStorage["wasabee-default-language"] || "English";
+    const lang =
+      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+      window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
     if (lang == "en_sq")
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se
         .default;

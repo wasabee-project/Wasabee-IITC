@@ -112,9 +112,11 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  const lang = localStorage["wasabee-default-language"] || "English";
+  const lang =
+    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
   const restore = operation.color;
-  if (lang == "en_sq") {
+  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
     operation.color = "SE";
   }
 
@@ -312,9 +314,11 @@ const updateAnchors = op => {
     return;
   }
 
-  const lang = localStorage["wasabee-default-language"] || "English";
+  const lang =
+    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
   const restore = op.color;
-  if (lang == "en_sq") {
+  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
     op.color = "SE";
   }
 
