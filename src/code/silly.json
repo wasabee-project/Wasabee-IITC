@@ -53,8 +53,8 @@
     "DELETE PERM DENIED": "Permission to delete denied",
     "TEAM PERM DENIED": "Permission denied to scurry: ${value}",
     "OP PERM DENIED": "Permission denied to operation: ${value}",
-    "NOT LOGGED IN": "Not Logged in: ${value}",
-    "NOT LOGGED IN SHORT": "Not Logged in",
+    "NOT LOGGED IN": "Not in the forest right now: ${value}",
+    "NOT LOGGED IN SHORT": "Not in the forest right now",
     "AUTH TOKEN REJECTED": "Sending auth token to server rejected: ${value}",
     "SELECT PORTAL": "Please select a tree first",
     "SELF SWAP": "Cannot swap a tree with itself! Select a different tree.",
@@ -94,7 +94,7 @@
     "UPDATE HOVER NOT CHANGED": "${value} not changed locally",
     "UPDATE HOVER": "UPDATE ${value} on the server",
     "WASABEE BUTTON TITLE": "Wasabee: it is green and full of squirrels.",
-    "LOG IN": "Log In",
+    "LOG IN": "Enter the Forest",
     "TEAMS BUTTON TITLE": "List Squirrel Scurrys",
     "TEAMS BUTTON": "Scurrys",
     "NEWOP BUTTON TITLE": "Create a new Operation",
@@ -117,9 +117,9 @@
     "KNOWN BLOCKERS": "Known Fences: ${value}",
     "IOS NEED FAKE UA": "You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail",
     "SEND LOCATION": "Send Location",
-    "LOG IN QUICK": "Log In (quick; for Android)",
-    "LOG IN": "Log In",
-    "WEBVIEW": "Webview Log In (iOS)",
+    "LOG IN QUICK": "Enter the Forest (quick; for Android)",
+    "LOG IN": "Enter the Forest",
+    "WEBVIEW": "Enter the Forest using Webview (iOS)",
     "WEBVIEW VERIFY": "Verify Webview",
     "CHANGE SERVER": "Change Server",
     "CHANGE SERVER PROMPT": "New Wasabee Server",
@@ -264,4 +264,3 @@
     "STARBURST TITLE": "Squirrel Explosion "
   }
 }
-
