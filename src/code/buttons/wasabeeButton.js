@@ -117,6 +117,11 @@ const WasabeeButton = WButton.extend({
   },
 
   getIcon: function() {
+    const lang = localStorage["wasabee-default-language"] || "English";
+    if (lang == "en_sq")
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se
+        .default;
+
     if (this._lastLoginState) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
         .default;

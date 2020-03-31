@@ -112,7 +112,7 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  let lang = localStorage["wasabee-default-language"] || "English";
+  const lang = localStorage["wasabee-default-language"] || "English";
   const restore = operation.color;
   if (lang == "en_sq") {
     operation.color = "SE";
@@ -312,7 +312,7 @@ const updateAnchors = op => {
     return;
   }
 
-  let lang = localStorage["wasabee-default-language"] || "English";
+  const lang = localStorage["wasabee-default-language"] || "English";
   const restore = op.color;
   if (lang == "en_sq") {
     op.color = "SE";

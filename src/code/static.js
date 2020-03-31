@@ -16,6 +16,7 @@ W.static = {
     toolbar_plus: require("./images/toolbar_plus.png"),
     toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
     toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
+    toolbar_wasabeebutton_se: require("./images/toolbar_wasabeebutton_se.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
     toolbar_settings: require("./images/toolbar_settings.png"),
     toolbar_multimax: require("./images/toolbar_multimax.png")
