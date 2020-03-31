@@ -65,6 +65,8 @@ W.static = {
 };
 
 W.static.strings = require("./translations.json");
+W.static.stringsSilly = require("./silly.json");
+W.static.tips = require("./tips.json");
 
 W.static.markerTypes = new Map([
   [
