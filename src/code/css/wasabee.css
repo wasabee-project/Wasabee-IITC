@@ -114,12 +114,11 @@
 .wasabee-dialog-assign { }
 .wasabee-agent-menu { align-items: center }
 
+/* this can be simplified now that the send location checkbox is not here */
 .wasabee-dialog-auth { max-width: min-content; }
 .wasabee-dialog-auth div.content { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 4px; }
 .wasabee-dialog-auth div.useragent { padding: 4px; grid-column-start: 1; grid-column-end: 5; }
 .wasabee-dialog-auth div.desc { padding: 4px; grid-column-start: 1; grid-column-end: 5;}
-.wasabee-dialog-auth label.sendloc { grid-column-start: 1; grid-column-end: 2;}
-.wasabee-dialog-auth input.sendloc { grid-column-start: 2; grid-column-end: 5;}
 .wasabee-dialog-auth button.andriod { margin: 4px; padding: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth button.gapi { margin: 4px; padding: 4px; grid-column-start: 1; grid-column-end: 5;}
 .wasabee-dialog-auth div.options { margin: 4px; grid-column-start: 1; grid-column-end: 5;}
@@ -193,6 +192,7 @@
 .wasabee-dialog-settings div.container { display: grid; grid-template-columns: 1fr 1fr; }
 .wasabee-dialog-settings label { grid-column-start: 1; grid-column-end: 2; }
 .wasabee-dialog-settings select { grid-column-start: 2; grid-column-end: 3; }
+.wasabee-dialog-settings input { grid-column-start: 2; grid-column-end: 3; }
 
 .wasabee-dialog-starburst { }
 .wasabee-dialog-starburst div.container { display: grid; grid-template-columns: 1fr 1fr 2fr; }
