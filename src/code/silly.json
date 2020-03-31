@@ -227,6 +227,7 @@
     "SET_3_PORT": "Please set the three trees first!",
     "DESCRIP_PLACEHOLD": "Description (optional)",
     "ADD_LINKS": "Add Links",
+    "ADD_BUTTON_LINKS": "Add all branches at once",
     "PICK_TARGETDEST_PORTALS": "Please select target and destination trees first!",
     "TARDEST_DIFF": "Target and destination trees must be different.",
     "PICK_TAR_FIRST": "Please select a target tree first!",
