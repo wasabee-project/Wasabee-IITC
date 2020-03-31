@@ -5,7 +5,7 @@ import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import OverflowMenu from "../overflowMenu";
-import { listenForAddedPortals } from "../uiCommands";
+import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import wX from "../wX";
 
 const MarkerList = WDialog.extend({
@@ -29,18 +29,20 @@ const MarkerList = WDialog.extend({
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
   },
 
   removeHooks: function() {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalDetailLoaded", listenForPortalDetails);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   _displayDialog: function() {
     for (const f of this._operation.fakedPortals) {
-      if (f.id.length != 35) window.portalDetail.request(f.id);
+      window.portalDetail.request(f.id);
     }
 
     this._dialog = window.dialog({

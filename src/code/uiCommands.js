@@ -125,6 +125,20 @@ export const listenForAddedPortals = newPortal => {
   }
 };
 
+export const listenForPortalDetails = e => {
+  if (!e.success) return;
+  const op = getSelectedOperation();
+
+  for (const faked of op.fakedPortals) {
+    if (faked.id == e.guid) {
+      faked.name = e.details.title;
+      op.update(true);
+      return;
+    }
+  }
+  // TODO listen for by location
+};
+
 export const sendLocation = () => {
   if (!WasabeeMe.isLoggedIn()) return;
   const sl =

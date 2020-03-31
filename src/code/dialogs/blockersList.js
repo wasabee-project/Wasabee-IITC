@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
-import { listenForAddedPortals } from "../uiCommands";
+import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
 
@@ -26,6 +26,7 @@ const BlockerList = WDialog.extend({
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
   },
 
@@ -33,6 +34,7 @@ const BlockerList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
 
   _displayDialog: function() {
@@ -42,7 +44,7 @@ const BlockerList = WDialog.extend({
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
     for (const f of this._operation.fakedPortals) {
-      if (f.id.length != 35) window.portalDetail.request(f.id);
+      window.portalDetail.request(f.id);
     }
 
     this._dialog = window.dialog({
@@ -65,6 +67,11 @@ const BlockerList = WDialog.extend({
           this.blockerlistUpdate(this._operation);
           this._operation.update(false); // blockers do not need to be sent to server
           window.runHooks("wasabeeCrosslinks", this._operation);
+        },
+        "Force Load": () => {
+          for (const f of this._operation.fakedPortals) {
+            window.portalDetail.request(f.id);
+          }
         }
       },
       closeCallback: () => {
