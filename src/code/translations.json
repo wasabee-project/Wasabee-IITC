@@ -279,7 +279,11 @@
     "SEL_SB_ANCHOR": "Select the anchor, zoom to area to add to starburst",
     "ANCHOR_PORTAL": "Anchor Portal ",
     "REMOVE_TEAM_CONFIRM_TITLE": "Remove Team ${value}",
-    "REMOVE_TEAM_CONFIRM_LABEL": "Do you want to permenantly remove ${value} from the Wasabee Server?"
+    "REMOVE_TEAM_CONFIRM_LABEL": "Do you want to permenantly remove ${value} from the Wasabee Server?",
+    "WASABEE_MODE_LABEL": "Mode",
+    "WASABEE_MODE_BATTLE": "Battle",
+    "WASABEE_MODE_DESIGN": "Design",
+    "WASABEE_MODE_DESC": "In design mode, changes must be manually pushed to the server; assignments made will not notify the agents; assignments pushed from IITC will override their current status on the server. In battle mode, changes will be automatically pushed to the server; assignments will be sent to the agents via Telegram (if available); the server's status for assignments has priority over the IITC data."
   },
   "es": {
     "last edited": "03-03-2020 @crystalwizard",
