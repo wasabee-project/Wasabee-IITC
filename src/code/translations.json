@@ -725,7 +725,7 @@
     "TEAM_NAME": "Team Name",
     "STATE": "Status",
     "LEAVE": "Verlassen",
-    "MANAGE": "Verwalten ${value}",
+    "MANAGE": "Verwalten",
     "SEND_LOC": "Sende Standort",
     "LOC_PROC": "Standort verarbeitet",
     "CUR_USER_INFO": "Aktuelle Nutzer Informationen",
