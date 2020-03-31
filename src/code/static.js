@@ -349,7 +349,7 @@ W.static.layerTypes = new Map([
         weight: 2
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupa.png")
+        iconUrl: require("./images/marker_layer_groupSE.png")
       }
     }
   ],

@@ -240,7 +240,7 @@
     "OPER_COLOR": "Foraging Plan Color: ",
     "CLEAR_EVERYTHING": "Clear Trees/Branches/Acorns",
     "DELETE": "Delete ${value}",
-    "LOCFRMSER": "<br />(locally and from server)",
+    "LOCFRMSER": " (locally and from server)",
     "REM_LOC_CP": "Remove local copy of ${value}",
     "OP_PERMS": "Foraging Plan Permissions",
     "DUPE_OP": "Duplicate Foraging Plan",

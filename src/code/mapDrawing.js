@@ -112,6 +112,12 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
+  let lang = localStorage["wasabee-default-language"] || "English";
+  const restore = operation.color;
+  if (lang == "en_sq") {
+    operation.color = "SE";
+  }
+
   // pre-fetch the op color outside the loop -- is this actually helpful?
   let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
@@ -122,6 +128,7 @@ const resetLinks = operation => {
   for (const l of operation.links) {
     addLink(l, style.link, operation);
   }
+  operation.color = restore;
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
@@ -305,6 +312,12 @@ const updateAnchors = op => {
     return;
   }
 
+  let lang = localStorage["wasabee-default-language"] || "English";
+  const restore = op.color;
+  if (lang == "en_sq") {
+    op.color = "SE";
+  }
+
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
     if (l.options.color != op.color) {
@@ -327,6 +340,7 @@ const updateAnchors = op => {
   for (const [k, v] of layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
+  op.color = restore;
 };
 
 /** This function adds a portal to the portal layer group */
