@@ -77,14 +77,6 @@ const AuthDialog = WDialog.extend({
       title.textContent = wX("AUTH ANDROID");
     }
 
-    const sendLocTitle = L.DomUtil.create("label", "sendloc", content);
-    sendLocTitle.textContent = wX("SEND LOCATION");
-    this._sendLocCheck = L.DomUtil.create("input", "sendloc", content);
-    this._sendLocCheck.type = "checkbox";
-    const sl =
-      localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
-    if (sl === "true") this._sendLocCheck.checked = true;
-
     if (this._android) {
       const gsapiButtonOLD = L.DomUtil.create("button", "andriod", content);
       gsapiButtonOLD.textContent = wX("LOG IN QUICK");
@@ -162,16 +154,12 @@ const AuthDialog = WDialog.extend({
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-auth",
       closeCallback: () => {
-        if (this._sendLocCheck && this._sendLocCheck.checked) {
+        if (
           localStorage[
             window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
-          ] = true;
+          ] === "true"
+        )
           sendLocation();
-        } else {
-          localStorage[
-            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
-          ] = false;
-        }
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },

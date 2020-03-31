@@ -49,6 +49,7 @@ const SettingsDialog = WDialog.extend({
   update: function() {
     const container = this._getContent();
     this._dialog.html(container);
+    // TODO also update the title
   },
 
   _getContent: function() {
@@ -76,6 +77,18 @@ const SettingsDialog = WDialog.extend({
       addButtons(getSelectedOperation());
       window.runHooks("wasabeeUIUpdate", getSelectedOperation());
     });
+
+    const sendLocTitle = L.DomUtil.create("label", null, container);
+    sendLocTitle.textContent = wX("SEND LOCATION");
+    const sendLocCheck = L.DomUtil.create("input", null, container);
+    sendLocCheck.type = "checkbox";
+    const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
+    const sl = localStorage[c];
+    if (sl === "true") sendLocCheck.checked = true;
+    L.DomEvent.on(sendLocCheck, "change", () => {
+      localStorage[c] = sendLocCheck.checked;
+    });
+
     return container;
   },
 

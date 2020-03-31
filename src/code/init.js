@@ -83,8 +83,11 @@ window.plugin.wasabee.init = function() {
   initWasabeeD();
 
   const sl = localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
-  if (sl !== true)
+  if (sl !== "true") {
+    console.log(sl);
+    console.log("resetting sendlocation to false");
     localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = false;
+  }
 
   // once everything else is done, do the initial draw
   addButtons(Wasabee._selectedOp);
