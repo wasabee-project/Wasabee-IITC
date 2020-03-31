@@ -89,6 +89,25 @@ const SettingsDialog = WDialog.extend({
       localStorage[c] = sendLocCheck.checked;
     });
 
+    const modeTitle = L.DomUtil.create("label", null, container);
+    modeTitle.textContent = wX("WASABEE_MODE_LABEL");
+    const modeSelect = L.DomUtil.create("select", null, container);
+    const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
+    const mode = localStorage[modeKey];
+    const designMode = L.DomUtil.create("option", null, modeSelect);
+    designMode.value = "design";
+    designMode.textContent = wX("WASABEE_MODE_DESIGN");
+    if (mode == "design") designMode.selected = true;
+    const battleMode = L.DomUtil.create("option", null, modeSelect);
+    battleMode.value = "battle";
+    battleMode.textContent = wX("WASABEE_MODE_BATTLE");
+    if (mode == "battle") battleMode.selected = true;
+    L.DomEvent.on(modeSelect, "change", () => {
+      localStorage[modeKey] = modeSelect.value;
+    });
+    /* const modeDesc = L.DomUtil.create("div", "desc", container);
+    modeDesc.textContent = wX("WASABEE_MODE_DESC"); */
+
     return container;
   },
 
