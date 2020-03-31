@@ -135,7 +135,7 @@ const LinkDialog = WDialog.extend({
     opt.textContent = "\u21b3";
     // Go button
     const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("ADD_LINKS");
+    button.textContent = wX("ADD_BUTTON_LINKS");
     L.DomEvent.on(button, "click", () => {
       if (!this._source) alert(wX("SEL_SRC_PORT"));
       if (this._anchor1) {

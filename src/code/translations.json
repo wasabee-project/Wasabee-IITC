@@ -220,6 +220,7 @@
     "SET_3_PORT": "Please set the three portals first!",
     "DESCRIP_PLACEHOLD": "Description (optional)",
     "ADD_LINKS": "Add Links",
+    "ADD_BUTTON_LINKS": "Add all links at once.",
     "PICK_TARGETDEST_Portals": "Please select target and destination portals first!",
     "TARDEST_DIFF": "Target and destination portals must be different.",
     "PICK_TAR_FIRST": "Please select a target portal first!",
