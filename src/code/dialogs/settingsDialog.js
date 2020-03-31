@@ -65,6 +65,12 @@ const SettingsDialog = WDialog.extend({
       option.textContent = l;
       if (l == current) option.selected = true;
     }
+    for (const l in window.plugin.wasabee.static.stringsSilly) {
+      const option = L.DomUtil.create("option", null, langMenu);
+      option.value = l;
+      option.textContent = l;
+      if (l == current) option.selected = true;
+    }
     L.DomEvent.on(langMenu, "change", () => {
       localStorage["wasabee-default-language"] = langMenu.value;
       addButtons(getSelectedOperation());
