@@ -43,11 +43,14 @@ W.static = {
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
     SEND_LOCATION_KEY: "wasabee-send-location",
+    LANGUAGE_KEY: "wasabee-default-language",
+    MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",
     SERVER_BASE_DEFAULT: "https://server.wasabee.rocks",
+    MARKER_TYPE_CAPTURE: "CapturePortalMarker",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
     MARKER_TYPE_DESTROY: "DestroyPortalAlert",
     MARKER_TYPE_FARM: "FarmPortalMarker",
@@ -70,6 +73,18 @@ W.static.stringsSilly = require("./silly.json");
 W.static.tips = require("./tips.json");
 
 W.static.markerTypes = new Map([
+  [
+    W.static.constants.MARKER_TYPE_CAPTURE,
+    {
+      name: W.static.constants.MARKER_TYPE_DECAY,
+      label: "Capture",
+      color: "#7D7D7D",
+      markerIcon: require("./images/wasabee_markers_other_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_other_done.png")
+    }
+  ],
   [
     W.static.constants.MARKER_TYPE_DECAY,
     {
