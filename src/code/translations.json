@@ -1,6 +1,7 @@
 {
-  "en": {
+  "English": {
     "last edited": "03-29-2020 @D0BERMAXX",
+    "LANG": "Language",
     "DISABLE_SYNC": "The stock Sync plugin is not compatible with Wassabe. Please disable Sync.",
     "SEND TARGET": "Send Target",
     "SELECT PORTAL": "Select a portal to send",
@@ -282,6 +283,7 @@
   },
   "en_sq": {
     "Squirrel dialog": "So much silliness. @crystalwizard 3/24/2020",
+    "LANG": "Favorite Nuts",
     "ANCHOR_PORTAL": "Anchor Tree ",
     "SOURCE_PORT": "Source Tree ",
     "START_PORT": "Start Tree ",
@@ -545,6 +547,7 @@
   },
   "es": {
     "last edited": "03-03-2020 @crystalwizard",
+    "LANG": "Idioma",
     "DISABLE_SYNC": "Wasabee no puede funcionar si la sync enchufar estÃ¡ instalada. Deshabilita la sync enchufar para usar Wasabee.",
     "SEND TARGET": "Enviar objetivo",
     "SELECT PORTAL": "Elija el portal de destino para enviar",
@@ -561,6 +564,7 @@
   },
   "it": {
     "last edited": "04-03-2020 @Bolina66",
+    "LANG": "Linguaggio",
     "DISABLE_SYNC": "Wasabee non puÃ² funzionare se Ã¨ installato il plugin di sincronizzazione. Disabilita il plugin di sincronizzazione per utilizzare Wasabee.",
     "SEND TARGET": "Invia obiettivo",
     "SELECT PORTAL": "Seleziona un portale da inviare",
@@ -577,6 +581,7 @@
   },
   "fil": {
     "last edited": "03-31-2020 @D0BERMAXX",
+    "LANG": "Wika",
     "DISABLE_SYNC": "Ang Wasabee at stock sync plugin ay hindi compatible. Paki disable sync para gamitin ang Wasabee",
     "SEND TARGET": "Ipadala ang Target",
     "SELECT PORTAL": "Piliin ang portal na ipapadala",
@@ -849,6 +854,7 @@
   },
   "de": {
     "last edited": "03-26-2020 @AxForest ",
+    "LANG": "Sprache",
     "DISABLE_SYNC": "Das Standard Synchronisations Plugin ist nicht mit Wasabee kompatibel - Bitte deaktiveren",
     "SEND TARGET": "Sende Ziel",
     "SELECT PORTAL": "Portal zum senden auswählen",

@@ -13,6 +13,7 @@ export default function(selectedOp) {
 
   if (window.plugin.wasabee.buttons) {
     console.log("replacing buttons");
+    window.map.removeControl(window.plugin.wasabee.buttons);
     delete window.plugin.wasabee.buttons;
   }
 

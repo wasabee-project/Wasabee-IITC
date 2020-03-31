@@ -87,7 +87,7 @@ export default class WasabeeMarker {
       content
     );
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
-    deleteButton.textContent = wX("DELETE");
+    deleteButton.textContent = wX("DELETE_ANCHOR");
     L.DomEvent.on(deleteButton, "click", () => {
       deleteMarker(operation, this, portal);
       marker.closePopup();

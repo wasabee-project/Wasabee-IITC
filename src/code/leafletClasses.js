@@ -179,6 +179,7 @@ export const WButton = L.Class.extend({
       this._createButton({
         title: b.title,
         text: b.text,
+        buttonImage: b.img,
         container: li,
         callback: b.callback,
         context: b.context,

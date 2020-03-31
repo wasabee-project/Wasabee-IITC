@@ -189,6 +189,11 @@
 .wasabee-dialog-setcomment div.container { display: grid; }
 .wasabee-dialog-setcomment div.desc { padding: 4px; }
 .wasabee-dialog-setcomment input { padding: 4px; width: 96%; }
+.wasabee-dialog-settings { }
+.wasabee-dialog-settings div.container { display: grid; grid-template-columns: 1fr 1fr; }
+.wasabee-dialog-settings label { grid-column-start: 1; grid-column-end: 2; }
+.wasabee-dialog-settings select { grid-column-start: 2; grid-column-end: 3; }
+
 .wasabee-dialog-starburst { }
 .wasabee-dialog-starburst div.container { display: grid; grid-template-columns: 1fr 1fr 2fr; }
 .wasabee-dialog-starburst div.desc { padding: 4px; grid-column-start: 1; grid-column-end: 4; }
