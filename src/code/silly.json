@@ -94,7 +94,7 @@
     "UPDATE HOVER NOT CHANGED": "${value} not changed locally",
     "UPDATE HOVER": "UPDATE ${value} on the server",
     "WASABEE BUTTON TITLE": "Wasabee: it is green and full of squirrels.",
-    "LOG IN": "Log In",
+    "LOG IN": "Enter the Forest",
     "TEAMS BUTTON TITLE": "List Squirrel Scurrys",
     "TEAMS BUTTON": "Scurrys",
     "NEWOP BUTTON TITLE": "Create a new Operation",
@@ -264,4 +264,3 @@
     "STARBURST TITLE": "Squirrel Explosion "
   }
 }
-
