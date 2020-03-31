@@ -25,7 +25,7 @@ const QuickdrawButton = WButton.extend({
       context: this.handler
     });
 
-    this.actionsContainer = this._createActions([
+    this.actionsContainer = this._createSubActions([
       {
         title: wX("QD BUTTON END"),
         text: wX("QD END"),
@@ -33,8 +33,8 @@ const QuickdrawButton = WButton.extend({
         context: this.handler
       }
     ]);
+    // this should be automaticly detected
     this.actionsContainer.style.top = "52px";
-    L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer);
 
     this.handler.on(

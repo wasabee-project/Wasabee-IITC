@@ -3,10 +3,7 @@ const W = window.plugin.wasabee || {};
 
 W.static = {
   CSS: {
-    example: require("./css/styles.css"),
-    ui: require("./css/ui.css"),
-    main: require("./css/main.css"),
-    leafletdraw: require("./css/leaflet.draw.css")
+    main: require("./css/wasabee.css")
   },
   images: {
     toolbar_addlinks: require("./images/toolbar_addlinks.png"),
@@ -43,15 +40,13 @@ W.static = {
     wasabeeDKeyButton: "wasabee-DKey"
   },
   constants: {
-    SELECTED_OP_KEY: "SELECTED_OP_KEY",
-    SEND_LOCATION_KEY: "SEND_LOCATION",
-    AGENT_INFO_KEY: "AGENT_INFO_KEY",
+    SELECTED_OP_KEY: "wasabee-selected-op",
+    SEND_LOCATION_KEY: "wasabee-send-location",
+    AGENT_INFO_KEY: "wasabee-me",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
-    SERVER_BASE_KEY: "Wasabee Server",
+    SERVER_BASE_KEY: "wasabee-server",
     SERVER_BASE_DEFAULT: "https://server.wasabee.rocks",
-    SERVER_BASE_TEST: "https://server.wasabee.rocks:8444",
-    CURRENT_EXPIRE_NUMERIC: 1209600000,
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
     MARKER_TYPE_DESTROY: "DestroyPortalAlert",
     MARKER_TYPE_FARM: "FarmPortalMarker",
@@ -65,8 +60,6 @@ W.static = {
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
     MARKER_TYPE_EXCLUDE: "ExcludeMarker",
     DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
-    BREAK_EXCEPTION: {},
-    OP_RESTRUCTURE_KEY: "OP_RESTRUCTURE_KEY22",
     SCRIPT_URL_NOTY: "http://wasabee.rocks/wasabee_extras/noty.js"
   }
 };
@@ -222,7 +215,7 @@ W.static.markerTypes = new Map([
   ]
 ]);
 
-// link is not used
+// https://leafletjs.com/reference-1.0.3.html#path
 W.static.layerTypes = new Map([
   [
     "main",
@@ -232,7 +225,7 @@ W.static.layerTypes = new Map([
       color: "#ff0000",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
@@ -249,7 +242,7 @@ W.static.layerTypes = new Map([
       color: "#ff6600",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
@@ -266,7 +259,7 @@ W.static.layerTypes = new Map([
       color: "#ff9900",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 1, 4, 1],
         opacity: 1,
         weight: 2
       },
@@ -283,7 +276,7 @@ W.static.layerTypes = new Map([
       color: "#bb9900",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
@@ -300,7 +293,7 @@ W.static.layerTypes = new Map([
       color: "#bb22cc",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
@@ -317,7 +310,7 @@ W.static.layerTypes = new Map([
       color: "#33cccc",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
@@ -334,12 +327,46 @@ W.static.layerTypes = new Map([
       color: "#ff55ff",
       link: {
         dashArray: [5, 5, 1, 5],
-        sharedKeysDashArray: [5, 5],
+        assignedDashArray: [4, 2, 1],
         opacity: 1,
         weight: 2
       },
       portal: {
         iconUrl: require("./images/marker_layer_groupf.png")
+      }
+    }
+  ],
+  [
+    "SE",
+    {
+      name: "SE",
+      displayName: "Special Edition",
+      color: "#333333",
+      link: {
+        dashArray: [5, 1, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupa.png")
+      }
+    }
+  ],
+  [
+    "self-block",
+    {
+      name: "self-block",
+      displayName: "Self Block",
+      color: "#ff1111",
+      link: {
+        dashArray: [1, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 4,
+        weight: 3
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupa.png")
       }
     }
   ]

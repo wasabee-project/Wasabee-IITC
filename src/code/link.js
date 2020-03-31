@@ -98,7 +98,7 @@ export default class WasabeeLink {
       operation.getPortal(this.fromPortalId).displayFormat(operation)
     );
     const arrow = L.DomUtil.create("span", null, d);
-    arrow.innerHTML = " ➾ ";
+    arrow.textContent = " ➾ ";
     arrow.style.color = this.getColorHex();
     d.appendChild(
       operation.getPortal(this.toPortalId).displayFormat(operation)

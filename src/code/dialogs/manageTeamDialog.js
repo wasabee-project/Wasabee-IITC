@@ -101,7 +101,7 @@ const ManageTeamDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           const button = L.DomUtil.create("a", null, cell);
-          button.textContent = "remove";
+          button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", () => {
             removeAgentFromTeamPromise(value, this._team.ID).then(
               () => {
@@ -137,7 +137,11 @@ const ManageTeamDialog = WDialog.extend({
     this._dialogContent(container); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this._dialog.html(container);
-    this._dialog.dialog("option", "title", "MANAGE: " + this._team.Name);
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("MANAGE_TEAM", this._team.Name)
+    );
   },
 
   _dialogContent: function(container) {
@@ -188,17 +192,17 @@ const ManageTeamDialog = WDialog.extend({
 
     const rocks = L.DomUtil.create("div", null, container);
     const rockslabel = L.DomUtil.create("label", null, rocks);
-    rockslabel.textContent = "enl.rocks community: ";
+    rockslabel.textContent = wX("ROCKS_COM");
     const rockscommField = L.DomUtil.create("input", null, rockslabel);
     rockscommField.placeholder = "xxyyzz.com";
     if (this._team.RocksComm) rockscommField.value = this._team.RocksComm;
     const rocksapilabel = L.DomUtil.create("label", null, rocks);
-    rocksapilabel.textContent = " api key: ";
+    rocksapilabel.textContent = wX("API_KEY");
     const rocksapiField = L.DomUtil.create("input", null, rocksapilabel);
     rocksapiField.placeholder = "...";
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
     const rocksButton = L.DomUtil.create("button", null, rocks);
-    rocksButton.textContent = "Set";
+    rocksButton.textContent = wX("SET");
     L.DomEvent.on(rocksButton, "click", () => {
       rocksPromise(
         this._team.ID,
@@ -220,14 +224,14 @@ const ManageTeamDialog = WDialog.extend({
 
     const remove = L.DomUtil.create("div", null, container);
     const removeLabel = L.DomUtil.create("label", null, remove);
-    removeLabel.textContent = "Remove Team: ";
+    removeLabel.textContent = wX("REMOVE_TEAM");
     const removeButton = L.DomUtil.create("button", null, removeLabel);
-    removeButton.textContent = "Remove";
+    removeButton.textContent = wX("REMOVE");
     L.DomEvent.on(removeButton, "click", () => {
       const cd = new ConfirmDialog();
       cd.setup(
-        `Remove Team ${this._team.Name}`,
-        `Do you want to permenantly remove ${this._team.Name} from the Wasabee Server?`,
+        wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
+        wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
         () => {
           deleteTeamPromise(this._team.ID).then(
             () => {
@@ -250,11 +254,11 @@ const ManageTeamDialog = WDialog.extend({
     this._dialogContent(container);
 
     this._dialog = window.dialog({
-      title: wX("MANAGE_TEAM") + this._team.Name,
+      title: wX("MANAGE_TEAM", this._team.Name),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-manageteam",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

@@ -4,6 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
+import wX from "./wX";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
@@ -242,7 +243,7 @@ export default class WasabeeOp {
       }
     }
 
-    // ensue unique
+    // ensure unique
     /* this should be faster, test when I get a moment
      finalPortals = newPortals.filter((value, index, self) => {
        return self.indexOf(value) === index;
@@ -426,7 +427,7 @@ export default class WasabeeOp {
         this.update(true);
         this.runCrosslinks();
       } else {
-        alert("This portal already has a marker. Chose a different portal.");
+        alert(wX("ALREADY_HAS_MARKER"));
       }
     }
   }
@@ -456,6 +457,14 @@ export default class WasabeeOp {
     this.links = Array();
     this.markers = Array();
     this.blockers = Array();
+    this.update(true);
+  }
+
+  clearAllLinks() {
+    this.links = Array();
+    this.blockers = Array();
+    this.cleanAnchorList();
+    this.cleanPortalList();
     this.update(true);
   }
 

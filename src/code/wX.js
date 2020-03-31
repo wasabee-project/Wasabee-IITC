@@ -1,16 +1,14 @@
 const wT = window.plugin.wasabee.static.strings;
 
 const wX = (key, value, option) => {
-  const ll = window.navigator.userLanguage || window.navigator.language || "en";
-  let l = ll.substring(0, 2);
+  let defaultLang = localStorage["wasabee-default-language"] || "English";
 
-  // if chosen langauge does not exist, use english
-  if (!wT[l]) l = "en";
+  if (!wT[defaultLang]) {
+    delete localStorage["wasabee-default-language"];
+    defaultLang = "English";
+  }
 
-  // if this key does not exist in the chosen langauge, use english
-  let s = wT[l][key] || wT["en"][key];
-
-  // if it doesn't exist in English
+  let s = wT[defaultLang][key] || wT["English"][key];
   if (!s) return "haec notificatio praebibo est";
 
   // do any necessary replacements

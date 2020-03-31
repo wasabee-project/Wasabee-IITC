@@ -50,7 +50,7 @@ const OpsDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._content,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog wasabee-dialog-ops",
       closeCallback: function() {
         context.disable();
         delete context._content;
@@ -68,11 +68,9 @@ const OpsDialog = WDialog.extend({
   },
 
   makeContent: function(selectedOp) {
-    const content = L.DomUtil.create("div", "temp-op-wasabee");
-    const container = L.DomUtil.create("div", "spinner", content);
-    container.style.textalign = "center";
-    const operationSelect = L.DomUtil.create("select", null, container);
-    operationSelect.style.width = "90%";
+    const content = L.DomUtil.create("div");
+    const topSet = L.DomUtil.create("div", "topset", content);
+    const operationSelect = L.DomUtil.create("select", null, topSet);
 
     const ol = opsList();
     for (const opID of ol) {
@@ -95,10 +93,11 @@ const OpsDialog = WDialog.extend({
 
     const writable = selectedOp.IsWritableOp();
 
-    const nameSection = L.DomUtil.create("p", null, content);
-    nameSection.innerHTML = "Operation Name: ";
+    const nameLabel = L.DomUtil.create("label", null, topSet);
+    nameLabel.textContent = wX("OPER_NAME");
+    const nameDisplay = L.DomUtil.create("div", null, topSet);
     if (writable) {
-      const input = L.DomUtil.create("input", null, nameSection);
+      const input = L.DomUtil.create("input", null, nameDisplay);
       input.value = selectedOp.name;
       L.DomEvent.on(input, "change", () => {
         if (!input.value || input.value == "") {
@@ -110,22 +109,24 @@ const OpsDialog = WDialog.extend({
         }
       });
     } else {
-      nameSection.innerHTML += selectedOp.name;
+      nameDisplay.textContent = selectedOp.name;
     }
 
     if (writable) {
-      const colorSection = L.DomUtil.create("p", null, content);
-      colorSection.innerHTML = "Operation Color: ";
+      const colorLabel = L.DomUtil.create("label", null, topSet);
+      colorLabel.textContent = wX("OPER_COLOR");
       const operationColor = selectedOp.color
         ? selectedOp.color
         : window.plugin.wasabee.static.constants.DEFAULT_OPERATION_COLOR;
-      const opColor = L.DomUtil.create("select", null, colorSection);
+      const colorDisplay = L.DomUtil.create("div", null, topSet);
+      const opColor = L.DomUtil.create("select", null, colorDisplay);
       for (const cd of window.plugin.wasabee.static.layerTypes) {
+        if (cd[0] == "SE" || cd[0] == "self-block") continue;
         const c = cd[1];
         const option = L.DomUtil.create("option", null, opColor);
         if (c.name == operationColor) option.selected = true;
         option.value = c.name;
-        option.innerHTML = c.displayName;
+        option.textContent = c.displayName;
       }
       L.DomEvent.on(opColor, "change", () => {
         selectedOp.color = opColor.value;
@@ -134,11 +135,8 @@ const OpsDialog = WDialog.extend({
       });
     }
 
-    const commentSection = L.DomUtil.create("p", null, content);
     if (writable) {
-      const commentInput = L.DomUtil.create("textarea", null, commentSection);
-      commentInput.rows = "3";
-      commentInput.width = "90%";
+      const commentInput = L.DomUtil.create("textarea", null, topSet);
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
       L.DomEvent.on(commentInput, "change", () => {
@@ -146,14 +144,16 @@ const OpsDialog = WDialog.extend({
         selectedOp.store();
       });
     } else {
-      const commentDisplay = L.DomUtil.create("p", null, commentSection);
-      commentDisplay.innerText = selectedOp.comment;
+      const commentDisplay = L.DomUtil.create("p", "comment", topSet);
+      commentDisplay.textContent = selectedOp.comment;
     }
 
-    const buttonSection = L.DomUtil.create("div", "temp-op-dialog", content);
+    const buttonSection = L.DomUtil.create("div", "buttonset", content);
     if (writable) {
-      const clearOpButton = L.DomUtil.create("a", null, buttonSection);
-      clearOpButton.innerHTML = "Clear Portals/Links/Markers";
+      const clearOpDiv = L.DomUtil.create("div", null, buttonSection);
+      const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
+      // adding a comment so that github will let me create a pull request to fix the issue with CLEAR_EVERYTHING showing up on the button instead of the correct text. Scott, pleae double check the line below this - I left off the wX code in the previous version.
+      clearOpButton.textContent = wX("CLEAR_EVERYTHING");
       L.DomEvent.on(clearOpButton, "click", () => {
         clearAllItems(selectedOp);
         selectedOp.store();
@@ -161,20 +161,21 @@ const OpsDialog = WDialog.extend({
     }
 
     if (opsList().length > 1) {
-      const deleteButton = L.DomUtil.create("a", null, buttonSection);
+      const deleteDiv = L.DomUtil.create("div", null, buttonSection);
+      const deleteButton = L.DomUtil.create("button", null, deleteDiv);
       if (selectedOp.IsOwnedOp()) {
-        deleteButton.innerHTML = "Delete " + selectedOp.name;
+        deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
         if (selectedOp.IsServerOp())
-          deleteButton.innerHTML += "<br />(locally and from server)";
+          deleteButton.textContent += wX("LOCFRMSER");
       } else {
-        deleteButton.innerHTML = "Remove local copy of " + selectedOp.name;
+        deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
       }
       L.DomEvent.on(deleteButton, "click", () => {
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
-          wX("CON_DEL") + selectedOp.name,
-          wX("YESNO_DEL") + selectedOp.name + "?",
+          wX("CON_DEL", selectedOp.name),
+          wX("YESNO_DEL", selectedOp.name),
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(
@@ -219,17 +220,19 @@ const OpsDialog = WDialog.extend({
     }
 
     if (selectedOp.IsServerOp()) {
-      const permsButton = L.DomUtil.create("a", null, buttonSection);
-      permsButton.innerHTML = "Op Permissions";
+      const permsDiv = L.DomUtil.create("div", null, buttonSection);
+      const permsButton = L.DomUtil.create("button", null, permsDiv);
+      permsButton.textContent = wX("OP_PERMS");
       L.DomEvent.on(permsButton, "click", () => {
         const opl = new OpPermList();
         opl.enable();
       });
     }
 
-    const permsButton = L.DomUtil.create("a", null, buttonSection);
-    permsButton.innerHTML = "Duplicate Operation";
-    L.DomEvent.on(permsButton, "click", () => {
+    const dupeDiv = L.DomUtil.create("div", null, buttonSection);
+    const dupeButton = L.DomUtil.create("button", null, dupeDiv);
+    dupeButton.textContent = wX("DUPE_OP");
+    L.DomEvent.on(dupeButton, "click", () => {
       duplicateOperation(selectedOp.ID);
       window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
     });

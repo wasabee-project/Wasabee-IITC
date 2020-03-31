@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import multimax from "../multimax";
-import store from "../../lib/store";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -38,7 +37,7 @@ const MultimaxDialog = WDialog.extend({
       // Set button
       const nodethree = tr.insertCell();
       const button = L.DomUtil.create("button", null, nodethree);
-      button.textContent = "set";
+      button.textContent = wX("SET");
       button.addEventListener("click", arg => this.setPortal(arg), false);
       // Portal link
       const nodetwo = tr.insertCell();
@@ -85,7 +84,7 @@ const MultimaxDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog",
       closeCallback: function() {
         context.disable();
         delete context._dialog;
@@ -98,28 +97,23 @@ const MultimaxDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = "Multimax";
-    this.label = "Multimax";
+    this.title = wX("MULTIMAX2");
+    this.label = wX("MULTIMAX2");
     this._portals = {};
     this._links = [];
     this._operation = getSelectedOperation();
   },
-
-  //***Function to clear local selections of portals for the dialog
-  /* clearLocalPortalSelections: function() {
-    store.remove("wasabee-multimax-A");
-    store.remove("wasabee-multimax-B");
-  }, */
 
   //***Function to set portal -- called from 'Set' Button
   setPortal: function(event) {
     const AB = event.currentTarget.parentNode.parentNode.getAttribute("AB");
     const selectedPortal = WasabeePortal.getSelected();
     if (selectedPortal) {
-      store.set("wasabee-multimax-" + AB, JSON.stringify(selectedPortal));
+      localStorage[
+        "wasabee-anchor-" + (AB == "A" ? "1" : "2")
+      ] = JSON.stringify(selectedPortal);
     } else {
       alert(wX("NO_PORT_SEL"));
-      store.remove("wasabee-multimax-" + AB);
     }
     this.updatePortal(AB);
   },
@@ -127,7 +121,9 @@ const MultimaxDialog = WDialog.extend({
   //***Function to get portal -- called in doMultimax
   getPortal: function(AB) {
     try {
-      const p = JSON.parse(store.get("wasabee-multimax-" + AB));
+      const p = JSON.parse(
+        localStorage["wasabee-anchor-" + (AB == "A" ? "1" : "2")]
+      );
       return WasabeePortal.create(p);
     } catch (err) {
       console.log(err);

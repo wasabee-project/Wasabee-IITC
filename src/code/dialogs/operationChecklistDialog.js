@@ -52,12 +52,9 @@ const OperationChecklistDialog = WDialog.extend({
       title: wX("OP_CHECKLIST", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;
@@ -69,7 +66,11 @@ const OperationChecklistDialog = WDialog.extend({
 
   checklistUpdate: function(newOpData) {
     this._operation = newOpData;
-    this._dialog.dialog("option", "title", wX("OP_CHECKLIST", newOpData.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("OP_CHECKLIST", newOpData.name)
+    );
     this.sortable = this.getListDialogContent(
       newOpData,
       this.sortable.sortBy,
@@ -132,7 +133,7 @@ const OperationChecklistDialog = WDialog.extend({
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value) => {
-          row.innerHTML = value;
+          row.textContent = value;
         }
       },
       {
@@ -141,7 +142,7 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, thing) => {
           const comment = L.DomUtil.create("a", "", row);
-          comment.innerHTML = value;
+          comment.textContent = value;
           L.DomEvent.on(row, "click", () => {
             const scd = new SetCommentDialog(window.map);
             scd.setup(thing, operation);
@@ -165,7 +166,7 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, agent) => {
           const assigned = L.DomUtil.create("a", "", row);
-          assigned.innerHTML = value;
+          assigned.textContent = value;
           // assigned.appendChild(agent.displayFormat());
           if (WasabeeMe.isLoggedIn()) {
             // XXX should be writable op

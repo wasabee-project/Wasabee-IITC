@@ -1,11 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
+import { getSelectedOperation } from "../selectedOp";
+import addButtons from "../addButtons";
 
 // This file documents the minimum requirements of a dialog in wasabee
-const AboutDialog = WDialog.extend({
+const SettingsDialog = WDialog.extend({
   // not strictly necessary, but good style
   statics: {
-    TYPE: "about"
+    TYPE: "settings"
   },
 
   // every leaflet class ought to have an initialize,
@@ -13,7 +15,7 @@ const AboutDialog = WDialog.extend({
   // options can extended by callers
   initialize: function(map = window.map, options) {
     // always define type, it is used by the parent classes
-    this.type = AboutDialog.TYPE;
+    this.type = SettingsDialog.TYPE;
     // call the parent classes initialize as well
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -22,6 +24,13 @@ const AboutDialog = WDialog.extend({
   addHooks: function() {
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
+    const context = this;
+    this._operation = getSelectedOperation();
+    // magic context incantation to make "this" work...
+    this._UIUpdateHook = newOpData => {
+      context.update(newOpData);
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     // put any per-open setup here
     // this is the call to actually do our work
     if (this._smallScreen) {
@@ -33,35 +42,51 @@ const AboutDialog = WDialog.extend({
 
   removeHooks: function() {
     // put any post close teardown here
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     WDialog.prototype.removeHooks.call(this);
+  },
+
+  update: function() {
+    const container = this._getContent();
+    this._dialog.html(container);
+  },
+
+  _getContent: function() {
+    // use leaflet's DOM object creation, not bare DOM or Jquery
+    const container = L.DomUtil.create("div", "container");
+    const langLabel = L.DomUtil.create("label", null, container);
+    langLabel.textContent = wX("LANG");
+    const langMenu = L.DomUtil.create("select", null, container);
+
+    const current = localStorage["wasabee-default-language"];
+    for (const l in window.plugin.wasabee.static.strings) {
+      const option = L.DomUtil.create("option", null, langMenu);
+      option.value = l;
+      option.textContent = l;
+      if (l == current) option.selected = true;
+    }
+    L.DomEvent.on(langMenu, "change", () => {
+      localStorage["wasabee-default-language"] = langMenu.value;
+      addButtons(getSelectedOperation());
+      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    });
+    return container;
   },
 
   // define our work in _displayDialog
   _displayDialog: function() {
-    // use leaflet's DOM object creation, not bare DOM or Jquery
-    const html = L.DomUtil.create("div", null);
-    const support = L.DomUtil.create("div", null, html);
-    // wX is the translation call, looks for strings in translations.json based
-    // on the browser's langauge setting
-    support.textContent = wX("SUPPORT_INSTRUCT");
-
-    const about = L.DomUtil.create("div", null, html);
-    about.innerHTML =
-      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.15: @deviousness</li></ul>";
-
-    const videos = L.DomUtil.create("div", null, html);
-    videos.innerHTML = wX("HOW_TO_VIDS");
+    const container = this._getContent();
 
     // create a JQueryUI dialog, store it in _dialog
     // set closeCallback to report that we are done and free up the memory
     // set id if you want only one instance of this dialog to be displayed at a time
     // enable/disable are inherited from L.Handler via WDialog
     this._dialog = window.dialog({
-      title: wX("ABOUT_WASABEE"),
+      title: "Settings",
       width: "auto",
       height: "auto",
-      html: html,
-      dialogClass: "wasabee-dialog wasabee-dialog-about",
+      html: container,
+      dialogClass: "wasabee-dialog wasabee-dialog-settings",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -78,4 +103,4 @@ const AboutDialog = WDialog.extend({
 });
 
 // this line allows other files to import our dialog
-export default AboutDialog;
+export default SettingsDialog;

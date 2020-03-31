@@ -27,9 +27,9 @@ export const swapPortal = (operation, portal) => {
 
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
-  pr.innerHTML = wX("SWAP PROMPT");
+  pr.textContent = wX("SWAP PROMPT");
   pr.appendChild(portal.displayFormat(operation));
-  L.DomUtil.create("span", null, pr).innerHTML = wX("SWAP WITH");
+  L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat(operation));
   con.setup(wX("SWAP TITLE"), pr, () => {
     operation.swapPortal(portal, selectedPortal);
@@ -40,7 +40,7 @@ export const swapPortal = (operation, portal) => {
 export const deletePortal = (operation, portal) => {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
-  pr.innerHTML = wX("DELETE ANCHOR PROMPT");
+  pr.textContent = wX("DELETE ANCHOR PROMPT");
   pr.appendChild(portal.displayFormat(operation));
   con.setup(wX("DELETE ANCHOR TITLE"), pr, () => {
     operation.removeAnchor(portal.id);
@@ -51,7 +51,7 @@ export const deletePortal = (operation, portal) => {
 export const deleteMarker = (operation, marker, portal) => {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
-  pr.innerHTML = wX("DELETE MARKER PROMPT");
+  pr.textContent = wX("DELETE MARKER PROMPT");
   pr.appendChild(portal.displayFormat(operation));
   con.setup(wX("DELETE MARKER TITLE"), pr, () => {
     operation.removeMarker(marker);
@@ -66,6 +66,20 @@ export const clearAllItems = operation => {
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
+      window.runHooks("wasabeeCrosslinks", operation);
+    }
+  );
+  con.enable();
+};
+
+export const clearAllLinks = operation => {
+  const con = new ConfirmDialog();
+  con.setup(
+    `Clear Links: ${operation.name}`,
+    `Do you want to remove all links from ${operation.name}?`,
+    () => {
+      operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", operation);
     }
   );
   con.enable();
@@ -113,7 +127,9 @@ export const listenForAddedPortals = newPortal => {
 
 export const sendLocation = () => {
   if (!WasabeeMe.isLoggedIn()) return;
-  if (!window.plugin.wasabee.sendLocation) return;
+  const sl =
+    localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
+  if (sl !== true) return;
 
   navigator.geolocation.getCurrentPosition(
     position => {

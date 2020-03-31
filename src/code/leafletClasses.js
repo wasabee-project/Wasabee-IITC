@@ -1,18 +1,15 @@
 export const WTooltip = L.Class.extend({
   initialize: function(map) {
     this._map = map;
-    this._popupPane = map._panes.popupPane;
+    // this._pane = map._panes.popupPane;
+    this._pane = map._panes.tooltipPane;
 
-    this._container = L.DomUtil.create(
-      "div",
-      "wasabee-tooltip",
-      this._popupPane
-    );
+    this._container = L.DomUtil.create("div", "wasabee-tooltip", this._pane);
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
   },
 
   dispose: function() {
-    this._popupPane.removeChild(this._container);
+    this._pane.removeChild(this._container);
     this._container = null;
   },
 
@@ -95,10 +92,7 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function() {
-    // called Wupdate because I think update might conflict with L.*
-    // console.log("WButton Wupdate called");
-  },
+  Wupdate: function() {},
 
   _toggleActions: function() {
     if (this._enabled) {
@@ -136,20 +130,17 @@ export const WButton = L.Class.extend({
       options.container
     );
     link.href = "#";
-    if (options.text) {
-      link.innerHTML = options.text;
-    }
+    if (options.text) link.innerHTML = options.text;
+
     if (options.buttonImage) {
-      $(link).append(
-        $("<img/>")
-          .prop("src", options.buttonImage)
-          .css("vertical-align", "middle")
-          .css("align", "center")
-      );
+      const img = L.DomUtil.create("img", "wasabee-actions-image", link);
+      img.src = options.buttonImage;
+      // img.style.verticalAlign = "middle";
+      // img.style.align = "center";
     }
-    if (options.title) {
-      link.title = options.title;
-    }
+
+    if (options.title) link.title = options.title;
+
     L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
       .on(link, "mousedown", L.DomEvent.stopPropagation)
       .on(link, "dblclick", L.DomEvent.stopPropagation)
@@ -166,10 +157,10 @@ export const WButton = L.Class.extend({
       .off(button, "click", callback);
   },
 
-  _createActions: function(buttons) {
+  /* _createActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
-      const li = L.DomUtil.create("li", "", container);
+      const li = L.DomUtil.create("li", "wasabee-actions", container);
       this._createButton({
         title: b.title,
         text: b.text,
@@ -179,7 +170,7 @@ export const WButton = L.Class.extend({
       });
     }
     return container;
-  },
+  }, */
 
   _createSubActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
@@ -188,13 +179,15 @@ export const WButton = L.Class.extend({
       this._createButton({
         title: b.title,
         text: b.text,
+        buttonImage: b.img,
         container: li,
         callback: b.callback,
-        context: b.context
+        context: b.context,
+        className: "wasabee-subactions"
       });
       // these should be in the css for wasabee-subactions now
-      li.style.setProperty("width", "auto", "important");
-      li.firstChild.style.setProperty("width", "auto", "important");
+      // li.style.setProperty("width", "auto", "important");
+      // li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
   }

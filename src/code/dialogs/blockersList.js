@@ -49,12 +49,9 @@ const BlockerList = WDialog.extend({
       title: wX("KNOWN BLOCKERS", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
@@ -87,7 +84,11 @@ const BlockerList = WDialog.extend({
       this.sortable.sortAsc
     );
     this._dialog.html(this.sortable.table);
-    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("KNOWN_BLOCK", newOpData.name)
+    );
   },
 
   _getListDialogContent(sortBy, sortAsc) {
@@ -115,7 +116,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       },
       {
         name: wX("TO_PORT"),
@@ -139,7 +140,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       }
     ];
     content.sortBy = sortBy;

@@ -60,7 +60,7 @@ export default class WasabeeMarker {
 
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
-    marker.className = "wasabee-dialog wasabee-dialog-ops";
+    marker.className = "wasabee-marker-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.innerHTML = this.getPopupBodyWithType(portal);
@@ -69,7 +69,7 @@ export default class WasabeeMarker {
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
-          assignment.innerHTML = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
+          assignment.textContent = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
           assignment.appendChild(a.formatDisplay());
         },
         function(err) {
@@ -81,16 +81,20 @@ export default class WasabeeMarker {
       assignment.innerHTML = wX("COMPLETED BY", this.completedBy);
     }
 
-    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-    const deleteButton = L.DomUtil.create("a", null, buttonSet);
-    deleteButton.textContent = wX("DELETE");
+    const buttonSet = L.DomUtil.create(
+      "div",
+      "wasabee-marker-buttonset",
+      content
+    );
+    const deleteButton = L.DomUtil.create("button", null, buttonSet);
+    deleteButton.textContent = wX("DELETE_ANCHOR");
     L.DomEvent.on(deleteButton, "click", () => {
       deleteMarker(operation, this, portal);
       marker.closePopup();
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", null, buttonSet);
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", () => {
         const ad = new AssignDialog();
