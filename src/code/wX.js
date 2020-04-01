@@ -3,6 +3,9 @@ const wX = (key, value, option) => {
   const strings = window.plugin.wasabee.static.strings;
   const silly = window.plugin.wasabee.static.stringsSilly;
 
+  // I don't like this, probably slow ...
+  const merged = Object.assign(strings, silly);
+
   // load the selected language, or use English if not set
   // storage named "default-language" for historic reasons
   let lang =
@@ -10,21 +13,18 @@ const wX = (key, value, option) => {
     window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 
   // if the langauge doesn't exist in either list, clear it and use English
-  if (!strings[lang] && !silly[lang]) {
+  if (!merged[lang]) {
     delete localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
     lang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
   }
 
   let s = null;
-  // check the selected langauge in the main list,
-  // if that fails, check the silly list. Use English as a last resort
-  if (strings[lang] && strings[lang][key]) s = strings[lang][key];
-  if (!s && silly[lang] && silly[lang][key]) s = silly[lang][key];
+  if (merged[lang] && merged[lang][key]) s = merged[lang][key];
   if (
     !s &&
-    strings[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key]
+    merged[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key]
   )
-    s = strings[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key];
+    s = merged[window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE][key];
   if (!s) s = "haec notificatio praebibo est";
 
   // do any necessary replacements

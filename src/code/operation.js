@@ -4,7 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
-import wX from "./wX";
+// import wX from "./wX";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
 
@@ -419,20 +419,16 @@ export default class WasabeeOp {
   }
 
   addMarker(markerType, portal, comment) {
-    if (portal) {
-      if (!this.containsMarker(portal, markerType)) {
-        this.addPortal(portal);
-        const marker = new WasabeeMarker(markerType, portal.id, comment);
-        this.markers.push(marker);
-        this.update(true);
-        this.runCrosslinks();
-      } else {
-        alert(wX("ALREADY_HAS_MARKER"));
-      }
-    }
+    if (!portal) return;
+    // if (!this.containsMarker(portal, markerType)) {
+    this.addPortal(portal);
+    const marker = new WasabeeMarker(markerType, portal.id, comment);
+    this.markers.push(marker);
+    this.update(true);
+    this.runCrosslinks();
+    //} else  alert(wX("ALREADY_HAS_MARKER"));
   }
 
-  // strictly speaking, this doesn't do anything since the server does it all, but this is for UI changes real-time
   assignMarker(id, gid) {
     for (const v of this.markers) {
       if (v.ID == id) {

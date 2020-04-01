@@ -43,8 +43,8 @@ W.static = {
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
     SEND_LOCATION_KEY: "wasabee-send-location",
-    LANGUAGE_KEY: "wasabee-default-language",
-    DEFAULT_LANGUAGE: "English",
+    LANGUAGE_KEY: "wasabee-language",
+    DEFAULT_LANGUAGE: "en_sq",
     SECONDARY_LANGUAGE: "en_sq",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",

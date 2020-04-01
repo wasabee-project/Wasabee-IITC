@@ -262,6 +262,17 @@
     "MULTIMAX2": "Multimax",
     "PERMS": " permissions",
     "STARBURST": "Squirrel Explosion",
-    "STARBURST TITLE": "Squirrel Explosion "
+    "STARBURST TITLE": "Squirrel Explosion ",
+    "DELETE_ANCHOR": "Delete",
+    "LANG": "Chatter",
+    "SET": "Bury",
+    "ANCHOR1": "First Tree",
+    "ANCHOR2": "Second Tree",
+    "SEL_SB_ANCHOR": "Set Explosion Tree!",
+    "WASABEE_MODE_LABEL": "Wasabee Mode",
+    "WASABEE_MODE_BATTLE": "Tail Chase!",
+    "WASABEE_MODE_DESIGN": "Plot acorns",
+    "DELETE_OP": "Delete Foraging Plan",
+    "WASABEE BUTTON TITLE": "deeez nuts!"
   }
 }
