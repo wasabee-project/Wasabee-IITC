@@ -160,6 +160,12 @@
 .wasabee-dialog-link button.add { padding: 4px; grid-column-start: 4; grid-column-end: 5; }
 .wasabee-dialog-link input.desc { padding: 4px; grid-column-start: 4; }
 .wasabee-dialog-manageteam { }
+.wasabee-dialog-manageteam div.container { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.wasabee-dialog-manageteam div.list {grid-column-start: 1; grid-column-end: 4; }
+.wasabee-dialog-manageteam label { grid-column-start: 1; grid-column-end: 2; }
+.wasabee-dialog-manageteam input { margin: 2px 2px 2px 2px; grid-column-start: 2; grid-column-end: 3; }
+.wasabee-dialog-manageteam button { margin: 2px 2px 2px 2px; grid-column-start: 3; grid-column-end: 4; }
+
 .wasabee-dialog-markeradd { }
 .wasabee-dialog-markeradd div.content { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; }
 .wasabee-dialog-markeradd div.portal { grid-column-start: 1; grid-column-end: 3; padding: 0px 0px 8px 0px; }
