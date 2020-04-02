@@ -68,10 +68,10 @@ export const uploadOpPromise = function() {
   });
 };
 
-export const updateOpPromise = function() {
+export const updateOpPromise = operation => {
   const SERVER_BASE = GetWasabeeServer();
 
-  const operation = getSelectedOperation();
+  // const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
   // console.log(json);

@@ -100,10 +100,10 @@ const SettingsDialog = WDialog.extend({
     designMode.value = "design";
     designMode.textContent = wX("WASABEE_MODE_DESIGN");
     if (mode == "design") designMode.selected = true;
-    const battleMode = L.DomUtil.create("option", null, modeSelect);
-    battleMode.value = "battle";
-    battleMode.textContent = wX("WASABEE_MODE_BATTLE");
-    if (mode == "battle") battleMode.selected = true;
+    const operationMode = L.DomUtil.create("option", null, modeSelect);
+    operationMode.value = "active";
+    operationMode.textContent = wX("WASABEE_MODE_BATTLE");
+    if (mode == "active") operationMode.selected = true;
     L.DomEvent.on(modeSelect, "change", () => {
       localStorage[modeKey] = modeSelect.value;
     });

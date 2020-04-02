@@ -188,6 +188,8 @@ const WasabeeDialog = WDialog.extend({
             ad.enable();
           },
           "Log out": () => {
+            localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
+              "design";
             logoutPromise().then(
               () => {
                 window.runHooks("wasabeeUIUpdate", getSelectedOperation());

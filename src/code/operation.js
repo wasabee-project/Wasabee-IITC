@@ -4,6 +4,8 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
+import { updateOpPromise } from "./server";
+
 // import wX from "./wX";
 
 const DEFAULT_OPERATION_COLOR = "groupa";
@@ -465,17 +467,56 @@ export default class WasabeeOp {
   }
 
   // call update to save the op and redraw everything on the map
-  update(updateLocalchanged) {
+  update(updateLocalchanged = true) {
+    // batchmode skips all this, for bulk adding links/etc
     if (this._batchmode === true) return;
-    if (updateLocalchanged) {
-      if (window.plugin.wasabee.battleMode) {
-        console.log("would push to server...");
-      } else {
-        this.localchanged = true;
+
+    if (this.fetched) {
+      // server op
+      if (updateLocalchanged) {
+        // caller requested store (default)
+        const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
+        const mode = localStorage[modeKey];
+        if (mode == "active") {
+          if (!WasabeeMe.isLoggedIn()) {
+            alert("Not Logged in, disabling active mode");
+            localStorage[modeKey] = "design";
+            this.localchanged = true;
+          } else {
+            // active mode
+            this._updateOnServer();
+          }
+        } else {
+          // design mode
+          this.localchanged = true;
+        }
       }
     }
+
+    // even if not server
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
+  }
+
+  // only for use by "active" mode
+  _updateOnServer() {
+    const now = Date.now();
+    if (this._AMpushed && now - this._AMpushed < 1000) {
+      this._AMpushed = now;
+      console.log("skipping active mode push");
+      return;
+    }
+
+    this._AMpushed = now;
+    updateOpPromise(this).then(
+      () => {
+        console.log("active mode change pushed", new Date().toGMTString());
+      },
+      err => {
+        console.log(err);
+        alert("Active Mode Update failed: " + err);
+      }
+    );
   }
 
   runCrosslinks() {
@@ -489,9 +530,7 @@ export default class WasabeeOp {
 
   endBatchMode() {
     this._batchmode = false;
-    this.store();
-    this.localchanged = true;
-    window.runHooks("wasabeeUIUpdate", this);
+    this.update(true);
     this.runCrosslinks();
   }
 

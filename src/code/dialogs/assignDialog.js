@@ -92,7 +92,7 @@ const AssignDialog = WDialog.extend({
 
   _upload: function(operation) {
     if (!operation.localchanged) return;
-    updateOpPromise().then(
+    updateOpPromise(operation).then(
       function() {
         console.log(
           "modified op: " +
