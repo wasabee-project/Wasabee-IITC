@@ -285,7 +285,8 @@
     "WASABEE_MODE_BATTLE": "Battle",
     "WASABEE_MODE_DESIGN": "Design",
     "WASABEE_MODE_DESC": "In design mode, changes must be manually pushed to the server; assignments made will not notify the agents; assignments pushed from IITC will override their current status on the server. In battle mode, changes will be automatically pushed to the server; assignments will be sent to the agents via Telegram (if available); the server's status for assignments has priority over the IITC data.",
-    "DELETE": "Delete"
+    "DELETE": "Delete",
+    "JOIN_LINK": "Join Link"
   },
   "es": {
     "last edited": "03-03-2020 @crystalwizard",
