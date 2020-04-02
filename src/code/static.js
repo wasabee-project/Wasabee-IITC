@@ -44,7 +44,7 @@ W.static = {
     SELECTED_OP_KEY: "wasabee-selected-op",
     SEND_LOCATION_KEY: "wasabee-send-location",
     LANGUAGE_KEY: "wasabee-language",
-    DEFAULT_LANGUAGE: "en_sq",
+    DEFAULT_LANGUAGE: "English",
     SECONDARY_LANGUAGE: "en_sq",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",

@@ -1,6 +1,7 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import { teamPromise } from "./server";
+import { getLanguage } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -112,9 +113,7 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  const lang =
-    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
-    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
+  const lang = getLanguage();
   const restore = operation.color;
   if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
     operation.color = "SE";
@@ -314,9 +313,7 @@ const updateAnchors = op => {
     return;
   }
 
-  const lang =
-    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
-    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
+  const lang = getLanguage();
   const restore = op.color;
   if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
     op.color = "SE";

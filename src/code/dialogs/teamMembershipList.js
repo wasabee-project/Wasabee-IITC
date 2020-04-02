@@ -29,6 +29,8 @@ const TeamMembershipList = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
+    // sometimes we are too quick, try again
+    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
 
     this._dialog = window.dialog({
       title: this._team.name,

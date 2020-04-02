@@ -6,7 +6,8 @@ import {
   addAgentToTeamPromise,
   renameTeamPromise,
   rocksPromise,
-  deleteTeamPromise
+  deleteTeamPromise,
+  GetWasabeeServer
 } from "../server";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
@@ -133,8 +134,7 @@ const ManageTeamDialog = WDialog.extend({
 
   update: function() {
     this.setup(this._team); // populate the list
-    const container = L.DomUtil.create("div", null);
-    this._dialogContent(container); // build the UI
+    const container = this._dialogContent(); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this._dialog.html(container);
     this._dialog.dialog(
@@ -144,16 +144,16 @@ const ManageTeamDialog = WDialog.extend({
     );
   },
 
-  _dialogContent: function(container) {
-    const list = L.DomUtil.create("div", null, container);
+  _dialogContent: function() {
+    const container = L.DomUtil.create("div", "container");
+    const list = L.DomUtil.create("div", "list", container);
     list.appendChild(this._table.table);
 
-    const add = L.DomUtil.create("div", null, container);
-    const addlabel = L.DomUtil.create("label", null, add);
+    const addlabel = L.DomUtil.create("label", null, container);
     addlabel.textContent = wX("ADD_AGENT");
-    const addField = L.DomUtil.create("input", null, addlabel);
+    const addField = L.DomUtil.create("input", null, container);
     addField.placeholder = wX("INGNAME_GID");
-    const addButton = L.DomUtil.create("button", null, addlabel);
+    const addButton = L.DomUtil.create("button", null, container);
     addButton.textContent = wX("ADD");
     L.DomEvent.on(addButton, "click", () => {
       addAgentToTeamPromise(addField.value, this._team.ID).then(
@@ -168,13 +168,12 @@ const ManageTeamDialog = WDialog.extend({
       );
     });
 
-    const rename = L.DomUtil.create("div", null, container);
-    const renamelabel = L.DomUtil.create("label", null, rename);
+    const renamelabel = L.DomUtil.create("label", null, container);
     renamelabel.textContent = wX("RENAME_TEAM");
-    const renameField = L.DomUtil.create("input", null, renamelabel);
+    const renameField = L.DomUtil.create("input", null, container);
     renameField.placeholder = wX("BAT_TOAD");
     renameField.value = this._team.Name;
-    const renameButton = L.DomUtil.create("button", null, renamelabel);
+    const renameButton = L.DomUtil.create("button", null, container);
     renameButton.textContent = wX("RENAME");
     L.DomEvent.on(renameButton, "click", () => {
       renameTeamPromise(this._team.ID, renameField.value).then(
@@ -190,18 +189,17 @@ const ManageTeamDialog = WDialog.extend({
       );
     });
 
-    const rocks = L.DomUtil.create("div", null, container);
-    const rockslabel = L.DomUtil.create("label", null, rocks);
+    const rockslabel = L.DomUtil.create("label", null, container);
     rockslabel.textContent = wX("ROCKS_COM");
-    const rockscommField = L.DomUtil.create("input", null, rockslabel);
+    const rockscommField = L.DomUtil.create("input", null, container);
     rockscommField.placeholder = "xxyyzz.com";
     if (this._team.RocksComm) rockscommField.value = this._team.RocksComm;
-    const rocksapilabel = L.DomUtil.create("label", null, rocks);
+    const rocksapilabel = L.DomUtil.create("label", null, container);
     rocksapilabel.textContent = wX("API_KEY");
-    const rocksapiField = L.DomUtil.create("input", null, rocksapilabel);
+    const rocksapiField = L.DomUtil.create("input", null, container);
     rocksapiField.placeholder = "...";
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
-    const rocksButton = L.DomUtil.create("button", null, rocks);
+    const rocksButton = L.DomUtil.create("button", null, container);
     rocksButton.textContent = wX("SET");
     L.DomEvent.on(rocksButton, "click", () => {
       rocksPromise(
@@ -222,10 +220,9 @@ const ManageTeamDialog = WDialog.extend({
       );
     });
 
-    const remove = L.DomUtil.create("div", null, container);
-    const removeLabel = L.DomUtil.create("label", null, remove);
+    const removeLabel = L.DomUtil.create("label", null, container);
     removeLabel.textContent = wX("REMOVE_TEAM");
-    const removeButton = L.DomUtil.create("button", null, removeLabel);
+    const removeButton = L.DomUtil.create("button", null, container);
     removeButton.textContent = wX("REMOVE");
     L.DomEvent.on(removeButton, "click", () => {
       const cd = new ConfirmDialog();
@@ -247,11 +244,26 @@ const ManageTeamDialog = WDialog.extend({
       );
       cd.enable();
     });
+
+    console.log(this._team);
+    if (this._team.jkt) {
+      const joinLinkLabel = L.DomUtil.create("label", null, container);
+      joinLinkLabel.textContent = wX("JOIN_LINK");
+      const joinLink = L.DomUtil.create("a", null, container);
+      const jl =
+        GetWasabeeServer() +
+        "/api/v1/team/" +
+        this._team.ID +
+        "/join/" +
+        this._team.jkt;
+      joinLink.href = jl;
+      joinLink.textContent = jl;
+    }
+    return container;
   },
 
   _displayDialog: function() {
-    const container = L.DomUtil.create("div", null);
-    this._dialogContent(container);
+    const container = this._dialogContent();
 
     this._dialog = window.dialog({
       title: wX("MANAGE_TEAM", this._team.Name),

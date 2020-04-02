@@ -7,7 +7,7 @@ import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
 import { resetOps, setupLocalStorage } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
-import wX from "../wX";
+import { wX, getLanguage } from "../wX";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -117,13 +117,13 @@ const WasabeeButton = WButton.extend({
   },
 
   getIcon: function() {
-    const lang =
-      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
-      window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
-    if (lang == "en_sq")
+    const lang = getLanguage();
+    // if the seconary langauge is set, use its icon
+    if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE)
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se
         .default;
 
+    // regular icon, two states
     if (this._lastLoginState) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
         .default;
