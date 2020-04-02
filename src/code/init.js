@@ -82,10 +82,10 @@ window.plugin.wasabee.init = function() {
   initCrossLinks();
   initWasabeeD();
 
-  Wasabee.sendLocation =
-    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
-  if (Wasabee.sendLocation === undefined) {
-    window.plugin.wasabee.sendLocation = false;
+  const sl = localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
+  if (sl !== "true") {
+    console.log(sl);
+    console.log("resetting sendlocation to false");
     localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = false;
   }
 

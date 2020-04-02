@@ -44,12 +44,9 @@ const KeysList = WDialog.extend({
       title: wX("KEY_LIST", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation).table,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
         delete this._dialog;
         this.disable();
@@ -60,7 +57,11 @@ const KeysList = WDialog.extend({
 
   update: function(operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
-    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("KEY_LIST", operation.name)
+    );
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
   },
@@ -82,8 +83,15 @@ const KeysList = WDialog.extend({
         name: wX("REQUIRED"),
         value: key => key.Required,
         sort: (a, b) => a - b,
-        format: (cell, value) => {
+        format: (cell, value, key) => {
           cell.textContent = value;
+          const oh = parseInt(key.onHand);
+          const req = parseInt(key.Required);
+          if (oh >= req) {
+            L.DomUtil.addClass(cell, "enough");
+          } else {
+            L.DomUtil.addClass(cell, "notenough");
+          }
         }
       },
       {
@@ -91,7 +99,7 @@ const KeysList = WDialog.extend({
         value: key => parseInt(key.onHand),
         sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          const a = L.DomUtil.create("a", "");
+          const a = L.DomUtil.create("a");
           a.name = key.id;
           L.DomEvent.on(a, "click", L.DomEvent.stopPropagation)
             .on(a, "mousedown", L.DomEvent.stopPropagation)
@@ -99,7 +107,7 @@ const KeysList = WDialog.extend({
             .on(a, "click", L.DomEvent.preventDefault)
             .on(a, "click", this.showKeyByPortal, key);
 
-          a.innerHTML = value;
+          a.textContent = value;
           cell.appendChild(a);
         }
       }
@@ -157,7 +165,7 @@ const KeysList = WDialog.extend({
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
-      if (k.Required == 0) continue;
+      // if (k.Required == 0) continue;
 
       const thesekeys = operation.keysonhand.filter(function(keys) {
         return keys.portalId == a;

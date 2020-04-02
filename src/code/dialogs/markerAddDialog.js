@@ -35,32 +35,33 @@ const MarkerAddDialog = WDialog.extend({
   _portalClickedHook: function() {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
-      this._portal.innerHTML = "";
+      this._portal.textContent = "";
+      this._portal.textContent = "";
       this._portal.appendChild(this._selectedPortal.displayFormat());
     } else {
-      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
+      this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
   _displayDialog: function() {
     this._marker = null;
 
-    const content = L.DomUtil.create("div", "temp-op-dialog");
-    this._portal = L.DomUtil.create("div", null, content);
+    const content = L.DomUtil.create("div", "content");
+    this._portal = L.DomUtil.create("div", "portal", content);
     this._portalClickedHook();
 
-    this._type = L.DomUtil.create("select", "", content);
+    this._type = L.DomUtil.create("select", null, content);
     for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", "", this._type);
       o.setAttribute("value", a);
-      o.innerHTML = k.label;
+      o.textContent = k.label;
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
-    this._comment = L.DomUtil.create("input", "", content);
+    this._comment = L.DomUtil.create("input", null, content);
     this._comment.setAttribute("placeholder", "comment");
-    const addMarkerButton = L.DomUtil.create("a", "", content);
-    addMarkerButton.innerHTML = "Add Marker";
+    const addMarkerButton = L.DomUtil.create("button", null, content);
+    addMarkerButton.textContent = wX("ADD_MARKER");
     L.DomEvent.on(addMarkerButton, "click", () =>
       this._addMarker(this._type.value, this._operation, this._comment.value)
     );
@@ -70,12 +71,9 @@ const MarkerAddDialog = WDialog.extend({
       title: wX("ADD_MARKER"),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center+30"
-      },
+      // position: { my: auto, at: "center center+30" },
       html: content,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
       closeCallback: function() {
         context.disable();
         delete context._dialog;

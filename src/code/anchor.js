@@ -54,32 +54,36 @@ export default class WasabeeAnchor {
   }
 
   popupContent(marker, operation) {
-    marker.className = "wasabee-dialog wasabee-dialog-ops";
+    marker.className = "wasabee-marker-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.innerHTML = this._portal.name;
-    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-    const linksButton = L.DomUtil.create("a", "", buttonSet);
+    const buttonSet = L.DomUtil.create(
+      "div",
+      "wasabee-marker-buttonset",
+      content
+    );
+    const linksButton = L.DomUtil.create("button", null, buttonSet);
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", () => {
       showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
-    const swapButton = L.DomUtil.create("a", null, buttonSet);
+    const swapButton = L.DomUtil.create("button", null, buttonSet);
     swapButton.textContent = wX("SWAP");
     L.DomEvent.on(swapButton, "click", () => {
       swapPortal(operation, this._portal);
       marker.closePopup();
     });
-    const deleteButton = L.DomUtil.create("a", null, buttonSet);
-    deleteButton.textContent = wX("DELETE");
+    const deleteButton = L.DomUtil.create("button", null, buttonSet);
+    deleteButton.textContent = wX("DELETE_ANCHOR");
     L.DomEvent.on(deleteButton, "click", () => {
       deletePortal(operation, this._portal);
       marker.closePopup();
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", null, buttonSet);
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", () => {
         const anchor = new WasabeeAnchor(this.ID);

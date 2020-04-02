@@ -64,10 +64,10 @@ const OpPermList = WDialog.extend({
       const permMenu = L.DomUtil.create("select", null, addArea);
       const read = L.DomUtil.create("option", null, permMenu);
       read.value = "read";
-      read.textContent = "read";
+      read.textContent = wX("READ");
       const write = L.DomUtil.create("option", null, permMenu);
       write.value = "write";
-      write.textContent = "write";
+      write.textContent = wX("WRITE");
       const ao = L.DomUtil.create("option", null, permMenu);
       ao.value = "assignedonly";
       ao.textContent = "assignedonly";
@@ -75,11 +75,11 @@ const OpPermList = WDialog.extend({
       ab.type = "button";
       ab.name = "Add";
       ab.value = "Add";
-      ab.textContent = "Add";
+      ab.textContent = wX("ADD");
 
       const context = this;
       L.DomEvent.on(ab, "click", () => {
-        context.addPerm(context._operation, teamMenu.value, permMenu.value);
+        context.addPerm(teamMenu.value, permMenu.value);
         context.setup();
         context._drawnTable = this._html.replaceChild(
           context._table.table,
@@ -89,11 +89,11 @@ const OpPermList = WDialog.extend({
     }
 
     this._dialog = window.dialog({
-      title: this._operation.name + " permissions",
+      title: wX("PERMS", this._operation.name),
       width: "auto",
       height: "auto",
       html: this._html,
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      dialogClass: "wasabee-dialog wasabee-dialog-perms",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -140,37 +140,44 @@ const OpPermList = WDialog.extend({
     this._table.items = this._operation.teamlist;
   },
 
-  addPerm: function(op, teamID, role) {
-    console.log("adding " + teamID + " " + role);
-    addPermPromise(op.ID, teamID, role).then(
+  addPerm: function(teamID, role) {
+    for (const p of this._operation.teamlist) {
+      if (p.teamid == teamID && p.role == role) {
+        console.log("not adding duplicate");
+        window.runHooks("wasabeeUIUpdate", this._operation);
+        return;
+      }
+    }
+    addPermPromise(this._operation.ID, teamID, role).then(
       () => {
-        op.teamlist.push({
+        this._operation.teamlist.push({
           teamid: teamID,
           role: role
         });
-        window.runHooks("wasabeeUIUpdate", op);
+        this._operation.store();
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       err => {
         console.log(err);
+        alert(err);
       }
     );
   },
 
   delPerm: function(obj) {
-    console.log(
-      "removing: " + this._operation.ID + " " + obj.teamid + " - " + obj.role
-    );
     delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
       () => {
         const n = new Array();
-        for (const p in this._operation.teamlist) {
-          if (p.teamid != obj.teamid && p.role != obj.role) n.push(p);
+        for (const p of this._operation.teamlist) {
+          if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
         }
         this._operation.teamlist = n;
-        window.runHooks("wasabeeUIUpdate", this._operation);
+        this._operation.store();
+        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       err => {
         console.log(err);
+        alert(err);
       }
     );
   }

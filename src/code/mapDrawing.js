@@ -112,16 +112,25 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  // pre-fetch the op color outside the loop -- is this actually helpful?
-  let lt = Wasabee.static.layerTypes.get("main");
-  if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+  const lang =
+    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
+  const restore = operation.color;
+  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
+    operation.color = "SE";
   }
-  lt.link.color = lt.color;
+
+  // pre-fetch the op color outside the loop -- is this actually helpful?
+  let style = Wasabee.static.layerTypes.get("main");
+  if (Wasabee.static.layerTypes.has(operation.color)) {
+    style = Wasabee.static.layerTypes.get(operation.color);
+  }
+  style.link.color = style.color;
 
   for (const l of operation.links) {
-    addLink(l, lt.link, operation);
+    addLink(l, style.link, operation);
   }
+  operation.color = restore;
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
@@ -139,11 +148,12 @@ const updateLinks = operation => {
   }
 
   // pre-fetch the op color outside the loop
-  let lt = Wasabee.static.layerTypes.get("main");
+  let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+    style = Wasabee.static.layerTypes.get(operation.color);
   }
-  lt.link.color = lt.color;
+  // because ... reasons?
+  style.link.color = style.color;
 
   for (const l of operation.links) {
     if (layerMap.has(l.ID)) {
@@ -154,11 +164,11 @@ const updateLinks = operation => {
         l.toPortalId != ll.options.to
       ) {
         Wasabee.linkLayerGroup.removeLayer(ll);
-        addLink(l, lt.link, operation);
+        addLink(l, style.link, operation);
       }
       layerMap.delete(l.ID);
     } else {
-      addLink(l, lt.link, operation);
+      addLink(l, style.link, operation);
     }
   }
 
@@ -177,6 +187,8 @@ const addLink = (wlink, style, operation) => {
     style.color = linkLt.color;
   }
 
+  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
+
   const latLngs = wlink.getLatLngs(operation);
   if (!latLngs) {
     console.log("LatLngs was null: op missing portal data?");
@@ -188,7 +200,6 @@ const addLink = (wlink, style, operation) => {
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
   newlink.options.Wcolor = wlink.Wcolor;
-  //
   newlink.addTo(Wasabee.linkLayerGroup);
 };
 
@@ -303,6 +314,14 @@ const updateAnchors = op => {
     return;
   }
 
+  const lang =
+    localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+    window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
+  const restore = op.color;
+  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
+    op.color = "SE";
+  }
+
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
     if (l.options.color != op.color) {
@@ -325,6 +344,7 @@ const updateAnchors = op => {
   for (const [k, v] of layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
+  op.color = restore;
 };
 
 /** This function adds a portal to the portal layer group */

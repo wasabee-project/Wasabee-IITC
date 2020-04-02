@@ -201,7 +201,7 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
 };
 
 const showCrossLink = (link, operation) => {
-  var blocked = L.geodesicPolyline(link.getLatLngs(operation), {
+  const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
     color: "#d22",
     opacity: 0.7,
     weight: 5,
@@ -252,8 +252,21 @@ const testLink = (link, operation) => {
   }
 };
 
+const testSelfBlock = (incoming, operation) => {
+  for (const against of operation.links) {
+    if (incoming.ID == against.ID) continue;
+    if (greatCircleArcIntersect(against, incoming)) {
+      const lt = window.plugin.wasabee.static.layerTypes.get("self-block");
+      const style = lt.link;
+      style.color = lt.color;
+      const blocked = L.geodesicPolyline(against.getLatLngs(operation), style);
+      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
+    }
+  }
+};
+
 export const checkAllLinks = operation => {
-  // console.time("checkAllLinks");
+  console.time("checkAllLinks");
   // console.log("checkAllLinks called: " + operation.ID);
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
@@ -262,14 +275,18 @@ export const checkAllLinks = operation => {
   for (const guid in window.links) {
     testLink(window.links[guid], operation);
   }
-  // console.timeEnd("checkAllLinks");
+
+  for (const l of operation.links) {
+    testSelfBlock(l, operation);
+  }
+  console.timeEnd("checkAllLinks");
 };
 
 const onLinkAdded = data => {
   testLink(data.link, getSelectedOperation());
 };
 
-/* probably unused now -- remove in 0.16 */
+/* probably unused now -- remove in 0.16
 const testForDeletedLinks = () => {
   for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
     const guid = layer.options.guid;
@@ -279,7 +296,7 @@ const testForDeletedLinks = () => {
       window.plugin.wasabee._crosslinkCache.delete(guid);
     }
   }
-};
+}; */
 
 const onMapDataRefreshStart = () => {
   window.removeHook("linkAdded", onLinkAdded);
@@ -291,7 +308,7 @@ const onMapDataRefreshEnd = () => {
   const operation = getSelectedOperation();
 
   checkAllLinks(operation);
-  testForDeletedLinks();
+  // testForDeletedLinks();
   window.addHook("linkAdded", onLinkAdded);
 };
 

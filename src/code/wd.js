@@ -2,6 +2,7 @@
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
 import { getAgent } from "./server";
+import wX from "./wX";
 
 // setup function
 export const initWasabeeD = () => {
@@ -184,14 +185,14 @@ const getMarkerPopup = PortalID => {
           li.appendChild(a.formatDisplay());
         } else {
           const fake = L.DomUtil.create("span", null, li);
-          fake.innerHTML = "[loading]";
+          fake.textContent = wX("LOADING");
         }
         const c = L.DomUtil.create("span", null, li);
-        c.innerHTML = `:  ${v.Count} ${v.CapID}`;
+        c.textContent = `:  ${v.Count} ${v.CapID}`;
       }
     }
   } else {
-    container.innerHTML = "No data";
+    container.textContent = wX("NO_DATA");
   }
   return container;
 };

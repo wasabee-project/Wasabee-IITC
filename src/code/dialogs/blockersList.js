@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
-import { listenForAddedPortals } from "../uiCommands";
+import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
 
@@ -26,6 +26,7 @@ const BlockerList = WDialog.extend({
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
   },
 
@@ -33,6 +34,7 @@ const BlockerList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
 
   _displayDialog: function() {
@@ -42,19 +44,16 @@ const BlockerList = WDialog.extend({
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
     for (const f of this._operation.fakedPortals) {
-      if (f.id.length != 35) window.portalDetail.request(f.id);
+      window.portalDetail.request(f.id);
     }
 
     this._dialog = window.dialog({
       title: wX("KNOWN BLOCKERS", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
+      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
@@ -68,6 +67,11 @@ const BlockerList = WDialog.extend({
           this.blockerlistUpdate(this._operation);
           this._operation.update(false); // blockers do not need to be sent to server
           window.runHooks("wasabeeCrosslinks", this._operation);
+        },
+        "Force Load": () => {
+          for (const f of this._operation.fakedPortals) {
+            window.portalDetail.request(f.id);
+          }
         }
       },
       closeCallback: () => {
@@ -87,7 +91,11 @@ const BlockerList = WDialog.extend({
       this.sortable.sortAsc
     );
     this._dialog.html(this.sortable.table);
-    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("KNOWN_BLOCK", newOpData.name)
+    );
   },
 
   _getListDialogContent(sortBy, sortAsc) {
@@ -115,7 +123,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       },
       {
         name: wX("TO_PORT"),
@@ -139,7 +147,7 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         sort: (a, b) => a - b,
-        format: (row, value) => (row.innerHTML = value)
+        format: (row, value) => (row.textContent = value)
       }
     ];
     content.sortBy = sortBy;

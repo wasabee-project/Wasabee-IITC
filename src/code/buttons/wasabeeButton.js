@@ -4,6 +4,7 @@ import WasabeeDialog from "../dialogs/wasabeeDialog";
 import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
+import SettingsDialog from "../dialogs/settingsDialog.js";
 import { resetOps, setupLocalStorage } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import wX from "../wX";
@@ -94,16 +95,35 @@ const WasabeeButton = WButton.extend({
       }
     ];
 
+    this._SettingsActions = [
+      {
+        img: window.plugin.wasabee.static.images.toolbar_settings.default,
+        title: "Settings",
+        text: "",
+        callback: () => {
+          this.disable();
+          const sd = new SettingsDialog();
+          sd.enable();
+        },
+        context: this
+      }
+    ];
+
     // build and display as if not logged in
     this.actionsContainer = this._getActions();
-    // L.DomUtil.addClass(this.actionsContainer, "leaflet-draw-actions-top");
     this._container.appendChild(this.actionsContainer);
-
     // check login state and update if necessary
     this.Wupdate(); // takes container and operation, not needed here
   },
 
   getIcon: function() {
+    const lang =
+      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] ||
+      window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
+    if (lang == "en_sq")
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se
+        .default;
+
     if (this._lastLoginState) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
         .default;
@@ -126,6 +146,9 @@ const WasabeeButton = WButton.extend({
     if (this._lastLoginState) {
       tmp = tmp.concat(this._Dactions);
     }
+
+    // settings always at the end
+    tmp = tmp.concat(this._SettingsActions);
 
     return this._createSubActions(tmp);
   },

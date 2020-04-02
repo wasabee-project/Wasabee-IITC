@@ -40,7 +40,7 @@ const AssignDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: this._html,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-assign",
       closeCallback: () => {
         assignDialog.disable();
         delete assignDialog._dialog;
@@ -55,15 +55,15 @@ const AssignDialog = WDialog.extend({
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
-    this._html = L.DomUtil.create("div", "temp-op-dialog");
-    const divtitle = L.DomUtil.create("div", "", this._html);
+    this._html = L.DomUtil.create("div", null);
+    const divtitle = L.DomUtil.create("div", "desc", this._html);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
       divtitle.appendChild(target.displayFormat(this._operation));
-      const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = wX("LINK ASSIGNMENT");
+      const t = L.DomUtil.create("span", null, divtitle);
+      t.textContent = wX("LINK ASSIGNMENT");
       this._name = wX("ASSIGN LINK PROMPT", portal.name);
     }
 
@@ -71,8 +71,8 @@ const AssignDialog = WDialog.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
       divtitle.appendChild(portal.displayFormat());
-      const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = wX("MARKER ASSIGNMENT");
+      const t = L.DomUtil.create("span", null, divtitle);
+      t.textContent = wX("MARKER ASSIGNMENT");
       this._name = wX("ASSIGN MARKER PROMPT", portal.name);
     }
 
@@ -80,8 +80,8 @@ const AssignDialog = WDialog.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
       divtitle.appendChild(portal.displayFormat());
-      const t = L.DomUtil.create("span", "", divtitle);
-      t.innerHTML = wX("ANCHOR ASSIGNMENT");
+      const t = L.DomUtil.create("span", null, divtitle);
+      t.textContent = wX("ANCHOR ASSIGNMENT");
       this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);
     }
 
@@ -109,7 +109,7 @@ const AssignDialog = WDialog.extend({
   _buildContent: function() {
     const content = L.DomUtil.create("div", "");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      content.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }
@@ -117,11 +117,11 @@ const AssignDialog = WDialog.extend({
   },
 
   _getAgentMenu: function(current) {
-    const container = L.DomUtil.create("div", "");
-    const menu = L.DomUtil.create("select", "", container);
-    let option = menu.appendChild(L.DomUtil.create("option", ""));
-    option.setAttribute("value", "");
-    option.innerHTML = wX("UNASSIGNED");
+    const container = L.DomUtil.create("div", "wasabee-agent-menu");
+    const menu = L.DomUtil.create("select", null, container);
+    let option = menu.appendChild(L.DomUtil.create("option", null));
+    option.setAttribute("value", null);
+    option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
     // this needs to make sure not to add the same agent multiple times...
@@ -140,9 +140,9 @@ const AssignDialog = WDialog.extend({
       for (const a of tt.agents) {
         if (!alreadyAdded.includes(a.id)) {
           alreadyAdded.push(a.id);
-          option = L.DomUtil.create("option", "");
+          option = L.DomUtil.create("option", null);
           option.setAttribute("value", a.id);
-          option.innerHTML = a.name;
+          option.textContent = a.name;
           if (a.id == current) {
             option.setAttribute("selected", true);
           }
