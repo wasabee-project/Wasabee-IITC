@@ -48,7 +48,7 @@ const BlockerList = WDialog.extend({
     }
 
     this._dialog = window.dialog({
-      title: wX("KNOWN BLOCKERS", this._operation.name),
+      title: wX("KNOWN_BLOCK", this._operation.name),
       width: "auto",
       height: "auto",
       // position: { my: "center top", at: "center center" },
