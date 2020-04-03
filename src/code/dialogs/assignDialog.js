@@ -150,15 +150,40 @@ const AssignDialog = WDialog.extend({
         }
       }
     }
+
     // ( => ) functions inherit the "this" of the caller
-    menu.addEventListener("change", value => {
-      this.assign(value);
-    });
+    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
+    if (mode == "active") {
+      menu.addEventListener("change", value => {
+        this.activeAssign(value);
+      });
+    } else {
+      menu.addEventListener("change", value => {
+        this.designAssign(value);
+      });
+    }
 
     return container;
   },
 
-  assign: function(value) {
+  designAssign: function(value) {
+    if (this._type == "Marker") {
+      this._operation.assignMarker(this._targetID, value.srcElement.value);
+    }
+    if (this._type == "Link") {
+      this._operation.assignLink(this._targetID, value.srcElement.value);
+    }
+    if (this._type == "Anchor") {
+      const links = this._operation.getLinkListFromPortal(
+        this._operation.getPortal(this._targetID)
+      );
+      for (const l of links) {
+        this._operation.assignLink(l.ID, value.srcElement.value);
+      }
+    }
+  },
+
+  activeAssign: function(value) {
     if (this._type == "Marker") {
       assignMarkerPromise(
         this._operation.ID,
