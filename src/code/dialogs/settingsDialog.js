@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import addButtons from "../addButtons";
+import WasabeeMe from "../me";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -103,6 +104,10 @@ const SettingsDialog = WDialog.extend({
     const operationMode = L.DomUtil.create("option", null, modeSelect);
     operationMode.value = "active";
     operationMode.textContent = wX("WASABEE_MODE_BATTLE");
+    if (!WasabeeMe.isLoggedIn()) {
+      operationMode.disabled = true;
+      operationMode.textContent += " (not logged in)";
+    }
     if (mode == "active") operationMode.selected = true;
     L.DomEvent.on(modeSelect, "change", () => {
       localStorage[modeKey] = modeSelect.value;
