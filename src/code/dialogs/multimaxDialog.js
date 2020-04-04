@@ -56,7 +56,7 @@ const MultimaxDialog = WDialog.extend({
 
     // Go button
     const button = L.DomUtil.create("button", null, div);
-    button.textContent = wX("MULTIMAX");
+    button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", async () => {
       const context = this;
 
@@ -97,8 +97,8 @@ const MultimaxDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = wX("MULTIMAX2");
-    this.label = wX("MULTIMAX2");
+    this.title = wX("MULTI_M");
+    this.label = wX("MULTI_M");
     this._portals = {};
     this._links = [];
     this._operation = getSelectedOperation();
