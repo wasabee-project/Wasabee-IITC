@@ -7,10 +7,8 @@
     "ADD_BUTTON_LINKS": "Add all links at once.",
     "ADD_BL": "Add Back Links: ",
     "ADD LINK TITLE": "Add Links Dialog",
-    "ADD LINK": "Add Link",
     "ADD_LINKS": "Add Links",
     "ADD MARKER TITLE": "Add Markers Dialog",
-    "ADD MARKER": "Add Marker",
     "ADD_MARKER": "Add Marker",
     "ADD_NEW_OP": "Add New Op",
     "ADD_SUCC_INSTR": "Add successful, they will need to enable the team on the Wasabee website before they appear in this list",
@@ -24,7 +22,6 @@
     "API_KEY": " api key: ",
     "ASSIGN": "Assign",
     "ASSIGNED": "Assigned",
-    "ASSIGNED TO": "Assigned to ",
     "ASS_TO": "Assigned To",
     "ASSIGN LINK PROMPT": "Assign link from: ${value}",
     "ASSIGN MARKER PROMPT": "Assign marker from: ${value}",
@@ -100,9 +97,7 @@
     "INVALID REQUEST": "Invalid Request",
     "IOS NEED FAKE UA": "You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail",
     "KEYS": "Keys",
-    "KEY_LIST": "Key List: ${value}",
-    "KEY LIST": "Key List for Portal ${value}",
-    "KNOWN BLOCKERS": "Known Blockers: ${value}",
+    "KEY_LIST": "Key List for Portal: ${value}",
     "KNOWN_BLOCK": "Known Blockers: ${value}",
     "LA": "L8+ some LA",
     "LA DESC": "Depending on the number and type of Link Amps used, a lower source portal level might suffice.",
@@ -585,7 +580,7 @@
     "ANCHOR_PORTAL": "Anchor Portal ",
     "ADD_BUTTON_LINKS": "Sabay-sabay idagdag ang lahat ng link."
   },
-  "Deutsche": {
+  "Deutsch": {
     "last edited": "03-26-2020 @AxForest ",
     "LANG": "Sprache",
     "DISABLE_SYNC": "Das Standard Synchronisations Plugin ist nicht mit Wasabee kompatibel - Bitte deaktiveren",
