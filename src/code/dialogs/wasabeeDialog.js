@@ -212,7 +212,7 @@ const WasabeeDialog = WDialog.extend({
               }
               newTeamPromise(newname).then(
                 () => {
-                  alert(wX("TEAM_CREATED"));
+                  alert(wX("TEAM_CREATED", newname));
                   window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                 },
                 reject => {
