@@ -71,10 +71,14 @@ export const uploadOpPromise = function() {
 export const updateOpPromise = operation => {
   const SERVER_BASE = GetWasabeeServer();
 
+  // let the server know how to process assignments etc
+  operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
+
   // const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
   // console.log(json);
+  delete operation.mode;
 
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
