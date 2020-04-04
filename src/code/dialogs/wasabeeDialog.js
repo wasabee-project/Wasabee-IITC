@@ -188,6 +188,8 @@ const WasabeeDialog = WDialog.extend({
             ad.enable();
           },
           "Log out": () => {
+            localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
+              "design";
             logoutPromise().then(
               () => {
                 window.runHooks("wasabeeUIUpdate", getSelectedOperation());
@@ -210,7 +212,7 @@ const WasabeeDialog = WDialog.extend({
               }
               newTeamPromise(newname).then(
                 () => {
-                  alert(wX("TEAM_CREATED"));
+                  alert(wX("TEAM_CREATED", newname));
                   window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                 },
                 reject => {
