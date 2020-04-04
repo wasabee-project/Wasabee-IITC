@@ -126,7 +126,7 @@ const OpPermList = WDialog.extend({
       },
       {
         name: wX("REMOVE"),
-        value: () => wX("DELETE"),
+        value: () => wX("REMOVE"),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
           cell.textContent = value;
