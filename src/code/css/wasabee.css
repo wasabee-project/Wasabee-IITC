@@ -173,6 +173,14 @@
 .wasabee-dialog-markeradd div.content input { margin: 4px; }
 .wasabee-dialog-markeradd div.content button { grid-column-start: 1; grid-column-end: 3; margin: 4px; padding: 8px }
 .wasabee-dialog-markerlist { }
+
+.wasabee-dialog-multimax { }
+.wasabee-dialog-multimax div.container { display: grid; grid-template-columns: 1fr 1fr 4fr; }
+.wasabee-dialog-multimax div.desc { grid-column-start: 1; grid-column-end: 7; padding: 4px; }
+.wasabee-dialog-multimax label { padding: 4px; }
+.wasabee-dialog-multimax button { margin: 0px 4px 4px 0px; }
+.wasabee-dialog-multimax span { padding: 4px; grid-column-start: 3; grid-column-end: 7;}
+
 .wasabee-dialog-newop { }
 .wasabee-dialog-newop div.buttonset button { padding: 8px 24px 8px 24px; margin: 24px 8px 24px 8px }
 .wasabee-dialog-newop div.buttonset { display: grid; grid-template-columns: 1fr; }

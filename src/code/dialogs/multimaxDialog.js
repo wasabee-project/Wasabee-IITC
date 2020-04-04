@@ -23,39 +23,59 @@ const MultimaxDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
-    const rdnTable = L.DomUtil.create("table", null, container);
 
-    ["A", "B"].forEach(string => {
-      const tr = rdnTable.insertRow();
-      tr.setAttribute("AB", string);
-      // Name
-      const node = tr.insertCell();
-      node.textContent = string;
-      // Set button
-      const nodethree = tr.insertCell();
-      const button = L.DomUtil.create("button", null, nodethree);
-      button.textContent = wX("SET");
-      button.addEventListener("click", arg => this.setPortal(arg), false);
-      // Portal link
-      const nodetwo = tr.insertCell();
-      nodetwo.className = "portal portal-" + string;
-      this._portals[string] = nodetwo;
-      this.updatePortal(string);
+    const anchorOneLabel = L.DomUtil.create("label", null, container);
+    anchorOneLabel.textContent = wX("ANCHOR1");
+    const anchorOneButton = L.DomUtil.create("button", null, container);
+    anchorOneButton.textContent = wX("SET");
+    this._anchorOneDisplay = L.DomUtil.create("span", null, container);
+    if (this._anchorOne) {
+      this._anchorOneDisplay.appendChild(this._anchorOne.displayFormat());
+    } else {
+      this._anchorOneDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorOneButton, "click", () => {
+      this._anchorOne = WasabeePortal.getSelected();
+      if (this._anchorOne) {
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        this._anchorOneDisplay.textContent = "";
+        this._anchorOneDisplay.appendChild(this._anchorOne.displayFormat());
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+
+    const anchorTwoLabel = L.DomUtil.create("label", null, container);
+    anchorTwoLabel.textContent = wX("ANCHOR2");
+    const anchorTwoButton = L.DomUtil.create("button", null, container);
+    anchorTwoButton.textContent = wX("SET");
+    this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
+    if (this._anchorTwo) {
+      this._anchorTwoDisplay.appendChild(this._anchorTwo.displayFormat());
+    } else {
+      this._anchorTwoDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorTwoButton, "click", () => {
+      this._anchorTwo = WasabeePortal.getSelected();
+      if (this._anchorTwo) {
+        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        this._anchorTwoDisplay.textContent = "";
+        this._anchorTwoDisplay.appendChild(this._anchorTwo.displayFormat());
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
-
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\u21b3";
 
     // Go button
-    const button = L.DomUtil.create("button", null, div);
+    const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", async () => {
       const context = this;
@@ -72,22 +92,21 @@ const MultimaxDialog = WDialog.extend({
       );
     });
 
-    const flylinks = L.DomUtil.create("span", null, div);
-    const fllabel = L.DomUtil.create("label", null, flylinks);
+    const fllabel = L.DomUtil.create("label", null, container);
     fllabel.textContent = wX("ADD_BL");
-    this._flcheck = L.DomUtil.create("input", null, flylinks);
+    this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
 
-    const context = this;
+    // const context = this;
     this._dialog = window.dialog({
       title: wX("MULTI_M"),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      dialogClass: "wasabee-dialog wasabee-dialog-multimax",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.multimaxButton
     });
@@ -99,54 +118,19 @@ const MultimaxDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
-    this._portals = {};
-    this._links = [];
     this._operation = getSelectedOperation();
-  },
-
-  //***Function to set portal -- called from 'Set' Button
-  setPortal: function(event) {
-    const AB = event.currentTarget.parentNode.parentNode.getAttribute("AB");
-    const selectedPortal = WasabeePortal.getSelected();
-    if (selectedPortal) {
-      localStorage[
-        "wasabee-anchor-" + (AB == "A" ? "1" : "2")
-      ] = JSON.stringify(selectedPortal);
-    } else {
-      alert(wX("NO_PORT_SEL"));
-    }
-    this.updatePortal(AB);
-  },
-
-  //***Function to get portal -- called in doMultimax
-  getPortal: function(AB) {
-    try {
-      const p = JSON.parse(
-        localStorage["wasabee-anchor-" + (AB == "A" ? "1" : "2")]
-      );
-      return WasabeePortal.create(p);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-  },
-
-  //***Function to update portal in the dialog
-  updatePortal: function(AB) {
-    const i = this.getPortal(AB);
-    const viewContainer = this._portals[AB];
-    $(viewContainer).empty();
-    if (i) {
-      viewContainer.appendChild(i.displayFormat(this._operation));
-    }
+    let p = localStorage["wasabee-anchor-1"];
+    if (p) this._anchorOne = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-2"];
+    if (p) this._anchorTwo = WasabeePortal.create(p);
   },
 
   doMultimax: context => {
     return new Promise((resolve, reject) => {
-      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
-      const A = context.getPortal("A");
-      const B = context.getPortal("B");
+      const A = this._anchorOne;
+      const B = this._anchorTwo;
       if (!A || !B) reject(wX("SEL_PORT_FIRST"));
+      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
 
       // Calculate the multimax
       multimax(A, B, portalsOnScreen).then(
