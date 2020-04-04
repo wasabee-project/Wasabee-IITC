@@ -31,7 +31,7 @@ const LinkButton = WButton.extend({
     this.actionsContainer = this._createSubActions([
       {
         title: wX("ADD LINK TITLE"),
-        text: wX("ADD LINKS"),
+        text: wX("ADD_LINKS"),
         callback: () => {
           this.disable();
           const ld = new LinkDialog(map);
