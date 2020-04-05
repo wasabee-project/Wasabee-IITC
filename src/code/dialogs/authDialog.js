@@ -34,12 +34,23 @@ const AuthDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
+  randomTip: function() {
+    const lang = "tips"; // XXX for now
+    if (!window.plugin.wasabee.static.tips[lang]) return;
+    const tips = window.plugin.wasabee.static.tips[lang];
+    const keys = Object.keys(tips);
+    // XXX use prompt dialog?
+    alert(tips[keys[(keys.length * Math.random()) << 0]]);
+  },
+
   _displayDialog: function() {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
       alert(wX("AUTH INCOMPAT"));
       return;
     }
+
+    console.log(document.cookie);
 
     const content = L.DomUtil.create("div", "content");
 
@@ -160,6 +171,7 @@ const AuthDialog = WDialog.extend({
           ] === "true"
         )
           sendLocation();
+        this.randomTip();
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },
