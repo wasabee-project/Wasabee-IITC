@@ -46,7 +46,7 @@ W.static = {
     SEND_LOCATION_KEY: "wasabee-send-location",
     LANGUAGE_KEY: "wasabee-language",
     DEFAULT_LANGUAGE: "English",
-    SECONDARY_LANGUAGE: "en_sq",
+    SECONDARY_LANGUAGE: "Squirrel",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
     OAUTH_CLIENT_ID:
