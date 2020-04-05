@@ -7,17 +7,9 @@ const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  // console.time("drawThings");
   updateAnchors(op);
   updateMarkers(op);
-
-  /* console.time("updateLinks");
-  updateLinks(op);
-  console.timeEnd("updateLinks"); */
-  // console.time("resetLinks");
   resetLinks(op);
-  // console.timeEnd("resetLinks");
-  //console.timeEnd("drawThings");
 };
 
 const updateMarkers = op => {
@@ -26,6 +18,9 @@ const updateMarkers = op => {
     Wasabee.markerLayerGroup.clearLayers();
     return;
   }
+
+  // this seems to wrongly assume one marker per portal -- or something
+  // XXX TODO find why markers duplicate if too many on one portal
 
   // get a list of every currently drawn marker
   const layerMap = new Map();
@@ -36,8 +31,8 @@ const updateMarkers = op => {
   // add any new ones, remove any existing from the list
   // markers don't change, so this doesn't need to be too smart
   for (const m of op.markers) {
-    if (layerMap.has(m.portalId)) {
-      const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.portalId));
+    if (layerMap.has(m.ID)) {
+      const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
       if (m.state != ll.options.state) {
         // state changed, update icon
         Wasabee.markerLayerGroup.removeLayer(ll);
@@ -51,7 +46,7 @@ const updateMarkers = op => {
         ll.setIcon(newicon);
         ll.addTo(Wasabee.markerLayerGroup);
       }
-      layerMap.delete(m.portalId);
+      layerMap.delete(m.ID);
     } else {
       addMarker(m, op);
     }
@@ -69,7 +64,7 @@ const addMarker = (target, operation) => {
   const targetPortal = operation.getPortal(target.portalId);
   const wMarker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
-    id: target.portalId,
+    id: target.ID,
     state: target.state,
     icon: L.icon({
       iconUrl: target.icon,
@@ -177,7 +172,7 @@ const updateLinks = operation => {
   }
 };
 
-/** This function adds a portal to the portal layer group */
+/** This function adds a link to the link layer group */
 const addLink = (wlink, style, operation) => {
   // determine per-link color
   if (wlink.color != "main" && Wasabee.static.layerTypes.has(wlink.color)) {

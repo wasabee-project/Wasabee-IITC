@@ -5,9 +5,9 @@ import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
 import { updateOpPromise } from "./server";
-
 // import wX from "./wX";
 
+// this should be in statics.js
 const DEFAULT_OPERATION_COLOR = "groupa";
 
 export default class WasabeeOp {
@@ -427,8 +427,9 @@ export default class WasabeeOp {
     const marker = new WasabeeMarker(markerType, portal.id, comment);
     this.markers.push(marker);
     this.update(true);
+    // only need this for virus/destroy
     this.runCrosslinks();
-    //} else  alert(wX("ALREADY_HAS_MARKER"));
+    // } else alert(wX("ALREADY_HAS_MARKER"));
   }
 
   assignMarker(id, gid) {
