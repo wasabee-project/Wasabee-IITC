@@ -119,12 +119,15 @@ const WasabeeButton = WButton.extend({
   getIcon: function() {
     const lang = getLanguage();
     // if the seconary langauge is set, use its icon
+    console.log(lang);
     if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
       if (this._lastLoginState) {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg //green eyed squirrel image
+        console.log("inside SEG");
+        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg //green eyed
           .default;
       } else {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se //non-green eyed squirrel image
+        console.log("inside SE");
+        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se //non-green eyed
           .default;
       }
     }
