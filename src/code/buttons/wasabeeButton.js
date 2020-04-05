@@ -121,19 +121,19 @@ const WasabeeButton = WButton.extend({
     // if the seconary langauge is set, use its icon
     if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
       if (this._lastLoginState) {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se
+        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg //green eyed
           .default;
       } else {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg
+        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se //non-green eyed
           .default;
       }
     }
     // regular icon, two states
     if (this._lastLoginState) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in //green bee image
         .default;
     } else {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out
+      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out //yellow bee image
         .default;
     }
   },

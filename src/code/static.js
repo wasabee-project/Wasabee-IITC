@@ -17,6 +17,7 @@ W.static = {
     toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
     toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
     toolbar_wasabeebutton_se: require("./images/toolbar_wasabeebutton_se.png"),
+    toolbar_wasabeebutton_seg: require("./images/toolbar_wasabeebutton_seg.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
     toolbar_settings: require("./images/toolbar_settings.png"),
     toolbar_multimax: require("./images/toolbar_multimax.png")
@@ -45,7 +46,7 @@ W.static = {
     SEND_LOCATION_KEY: "wasabee-send-location",
     LANGUAGE_KEY: "wasabee-language",
     DEFAULT_LANGUAGE: "English",
-    SECONDARY_LANGUAGE: "en_sq",
+    SECONDARY_LANGUAGE: "Squirrel",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
     OAUTH_CLIENT_ID:
