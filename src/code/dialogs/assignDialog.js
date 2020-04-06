@@ -178,7 +178,9 @@ const AssignDialog = WDialog.extend({
         this._operation.getPortal(this._targetID)
       );
       for (const l of links) {
-        this._operation.assignLink(l.ID, value.srcElement.value);
+        if (l.fromPortalId == this._targetID) {
+          this._operation.assignLink(l.ID, value.srcElement.value);
+        }
       }
     }
   },

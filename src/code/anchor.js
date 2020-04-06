@@ -86,6 +86,7 @@ export default class WasabeeAnchor {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", () => {
+        // XXX why can't I just use "this"? instead of making a new anchor?
         const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();
         ad.setup(anchor, operation);
