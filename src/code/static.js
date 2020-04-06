@@ -71,7 +71,7 @@ W.static = {
   }
 };
 
-W.static.strings = require("./translations.json");
+W.static.strings = require("./translations/translations.json");
 W.static.stringsSilly = require("./silly.json");
 W.static.tips = require("./tips.json");
 
