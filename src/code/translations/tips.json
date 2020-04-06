@@ -1,0 +1,17 @@
+{
+  "ENGLISH_TIPS": {
+    "last edited": "04-05-2020 @TheMitch2",
+    "UPLOAD_CHANGES": "When you make changes to an OP, be sure to upload to the server so you can access it across all instances of Wasabee.",
+    "DUPLICATE_OPERATION": "When Duplicating an Operation, Make sure you are NOT accidentally Deleting the Operation.",
+    "RECOVER_OPERATION": "If you delete an Operation you can recover it IF you have a local copy, but you must duplicate it before uploading to the server.",
+    "MULTIMAX_SS": "When doing Multimax, you can select the first portal, go to the Second portal, Then open the Multimax Box.  Set A, select B, Set B, and Close the box.  Then go to where you want the spine to be.  Reopen and hit Multimax.  This is especially useful on small screen devices.",
+    "WD_KEYS": "You can use the \"W-D Keys\" option to show how many keys you have to a specific portal. The number of keys will only show up for those on teams you have marked active.",
+    "LOCATION": "Wasabee can be used to share agent locations. These locations are visible to all agents that share an active group with you.",
+    "OPSEC": "For OPSEC purposes, you should frequently check which groups you have marked active on the teams list. Disable any teams you are not actively using.",
+    "AUTO_FIELD": "The speed of Wasabee's calculations when auto-fielding are primarily limited by the processing power of your system. Slower, and older, systems will take longer to calculate as the number of portals involved increases.",
+    "EXCLUDE_PORTAL": "There is an exclude option under Add Markers to designate portals you don't want used in auto-fielding calculations.",
+    "NOT_LOADING": "Whenever you find a portal that is named \"Loading: [PORTALGUID]\" a single press of the cursor over the name should allow the portal information to load and show correctly on your list.  IF this is a Multimax anchor, you may need to \"Swap\" that anchor to another, then back again to correct your Keys list.",
+    "SMURF_TEARS": "Smurf tears are the sweetest thing there is.",
+    "MICRO_FIELD": "Micro fields are the fastest way to AP and leveling."
+  }
+}
