@@ -71,10 +71,13 @@ W.static = {
   }
 };
 
-W.static.strings = require("./translations/translations.json");
+W.static.strings = require("./translations/german.json");
 W.static.strings = require("./translations/spanish.json");
-W.static.stringsSilly = require("./silly.json");
-W.static.tips = require("./tips.json");
+W.static.strings = require("./translations/english.json");
+W.static.strings = require("./translations/italian.json");
+W.static.strings = require("./translations/filipino.json");
+W.static.stringsSilly = require("./translations/silly.json");
+W.static.tips = require("./translations/tips.json");
 
 W.static.markerTypes = new Map([
   [
