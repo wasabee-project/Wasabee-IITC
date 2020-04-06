@@ -88,7 +88,9 @@ const MarkerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, marker) => {
           a.appendChild(
-            operation.getPortal(marker.portalId).displayFormat(operation)
+            operation
+              .getPortal(marker.portalId)
+              .displayFormat(operation, this._smallScreen)
           );
         }
       },

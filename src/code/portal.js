@@ -59,11 +59,15 @@ export default class WasabeePortal {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
-  displayFormat() {
+  displayFormat(operation, shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
     const e = L.DomUtil.create("a", null);
-    e.appendChild(document.createTextNode(this.name));
+    if (shortName === true && this.name.length > 12) {
+      e.textContent = this.name.slice(0, 8) + "...";
+    } else {
+      e.textContent = this.name;
+    }
 
     if (window.portals[this.id]) {
       const data = window.portals[this.id].options.data;

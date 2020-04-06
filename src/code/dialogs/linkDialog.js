@@ -58,10 +58,16 @@ const LinkDialog = WDialog.extend({
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
+    const clearSourceButton = L.DomUtil.create("button", "clear", container);
+    clearSourceButton.textContent = wX("CLEAR");
+    L.DomEvent.on(clearSourceButton, "click", () => {
+      delete localStorage["wasabee-link-source"];
+      this._sourceDisplay.textContent = wX("NOT_SET");
+    });
 
     const anchor1Label = L.DomUtil.create("label", null, container);
     anchor1Label.textContent = wX("ANCHOR1");
-    const anchor1Button = L.DomUtil.create("button", null, container);
+    const anchor1Button = L.DomUtil.create("button", "set", container);
     anchor1Button.textContent = wX("SET");
     this._anchor1Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor1) {
@@ -93,10 +99,16 @@ const LinkDialog = WDialog.extend({
         alert("Select both Source and Anchor 1");
       }
     });
+    const clearAnchor1Button = L.DomUtil.create("button", "clear", container);
+    clearAnchor1Button.textContent = wX("CLEAR");
+    L.DomEvent.on(clearAnchor1Button, "click", () => {
+      delete localStorage["wasabee-anchor-1"];
+      this._anchor1Display.textContent = wX("NOT_SET");
+    });
 
     const anchor2Label = L.DomUtil.create("label", null, container);
     anchor2Label.textContent = wX("ANCHOR2");
-    const anchor2Button = L.DomUtil.create("button", null, container);
+    const anchor2Button = L.DomUtil.create("button", "set", container);
     anchor2Button.textContent = wX("SET");
     this._anchor2Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor2) {
@@ -127,6 +139,12 @@ const LinkDialog = WDialog.extend({
       } else {
         alert(wX("SEL_SRC_ANC2"));
       }
+    });
+    const clearAnchor2Button = L.DomUtil.create("button", "clear", container);
+    clearAnchor2Button.textContent = wX("CLEAR");
+    L.DomEvent.on(clearAnchor2Button, "click", () => {
+      delete localStorage["wasabee-anchor-2"];
+      this._anchor2Display.textContent = wX("NOT_SET");
     });
 
     // Bottom buttons bar

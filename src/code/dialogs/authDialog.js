@@ -94,10 +94,14 @@ const AuthDialog = WDialog.extend({
       L.DomEvent.on(gsapiButtonOLD, "click", () =>
         this.gsapiAuthImmediate(this)
       );
+      // XXX until people test the other
+      gsapiButtonOLD.style.display = "none";
     }
 
     const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.textContent = wX("LOG IN");
+    // XXX until we can figure out why IITC-M iOS doesn't set the cookie very often
+    if (this._ios) gapiButton.style.display = "none";
 
     // XXX this needs to go away
     const menus = L.DomUtil.create("div", "options", content);

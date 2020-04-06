@@ -51,7 +51,6 @@ const BlockerList = WDialog.extend({
       title: wX("KNOWN_BLOCK", this._operation.name),
       width: "auto",
       height: "auto",
-      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
@@ -109,7 +108,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.fromPortalId);
-          row.appendChild(p.displayFormat(this._operation));
+          row.appendChild(p.displayFormat(this._operation, this._smallScreen));
         }
       },
       {
@@ -133,7 +132,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.toPortalId);
-          row.appendChild(p.displayFormat(this._operation));
+          row.appendChild(p.displayFormat(this._operation, this._smallScreen));
         }
       },
       {

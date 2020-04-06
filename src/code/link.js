@@ -92,16 +92,18 @@ export default class WasabeeLink {
   }
 
   // returns a DOM object appropriate for display
-  displayFormat(operation) {
+  displayFormat(operation, smallScreen = false) {
     const d = L.DomUtil.create("div", null);
     d.appendChild(
-      operation.getPortal(this.fromPortalId).displayFormat(operation)
+      operation
+        .getPortal(this.fromPortalId)
+        .displayFormat(operation, smallScreen)
     );
     const arrow = L.DomUtil.create("span", null, d);
     arrow.textContent = " ➾ ";
     arrow.style.color = this.getColorHex();
     d.appendChild(
-      operation.getPortal(this.toPortalId).displayFormat(operation)
+      operation.getPortal(this.toPortalId).displayFormat(operation, smallScreen)
     );
     return d;
   }

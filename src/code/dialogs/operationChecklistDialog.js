@@ -54,9 +54,8 @@ const OperationChecklistDialog = WDialog.extend({
       title: wX("OP_CHECKLIST", this._operation.name),
       width: "auto",
       height: "auto",
-      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog wasabee-dialog-checklist",
+      dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;
@@ -112,10 +111,12 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, thing) => {
           if (thing instanceof WasabeeLink) {
-            row.appendChild(thing.displayFormat(operation));
+            row.appendChild(thing.displayFormat(operation, this._smallScreen));
           } else {
             row.appendChild(
-              operation.getPortal(thing.portalId).displayFormat(operation)
+              operation
+                .getPortal(thing.portalId)
+                .displayFormat(operation, this._smallScreen)
             );
           }
         }

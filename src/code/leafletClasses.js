@@ -43,7 +43,7 @@ export const WDialog = L.Handler.extend({
     this._container = map._container;
     L.Util.extend(this.options, options);
     this._enabled = false;
-    this._smallScreen = false;
+    this._smallScreen = this.isMobile();
     this._dialog = null;
     // look for operation in options, if not set, get it
     // determine large or small screen dialog sizes
@@ -61,7 +61,14 @@ export const WDialog = L.Handler.extend({
 
   addHooks: function() {},
 
-  removeHooks: function() {}
+  removeHooks: function() {},
+
+  isMobile: function() {
+    // return true;
+    // XXX this is a cheap hack -- determine a better check
+    if (window.plugin.userLocation) return true;
+    return false;
+  }
 });
 
 export const WButton = L.Class.extend({
