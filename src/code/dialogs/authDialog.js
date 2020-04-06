@@ -9,7 +9,7 @@ import PromptDialog from "./promptDialog";
 import AboutDialog from "./about";
 import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
-import wX from "../wX";
+import { wX, getLanguage } from "../wX";
 import WasabeeMe from "../me";
 
 const AuthDialog = WDialog.extend({
@@ -35,7 +35,7 @@ const AuthDialog = WDialog.extend({
   },
 
   randomTip: function() {
-    const lang = "tips"; // XXX for now
+    const lang = getLanguage();
     if (!window.plugin.wasabee.static.tips[lang]) return;
     const tips = window.plugin.wasabee.static.tips[lang];
     const keys = Object.keys(tips);
