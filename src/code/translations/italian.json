@@ -1,0 +1,16 @@
+{
+  "Italiano": {
+    "SEND TARGET": "Invia obiettivo",
+    "SELECT PORTAL": "Seleziona un portale da inviare",
+    "SEND TARGET CONFIRM": "Vuoi inviare ${value} obiettivo a ${option}?",
+    "TARGET SENT": "Obiettivo inviato",
+    "AGES": " (ultima posizione nota)",
+    "HOURS": " (${value} ore fa)",
+    "MINUTES": " (${value} minuti fa)",
+    "SECONDS": " (${value} secondi fa)",
+    "SWAP": "Scambia",
+    "LINKS": "Collega",
+    "DELETE_ANCHOR": "Elimina",
+    "ASSIGN OUTBOUND": "Assegna collegamenti in uscita"
+  }
+}
