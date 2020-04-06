@@ -77,7 +77,7 @@ const MultimaxDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("MULTI_M");
-    L.DomEvent.on(button, "click", async () => {
+    L.DomEvent.on(button, "click", () => {
       const context = this;
 
       this.doMultimax(context).then(
@@ -127,8 +127,8 @@ const MultimaxDialog = WDialog.extend({
 
   doMultimax: context => {
     return new Promise((resolve, reject) => {
-      const A = this._anchorOne;
-      const B = this._anchorTwo;
+      const A = context._anchorOne;
+      const B = context._anchorTwo;
       if (!A || !B) reject(wX("SEL_PORT_FIRST"));
       const portalsOnScreen = getAllPortalsOnScreen(context._operation);
 
