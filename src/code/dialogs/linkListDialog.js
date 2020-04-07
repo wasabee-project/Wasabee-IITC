@@ -4,7 +4,6 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
-import OverflowMenu from "../overflowMenu";
 import wX from "../wX";
 
 const LinkListDialog = WDialog.extend({
@@ -157,7 +156,9 @@ const LinkListDialog = WDialog.extend({
         name: "",
         sort: null,
         value: link => link,
-        format: (o, e) => this.makeMenu(o, e)
+        format: (list, data) => {
+          list.textContent = data;
+        }
       }
     ];
     this._table.sortBy = 0;
@@ -175,7 +176,7 @@ const LinkListDialog = WDialog.extend({
     con.enable();
   },
 
-  makeMenu: function(list, data) {
+  /* makeMenu: function(list, data) {
     const state = new OverflowMenu();
     const options = [
       {
@@ -210,7 +211,7 @@ const LinkListDialog = WDialog.extend({
     state.items = options;
     list.className = "menu";
     list.appendChild(state.button);
-  },
+  }, */
 
   makeColorMenu: function(list, data, link) {
     const colorSection = L.DomUtil.create("div", null, list);

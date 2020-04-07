@@ -9,21 +9,28 @@
 .wasabee-subactions li { vertical-align: middle }
 .wasabee-subactions a {
     background-color: rgba(99,99,88,.66);
-    /* line-height: 28px; */
-    text-decoration: none;
-    /* font: 11px/19px "Helvetica Neue",Arial,Helvetica,sans-serif; */
     padding-left: 10px;
     padding-right: 10px;
-    width: auto !important;
+    width: auto;
+    /* width: auto !important; */
     border-left: 1px solid #aaa;
     color: #fff;
-    /* height: 28px; */
-    /* vertical-align: middle; */
 }
-.wasabee-subactions a:hover { background-color: #a0a098 }
+.wasabee-subactions a:hover { background-color: #a0a098; width: auto; }
 .wasabee-subactions li:first-child a { border-left: none } 
 .wasabee-subactions li:last-child a { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0 }
 .wasabee-actions-image { vertical-align: middle; text-align: center }
+
+@media (max-width : 400px) {
+  .wasabee-subactions a {
+    width: 60px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
 
 /* wasabee-tooltip is used for the quickdraw mouse follower */
 .wasabee-tooltip {
@@ -59,7 +66,7 @@
 .wasabee-table tr { background: rgba(25,63,95,.75) }
 .wasabee-table tbody tr:nth-child(2n+1) { background: rgba(8,48,78,.75) }
 .wasabee-table>thead .sortable:before { content: " "; display: inline-block; float: right; min-width: 1em; text-align: right } 
-.wasabee-table td.menu>.wasabee-overflow-button { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex } 
+/* .wasabee-table td.menu>.wasabee-overflow-button { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex }  */
 .wasabee-table { border-collapse: collapse; empty-cells: show; width: 100%; clear: both } 
 .wasabee-table td,.wasabee-table th { border-width: 0 1px; border-style: solid; border-color: rgba(8,48,78,.75); padding: 3px 4px; text-align: left } 
 .wasabee-table td:first-child,.wasabee-table th:first-child { border-left-width: 0 } 
@@ -69,7 +76,7 @@
 .wasabee-table>thead .sortable.desc:before { content: "\25bc" } 
 .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px }
 
-.wasabee-overflow-button span { flex: 0 0 auto; box: 0 0 auto } 
+/* .wasabee-overflow-button span { flex: 0 0 auto; box: 0 0 auto }  */
 
 /* defined in agent.js, always on an <a> */
 .wasabee-agent-label a {
@@ -93,15 +100,16 @@
 .wasabee-agent-popup { display: flex; align-items: center }
 .wasabee-agent-popup div.desc { padding: 4px 4px }
 
-/* used, not audited */
+/* used, not audited
 .wasabee-overflow-menu { border: 1px solid #20a8b1; background: rgba(8,48,78,.9); color: #ffce00; padding: 0; margin: 0; position: absolute; list-style: none; z-index: 30000; max-height: 70%; max-width: 25em; overflow-y: auto; overflow-x: hidden }
 .wasabee-overflow-menu a { display: block; padding: .5em; min-width: 8em; text-decoration: none; outline: 0 transparent!important }
 .wasabee-overflow-menu a:hover { text-decoration: none; background-color: rgba(32,168,177,.7) }
 .wasabee-overflow-menu a:active,.wasabee-overflow-menu a:focus { text-decoration: underline }
 .wasabee-overflow-button { align-self: stretch; background-color: rgba(8,48,78,.9); border: 1px solid #ffce00; color: #ffce00; padding: 2px }
 .wasabee-overflow-button { display: inline-box; display: inline-flex; min-width: 24px; min-height: 20px; text-align: center; vertical-align: middle; font-weight: 700; text-decoration: none!important; color: #ffce00; cursor: pointer; align-items: center; justify-content: center }
+ */
 
-/* all dialogs get this class */
+/* all dialogs get this class -- these can probably be pruned now */
 .wasabee-dialog .desc em { color: inherit; font-style: italic }
 .wasabee-dialog .desc { margin: 0 }
 .wasabee-dialog .desc ul { padding-left: 1.5em }
@@ -168,7 +176,7 @@
 .wasabee-dialog-manageteam input { margin: 2px 2px 2px 2px; grid-column-start: 2; grid-column-end: 3; }
 .wasabee-dialog-manageteam button { margin: 2px 2px 2px 2px; grid-column-start: 3; grid-column-end: 4; }
 
-.wasabee-dialog-markeradd { }
+.wasabee-dialog-markeradd { max-width: min-content; }
 .wasabee-dialog-markeradd div.content { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; }
 .wasabee-dialog-markeradd div.portal { grid-column-start: 1; grid-column-end: 3; padding: 0px 0px 8px 0px; }
 .wasabee-dialog-markeradd div.content select { margin: 4px; }

@@ -167,32 +167,17 @@ export const WButton = L.Class.extend({
   _createSubActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
-      let text = b.text;
-      if (this._isMobile && b.text.length > 8) {
-        text = b.text.split(0, 6) + "...";
-      }
-
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
         title: b.title,
-        text: text,
+        text: b.text,
         buttonImage: b.img,
         container: li,
         callback: b.callback,
         context: b.context,
         className: "wasabee-subactions"
       });
-      // these should be in the css for wasabee-subactions now
-      // li.style.setProperty("width", "auto", "important");
-      // li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
-  },
-
-  _isMobile: function() {
-    // return true;
-    // XXX this is a cheap hack -- determine a better check
-    if (window.plugin.userLocation) return true;
-    return false;
   }
 });

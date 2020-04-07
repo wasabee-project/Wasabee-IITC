@@ -4,7 +4,7 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
-import OverflowMenu from "../overflowMenu";
+import WasabeeMe from "../me";
 import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import wX from "../wX";
 
@@ -155,47 +155,19 @@ const MarkerList = WDialog.extend({
         }
       },
       {
-        name: "",
+        name: wX("DELETE_MARKER"),
         sort: null,
         value: m => m,
-        format: (o, e) => this.makeMarkerDialogMenu(o, e)
+        format: (cell, data) => {
+	  const d = L.DomUtil.create("a", null, cell);
+	  d.href = "#";
+	  d.textContent = wX("DELETE_MARKER");
+	}
       }
     ];
     content.sortBy = 0;
     content.items = operation.markers;
     return content;
-  },
-
-  makeMarkerDialogMenu: function(list, data) {
-    const operation = getSelectedOperation();
-    const state = new OverflowMenu();
-    const options = [
-      {
-        label: wX("SET_COMMENT"),
-        onclick: () => {
-          const scd = new SetCommentDialog(window.map);
-          scd.setup(data, operation);
-          scd.enable();
-        }
-      },
-      {
-        label: wX("DELETE"),
-        onclick: () => operation.removeMarker(data)
-      }
-    ];
-    if (operation.IsServerOp()) {
-      options.push({
-        label: wX("ASSIGN"),
-        onclick: () => {
-          const ad = new AssignDialog();
-          ad.setup(data, operation);
-          ad.enable();
-        }
-      });
-    }
-    state.items = options;
-    list.className = "menu";
-    list.appendChild(state.button);
   }
 });
 
