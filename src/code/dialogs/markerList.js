@@ -122,11 +122,12 @@ const MarkerList = WDialog.extend({
         name: wX("ASS_TO"),
         value: marker => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
+            if (!WasabeeMe.isLoggedIn()) return "not logged in";
             const agent = getAgent(marker.assignedTo);
             if (agent != null) {
               return agent.name;
             } else {
-              return "looking up: [" + marker.assignedTo + "]";
+              return "Loading: [" + marker.assignedTo + "]";
             }
           }
           return "";
@@ -159,10 +160,13 @@ const MarkerList = WDialog.extend({
         sort: null,
         value: m => m,
         format: (cell, data) => {
-	  const d = L.DomUtil.create("a", null, cell);
-	  d.href = "#";
-	  d.textContent = wX("DELETE_MARKER");
-	}
+          const d = L.DomUtil.create("a", null, cell);
+          d.href = "#";
+          d.textContent = wX("DELETE_MARKER");
+          L.DomEvent.on(d, "click", () => {
+            operation.removeMarker(data);
+          });
+        }
       }
     ];
     content.sortBy = 0;
