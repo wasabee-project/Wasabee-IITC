@@ -65,10 +65,8 @@ const LinkListDialog = WDialog.extend({
         value: link => link.order,
         sort: (a, b) => {
           return a - b;
-        },
-        format: (a, m) => {
-          a.textContent = m;
         }
+        // , format: (a, m) => { a.textContent = m; }
       },
       {
         name: "From",
@@ -91,7 +89,8 @@ const LinkListDialog = WDialog.extend({
           a.classList.add("length");
           a.textContent =
             m > 1e3 ? (m / 1e3).toFixed(1) + "km" : m.toFixed(1) + "m";
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Min Lvl",
@@ -99,7 +98,8 @@ const LinkListDialog = WDialog.extend({
         value: link => link.length(this._operation),
         format: (cell, d, link) => {
           cell.appendChild(link.minLevel(this._operation));
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Comment",
@@ -116,7 +116,8 @@ const LinkListDialog = WDialog.extend({
               scd.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Assigned To",
@@ -142,22 +143,29 @@ const LinkListDialog = WDialog.extend({
               ad.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Color",
         value: link => link.color,
-        sort: null,
-        format: (list, data, link) => {
-          this.makeColorMenu(list, data, link);
-        }
+        // sort: null,
+        format: (cell, data, link) => {
+          this.makeColorMenu(cell, data, link);
+        },
+        smallScreenHide: true
       },
       {
-        name: "",
-        sort: null,
+        name: wX("DELETE_LINK"),
+        // sort: null,
         value: link => link,
-        format: (list, data) => {
-          list.textContent = data;
+        format: (cell, data, link) => {
+          const d = L.DomUtil.create("a", null, cell);
+          d.href = "#";
+          d.textContent = wX("DELETE_LINK");
+          L.DomEvent.on(d, "click", () => {
+            this.deleteLink(link);
+          });
         }
       }
     ];
@@ -165,53 +173,16 @@ const LinkListDialog = WDialog.extend({
     this._table.items = this._operation.getLinkListFromPortal(this._portal);
   },
 
-  deleteLink: function(link, operation) {
+  deleteLink: function(link) {
     const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
     prompt.textContent = wX("CONFIRM_DELETE");
-    prompt.appendChild(link.displayFormat(operation));
+    prompt.appendChild(link.displayFormat(this._operation));
     con.setup("Delete Link", prompt, () => {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);
     });
     con.enable();
   },
-
-  /* makeMenu: function(list, data) {
-    const state = new OverflowMenu();
-    const options = [
-      {
-        label: "Reverse",
-        onclick: () => {
-          this._operation.reverseLink(data.fromPortalId, data.toPortalId);
-        }
-      },
-      {
-        label: "Delete",
-        onclick: () => this.deleteLink(data, this._operation)
-      },
-      {
-        label: "Set Comment",
-        onclick: () => {
-          const scd = new SetCommentDialog(window.map);
-          scd.setup(data, this._operation);
-          scd.enable();
-        }
-      }
-    ];
-    if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-      options.push({
-        label: "Assign",
-        onclick: () => {
-          const ad = new AssignDialog();
-          ad.setup(data, this._operation);
-          ad.enable();
-        }
-      });
-    }
-    state.items = options;
-    list.className = "menu";
-    list.appendChild(state.button);
-  }, */
 
   makeColorMenu: function(list, data, link) {
     const colorSection = L.DomUtil.create("div", null, list);

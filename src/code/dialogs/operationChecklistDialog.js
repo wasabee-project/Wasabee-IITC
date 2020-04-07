@@ -151,7 +151,8 @@ const OperationChecklistDialog = WDialog.extend({
             scd.setup(thing, operation);
             scd.enable();
           });
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: wX("ASS_TO"),
@@ -179,7 +180,8 @@ const OperationChecklistDialog = WDialog.extend({
               ad.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: wX("STATE"),
@@ -187,7 +189,8 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value) => {
           row.textContent = value;
-        }
+        },
+        smallScreenHide: true
       }
     ];
     content.sortBy = sortBy;
