@@ -80,7 +80,7 @@
     "FAN_FIELD3": "Fan Field",
     "FANFIELD TITLE": "Fanfield",
     "FROM_PORT": "From Portal",
-    "GET_DT_DRAW": "Get existing DrawTools draw",
+    "GET_DT_DRAW": "Import DrawTools draw",
     "HOURS": " (${value} hours ago)",
     "HOW_TO_VIDS": "<h3>How-To Videos:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>0.15 Intro</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Old Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Teams and Permissions</a></li></ul>",
     "IMP_COMP": "Import Complete. Found ",
