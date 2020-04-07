@@ -1,5 +1,4 @@
 {
-  "Italiano": {
     "SEND TARGET": "Invia obiettivo",
     "SELECT PORTAL": "Seleziona un portale da inviare",
     "SEND TARGET CONFIRM": "Vuoi inviare ${value} obiettivo a ${option}?",
@@ -12,5 +11,4 @@
     "LINKS": "Collega",
     "DELETE_ANCHOR": "Elimina",
     "ASSIGN OUTBOUND": "Assegna collegamenti in uscita"
-  }
 }

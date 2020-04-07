@@ -1,5 +1,4 @@
 {
-  "Tagalog": {
     "last edited": "03-31-2020 @D0BERMAXX",
     "LANG": "Wika",
     "DISABLE_SYNC": "Ang Wasabee at stock sync plugin ay hindi compatible. Paki disable sync para gamitin ang Wasabee",
@@ -272,5 +271,4 @@
     "SEL_SB_ANCHOR": "Pillin ang anchor, I-zoom sa area para dagdagan sa starburst",
     "ANCHOR_PORTAL": "Anchor Portal ",
     "ADD_BUTTON_LINKS": "Sabay-sabay idagdag ang lahat ng link."
-  }
 }

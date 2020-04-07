@@ -167,14 +167,15 @@ export const WButton = L.Class.extend({
   _createSubActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
-      if (this._isMobile && b.text.length > 12) {
-        b.text = b.text.split(0, 8) + "...";
+      let text = b.text;
+      if (this._isMobile && b.text.length > 8) {
+        text = b.text.split(0, 6) + "...";
       }
 
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
         title: b.title,
-        text: b.text,
+        text: text,
         buttonImage: b.img,
         container: li,
         callback: b.callback,

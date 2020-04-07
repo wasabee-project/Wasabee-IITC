@@ -1,5 +1,4 @@
 {
-  "Deutsch": {
     "last edited": "03-26-2020 @AxForest ",
     "LANG": "Sprache",
     "DISABLE_SYNC": "Das Standard Synchronisations Plugin ist nicht mit Wasabee kompatibel - Bitte deaktiveren",
@@ -260,5 +259,4 @@
     "WASABEE_MODE_BATTLE": "Kampf",
     "WASABEE_MODE_DESIGN": "Planung",
     "WASABEE_MODE_DESC": "Im Planungsmodus veränderungen müssen manuell zum Server hinzugefügt werden. Änderungen werden nicht an die Agenten weitergegeben. Änderungen in der IITC überschreiben die bisherigen werte. Im Kampfmodus werden änderungen direkt an den Server, sowie die Agenten (via. Telegram, wenn verfügbar) weitergeleitet. Die akuten änderungen haben eine höhere Priorität als die IITC daten."
-  }
 }

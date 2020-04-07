@@ -1,5 +1,4 @@
 {
-  "Espanol": {
     "ABOUT WASABEE-IITC": "Sobre Wasabee-IITC",
     "ABOUT_WASABEE": "Sobre Wasabee",
     "ADD": "Agregar",
@@ -280,5 +279,4 @@
     "DELETE": "Borrar",
     "UPDATE PERM DENIED": "Permiso para acutalizar denegado",
     "UPLOAD BUTTON HOVER": "CARGAR ${value} (no se encuentra actualmente en el servidor)"
-  }
 }
