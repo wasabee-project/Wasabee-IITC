@@ -1,6 +1,5 @@
 // aliases to make review easier
 const strings = window.plugin.wasabee.static.strings;
-const silly = window.plugin.wasabee.static.stringsSilly;
 const defaultLang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 const localStoreKey = window.plugin.wasabee.static.constants.LANGUAGE_KEY;
 
@@ -9,7 +8,6 @@ export const wX = (key, value, option) => {
 
   let s = null;
   if (strings[lang] && strings[lang][key]) s = strings[lang][key];
-  if (!s && silly[lang] && silly[lang][key]) s = silly[lang][key];
   if (!s && strings[defaultLang] && strings[defaultLang][key])
     s = strings[defaultLang][key];
   if (!s) s = "haec notificatio praebibo est";
@@ -30,7 +28,7 @@ export const getLanguage = () => {
   }
 
   // if the langauge doesn't exist in either list, clear it and use DEFAULT_LANGUAGE
-  if (!strings[lang] && !silly[lang]) {
+  if (!strings[lang]) {
     lang = defaultLang;
     localStorage[localStoreKey] = defaultLang;
     console.log("invalid language set, changing to default");

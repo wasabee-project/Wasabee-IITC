@@ -77,7 +77,7 @@ W.static.strings.Espanol = require("./translations/spanish.json");
 W.static.strings.English = require("./translations/english.json");
 W.static.strings.Italiano = require("./translations/italian.json");
 W.static.strings.Tagalog = require("./translations/filipino.json");
-W.static.stringsSilly = require("./translations/silly.json");
+W.static.strings.Squirrel = require("./translations/silly.json");
 W.static.tips = require("./translations/tips.json");
 
 W.static.markerTypes = new Map([
