@@ -43,7 +43,7 @@ export const WDialog = L.Handler.extend({
     this._container = map._container;
     L.Util.extend(this.options, options);
     this._enabled = false;
-    this._smallScreen = this.isMobile();
+    this._smallScreen = this._isMobile();
     this._dialog = null;
     // look for operation in options, if not set, get it
     // determine large or small screen dialog sizes
@@ -63,7 +63,7 @@ export const WDialog = L.Handler.extend({
 
   removeHooks: function() {},
 
-  isMobile: function() {
+  _isMobile: function() {
     // return true;
     // XXX this is a cheap hack -- determine a better check
     if (window.plugin.userLocation) return true;
@@ -164,24 +164,13 @@ export const WButton = L.Class.extend({
       .off(button, "click", callback);
   },
 
-  /* _createActions: function(buttons) {
-    const container = L.DomUtil.create("ul", "wasabee-actions");
-    for (const b of buttons) {
-      const li = L.DomUtil.create("li", "wasabee-actions", container);
-      this._createButton({
-        title: b.title,
-        text: b.text,
-        container: li,
-        callback: b.callback,
-        context: b.context
-      });
-    }
-    return container;
-  }, */
-
   _createSubActions: function(buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
+      if (this._isMobile && b.text.length > 12) {
+        b.text = b.text.split(0, 8) + "...";
+      }
+
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
         title: b.title,
@@ -197,5 +186,12 @@ export const WButton = L.Class.extend({
       // li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
+  },
+
+  _isMobile: function() {
+    // return true;
+    // XXX this is a cheap hack -- determine a better check
+    if (window.plugin.userLocation) return true;
+    return false;
   }
 });
