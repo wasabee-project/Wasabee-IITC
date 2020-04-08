@@ -5,6 +5,7 @@ import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
 import wX from "../wX";
+import WasabeeMe from "../me";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -62,33 +63,33 @@ const LinkListDialog = WDialog.extend({
     this._table.fields = [
       {
         name: "Order",
-        value: link => link.order,
-        sort: (a, b) => {
-          return a - b;
-        }
-        // , format: (a, m) => { a.textContent = m; }
+        value: link => link.throwOrderPos
+        // , sort: (a, b) => { return a - b; }
+        // , format: (cell, value, obj) => { console.log(value, obj); cell.textContent = value; }
       },
       {
         name: "From",
         value: link => this._operation.getPortal(link.fromPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
+        format: (cell, data) =>
+          cell.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "To",
         value: link => this._operation.getPortal(link.toPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
+        format: (cell, data) =>
+          cell.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "Length",
         value: link => link.length(this._operation),
-        format: (a, m) => {
-          a.classList.add("length");
-          a.textContent =
-            m > 1e3 ? (m / 1e3).toFixed(1) + "km" : m.toFixed(1) + "m";
+        format: (cell, data) => {
+          cell.classList.add("length");
+          cell.textContent =
+            data > 1e3 ? (data / 1e3).toFixed(1) + "km" : data.toFixed(1) + "m";
         },
         smallScreenHide: true
       },
@@ -96,7 +97,7 @@ const LinkListDialog = WDialog.extend({
         name: "Min Lvl",
         title: wX("MIN_SRC_PORT_LVL"),
         value: link => link.length(this._operation),
-        format: (cell, d, link) => {
+        format: (cell, data, link) => {
           cell.appendChild(link.minLevel(this._operation));
         },
         smallScreenHide: true
@@ -105,12 +106,12 @@ const LinkListDialog = WDialog.extend({
         name: "Comment",
         value: link => link.comment,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, obj, link) => {
-          row.className = "desc";
-          if (obj != null) {
-            const comment = L.DomUtil.create("a", null, row);
-            comment.textContent = window.escapeHtmlSpecialChars(obj);
-            L.DomEvent.on(comment, "click", () => {
+        format: (cell, data, link) => {
+          cell.className = "desc";
+          if (data != null) {
+            const comment = L.DomUtil.create("a", null, cell);
+            comment.textContent = window.escapeHtmlSpecialChars(data);
+            L.DomEvent.on(cell, "click", () => {
               const scd = new SetCommentDialog(window.map);
               scd.setup(link, operation);
               scd.enable();
@@ -123,6 +124,7 @@ const LinkListDialog = WDialog.extend({
         name: "Assigned To",
         value: link => {
           if (link.assignedTo != null && link.assignedTo != "") {
+            if (!WasabeeMe.isLoggedIn()) return "not logged in";
             const agent = getAgent(link.assignedTo);
             if (agent != null) {
               return agent.name;
@@ -137,7 +139,7 @@ const LinkListDialog = WDialog.extend({
           const assignee = L.DomUtil.create("a", null, a);
           assignee.textContent = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-            L.DomEvent.on(assignee, "click", () => {
+            L.DomEvent.on(a, "click", () => {
               const ad = new AssignDialog();
               ad.setup(link, this._operation);
               ad.enable();
@@ -157,7 +159,7 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: wX("DELETE_LINK"),
-        // sort: null,
+        sort: null,
         value: link => link,
         format: (cell, data, link) => {
           const d = L.DomUtil.create("a", null, cell);
