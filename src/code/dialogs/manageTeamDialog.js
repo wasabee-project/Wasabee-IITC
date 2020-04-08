@@ -66,7 +66,8 @@ const ManageTeamDialog = WDialog.extend({
         format: (cell, value, obj) => {
           const button = L.DomUtil.create("a", null, cell);
           button.textContent = value;
-          L.DomEvent.on(button, "click", () => {
+          L.DomEvent.on(button, "click", ev => {
+            L.DomEvent.stop(ev);
             const squadDialog = new PromptDialog(window.map);
             squadDialog.setup(`Set Squad for ${obj.name}`, "Squad", () => {
               if (squadDialog.inputField.value) {
@@ -103,7 +104,8 @@ const ManageTeamDialog = WDialog.extend({
         format: (cell, value) => {
           const button = L.DomUtil.create("a", null, cell);
           button.textContent = wX("REMOVE");
-          L.DomEvent.on(button, "click", () => {
+          L.DomEvent.on(button, "click", ev => {
+            L.DomEvent.stop(ev);
             removeAgentFromTeamPromise(value, this._team.ID).then(
               () => {
                 window.runHooks("wasabeeUIUpdate", getSelectedOperation());
@@ -155,7 +157,8 @@ const ManageTeamDialog = WDialog.extend({
     addField.placeholder = wX("INGNAME_GID");
     const addButton = L.DomUtil.create("button", null, container);
     addButton.textContent = wX("ADD");
-    L.DomEvent.on(addButton, "click", () => {
+    L.DomEvent.on(addButton, "click", ev => {
+      L.DomEvent.stop(ev);
       addAgentToTeamPromise(addField.value, this._team.ID).then(
         () => {
           alert(wX("ADD_SUCC_INSTR"));
@@ -175,7 +178,8 @@ const ManageTeamDialog = WDialog.extend({
     renameField.value = this._team.Name;
     const renameButton = L.DomUtil.create("button", null, container);
     renameButton.textContent = wX("RENAME");
-    L.DomEvent.on(renameButton, "click", () => {
+    L.DomEvent.on(renameButton, "click", ev => {
+      L.DomEvent.stop(ev);
       renameTeamPromise(this._team.ID, renameField.value).then(
         () => {
           alert(`renamed to ${renameField.value}`);
@@ -201,7 +205,8 @@ const ManageTeamDialog = WDialog.extend({
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
     const rocksButton = L.DomUtil.create("button", null, container);
     rocksButton.textContent = wX("SET");
-    L.DomEvent.on(rocksButton, "click", () => {
+    L.DomEvent.on(rocksButton, "click", ev => {
+      L.DomEvent.stop(ev);
       rocksPromise(
         this._team.ID,
         rockscommField.value,
@@ -224,7 +229,8 @@ const ManageTeamDialog = WDialog.extend({
     removeLabel.textContent = wX("REMOVE_TEAM");
     const removeButton = L.DomUtil.create("button", null, container);
     removeButton.textContent = wX("REMOVE");
-    L.DomEvent.on(removeButton, "click", () => {
+    L.DomEvent.on(removeButton, "click", ev => {
+      L.DomEvent.stop(ev);
       const cd = new ConfirmDialog();
       cd.setup(
         wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),

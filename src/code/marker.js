@@ -88,7 +88,8 @@ export default class WasabeeMarker {
     );
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
     deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", () => {
+    L.DomEvent.on(deleteButton, "click", ev => {
+      L.DomEvent.stop(ev);
       deleteMarker(operation, this, portal);
       marker.closePopup();
     });
@@ -96,7 +97,8 @@ export default class WasabeeMarker {
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN");
-      L.DomEvent.on(assignButton, "click", () => {
+      L.DomEvent.on(assignButton, "click", ev => {
+        L.DomEvent.stop(ev);
         const ad = new AssignDialog();
         ad.setup(this, operation);
         ad.enable();

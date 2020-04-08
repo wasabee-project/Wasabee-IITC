@@ -62,9 +62,10 @@ const MarkerAddDialog = WDialog.extend({
     this._comment.setAttribute("placeholder", "comment");
     const addMarkerButton = L.DomUtil.create("button", null, content);
     addMarkerButton.textContent = wX("ADD_MARKER");
-    L.DomEvent.on(addMarkerButton, "click", () =>
-      this._addMarker(this._type.value, this._operation, this._comment.value)
-    );
+    L.DomEvent.on(addMarkerButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      this._addMarker(this._type.value, this._operation, this._comment.value);
+    });
 
     const context = this;
     this._dialog = window.dialog({

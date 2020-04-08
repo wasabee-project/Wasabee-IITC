@@ -66,7 +66,8 @@ const DefensiveKeysDialog = WDialog.extend({
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("button", null, this._content);
     addDKeyButton.textContent = wX("UPDATE_COUNT");
-    L.DomEvent.on(addDKeyButton, "click", () => {
+    L.DomEvent.on(addDKeyButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._addDKey();
     });
 

@@ -78,7 +78,8 @@ const OpPermList = WDialog.extend({
       ab.textContent = wX("ADD");
 
       const context = this;
-      L.DomEvent.on(ab, "click", () => {
+      L.DomEvent.on(ab, "click", ev => {
+        L.DomEvent.stop(ev);
         context.addPerm(teamMenu.value, permMenu.value);
         context.setup();
         context._drawnTable = this._html.replaceChild(
@@ -130,7 +131,8 @@ const OpPermList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
           cell.textContent = value;
-          L.DomEvent.on(cell, "click", () => {
+          L.DomEvent.on(cell, "click", ev => {
+            L.DomEvent.stop(ev);
             this.delPerm(obj);
           });
         }

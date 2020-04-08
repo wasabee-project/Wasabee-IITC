@@ -111,7 +111,8 @@ const LinkListDialog = WDialog.extend({
           if (data != null) {
             const comment = L.DomUtil.create("a", null, cell);
             comment.textContent = window.escapeHtmlSpecialChars(data);
-            L.DomEvent.on(cell, "click", () => {
+            L.DomEvent.on(cell, "click", ev => {
+              L.DomEvent.stop(ev);
               const scd = new SetCommentDialog(window.map);
               scd.setup(link, operation);
               scd.enable();
@@ -139,7 +140,8 @@ const LinkListDialog = WDialog.extend({
           const assignee = L.DomUtil.create("a", null, a);
           assignee.textContent = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-            L.DomEvent.on(a, "click", () => {
+            L.DomEvent.on(a, "click", ev => {
+              L.DomEvent.stop(ev);
               const ad = new AssignDialog();
               ad.setup(link, this._operation);
               ad.enable();
@@ -165,7 +167,8 @@ const LinkListDialog = WDialog.extend({
           const d = L.DomUtil.create("a", null, cell);
           d.href = "#";
           d.textContent = wX("DELETE_LINK");
-          L.DomEvent.on(d, "click", () => {
+          L.DomEvent.on(d, "click", ev => {
+            L.DomEvent.stop(ev);
             this.deleteLink(link);
           });
         }

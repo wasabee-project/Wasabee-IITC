@@ -48,7 +48,8 @@ const LinkDialog = WDialog.extend({
     } else {
       this._sourceDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(sourceButton, "click", () => {
+    L.DomEvent.on(sourceButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._source = WasabeePortal.getSelected();
       if (this._source) {
         localStorage["wasabee-link-source"] = JSON.stringify(this._source);
@@ -60,7 +61,8 @@ const LinkDialog = WDialog.extend({
     });
     const clearSourceButton = L.DomUtil.create("button", "clear", container);
     clearSourceButton.textContent = wX("CLEAR");
-    L.DomEvent.on(clearSourceButton, "click", () => {
+    L.DomEvent.on(clearSourceButton, "click", ev => {
+      L.DomEvent.stop(ev);
       delete localStorage["wasabee-link-source"];
       this._sourceDisplay.textContent = wX("NOT_SET");
     });
@@ -75,7 +77,8 @@ const LinkDialog = WDialog.extend({
     } else {
       this._anchor1Display.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchor1Button, "click", () => {
+    L.DomEvent.on(anchor1Button, "click", ev => {
+      L.DomEvent.stop(ev);
       this._anchor1 = WasabeePortal.getSelected();
       if (this._anchor1) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
@@ -87,7 +90,8 @@ const LinkDialog = WDialog.extend({
     });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
     anchor1AddButton.textContent = wX("ADD");
-    L.DomEvent.on(anchor1AddButton, "click", () => {
+    L.DomEvent.on(anchor1AddButton, "click", ev => {
+      L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
         this._operation.addLink(
           this._source,
@@ -101,7 +105,8 @@ const LinkDialog = WDialog.extend({
     });
     const clearAnchor1Button = L.DomUtil.create("button", "clear", container);
     clearAnchor1Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor1Button, "click", () => {
+    L.DomEvent.on(clearAnchor1Button, "click", ev => {
+      L.DomEvent.stop(ev);
       delete localStorage["wasabee-anchor-1"];
       this._anchor1Display.textContent = wX("NOT_SET");
     });
@@ -116,7 +121,8 @@ const LinkDialog = WDialog.extend({
     } else {
       this._anchor2Display.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchor2Button, "click", () => {
+    L.DomEvent.on(anchor2Button, "click", ev => {
+      L.DomEvent.stop(ev);
       this._anchor2 = WasabeePortal.getSelected();
       if (this._anchor2) {
         localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
@@ -128,7 +134,8 @@ const LinkDialog = WDialog.extend({
     });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
     anchor2AddButton.textContent = wX("ADD");
-    L.DomEvent.on(anchor2AddButton, "click", () => {
+    L.DomEvent.on(anchor2AddButton, "click", ev => {
+      L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
         this._operation.addLink(
           this._source,
@@ -142,7 +149,8 @@ const LinkDialog = WDialog.extend({
     });
     const clearAnchor2Button = L.DomUtil.create("button", "clear", container);
     clearAnchor2Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor2Button, "click", () => {
+    L.DomEvent.on(clearAnchor2Button, "click", ev => {
+      L.DomEvent.stop(ev);
       delete localStorage["wasabee-anchor-2"];
       this._anchor2Display.textContent = wX("NOT_SET");
     });
@@ -154,7 +162,8 @@ const LinkDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("ADD_BUTTON_LINKS");
-    L.DomEvent.on(button, "click", () => {
+    L.DomEvent.on(button, "click", ev => {
+      L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));
       if (this._anchor1) {
         this._operation.addLink(

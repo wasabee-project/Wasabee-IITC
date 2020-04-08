@@ -74,7 +74,8 @@ const SettingsDialog = WDialog.extend({
       option.textContent = l;
       if (l == current) option.selected = true;
     }
-    L.DomEvent.on(langMenu, "change", () => {
+    L.DomEvent.on(langMenu, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
         langMenu.value;
       addButtons(getSelectedOperation());
@@ -88,7 +89,8 @@ const SettingsDialog = WDialog.extend({
     const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
     const sl = localStorage[c];
     if (sl === "true") sendLocCheck.checked = true;
-    L.DomEvent.on(sendLocCheck, "change", () => {
+    L.DomEvent.on(sendLocCheck, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[c] = sendLocCheck.checked;
     });
 
@@ -109,7 +111,8 @@ const SettingsDialog = WDialog.extend({
       operationMode.textContent += " (not logged in)";
     }
     if (mode == "active") operationMode.selected = true;
-    L.DomEvent.on(modeSelect, "change", () => {
+    L.DomEvent.on(modeSelect, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[modeKey] = modeSelect.value;
     });
     /* const modeDesc = L.DomUtil.create("div", "desc", container);

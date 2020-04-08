@@ -65,19 +65,22 @@ export default class WasabeeAnchor {
     );
     const linksButton = L.DomUtil.create("button", null, buttonSet);
     linksButton.textContent = wX("LINKS");
-    L.DomEvent.on(linksButton, "click", () => {
+    L.DomEvent.on(linksButton, "click", ev => {
+      L.DomEvent.stop(ev);
       showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
     const swapButton = L.DomUtil.create("button", null, buttonSet);
     swapButton.textContent = wX("SWAP");
-    L.DomEvent.on(swapButton, "click", () => {
+    L.DomEvent.on(swapButton, "click", ev => {
+      L.DomEvent.stop(ev);
       swapPortal(operation, this._portal);
       marker.closePopup();
     });
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
     deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", () => {
+    L.DomEvent.on(deleteButton, "click", ev => {
+      L.DomEvent.stop(ev);
       deletePortal(operation, this._portal);
       marker.closePopup();
     });
@@ -85,7 +88,8 @@ export default class WasabeeAnchor {
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
-      L.DomEvent.on(assignButton, "click", () => {
+      L.DomEvent.on(assignButton, "click", ev => {
+        L.DomEvent.stop(ev);
         // XXX why can't I just use "this"? instead of making a new anchor?
         const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();

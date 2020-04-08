@@ -62,7 +62,8 @@ const WasabeeDialog = WDialog.extend({
           link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", () => {
+            L.DomEvent.on(link, "click", ev => {
+              L.DomEvent.stop(ev);
               const td = new TeamMembershipList();
               td.setup(team.ID);
               td.enable();
@@ -93,7 +94,8 @@ const WasabeeDialog = WDialog.extend({
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = wX("LEAVE");
-          L.DomEvent.on(link, "click", () => {
+          L.DomEvent.on(link, "click", ev => {
+            L.DomEvent.stop(ev);
             const cd = new ConfirmDialog();
             cd.setup(
               `Leave ${obj.Name}?`,
@@ -125,7 +127,8 @@ const WasabeeDialog = WDialog.extend({
             if (obj.State == "On" && ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
               link.textContent = wX("MANAGE");
-              L.DomEvent.on(link, "click", () => {
+              L.DomEvent.on(link, "click", ev => {
+                L.DomEvent.stop(ev);
                 const mtd = new ManageTeamDialog();
                 mtd.setup(ot);
                 mtd.enable();
@@ -141,11 +144,15 @@ const WasabeeDialog = WDialog.extend({
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
     serverInfo.href = "#";
-    L.DomEvent.on(serverInfo, "click", this.setServer);
+    L.DomEvent.on(serverInfo, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.setServer();
+    });
 
     const locbutton = L.DomUtil.create("button", "sendloc", container);
     locbutton.textContent = wX("SEND_LOC");
-    L.DomEvent.on(locbutton, "click", () => {
+    L.DomEvent.on(locbutton, "click", ev => {
+      L.DomEvent.stop(ev);
       navigator.geolocation.getCurrentPosition(
         position => {
           locationPromise(

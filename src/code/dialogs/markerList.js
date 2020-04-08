@@ -111,7 +111,8 @@ const MarkerList = WDialog.extend({
         format: (a, m, marker) => {
           const comment = L.DomUtil.create("a", "", a);
           comment.textContent = m;
-          L.DomEvent.on(comment, "click", () => {
+          L.DomEvent.on(comment, "click", ev => {
+            L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(marker, operation);
             scd.enable();

@@ -41,7 +41,8 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButton, "click", () => {
+    L.DomEvent.on(anchorButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
@@ -62,7 +63,8 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._startDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(startButton, "click", () => {
+    L.DomEvent.on(startButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._start = WasabeePortal.getSelected();
       if (this._start) {
         localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
@@ -83,7 +85,8 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._endDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(endButton, "click", () => {
+    L.DomEvent.on(endButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._end = WasabeePortal.getSelected();
       if (this._end) {
         localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
@@ -101,7 +104,8 @@ const FanfieldDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("FANFIELD");
-    L.DomEvent.on(button, "click", () => {
+    L.DomEvent.on(button, "click", ev => {
+      L.DomEvent.stop(ev);
       const context = this;
       this.fanfield(context);
     });

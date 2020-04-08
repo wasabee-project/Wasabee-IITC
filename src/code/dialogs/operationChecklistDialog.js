@@ -94,7 +94,8 @@ const OperationChecklistDialog = WDialog.extend({
           const oif = L.DomUtil.create("input", "");
           oif.value = value;
           oif.size = 3;
-          L.DomEvent.on(oif, "change", () => {
+          L.DomEvent.on(oif, "change", ev => {
+            L.DomEvent.stop(ev);
             thing.opOrder = oif.value;
             // since we are changing the values in the (thing)
             // let the op know it has changed (save/redraw);
@@ -146,7 +147,8 @@ const OperationChecklistDialog = WDialog.extend({
         format: (row, value, thing) => {
           const comment = L.DomUtil.create("a", "", row);
           comment.textContent = value;
-          L.DomEvent.on(row, "click", () => {
+          L.DomEvent.on(row, "click", ev => {
+            L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(thing, operation);
             scd.enable();
@@ -174,7 +176,8 @@ const OperationChecklistDialog = WDialog.extend({
           // assigned.appendChild(agent.displayFormat());
           if (WasabeeMe.isLoggedIn()) {
             // XXX should be writable op
-            L.DomEvent.on(row, "click", () => {
+            L.DomEvent.on(row, "click", ev => {
+              L.DomEvent.stop(ev);
               const ad = new AssignDialog();
               ad.setup(agent, operation);
               ad.enable();
