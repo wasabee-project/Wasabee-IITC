@@ -81,11 +81,9 @@ const KeyListPortal = WDialog.extend({
       },
       {
         name: wX("ON_HAND"),
-        value: key => key.onhand,
-        sort: (a, b) => a - b,
-        format: (cell, value) => {
-          cell.textContent = value;
-        }
+        value: key => key.onhand
+        // sort: (a, b) => a - b,
+        // format: (cell, value) => { cell.textContent = value; }
       },
       {
         name: wX("CAPSULE"),

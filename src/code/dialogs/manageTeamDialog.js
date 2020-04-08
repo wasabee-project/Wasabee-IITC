@@ -56,8 +56,8 @@ const ManageTeamDialog = WDialog.extend({
       {
         name: "Enabled",
         value: agent => agent.state,
-        sort: (a, b) => a && !b,
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a && !b
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("SQUAD"),

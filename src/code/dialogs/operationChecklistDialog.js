@@ -89,7 +89,7 @@ const OperationChecklistDialog = WDialog.extend({
       {
         name: wX("ORDER"),
         value: thing => thing.opOrder,
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (row, value, thing) => {
           const oif = L.DomUtil.create("input", "");
           oif.value = value;

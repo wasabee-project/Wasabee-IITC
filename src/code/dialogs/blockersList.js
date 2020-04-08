@@ -121,7 +121,7 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value)
       },
       {
@@ -145,7 +145,7 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value)
       }
     ];

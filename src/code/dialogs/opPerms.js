@@ -115,14 +115,14 @@ const OpPermList = WDialog.extend({
           }
           return "[" + perm.teamid + "] denied";
         },
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("ROLE"),
         value: perm => perm.role,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("REMOVE"),

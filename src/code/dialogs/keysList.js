@@ -84,7 +84,7 @@ const KeysList = WDialog.extend({
       {
         name: wX("REQUIRED"),
         value: key => key.Required,
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           cell.textContent = value;
           const oh = parseInt(key.onHand);
@@ -99,7 +99,7 @@ const KeysList = WDialog.extend({
       {
         name: wX("ON_HAND"),
         value: key => parseInt(key.onHand),
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
           a.name = key.id;
@@ -122,7 +122,7 @@ const KeysList = WDialog.extend({
         {
           name: wX("MY_COUNT"),
           value: key => parseInt(key.iHave),
-          sort: (a, b) => a - b,
+          // sort: (a, b) => a - b,
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");
             oif.value = value;

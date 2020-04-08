@@ -89,7 +89,7 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("LEAVE"),
         value: team => team.State,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = wX("LEAVE");
@@ -118,7 +118,7 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("MANAGE"),
         value: team => team.ID,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           row.textContent = "";
           for (const ot of this._me.OwnedTeams) {
