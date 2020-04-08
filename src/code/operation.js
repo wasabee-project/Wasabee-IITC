@@ -290,6 +290,10 @@ export default class WasabeeOp {
   }
 
   addLink(fromPortal, toPortal, description, order) {
+    if (!fromPortal || !toPortal) {
+      console.log("missing portal for link");
+      return;
+    }
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."
