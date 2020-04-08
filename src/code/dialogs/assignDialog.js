@@ -3,12 +3,7 @@ import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
 import WasabeeTeam from "../team";
-import {
-  updateOpPromise,
-  assignLinkPromise,
-  assignMarkerPromise,
-  teamPromise
-} from "../server";
+import { assignLinkPromise, assignMarkerPromise, teamPromise } from "../server";
 import wX from "../wX";
 
 const AssignDialog = WDialog.extend({
@@ -16,8 +11,7 @@ const AssignDialog = WDialog.extend({
     TYPE: "assignDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = AssignDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -33,7 +27,6 @@ const AssignDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (!this._map) return;
     const assignDialog = this;
     this._dialog = window.dialog({
       title: this._name,
@@ -50,8 +43,6 @@ const AssignDialog = WDialog.extend({
   },
 
   setup: function(target, operation) {
-    this._upload(operation);
-
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
@@ -87,27 +78,10 @@ const AssignDialog = WDialog.extend({
 
     const menu = this._getAgentMenu(target.assignedTo);
     this._html.appendChild(menu);
-    menu.style.align = "center";
-  },
-
-  _upload: function(operation) {
-    if (!operation.localchanged) return;
-    updateOpPromise(operation).then(
-      function() {
-        console.log(
-          "modified op: " +
-            operation.name +
-            " uploaded before making assignments."
-        );
-      },
-      function(err) {
-        alert(err);
-      }
-    );
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div");
     if (typeof this._label == "string") {
       content.textContent = this._label;
     } else {
@@ -116,6 +90,7 @@ const AssignDialog = WDialog.extend({
     return content;
   },
 
+  // TODO this should return a promise so the draw routine can .then() it...
   _getAgentMenu: function(current) {
     const container = L.DomUtil.create("div", "wasabee-agent-menu");
     const menu = L.DomUtil.create("select", null, container);
@@ -124,7 +99,18 @@ const AssignDialog = WDialog.extend({
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
-    // this needs to make sure not to add the same agent multiple times...
+    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
+    if (mode == "active") {
+      menu.addEventListener("change", value => {
+        this.activeAssign(value);
+      });
+    } else {
+      menu.addEventListener("change", value => {
+        this.designAssign(value);
+      });
+    }
+
+    // TODO return promise ( ...
     for (const t of this._operation.teamlist) {
       if (!window.plugin.wasabee.teams.has(t.teamid)) {
         teamPromise(t.teamid).then(
@@ -138,7 +124,7 @@ const AssignDialog = WDialog.extend({
       }
       const tt = window.plugin.wasabee.teams.get(t.teamid) || new WasabeeTeam();
       for (const a of tt.agents) {
-        if (!alreadyAdded.includes(a.id)) {
+        if (!alreadyAdded.includes(a.id) && a.state === true) {
           alreadyAdded.push(a.id);
           option = L.DomUtil.create("option", null);
           option.setAttribute("value", a.id);
@@ -149,18 +135,6 @@ const AssignDialog = WDialog.extend({
           menu.appendChild(option);
         }
       }
-    }
-
-    // ( => ) functions inherit the "this" of the caller
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode == "active") {
-      menu.addEventListener("change", value => {
-        this.activeAssign(value);
-      });
-    } else {
-      menu.addEventListener("change", value => {
-        this.designAssign(value);
-      });
     }
 
     return container;
