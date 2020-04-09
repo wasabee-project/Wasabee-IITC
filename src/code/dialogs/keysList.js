@@ -103,15 +103,11 @@ const KeysList = WDialog.extend({
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
           a.name = key.id;
-          L.DomEvent.on(a, "click").on(
-            a,
-            "click",
-            ev => {
-              L.DomEvent.stop(ev);
-              this.showKeyByPortal(ev);
-            },
-            key
-          );
+          L.DomEvent.on(a, "click", L.DomEvent.stopPropagation)
+            .on(a, "mousedown", L.DomEvent.stopPropagation)
+            .on(a, "dblclick", L.DomEvent.stopPropagation)
+            .on(a, "click", L.DomEvent.preventDefault)
+            .on(a, "click", this.showKeyByPortal, key);
 
           a.textContent = value;
           cell.appendChild(a);
@@ -131,8 +127,7 @@ const KeysList = WDialog.extend({
             const oif = L.DomUtil.create("input");
             oif.value = value;
             oif.size = 3;
-            L.DomEvent.on(oif, "change", ev => {
-              L.DomEvent.stop(ev);
+            L.DomEvent.on(oif, "change", () => {
               opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
@@ -147,8 +142,7 @@ const KeysList = WDialog.extend({
             const oif = L.DomUtil.create("input");
             oif.value = value;
             oif.size = 8;
-            L.DomEvent.on(oif, "change", ev => {
-              L.DomEvent.stop(ev);
+            L.DomEvent.on(oif, "change", () => {
               opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });
