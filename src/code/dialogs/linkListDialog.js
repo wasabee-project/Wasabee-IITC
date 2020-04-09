@@ -160,6 +160,19 @@ const LinkListDialog = WDialog.extend({
         smallScreenHide: true
       },
       {
+        name: "Reverse",
+        value: link => link.fromPortalId,
+        format: (cell, data, link) => {
+          const d = L.DomUtil.create("a", null, cell);
+          d.href = "#";
+          d.textContent = "Reverse";
+          L.DomEvent.on(d, "click", ev => {
+            L.DomEvent.stop(ev);
+            operation.reverseLink(link.fromPortalId, link.toPortalId);
+          });
+        }
+      },
+      {
         name: wX("DELETE_LINK"),
         sort: null,
         value: link => link,

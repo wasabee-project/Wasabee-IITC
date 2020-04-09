@@ -240,10 +240,16 @@ export const mePromise = function() {
     req.withCredentials = true;
     req.crossDomain = true;
 
+    let me = null;
     req.onload = function() {
       switch (req.status) {
         case 200:
-          resolve(WasabeeMe.create(req.response));
+          me = WasabeeMe.create(req.response);
+          if (!me) {
+            reject(wX("NOT LOGGED IN", req.responseText));
+          } else {
+            resolve(me);
+          }
           break;
         case 401:
           reject(wX("NOT LOGGED IN", req.responseText));
