@@ -5,9 +5,14 @@ import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-import { resetOps, setupLocalStorage } from "../selectedOp";
+import {
+  getSelectedOperation,
+  resetOps,
+  setupLocalStorage
+} from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX, getLanguage } from "../wX";
+import { logoutPromise } from "../server";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -39,6 +44,40 @@ const WasabeeButton = WButton.extend({
         this.disable();
         const ad = new AuthDialog(this._map);
         ad.enable();
+      },
+      context: this
+    };
+
+    this._teamAction = {
+      title: wX("TEAMS BUTTON TITLE"),
+      text: wX("TEAMS BUTTON"),
+      callback: () => {
+        this.disable();
+        const wd = new WasabeeDialog(this._map);
+        wd.enable();
+      },
+      context: this
+    };
+
+    //logout out function
+
+    this._logoutAction = {
+      title: wX("LOG_OUT"),
+      text: wX("LOG_OUT"),
+      callback: () => {
+        localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
+          "design";
+
+        logoutPromise().then(
+          () => {
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            window.runHooks("wasabeeDkeys");
+          },
+          err => {
+            alert(err);
+            console.log(err);
+          }
+        );
       },
       context: this
     };
@@ -143,7 +182,9 @@ const WasabeeButton = WButton.extend({
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
     } else {
-      tmp = [this._teamAction];
+      //    tmp = [this._teamAction];
+      tmp = [this._logoutAction];
+      tmp.push(this._teamAction);
     }
 
     tmp = tmp.concat(this._alwaysActions);

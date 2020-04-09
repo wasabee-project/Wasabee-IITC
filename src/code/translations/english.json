@@ -118,6 +118,7 @@
   "LOCATION SUB": "Location registered",
   "LOCFRMSER": " (locally and from server)",
   "LOG IN": "Log In",
+  "LOG_OUT": "Log Out",
   "LOG IN QUICK": "Log In (quick; for Android)",
   "MANAGE": "Manage",
   "MANAGE_TEAM": "Manage ${value}",
