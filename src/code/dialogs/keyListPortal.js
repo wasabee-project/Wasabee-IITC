@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import WasabeeMe from "../me";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -41,6 +42,12 @@ const KeyListPortal = WDialog.extend({
   _displayDialog: function() {
     if (!this._portalID) {
       this.disable();
+      return;
+    }
+
+    if (!WasabeeMe.isLoggedIn()) {
+      this.disable();
+      alert("log in to see key detail");
       return;
     }
 
