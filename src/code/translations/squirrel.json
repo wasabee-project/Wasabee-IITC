@@ -257,7 +257,7 @@
   "FAN_FIELD3": "Fan Shaped Nut Storage",
   "OPTION": "option",
   "TITLE": "title",
-  "KEY LIST": "Key List for Tree ${value}",
+  "KEY LIST": "Key List for Nut Storage Operation ${value}",
   "LINKS2": ": Branches",
   "MULTIMAX2": "Multimax",
   "PERMS": " permissions",
