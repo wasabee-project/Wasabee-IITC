@@ -41,7 +41,8 @@ const KeysList = WDialog.extend({
 
   _displayDialog: function() {
     this._dialog = window.dialog({
-      title: wX("KEY_LIST", this._operation.name),
+      //      title: wX("KEY_LIST", this._operation.name),
+      title: wX("KEY_LIST2", this._operation.name),
       width: "auto",
       height: "auto",
       // position: { my: "center top", at: "center center" },
