@@ -130,7 +130,7 @@ export default class Sortable {
   sort() {
     const context = this;
     this.empty(this._body);
-    const context = this._fields[this._sortBy];
+    const ctx = this._fields[this._sortBy];
     this._items.forEach(function(a, b) {
       return (a.index = b);
     });
@@ -139,8 +139,8 @@ export default class Sortable {
       const i = b.sortValues[context._sortBy];
       let length = 0;
       return (
-        (length = context.sort
-          ? context.sort(value, i, a.obj, b.obj)
+        (length = ctx.sort
+          ? ctx.sort(value, i, a.obj, b.obj)
           : i > value
           ? -1
           : value > i
@@ -151,11 +151,13 @@ export default class Sortable {
       );
     });
     for (const tabs of this._items) {
-      return context._body.appendChild(tabs.row);
-    });
-    $(this._head.getElementsByClassName("sorted")).removeClass(
-      "sorted asc desc"
-    );
+      context._body.appendChild(tabs.row);
+    };
+    // jQuery syntax needs to die in a fire
+    console.log(this);
+    for (const h of this._head.children[0].cells) {
+      L.DomUtil.removeClass("sorted asc desc");
+    }
     const dayEle = this._head.rows[0].children[this._sortBy];
     dayEle.classList.add("sorted");
     dayEle.classList.add(this._sortAsc ? "asc" : "desc");
