@@ -42,7 +42,7 @@ export default class Sortable {
   }
 
   set items(a) {
-    const me = this;
+    const context = this;
     this._items = a.map(function(e) {
       const row = L.DomUtil.create("tr");
       const data = {
@@ -52,7 +52,7 @@ export default class Sortable {
         values: [],
         sortValues: []
       };
-      me._fields.forEach(function(b) {
+      for (const b of context._fields) {
         const a = b.value(e);
         data.values.push(a);
         data.sortValues.push(b.sortValue ? b.sortValue(a, e) : a);
@@ -62,10 +62,10 @@ export default class Sortable {
         } else {
           f.textContent = a;
         }
-	if (b.smallScreenHide && me._smallScreen) {
+	if (b.smallScreenHide && context._smallScreen) {
          f.style.display = "none";
 	}
-      });
+      };
       return data;
     });
     this.sort();
@@ -81,7 +81,7 @@ export default class Sortable {
   }
 
   renderHead() {
-    const self = this;
+    const context = this;
     this.empty(this._head);
     const titleRow = this._head.insertRow(-1);
     this._fields.forEach(function(column, currentState) {
@@ -90,11 +90,11 @@ export default class Sortable {
       if (column.title) {
         editor.title = column.title;
       }
-      if (column.smallScreenHide && self._smallScreen) {
+      if (column.smallScreenHide && context._smallScreen) {
          editor.style.display = "none"
       }
       if (column.sort !== null) {
-        editor.classList.add("sortable");
+        L.DomUtil.addClass(editor, "sortable");
         editor.tabIndex = 0;
         editor.addEventListener(
           "keypress",
@@ -113,13 +113,13 @@ export default class Sortable {
         editor.addEventListener(
           "click",
           function() {
-            if (currentState === self._sortBy) {
-              self._sortAsc = !self._sortAsc;
+            if (currentState === context._sortBy) {
+              context._sortAsc = !context._sortAsc;
             } else {
-              self._sortBy = currentState;
-              self._sortAsc = column.defaultAsc;
+              context._sortBy = currentState;
+              context._sortAsc = column.defaultAsc;
             }
-            self.sort();
+            context.sort();
           },
           false
         );
@@ -128,30 +128,30 @@ export default class Sortable {
   }
 
   sort() {
-    const that = this;
+    const context = this;
     this.empty(this._body);
-    const self = this._fields[this._sortBy];
+    const context = this._fields[this._sortBy];
     this._items.forEach(function(a, b) {
       return (a.index = b);
     });
     this._items.sort(function(a, b) {
-      const value = a.sortValues[that._sortBy];
-      const i = b.sortValues[that._sortBy];
+      const value = a.sortValues[context._sortBy];
+      const i = b.sortValues[context._sortBy];
       let length = 0;
       return (
-        (length = self.sort
-          ? self.sort(value, i, a.obj, b.obj)
+        (length = context.sort
+          ? context.sort(value, i, a.obj, b.obj)
           : i > value
           ? -1
           : value > i
           ? 1
           : 0),
         length === 0 && (length = a.index - b.index),
-        that._sortAsc ? length : -length
+        context._sortAsc ? length : -length
       );
     });
-    this._items.forEach(function(tabs) {
-      return that._body.appendChild(tabs.row);
+    for (const tabs of this._items) {
+      return context._body.appendChild(tabs.row);
     });
     $(this._head.getElementsByClassName("sorted")).removeClass(
       "sorted asc desc"
