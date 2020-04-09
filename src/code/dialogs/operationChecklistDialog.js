@@ -194,6 +194,23 @@ const OperationChecklistDialog = WDialog.extend({
           row.textContent = value;
         },
         smallScreenHide: true
+      },
+      {
+        name: "Commands",
+        value: obj => typeof obj,
+        format: (row, value, obj) => {
+          if (obj instanceof WasabeeLink) {
+            const rev = L.DomUtil.create("a", null, row);
+            rev.href = "#";
+            rev.textContent = "Reverse";
+            L.DomEvent.on(rev, "click", ev => {
+              L.DomEvent.stop(ev);
+              operation.reverseLink(obj.fromPortalId, obj.toPortalId);
+            });
+          } else {
+            row.textContent = "";
+          }
+        }
       }
     ];
     content.sortBy = sortBy;
