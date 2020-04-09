@@ -182,7 +182,9 @@ const WasabeeButton = WButton.extend({
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
     } else {
-      tmp = [this._teamAction];
+      //    tmp = [this._teamAction];
+      tmp = [this._logoutAction];
+      tmp.push(this._teamAction);
     }
 
     tmp = tmp.concat(this._alwaysActions);
