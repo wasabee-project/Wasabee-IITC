@@ -274,5 +274,26 @@
   "WRITE": "write",
   "WSERVER": "Server: ${value}",
   "YES": "Yes",
-  "YESNO_DEL": "Are you sure you want to delete ${value}?"
+  "YESNO_DEL": "Are you sure you want to delete ${value}?",
+  "smallScreen": {
+    "LOG IN": "Log In",
+    "LOG_OUT": "Log Out",
+    "NEWOP BUTTON": "New Op",
+    "CLEAROPS BUTTON": "Remove Ops",
+    "TEAMS BUTTON": "Teams",
+    "WD BUTTON": "W-D Keys",
+    "OPS BUTTON": "Ops",
+    "CHECKLIST BUTTON": "Checklist",
+    "MARKER LIST": "Markers",
+    "BLOCKER TITLE": "Blockers",
+    "KEYS": "Keys",
+    "EXPORT OP": "Export Op",
+    "QD END": "End",
+    "ADD_LINKS": "Add Links",
+    "MM": "Multimax",
+    "FAN_FIELD3": "Fan Field",
+    "STARBURST": "Starburst",
+    "ADD_MARKER": "Add Marker",
+    "MARKERS BUTTON TITLE": "Markers"
+  }
 }
