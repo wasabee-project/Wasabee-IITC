@@ -135,6 +135,7 @@ const MultimaxDialog = WDialog.extend({
       const portalsOnScreen = getAllPortalsOnScreen(context._operation);
 
       // Calculate the multimax
+      // TODO remove this promise wrapper, it accomplishes nothing
       this.multimax(A, B, portalsOnScreen).then(
         sequence => {
           if (!Array.isArray(sequence) || !sequence.length)
@@ -304,6 +305,8 @@ const MultimaxDialog = WDialog.extend({
   },
 
   multimax: (anchor1, anchor2, visible) => {
+    // this returning a promise was an old attempt at having a progress bar
+    // remove it
     return new Promise(function(resolve, reject) {
       if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
 
@@ -315,4 +318,5 @@ const MultimaxDialog = WDialog.extend({
     });
   }
 });
+
 export default MultimaxDialog;

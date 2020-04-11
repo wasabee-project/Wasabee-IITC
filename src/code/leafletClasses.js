@@ -142,8 +142,6 @@ export const WButton = L.Class.extend({
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);
       img.src = options.buttonImage;
-      // img.style.verticalAlign = "middle";
-      // img.style.align = "center";
     }
 
     if (options.title) link.title = options.title;
