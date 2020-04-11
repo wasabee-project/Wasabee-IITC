@@ -7,10 +7,23 @@ export const wX = (key, value, option) => {
   const lang = getLanguage();
 
   let s = null;
+
   if (strings[lang] && strings[lang][key]) s = strings[lang][key];
   if (!s && strings[defaultLang] && strings[defaultLang][key])
     s = strings[defaultLang][key];
-  if (!s) s = "haec notificatio praebibo est";
+
+  // detect smallScreen here
+  let smallScreen = false;
+  if (window.plugin.userLocation) smallScreen = true;
+  if (smallScreen) {
+    if (
+      strings[lang] &&
+      strings[lang].smallScreen &&
+      strings[lang].smallScreen[key]
+    )
+      s = strings[lang].smallScreen[key];
+  }
+  if (!s) s = "${key} not in ${lang} or ${defaultLang}";
 
   // do any necessary replacements
   if (option) s = s.replace("${option}", option);
