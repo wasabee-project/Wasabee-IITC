@@ -82,6 +82,7 @@ export const WButton = L.Class.extend({
 
   // make sure all these bases are covered in your button
   initialize: function(map, container) {
+    console.log("Wbutton init");
     if (!map) map = window.map;
     this._map = map;
 
@@ -102,6 +103,7 @@ export const WButton = L.Class.extend({
   Wupdate: function() {},
 
   _toggleActions: function() {
+    console.log("Wbutton _toggleActions");
     if (this._enabled) {
       this.disable();
     } else {
@@ -155,6 +157,7 @@ export const WButton = L.Class.extend({
   },
 
   _disposeButton: function(button, callback) {
+    console.log("Wbutton _disposeButton");
     L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
       .off(button, "mousedown", L.DomEvent.stopPropagation)
       .off(button, "dblclick", L.DomEvent.stopPropagation)

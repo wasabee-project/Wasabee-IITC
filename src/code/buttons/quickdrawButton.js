@@ -18,7 +18,7 @@ const QuickdrawButton = WButton.extend({
     this.type = QuickdrawButton.TYPE;
 
     this.button = this._createButton({
-      title: wX("QD TITLE"),
+      title: this.title,
       container: container,
       buttonImage:
         window.plugin.wasabee.static.images.toolbar_quickdraw.default,
@@ -26,56 +26,64 @@ const QuickdrawButton = WButton.extend({
       context: this.handler
     });
 
+    this._endSubAction = {
+      title: wX("QD BUTTON END"),
+      text: wX("QD END"),
+      callback: this.handler.disable,
+      context: this.handler
+    };
+    this._qdModeSubAction = {
+      title: "QuickDraw Mode",
+      text: "Draws one layer per click",
+      callback: this.toggleMode,
+      context: this
+    };
+    this._slModeSubAction = {
+      title: "Single Link Mode",
+      text: "Draws one link per click",
+      callback: this.toggleMode,
+      context: this
+    };
+
     this.actionsContainer = this._createSubActions([
-      {
-        title: wX("QD BUTTON END"),
-        text: wX("QD END"),
-        callback: this.handler.disable,
-        context: this.handler
-      }
+      this._endSubAction
+      // this._qdModeSubAction
     ]);
     // this should be automaticly detected
     this.actionsContainer.style.top = "52px";
     this._container.appendChild(this.actionsContainer);
+  },
 
-    this.handler.on(
-      "enabled",
-      function() {
-        this.actionsContainer.style.display = "block";
-      },
-      this
-    );
-    this.handler.on(
-      "disabled",
-      function() {
-        this.actionsContainer.style.display = "none";
-      },
-      this
-    );
+  toggleMode: function() {
+    console.log(this);
+    const from = this.handler.drawMode;
+    if (from == "quickdraw") {
+      console.log("switching to single link");
+      this.handler.drawMode = "singlelink";
+      this.actionsContainer = this._createSubActions([
+        this._endSubAction,
+        this._slModeSubAction
+      ]);
+    } else {
+      console.log("switching to layers");
+      this.handler.drawMode = "quickdraw";
+      this.actionsContainer = this._createSubActions([
+        this._endSubAction,
+        this._qdModeSubAction
+      ]);
+    }
   }
 
   // Wupdate: function(container) { }
 });
 
 const QuickDrawControl = L.Handler.extend({
-  includes: L.Mixin.Events,
-
-  statics: {
-    TYPE: "quickdraw"
-  },
-
-  options: {
-    icon: new L.Icon({
-      iconSize: new L.Point(16, 16),
-      iconAnchor: new L.Point(0, 0),
-      iconUrl: window.plugin.wasabee.static.images.toolbar_quickdraw
-    })
-  },
-
   initialize: function(map = window.map, options) {
     this._map = map;
     this._container = map._container;
-    this.type = QuickDrawControl.TYPE;
+    this.type = "QuickDrawControl";
+    this.buttonName = "quickdrawButton";
+    this.drawMode = "quickdraw";
     L.Handler.prototype.initialize.call(this, map, options);
     L.Util.extend(this.options, options);
   },
@@ -83,15 +91,13 @@ const QuickDrawControl = L.Handler.extend({
   enable: function() {
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
-    // tell the button to display the "end" option
-    this.fire("enabled", { handler: this.type });
+    window.plugin.wasabee.buttons._modes[this.buttonName].enable();
   },
 
   disable: function() {
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-    // revoke button's "end" option
-    this.fire("disabled", { handler: this.type });
+    window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
 
   addHooks: function() {
@@ -150,7 +156,9 @@ const QuickDrawControl = L.Handler.extend({
 
   _portalClicked: function() {
     const selectedPortal = WasabeePortal.getSelected();
+
     if (!selectedPortal) return;
+
     if (!this._anchor1) {
       this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
