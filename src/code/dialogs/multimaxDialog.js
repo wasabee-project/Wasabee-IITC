@@ -101,7 +101,7 @@ const MultimaxDialog = WDialog.extend({
 
     // const context = this;
     this._dialog = window.dialog({
-      title: wX("MULTI_M"),
+      title: wX("MULTI_M_TITLE"),
       width: "auto",
       height: "auto",
       html: container,
