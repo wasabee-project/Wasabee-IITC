@@ -12,7 +12,6 @@
     padding-left: 10px;
     padding-right: 10px;
     width: auto;
-    /* width: auto !important; */
     border-left: 1px solid #aaa;
     color: #fff;
 }
@@ -23,7 +22,7 @@
 
 @media (max-width : 400px) {
   .wasabee-subactions a {
-    width: 80px;
+    width: 50px !important;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

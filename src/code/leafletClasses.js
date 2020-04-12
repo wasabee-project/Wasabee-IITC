@@ -153,7 +153,29 @@ export const WButton = L.Class.extend({
       .on(link, "dblclick", L.DomEvent.stopPropagation)
       .on(link, "click", L.DomEvent.preventDefault)
       .on(link, "click", options.callback, options.context);
+
+    /* 
+    L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
+      .on(link, "touchstart", L.DomEvent.preventDefault)
+      .on(link, "touchstart", this.touchstart, options.context)
+      .on(link, "touchend", this.touchend, options.context); */
     return link;
+  },
+
+  touchstart: function() {
+    console.log("Wbutton touchstart");
+    // console.log(ev);
+  },
+
+  touchend: function(ev) {
+    console.log("Wbutton touchend");
+    console.log(ev);
+    console.log(this);
+    if (this._enabled) {
+      this.disable();
+    } else {
+      this.enable();
+    }
   },
 
   _disposeButton: function(button, callback) {
