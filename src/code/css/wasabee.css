@@ -51,12 +51,12 @@
 
 @media screen and (max-width: 1280px) {
   .wasabee-subactions a {
-    width: 50px !important;
+    width: 60px !important;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding-left: 2px;
-    padding-right: 2px;
+    padding-left: 3px;
+    padding-right: 3px;
   }
 }
 
