@@ -30,7 +30,6 @@ const ConfirmDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const confirmDialog = this;
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
@@ -48,8 +47,8 @@ const ConfirmDialog = WDialog.extend({
         }
       },
       closeCallback: () => {
-        confirmDialog.disable();
-        delete confirmDialog._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });

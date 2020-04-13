@@ -39,7 +39,6 @@ const BlockerList = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const blockerList = this;
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
@@ -74,8 +73,8 @@ const BlockerList = WDialog.extend({
         }
       },
       closeCallback: () => {
-        blockerList.disable();
-        delete blockerList._dialog;
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.blockerList
     });

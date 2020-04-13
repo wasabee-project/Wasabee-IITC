@@ -31,7 +31,6 @@ const PromptDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const promptDialog = this;
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
@@ -50,8 +49,8 @@ const PromptDialog = WDialog.extend({
       },
       closeCallback: () => {
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        promptDialog.disable();
-        delete promptDialog._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
