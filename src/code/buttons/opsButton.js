@@ -1,7 +1,6 @@
 import { WButton } from "../leafletClasses";
 import OpsDialog from "../dialogs/opsDialog";
 import BlockersList from "../dialogs/blockersList";
-import MarkerList from "../dialogs/markerList";
 import OperationChecklistDialog from "../dialogs/operationChecklistDialog";
 import ExportDialog from "../dialogs/exportDialog";
 import KeysList from "../dialogs/keysList";
@@ -48,16 +47,6 @@ const OpsButton = WButton.extend({
           this.disable();
           const cl = new OperationChecklistDialog(map);
           cl.enable();
-        },
-        context: context
-      },
-      {
-        title: wX("MARKER LIST TITLE"),
-        text: wX("MARKER LIST"),
-        callback: () => {
-          this.disable();
-          const md = new MarkerList(map);
-          md.enable();
         },
         context: context
       },
