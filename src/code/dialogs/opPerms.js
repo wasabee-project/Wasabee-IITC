@@ -77,14 +77,13 @@ const OpPermList = WDialog.extend({
       ab.value = "Add";
       ab.textContent = wX("ADD");
 
-      const context = this;
       L.DomEvent.on(ab, "click", ev => {
         L.DomEvent.stop(ev);
-        context.addPerm(teamMenu.value, permMenu.value);
-        context.setup();
-        context._drawnTable = this._html.replaceChild(
-          context._table.table,
-          context._drawnTable
+        this.addPerm(teamMenu.value, permMenu.value);
+        this.setup();
+        this._drawnTable = this._html.replaceChild(
+          this._table.table,
+          this._drawnTable
         );
       });
     }
