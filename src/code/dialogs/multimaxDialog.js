@@ -116,24 +116,18 @@ const MultimaxDialog = WDialog.extend({
     p = localStorage["wasabee-anchor-2"];
     if (p) this._anchorTwo = WasabeePortal.create(p);
 
-    this._urp = JSON.parse(
+    // the unreachable point (urp) to test from
+    let urp =
       localStorage[
         window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ]
-    );
-    if (!this._urp) {
+      ];
+    if (!urp) {
+      urp = '{"lat":-74.2,"lng":-143.4}';
       localStorage[
         window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = JSON.stringify({
-        lat: -74.2,
-        lng: -143.4
-      });
-      this._urp = JSON.parse(
-        localStorage[
-          window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-        ]
-      );
+      ] = urp;
     }
+    this._urp = JSON.parse(urp);
   },
 
   doMultimax: function() {
