@@ -60,10 +60,8 @@ export default class WasabeeMarker {
 
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
-    marker.className = "wasabee-marker-popup";
-    const content = L.DomUtil.create("div", null);
-    const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = this.getPopupBodyWithType(portal);
+    const content = L.DomUtil.create("div", "wasabee-marker-popup");
+    content.appendChild(this.getPopupBodyWithType(portal, operation));
 
     const assignment = L.DomUtil.create("div", null, content);
     if (this.state != "completed" && this.assignedTo) {
@@ -109,14 +107,27 @@ export default class WasabeeMarker {
     return content;
   }
 
-  getPopupBodyWithType(portal) {
+  getPopupBodyWithType(portal, operation) {
     // is this paranoia left from ages past?
     if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
       this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
     }
+
     const type = window.plugin.wasabee.static.markerTypes.get(this.type);
-    let title = `${type.label}: ${portal.name}`;
-    if (this.comment) title = title + "\n" + this.comment;
+    const title = L.DomUtil.create("div", "desc");
+    const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
+    kind.textContent = type.label;
+    kind.style.color = type.color;
+    title.appendChild(portal.displayFormat(operation));
+
+    if (this.comment) {
+      const comment = L.DomUtil.create(
+        "div",
+        "wasabee-marker-popup-comment",
+        title
+      );
+      comment.textContent = this.comment;
+    }
     return title;
   }
 }

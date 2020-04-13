@@ -80,18 +80,9 @@ const MultimaxDialog = WDialog.extend({
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
-      const context = this;
-
-      this.doMultimax(context).then(
-        total => {
-          alert(`Multimax found ${total} layers`);
-          this._dialog.dialog("close");
-        },
-        reject => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+      const total = this.doMultimax.call(this);
+      alert(`Multimax found ${total} layers`);
+      this._dialog.dialog("close");
     });
 
     const fllabel = L.DomUtil.create("label", null, container);
@@ -99,7 +90,6 @@ const MultimaxDialog = WDialog.extend({
     this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
 
-    // const context = this;
     this._dialog = window.dialog({
       title: wX("MULTI_M_TITLE"),
       width: "auto",
@@ -127,71 +117,78 @@ const MultimaxDialog = WDialog.extend({
     if (p) this._anchorTwo = WasabeePortal.create(p);
   },
 
-  doMultimax: context => {
-    return new Promise((resolve, reject) => {
-      const A = context._anchorOne;
-      const B = context._anchorTwo;
-      if (!A || !B) reject(wX("SEL_PORT_FIRST"));
-      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
+  doMultimax: function() {
+    const portalsOnScreen = getAllPortalsOnScreen(this._operation);
 
-      // Calculate the multimax
-      // TODO remove this promise wrapper, it accomplishes nothing
-      this.multimax(A, B, portalsOnScreen).then(
-        sequence => {
-          if (!Array.isArray(sequence) || !sequence.length)
-            reject("No layers found");
+    // Calculate the multimax
+    if (!this._anchorOne || !this._anchorTwo || !portalsOnScreen) {
+      alert(wX("INVALID REQUEST"));
+      return 0;
+    }
 
-          let order = sequence.length * (context._flcheck ? 3 : 2);
-          let prev = null;
+    console.log("starting multimax");
+    const poset = this.buildPOSet(
+      this._anchorOne,
+      this._anchorTwo,
+      portalsOnScreen
+    );
+    const sequence = this.longestSequence(poset);
+    console.log("multimax done");
 
-          context._operation.startBatchMode(); // bypass save and crosslinks checks
-          context._operation.addLink(A, B, "multimax base", 1);
+    if (!Array.isArray(sequence) || !sequence.length) {
+      // alert("No layers found");
+      return 0;
+    }
 
-          for (const node of sequence) {
-            let p = WasabeePortal.get(node);
-            if (context._flcheck.checked && prev) {
-              context._operation.addLink(
-                prev,
-                p,
-                "multimax generated back link",
-                order + 3
-              );
-              order--;
-            }
-            if (!p) {
-              console.log("skipping: " + node);
-              continue;
-              // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
-            }
-            context._operation.addLink(
-              p,
-              A,
-              "multimax generated link",
-              order--
-            );
-            context._operation.addLink(
-              p,
-              B,
-              "multimax generated link",
-              order--
-            );
-            prev = p;
-          }
-          context._operation.endBatchMode(); // save and run crosslinks
-          resolve(sequence.length);
-        },
-        err => {
-          console.log(err);
-          reject(err);
-        }
+    let order = sequence.length * (this._flcheck ? 3 : 2);
+    let prev = null;
+
+    this._operation.startBatchMode(); // bypass save and crosslinks checks
+    this._operation.addLink(
+      this._anchorOne,
+      this._anchorTwo,
+      "multimax base",
+      1
+    );
+
+    for (const node of sequence) {
+      let p = WasabeePortal.get(node);
+      if (this._flcheck.checked && prev) {
+        this._operation.addLink(
+          prev,
+          p,
+          "multimax generated back link",
+          order + 3
+        );
+        order--;
+      }
+      if (!p) {
+        console.log("skipping: " + node);
+        continue;
+        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
+      }
+      this._operation.addLink(
+        p,
+        this._anchorOne,
+        "multimax generated link",
+        order--
       );
-    });
+      this._operation.addLink(
+        p,
+        this._anchorTwo,
+        "multimax generated link",
+        order--
+      );
+      prev = p;
+    }
+    this._operation.endBatchMode(); // save and run crosslinks
+    return sequence.length;
   },
 
   /*
-  Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
-*/
-  fieldCoversPortal: (a, b, field3, portal) => {
+Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
+ */
+  fieldCoversPortal: function(a, b, field3, portal) {
     // Let's hope no one ever wants to field over this point!
     const unreachableMapPoint = {
       lat: -74.2,
@@ -215,7 +212,7 @@ const MultimaxDialog = WDialog.extend({
   },
 
   // build a map that shows which and how many portals are covered by each possible field
-  buildPOSet: (anchor1, anchor2, visible) => {
+  buildPOSet: function(anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
       poset.set(
@@ -229,7 +226,7 @@ const MultimaxDialog = WDialog.extend({
   },
 
   /* not working properly */
-  buildPOSetFaster: (a, b, visible) => {
+  buildPOSetFaster: function(a, b, visible) {
     const poset = new Map();
     for (const i of visible) {
       const iCovers = new Array();
@@ -260,7 +257,7 @@ const MultimaxDialog = WDialog.extend({
     return poset;
   },
 
-  longestSequence: poset => {
+  longestSequence: function(poset) {
     const out = new Array();
 
     // the recursive function
@@ -302,20 +299,6 @@ const MultimaxDialog = WDialog.extend({
 
     recurse();
     return out;
-  },
-
-  multimax: (anchor1, anchor2, visible) => {
-    // this returning a promise was an old attempt at having a progress bar
-    // remove it
-    return new Promise(function(resolve, reject) {
-      if (!anchor1 || !anchor2 || !visible) reject(wX("INVALID REQUEST"));
-
-      console.log("starting multimax");
-      const poset = this.buildPOSet(anchor1, anchor2, visible);
-      const p = this.longestSequence(poset);
-      console.log("multimax done");
-      resolve(p);
-    });
   }
 });
 

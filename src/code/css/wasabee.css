@@ -170,25 +170,42 @@
 }
 
 .wasabee-marker-popup {
-  display: flex;
-  align-items: center;
+  /* display: flex; */
+  /* align-items: center; */
 }
 .wasabee-marker-popup div.desc {
+  width: 250px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #FFF;
   padding: 4px 4px;
 }
-.wasabee-marker-buttonset {
-  padding: 2px 2px;
+
+.wasabee-marker-popup-kind {
+  padding: 0px 4px;
+  font-weight: 900;
 }
+
+.wasabee-marker-popup-comment {
+  font-weight: 400;
+}
+
+.wasabee-marker-buttonset {
+}
+
 .wasabee-marker-buttonset button {
+  display: block;
+  width: 95%;
   margin-right: 4px;
 }
 
 .wasabee-agent-popup {
-  display: flex;
   align-items: center;
 }
 .wasabee-agent-popup div.desc {
   padding: 4px 4px;
+  color: #FFF;
 }
 
 /* all dialogs get this class -- do global stuff with it */
@@ -582,4 +599,13 @@
   padding: 4px;
   margin: 4px;
   grid-column-start: 1;
+}
+
+/* put leaflet overrrides here */
+#map .leaflet-popup-content-wrapper {
+  -webkit-border-radius: 2px;
+  border: 1px solid rgba(81,177,32,0.90);
+  background: rgba(39,41,38,0.50);
+  padding-left: 3px;
+  padding-right: 3px;
 }

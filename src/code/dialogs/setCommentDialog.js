@@ -59,7 +59,6 @@ export const SetCommentDialog = WDialog.extend({
       return;
     }
     if (!this._map) return;
-    const setCommentHandler = this;
     this._dialog = window.dialog({
       title: this.dialogTitle,
       width: "auto",
@@ -67,8 +66,8 @@ export const SetCommentDialog = WDialog.extend({
       html: this._buildHtml(),
       dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
       closeCallback: () => {
-        setCommentHandler.disable();
-        delete setCommentHandler._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });

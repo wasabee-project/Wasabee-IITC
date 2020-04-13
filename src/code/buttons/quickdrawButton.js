@@ -113,9 +113,8 @@ const QuickDrawControl = L.Handler.extend({
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
-    const that = this;
-    this._portalClickedHook = function() {
-      QuickDrawControl.prototype._portalClicked.call(that);
+    this._portalClickedHook = () => {
+      QuickDrawControl.prototype._portalClicked.call(this);
     };
     window.addHook("portalSelected", this._portalClickedHook);
     this._map.on("mousemove", this._onMouseMove, this);

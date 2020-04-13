@@ -27,7 +27,6 @@ const ExportDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const exportDialog = this;
     this._dialog = window.dialog({
       title: wX("EXPORT") + this._operation.name,
       width: "auto",
@@ -43,8 +42,8 @@ const ExportDialog = WDialog.extend({
         }
       },
       closeCallback: () => {
-        exportDialog.disable();
-        delete exportDialog._dialog;
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.exportDialog
     });

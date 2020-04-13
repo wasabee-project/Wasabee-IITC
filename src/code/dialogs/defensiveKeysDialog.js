@@ -21,9 +21,8 @@ const DefensiveKeysDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet();
     this._operation = getSelectedOperation();
-    const context = this;
     this._pch = portal => {
-      context._portalClickedHook(portal);
+      this._portalClickedHook(portal);
     };
     window.addHook("portalSelected", this._pch);
 

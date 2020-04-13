@@ -106,20 +106,18 @@ const FanfieldDialog = WDialog.extend({
     button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
-      const context = this;
-      this.fanfield(context);
+      this.fanfield.call(this);
     });
 
-    const context = this;
     this._dialog = window.dialog({
       title: wX("FANFIELD2"),
       width: "auto",
       height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       buttons: {
         OK: () => {
@@ -148,47 +146,47 @@ const FanfieldDialog = WDialog.extend({
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)
-  fanfield: context => {
-    context._layerGroup.clearLayers();
+  fanfield: function() {
+    this._layerGroup.clearLayers();
 
-    if (!context._anchor || !context._start || !context._end) {
+    if (!this._anchor || !this._start || !this._end) {
       alert(wX("SET_3_PORT"));
       return;
     }
 
-    let startAngle = context._angle(context._anchor, context._start, false);
-    let endAngle = context._angle(context._anchor, context._end, false);
+    let startAngle = this._angle(this._anchor, this._start, false);
+    let endAngle = this._angle(this._anchor, this._end, false);
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
-    context._cw = false;
+    this._cw = false;
 
     if (startAngle != min) {
       console.log("fanfield running clockwise");
-      context._cw = true; // must be going counter-clockwise
-      startAngle = context._angle(context._anchor, context._start, true);
-      endAngle = context._angle(context._anchor, context._end, true);
+      this._cw = true; // must be going counter-clockwise
+      startAngle = this._angle(this._anchor, this._start, true);
+      endAngle = this._angle(this._anchor, this._end, true);
       min = Math.min(startAngle, endAngle);
       max = Math.max(startAngle, endAngle);
     }
 
-    const text = min + " ... " + max + " " + context._cw + " " + (max - min);
-    console.log(text);
+    // const text = min + " ... " + max + " " + this._cw + " " + (max - min);
+    // console.log(text);
 
     // if we cross 0, rotate 180deg so we don't have to deal with it
-    context._invert = false;
+    this._invert = false;
     if (max - min > Math.PI) {
       console.log("going inverted");
-      context._invert = true;
+      this._invert = true;
       // min = (min + Math.PI) % (2 * Math.PI);
       // max = (max + Math.PI) % (2 * Math.PI);
     }
 
     const good = new Map();
-    for (const p of getAllPortalsOnScreen(context._operation)) {
-      if (p.options.guid == context._anchor.id) continue;
-      let pAngle = context._angle(context._anchor, p, context._cw);
+    for (const p of getAllPortalsOnScreen(this._operation)) {
+      if (p.options.guid == this._anchor.id) continue;
+      let pAngle = this._angle(this._anchor, p, this._cw);
 
-      if (context._invert) pAngle = (pAngle + Math.PI) % (2 * Math.PI);
+      if (this._invert) pAngle = (pAngle + Math.PI) % (2 * Math.PI);
 
       const label = L.marker(p._latlng, {
         icon: L.divIcon({
@@ -199,34 +197,39 @@ const FanfieldDialog = WDialog.extend({
         }),
         guid: p.options.guid
       });
-      label.addTo(context._layerGroup);
+      label.addTo(this._layerGroup);
 
       if (pAngle < min || pAngle > max) continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
     const sorted = new Map([...good.entries()].sort());
-    context._draw(sorted, context);
+    this._draw(sorted);
   },
 
   // draw takes the sorted list of poratls and draws the links
   // determining any sub-fields can be added
-  _draw: function(sorted, context) {
-    context._operation.startBatchMode();
+  _draw: function(sorted) {
+    this._operation.startBatchMode();
     let order = 0;
     let fields = 0;
     for (const [angle, p] of sorted) {
       order++;
       const wp = WasabeePortal.get(p.options.guid);
-      context._operation.addLink(wp, context._anchor, "fan anchor", order);
+      if (!wp) {
+        // needs wX()
+        alert("unable to load details for portal " + p.options.guid);
+        continue;
+      }
+      this._operation.addLink(wp, this._anchor, "fan anchor", order);
       for (const [nextangle, check] of sorted) {
         if (nextangle >= angle) break; // stop if we've gone too far
         const testlink = new WasabeeLink(
-          context._operation,
+          this._operation,
           wp.id,
           check.options.guid
         );
         let crossed = false;
-        for (const real of context._operation.links) {
+        for (const real of this._operation.links) {
           if (greatCircleArcIntersect(real, testlink)) {
             crossed = true;
             break;
@@ -236,12 +239,13 @@ const FanfieldDialog = WDialog.extend({
           testlink.throwOrderPos = ++order;
           testlink.description = "fan subfield";
           fields++;
-          context._operation.links.push(testlink);
+          this._operation.links.push(testlink);
         }
       }
     }
-    context._operation.endBatchMode();
+    this._operation.endBatchMode();
     const ap = 313 * order + 1250 * fields;
+    // too many parameters for wX();
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
