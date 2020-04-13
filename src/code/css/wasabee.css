@@ -208,6 +208,12 @@
   color: #FFF;
 }
 
+.wasabee-agent-popup button {
+  display: block;
+  width: 95%;
+  margin-right: 4px;
+}
+
 /* all dialogs get this class -- do global stuff with it */
 .wasabee-dialog {
 }
