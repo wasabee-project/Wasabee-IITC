@@ -118,6 +118,33 @@ const SettingsDialog = WDialog.extend({
     /* const modeDesc = L.DomUtil.create("div", "desc", container);
     modeDesc.textContent = wX("WASABEE_MODE_DESC"); */
 
+    const urpTitle = L.DomUtil.create("label", null, container);
+    urpTitle.textContent = "Multimax test point";
+    const urpSelect = L.DomUtil.create("select", null, container);
+    const urpKey =
+      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY;
+    let urp = localStorage[urpKey];
+    if (!urp) {
+      urp = '{"lat": -74.2,"lng:"-143.4}';
+      localStorage[urpKey] = urp;
+    }
+    const pairs = [
+      ["Antarctic West", '{"lat":-74.2,"lng":-143.4}'],
+      ["Antarctic East", '{"lat":-74.2,"lng":30.0}'],
+      ["Equatorial Atlantic", '{"lat":-2.66,"lng":-4.28}'],
+      ["Arctic West", '{"lat":74.2,"lng":-143.4}'],
+      ["Arctic East", '{"lat":78.5,"lng":143.4}']
+    ];
+    for (const [k, v] of pairs) {
+      const option = L.DomUtil.create("option", null, urpSelect);
+      option.textContent = k;
+      option.value = v;
+      if (urp == v) option.selected = true;
+    }
+    L.DomEvent.on(urpSelect, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[urpKey] = urpSelect.value;
+    });
     return container;
   },
 
