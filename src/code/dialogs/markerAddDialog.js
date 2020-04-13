@@ -69,7 +69,7 @@ const MarkerAddDialog = WDialog.extend({
 
     const context = this;
     this._dialog = window.dialog({
-      title: wX("ADD_MARKER"),
+      title: wX("ADD_MARKER_TITLE"),
       width: "auto",
       height: "auto",
       // position: { my: auto, at: "center center+30" },
