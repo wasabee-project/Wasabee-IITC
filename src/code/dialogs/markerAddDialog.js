@@ -37,7 +37,9 @@ const MarkerAddDialog = WDialog.extend({
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.textContent = "";
-      this._portal.appendChild(this._selectedPortal.displayFormat(this._smallScreen));
+      this._portal.appendChild(
+        this._selectedPortal.displayFormat(this._smallScreen)
+      );
     } else {
       this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }

@@ -35,7 +35,9 @@ const MultimaxDialog = WDialog.extend({
     anchorOneButton.textContent = wX("SET");
     this._anchorOneDisplay = L.DomUtil.create("span", null, container);
     if (this._anchorOne) {
-      this._anchorOneDisplay.appendChild(this._anchorOne.displayFormat(this._smallScreen));
+      this._anchorOneDisplay.appendChild(
+        this._anchorOne.displayFormat(this._smallScreen)
+      );
     } else {
       this._anchorOneDisplay.textContent = wX("NOT_SET");
     }
@@ -44,7 +46,9 @@ const MultimaxDialog = WDialog.extend({
       if (this._anchorOne) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
-        this._anchorOneDisplay.appendChild(this._anchorOne.displayFormat(this._smallScreen));
+        this._anchorOneDisplay.appendChild(
+          this._anchorOne.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
@@ -56,7 +60,9 @@ const MultimaxDialog = WDialog.extend({
     anchorTwoButton.textContent = wX("SET");
     this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
     if (this._anchorTwo) {
-      this._anchorTwoDisplay.appendChild(this._anchorTwo.displayFormat(this._smallScreen));
+      this._anchorTwoDisplay.appendChild(
+        this._anchorTwo.displayFormat(this._smallScreen)
+      );
     } else {
       this._anchorTwoDisplay.textContent = wX("NOT_SET");
     }
@@ -65,7 +71,9 @@ const MultimaxDialog = WDialog.extend({
       if (this._anchorTwo) {
         localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
-        this._anchorTwoDisplay.appendChild(this._anchorTwo.displayFormat(this._smallScreen));
+        this._anchorTwoDisplay.appendChild(
+          this._anchorTwo.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }

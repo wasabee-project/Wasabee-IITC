@@ -49,7 +49,9 @@ const StateDialog = WDialog.extend({
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.appendChild(target.displayFormat(this._operation, this._smallScreen));
+      divtitle.appendChild(
+        target.displayFormat(this._operation, this._smallScreen)
+      );
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("LINK STATE");
       this._name = wX("LINK STATE PROMPT", portal.name);

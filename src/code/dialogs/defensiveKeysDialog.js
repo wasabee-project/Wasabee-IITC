@@ -40,7 +40,9 @@ const DefensiveKeysDialog = WDialog.extend({
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
-      this._portal.appendChild(this._selectedPortal.displayFormat(this._smallScreen));
+      this._portal.appendChild(
+        this._selectedPortal.displayFormat(this._smallScreen)
+      );
       const mine = this._getMyData(this._selectedPortal.id);
       if (mine) {
         this._count.value = mine.Count;

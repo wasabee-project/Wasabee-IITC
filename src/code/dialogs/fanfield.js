@@ -37,7 +37,9 @@ const FanfieldDialog = WDialog.extend({
     anchorButton.textContent = wX("SET");
     this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
-      this._anchorDisplay.appendChild(this._anchor.displayFormat(this._smallScreen));
+      this._anchorDisplay.appendChild(
+        this._anchor.displayFormat(this._smallScreen)
+      );
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
@@ -47,7 +49,9 @@ const FanfieldDialog = WDialog.extend({
       if (this._anchor) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(this._anchor.displayFormat(this._smallScreen));
+        this._anchorDisplay.appendChild(
+          this._anchor.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
@@ -59,7 +63,9 @@ const FanfieldDialog = WDialog.extend({
     startButton.textContent = wX("SET");
     this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
-      this._startDisplay.appendChild(this._start.displayFormat(this._smallScreen));
+      this._startDisplay.appendChild(
+        this._start.displayFormat(this._smallScreen)
+      );
     } else {
       this._startDisplay.textContent = wX("NOT_SET");
     }
@@ -69,7 +75,9 @@ const FanfieldDialog = WDialog.extend({
       if (this._start) {
         localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
         this._startDisplay.textContent = "";
-        this._startDisplay.appendChild(this._start.displayFormat(this._smallScreen));
+        this._startDisplay.appendChild(
+          this._start.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
@@ -91,7 +99,9 @@ const FanfieldDialog = WDialog.extend({
       if (this._end) {
         localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
         this._endDisplay.textContent = "";
-        this._endDisplay.appendChild(this._end.displayFormat(this._smallScreen));
+        this._endDisplay.appendChild(
+          this._end.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
