@@ -107,7 +107,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.fromPortalId);
-          row.appendChild(p.displayFormat(this._operation, this._smallScreen));
+          row.appendChild(p.displayFormat(this._smallScreen));
         }
       },
       {
@@ -131,7 +131,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.toPortalId);
-          row.appendChild(p.displayFormat(this._operation, this._smallScreen));
+          row.appendChild(p.displayFormat(this._smallScreen));
         }
       },
       {

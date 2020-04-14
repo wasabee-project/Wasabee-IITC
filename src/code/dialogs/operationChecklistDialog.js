@@ -118,7 +118,7 @@ const OperationChecklistDialog = WDialog.extend({
             row.appendChild(
               operation
                 .getPortal(thing.portalId)
-                .displayFormat(operation, this._smallScreen)
+                .displayFormat(this._smallScreen)
             );
           }
         }
@@ -172,9 +172,9 @@ const OperationChecklistDialog = WDialog.extend({
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, agent) => {
-          const assigned = L.DomUtil.create("a", "", row);
+          const assigned = L.DomUtil.create("a", null, row);
           assigned.textContent = value;
-          // assigned.appendChild(agent.displayFormat());
+          // assigned.appendChild(agent.displayFormat(this._smallScreen));
           if (WasabeeMe.isLoggedIn()) {
             // XXX should be writable op
             L.DomEvent.on(row, "click", ev => {

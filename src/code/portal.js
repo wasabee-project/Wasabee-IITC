@@ -59,7 +59,7 @@ export default class WasabeePortal {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
-  displayFormat(operation, shortName = false) {
+  displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
     const e = L.DomUtil.create("a", null);

@@ -118,7 +118,7 @@ export default class WasabeeMarker {
     const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
     kind.textContent = type.label;
     kind.style.color = type.color;
-    title.appendChild(portal.displayFormat(operation));
+    title.appendChild(portal.displayFormat());
 
     if (this.comment) {
       const comment = L.DomUtil.create(

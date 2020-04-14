@@ -44,7 +44,7 @@ const LinkDialog = WDialog.extend({
     sourceButton.textContent = wX("SET");
     this._sourceDisplay = L.DomUtil.create("span", "portal", container);
     if (this._source) {
-      this._sourceDisplay.appendChild(this._source.displayFormat());
+      this._sourceDisplay.appendChild(this._source.displayFormat(this._smallScreen));
     } else {
       this._sourceDisplay.textContent = wX("NOT_SET");
     }
@@ -54,7 +54,7 @@ const LinkDialog = WDialog.extend({
       if (this._source) {
         localStorage["wasabee-link-source"] = JSON.stringify(this._source);
         this._sourceDisplay.textContent = "";
-        this._sourceDisplay.appendChild(this._source.displayFormat());
+        this._sourceDisplay.appendChild(this._source.displayFormat(this._smallScreen));
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
@@ -73,7 +73,7 @@ const LinkDialog = WDialog.extend({
     anchor1Button.textContent = wX("SET");
     this._anchor1Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor1) {
-      this._anchor1Display.appendChild(this._anchor1.displayFormat());
+      this._anchor1Display.appendChild(this._anchor1.displayFormat(this._smallScreen));
     } else {
       this._anchor1Display.textContent = wX("NOT_SET");
     }
@@ -83,7 +83,7 @@ const LinkDialog = WDialog.extend({
       if (this._anchor1) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
         this._anchor1Display.textContent = "";
-        this._anchor1Display.appendChild(this._anchor1.displayFormat());
+        this._anchor1Display.appendChild(this._anchor1.displayFormat(this._smallScreen));
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
@@ -117,7 +117,7 @@ const LinkDialog = WDialog.extend({
     anchor2Button.textContent = wX("SET");
     this._anchor2Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor2) {
-      this._anchor2Display.appendChild(this._anchor2.displayFormat());
+      this._anchor2Display.appendChild(this._anchor2.displayFormat(this._smallScreen));
     } else {
       this._anchor2Display.textContent = wX("NOT_SET");
     }
@@ -127,7 +127,7 @@ const LinkDialog = WDialog.extend({
       if (this._anchor2) {
         localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
         this._anchor2Display.textContent = "";
-        this._anchor2Display.appendChild(this._anchor2.displayFormat());
+        this._anchor2Display.appendChild(this._anchor2.displayFormat(this._smallScreen));
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }

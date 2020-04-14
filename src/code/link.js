@@ -100,18 +100,19 @@ export default class WasabeeLink {
   }
 
   // returns a DOM object appropriate for display
+  // do we still need the operation here?
   displayFormat(operation, smallScreen = false) {
     const d = L.DomUtil.create("div", null);
     d.appendChild(
       operation
         .getPortal(this.fromPortalId)
-        .displayFormat(operation, smallScreen)
+        .displayFormat(smallScreen)
     );
     const arrow = L.DomUtil.create("span", null, d);
     arrow.textContent = " ➾ ";
     arrow.style.color = this.getColor();
     d.appendChild(
-      operation.getPortal(this.toPortalId).displayFormat(operation, smallScreen)
+      operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
     return d;
   }

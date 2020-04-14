@@ -6,7 +6,6 @@ import {
   SetWasabeeServer,
   SetTeamState,
   locationPromise,
-  logoutPromise,
   leaveTeamPromise,
   newTeamPromise
 } from "../server";
@@ -193,21 +192,6 @@ const WasabeeDialog = WDialog.extend({
           About: () => {
             const ad = new AboutDialog();
             ad.enable();
-          },
-          "Log out": () => {
-            localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
-              "design";
-            logoutPromise().then(
-              () => {
-                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-                window.runHooks("wasabeeDkeys");
-                this._dialog.dialog("close");
-              },
-              err => {
-                alert(err);
-                console.log(err);
-              }
-            );
           },
           "New Team": () => {
             const p = new PromptDialog(window.map);

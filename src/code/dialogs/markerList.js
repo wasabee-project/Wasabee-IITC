@@ -90,7 +90,7 @@ const MarkerList = WDialog.extend({
           a.appendChild(
             operation
               .getPortal(marker.portalId)
-              .displayFormat(operation, this._smallScreen)
+              .displayFormat(this._smallScreen)
           );
         }
       },

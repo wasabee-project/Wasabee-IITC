@@ -37,8 +37,8 @@ export default class WasabeeAnchor {
     return new WasabeeAnchor(portalId);
   }
 
-  displayFormat(operation) {
-    return this._portal.displayFormat(operation);
+  displayFormat(smallScreen = false) {
+    return this._portal.displayFormat(smallScreen);
   }
 
   get latLng() {

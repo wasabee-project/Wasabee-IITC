@@ -28,9 +28,9 @@ export const swapPortal = (operation, portal) => {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("SWAP PROMPT");
-  pr.appendChild(portal.displayFormat(operation));
+  pr.appendChild(portal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
-  pr.appendChild(selectedPortal.displayFormat(operation));
+  pr.appendChild(selectedPortal.displayFormat());
   con.setup(wX("SWAP TITLE"), pr, () => {
     operation.swapPortal(portal, selectedPortal);
   });
@@ -41,7 +41,7 @@ export const deletePortal = (operation, portal) => {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
-  pr.appendChild(portal.displayFormat(operation));
+  pr.appendChild(portal.displayFormat());
   con.setup(wX("DELETE ANCHOR TITLE"), pr, () => {
     operation.removeAnchor(portal.id);
   });
@@ -52,7 +52,7 @@ export const deleteMarker = (operation, marker, portal) => {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
-  pr.appendChild(portal.displayFormat(operation));
+  pr.appendChild(portal.displayFormat());
   con.setup(wX("DELETE MARKER TITLE"), pr, () => {
     operation.removeMarker(marker);
   });

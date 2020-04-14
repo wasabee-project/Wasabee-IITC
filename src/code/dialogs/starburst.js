@@ -32,7 +32,7 @@ const StarburstDialog = WDialog.extend({
     anchorButton.textContent = wX("SET");
     this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
     if (this._anchor) {
-      this._anchorDisplay.appendChild(this._anchor.displayFormat());
+      this._anchorDisplay.appendChild(this._anchor.displayFormat(this._smallScreen));
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
@@ -42,7 +42,7 @@ const StarburstDialog = WDialog.extend({
       if (this._anchor) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(this._anchor.displayFormat());
+        this._anchorDisplay.appendChild(this._anchor.displayFormat(this._smallScreen));
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }

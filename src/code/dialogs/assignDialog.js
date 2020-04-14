@@ -51,7 +51,7 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.appendChild(target.displayFormat(this._operation));
+      divtitle.appendChild(target.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("LINK ASSIGNMENT");
       this._name = wX("ASSIGN LINK PROMPT", portal.name);
@@ -60,7 +60,7 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
-      divtitle.appendChild(portal.displayFormat());
+      divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("MARKER ASSIGNMENT");
       this._name = wX("ASSIGN MARKER PROMPT", portal.name);
@@ -69,7 +69,7 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeAnchor) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
-      divtitle.appendChild(portal.displayFormat());
+      divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("ANCHOR ASSIGNMENT");
       this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);

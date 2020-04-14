@@ -78,7 +78,7 @@ const KeysList = WDialog.extend({
           cell.appendChild(
             operation
               .getPortal(key.id)
-              .displayFormat(operation, this._smallScreen)
+              .displayFormat(this._smallScreen)
           );
         }
       },
