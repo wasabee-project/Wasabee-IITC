@@ -104,9 +104,7 @@ export default class WasabeeLink {
   displayFormat(operation, smallScreen = false) {
     const d = L.DomUtil.create("div", null);
     d.appendChild(
-      operation
-        .getPortal(this.fromPortalId)
-        .displayFormat(smallScreen)
+      operation.getPortal(this.fromPortalId).displayFormat(smallScreen)
     );
     const arrow = L.DomUtil.create("span", null, d);
     arrow.textContent = " ➾ ";
