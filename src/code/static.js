@@ -29,6 +29,7 @@ W.static = {
     linkList: "wasabee-linklist",
     markerList: "wasabee-markerlist",
     assign: "wasabee-assign",
+    state: "wasabee-state",
     multimaxButton: "wasabee-multimax",
     importDialog: "wasabee-import",
     operationChecklist: "wasabee-operation-checklist",
