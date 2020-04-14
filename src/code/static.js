@@ -37,7 +37,8 @@ W.static = {
     exportDialog: "wasabee-export",
     keysList: "wasabee-keys",
     keyListPortal: "wasabee-keyByPortal",
-    wasabeeDKeyButton: "wasabee-DKey"
+    wasabeeDKeyButton: "wasabee-DKey",
+    wasabeeDList: "wasabee-DList"
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",

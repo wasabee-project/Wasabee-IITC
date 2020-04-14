@@ -4,6 +4,7 @@ import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
+import WasabeeDList from "./wasabeeDlist";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -68,6 +69,14 @@ const DefensiveKeysDialog = WDialog.extend({
     L.DomEvent.on(addDKeyButton, "click", ev => {
       L.DomEvent.stop(ev);
       this._addDKey();
+    });
+
+    const showDKeyButton = L.DomUtil.create("button", null, this._content);
+    showDKeyButton.textContent = wX("D_SHOW_LIST");
+    L.DomEvent.on(showDKeyButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      const dl = new WasabeeDList();
+      dl.enable();
     });
 
     this._portalClickedHook();
