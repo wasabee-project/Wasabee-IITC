@@ -61,7 +61,7 @@ export default class WasabeeMarker {
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
     const content = L.DomUtil.create("div", "wasabee-marker-popup");
-    content.appendChild(this.getPopupBodyWithType(portal, operation));
+    content.appendChild(this.getPopupBodyWithType(portal));
 
     const assignment = L.DomUtil.create("div", null, content);
     if (this.state != "completed" && this.assignedTo) {
@@ -107,7 +107,7 @@ export default class WasabeeMarker {
     return content;
   }
 
-  getPopupBodyWithType(portal, operation) {
+  getPopupBodyWithType(portal) {
     // is this paranoia left from ages past?
     if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
       this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
