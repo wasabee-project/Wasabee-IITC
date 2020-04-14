@@ -427,7 +427,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
-      console.log(req.getAllResponseHeaders());
+      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           WasabeeMe.create(req.response); // free update

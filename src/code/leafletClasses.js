@@ -103,7 +103,6 @@ export const WButton = L.Class.extend({
   Wupdate: function() {},
 
   _toggleActions: function() {
-    console.log("Wbutton _toggleActions");
     if (this._enabled) {
       this.disable();
     } else {
