@@ -29,6 +29,7 @@ W.static = {
     linkList: "wasabee-linklist",
     markerList: "wasabee-markerlist",
     assign: "wasabee-assign",
+    state: "wasabee-state",
     multimaxButton: "wasabee-multimax",
     importDialog: "wasabee-import",
     operationChecklist: "wasabee-operation-checklist",
@@ -46,6 +47,7 @@ W.static = {
     SECONDARY_LANGUAGE: "Squirrel",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
+    MULTIMAX_UNREACHABLE_KEY: "wasabee-mm-unreachable",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",

@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
+import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
@@ -190,8 +191,16 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("STATE"),
         value: thing => thing.state,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value) => {
-          row.textContent = value;
+        format: (row, value, thing) => {
+          const a = L.DomUtil.create("a", null, row);
+          a.href = "#";
+          a.textContent = wX(value);
+          L.DomEvent.on(row, "click", ev => {
+            L.DomEvent.stop(ev);
+            const sd = new StateDialog();
+            sd.setup(thing, operation);
+            sd.enable();
+          });
         },
         smallScreenHide: true
       },

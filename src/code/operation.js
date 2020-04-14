@@ -156,6 +156,24 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  setMarkerState(markerID, state) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.state = state;
+      }
+    }
+    this.update(true);
+  }
+
+  setLinkState(linkID, state) {
+    for (const v of this.links) {
+      if (v.ID == linkID) {
+        v.state = state;
+      }
+    }
+    this.update(true);
+  }
+
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
     const newLinks = [];

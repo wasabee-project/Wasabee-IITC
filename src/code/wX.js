@@ -23,7 +23,7 @@ export const wX = (key, value, option) => {
     )
       s = strings[lang].smallScreen[key];
   }
-  if (!s) s = "${key} not in ${lang} or ${defaultLang}";
+  if (!s) s = `${key} not in ${lang} or ${defaultLang}`;
 
   // do any necessary replacements
   if (option) s = s.replace("${option}", option);

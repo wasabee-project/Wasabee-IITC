@@ -115,6 +115,19 @@ const MultimaxDialog = WDialog.extend({
     if (p) this._anchorOne = WasabeePortal.create(p);
     p = localStorage["wasabee-anchor-2"];
     if (p) this._anchorTwo = WasabeePortal.create(p);
+
+    // the unreachable point (urp) to test from
+    let urp =
+      localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ];
+    if (!urp) {
+      urp = '{"lat":-74.2,"lng":-143.4}';
+      localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ] = urp;
+    }
+    this._urp = JSON.parse(urp);
   },
 
   doMultimax: function() {
@@ -189,11 +202,8 @@ const MultimaxDialog = WDialog.extend({
 Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
  */
   fieldCoversPortal: function(a, b, field3, portal) {
-    // Let's hope no one ever wants to field over this point!
-    const unreachableMapPoint = {
-      lat: -74.2,
-      lng: -143.4
-    };
+    const unreachableMapPoint = this._urp;
+
     const p = portal.getLatLng();
     const c = field3.getLatLng();
 
