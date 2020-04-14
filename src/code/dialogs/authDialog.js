@@ -235,7 +235,7 @@ const AuthDialog = WDialog.extend({
   // this is probably the most correct, but doesn't seem to work properly
   // does making it async change anything?
   gapiAuth: async function() {
-    console.log("calling main log in method");
+    // console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
@@ -257,7 +257,7 @@ const AuthDialog = WDialog.extend({
               console.log(err);
               return;
             }
-            console.log("sending to Wasabee (immediate_failed)");
+            // console.log("sending to Wasabee (immediate_failed)");
             SendAccessTokenAsync(responseSelect.access_token).then(
               () => {
                 if (this._ios) {
@@ -283,7 +283,7 @@ const AuthDialog = WDialog.extend({
         }
         return;
       }
-      console.log("sending to Wasabee");
+      // console.log("sending to Wasabee");
       SendAccessTokenAsync(response.access_token).then(
         () => {
           if (this._ios) {
