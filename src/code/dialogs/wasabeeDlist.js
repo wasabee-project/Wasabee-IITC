@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import wX from "../wX";
 import WasabeeMe from "../me";
+import WasabeePortal from "../portal";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -52,7 +53,8 @@ const WasabeeDList = WDialog.extend({
             window.portals[n.PortalID] &&
             window.portals[n.PortalID].options.data.title
           ) {
-            cell.textContent = window.portals[n.PortalID].options.data.title;
+            const p = WasabeePortal.get(n.PortalID);
+            cell.appendChild(p.displayFormat(this._smallScreen));
           } else {
             cell.textContent = value;
           }
