@@ -608,10 +608,4 @@
 }
 
 /* put leaflet overrrides here */
-#map .leaflet-popup-content-wrapper {
-  -webkit-border-radius: 2px;
-  border: 1px solid rgba(81,177,32,0.90);
-  background: rgba(39,41,38,0.50);
-  padding-left: 3px;
-  padding-right: 3px;
-}
+// #map .leaflet-popup-content-wrapper { -webkit-border-radius: 2px; border: 1px solid rgba(81,177,32,0.90); background: rgba(39,41,38,0.50); padding-left: 3px; padding-right: 3px; }
