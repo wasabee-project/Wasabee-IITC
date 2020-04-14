@@ -19,11 +19,22 @@ const WasabeeDList = WDialog.extend({
   addHooks: function() {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    const context = this;
+    this._UIUpdateHook = () => {
+      context.update();
+    };
     this._displayDialog();
+    window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },
 
   removeHooks: function() {
     WDialog.prototype.removeHooks.call(this);
+    window.removeHook("portalDetailLoaded", this._UIUpdateHook);
+  },
+
+  update: function() {
+    const table = this.getListDialogContent().table;
+    this._dialog.html(table);
   },
 
   _displayDialog: function() {
@@ -56,6 +67,7 @@ const WasabeeDList = WDialog.extend({
             const p = WasabeePortal.get(n.PortalID);
             cell.appendChild(p.displayFormat(this._smallScreen));
           } else {
+            window.portalDetail.request(n.PortalID);
             cell.textContent = value;
           }
         }
