@@ -57,7 +57,14 @@ const WasabeeDList = WDialog.extend({
     content.fields = [
       {
         name: wX("PORTAL"),
-        value: key => key.PortalID,
+        value: n => {
+          if (
+            window.portals[n.PortalID] &&
+            window.portals[n.PortalID].options.data.title
+          )
+            return window.portals[n.PortalID].options.data.title;
+          return n.PortalID;
+        },
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, n) => {
           if (
