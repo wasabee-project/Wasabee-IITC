@@ -49,7 +49,7 @@
   text-align: center;
 }
 
-/*wider screens*/
+/*non-iOS device wider screens*/
 @media screen and (min-width: 1001px) and (max-width: 1280px) {
   .wasabee-subactions a {
     width: 60px !important;
@@ -61,8 +61,20 @@
   }
 }
 
-/*Paul's iOs device*/
-@media screen and (max-device-width: 1000px) {
+/*non-iOS device small screens*/
+@media screen and (min-width: 401px) and (max-width: 1000px) {
+  .wasabee-subactions a {
+    width: 50px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+/*iOS device screens larger than 400 but not tablet sized */
+@media screen and (min-device-width: 401) and (max-device-width: 1000px) {
   .wasabee-subactions a {
     width: 50px !important;
     overflow: hidden;
@@ -73,9 +85,21 @@
   }
 }
 
+/*iOS screens smaller than 400px*/
+@media screen and (max-device-width: 400px) {
+  .wasabee-subactions a {
+    width: 50px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
 /* wasabee-tooltip is used for the quickdraw mouse follower */
 .wasabee-tooltip {
-  background: rgba(99, 99, 88, 0.66);
+  background: rgba(30, 130, 76, 0.66);
   border: 1px solid transparent;
   -webkit-border-radius: 4px;
   border-radius: 4px;
@@ -83,7 +107,7 @@
   /* font: 12px/18px "Helvetica Neue",Arial,Helvetica,sans-serif; */
   margin-left: 20px;
   margin-top: -21px;
-  padding: 4px 8px;
+  padding: 2px 4px;
   position: absolute;
   white-space: nowrap;
   z-index: 6;
@@ -198,6 +222,7 @@
 .wasabee-marker-popup-kind {
   padding: 0px 4px;
   font-weight: 900;
+  background: rgba(197, 239, 247, 0.63);
 }
 
 .wasabee-marker-popup-comment {
