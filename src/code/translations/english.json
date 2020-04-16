@@ -12,7 +12,7 @@
   "ADD LINK TITLE": "Add Links Dialog",
   "ADD_LINKS": "Add Links",
   "ADD MARKER TITLE": "Add Markers Dialog",
-  "ADD_MARKER": "Add Marker",
+  "ADD_MARKER": "+ Marker",
   "ADD_NEW_OP": "Add New Op",
   "ADD_SUCC_INSTR": "Add successful, they will need to enable the team on the Wasabee website before they appear in this list",
   "AGENT": "Agent",
@@ -285,6 +285,8 @@
   "YESNO_DEL": "Are you sure you want to delete ${value}?",
   "LINK STATE PROMPT": "Link State",
   "LINK STATE": "Set link status",
+  "D_SHOW_LIST": "Input Defensive Keys",
+  "WASABEE_D_LIST": "Input Defensive Key Count",
   "smallScreen": {
     "LOG IN": "Log In",
     "LOG_OUT": "Log Out",
