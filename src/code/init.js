@@ -3,6 +3,7 @@ import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
+import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { sendLocation } from "./uiCommands";
@@ -91,6 +92,7 @@ window.plugin.wasabee.init = function() {
 
   // once everything else is done, do the initial draw
   addButtons(Wasabee._selectedOp);
+  setupToolbox();
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
   if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
     window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);

@@ -5,13 +5,11 @@ import {
   GetWasabeeServer,
   SetWasabeeServer,
   SetTeamState,
-  locationPromise,
   leaveTeamPromise,
   newTeamPromise
 } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
-import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
@@ -148,30 +146,6 @@ const WasabeeDialog = WDialog.extend({
       this.setServer();
     });
 
-    const locbutton = L.DomUtil.create("button", "sendloc", container);
-    locbutton.textContent = wX("SEND_LOC");
-    L.DomEvent.on(locbutton, "click", ev => {
-      L.DomEvent.stop(ev);
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          locationPromise(
-            position.coords.latitude,
-            position.coords.longitude
-          ).then(
-            () => {
-              alert(wX("LOC_PROC"));
-            },
-            err => {
-              console.log(err);
-            }
-          );
-        },
-        err => {
-          console.log(err);
-        }
-      );
-    });
-
     container.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
     return container;
@@ -188,10 +162,6 @@ const WasabeeDialog = WDialog.extend({
         buttons: {
           OK: () => {
             this._dialog.dialog("close");
-          },
-          About: () => {
-            const ad = new AboutDialog();
-            ad.enable();
           },
           "New Team": () => {
             const p = new PromptDialog(window.map);
