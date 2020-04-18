@@ -88,10 +88,21 @@ export default class WasabeeOp {
     return this.containsLinkFromTo(link.fromPortalId, link.toPortalId);
   }
 
-  containsMarker(portal, markerType) {
+  // unused
+  /* containsMarker(portal, markerType) {
     if (this.markers.length == 0) return false;
     for (const m of this.markers) {
       if (m.portalId == portal.id && m.type == markerType) {
+        return true;
+      }
+    }
+    return false;
+  } */
+
+  containsMarkerByID(portalID, markerType) {
+    if (this.markers.length == 0) return false;
+    for (const m of this.markers) {
+      if (m.portalId == portalID && m.type == markerType) {
         return true;
       }
     }

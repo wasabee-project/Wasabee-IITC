@@ -158,8 +158,20 @@ const BlockerList = WDialog.extend({
     // build count list
     const portals = new Array();
     for (const b of this._operation.blockers) {
-      portals.push(b.fromPortalId);
-      portals.push(b.toPortalId);
+      if (
+        !this._operation.containsMarkerByID(
+          b.fromPortalId,
+          window.plugin.wasabee.constants.MARKER_TYPE_EXCLUDE
+        )
+      )
+        portals.push(b.fromPortalId);
+      if (
+        !this._operation.containsMarkerByID(
+          b.toPortalId,
+          window.plugin.wasabee.constants.MARKER_TYPE_EXCLUDE
+        )
+      )
+        portals.push(b.toPortalId);
     }
     const reduced = {};
     for (const p of portals) {
@@ -167,12 +179,11 @@ const BlockerList = WDialog.extend({
       reduced[p]++;
     }
     const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
-    console.log(sorted);
 
+    // return from recursion
     if (sorted.length == 0) return;
 
     const portalId = sorted[0][0];
-    // const count = sorted[0][1];
 
     // put in some smarts for picking close portals, rather than random ones
     // when the count gets > 3
@@ -184,7 +195,7 @@ const BlockerList = WDialog.extend({
       alert(wX("AUTOMARK STOP"));
       return;
     }
-    console.log(wportal);
+    // console.log(wportal);
 
     // add marker
     let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
@@ -204,6 +215,7 @@ const BlockerList = WDialog.extend({
       return true;
     });
     window.runHooks("wasabeeUIUpdate", this._operation);
+    // recurse
     this.automark();
   }
 });
