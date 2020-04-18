@@ -161,14 +161,14 @@ const BlockerList = WDialog.extend({
       if (
         !this._operation.containsMarkerByID(
           b.fromPortalId,
-          window.plugin.wasabee.constants.MARKER_TYPE_EXCLUDE
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
         )
       )
         portals.push(b.fromPortalId);
       if (
         !this._operation.containsMarkerByID(
           b.toPortalId,
-          window.plugin.wasabee.constants.MARKER_TYPE_EXCLUDE
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
         )
       )
         portals.push(b.toPortalId);
