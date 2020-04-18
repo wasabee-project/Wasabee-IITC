@@ -54,10 +54,10 @@ export default class WasabeeAnchor {
   }
 
   popupContent(marker, operation) {
-    marker.className = "wasabee-marker-popup";
+    marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = this._portal.name;
+    title.appendChild(this._portal.displayFormat());
     const buttonSet = L.DomUtil.create(
       "div",
       "wasabee-marker-buttonset",

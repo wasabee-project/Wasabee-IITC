@@ -84,6 +84,10 @@ const addMarker = (target, operation) => {
     () => {
       // IITCs version of leaflet does not have marker.isPopupOpen()
       wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
+      // this seems hackish
+      const pu = wMarker._popup.getElement();
+      const pc = pu.firstElementChild;
+      pc.classList.add("wasabee-popup-override");
       wMarker.update();
       wMarker.openPopup();
     },
@@ -93,6 +97,9 @@ const addMarker = (target, operation) => {
     "spiderfiedclick",
     () => {
       wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
+      const pu = wMarker._popup.getElement();
+      const pc = pu.firstElementChild;
+      pc.classList.add("wasabee-popup-override");
       wMarker.update();
       wMarker.openPopup();
     },
@@ -257,6 +264,10 @@ export const drawAgents = async () => {
                   // get fresh data
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
+                  // works on spiderfiedclick, but not click?! WTF
+                  /* const pu = marker._popup.getElement();
+                  const pc = pu.firstElementChild;
+                  pc.classList.add("wasabee-popup-override"); */
                   marker.update();
                   marker.openPopup();
                 },
@@ -268,6 +279,9 @@ export const drawAgents = async () => {
                   // get fresh data
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
+                  const pu = marker._popup.getElement();
+                  const pc = pu.firstElementChild;
+                  pc.classList.add("wasabee-popup-override");
                   marker.update();
                   marker.openPopup();
                 },
@@ -296,7 +310,7 @@ export const drawAgents = async () => {
 
   // remove those not found in this fetch
   for (const agent in layerMap) {
-    console.log(agent);
+    console.log("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 };
@@ -364,6 +378,9 @@ const addAnchorToMap = (portalId, operation) => {
     "click",
     () => {
       marker.setPopupContent(content);
+      const pu = marker._popup.getElement();
+      const pc = pu.firstElementChild;
+      pc.classList.add("wasabee-popup-override");
       marker.update();
       marker.openPopup();
     },
@@ -373,6 +390,9 @@ const addAnchorToMap = (portalId, operation) => {
     "spiderfiedclick",
     () => {
       marker.setPopupContent(content);
+      const pu = marker._popup.getElement();
+      const pc = pu.firstElementChild;
+      pc.classList.add("wasabee-popup-override");
       marker.update();
       marker.openPopup();
     },
