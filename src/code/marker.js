@@ -63,7 +63,11 @@ export default class WasabeeMarker {
     const content = L.DomUtil.create("div", "wasabee-marker-popup");
     content.appendChild(this.getPopupBodyWithType(portal));
 
-    const assignment = L.DomUtil.create("div", null, content);
+    const assignment = L.DomUtil.create(
+      "div",
+      "wasabee-popup-assignment",
+      content
+    );
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
