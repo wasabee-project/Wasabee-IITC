@@ -121,7 +121,16 @@ export const SetCommentDialog = WDialog.extend({
         false
       );
 
-      // add hardness here too
+      const hardnessInput = L.DomUtil.create("input", null, container);
+      hardnessInput.placeholder = "hardness";
+      if (this.portal.hardness) hardnessInput.value = this.portal.hardness;
+      hardnessInput.addEventListener(
+        "change",
+        () => {
+          this.operation.setPortalHardness(this.target, hardnessInput.value);
+        },
+        false
+      );
     }
 
     return container;

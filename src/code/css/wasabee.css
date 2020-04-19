@@ -715,6 +715,22 @@
   grid-column-start: 1;
 }
 
+.wasabee-portal-comment {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness a {
+  color: #F00 !important;
+}
+
 /* marker color */
 .CapturePortalMarker { color: #7d7d7d; }
 .LetDecayPortalAlert { color: #000000; } 
