@@ -81,7 +81,8 @@ const addMarker = (target, operation) => {
   wMarker.off("click", wMarker.openPopup, wMarker);
   wMarker.on(
     "click",
-    () => {
+    ev => {
+      L.DomEvent.stop(ev);
       // IITCs version of leaflet does not have marker.isPopupOpen()
       wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
       // this seems hackish
@@ -95,7 +96,8 @@ const addMarker = (target, operation) => {
   );
   wMarker.on(
     "spiderfiedclick",
-    () => {
+    ev => {
+      L.DomEvent.stop(ev);
       wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
       const pu = wMarker._popup.getElement();
       const pc = pu.firstElementChild;
@@ -260,7 +262,8 @@ export const drawAgents = async () => {
               marker.off("click", agent.openPopup, agent);
               marker.on(
                 "click",
-                () => {
+                ev => {
+                  L.DomEvent.stop(ev);
                   // get fresh data
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
@@ -275,7 +278,8 @@ export const drawAgents = async () => {
               );
               marker.on(
                 "spiderfiedclick",
-                () => {
+                ev => {
+                  L.DomEvent.stop(ev);
                   // get fresh data
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
@@ -376,7 +380,8 @@ const addAnchorToMap = (portalId, operation) => {
   marker.off("click", marker.openPopup, marker);
   marker.on(
     "click",
-    () => {
+    ev => {
+      L.DomEvent.stop(ev);
       marker.setPopupContent(content);
       const pu = marker._popup.getElement();
       const pc = pu.firstElementChild;
@@ -388,7 +393,8 @@ const addAnchorToMap = (portalId, operation) => {
   );
   marker.on(
     "spiderfiedclick",
-    () => {
+    ev => {
+      L.DomEvent.stop(ev);
       marker.setPopupContent(content);
       const pu = marker._popup.getElement();
       const pc = pu.firstElementChild;
