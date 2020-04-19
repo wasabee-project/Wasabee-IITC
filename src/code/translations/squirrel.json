@@ -300,6 +300,7 @@
   "UpgradePortalAlert": "L8",
   "UseVirusPortalAlert": "Flip",
   "ExcludeMarker": "Exclude from Auto-Draw/Mark",
+  "SET_PORTAL_COMMENT": "Set portal comment",
   "smallScreen": {
     "LOG IN": "Forest",
     "LOG_OUT": "Run",
