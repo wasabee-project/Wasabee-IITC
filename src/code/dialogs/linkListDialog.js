@@ -211,13 +211,9 @@ const LinkListDialog = WDialog.extend({
       if (style[0] == "SE" || style[0] == "self-block") continue;
       const a = style[1];
       const option = L.DomUtil.create("option");
-      option.setAttribute("value", a.name);
-      if (a.name == "main") {
-        a.displayName = "Op Color";
-      }
-      if (a.name == data) {
-        option.setAttribute("selected", true);
-      }
+      option.value = a.name;
+      if (a.name == "main") a.displayName = "Op Color";
+      if (a.name == data) option.selected = true;
       option.innerHTML = a.displayName;
       linkColor.append(option);
     }

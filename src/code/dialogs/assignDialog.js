@@ -94,7 +94,7 @@ const AssignDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "wasabee-agent-menu");
     const menu = L.DomUtil.create("select", null, container);
     let option = menu.appendChild(L.DomUtil.create("option", null));
-    option.setAttribute("value", null);
+    option.value = null;
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
@@ -125,12 +125,10 @@ const AssignDialog = WDialog.extend({
       for (const a of tt.agents) {
         if (!alreadyAdded.includes(a.id) && a.state === true) {
           alreadyAdded.push(a.id);
-          option = L.DomUtil.create("option", null);
-          option.setAttribute("value", a.id);
+          option = L.DomUtil.create("option");
+          option.value = a.id;
           option.textContent = a.name;
-          if (a.id == current) {
-            option.setAttribute("selected", true);
-          }
+          if (a.id == current) option.selected = true;
           menu.appendChild(option);
         }
       }

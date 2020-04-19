@@ -61,10 +61,10 @@ const DefensiveKeysDialog = WDialog.extend({
     this._portal = L.DomUtil.create("div", "portal", this._content);
 
     this._count = L.DomUtil.create("input", null, this._content);
-    this._count.setAttribute("placeholder", "number of keys");
+    this._count.placeholder = "number of keys";
     this._count.size = 3;
     this._capID = L.DomUtil.create("input", null, this._content);
-    this._capID.setAttribute("placeholder", "Capsule ID");
+    this._capID.placeholder = "Capsule ID";
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("button", null, this._content);
     addDKeyButton.textContent = wX("UPDATE_COUNT");

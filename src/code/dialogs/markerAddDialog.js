@@ -55,13 +55,13 @@ const MarkerAddDialog = WDialog.extend({
     this._type = L.DomUtil.create("select", null, content);
     for (const k of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
-      o.setAttribute("value", k[0]);
+      o.value = k[0];
       o.textContent = wX(k[0]);
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
     this._comment = L.DomUtil.create("input", null, content);
-    this._comment.setAttribute("placeholder", "comment");
+    this._comment.placeholder = "comment";
     const addMarkerButton = L.DomUtil.create("button", null, content);
     addMarkerButton.textContent = wX("ADD_MARKER");
     L.DomEvent.on(addMarkerButton, "click", ev => {
