@@ -104,10 +104,10 @@ const MarkerList = WDialog.extend({
         name: wX("COMMENT"),
         value: marker => marker.comment,
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m, marker) => {
-          const comment = L.DomUtil.create("a", "", a);
-          comment.textContent = m;
-          L.DomEvent.on(comment, "click", ev => {
+        format: (cell, value, marker) => {
+          const comment = L.DomUtil.create("a", "", cell);
+          comment.textContent = value;
+          L.DomEvent.on(cell, "click", ev => {
             L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(marker, operation);
@@ -130,10 +130,10 @@ const MarkerList = WDialog.extend({
           return "";
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m, agent) => {
-          const assigned = L.DomUtil.create("a", "", a);
-          assigned.textContent = m;
-          L.DomEvent.on(assigned, "click", () => {
+        format: (cell, value, agent) => {
+          const assigned = L.DomUtil.create("a", "", cell);
+          assigned.textContent = value;
+          L.DomEvent.on(cell, "click", () => {
             const ad = new AssignDialog();
             ad.setup(agent, operation);
             ad.enable();

@@ -3,6 +3,7 @@ import { deleteMarker } from "./uiCommands.js";
 import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 import wX from "./wX";
+import SetCommentDialog from "./dialogs/setCommentDialog";
 
 export default class WasabeeMarker {
   constructor(type, portalId, comment) {
@@ -61,7 +62,7 @@ export default class WasabeeMarker {
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
     const content = L.DomUtil.create("div", "wasabee-marker-popup");
-    content.appendChild(this.getPopupBodyWithType(portal));
+    content.appendChild(this.getPopupBodyWithType(portal, operation, marker));
 
     const assignment = L.DomUtil.create(
       "div",
@@ -111,11 +112,7 @@ export default class WasabeeMarker {
     return content;
   }
 
-  getPopupBodyWithType(portal) {
-    // is this paranoia left from ages past?
-    // if (!window.plugin.wasabee.static.markerTypes.has(this.type)) { this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE; }
-
-    // const type = window.plugin.wasabee.static.markerTypes.get(this.type);
+  getPopupBodyWithType(portal, operation, marker) {
     const title = L.DomUtil.create("div", "desc");
     const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
     L.DomUtil.addClass(kind, this.type);
@@ -129,6 +126,37 @@ export default class WasabeeMarker {
         title
       );
       comment.textContent = this.comment;
+      // should allow setting of marker-level comment here
+    }
+    if (portal.comment) {
+      const comment = L.DomUtil.create("div", "wasabee-portal-comment", title);
+      const cl = L.DomUtil.create("a", null, comment);
+      cl.textContent = portal.comment;
+      cl.href = "#";
+      L.DomEvent.on(cl, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(portal, operation);
+        cd.enable();
+        marker.closePopup();
+      });
+    }
+    if (portal.hardness) {
+      const hardness = L.DomUtil.create(
+        "div",
+        "wasabee-portal-hardness",
+        title
+      );
+      const hl = L.DomUtil.create("a", null, hardness);
+      hl.textContent = portal.hardness;
+      hl.href = "#";
+      L.DomEvent.on(hl, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(portal, operation);
+        cd.enable();
+        marker.closePopup();
+      });
     }
     return title;
   }
