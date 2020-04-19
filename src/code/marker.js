@@ -113,15 +113,13 @@ export default class WasabeeMarker {
 
   getPopupBodyWithType(portal) {
     // is this paranoia left from ages past?
-    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
-      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
-    }
+    // if (!window.plugin.wasabee.static.markerTypes.has(this.type)) { this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE; }
 
-    const type = window.plugin.wasabee.static.markerTypes.get(this.type);
+    // const type = window.plugin.wasabee.static.markerTypes.get(this.type);
     const title = L.DomUtil.create("div", "desc");
     const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
-    kind.textContent = type.label;
-    kind.style.color = type.color;
+    L.DomUtil.addClass(kind, this.type);
+    kind.textContent = wX(this.type);
     title.appendChild(portal.displayFormat());
 
     if (this.comment) {
