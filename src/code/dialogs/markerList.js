@@ -77,10 +77,7 @@ const MarkerList = WDialog.extend({
       {
         name: wX("ORDER"),
         value: marker => marker.order,
-        // sort: (a, b) => (a < b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
+        format: (a, m) => (a.textContent = m)
       },
       {
         name: wX("PORTAL"),
@@ -96,27 +93,21 @@ const MarkerList = WDialog.extend({
       },
       {
         name: wX("TYPE"),
-        value: marker =>
-          window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
-          "unknown",
+        value: marker => wX(marker.type),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, marker) => {
-          const color =
-            window.plugin.wasabee.static.markerTypes.get(marker.type).color ||
-            "unknown";
-          const d = L.DomUtil.create("span", null, cell);
+          const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
-          d.style.color = color;
         }
       },
       {
         name: wX("COMMENT"),
         value: marker => marker.comment,
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m, marker) => {
-          const comment = L.DomUtil.create("a", "", a);
-          comment.textContent = m;
-          L.DomEvent.on(comment, "click", ev => {
+        format: (cell, value, marker) => {
+          const comment = L.DomUtil.create("a", "", cell);
+          comment.textContent = value;
+          L.DomEvent.on(cell, "click", ev => {
             L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(marker, operation);
@@ -139,10 +130,10 @@ const MarkerList = WDialog.extend({
           return "";
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m, agent) => {
-          const assigned = L.DomUtil.create("a", "", a);
-          assigned.textContent = m;
-          L.DomEvent.on(assigned, "click", () => {
+        format: (cell, value, agent) => {
+          const assigned = L.DomUtil.create("a", "", cell);
+          assigned.textContent = value;
+          L.DomEvent.on(cell, "click", () => {
             const ad = new AssignDialog();
             ad.setup(agent, operation);
             ad.enable();

@@ -299,9 +299,12 @@ export const drawAgents = async () => {
             if (!doneAgents.includes(agent.id)) {
               const a = layerMap.get(agent.id);
               const al = Wasabee.agentLayerGroup.getLayer(a);
-              if (agent.lat && agent.lng) al.setLatLng(agent.latLng);
-              layerMap.delete(agent.id);
-              doneAgents.push(agent.id);
+              if (agent.lat && agent.lng) {
+                al.setLatLng(agent.latLng);
+                layerMap.delete(agent.id);
+                doneAgents.push(agent.id);
+                al.update();
+              }
             }
           }
         }
@@ -344,12 +347,13 @@ const updateAnchors = op => {
 
   for (const a of op.anchors) {
     if (layerMap.has(a)) {
-      layerMap.delete(a); // no changes
+      layerMap.delete(a);
     } else {
       addAnchorToMap(a, op);
     }
   }
 
+  // XXX use "in" instead of "of" and the first value
   // eslint-disable-next-line
   for (const [k, v] of layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
@@ -375,13 +379,13 @@ const addAnchorToMap = (portalId, operation) => {
   });
 
   window.registerMarkerForOMS(marker);
-  const content = anchor.popupContent(marker, operation);
-  marker.bindPopup(content);
+  marker.bindPopup("loading ...");
   marker.off("click", marker.openPopup, marker);
   marker.on(
     "click",
     ev => {
       L.DomEvent.stop(ev);
+      const content = anchor.popupContent(marker, operation);
       marker.setPopupContent(content);
       const pu = marker._popup.getElement();
       const pc = pu.firstElementChild;
@@ -395,6 +399,7 @@ const addAnchorToMap = (portalId, operation) => {
     "spiderfiedclick",
     ev => {
       L.DomEvent.stop(ev);
+      const content = anchor.popupContent(marker, operation);
       marker.setPopupContent(content);
       const pu = marker._popup.getElement();
       const pc = pu.firstElementChild;

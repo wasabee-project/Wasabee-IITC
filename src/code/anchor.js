@@ -2,6 +2,7 @@ import { showLinksDialog, swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
+import SetCommentDialog from "./dialogs/setCommentDialog";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
@@ -15,9 +16,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    const operation = op ? op : getSelectedOperation();
-    this._portal = operation.getPortal(this.ID);
-    this.color = operation.color;
+    this._operation = op ? op : getSelectedOperation();
+    this._portal = this._operation.getPortal(this.ID);
+    this.color = this._operation.color;
   }
 
   // pointless, since these are never pushed to the server
@@ -58,6 +59,40 @@ export default class WasabeeAnchor {
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.appendChild(this._portal.displayFormat());
+    if (this._portal.comment) {
+      const portalComment = L.DomUtil.create(
+        "div",
+        "wasabee-portal-comment",
+        content
+      );
+      const pcLink = L.DomUtil.create("a", null, portalComment);
+      pcLink.textContent = this._portal.comment;
+      pcLink.href = "#";
+      L.DomEvent.on(pcLink, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(this._portal, this._operation);
+        cd.enable();
+        marker.closePopup();
+      });
+    }
+    if (this._portal.hardness) {
+      const portalHardness = L.DomUtil.create(
+        "div",
+        "wasabee-portal-hardness",
+        content
+      );
+      const phLink = L.DomUtil.create("a", null, portalHardness);
+      phLink.textContent = this._portal.hardness;
+      phLink.href = "#";
+      L.DomEvent.on(phLink, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(this._portal, this._operation);
+        cd.enable();
+        marker.closePopup();
+      });
+    }
     const buttonSet = L.DomUtil.create(
       "div",
       "wasabee-marker-buttonset",

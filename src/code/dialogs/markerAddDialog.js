@@ -53,10 +53,10 @@ const MarkerAddDialog = WDialog.extend({
     this._portalClickedHook();
 
     this._type = L.DomUtil.create("select", null, content);
-    for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
-      const o = L.DomUtil.create("option", "", this._type);
-      o.setAttribute("value", a);
-      o.textContent = k.label;
+    for (const k of window.plugin.wasabee.static.markerTypes) {
+      const o = L.DomUtil.create("option", null, this._type);
+      o.setAttribute("value", k[0]);
+      o.textContent = wX(k[0]);
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
@@ -73,7 +73,6 @@ const MarkerAddDialog = WDialog.extend({
       title: wX("ADD MARKER TITLE"),
       width: "auto",
       height: "auto",
-      // position: { my: auto, at: "center center+30" },
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
       closeCallback: () => {

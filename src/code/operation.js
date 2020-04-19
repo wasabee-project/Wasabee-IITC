@@ -185,6 +185,24 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  setPortalComment(portal, comment) {
+    for (const p of this.opportals) {
+      if (p.id == portal.id) {
+        p.comment = comment;
+        this.update(true);
+      }
+    }
+  }
+
+  setPortalHardness(portal, hardness) {
+    for (const p of this.opportals) {
+      if (p.id == portal.id) {
+        p.hardness = hardness;
+        this.update(true);
+      }
+    }
+  }
+
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
   removeLink(startPortal, endPortal) {
     const newLinks = [];

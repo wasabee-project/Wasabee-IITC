@@ -715,5 +715,34 @@
   grid-column-start: 1;
 }
 
-/* put leaflet overrrides here */
-// #map .leaflet-popup-content-wrapper { -webkit-border-radius: 2px; border: 1px solid rgba(81,177,32,0.90); background: rgba(39,41,38,0.50); padding-left: 3px; padding-right: 3px; }
+.wasabee-portal-comment {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness a {
+  color: #F00 !important;
+}
+
+/* marker color */
+.CapturePortalMarker { color: #7d7d7d; }
+.LetDecayPortalAlert { color: #000000; } 
+.DestroyPortalAlert { color: #CE3B37; }
+.FarmPortalMarker { color: #f17030; }
+.GotoPortalMarker { color: #e235a9; }
+.GetKeyPortalMarker { color: #78b32c; }
+.CreateLinkAlert { color: #0a5d00; }
+.MeetAgentPortalMarker { color: #6b553d; }
+.OtherPortalAlert { color: #3c3c3c; }
+.RechargePortalAlert { color: #298566; }
+.UpgradePortalAlert { color: #298566; }
+.UseVirusPortalAlert { color: #400080; }
+.ExcludeMarker { color: #000099; }
+
