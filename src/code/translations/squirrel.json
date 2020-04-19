@@ -283,9 +283,9 @@
   "MARKER STATE": " Set acorn state",
   "LINK STATE PROMPT": "Branch Status",
   "LINK STATE": "Set branch status",
-  "acknowledged": "Acknowledged",
-  "assigned": "Assigned",
-  "completed": "Completed",
+  "acknowledged": "Received",
+  "assigned": "Accepted",
+  "completed": "Eaten",
   "pending": "Pending",
   "smallScreen": {
     "LOG IN": "Forest",
