@@ -59,23 +59,21 @@ export default class WasabeeAnchor {
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
     title.appendChild(this._portal.displayFormat());
-    if (this._portal.comment) {
-      const portalComment = L.DomUtil.create(
-        "div",
-        "wasabee-portal-comment",
-        content
-      );
-      const pcLink = L.DomUtil.create("a", null, portalComment);
-      pcLink.textContent = this._portal.comment;
-      pcLink.href = "#";
-      L.DomEvent.on(pcLink, "click", ev => {
-        L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(this._portal, this._operation);
-        cd.enable();
-        marker.closePopup();
-      });
-    }
+    const portalComment = L.DomUtil.create(
+      "div",
+      "wasabee-portal-comment",
+      content
+    );
+    const pcLink = L.DomUtil.create("a", null, portalComment);
+    pcLink.textContent = this._portal.comment || wX("SET_PORTAL_COMMENT");
+    pcLink.href = "#";
+    L.DomEvent.on(pcLink, "click", ev => {
+      L.DomEvent.stop(ev);
+      const cd = new SetCommentDialog();
+      cd.setup(this._portal, this._operation);
+      cd.enable();
+      marker.closePopup();
+    });
     if (this._portal.hardness) {
       const portalHardness = L.DomUtil.create(
         "div",

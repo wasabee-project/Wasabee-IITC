@@ -126,21 +126,25 @@ export default class WasabeeMarker {
         title
       );
       comment.textContent = this.comment;
-      // should allow setting of marker-level comment here
-    }
-    if (portal.comment) {
-      const comment = L.DomUtil.create("div", "wasabee-portal-comment", title);
-      const cl = L.DomUtil.create("a", null, comment);
-      cl.textContent = portal.comment;
-      cl.href = "#";
-      L.DomEvent.on(cl, "click", ev => {
+      L.DomEvent.on(comment, "click", ev => {
         L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(portal, operation);
-        cd.enable();
+        const com = new SetCommentDialog();
+        com.setup(this, operation);
+        com.enable();
         marker.closePopup();
       });
     }
+    const comment = L.DomUtil.create("div", "wasabee-portal-comment", title);
+    const cl = L.DomUtil.create("a", null, comment);
+    cl.textContent = portal.comment || wX("SET_PORTAL_COMMENT");
+    cl.href = "#";
+    L.DomEvent.on(cl, "click", ev => {
+      L.DomEvent.stop(ev);
+      const cd = new SetCommentDialog();
+      cd.setup(portal, operation);
+      cd.enable();
+      marker.closePopup();
+    });
     if (portal.hardness) {
       const hardness = L.DomUtil.create(
         "div",

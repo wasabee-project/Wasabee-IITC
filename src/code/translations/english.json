@@ -244,6 +244,7 @@
   "SET_NEW_OP": "Please Set the New Operation Name",
   "SET_PORT_COMMENT": "Set comment for portal: ",
   "SET_PCOMMENT": "Set Portal Comment: ${value}",
+  "SET_PORTAL_COMMENT": "Set Portal Comment",
   "SOURCE_PORT": "Source Portal ",
   "SQUAD": "Squad",
   "STARBURST": "Starburst",
