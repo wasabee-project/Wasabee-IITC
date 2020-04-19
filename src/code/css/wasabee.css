@@ -135,14 +135,17 @@
 }
 
 /* used in anything that is a sortable table */
-.wasabee-table tbody tr:nth-child(2n + 1) td {
-  border-color: rgba(25, 63, 95, 0.75);
-}
+/* .wasabee-table tbody tr:nth-child(2n + 1) td { border-color: rgba(50, 0, 125, 1); } */
 .wasabee-table tr {
-  background: rgba(25, 63, 95, 0.75);
+  background: rgba(215, 225, 210, 0.9);
 }
+
+.wasabee-table .enl {
+  color: rgb(56, 142, 60) !important;
+}
+
 .wasabee-table tbody tr:nth-child(2n + 1) {
-  background: rgba(8, 48, 78, 0.75);
+  background: rgba(240, 240, 240, 0.9);
 }
 .wasabee-table > thead .sortable:before {
   content: " ";
@@ -151,7 +154,7 @@
   min-width: 1em;
   text-align: right;
 }
-/* .wasabee-table td.menu>.wasabee-overflow-button { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex }  */
+
 .wasabee-table {
   border-collapse: collapse;
   empty-cells: show;
@@ -162,9 +165,10 @@
 .wasabee-table th {
   border-width: 0 1px;
   border-style: solid;
-  border-color: rgba(8, 48, 78, 0.75);
+  border-color: rgba(50, 0, 125, 1);
   padding: 3px 4px;
   text-align: left;
+  color: rgba(125, 90, 195, 1);
 }
 .wasabee-table td:first-child,
 .wasabee-table th:first-child {
@@ -175,7 +179,7 @@
   border-right-width: 0;
 }
 .wasabee-table > thead .sorted {
-  color: #ffce00;
+  color: rgba(125, 90, 195, 1);
 }
 .wasabee-table > thead .sortable.asc:before {
   content: "\25b2";
@@ -188,8 +192,6 @@
   min-height: 20px;
   min-width: 24px;
 }
-
-/* .wasabee-overflow-button span { flex: 0 0 auto; box: 0 0 auto }  */
 
 /* defined in agent.js, always on an <a> -- can this be pruned ? */
 .wasabee-agent-label a {
@@ -285,7 +287,56 @@
 }
 
 /* all dialogs get this class -- do global stuff with it */
-.wasabee-dialog { }
+.wasabee-dialog {
+  background-color: rgba(250, 250, 250, 0.9);
+  color: #000;
+}
+
+.wasabee-dialog button {
+  padding: 1px 7px 2px;
+  border: initial;
+  background-color: buttonface;
+  color: buttontext;
+  border-image: initial;
+  border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+  border-width: 1px;
+  border-style: solid;
+  margin: 2px 0px 2px 0px;
+}
+
+.wasabee-dialog a {
+  color: rgba(125, 90, 195, 1);
+}
+
+.wasabee-dialog h3 {
+  color: rgba(125, 90, 195, 1);
+}
+
+.wasabee-dialog div.ui-dialog-titlebar {
+  background-color: rgba(110, 120, 110, 1);
+  color: #000;
+  text-align: left;
+  line-height: 14px;
+  font-size: 13px;
+  border: 1px solid rgba(110, 120, 110, 1);
+}
+
+.wasabee-dialog span.ui-dialog-title {
+}
+
+.wasabee-dialog span.ui-dialog-title-active {
+  color: rgba(15, 250, 5, 1);
+}
+
+.wasabee-dialog button.ui-button {
+  background-color: rgba(110, 120, 110, 1);
+  color: rgba(15, 250, 5, 1);
+  padding: 4px 4px 4px 4px;
+}
+
+.wasabee-dialog .ui-dialog-titlebar-button {
+  border: 1px solid rgba(15, 250, 5, 1);
+}
 
 /* classes specific to various dialogs */
 .wasabee-dialog-about {
@@ -342,12 +393,6 @@
   margin: 4px;
   padding: 4px;
   grid-column-start: 1;
-  grid-column-end: 3;
-}
-.wasabee-dialog-auth button.about {
-  margin: 4px;
-  padding: 4px;
-  grid-column-start: 3;
   grid-column-end: 5;
 }
 
@@ -545,10 +590,7 @@
 
 .wasabee-dialog-newop {
 }
-.wasabee-dialog-newop div.buttonset button {
-  padding: 8px 24px 8px 24px;
-  margin: 24px 8px 24px 8px;
-}
+.wasabee-dialog-newop div.buttonset button { }
 .wasabee-dialog-newop div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
@@ -582,12 +624,9 @@
 .wasabee-dialog-ops div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
-  text-align: center;
 }
 .wasabee-dialog-ops div.buttonset button {
-  width: 96%;
-  padding: 8px 24px 8px 24px;
-  margin: 2px 2px 2px 2px;
+  width: 100%;
 }
 .wasabee-dialog-checklist {
 }
