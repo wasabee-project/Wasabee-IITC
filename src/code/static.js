@@ -84,9 +84,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_CAPTURE,
     {
-      name: W.static.constants.MARKER_TYPE_DECAY,
-      label: "Capture",
-      color: "#7d7d7d",
       markerIcon: require("./images/wasabee_markers_capture_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_capture_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_capture_assigned.png"),
@@ -96,9 +93,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_DECAY,
     {
-      name: W.static.constants.MARKER_TYPE_DECAY,
-      label: "Let Decay",
-      color: "#000000",
       markerIcon: require("./images/wasabee_markers_decay_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_decay_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_decay_assigned.png"),
@@ -108,9 +102,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_DESTROY,
     {
-      name: W.static.constants.MARKER_TYPE_DESTROY,
-      label: "Destroy",
-      color: "#CE3B37",
       markerIcon: require("./images/wasabee_markers_destroy_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_destroy_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_destroy_assigned.png"),
@@ -120,9 +111,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_FARM,
     {
-      name: W.static.constants.MARKER_TYPE_FARM,
-      label: "Farm",
-      color: "#f17030",
       markerIcon: require("./images/wasabee_markers_farm_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
@@ -132,9 +120,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_GOTO,
     {
-      name: W.static.constants.MARKER_TYPE_GOTO,
-      label: "Go To",
-      color: "#e235a9",
       markerIcon: require("./images/wasabee_markers_goto_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_goto_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_goto_assigned.png"),
@@ -144,9 +129,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_KEY,
     {
-      name: W.static.constants.MARKER_TYPE_KEY,
-      label: "Get Keys",
-      color: "#78b32c",
       markerIcon: require("./images/wasabee_markers_key_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_key_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_key_assigned.png"),
@@ -156,9 +138,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_LINK,
     {
-      name: W.static.constants.MARKER_TYPE_LINK,
-      label: "Link",
-      color: "#0a5d00",
       markerIcon: require("./images/wasabee_markers_link_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_link_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_link_assigned.png"),
@@ -168,9 +147,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_MEETAGENT,
     {
-      name: W.static.constants.MARKER_TYPE_MEETAGENT,
-      label: "Meet Agent",
-      color: "#6b553d",
       markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.png"),
@@ -180,9 +156,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_OTHER,
     {
-      name: W.static.constants.MARKER_TYPE_OTHER,
-      label: "Other",
-      color: "#3c3c3c",
       markerIcon: require("./images/wasabee_markers_other_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
@@ -192,9 +165,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_RECHARGE,
     {
-      name: W.static.constants.MARKER_TYPE_RECHARGE,
-      label: "Recharge",
-      color: "#298566",
       markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.png"),
@@ -204,9 +174,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_UPGRADE,
     {
-      name: W.static.constants.MARKER_TYPE_UPGRADE,
-      label: "Upgrade",
-      color: "#298566",
       markerIcon: require("./images/wasabee_markers_upgrade_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_upgrade_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_upgrade_assigned.png"),
@@ -216,9 +183,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_VIRUS,
     {
-      name: W.static.constants.MARKER_TYPE_VIRUS,
-      label: "Use Virus",
-      color: "#400080",
       markerIcon: require("./images/wasabee_markers_virus_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
@@ -228,9 +192,6 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_EXCLUDE,
     {
-      name: W.static.constants.MARKER_TYPE_EXCLUDE,
-      label: "Exclude from auto-draws",
-      color: "#000099",
       markerIcon: require("./images/wasabee_markers_exclude_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_exclude_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_exclude_assigned.png"),

@@ -77,10 +77,7 @@ const MarkerList = WDialog.extend({
       {
         name: wX("ORDER"),
         value: marker => marker.order,
-        // sort: (a, b) => (a < b),
-        format: (a, m) => {
-          a.textContent = m;
-        }
+        format: (a, m) => (a.textContent = m)
       },
       {
         name: wX("PORTAL"),
@@ -96,17 +93,11 @@ const MarkerList = WDialog.extend({
       },
       {
         name: wX("TYPE"),
-        value: marker =>
-          window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
-          "unknown",
+        value: marker => wX(marker.type),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, marker) => {
-          const color =
-            window.plugin.wasabee.static.markerTypes.get(marker.type).color ||
-            "unknown";
-          const d = L.DomUtil.create("span", null, cell);
+          const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
-          d.style.color = color;
         }
       },
       {
