@@ -6,7 +6,6 @@ import {
   SetWasabeeServer
 } from "../server";
 import PromptDialog from "./promptDialog";
-import AboutDialog from "./about";
 import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
 import { wX, getLanguage } from "../wX";
@@ -160,14 +159,6 @@ const AuthDialog = WDialog.extend({
       serverDialog.current = GetWasabeeServer();
       serverDialog.placeholder = "https://server.wasabee.rocks";
       serverDialog.enable();
-    });
-
-    const aboutButton = L.DomUtil.create("button", "about", content);
-    aboutButton.textContent = wX("ABOUT WASABEE-IITC");
-    L.DomEvent.on(aboutButton, "click", ev => {
-      L.DomEvent.stop(ev);
-      const ad = new AboutDialog();
-      ad.enable();
     });
 
     this._dialog = window.dialog({

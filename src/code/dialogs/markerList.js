@@ -100,8 +100,13 @@ const MarkerList = WDialog.extend({
           window.plugin.wasabee.static.markerTypes.get(marker.type).label ||
           "unknown",
         sort: (a, b) => a.localeCompare(b),
-        format: (a, m) => {
-          a.textContent = m;
+        format: (cell, value, marker) => {
+          const color =
+            window.plugin.wasabee.static.markerTypes.get(marker.type).color ||
+            "unknown";
+          const d = L.DomUtil.create("span", null, cell);
+          d.textContent = value;
+          d.style.color = color;
         }
       },
       {

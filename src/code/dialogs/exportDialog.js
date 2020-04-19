@@ -64,7 +64,7 @@ const ExportDialog = WDialog.extend({
     for (const link of this._operation.links) {
       const l = {};
       l.type = "polyline";
-      l.color = link.getColorHex();
+      l.color = link.getColor();
       l.latLngs = link.getLatLngs(this._operation);
       output.push(l);
     }
