@@ -62,7 +62,7 @@ export default class WasabeePortal {
   displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
-    const e = L.DomUtil.create("a", null);
+    const e = L.DomUtil.create("a", "wasabee-portal");
     if (shortName === true && this.name.length > 12) {
       e.textContent = this.name.slice(0, 8) + "...";
     } else {

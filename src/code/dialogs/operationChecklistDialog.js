@@ -127,18 +127,17 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("TYPE"),
         value: thing => {
           if (thing instanceof WasabeeLink) {
-            return "link";
+            return "Link";
           } else {
             // push this shit in to the marker class
-            return (
-              window.plugin.wasabee.static.markerTypes.get(thing.type).label ||
-              "unknown"
-            );
+            return wX(thing.type);
           }
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value) => {
-          row.textContent = value;
+        format: (row, value, thing) => {
+          const span = L.DomUtil.create("span", null, row);
+          if (thing.type) L.DomUtil.addClass(span, thing.type);
+          span.textContent = value;
         }
       },
       {

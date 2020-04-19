@@ -140,10 +140,6 @@
   background: rgba(215, 225, 210, 0.9);
 }
 
-.wasabee-table .enl {
-  color: rgb(56, 142, 60) !important;
-}
-
 .wasabee-table tbody tr:nth-child(2n + 1) {
   background: rgba(240, 240, 240, 0.9);
 }
@@ -215,10 +211,6 @@
   font-weight: bolder;
 }
 
-/* in our popups, use a darker green for ENL for better contrast */
-.wasabee-popup-override .enl {
-  color: rgb(56, 142, 60) !important;
-}
 
 .wasabee-marker-popup { }
 .wasabee-marker-popup div.desc {
@@ -730,6 +722,11 @@
 .wasabee-portal-hardness a {
   color: #F00 !important;
 }
+
+/* in our popups, use a darker green for ENL for better contrast */
+.wasabee-dialog a.wasabee-portal { color: #ff6600; }
+.wasabee-dialog a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
+.wasabee-dialog a.wasabee-portal.res { }
 
 /* marker color */
 .CapturePortalMarker { color: #7d7d7d; }
