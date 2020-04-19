@@ -723,10 +723,13 @@
   color: #F00 !important;
 }
 
-/* in our popups, use a darker green for ENL for better contrast */
+/* in our dialogs and popups, use a darker green for ENL for better contrast */
 .wasabee-dialog a.wasabee-portal { color: #ff6600; }
 .wasabee-dialog a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
 .wasabee-dialog a.wasabee-portal.res { }
+a.wasabee-portal { color: #ff6600; }
+a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
+a.wasabee-portal.res { }
 
 /* marker color */
 .CapturePortalMarker { color: #7d7d7d; }
