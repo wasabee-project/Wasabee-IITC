@@ -18,15 +18,13 @@ export const setupToolbox = () => {
 
   const settingsLink = L.DomUtil.create("a", null, toolbox);
   settingsLink.href = "#";
+  settingsLink.textContent = wX("SETTINGS");
 
   L.DomEvent.on(settingsLink, "click", ev => {
     L.DomEvent.stop(ev);
     const sd = new SettingsDialog();
     sd.enable();
   });
-  const settingsImg = L.DomUtil.create("img", null, settingsLink);
-  settingsImg.src =
-    window.plugin.wasabee.static.images.toolbar_settings.default;
 
   const locationLink = L.DomUtil.create("a", null, toolbox);
   locationLink.textContent = wX("SEND_LOC");

@@ -43,11 +43,11 @@ const AboutDialog = WDialog.extend({
     const support = L.DomUtil.create("div", null, html);
     // wX is the translation call, looks for strings in translations.json based
     // on the browser's langauge setting
-    support.textContent = wX("SUPPORT_INSTRUCT");
+    support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
-      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.15: @deviousness</li></ul>";
+      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.16: @deviousness</li></ul>";
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");

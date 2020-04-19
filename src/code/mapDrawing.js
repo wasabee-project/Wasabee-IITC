@@ -117,12 +117,6 @@ const resetLinks = operation => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  const lang = getLanguage();
-  const restore = operation.color;
-  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
-    operation.color = "SE";
-  }
-
   // pre-fetch the op color outside the loop -- is this actually helpful?
   let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
@@ -133,7 +127,6 @@ const resetLinks = operation => {
   for (const l of operation.links) {
     addLink(l, style.link, operation);
   }
-  operation.color = restore;
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
