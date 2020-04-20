@@ -62,7 +62,7 @@ const updateMarkers = op => {
 /** This function adds a Markers to the target layer group */
 const addMarker = (target, operation) => {
   const targetPortal = operation.getPortal(target.portalId);
-  const wMarker = L.marker(targetPortal.latLng, {
+  const marker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
     id: target.ID,
     state: target.state,
@@ -76,38 +76,28 @@ const addMarker = (target, operation) => {
   });
 
   // register the marker for spiderfied click
-  window.registerMarkerForOMS(wMarker);
-  wMarker.bindPopup("loading...");
-  wMarker.off("click", wMarker.openPopup, wMarker);
-  wMarker.on(
-    "click",
+  window.registerMarkerForOMS(marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup-override",
+    closeButton: false
+  });
+  // marker.off("click", marker.openPopup, marker);
+  marker.on(
+    "click spiderfiedclick",
     ev => {
       L.DomEvent.stop(ev);
-      // IITCs version of leaflet does not have marker.isPopupOpen()
-      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
-      // this seems hackish
-      const pu = wMarker._popup.getElement();
-      const pc = pu.firstElementChild;
-      pc.classList.add("wasabee-popup-override");
-      wMarker.update();
-      wMarker.openPopup();
+      // IITC 0.26's leaflet doesn't have this, just deal
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
+      marker.setPopupContent(target.getMarkerPopup(marker, operation));
+      // IITC 0.26's leaflet doesn't have this, just deal
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup-override");
+      marker.update();
+      marker.openPopup();
     },
-    wMarker
+    marker
   );
-  wMarker.on(
-    "spiderfiedclick",
-    ev => {
-      L.DomEvent.stop(ev);
-      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
-      const pu = wMarker._popup.getElement();
-      const pc = pu.firstElementChild;
-      pc.classList.add("wasabee-popup-override");
-      wMarker.update();
-      wMarker.openPopup();
-    },
-    wMarker
-  );
-  wMarker.addTo(Wasabee.markerLayerGroup);
+  marker.addTo(Wasabee.markerLayerGroup);
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
@@ -251,40 +241,27 @@ export const drawAgents = async () => {
               });
 
               window.registerMarkerForOMS(marker);
-              marker.bindPopup(agent.getPopup());
-              marker.off("click", agent.openPopup, agent);
+              marker.bindPopup("Loading...", {
+                className: "wasabee-popup-override",
+                closeButton: false
+              });
+              // marker.off("click", agent.openPopup, agent);
               marker.on(
-                "click",
+                "click spiderfiedclick",
                 ev => {
                   L.DomEvent.stop(ev);
-                  // get fresh data
+                  if (marker.isPopupOpen && marker.isPopupOpen()) return;
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
-                  // works on spiderfiedclick, but not click?! WTF
-                  /* const pu = marker._popup.getElement();
-                  const pc = pu.firstElementChild;
-                  pc.classList.add("wasabee-popup-override"); */
-                  marker.update();
-                  marker.openPopup();
-                },
-                agent
-              );
-              marker.on(
-                "spiderfiedclick",
-                ev => {
-                  L.DomEvent.stop(ev);
-                  // get fresh data
-                  const a = window.plugin.wasabee._agentCache.get(agent.id);
-                  marker.setPopupContent(a.getPopup());
-                  const pu = marker._popup.getElement();
-                  const pc = pu.firstElementChild;
-                  pc.classList.add("wasabee-popup-override");
+                  if (marker._popup._wrapper)
+                    marker._popup._wrapper.classList.add(
+                      "wasabee-popup-override"
+                    );
                   marker.update();
                   marker.openPopup();
                 },
                 marker
               );
-
               marker.addTo(Wasabee.agentLayerGroup);
             }
           } else {
@@ -372,31 +349,20 @@ const addAnchorToMap = (portalId, operation) => {
   });
 
   window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading ...");
-  marker.off("click", marker.openPopup, marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup-override",
+    closeButton: false
+  });
+  // marker.off("click", marker.openPopup, marker);
   marker.on(
-    "click",
+    "click spiderfiedclick",
     ev => {
       L.DomEvent.stop(ev);
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
       const content = anchor.popupContent(marker, operation);
       marker.setPopupContent(content);
-      const pu = marker._popup.getElement();
-      const pc = pu.firstElementChild;
-      pc.classList.add("wasabee-popup-override");
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.on(
-    "spiderfiedclick",
-    ev => {
-      L.DomEvent.stop(ev);
-      const content = anchor.popupContent(marker, operation);
-      marker.setPopupContent(content);
-      const pu = marker._popup.getElement();
-      const pc = pu.firstElementChild;
-      pc.classList.add("wasabee-popup-override");
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup-override");
       marker.update();
       marker.openPopup();
     },
