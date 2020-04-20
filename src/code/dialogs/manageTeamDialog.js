@@ -251,7 +251,6 @@ const ManageTeamDialog = WDialog.extend({
       cd.enable();
     });
 
-    console.log(this._team);
     if (this._team.jkt) {
       const joinLinkLabel = L.DomUtil.create("label", null, container);
       joinLinkLabel.textContent = wX("JOIN_LINK");
