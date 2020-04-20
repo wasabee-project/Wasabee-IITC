@@ -58,8 +58,9 @@ export default class WasabeeAgent {
     }
     display.href = `${server}/api/v1/agent/${this.id}?json=n`;
     display.target = "_new";
-    L.DomEvent.on(display, "click", () => {
+    L.DomEvent.on(display, "click", ev => {
       window.open(display.href, this.id);
+      L.DomEvent.stop(ev);
     });
     display.textContent = this.name;
     return display;
@@ -72,7 +73,8 @@ export default class WasabeeAgent {
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
-    L.DomEvent.on(sendTarget, "click", () => {
+    L.DomEvent.on(sendTarget, "click", ev => {
+      L.DomEvent.stop(ev);
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
         alert(wX("SELECT PORTAL"));

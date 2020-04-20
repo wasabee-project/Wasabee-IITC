@@ -53,14 +53,11 @@ export default class WasabeeLink {
 
   // make the interface match (kinda) what markers do
   // 'pending','assigned','acknowledged','completed'
+  // THESE ARE INTERNAL VALUES AND SHOULD NOT BE wX'd!!!
   get state() {
-    if (this.completed) {
-      return wX("COMPLETED");
-    }
-    if (this.assignedTo) {
-      return wX("ASSIGNED");
-    }
-    return wX("PENDING");
+    if (this.completed) return "completed";
+    if (this.assignedTo) return "assigned";
+    return "pending";
   }
 
   set state(s) {
@@ -79,11 +76,22 @@ export default class WasabeeLink {
   getLatLngs(operation) {
     if (!operation) operation = getSelectedOperation();
 
-    const fromPortal = operation.getPortal(this.fromPortalId);
-    const toPortal = operation.getPortal(this.toPortalId);
     const returnArray = Array();
+
+    const fromPortal = operation.getPortal(this.fromPortalId);
+    if (!fromPortal || !fromPortal.lat) {
+      console.log("unable to get source portal");
+      return null;
+    }
     returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+
+    const toPortal = operation.getPortal(this.toPortalId);
+    if (!toPortal || !toPortal.lat) {
+      console.log("unable to get destination portal");
+      return null;
+    }
     returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+
     return returnArray;
   }
 
@@ -92,21 +100,22 @@ export default class WasabeeLink {
   }
 
   // returns a DOM object appropriate for display
-  displayFormat(operation) {
+  // do we still need the operation here?
+  displayFormat(operation, smallScreen = false) {
     const d = L.DomUtil.create("div", null);
     d.appendChild(
-      operation.getPortal(this.fromPortalId).displayFormat(operation)
+      operation.getPortal(this.fromPortalId).displayFormat(smallScreen)
     );
     const arrow = L.DomUtil.create("span", null, d);
     arrow.textContent = " ➾ ";
-    arrow.style.color = this.getColorHex();
+    arrow.style.color = this.getColor();
     d.appendChild(
-      operation.getPortal(this.toPortalId).displayFormat(operation)
+      operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
     return d;
   }
 
-  getColorHex() {
+  getColor() {
     if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
       const c = window.plugin.wasabee.static.layerTypes.get(this.color);
       return c.color;

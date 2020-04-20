@@ -37,7 +37,9 @@ const MarkerAddDialog = WDialog.extend({
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.textContent = "";
-      this._portal.appendChild(this._selectedPortal.displayFormat());
+      this._portal.appendChild(
+        this._selectedPortal.displayFormat(this._smallScreen)
+      );
     } else {
       this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
@@ -51,32 +53,31 @@ const MarkerAddDialog = WDialog.extend({
     this._portalClickedHook();
 
     this._type = L.DomUtil.create("select", null, content);
-    for (const [a, k] of window.plugin.wasabee.static.markerTypes) {
-      const o = L.DomUtil.create("option", "", this._type);
-      o.setAttribute("value", a);
-      o.textContent = k.label;
+    for (const k of window.plugin.wasabee.static.markerTypes) {
+      const o = L.DomUtil.create("option", null, this._type);
+      o.value = k[0];
+      o.textContent = wX(k[0]);
     }
     this._type.value =
       window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
     this._comment = L.DomUtil.create("input", null, content);
-    this._comment.setAttribute("placeholder", "comment");
+    this._comment.placeholder = "comment";
     const addMarkerButton = L.DomUtil.create("button", null, content);
     addMarkerButton.textContent = wX("ADD_MARKER");
-    L.DomEvent.on(addMarkerButton, "click", () =>
-      this._addMarker(this._type.value, this._operation, this._comment.value)
-    );
+    L.DomEvent.on(addMarkerButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      this._addMarker(this._type.value, this._operation, this._comment.value);
+    });
 
-    const context = this;
     this._dialog = window.dialog({
-      title: wX("ADD_MARKER"),
+      title: wX("ADD MARKER TITLE"),
       width: "auto",
       height: "auto",
-      // position: { my: auto, at: "center center+30" },
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerButton
     });

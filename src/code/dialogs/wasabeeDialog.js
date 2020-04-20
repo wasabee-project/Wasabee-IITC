@@ -5,14 +5,11 @@ import {
   GetWasabeeServer,
   SetWasabeeServer,
   SetTeamState,
-  locationPromise,
-  logoutPromise,
   leaveTeamPromise,
   newTeamPromise
 } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
-import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
@@ -62,7 +59,8 @@ const WasabeeDialog = WDialog.extend({
           link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", () => {
+            L.DomEvent.on(link, "click", ev => {
+              L.DomEvent.stop(ev);
               const td = new TeamMembershipList();
               td.setup(team.ID);
               td.enable();
@@ -89,11 +87,12 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("LEAVE"),
         value: team => team.State,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = wX("LEAVE");
-          L.DomEvent.on(link, "click", () => {
+          L.DomEvent.on(link, "click", ev => {
+            L.DomEvent.stop(ev);
             const cd = new ConfirmDialog();
             cd.setup(
               `Leave ${obj.Name}?`,
@@ -118,14 +117,15 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("MANAGE"),
         value: team => team.ID,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           row.textContent = "";
           for (const ot of this._me.OwnedTeams) {
             if (obj.State == "On" && ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
               link.textContent = wX("MANAGE");
-              L.DomEvent.on(link, "click", () => {
+              L.DomEvent.on(link, "click", ev => {
+                L.DomEvent.stop(ev);
                 const mtd = new ManageTeamDialog();
                 mtd.setup(ot);
                 mtd.enable();
@@ -141,29 +141,9 @@ const WasabeeDialog = WDialog.extend({
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
     serverInfo.href = "#";
-    L.DomEvent.on(serverInfo, "click", this.setServer);
-
-    const locbutton = L.DomUtil.create("button", "sendloc", container);
-    locbutton.textContent = wX("SEND_LOC");
-    L.DomEvent.on(locbutton, "click", () => {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          locationPromise(
-            position.coords.latitude,
-            position.coords.longitude
-          ).then(
-            () => {
-              alert(wX("LOC_PROC"));
-            },
-            err => {
-              console.log(err);
-            }
-          );
-        },
-        err => {
-          console.log(err);
-        }
-      );
+    L.DomEvent.on(serverInfo, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.setServer();
     });
 
     container.appendChild(teamlist.table);
@@ -183,23 +163,6 @@ const WasabeeDialog = WDialog.extend({
           OK: () => {
             this._dialog.dialog("close");
           },
-          About: () => {
-            const ad = new AboutDialog();
-            ad.enable();
-          },
-          "Log out": () => {
-            logoutPromise().then(
-              () => {
-                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-                window.runHooks("wasabeeDkeys");
-                this._dialog.dialog("close");
-              },
-              err => {
-                alert(err);
-                console.log(err);
-              }
-            );
-          },
           "New Team": () => {
             const p = new PromptDialog(window.map);
             p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
@@ -210,7 +173,7 @@ const WasabeeDialog = WDialog.extend({
               }
               newTeamPromise(newname).then(
                 () => {
-                  alert(wX("TEAM_CREATED"));
+                  alert(wX("TEAM_CREATED", newname));
                   window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                 },
                 reject => {

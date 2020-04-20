@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import addButtons from "../addButtons";
+import WasabeeMe from "../me";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -73,7 +74,8 @@ const SettingsDialog = WDialog.extend({
       option.textContent = l;
       if (l == current) option.selected = true;
     }
-    L.DomEvent.on(langMenu, "change", () => {
+    L.DomEvent.on(langMenu, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
         langMenu.value;
       addButtons(getSelectedOperation());
@@ -87,7 +89,8 @@ const SettingsDialog = WDialog.extend({
     const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
     const sl = localStorage[c];
     if (sl === "true") sendLocCheck.checked = true;
-    L.DomEvent.on(sendLocCheck, "change", () => {
+    L.DomEvent.on(sendLocCheck, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[c] = sendLocCheck.checked;
     });
 
@@ -100,16 +103,48 @@ const SettingsDialog = WDialog.extend({
     designMode.value = "design";
     designMode.textContent = wX("WASABEE_MODE_DESIGN");
     if (mode == "design") designMode.selected = true;
-    const battleMode = L.DomUtil.create("option", null, modeSelect);
-    battleMode.value = "battle";
-    battleMode.textContent = wX("WASABEE_MODE_BATTLE");
-    if (mode == "battle") battleMode.selected = true;
-    L.DomEvent.on(modeSelect, "change", () => {
+    const operationMode = L.DomUtil.create("option", null, modeSelect);
+    operationMode.value = "active";
+    operationMode.textContent = wX("WASABEE_MODE_BATTLE");
+    if (!WasabeeMe.isLoggedIn()) {
+      operationMode.disabled = true;
+      operationMode.textContent += " (not logged in)";
+    }
+    if (mode == "active") operationMode.selected = true;
+    L.DomEvent.on(modeSelect, "change", ev => {
+      L.DomEvent.stop(ev);
       localStorage[modeKey] = modeSelect.value;
     });
     /* const modeDesc = L.DomUtil.create("div", "desc", container);
     modeDesc.textContent = wX("WASABEE_MODE_DESC"); */
 
+    const urpTitle = L.DomUtil.create("label", null, container);
+    urpTitle.textContent = "Multimax test point";
+    const urpSelect = L.DomUtil.create("select", null, container);
+    const urpKey =
+      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY;
+    let urp = localStorage[urpKey];
+    if (!urp) {
+      urp = '{"lat": -74.2,"lng:"-143.4}';
+      localStorage[urpKey] = urp;
+    }
+    const pairs = [
+      ["Antarctic West", '{"lat":-74.2,"lng":-143.4}'],
+      ["Antarctic East", '{"lat":-74.2,"lng":30.0}'],
+      ["Equatorial Atlantic", '{"lat":-2.66,"lng":-4.28}'],
+      ["Arctic West", '{"lat":74.2,"lng":-143.4}'],
+      ["Arctic East", '{"lat":78.5,"lng":143.4}']
+    ];
+    for (const [k, v] of pairs) {
+      const option = L.DomUtil.create("option", null, urpSelect);
+      option.textContent = k;
+      option.value = v;
+      if (urp == v) option.selected = true;
+    }
+    L.DomEvent.on(urpSelect, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[urpKey] = urpSelect.value;
+    });
     return container;
   },
 

@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import WasabeeMe from "../me";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -44,6 +45,12 @@ const KeyListPortal = WDialog.extend({
       return;
     }
 
+    if (!WasabeeMe.isLoggedIn()) {
+      this.disable();
+      alert("log in to see key detail");
+      return;
+    }
+
     this._dialog = window.dialog({
       title: `Key List for Portal ${this._portal.name}`,
       width: "auto",
@@ -81,11 +88,9 @@ const KeyListPortal = WDialog.extend({
       },
       {
         name: wX("ON_HAND"),
-        value: key => key.onhand,
-        sort: (a, b) => a - b,
-        format: (cell, value) => {
-          cell.textContent = value;
-        }
+        value: key => key.onhand
+        // sort: (a, b) => a - b,
+        // format: (cell, value) => { cell.textContent = value; }
       },
       {
         name: wX("CAPSULE"),

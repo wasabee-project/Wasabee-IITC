@@ -39,7 +39,6 @@ const BlockerList = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const blockerList = this;
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
@@ -48,10 +47,9 @@ const BlockerList = WDialog.extend({
     }
 
     this._dialog = window.dialog({
-      title: wX("KNOWN BLOCKERS", this._operation.name),
+      title: wX("KNOWN_BLOCK", this._operation.name),
       width: "auto",
       height: "auto",
-      // position: { my: "center top", at: "center center" },
       html: this.sortable.table,
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: {
@@ -75,8 +73,8 @@ const BlockerList = WDialog.extend({
         }
       },
       closeCallback: () => {
-        blockerList.disable();
-        delete blockerList._dialog;
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.blockerList
     });
@@ -109,7 +107,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.fromPortalId);
-          row.appendChild(p.displayFormat(this._operation));
+          row.appendChild(p.displayFormat(this._smallScreen));
         }
       },
       {
@@ -122,7 +120,7 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value)
       },
       {
@@ -133,7 +131,7 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.toPortalId);
-          row.appendChild(p.displayFormat(this._operation));
+          row.appendChild(p.displayFormat(this._smallScreen));
         }
       },
       {
@@ -146,7 +144,7 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        sort: (a, b) => a - b,
+        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value)
       }
     ];
@@ -160,8 +158,20 @@ const BlockerList = WDialog.extend({
     // build count list
     const portals = new Array();
     for (const b of this._operation.blockers) {
-      portals.push(b.fromPortalId);
-      portals.push(b.toPortalId);
+      if (
+        !this._operation.containsMarkerByID(
+          b.fromPortalId,
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        )
+      )
+        portals.push(b.fromPortalId);
+      if (
+        !this._operation.containsMarkerByID(
+          b.toPortalId,
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        )
+      )
+        portals.push(b.toPortalId);
     }
     const reduced = {};
     for (const p of portals) {
@@ -169,12 +179,11 @@ const BlockerList = WDialog.extend({
       reduced[p]++;
     }
     const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
-    console.log(sorted);
 
+    // return from recursion
     if (sorted.length == 0) return;
 
     const portalId = sorted[0][0];
-    // const count = sorted[0][1];
 
     // put in some smarts for picking close portals, rather than random ones
     // when the count gets > 3
@@ -186,7 +195,7 @@ const BlockerList = WDialog.extend({
       alert(wX("AUTOMARK STOP"));
       return;
     }
-    console.log(wportal);
+    // console.log(wportal);
 
     // add marker
     let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
@@ -206,6 +215,7 @@ const BlockerList = WDialog.extend({
       return true;
     });
     window.runHooks("wasabeeUIUpdate", this._operation);
+    // recurse
     this.automark();
   }
 });

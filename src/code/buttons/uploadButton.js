@@ -26,7 +26,7 @@ const UploadButton = WButton.extend({
       callback: () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
-          updateOpPromise().then(
+          updateOpPromise(operation).then(
             () => {
               alert(wX("UPDATED"));
               this.Wupdate(this._container, operation);
@@ -49,11 +49,11 @@ const UploadButton = WButton.extend({
           },
           reject => {
             // this shouldn't be necessary, but the UI is behind
-            updateOpPromise().then(
+            updateOpPromise(operation).then(
               () => {
-                const operation = getSelectedOperation();
+                const selop = getSelectedOperation();
                 alert(wX("UPDATED"));
-                this.Wupdate(this._container, operation);
+                this.Wupdate(this._container, selop);
               },
               reject => {
                 console.log(reject);

@@ -2,6 +2,7 @@ import { showLinksDialog, swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
+import SetCommentDialog from "./dialogs/setCommentDialog";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
@@ -15,9 +16,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    const operation = op ? op : getSelectedOperation();
-    this._portal = operation.getPortal(this.ID);
-    this.color = operation.color;
+    this._operation = op ? op : getSelectedOperation();
+    this._portal = this._operation.getPortal(this.ID);
+    this.color = this._operation.color;
   }
 
   // pointless, since these are never pushed to the server
@@ -37,8 +38,8 @@ export default class WasabeeAnchor {
     return new WasabeeAnchor(portalId);
   }
 
-  displayFormat(operation) {
-    return this._portal.displayFormat(operation);
+  displayFormat(smallScreen = false) {
+    return this._portal.displayFormat(smallScreen);
   }
 
   get latLng() {
@@ -54,10 +55,42 @@ export default class WasabeeAnchor {
   }
 
   popupContent(marker, operation) {
-    marker.className = "wasabee-marker-popup";
+    marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = this._portal.name;
+    title.appendChild(this._portal.displayFormat());
+    const portalComment = L.DomUtil.create(
+      "div",
+      "wasabee-portal-comment",
+      content
+    );
+    const pcLink = L.DomUtil.create("a", null, portalComment);
+    pcLink.textContent = this._portal.comment || wX("SET_PORTAL_COMMENT");
+    pcLink.href = "#";
+    L.DomEvent.on(pcLink, "click", ev => {
+      L.DomEvent.stop(ev);
+      const cd = new SetCommentDialog();
+      cd.setup(this._portal, this._operation);
+      cd.enable();
+      marker.closePopup();
+    });
+    if (this._portal.hardness) {
+      const portalHardness = L.DomUtil.create(
+        "div",
+        "wasabee-portal-hardness",
+        content
+      );
+      const phLink = L.DomUtil.create("a", null, portalHardness);
+      phLink.textContent = this._portal.hardness;
+      phLink.href = "#";
+      L.DomEvent.on(phLink, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(this._portal, this._operation);
+        cd.enable();
+        marker.closePopup();
+      });
+    }
     const buttonSet = L.DomUtil.create(
       "div",
       "wasabee-marker-buttonset",
@@ -65,19 +98,22 @@ export default class WasabeeAnchor {
     );
     const linksButton = L.DomUtil.create("button", null, buttonSet);
     linksButton.textContent = wX("LINKS");
-    L.DomEvent.on(linksButton, "click", () => {
+    L.DomEvent.on(linksButton, "click", ev => {
+      L.DomEvent.stop(ev);
       showLinksDialog(operation, this._portal);
       marker.closePopup();
     });
     const swapButton = L.DomUtil.create("button", null, buttonSet);
     swapButton.textContent = wX("SWAP");
-    L.DomEvent.on(swapButton, "click", () => {
+    L.DomEvent.on(swapButton, "click", ev => {
+      L.DomEvent.stop(ev);
       swapPortal(operation, this._portal);
       marker.closePopup();
     });
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
     deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", () => {
+    L.DomEvent.on(deleteButton, "click", ev => {
+      L.DomEvent.stop(ev);
       deletePortal(operation, this._portal);
       marker.closePopup();
     });
@@ -85,7 +121,9 @@ export default class WasabeeAnchor {
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
-      L.DomEvent.on(assignButton, "click", () => {
+      L.DomEvent.on(assignButton, "click", ev => {
+        L.DomEvent.stop(ev);
+        // XXX why can't I just use "this"? instead of making a new anchor?
         const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();
         ad.setup(anchor, operation);

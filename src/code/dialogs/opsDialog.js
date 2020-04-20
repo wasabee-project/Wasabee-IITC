@@ -44,17 +44,16 @@ const OpsDialog = WDialog.extend({
   _displayDialog: function() {
     this.makeContent(getSelectedOperation());
 
-    const context = this;
     this._dialog = window.dialog({
       title: wX("OPERATIONS"),
       width: "auto",
       height: "auto",
       html: this._content,
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
-      closeCallback: function() {
-        context.disable();
-        delete context._content;
-        delete context._dialog;
+      closeCallback: () => {
+        this.disable();
+        delete this._content;
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.opsButton
     });
@@ -81,7 +80,8 @@ const OpsDialog = WDialog.extend({
       if (opID == selectedOp.ID) option.selected = true;
     }
 
-    L.DomEvent.on(operationSelect, "change", () => {
+    L.DomEvent.on(operationSelect, "change", ev => {
+      L.DomEvent.stop(ev);
       const newop = makeSelectedOperation(operationSelect.value);
       const mbr = newop.mbr;
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
@@ -99,7 +99,8 @@ const OpsDialog = WDialog.extend({
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
       input.value = selectedOp.name;
-      L.DomEvent.on(input, "change", () => {
+      L.DomEvent.on(input, "change", ev => {
+        L.DomEvent.stop(ev);
         if (!input.value || input.value == "") {
           alert(wX("USE_VALID_NAME"));
         } else {
@@ -128,7 +129,8 @@ const OpsDialog = WDialog.extend({
         option.value = c.name;
         option.textContent = c.displayName;
       }
-      L.DomEvent.on(opColor, "change", () => {
+      L.DomEvent.on(opColor, "change", ev => {
+        L.DomEvent.stop(ev);
         selectedOp.color = opColor.value;
         selectedOp.store();
         window.runHooks("wasabeeUIUpdate", selectedOp);
@@ -139,7 +141,8 @@ const OpsDialog = WDialog.extend({
       const commentInput = L.DomUtil.create("textarea", null, topSet);
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
-      L.DomEvent.on(commentInput, "change", () => {
+      L.DomEvent.on(commentInput, "change", ev => {
+        L.DomEvent.stop(ev);
         selectedOp.comment = commentInput.value;
         selectedOp.store();
       });
@@ -154,7 +157,8 @@ const OpsDialog = WDialog.extend({
       const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
       // adding a comment so that github will let me create a pull request to fix the issue with CLEAR_EVERYTHING showing up on the button instead of the correct text. Scott, pleae double check the line below this - I left off the wX code in the previous version.
       clearOpButton.textContent = wX("CLEAR_EVERYTHING");
-      L.DomEvent.on(clearOpButton, "click", () => {
+      L.DomEvent.on(clearOpButton, "click", ev => {
+        L.DomEvent.stop(ev);
         clearAllItems(selectedOp);
         selectedOp.store();
       });
@@ -170,7 +174,8 @@ const OpsDialog = WDialog.extend({
       } else {
         deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
       }
-      L.DomEvent.on(deleteButton, "click", () => {
+      L.DomEvent.on(deleteButton, "click", ev => {
+        L.DomEvent.stop(ev);
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
         con.setup(
@@ -223,7 +228,8 @@ const OpsDialog = WDialog.extend({
       const permsDiv = L.DomUtil.create("div", null, buttonSection);
       const permsButton = L.DomUtil.create("button", null, permsDiv);
       permsButton.textContent = wX("OP_PERMS");
-      L.DomEvent.on(permsButton, "click", () => {
+      L.DomEvent.on(permsButton, "click", ev => {
+        L.DomEvent.stop(ev);
         const opl = new OpPermList();
         opl.enable();
       });
@@ -232,7 +238,8 @@ const OpsDialog = WDialog.extend({
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
     dupeButton.textContent = wX("DUPE_OP");
-    L.DomEvent.on(dupeButton, "click", () => {
+    L.DomEvent.on(dupeButton, "click", ev => {
+      L.DomEvent.stop(ev);
       duplicateOperation(selectedOp.ID);
       window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
     });

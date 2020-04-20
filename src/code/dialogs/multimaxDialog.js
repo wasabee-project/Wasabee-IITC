@@ -1,10 +1,12 @@
 import { WDialog } from "../leafletClasses";
-import multimax from "../multimax";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import { getAllPortalsOnScreen } from "../uiCommands";
+import { greatCircleArcIntersect } from "../crosslinks";
 
+// now that the formerly external mm functions are in the class, some of the logic can be cleaned up
+// to not require passing values around when we can get them from this.XXX
 const MultimaxDialog = WDialog.extend({
   statics: {
     TYPE: "multimaxDialog"
@@ -23,71 +25,88 @@ const MultimaxDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
-    const rdnTable = L.DomUtil.create("table", null, container);
 
-    ["A", "B"].forEach(string => {
-      const tr = rdnTable.insertRow();
-      tr.setAttribute("AB", string);
-      // Name
-      const node = tr.insertCell();
-      node.textContent = string;
-      // Set button
-      const nodethree = tr.insertCell();
-      const button = L.DomUtil.create("button", null, nodethree);
-      button.textContent = wX("SET");
-      button.addEventListener("click", arg => this.setPortal(arg), false);
-      // Portal link
-      const nodetwo = tr.insertCell();
-      nodetwo.className = "portal portal-" + string;
-      this._portals[string] = nodetwo;
-      this.updatePortal(string);
+    const anchorOneLabel = L.DomUtil.create("label", null, container);
+    anchorOneLabel.textContent = wX("ANCHOR1");
+    const anchorOneButton = L.DomUtil.create("button", null, container);
+    anchorOneButton.textContent = wX("SET");
+    this._anchorOneDisplay = L.DomUtil.create("span", null, container);
+    if (this._anchorOne) {
+      this._anchorOneDisplay.appendChild(
+        this._anchorOne.displayFormat(this._smallScreen)
+      );
+    } else {
+      this._anchorOneDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorOneButton, "click", () => {
+      this._anchorOne = WasabeePortal.getSelected();
+      if (this._anchorOne) {
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        this._anchorOneDisplay.textContent = "";
+        this._anchorOneDisplay.appendChild(
+          this._anchorOne.displayFormat(this._smallScreen)
+        );
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+
+    const anchorTwoLabel = L.DomUtil.create("label", null, container);
+    anchorTwoLabel.textContent = wX("ANCHOR2");
+    const anchorTwoButton = L.DomUtil.create("button", null, container);
+    anchorTwoButton.textContent = wX("SET");
+    this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
+    if (this._anchorTwo) {
+      this._anchorTwoDisplay.appendChild(
+        this._anchorTwo.displayFormat(this._smallScreen)
+      );
+    } else {
+      this._anchorTwoDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorTwoButton, "click", () => {
+      this._anchorTwo = WasabeePortal.getSelected();
+      if (this._anchorTwo) {
+        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        this._anchorTwoDisplay.textContent = "";
+        this._anchorTwoDisplay.appendChild(
+          this._anchorTwo.displayFormat(this._smallScreen)
+        );
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
-
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\u21b3";
 
     // Go button
-    const button = L.DomUtil.create("button", null, div);
-    button.textContent = wX("MULTIMAX");
-    L.DomEvent.on(button, "click", async () => {
-      const context = this;
-
-      this.doMultimax(context).then(
-        total => {
-          alert(`Multimax found ${total} layers`);
-          this._dialog.dialog("close");
-        },
-        reject => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("MULTI_M");
+    L.DomEvent.on(button, "click", () => {
+      const total = this.doMultimax.call(this);
+      alert(`Multimax found ${total} layers`);
+      this._dialog.dialog("close");
     });
 
-    const flylinks = L.DomUtil.create("span", null, div);
-    const fllabel = L.DomUtil.create("label", null, flylinks);
+    const fllabel = L.DomUtil.create("label", null, container);
     fllabel.textContent = wX("ADD_BL");
-    this._flcheck = L.DomUtil.create("input", null, flylinks);
+    this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
 
-    const context = this;
     this._dialog = window.dialog({
-      title: wX("MULTI_M"),
+      title: wX("MULTI_M_TITLE"),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      dialogClass: "wasabee-dialog wasabee-dialog-multimax",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.multimaxButton
     });
@@ -97,108 +116,207 @@ const MultimaxDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = wX("MULTIMAX2");
-    this.label = wX("MULTIMAX2");
-    this._portals = {};
-    this._links = [];
+    this.title = wX("MULTI_M");
+    this.label = wX("MULTI_M");
     this._operation = getSelectedOperation();
-  },
+    let p = localStorage["wasabee-anchor-1"];
+    if (p) this._anchorOne = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-2"];
+    if (p) this._anchorTwo = WasabeePortal.create(p);
 
-  //***Function to set portal -- called from 'Set' Button
-  setPortal: function(event) {
-    const AB = event.currentTarget.parentNode.parentNode.getAttribute("AB");
-    const selectedPortal = WasabeePortal.getSelected();
-    if (selectedPortal) {
+    // the unreachable point (urp) to test from
+    let urp =
       localStorage[
-        "wasabee-anchor-" + (AB == "A" ? "1" : "2")
-      ] = JSON.stringify(selectedPortal);
-    } else {
-      alert(wX("NO_PORT_SEL"));
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ];
+    if (!urp) {
+      urp = '{"lat":-74.2,"lng":-143.4}';
+      localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ] = urp;
     }
-    this.updatePortal(AB);
+    this._urp = JSON.parse(urp);
   },
 
-  //***Function to get portal -- called in doMultimax
-  getPortal: function(AB) {
-    try {
-      const p = JSON.parse(
-        localStorage["wasabee-anchor-" + (AB == "A" ? "1" : "2")]
+  doMultimax: function() {
+    const portalsOnScreen = getAllPortalsOnScreen(this._operation);
+
+    // Calculate the multimax
+    if (!this._anchorOne || !this._anchorTwo || !portalsOnScreen) {
+      alert(wX("INVALID REQUEST"));
+      return 0;
+    }
+
+    console.log("starting multimax");
+    const poset = this.buildPOSet(
+      this._anchorOne,
+      this._anchorTwo,
+      portalsOnScreen
+    );
+    const sequence = this.longestSequence(poset);
+    console.log("multimax done");
+
+    if (!Array.isArray(sequence) || !sequence.length) {
+      // alert("No layers found");
+      return 0;
+    }
+
+    let order = sequence.length * (this._flcheck ? 3 : 2);
+    let prev = null;
+
+    this._operation.startBatchMode(); // bypass save and crosslinks checks
+    this._operation.addLink(
+      this._anchorOne,
+      this._anchorTwo,
+      "multimax base",
+      1
+    );
+
+    for (const node of sequence) {
+      let p = WasabeePortal.get(node);
+      if (this._flcheck.checked && prev) {
+        this._operation.addLink(
+          prev,
+          p,
+          "multimax generated back link",
+          order + 3
+        );
+        order--;
+      }
+      if (!p) {
+        console.log("skipping: " + node);
+        continue;
+        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
+      }
+      this._operation.addLink(
+        p,
+        this._anchorOne,
+        "multimax generated link",
+        order--
       );
-      return WasabeePortal.create(p);
-    } catch (err) {
-      console.log(err);
-      return null;
+      this._operation.addLink(
+        p,
+        this._anchorTwo,
+        "multimax generated link",
+        order--
+      );
+      prev = p;
     }
+    this._operation.endBatchMode(); // save and run crosslinks
+    return sequence.length;
   },
 
-  //***Function to update portal in the dialog
-  updatePortal: function(AB) {
-    const i = this.getPortal(AB);
-    const viewContainer = this._portals[AB];
-    $(viewContainer).empty();
-    if (i) {
-      viewContainer.appendChild(i.displayFormat(this._operation));
-    }
+  /*
+Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
+ */
+  fieldCoversPortal: function(a, b, field3, portal) {
+    const unreachableMapPoint = this._urp;
+
+    const p = portal.getLatLng();
+    const c = field3.getLatLng();
+
+    // greatCircleArcIntersect now takes either WasabeeLink or window.link format
+    // needs link.getLatLngs(); and to be an object we can cache in
+    const urp = L.polyline([unreachableMapPoint, p]);
+    const lab = L.polyline([a.latLng, b.latLng]);
+    const lac = L.polyline([a.latLng, c]);
+    const lbc = L.polyline([c, b.latLng]);
+
+    let crossings = 0;
+    if (greatCircleArcIntersect(urp, lab)) crossings++;
+    if (greatCircleArcIntersect(urp, lac)) crossings++;
+    if (greatCircleArcIntersect(urp, lbc)) crossings++;
+    return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
   },
 
-  doMultimax: context => {
-    return new Promise((resolve, reject) => {
-      const portalsOnScreen = getAllPortalsOnScreen(context._operation);
-      const A = context.getPortal("A");
-      const B = context.getPortal("B");
-      if (!A || !B) reject(wX("SEL_PORT_FIRST"));
+  // build a map that shows which and how many portals are covered by each possible field
+  buildPOSet: function(anchor1, anchor2, visible) {
+    const poset = new Map();
+    for (const i of visible) {
+      poset.set(
+        i.options.guid,
+        visible.filter(j => {
+          return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
+        })
+      );
+    }
+    return poset;
+  },
 
-      // Calculate the multimax
-      multimax(A, B, portalsOnScreen).then(
-        sequence => {
-          if (!Array.isArray(sequence) || !sequence.length)
-            reject("No layers found");
-
-          let order = sequence.length * (context._flcheck ? 3 : 2);
-          let prev = null;
-
-          context._operation.startBatchMode(); // bypass save and crosslinks checks
-          context._operation.addLink(A, B, "multimax base", 1);
-
-          for (const node of sequence) {
-            let p = WasabeePortal.get(node);
-            if (context._flcheck.checked && prev) {
-              context._operation.addLink(
-                prev,
-                p,
-                "multimax generated back link",
-                order + 3
-              );
-              order--;
-            }
-            if (!p) {
-              console.log("skipping: " + node);
-              continue;
-              // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
-            }
-            context._operation.addLink(
-              p,
-              A,
-              "multimax generated link",
-              order--
-            );
-            context._operation.addLink(
-              p,
-              B,
-              "multimax generated link",
-              order--
-            );
-            prev = p;
-          }
-          context._operation.endBatchMode(); // save and run crosslinks
-          resolve(sequence.length);
-        },
-        err => {
-          console.log(err);
-          reject(err);
+  /* not working properly */
+  buildPOSetFaster: function(a, b, visible) {
+    const poset = new Map();
+    for (const i of visible) {
+      const iCovers = new Array();
+      for (const j of visible) {
+        // console.log(iCovers);
+        if (iCovers.includes(j.options.guid)) {
+          // we've already found this one
+          // console.log("saved some searching");
+          continue;
         }
-      );
-    });
+        if (j.options.guid == i.options.guid) {
+          // iCovers.push(j.options.guid);
+          continue;
+        }
+        if (this.fieldCoversPortal(a, b, i, j)) {
+          iCovers.push(j.options.guid);
+          if (poset.has(j.options.guid)) {
+            // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
+            // console.log("found savings");
+            for (const n of poset.get(j.options.guid)) {
+              if (!iCovers.includes(j.options.guid)) iCovers.push(n);
+            }
+          }
+        }
+      }
+      poset.set(i.options.guid, iCovers);
+    }
+    return poset;
+  },
+
+  longestSequence: function(poset) {
+    const out = new Array();
+
+    // the recursive function
+    const recurse = () => {
+      if (poset.size == 0) return; // hit bottom
+
+      let longest = "";
+      let length = 0;
+
+      // let prev = null;
+      // determine the longest
+      for (const [k, v] of poset) {
+        if (v.length > length) {
+          length = v.length;
+          longest = k;
+          // TODO build array of all with this same length
+          // TODO determine which is closest to previous
+        }
+        // record previous
+      }
+      out.push(longest);
+      const thisList = poset.get(longest);
+      poset.delete(longest);
+
+      // remove any portals not under this layer
+      // eslint-disable-next-line
+      for (const [k, v] of poset) {
+        let under = false;
+        for (const l of thisList) {
+          if (l.options.guid == k) under = true;
+        }
+        if (!under) {
+          poset.delete(k);
+        }
+      }
+      if (poset.size == 0) return; // hit bottom
+      recurse(); // keep digging
+    };
+
+    recurse();
+    return out;
   }
 });
 

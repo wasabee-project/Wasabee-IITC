@@ -30,7 +30,7 @@ const MarkerButton = WButton.extend({
     this.actionsContainer = this._createSubActions([
       {
         title: wX("ADD MARKER TITLE"),
-        text: wX("ADD MARKER"),
+        text: wX("ADD_MARKER"),
         callback: () => {
           this.disable();
           const md = new MarkerAddDialog(map);

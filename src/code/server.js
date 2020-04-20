@@ -68,13 +68,17 @@ export const uploadOpPromise = function() {
   });
 };
 
-export const updateOpPromise = function() {
+export const updateOpPromise = operation => {
   const SERVER_BASE = GetWasabeeServer();
 
-  const operation = getSelectedOperation();
+  // let the server know how to process assignments etc
+  operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
+
+  // const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
   // console.log(json);
+  delete operation.mode;
 
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
@@ -236,10 +240,16 @@ export const mePromise = function() {
     req.withCredentials = true;
     req.crossDomain = true;
 
+    let me = null;
     req.onload = function() {
       switch (req.status) {
         case 200:
-          resolve(WasabeeMe.create(req.response));
+          me = WasabeeMe.create(req.response);
+          if (!me) {
+            reject(wX("NOT LOGGED IN", req.responseText));
+          } else {
+            resolve(me);
+          }
           break;
         case 401:
           reject(wX("NOT LOGGED IN", req.responseText));
@@ -417,6 +427,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
+      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           WasabeeMe.create(req.response); // free update
@@ -424,13 +435,14 @@ export const SendAccessTokenAsync = function(accessToken) {
           break;
         default:
           alert(wX("AUTH TOKEN REJECTED", req.statusText));
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
+      console.log(req.getAllResponseHeaders());
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json");

@@ -6,10 +6,9 @@ import {
   SetWasabeeServer
 } from "../server";
 import PromptDialog from "./promptDialog";
-import AboutDialog from "./about";
 import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
-import wX from "../wX";
+import { wX, getLanguage } from "../wX";
 import WasabeeMe from "../me";
 
 const AuthDialog = WDialog.extend({
@@ -34,12 +33,23 @@ const AuthDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
+  randomTip: function() {
+    const lang = getLanguage();
+    if (!window.plugin.wasabee.static.tips[lang]) return;
+    const tips = window.plugin.wasabee.static.tips[lang];
+    const keys = Object.keys(tips);
+    // XXX use prompt dialog?
+    alert(tips[keys[(keys.length * Math.random()) << 0]]);
+  },
+
   _displayDialog: function() {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
       alert(wX("AUTH INCOMPAT"));
       return;
     }
+
+    console.log(document.cookie);
 
     const content = L.DomUtil.create("div", "content");
 
@@ -80,13 +90,18 @@ const AuthDialog = WDialog.extend({
     if (this._android) {
       const gsapiButtonOLD = L.DomUtil.create("button", "andriod", content);
       gsapiButtonOLD.textContent = wX("LOG IN QUICK");
-      L.DomEvent.on(gsapiButtonOLD, "click", () =>
-        this.gsapiAuthImmediate(this)
-      );
+      L.DomEvent.on(gsapiButtonOLD, "click", ev => {
+        L.DomEvent.stop(ev);
+        this.gsapiAuthImmediate.call(this);
+      });
+      // XXX until people test the other
+      gsapiButtonOLD.style.display = "none";
     }
 
     const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.textContent = wX("LOG IN");
+    // XXX until we can figure out why IITC-M iOS doesn't set the cookie very often
+    if (this._ios) gapiButton.style.display = "none";
 
     // XXX this needs to go away
     const menus = L.DomUtil.create("div", "options", content);
@@ -95,13 +110,17 @@ const AuthDialog = WDialog.extend({
       "<span><label>Immediate</label>: <select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
     if (!this._android) menus.style.display = "none";
 
-    L.DomEvent.on(gapiButton, "click", () => this.gapiAuth(this));
+    L.DomEvent.on(gapiButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.gapiAuth.call(this);
+    });
 
     // webview cannot work on android IITC-M
     if (this._ios) {
       const webviewButton = L.DomUtil.create("button", "webview", content);
       webviewButton.textContent = wX("WEBVIEW");
-      L.DomEvent.on(webviewButton, "click", () => {
+      L.DomEvent.on(webviewButton, "click", ev => {
+        L.DomEvent.stop(ev);
         window.open(GetWasabeeServer());
         webviewButton.style.display = "none";
         postwebviewButton.style.display = "block";
@@ -109,7 +128,8 @@ const AuthDialog = WDialog.extend({
       const postwebviewButton = L.DomUtil.create("button", "webview", content);
       postwebviewButton.textContent = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
-      L.DomEvent.on(postwebviewButton, "click", async () => {
+      L.DomEvent.on(postwebviewButton, "click", async ev => {
+        L.DomEvent.stop(ev);
         mePromise().then(
           () => {
             this._dialog.dialog("close");
@@ -123,7 +143,8 @@ const AuthDialog = WDialog.extend({
 
     const changeServerButton = L.DomUtil.create("button", "server", content);
     changeServerButton.textContent = wX("CHANGE SERVER");
-    L.DomEvent.on(changeServerButton, "click", () => {
+    L.DomEvent.on(changeServerButton, "click", ev => {
+      L.DomEvent.stop(ev);
       const serverDialog = new PromptDialog();
       serverDialog.setup(
         wX("CHANGE SERVER"),
@@ -140,13 +161,6 @@ const AuthDialog = WDialog.extend({
       serverDialog.enable();
     });
 
-    const aboutButton = L.DomUtil.create("button", "about", content);
-    aboutButton.textContent = wX("ABOUT WASABEE-IITC");
-    L.DomEvent.on(aboutButton, "click", () => {
-      const ad = new AboutDialog();
-      ad.enable();
-    });
-
     this._dialog = window.dialog({
       title: wX("AUTH REQUIRED"),
       width: "auto",
@@ -160,6 +174,7 @@ const AuthDialog = WDialog.extend({
           ] === "true"
         )
           sendLocation();
+        this.randomTip();
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         window.runHooks("wasabeeDkeys");
       },
@@ -167,7 +182,7 @@ const AuthDialog = WDialog.extend({
     });
   },
 
-  gsapiAuthImmediate: context => {
+  gsapiAuthImmediate: function() {
     window.gapi.auth2.authorize(
       {
         prompt: "none",
@@ -180,10 +195,10 @@ const AuthDialog = WDialog.extend({
           // on immediate_failed, try again with "select_account" settings
           if (response.error == "immediate_failed") {
             console.log("switching to gsapiAuthChoose");
-            context.gsapiAuthChoose(context);
+            this.gsapiAuthChoose.call(this);
           } else {
             // error but not immediate_failed
-            context._dialog.dialog("close");
+            this._dialog.dialog("close");
             const err = `error from gsapiAuthImmediate: ${response.error}: ${response.error_subtype}`;
             alert(err);
             return;
@@ -197,7 +212,7 @@ const AuthDialog = WDialog.extend({
             // eslint-disable-next-line
             const me = await mePromise();
             // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
-            context._dialog.dialog("close");
+            this._dialog.dialog("close");
           },
           reject => {
             console.log(reject);
@@ -210,8 +225,8 @@ const AuthDialog = WDialog.extend({
 
   // this is probably the most correct, but doesn't seem to work properly
   // does making it async change anything?
-  gapiAuth: async context => {
-    console.log("calling main log in method");
+  gapiAuth: async function() {
+    // console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
@@ -233,53 +248,53 @@ const AuthDialog = WDialog.extend({
               console.log(err);
               return;
             }
-            console.log("sending to Wasabee (immediate_failed)");
+            // console.log("sending to Wasabee (immediate_failed)");
             SendAccessTokenAsync(responseSelect.access_token).then(
               () => {
-                if (context._ios) {
+                if (this._ios) {
                   window.setTimeout(() => {
-                    context._dialog.dialog("close");
+                    this._dialog.dialog("close");
                   }, 1500); // give time for the cookie to settle
                 } else {
-                  context._dialog.dialog("close");
+                  this._dialog.dialog("close");
                 }
               },
               tokErr => {
                 console.log(tokErr);
                 alert(tokErr);
-                context._dialog.dialog("close");
+                this._dialog.dialog("close");
               }
             );
           });
         } else {
-          context._dialog.dialog("close");
+          this._dialog.dialog("close");
           const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
           console.log(err);
           alert(err);
         }
         return;
       }
-      console.log("sending to Wasabee");
+      // console.log("sending to Wasabee");
       SendAccessTokenAsync(response.access_token).then(
         () => {
-          if (context._ios) {
+          if (this._ios) {
             window.setTimeout(() => {
-              context._dialog.dialog("close");
+              this._dialog.dialog("close");
             }, 1500); // give time for the cookie to settle
           } else {
-            context._dialog.dialog("close");
+            this._dialog.dialog("close");
           }
         },
         tokErr => {
           console.log(tokErr);
           alert(tokErr);
-          context._dialog.dialog("close");
+          this._dialog.dialog("close");
         }
       );
     });
   },
 
-  gsapiAuthChoose: context => {
+  gsapiAuthChoose: function() {
     window.gapi.auth2.authorize(
       {
         prompt: "select_account",
@@ -290,7 +305,7 @@ const AuthDialog = WDialog.extend({
       },
       response => {
         if (response.error) {
-          context._dialog.dialog("close");
+          this._dialog.dialog("close");
           const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
@@ -298,7 +313,7 @@ const AuthDialog = WDialog.extend({
         SendAccessTokenAsync(response.access_token).then(
           () => {
             mePromise(); // needs .then...
-            context._dialog.dialog("close");
+            this._dialog.dialog("close");
           },
           reject => {
             console.log(reject);

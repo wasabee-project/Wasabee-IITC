@@ -30,13 +30,15 @@ const NewopDialog = WDialog.extend({
 
     const importButton = L.DomUtil.create("button", null, buttonSet);
     importButton.textContent = wX("IMPORT_OP");
-    L.DomEvent.on(importButton, "click", () => {
+    L.DomEvent.on(importButton, "click", ev => {
+      L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
       const id = new ImportDialogControl(this._map, null);
       id.enable();
     });
 
-    L.DomEvent.on(addButton, "click", () => {
+    L.DomEvent.on(addButton, "click", ev => {
+      L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
       const addDialog = new PromptDialog(this._map);
       addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {

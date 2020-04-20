@@ -29,7 +29,6 @@ const ImportDialogControl = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
     this.idialog = new ImportDialog();
-    const idhandler = this;
     this._dialog = window.dialog({
       title: wX("IMP_WAS_OP"),
       width: "auto",
@@ -46,8 +45,8 @@ const ImportDialogControl = WDialog.extend({
       },
       dialogClass: "wasabee-dialog wasabee-dialog-import",
       closeCallback: () => {
-        idhandler.disable();
-        delete idhandler._dialog;
+        this.disable();
+        delete this._dialog;
         const newop = getSelectedOperation();
         window.runHooks("wasabeeUIUpdate", newop);
         window.runHooks("wasabeeCrosslinks", newop);

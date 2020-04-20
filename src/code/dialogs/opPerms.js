@@ -77,13 +77,13 @@ const OpPermList = WDialog.extend({
       ab.value = "Add";
       ab.textContent = wX("ADD");
 
-      const context = this;
-      L.DomEvent.on(ab, "click", () => {
-        context.addPerm(teamMenu.value, permMenu.value);
-        context.setup();
-        context._drawnTable = this._html.replaceChild(
-          context._table.table,
-          context._drawnTable
+      L.DomEvent.on(ab, "click", ev => {
+        L.DomEvent.stop(ev);
+        this.addPerm(teamMenu.value, permMenu.value);
+        this.setup();
+        this._drawnTable = this._html.replaceChild(
+          this._table.table,
+          this._drawnTable
         );
       });
     }
@@ -115,22 +115,23 @@ const OpPermList = WDialog.extend({
           }
           return "[" + perm.teamid + "] denied";
         },
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("ROLE"),
         value: perm => perm.role,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("REMOVE"),
-        value: () => wX("DELETE"),
+        value: () => wX("REMOVE"),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
           cell.textContent = value;
-          L.DomEvent.on(cell, "click", () => {
+          L.DomEvent.on(cell, "click", ev => {
+            L.DomEvent.stop(ev);
             this.delPerm(obj);
           });
         }

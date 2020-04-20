@@ -1,13 +1,15 @@
+/* started modification to make it work with leaflet's L.DomUtil -- work is unfinished */
+
 export default class Sortable {
   constructor() {
     this._items = [];
     this._fields = [];
     this._sortBy = 0;
     this._sortAsc = true;
-    this._table = document.createElement("table");
-    this._table.className = "wasabee-table";
-    this._head = this._table.appendChild(document.createElement("thead"));
-    this._body = this._table.appendChild(document.createElement("tbody"));
+    this._table = L.DomUtil.create("table", "wasabee-table");
+    this._head = L.DomUtil.create("thead", null, this._table);
+    this._body = L.DomUtil.create("tbody", null, this._table);
+    this._smallScreen = window.plugin.userLocation ? true : false;
     this.renderHead();
   }
 
@@ -40,26 +42,29 @@ export default class Sortable {
   }
 
   set items(a) {
-    var visitor = this;
+    const me = this;
     this._items = a.map(function(e) {
-      var row = document.createElement("tr");
-      var data = {
+      const row = L.DomUtil.create("tr");
+      const data = {
         obj: e,
         row: row,
         index: 0,
         values: [],
         sortValues: []
       };
-      visitor._fields.forEach(function(b) {
-        var a = b.value(e);
+      me._fields.forEach(function(b) {
+        const a = b.value(e);
         data.values.push(a);
         data.sortValues.push(b.sortValue ? b.sortValue(a, e) : a);
-        var f = row.insertCell(-1);
+        const f = row.insertCell(-1);
         if (b.format) {
           b.format(f, a, e);
         } else {
           f.textContent = a;
         }
+	if (b.smallScreenHide && me._smallScreen) {
+         f.style.display = "none";
+	}
       });
       return data;
     });
@@ -76,14 +81,17 @@ export default class Sortable {
   }
 
   renderHead() {
-    var self = this;
+    const self = this;
     this.empty(this._head);
-    var titleRow = this._head.insertRow(-1);
+    const titleRow = this._head.insertRow(-1);
     this._fields.forEach(function(column, currentState) {
-      var editor = titleRow.appendChild(document.createElement("th"));
+      const editor = L.DomUtil.create("th", null, titleRow);
       editor.textContent = column.name;
       if (column.title) {
         editor.title = column.title;
+      }
+      if (column.smallScreenHide && self._smallScreen) {
+         editor.style.display = "none"
       }
       if (column.sort !== null) {
         editor.classList.add("sortable");
@@ -120,16 +128,16 @@ export default class Sortable {
   }
 
   sort() {
-    var that = this;
+    const that = this;
     this.empty(this._body);
-    var self = this._fields[this._sortBy];
+    const self = this._fields[this._sortBy];
     this._items.forEach(function(a, b) {
       return (a.index = b);
     });
     this._items.sort(function(a, b) {
-      var value = a.sortValues[that._sortBy];
-      var i = b.sortValues[that._sortBy];
-      var length = 0;
+      const value = a.sortValues[that._sortBy];
+      const i = b.sortValues[that._sortBy];
+      let length = 0;
       return (
         (length = self.sort
           ? self.sort(value, i, a.obj, b.obj)
@@ -148,7 +156,7 @@ export default class Sortable {
     $(this._head.getElementsByClassName("sorted")).removeClass(
       "sorted asc desc"
     );
-    var dayEle = this._head.rows[0].children[this._sortBy];
+    const dayEle = this._head.rows[0].children[this._sortBy];
     dayEle.classList.add("sorted");
     dayEle.classList.add(this._sortAsc ? "asc" : "desc");
   }

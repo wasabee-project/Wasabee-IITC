@@ -29,6 +29,8 @@ const TeamMembershipList = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
+    // sometimes we are too quick, try again
+    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
 
     this._dialog = window.dialog({
       title: this._team.name,
@@ -72,14 +74,14 @@ const TeamMembershipList = WDialog.extend({
       {
         name: wX("SQUAD"),
         value: agent => agent.squad,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("LOC_UPDATE"),
         value: agent => agent.date,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       }
     ];
     this._table.sortBy = 0;
