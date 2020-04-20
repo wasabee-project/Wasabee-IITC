@@ -143,7 +143,7 @@ export const sendLocation = () => {
   if (!WasabeeMe.isLoggedIn()) return;
   const sl =
     localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
-  if (sl !== true) return;
+  if (sl !== "true") return;
 
   navigator.geolocation.getCurrentPosition(
     position => {
