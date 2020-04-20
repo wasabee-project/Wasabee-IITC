@@ -301,6 +301,7 @@
   "UseVirusPortalAlert": "Flip",
   "ExcludeMarker": "Exclude from Auto-Draw/Mark",
   "SET_PORTAL_COMMENT": "Set portal comment",
+  "SETTINGS": "Wasabee Settings",
   "smallScreen": {
     "LOG IN": "Forest",
     "LOG_OUT": "Run",
