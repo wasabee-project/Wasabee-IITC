@@ -137,11 +137,13 @@
 /* used in anything that is a sortable table */
 /* .wasabee-table tbody tr:nth-child(2n + 1) td { border-color: rgba(50, 0, 125, 1); } */
 .wasabee-table tr {
-  background: rgba(225, 235, 225, 1);
+  /* background: rgba(225, 235, 225, 1); */
+  background: rgba(25, 63, 95, 0.75);
 }
 
 .wasabee-table tbody tr:nth-child(2n + 1) {
-  background: rgba(240, 240, 240, 1);
+  /* background: rgba(240, 240, 240, 1); */
+  background: rgba(8, 48, 78, 0.75);
 }
 .wasabee-table > thead .sortable:before {
   content: " ";
@@ -161,10 +163,10 @@
 .wasabee-table th {
   border-width: 0 1px;
   border-style: solid;
-  border-color: rgba(50, 0, 125, 1);
+  /* border-color: rgba(50, 0, 125, 1); */
   padding: 3px 4px;
   text-align: left;
-  color: rgba(0, 0, 0, 1);
+  /* color: rgba(0, 0, 0, 1); */
 }
 .wasabee-table td:first-child,
 .wasabee-table th:first-child {
@@ -175,7 +177,7 @@
   border-right-width: 0;
 }
 .wasabee-table > thead .sorted {
-  color: rgba(125, 90, 195, 1);
+  /* color: rgba(125, 90, 195, 1); */
 }
 .wasabee-table > thead .sortable.asc:before {
   content: "\25b2";
@@ -201,12 +203,14 @@
 }
 
 /* this class is appended to leaflet-popup so we can adjust without stepping on other plugins */
-.wasabee-popup-override {
-  background: rgba(250, 250, 250, 0.9) !important;
+.wasabee-popup {
+  background: rgba(235, 235, 235, 0.75) !important;
   -webkit-border-radius: 6px !important;
   font-weight: bolder;
 }
 
+.wasabee-popup a.enl { color: rgb(56, 142, 60) !important; }
+.wasabee-popup a.res { color: rgb(0, 135, 255) !important; }
 
 .wasabee-marker-popup { }
 .wasabee-marker-popup div.desc {
@@ -275,7 +279,7 @@
 }
 
 /* all dialogs get this class -- do global stuff with it */
-.wasabee-dialog {
+/* .wasabee-dialog {
   background-color: rgba(250, 250, 250, 0.9);
   border: 1px solid rgba(35, 175, 30, 0.75);
   color: #000;
@@ -335,7 +339,7 @@
   background-color: rgba(180, 190, 180, .8);
   padding: 4px;
   border-top: initial;
-}
+} */
 
 /* classes specific to various dialogs */
 .wasabee-dialog-about {
@@ -395,15 +399,12 @@
 .wasabee-dialog-auth-buttonset button {
   margin-right: 4px;
 }
-.wasabee-dialog-blockerlist {
-}
+.wasabee-dialog-blockerlist { }
 .wasabee-dialog-confirm {
   align-items: center;
 }
-.wasabee-dialog-confirm div.title {
-}
-.wasabee-dialog-wdkeys {
-}
+.wasabee-dialog-confirm div.title { }
+.wasabee-dialog-wdkeys { }
 .wasabee-dialog-wdkeys div.container {
   display: grid;
 }
@@ -415,15 +416,15 @@
 }
 .wasabee-dialog-wdkeys button { }
 
-.wasabee-dialog-export {
-}
+.wasabee-dialog-export { }
 .wasabee-dialog-export textarea {
   width: 96%;
   height: 250px;
   resize: vertical;
 }
-.wasabee-dialog-fanfield {
-} /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
+
+.wasabee-dialog-fanfield { }
+/* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr;
@@ -451,7 +452,7 @@
 .wasabee-dialog-keylistportal { }
 .wasabee-dialog-keyslist { }
 .wasabee-dialog-keyslist .enough {
-  color: #000;
+  color: #fff;
   font-weight: bold;
 }
 .wasabee-dialog-keyslist .notenough {
@@ -692,9 +693,8 @@
   color: #F00 !important;
 }
 
-
 /* in our dialogs and popups, use a darker green for ENL for better contrast */
-.wasabee-dialog a.wasabee-portal {
+/* .wasabee-dialog a.wasabee-portal {
   color: #ff6600;
   text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
 }
@@ -706,6 +706,7 @@ a.wasabee-portal {
 }
 a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
 a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
+ */
 
 /* marker color */
 .CapturePortalMarker { color: #7d7d7d; }
