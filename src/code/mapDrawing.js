@@ -78,7 +78,7 @@ const addMarker = (target, operation) => {
   // register the marker for spiderfied click
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
-    className: "wasabee-popup-override",
+    className: "wasabee-popup",
     closeButton: false
   });
   // marker.off("click", marker.openPopup, marker);
@@ -91,7 +91,7 @@ const addMarker = (target, operation) => {
       marker.setPopupContent(target.getMarkerPopup(marker, operation));
       // IITC 0.26's leaflet doesn't have this, just deal
       if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup-override");
+        marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },
@@ -242,7 +242,7 @@ export const drawAgents = async () => {
 
               window.registerMarkerForOMS(marker);
               marker.bindPopup("Loading...", {
-                className: "wasabee-popup-override",
+                className: "wasabee-popup",
                 closeButton: false
               });
               // marker.off("click", agent.openPopup, agent);
@@ -254,9 +254,7 @@ export const drawAgents = async () => {
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
                   if (marker._popup._wrapper)
-                    marker._popup._wrapper.classList.add(
-                      "wasabee-popup-override"
-                    );
+                    marker._popup._wrapper.classList.add("wasabee-popup");
                   marker.update();
                   marker.openPopup();
                 },
@@ -350,7 +348,7 @@ const addAnchorToMap = (portalId, operation) => {
 
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
-    className: "wasabee-popup-override",
+    className: "wasabee-popup",
     closeButton: false
   });
   // marker.off("click", marker.openPopup, marker);
@@ -362,7 +360,7 @@ const addAnchorToMap = (portalId, operation) => {
       const content = anchor.popupContent(marker, operation);
       marker.setPopupContent(content);
       if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup-override");
+        marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },

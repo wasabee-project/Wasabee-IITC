@@ -139,7 +139,7 @@ const dLoadDetails = e => {
 
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
-    className: "wasabee-popup-override",
+    className: "wasabee-popup",
     closeButton: false
   });
   marker.on(
@@ -149,7 +149,7 @@ const dLoadDetails = e => {
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
       marker.setPopupContent(getMarkerPopup(e.guid));
       if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup-override");
+        marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },
