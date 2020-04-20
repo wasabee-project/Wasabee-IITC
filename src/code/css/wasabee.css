@@ -137,11 +137,11 @@
 /* used in anything that is a sortable table */
 /* .wasabee-table tbody tr:nth-child(2n + 1) td { border-color: rgba(50, 0, 125, 1); } */
 .wasabee-table tr {
-  background: rgba(215, 225, 210, 0.9);
+  background: rgba(225, 235, 225, 1);
 }
 
 .wasabee-table tbody tr:nth-child(2n + 1) {
-  background: rgba(240, 240, 240, 0.9);
+  background: rgba(240, 240, 240, 1);
 }
 .wasabee-table > thead .sortable:before {
   content: " ";
@@ -164,7 +164,7 @@
   border-color: rgba(50, 0, 125, 1);
   padding: 3px 4px;
   text-align: left;
-  color: rgba(125, 90, 195, 1);
+  color: rgba(0, 0, 0, 1);
 }
 .wasabee-table td:first-child,
 .wasabee-table th:first-child {
@@ -183,11 +183,7 @@
 .wasabee-table > thead .sortable.desc:before {
   content: "\25bc";
 }
-.wasabee-table td.menu {
-  position: relative;
-  min-height: 20px;
-  min-width: 24px;
-}
+// .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; }
 
 /* defined in agent.js, always on an <a> -- can this be pruned ? */
 .wasabee-agent-label a {
@@ -281,6 +277,7 @@
 /* all dialogs get this class -- do global stuff with it */
 .wasabee-dialog {
   background-color: rgba(250, 250, 250, 0.9);
+  border: 1px solid rgba(35, 175, 30, 0.75);
   color: #000;
 }
 
@@ -296,6 +293,12 @@
   margin: 2px 0px 2px 0px;
 }
 
+.wasabee-dialog input {
+  color: initial;
+  background-color: rgba(240, 255, 240, 1);
+  padding: 2px 4px;
+}
+
 .wasabee-dialog a {
   color: rgba(125, 90, 195, 1);
 }
@@ -305,29 +308,33 @@
 }
 
 .wasabee-dialog div.ui-dialog-titlebar {
-  background-color: rgba(110, 120, 110, 1);
+  background-color: rgba(150, 150, 150, 1);
   color: #000;
   text-align: left;
   line-height: 14px;
   font-size: 13px;
-  border: 1px solid rgba(110, 120, 110, 1);
+  border: 1px solid rgba(180, 190, 180, 1);
 }
 
-.wasabee-dialog span.ui-dialog-title {
-}
+.wasabee-dialog span.ui-dialog-title { }
 
 .wasabee-dialog span.ui-dialog-title-active {
   color: rgba(15, 250, 5, 1);
 }
 
-.wasabee-dialog button.ui-button {
-  background-color: rgba(110, 120, 110, 1);
-  color: rgba(15, 250, 5, 1);
-  padding: 4px 4px 4px 4px;
-}
-
 .wasabee-dialog .ui-dialog-titlebar-button {
   border: 1px solid rgba(15, 250, 5, 1);
+  color: rgba(15, 250, 5, 1);
+}
+
+.wasabee-dialog .ui-dialog-content {
+  background-color: rgba(180, 190, 180, .8);
+}
+
+.wasabee-dialog .ui-dialog-buttonpane {
+  background-color: rgba(180, 190, 180, .8);
+  padding: 4px;
+  border-top: initial;
 }
 
 /* classes specific to various dialogs */
@@ -360,14 +367,10 @@
   grid-column-end: 5;
 }
 .wasabee-dialog-auth button.andriod {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 1;
   grid-column-end: 5;
 }
 .wasabee-dialog-auth button.gapi {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 1;
   grid-column-end: 5;
 }
@@ -377,13 +380,10 @@
   grid-column-end: 5;
 }
 .wasabee-dialog-auth button.webview {
-  margin: 4px;
   grid-column-start: 1;
   grid-column-end: 5;
 }
 .wasabee-dialog-auth button.server {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 1;
   grid-column-end: 5;
 }
@@ -413,10 +413,7 @@
 .wasabee-dialog-wdkeys input {
   padding: 4px;
 }
-.wasabee-dialog-wdkeys button {
-  padding: 4px;
-  margin: 4px;
-}
+.wasabee-dialog-wdkeys button { }
 
 .wasabee-dialog-export {
 }
@@ -439,36 +436,30 @@
 .wasabee-dialog-fanfield label {
   padding: 4px;
 }
-.wasabee-dialog-fanfield button {
-  margin: 0px 4px 4px 0px;
-}
+.wasabee-dialog-fanfield button { }
 .wasabee-dialog-fanfield span {
   padding: 4px;
   grid-column-start: 3;
   grid-column-end: 7;
 }
-.wasabee-dialog-import {
-}
+.wasabee-dialog-import { }
 .wasabee-dialog-import textarea {
-  width: 96%;
+  width: 100%;
   height: 250px;
   resize: vertical;
 }
-.wasabee-dialog-keylistportal {
-}
-.wasabee-dialog-keyslist {
-}
+.wasabee-dialog-keylistportal { }
+.wasabee-dialog-keyslist { }
 .wasabee-dialog-keyslist .enough {
-  color: #fff;
+  color: #000;
+  font-weight: bold;
 }
 .wasabee-dialog-keyslist .notenough {
   color: #900;
   font-weight: bold;
 }
-.wasabee-dialog-linklist {
-}
-.wasabee-dialog-link {
-}
+.wasabee-dialog-linklist { }
+.wasabee-dialog-link { }
 .wasabee-dialog-link div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
@@ -479,8 +470,6 @@
   grid-column-end: 2;
 }
 .wasabee-dialog-link button.set {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 2;
   grid-column-end: 3;
 }
@@ -489,8 +478,6 @@
   grid-column-end: 4;
 }
 .wasabee-dialog-link button.add {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 4;
   grid-column-end: 5;
 }
@@ -499,8 +486,6 @@
   grid-column-start: 4;
 }
 .wasabee-dialog-link button.clear {
-  margin: 4px;
-  padding: 4px;
   grid-column-start: 5;
 }
 
@@ -524,7 +509,6 @@
   grid-column-end: 3;
 }
 .wasabee-dialog-manageteam button {
-  margin: 2px 2px 2px 2px;
   grid-column-start: 3;
   grid-column-end: 4;
 }
@@ -551,14 +535,9 @@
 .wasabee-dialog-markeradd div.content button {
   grid-column-start: 1;
   grid-column-end: 3;
-  margin: 4px;
-  padding: 8px;
 }
-.wasabee-dialog-markerlist {
-}
-
-.wasabee-dialog-multimax {
-}
+.wasabee-dialog-markerlist { }
+.wasabee-dialog-multimax { }
 .wasabee-dialog-multimax div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr;
@@ -571,18 +550,14 @@
 .wasabee-dialog-multimax label {
   padding: 4px;
 }
-.wasabee-dialog-multimax button {
-  margin: 0px 4px 4px 0px;
-}
+.wasabee-dialog-multimax button { }
 .wasabee-dialog-multimax span {
   padding: 4px;
   grid-column-start: 3;
   grid-column-end: 7;
 }
 
-.wasabee-dialog-newop {
-}
-.wasabee-dialog-newop div.buttonset button { }
+.wasabee-dialog-newop { }
 .wasabee-dialog-newop div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
@@ -685,9 +660,7 @@
 .wasabee-dialog-starburst label {
   padding: 4px;
 }
-.wasabee-dialog-starburst button {
-  padding: 4px;
-}
+.wasabee-dialog-starburst button { }
 .wasabee-dialog-starburst div.anchor {
   padding: 4px;
 }
@@ -697,13 +670,9 @@
   display: grid;
 }
 .wasabee-dialog-wasabee button.server {
-  padding: 4px;
-  margin: 4px;
   grid-column-start: 1;
 }
 .wasabee-dialog-wasabee button.sendloc {
-  padding: 4px;
-  margin: 4px;
   grid-column-start: 1;
 }
 
@@ -723,13 +692,20 @@
   color: #F00 !important;
 }
 
+
 /* in our dialogs and popups, use a darker green for ENL for better contrast */
-.wasabee-dialog a.wasabee-portal { color: #ff6600; }
-.wasabee-dialog a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
-.wasabee-dialog a.wasabee-portal.res { }
-a.wasabee-portal { color: #ff6600; }
+.wasabee-dialog a.wasabee-portal {
+  color: #ff6600;
+  text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
+}
+.wasabee-dialog a.enl { color: rgb(56, 142, 60) !important; }
+.wasabee-dialog a.res { color: rgb(0, 135, 255) !important; }
+a.wasabee-portal {
+  color: #ff6600;
+  text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
+}
 a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
-a.wasabee-portal.res { }
+a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 
 /* marker color */
 .CapturePortalMarker { color: #7d7d7d; }
