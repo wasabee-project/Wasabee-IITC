@@ -304,5 +304,5 @@
     "WRITE": "isulat",
     "WSERVER": "Server: ${value}",
     "YES": "Oo",
-    "YESNO_DEL": "Sigurado ka na gusto mo burahin ang ${value}?",
+    "YESNO_DEL": "Sigurado ka na gusto mo burahin ang ${value}?"
 }
