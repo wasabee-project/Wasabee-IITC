@@ -69,7 +69,8 @@ gulp.task("buildheaders", cb => {
     );
   }
 
-  const bd = new Date().toISOString();
+  const d = new Date();
+  const bd = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
   content = content.replace("BUILDDATE", bd);
 
   status.headers = content;
