@@ -101,7 +101,7 @@ export default class WasabeeAgent {
 
   timeSinceformat() {
     if (!this.date) return "";
-    const date = new Date(this.date);
+    const date = Date.parse(this.date + " GMT");
     if (date == 0) return "";
 
     const seconds = Math.floor((new Date() - date) / 1000);

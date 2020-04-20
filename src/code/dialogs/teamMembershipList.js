@@ -79,7 +79,7 @@ const TeamMembershipList = WDialog.extend({
       },
       {
         name: wX("LOC_UPDATE"),
-        value: agent => agent.date,
+        value: agent => agent.date + " GMT",
         sort: (a, b) => a.localeCompare(b)
         // , format: (cell, value) => (cell.textContent = value)
       }
