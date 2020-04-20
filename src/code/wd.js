@@ -138,21 +138,18 @@ const dLoadDetails = e => {
   marker.addTo(window.plugin.wasabee.defensiveLayers);
 
   window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...");
-  marker.off("click", marker.openPopup, marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup-override",
+    closeButton: false
+  });
   marker.on(
-    "click",
-    () => {
+    "click spiderfiedclick",
+    ev => {
+      L.DomEvent.stop(ev);
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
       marker.setPopupContent(getMarkerPopup(e.guid));
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.on(
-    "spiderfiedclick",
-    () => {
-      marker.setPopupContent(getMarkerPopup(e.guid));
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup-override");
       marker.update();
       marker.openPopup();
     },
