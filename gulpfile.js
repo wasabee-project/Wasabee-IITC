@@ -69,9 +69,22 @@ gulp.task("buildheaders", cb => {
     );
   }
 
-  const d = new Date();
-  const bd = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
-  content = content.replace("BUILDDATE", bd);
+  const gbd = () => {
+    const d = new Date();
+    let bd = d.getFullYear();
+    let t = ("0" + (d.getMonth() + 1)).substr(-2);
+    bd += t;
+    t = ("0" + d.getDate()).substr(-2);
+    bd += t;
+    t = ("0" + d.getHours()).substr(-2);
+    bd += t;
+    t = ("0" + d.getMinutes()).substr(-2);
+    bd += t;
+    t = ("0" + d.getSeconds()).substr(-2);
+    bd += t;
+    return bd;
+  };
+  content = content.replace("BUILDDATE", gbd());
 
   status.headers = content;
 
