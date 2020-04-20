@@ -101,10 +101,12 @@ export default class WasabeeAgent {
 
   timeSinceformat() {
     if (!this.date) return "";
-    const date = Date.parse(this.date + " GMT");
+    const date = Date.parse(this.date + " UTC");
+    if (Number.isNaN(date)) return `(${this.date} UTC)`; // FireFox Date.parse no good
     if (date == 0) return "";
 
     const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 0) return "";
     let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
 
     if (interval > 1) return wX("AGES");
