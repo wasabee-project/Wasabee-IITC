@@ -1,6 +1,5 @@
 {
   "English": {
-    "last edited": "04-05-2020 @TheMitch2",
     "UPLOAD_CHANGES": "When you make changes to an OP, be sure to upload to the server so you can access it across all instances of Wasabee.",
     "DUPLICATE_OPERATION": "When Duplicating an Operation, Make sure you are NOT accidentally Deleting the Operation.",
     "RECOVER_OPERATION": "If you delete an Operation you can recover it IF you have a local copy, but you must duplicate it before uploading to the server.",
@@ -12,6 +11,13 @@
     "EXCLUDE_PORTAL": "There is an exclude option under Add Markers to designate portals you don't want used in auto-fielding calculations.",
     "NOT_LOADING": "Whenever you find a portal that is named \"Loading: [PORTALGUID]\" a single press of the cursor over the name should allow the portal information to load and show correctly on your list.  IF this is a Multimax anchor, you may need to \"Swap\" that anchor to another, then back again to correct your Keys list.",
     "SMURF_TEARS": "Smurf tears are the sweetest thing there is.",
-    "MICRO_FIELD": "Micro fields are the fastest way to AP and leveling."
-  }
+    "MICRO_FIELD": "Micro fields are the fastest way to AP and leveling.",
+    "Upload_OP": "Don't forget to upload your new OP to the server after creation and after every update!.",
+    "PERMISSION_DENIED": "If you get Permission Denied when trying to download ops from the server, you have timed out. Log out in Wasabee, then log in again.",
+    "KEYS": "You can share keys you have to strategic or durable portals. Make sure you are logged in, then click the bee>W-D Keys. Select a portal then enter the number of keys and capsule ID if applicable. Finally, press \"update count\".  This allows people on any shared and enabled teams to see keys.",
+    "CREATE_FIRST": "Create a new op BEFORE you start drawing. Draw 1 link so it's not empty, and upload to the server. Then, once it's safe, delete the temp link and draw the op. make sure to upload to the server before syncing or opening another op.",
+    "LOGOUT_FAIL": "If you try to log out and get any sort of failure, click the download button. This will force the server to recognize you are not logged in and reset your status. You will be able to log on and continue work.",
+    "FIREFOX_SUCKS": "If you are using firefox, you should be aware that there are many issues with how that browser handles many of the features of Wasabee. Issues will be handled as possible, but for the best experience you are advised to move to Chrome.",
+    "COMPENSATION": "If you are enjoying the project, please '<a href=\"https://paypal.me/pools/c/8osG170xBE\">click here<\/a>' and make a small donation."
+ }
 }
