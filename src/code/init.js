@@ -103,10 +103,10 @@ const addCSS = (name, content) => {
   c.id = "wasabee-css-" + name;
 
   /* not used yet -- for future theme support */
-  const sheet = new CSSStyleSheet();
+  /* const sheet = new CSSStyleSheet();
   sheet.replaceSync(content);
   // adoptedStyleSheets is frozen, can't use .push(); just overwrite w/ all
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]; */
 };
 
 const initGoogleAPI = () => {
