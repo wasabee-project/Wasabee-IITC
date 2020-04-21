@@ -1,22 +1,15 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import { teamPromise } from "./server";
+import { getLanguage } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export const drawThings = op => {
-  // console.time("drawThings");
   updateAnchors(op);
   updateMarkers(op);
-
-  /* console.time("updateLinks");
-  updateLinks(op);
-  console.timeEnd("updateLinks"); */
-  // console.time("resetLinks");
   resetLinks(op);
-  // console.timeEnd("resetLinks");
-  //console.timeEnd("drawThings");
 };
 
 const updateMarkers = op => {
@@ -25,6 +18,9 @@ const updateMarkers = op => {
     Wasabee.markerLayerGroup.clearLayers();
     return;
   }
+
+  // this seems to wrongly assume one marker per portal -- or something
+  // XXX TODO find why markers duplicate if too many on one portal
 
   // get a list of every currently drawn marker
   const layerMap = new Map();
@@ -35,8 +31,8 @@ const updateMarkers = op => {
   // add any new ones, remove any existing from the list
   // markers don't change, so this doesn't need to be too smart
   for (const m of op.markers) {
-    if (layerMap.has(m.portalId)) {
-      const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.portalId));
+    if (layerMap.has(m.ID)) {
+      const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
       if (m.state != ll.options.state) {
         // state changed, update icon
         Wasabee.markerLayerGroup.removeLayer(ll);
@@ -50,7 +46,7 @@ const updateMarkers = op => {
         ll.setIcon(newicon);
         ll.addTo(Wasabee.markerLayerGroup);
       }
-      layerMap.delete(m.portalId);
+      layerMap.delete(m.ID);
     } else {
       addMarker(m, op);
     }
@@ -66,9 +62,9 @@ const updateMarkers = op => {
 /** This function adds a Markers to the target layer group */
 const addMarker = (target, operation) => {
   const targetPortal = operation.getPortal(target.portalId);
-  const wMarker = L.marker(targetPortal.latLng, {
+  const marker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
-    id: target.portalId,
+    id: target.ID,
     state: target.state,
     icon: L.icon({
       iconUrl: target.icon,
@@ -80,29 +76,28 @@ const addMarker = (target, operation) => {
   });
 
   // register the marker for spiderfied click
-  window.registerMarkerForOMS(wMarker);
-  wMarker.bindPopup("loading...");
-  wMarker.off("click", wMarker.openPopup, wMarker);
-  wMarker.on(
-    "click",
-    () => {
-      // IITCs version of leaflet does not have marker.isPopupOpen()
-      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
-      wMarker.update();
-      wMarker.openPopup();
+  window.registerMarkerForOMS(marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup",
+    closeButton: false
+  });
+  // marker.off("click", marker.openPopup, marker);
+  marker.on(
+    "click spiderfiedclick",
+    ev => {
+      L.DomEvent.stop(ev);
+      // IITC 0.26's leaflet doesn't have this, just deal
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
+      marker.setPopupContent(target.getMarkerPopup(marker, operation));
+      // IITC 0.26's leaflet doesn't have this, just deal
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup");
+      marker.update();
+      marker.openPopup();
     },
-    wMarker
+    marker
   );
-  wMarker.on(
-    "spiderfiedclick",
-    () => {
-      wMarker.setPopupContent(target.getMarkerPopup(wMarker, operation));
-      wMarker.update();
-      wMarker.openPopup();
-    },
-    wMarker
-  );
-  wMarker.addTo(Wasabee.markerLayerGroup);
+  marker.addTo(Wasabee.markerLayerGroup);
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
@@ -113,14 +108,14 @@ const resetLinks = operation => {
   if (!operation.links || operation.links.length == 0) return;
 
   // pre-fetch the op color outside the loop -- is this actually helpful?
-  let lt = Wasabee.static.layerTypes.get("main");
+  let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+    style = Wasabee.static.layerTypes.get(operation.color);
   }
-  lt.link.color = lt.color;
+  style.link.color = style.color;
 
   for (const l of operation.links) {
-    addLink(l, lt.link, operation);
+    addLink(l, style.link, operation);
   }
 };
 
@@ -139,11 +134,12 @@ const updateLinks = operation => {
   }
 
   // pre-fetch the op color outside the loop
-  let lt = Wasabee.static.layerTypes.get("main");
+  let style = Wasabee.static.layerTypes.get("main");
   if (Wasabee.static.layerTypes.has(operation.color)) {
-    lt = Wasabee.static.layerTypes.get(operation.color);
+    style = Wasabee.static.layerTypes.get(operation.color);
   }
-  lt.link.color = lt.color;
+  // because ... reasons?
+  style.link.color = style.color;
 
   for (const l of operation.links) {
     if (layerMap.has(l.ID)) {
@@ -154,11 +150,11 @@ const updateLinks = operation => {
         l.toPortalId != ll.options.to
       ) {
         Wasabee.linkLayerGroup.removeLayer(ll);
-        addLink(l, lt.link, operation);
+        addLink(l, style.link, operation);
       }
       layerMap.delete(l.ID);
     } else {
-      addLink(l, lt.link, operation);
+      addLink(l, style.link, operation);
     }
   }
 
@@ -168,7 +164,7 @@ const updateLinks = operation => {
   }
 };
 
-/** This function adds a portal to the portal layer group */
+/** This function adds a link to the link layer group */
 const addLink = (wlink, style, operation) => {
   // determine per-link color
   if (wlink.color != "main" && Wasabee.static.layerTypes.has(wlink.color)) {
@@ -176,6 +172,8 @@ const addLink = (wlink, style, operation) => {
     style = linkLt.link;
     style.color = linkLt.color;
   }
+
+  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
 
   const latLngs = wlink.getLatLngs(operation);
   if (!latLngs) {
@@ -188,7 +186,6 @@ const addLink = (wlink, style, operation) => {
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
   newlink.options.Wcolor = wlink.Wcolor;
-  //
   newlink.addTo(Wasabee.linkLayerGroup);
 };
 
@@ -244,31 +241,25 @@ export const drawAgents = async () => {
               });
 
               window.registerMarkerForOMS(marker);
-              marker.bindPopup(agent.getPopup());
-              marker.off("click", agent.openPopup, agent);
+              marker.bindPopup("Loading...", {
+                className: "wasabee-popup",
+                closeButton: false
+              });
+              // marker.off("click", agent.openPopup, agent);
               marker.on(
-                "click",
-                () => {
-                  // get fresh data
+                "click spiderfiedclick",
+                ev => {
+                  L.DomEvent.stop(ev);
+                  if (marker.isPopupOpen && marker.isPopupOpen()) return;
                   const a = window.plugin.wasabee._agentCache.get(agent.id);
                   marker.setPopupContent(a.getPopup());
-                  marker.update();
-                  marker.openPopup();
-                },
-                agent
-              );
-              marker.on(
-                "spiderfiedclick",
-                () => {
-                  // get fresh data
-                  const a = window.plugin.wasabee._agentCache.get(agent.id);
-                  marker.setPopupContent(a.getPopup());
+                  if (marker._popup._wrapper)
+                    marker._popup._wrapper.classList.add("wasabee-popup");
                   marker.update();
                   marker.openPopup();
                 },
                 marker
               );
-
               marker.addTo(Wasabee.agentLayerGroup);
             }
           } else {
@@ -276,9 +267,12 @@ export const drawAgents = async () => {
             if (!doneAgents.includes(agent.id)) {
               const a = layerMap.get(agent.id);
               const al = Wasabee.agentLayerGroup.getLayer(a);
-              if (agent.lat && agent.lng) al.setLatLng(agent.latLng);
-              layerMap.delete(agent.id);
-              doneAgents.push(agent.id);
+              if (agent.lat && agent.lng) {
+                al.setLatLng(agent.latLng);
+                layerMap.delete(agent.id);
+                doneAgents.push(agent.id);
+                al.update();
+              }
             }
           }
         }
@@ -291,7 +285,7 @@ export const drawAgents = async () => {
 
   // remove those not found in this fetch
   for (const agent in layerMap) {
-    console.log(agent);
+    console.log("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 };
@@ -301,6 +295,12 @@ const updateAnchors = op => {
   if (!op.anchors || op.anchors.length == 0) {
     Wasabee.portalLayerGroup.clearLayers();
     return;
+  }
+
+  const lang = getLanguage();
+  const restore = op.color;
+  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
+    op.color = "SE";
   }
 
   const layerMap = new Map();
@@ -315,16 +315,18 @@ const updateAnchors = op => {
 
   for (const a of op.anchors) {
     if (layerMap.has(a)) {
-      layerMap.delete(a); // no changes
+      layerMap.delete(a);
     } else {
       addAnchorToMap(a, op);
     }
   }
 
+  // XXX use "in" instead of "of" and the first value
   // eslint-disable-next-line
   for (const [k, v] of layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
+  op.color = restore;
 };
 
 /** This function adds a portal to the portal layer group */
@@ -345,22 +347,20 @@ const addAnchorToMap = (portalId, operation) => {
   });
 
   window.registerMarkerForOMS(marker);
-  const content = anchor.popupContent(marker, operation);
-  marker.bindPopup(content);
-  marker.off("click", marker.openPopup, marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup",
+    closeButton: false
+  });
+  // marker.off("click", marker.openPopup, marker);
   marker.on(
-    "click",
-    () => {
+    "click spiderfiedclick",
+    ev => {
+      L.DomEvent.stop(ev);
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
+      const content = anchor.popupContent(marker, operation);
       marker.setPopupContent(content);
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.on(
-    "spiderfiedclick",
-    () => {
-      marker.setPopupContent(content);
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },

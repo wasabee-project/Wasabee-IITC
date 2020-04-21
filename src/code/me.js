@@ -1,4 +1,3 @@
-import store from "../lib/store";
 import { mePromise } from "./server";
 import { getSelectedOperation } from "./selectedOp";
 
@@ -17,16 +16,18 @@ export default class WasabeeMe {
   }
 
   store() {
-    store.set(Wasabee.static.constants.AGENT_INFO_KEY, JSON.stringify(this));
+    localStorage[Wasabee.static.constants.AGENT_INFO_KEY] = JSON.stringify(
+      this
+    );
   }
 
   remove() {
-    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
   }
 
   static isLoggedIn() {
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     if (!lsme || typeof lsme !== "string") {
       return false;
     }
@@ -34,17 +35,17 @@ export default class WasabeeMe {
     if (me.fetched > maxCacheAge) {
       return true;
     }
-    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     return false;
   }
 
   static get(force) {
     let me = null;
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      // XXX this might be a problem, since create writes it back to the store
+      // XXX this might be a problem, since create writes it back to localStore
       me = WasabeeMe.create(lsme);
     }
     if (
@@ -61,7 +62,7 @@ export default class WasabeeMe {
         },
         function(err) {
           console.log(err);
-          store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+          delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
           me = null;
           alert(err);
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
@@ -74,7 +75,7 @@ export default class WasabeeMe {
   static async waitGet(force) {
     let me = null;
     const maxCacheAge = Date.now() - 1000 * 60 * 59;
-    const lsme = store.get(Wasabee.static.constants.AGENT_INFO_KEY);
+    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
       // XXX this might be a problem, since create writes it back to the store
@@ -90,7 +91,7 @@ export default class WasabeeMe {
       if (newme instanceof WasabeeMe) {
         me = newme;
       } else {
-        store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+        delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
         console.log(newme);
         alert(newme);
         me = null;
@@ -134,7 +135,7 @@ export default class WasabeeMe {
   }
 
   static purge() {
-    store.remove(Wasabee.static.constants.AGENT_INFO_KEY);
+    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     if (window.plugin.wasabee._agentCache)
       window.plugin.wasabee._agentCache.clear();
     if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();

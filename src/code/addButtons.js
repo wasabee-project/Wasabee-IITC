@@ -13,6 +13,7 @@ export default function(selectedOp) {
 
   if (window.plugin.wasabee.buttons) {
     console.log("replacing buttons");
+    window.map.removeControl(window.plugin.wasabee.buttons);
     delete window.plugin.wasabee.buttons;
   }
 
@@ -21,15 +22,8 @@ export default function(selectedOp) {
       position: "topleft"
     },
     onAdd: function(map) {
-      const outerDiv = L.DomUtil.create(
-        "div",
-        "leaflet-draw leaflet-draw-section"
-      );
-      this._container = L.DomUtil.create(
-        "div",
-        "leaflet-arcs leaflet-bar",
-        outerDiv
-      );
+      const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
+      this._container = L.DomUtil.create("div", "leaflet-bar", outerDiv);
       this._modes = {};
 
       const wb = new WasabeeButton(map, this._container);

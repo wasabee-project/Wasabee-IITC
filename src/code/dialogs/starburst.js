@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 // import WasabeeLink from "../link";
-import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
 const StarburstDialog = WDialog.extend({
@@ -23,66 +23,63 @@ const StarburstDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
-    description.textContent =
-      "Select the anchor, zoom to area to add to starburst";
-
-    const controls = L.DomUtil.create("div", null, container);
-
-    const anchorDiv = L.DomUtil.create("div", null, controls);
-    const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
-    anchorLabel.textContent = "Anchor Portal ";
-    const anchorButton = L.DomUtil.create("button", null, anchorLabel);
-    anchorButton.textContent = "set";
-    this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
+    description.textContent = wX("SEL_SB_ANCHOR");
+    const anchorLabel = L.DomUtil.create("label", null, container);
+    anchorLabel.textContent = wX("ANCHOR_PORTAL");
+    const anchorButton = L.DomUtil.create("button", null, container);
+    anchorButton.textContent = wX("SET");
+    this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
     if (this._anchor) {
-      this._anchorDisplay.appendChild(this._anchor.displayFormat());
+      this._anchorDisplay.appendChild(
+        this._anchor.displayFormat(this._smallScreen)
+      );
     } else {
-      this._anchorDisplay.textContent = "not set";
+      this._anchorDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButton, "click", () => {
+    L.DomEvent.on(anchorButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-fanfield-anchor"] = JSON.stringify(this._anchor);
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(this._anchor.displayFormat());
+        this._anchorDisplay.appendChild(
+          this._anchor.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("div", "arrow", container);
     opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, div);
-    button.textContent = wX("STARBURST");
-    L.DomEvent.on(button, "click", () => {
-      const context = this;
-      this.starburst(context);
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("STARBURST_DRAW");
+    L.DomEvent.on(button, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.starburst.call(this);
     });
 
-    const context = this;
     this._dialog = window.dialog({
       title: wX("STARBURST TITLE"),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      dialogClass: "wasabee-dialog wasabee-dialog-starburst",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
         },
-        "Clear All": () => {
-          clearAllItems(getSelectedOperation());
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
         }
       }
     });
@@ -95,24 +92,24 @@ const StarburstDialog = WDialog.extend({
     this.title = wX("STARBURST");
     this.label = wX("STARBURST TITLE");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-starburst-anchor"];
+    let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)
-  starburst: context => {
-    if (!context._anchor) {
+  starburst: function() {
+    if (!this._anchor) {
       alert("Select an anchor portal");
       return;
     }
 
-    context._operation.startBatchMode();
-    for (const p of getAllPortalsOnScreen(context._operation)) {
-      if (p.options.guid == context._anchor.id) continue;
+    this._operation.startBatchMode();
+    for (const p of getAllPortalsOnScreen(this._operation)) {
+      if (p.options.guid == this._anchor.id) continue;
       const wp = WasabeePortal.get(p.options.guid);
-      context._operation.addLink(wp, context._anchor, "auto starburst");
+      this._operation.addLink(wp, this._anchor, "auto starburst");
     }
-    context._operation.endBatchMode();
+    this._operation.endBatchMode();
   }
 });
 

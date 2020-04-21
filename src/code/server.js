@@ -2,8 +2,7 @@ import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
-import store from "../lib/store";
-import { getSelectedOperation, getOperationByID } from "./selectedOp";
+import { getSelectedOperation, getOperationByID, resetOps } from "./selectedOp";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -69,13 +68,17 @@ export const uploadOpPromise = function() {
   });
 };
 
-export const updateOpPromise = function() {
+export const updateOpPromise = operation => {
   const SERVER_BASE = GetWasabeeServer();
 
-  const operation = getSelectedOperation();
+  // let the server know how to process assignments etc
+  operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
+
+  // const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
   // console.log(json);
+  delete operation.mode;
 
   return new Promise(function(resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
@@ -142,6 +145,13 @@ export const deleteOpPromise = function(opID) {
 export const teamPromise = function(teamid) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise(function(resolve, reject) {
+    if (teamid == "owned") {
+      const owned = new WasabeeTeam();
+      owned.id = "owned";
+      owned.name = "Owned Ops";
+      resolve(owned);
+    }
+
     const url = `${SERVER_BASE}/api/v1/team/${teamid}`;
     const req = new XMLHttpRequest();
     req.open("GET", url);
@@ -230,12 +240,25 @@ export const mePromise = function() {
     req.withCredentials = true;
     req.crossDomain = true;
 
+    let me = null;
     req.onload = function() {
       switch (req.status) {
         case 200:
-          resolve(WasabeeMe.create(req.response));
+          me = WasabeeMe.create(req.response);
+          if (!me) {
+            reject(wX("NOT LOGGED IN", req.responseText));
+          } else {
+            resolve(me);
+          }
           break;
         case 401:
+          reject(wX("NOT LOGGED IN", req.responseText));
+          break;
+        case 403:
+          // 403 is a detected RES agent
+          alert(`${req.responseText}`);
+          WasabeeMe.purge();
+          resetOps();
           reject(wX("NOT LOGGED IN", req.responseText));
           break;
         default:
@@ -404,6 +427,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.crossDomain = true;
 
     req.onload = function() {
+      // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
           WasabeeMe.create(req.response); // free update
@@ -411,13 +435,14 @@ export const SendAccessTokenAsync = function(accessToken) {
           break;
         default:
           alert(wX("AUTH TOKEN REJECTED", req.statusText));
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
+          reject(`${req.status}: ${req.statusText}`);
           break;
       }
     };
 
     req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
+      console.log(req.getAllResponseHeaders());
+      reject(`Network Error: ${req.statusText}`);
     };
 
     req.setRequestHeader("Content-Type", "application/json");
@@ -937,16 +962,20 @@ export const deleteTeamPromise = function(teamID) {
   });
 };
 
-export const GetWasabeeServer = function() {
-  let server = store.get(Wasabee.static.constants.SERVER_BASE_KEY);
+export const GetWasabeeServer = () => {
+  let server = localStorage[Wasabee.static.constants.SERVER_BASE_KEY];
   if (server == null) {
     server = Wasabee.static.constants.SERVER_BASE_DEFAULT;
-    store.set(
-      Wasabee.static.constants.SERVER_BASE_KEY,
-      Wasabee.static.constants.SERVER_BASE_DEFAULT
-    );
+    localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
   }
   return server;
+};
+
+export const SetWasabeeServer = server => {
+  // sanity checking here please:
+  // starts w/ https://
+  // does not end with /
+  localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
 };
 
 // don't use this unless you just can't use the promise directly

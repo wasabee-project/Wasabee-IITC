@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 // generic prompt screen
 
@@ -12,8 +13,8 @@ const PromptDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = PromptDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = "No title set";
-    this._label = "No label set";
+    this._title = wX("NO_TITLE"); // should never be displayed
+    this._label = wX("NO_LABEL"); // should never be displayed
     this.placeholder = "";
     this.current = "";
   },
@@ -30,16 +31,14 @@ const PromptDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const promptDialog = this;
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
       height: "auto",
       html: this._buildContent(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-prompt",
       buttons: {
         OK: () => {
-          console.log(this.inputField.value);
           if (this._callback) this._callback();
           this._dialog.dialog("close");
         },
@@ -50,8 +49,8 @@ const PromptDialog = WDialog.extend({
       },
       closeCallback: () => {
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        promptDialog.disable();
-        delete promptDialog._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
@@ -65,14 +64,14 @@ const PromptDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", "container");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      const label = L.DomUtil.create("label", null, content);
+      label.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }
-    const d = L.DomUtil.create("div", "", content);
-    this.inputField = L.DomUtil.create("input", "", d);
+    this.inputField = L.DomUtil.create("input", null, content);
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.placeholder;
     this.inputField.value = this.current;

@@ -4,7 +4,8 @@ import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
-import OverflowMenu from "../overflowMenu";
+import wX from "../wX";
+import WasabeeMe from "../me";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -15,8 +16,8 @@ const LinkListDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = LinkListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = "No title set";
-    this._label = "No label set";
+    this._title = wX("NO_TITLE");
+    this._label = wX("NO_LABEL");
     this.placeholder = "";
     this.current = "";
   },
@@ -41,7 +42,7 @@ const LinkListDialog = WDialog.extend({
     if (!this._map) return;
 
     this._dialog = window.dialog({
-      title: this._portal.name + ": Links",
+      title: this._portal.name + wX("LINKS2"),
       width: "auto",
       height: "auto",
       html: this._table.table,
@@ -62,66 +63,69 @@ const LinkListDialog = WDialog.extend({
     this._table.fields = [
       {
         name: "Order",
-        value: link => link.order,
-        sort: (a, b) => {
-          return a - b;
-        },
-        format: (a, m) => {
-          a.textContent = m;
-        }
+        value: link => link.throwOrderPos
+        // , sort: (a, b) => { return a - b; }
+        // , format: (cell, value, obj) => { console.log(value, obj); cell.textContent = value; }
       },
       {
         name: "From",
         value: link => this._operation.getPortal(link.fromPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
+        format: (cell, data) =>
+          cell.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "To",
         value: link => this._operation.getPortal(link.toPortalId),
         sortValue: b => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (d, data) => d.appendChild(data.displayFormat(this._operation))
+        format: (cell, data) =>
+          cell.appendChild(data.displayFormat(this._operation))
       },
       {
         name: "Length",
         value: link => link.length(this._operation),
-        format: (a, m) => {
-          a.classList.add("length");
-          a.textContent =
-            m > 1e3 ? (m / 1e3).toFixed(1) + "km" : m.toFixed(1) + "m";
-        }
+        format: (cell, data) => {
+          cell.classList.add("length");
+          cell.textContent =
+            data > 1e3 ? (data / 1e3).toFixed(1) + "km" : data.toFixed(1) + "m";
+        },
+        smallScreenHide: true
       },
       {
         name: "Min Lvl",
-        title: "Minimum level required on source portal",
+        title: wX("MIN_SRC_PORT_LVL"),
         value: link => link.length(this._operation),
-        format: (cell, d, link) => {
+        format: (cell, data, link) => {
           cell.appendChild(link.minLevel(this._operation));
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Comment",
         value: link => link.comment,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, obj, link) => {
-          row.className = "desc";
-          if (obj != null) {
-            const comment = L.DomUtil.create("a", "", row);
-            comment.innerHTML = window.escapeHtmlSpecialChars(obj);
-            L.DomEvent.on(comment, "click", () => {
+        format: (cell, data, link) => {
+          cell.className = "desc";
+          if (data != null) {
+            const comment = L.DomUtil.create("a", null, cell);
+            comment.textContent = window.escapeHtmlSpecialChars(data);
+            L.DomEvent.on(cell, "click", ev => {
+              L.DomEvent.stop(ev);
               const scd = new SetCommentDialog(window.map);
               scd.setup(link, operation);
               scd.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Assigned To",
         value: link => {
           if (link.assignedTo != null && link.assignedTo != "") {
+            if (!WasabeeMe.isLoggedIn()) return "not logged in";
             const agent = getAgent(link.assignedTo);
             if (agent != null) {
               return agent.name;
@@ -133,101 +137,86 @@ const LinkListDialog = WDialog.extend({
         },
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, link) => {
-          const assignee = L.DomUtil.create("a", "", a);
-          assignee.innerHTML = m;
+          const assignee = L.DomUtil.create("a", null, a);
+          assignee.textContent = m;
           if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-            L.DomEvent.on(assignee, "click", () => {
+            L.DomEvent.on(a, "click", ev => {
+              L.DomEvent.stop(ev);
               const ad = new AssignDialog();
               ad.setup(link, this._operation);
               ad.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: "Color",
         value: link => link.color,
-        sort: null,
-        format: (list, data, link) => {
-          this.makeColorMenu(list, data, link);
+        // sort: null,
+        format: (cell, data, link) => {
+          this.makeColorMenu(cell, data, link);
+        },
+        smallScreenHide: true
+      },
+      {
+        name: "Reverse",
+        value: link => link.fromPortalId,
+        format: (cell, data, link) => {
+          const d = L.DomUtil.create("a", null, cell);
+          d.href = "#";
+          d.textContent = "Reverse";
+          L.DomEvent.on(d, "click", ev => {
+            L.DomEvent.stop(ev);
+            operation.reverseLink(link.fromPortalId, link.toPortalId);
+          });
         }
       },
       {
-        name: "",
+        name: wX("DELETE_LINK"),
         sort: null,
         value: link => link,
-        format: (o, e) => this.makeMenu(o, e)
+        format: (cell, data, link) => {
+          const d = L.DomUtil.create("a", null, cell);
+          d.href = "#";
+          d.textContent = wX("DELETE_LINK");
+          L.DomEvent.on(d, "click", ev => {
+            L.DomEvent.stop(ev);
+            this.deleteLink(link);
+          });
+        }
       }
     ];
     this._table.sortBy = 0;
     this._table.items = this._operation.getLinkListFromPortal(this._portal);
   },
 
-  deleteLink: function(link, operation) {
+  deleteLink: function(link) {
     const con = new ConfirmDialog(window.map);
-    const prompt = L.DomUtil.create("div", "");
-    prompt.innerHTML = "Do you really want to delete this link: ";
-    prompt.appendChild(link.displayFormat(operation));
+    const prompt = L.DomUtil.create("div");
+    prompt.textContent = wX("CONFIRM_DELETE");
+    prompt.appendChild(link.displayFormat(this._operation));
     con.setup("Delete Link", prompt, () => {
       this._operation.removeLink(link.fromPortalId, link.toPortalId);
     });
     con.enable();
   },
 
-  makeMenu: function(list, data) {
-    const state = new OverflowMenu();
-    const options = [
-      {
-        label: "Reverse",
-        onclick: () => {
-          this._operation.reverseLink(data.fromPortalId, data.toPortalId);
-        }
-      },
-      {
-        label: "Delete",
-        onclick: () => this.deleteLink(data, this._operation)
-      },
-      {
-        label: "Set Comment",
-        onclick: () => {
-          const scd = new SetCommentDialog(window.map);
-          scd.setup(data, this._operation);
-          scd.enable();
-        }
-      }
-    ];
-    if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
-      options.push({
-        label: "Assign",
-        onclick: () => {
-          const ad = new AssignDialog();
-          ad.setup(data, this._operation);
-          ad.enable();
-        }
-      });
-    }
-    state.items = options;
-    list.className = "menu";
-    list.appendChild(state.button);
-  },
-
   makeColorMenu: function(list, data, link) {
-    const colorSection = L.DomUtil.create("div", "", list);
-    const linkColor = L.DomUtil.create("select", "", colorSection);
+    const colorSection = L.DomUtil.create("div", null, list);
+    const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
 
-    window.plugin.wasabee.static.layerTypes.forEach(function(a) {
-      const option = L.DomUtil.create("option", "");
-      option.setAttribute("value", a.name);
-      if (a.name == "main") {
-        a.displayName = "Op Color";
-      }
-      if (a.name == data) {
-        option.setAttribute("selected", true);
-      }
+    for (const style of window.plugin.wasabee.static.layerTypes) {
+      if (style[0] == "SE" || style[0] == "self-block") continue;
+      const a = style[1];
+      const option = L.DomUtil.create("option");
+      option.value = a.name;
+      if (a.name == "main") a.displayName = "Op Color";
+      if (a.name == data) option.selected = true;
       option.innerHTML = a.displayName;
       linkColor.append(option);
-    });
+    }
 
     linkColor.addEventListener(
       "change",

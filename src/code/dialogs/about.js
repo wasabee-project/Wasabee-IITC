@@ -41,13 +41,13 @@ const AboutDialog = WDialog.extend({
     // use leaflet's DOM object creation, not bare DOM or Jquery
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
-    // xW is the translation call, looks for strings in translations.json based
+    // wX is the translation call, looks for strings in translations.json based
     // on the browser's langauge setting
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
-      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.15: @deviousness</li></ul>";
+      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.16: @deviousness</li></ul>";
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
@@ -61,7 +61,7 @@ const AboutDialog = WDialog.extend({
       width: "auto",
       height: "auto",
       html: html,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-about",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

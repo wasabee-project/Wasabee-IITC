@@ -3,7 +3,7 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
-import { clearAllItems, getAllPortalsOnScreen } from "../uiCommands";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
 const FanfieldDialog = WDialog.extend({
@@ -16,7 +16,7 @@ const FanfieldDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, false);
+    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
@@ -27,109 +27,114 @@ const FanfieldDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
-    const container = L.DomUtil.create("div", null);
-    const description = L.DomUtil.create("div", null, container);
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const controls = L.DomUtil.create("div", null, container);
-
-    const anchorDiv = L.DomUtil.create("div", null, controls);
-    const anchorLabel = L.DomUtil.create("label", null, anchorDiv);
-    anchorLabel.textContent = "Anchor Portal ";
-    const anchorButton = L.DomUtil.create("button", null, anchorLabel);
-    anchorButton.textContent = "set";
-    this._anchorDisplay = L.DomUtil.create("span", null, anchorLabel);
+    const anchorLabel = L.DomUtil.create("label", null, container);
+    anchorLabel.textContent = wX("ANCHOR_PORTAL");
+    const anchorButton = L.DomUtil.create("button", null, container);
+    anchorButton.textContent = wX("SET");
+    this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
-      this._anchorDisplay.appendChild(this._anchor.displayFormat());
+      this._anchorDisplay.appendChild(
+        this._anchor.displayFormat(this._smallScreen)
+      );
     } else {
-      this._anchorDisplay.textContent = "not set";
+      this._anchorDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButton, "click", () => {
+    L.DomEvent.on(anchorButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-fanfield-anchor"] = JSON.stringify(this._anchor);
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(this._anchor.displayFormat());
+        this._anchorDisplay.appendChild(
+          this._anchor.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
-    const startDiv = L.DomUtil.create("div", null, controls);
-    const startLabel = L.DomUtil.create("label", null, startDiv);
-    startLabel.textContent = "Start Portal ";
-    const startButton = L.DomUtil.create("button", null, startLabel);
-    startButton.textContent = "set";
-    this._startDisplay = L.DomUtil.create("span", null, startLabel);
+    const startLabel = L.DomUtil.create("label", null, container);
+    startLabel.textContent = wX("START_PORT");
+    const startButton = L.DomUtil.create("button", null, container);
+    startButton.textContent = wX("SET");
+    this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
-      this._startDisplay.appendChild(this._start.displayFormat());
+      this._startDisplay.appendChild(
+        this._start.displayFormat(this._smallScreen)
+      );
     } else {
-      this._startDisplay.textContent = "not set";
+      this._startDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(startButton, "click", () => {
+    L.DomEvent.on(startButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._start = WasabeePortal.getSelected();
       if (this._start) {
         localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
         this._startDisplay.textContent = "";
-        this._startDisplay.appendChild(this._start.displayFormat());
+        this._startDisplay.appendChild(
+          this._start.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
-    const endDiv = L.DomUtil.create("div", null, controls);
-    const endLabel = L.DomUtil.create("label", null, endDiv);
-    endLabel.textContent = "End Portal ";
-    const endButton = L.DomUtil.create("button", null, endLabel);
-    endButton.textContent = "set";
-    this._endDisplay = L.DomUtil.create("span", null, endLabel);
+    const endLabel = L.DomUtil.create("label", null, container);
+    endLabel.textContent = wX("END_PORT");
+    const endButton = L.DomUtil.create("button", null, container);
+    endButton.textContent = wX("SET");
+    this._endDisplay = L.DomUtil.create("span", null, container);
     if (this._end) {
-      this._endDisplay.appendChild(this._end.displayFormat());
+      this._endDisplay.appendChild(this._end.displayFormat(this._smallScreen));
     } else {
-      this._endDisplay.textContent = "not set";
+      this._endDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(endButton, "click", () => {
+    L.DomEvent.on(endButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._end = WasabeePortal.getSelected();
       if (this._end) {
         localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
         this._endDisplay.textContent = "";
-        this._endDisplay.appendChild(this._end.displayFormat());
+        this._endDisplay.appendChild(
+          this._end.displayFormat(this._smallScreen)
+        );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
     // Bottom buttons bar
-    const element = L.DomUtil.create("div", "buttonbar", container);
-    const div = L.DomUtil.create("span", null, element);
     // Enter arrow
-    const opt = L.DomUtil.create("span", "arrow", div);
+    const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, div);
+    const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("FANFIELD");
-    L.DomEvent.on(button, "click", () => {
-      const context = this;
-      this.fanfield(context);
+    L.DomEvent.on(button, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.fanfield.call(this);
     });
 
-    const context = this;
     this._dialog = window.dialog({
       title: wX("FANFIELD2"),
       width: "auto",
       height: "auto",
       html: container,
-      dialogClass: "wasabee-dialog-mustauth",
-      closeCallback: function() {
-        context.disable();
-        delete context._dialog;
+      dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
       },
       buttons: {
         OK: () => {
           this._dialog.dialog("close");
         },
-        "Clear All": () => {
-          clearAllItems(getSelectedOperation());
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
         }
       }
     });
@@ -139,10 +144,10 @@ const FanfieldDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = FanfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this.title = "Fan Field";
-    this.label = "Fan Field";
+    this.title = wX("FAN_FIELD3");
+    this.label = wX("FAN_FIELD3");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-fanfield-anchor"];
+    let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
     p = localStorage["wasabee-fanfield-start"];
     if (p) this._start = WasabeePortal.create(p);
@@ -151,47 +156,47 @@ const FanfieldDialog = WDialog.extend({
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)
-  fanfield: context => {
-    context._layerGroup.clearLayers();
+  fanfield: function() {
+    this._layerGroup.clearLayers();
 
-    if (!context._anchor || !context._start || !context._end) {
+    if (!this._anchor || !this._start || !this._end) {
       alert(wX("SET_3_PORT"));
       return;
     }
 
-    let startAngle = context._angle(context._anchor, context._start, false);
-    let endAngle = context._angle(context._anchor, context._end, false);
+    let startAngle = this._angle(this._anchor, this._start, false);
+    let endAngle = this._angle(this._anchor, this._end, false);
     let min = Math.min(startAngle, endAngle);
     let max = Math.max(startAngle, endAngle);
-    context._cw = false;
+    this._cw = false;
 
     if (startAngle != min) {
       console.log("fanfield running clockwise");
-      context._cw = true; // must be going counter-clockwise
-      startAngle = context._angle(context._anchor, context._start, true);
-      endAngle = context._angle(context._anchor, context._end, true);
+      this._cw = true; // must be going counter-clockwise
+      startAngle = this._angle(this._anchor, this._start, true);
+      endAngle = this._angle(this._anchor, this._end, true);
       min = Math.min(startAngle, endAngle);
       max = Math.max(startAngle, endAngle);
     }
 
-    const text = min + " ... " + max + " " + context._cw + " " + (max - min);
-    console.log(text);
+    // const text = min + " ... " + max + " " + this._cw + " " + (max - min);
+    // console.log(text);
 
     // if we cross 0, rotate 180deg so we don't have to deal with it
-    context._invert = false;
+    this._invert = false;
     if (max - min > Math.PI) {
       console.log("going inverted");
-      context._invert = true;
+      this._invert = true;
       // min = (min + Math.PI) % (2 * Math.PI);
       // max = (max + Math.PI) % (2 * Math.PI);
     }
 
     const good = new Map();
-    for (const p of getAllPortalsOnScreen(context._operation)) {
-      if (p.options.guid == context._anchor.id) continue;
-      let pAngle = context._angle(context._anchor, p, context._cw);
+    for (const p of getAllPortalsOnScreen(this._operation)) {
+      if (p.options.guid == this._anchor.id) continue;
+      let pAngle = this._angle(this._anchor, p, this._cw);
 
-      if (context._invert) pAngle = (pAngle + Math.PI) % (2 * Math.PI);
+      if (this._invert) pAngle = (pAngle + Math.PI) % (2 * Math.PI);
 
       const label = L.marker(p._latlng, {
         icon: L.divIcon({
@@ -202,34 +207,39 @@ const FanfieldDialog = WDialog.extend({
         }),
         guid: p.options.guid
       });
-      label.addTo(context._layerGroup);
+      label.addTo(this._layerGroup);
 
       if (pAngle < min || pAngle > max) continue;
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
     const sorted = new Map([...good.entries()].sort());
-    context._draw(sorted, context);
+    this._draw(sorted);
   },
 
   // draw takes the sorted list of poratls and draws the links
   // determining any sub-fields can be added
-  _draw: function(sorted, context) {
-    context._operation.startBatchMode();
+  _draw: function(sorted) {
+    this._operation.startBatchMode();
     let order = 0;
     let fields = 0;
     for (const [angle, p] of sorted) {
       order++;
       const wp = WasabeePortal.get(p.options.guid);
-      context._operation.addLink(wp, context._anchor, "fan anchor", order);
+      if (!wp) {
+        // needs wX()
+        alert("unable to load details for portal " + p.options.guid);
+        continue;
+      }
+      this._operation.addLink(wp, this._anchor, "fan anchor", order);
       for (const [nextangle, check] of sorted) {
         if (nextangle >= angle) break; // stop if we've gone too far
         const testlink = new WasabeeLink(
-          context._operation,
+          this._operation,
           wp.id,
           check.options.guid
         );
         let crossed = false;
-        for (const real of context._operation.links) {
+        for (const real of this._operation.links) {
           if (greatCircleArcIntersect(real, testlink)) {
             crossed = true;
             break;
@@ -239,12 +249,13 @@ const FanfieldDialog = WDialog.extend({
           testlink.throwOrderPos = ++order;
           testlink.description = "fan subfield";
           fields++;
-          context._operation.links.push(testlink);
+          this._operation.links.push(testlink);
         }
       }
     }
-    context._operation.endBatchMode();
+    this._operation.endBatchMode();
     const ap = 313 * order + 1250 * fields;
+    // too many parameters for wX();
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 

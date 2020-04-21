@@ -18,12 +18,12 @@ export const SetCommentDialog = WDialog.extend({
     if (target instanceof WasabeeMarker) {
       this.commentType = "marker";
       this.portal = this.operation.getPortal(this.target.portalId);
-      this.dialogTitle = wX("SET_MCOMMENT") + this.portal.name;
+      this.dialogTitle = wX("SET_MCOMMENT", this.portal.name);
     }
 
     if (target instanceof WasabeePortal) {
       this.commentType = "portal";
-      this.dialogTitle = wX("SET_PCOMMENT") + target.name;
+      this.dialogTitle = wX("SET_PCOMMENT", target.name);
       this.portal = this.target;
     }
 
@@ -59,33 +59,31 @@ export const SetCommentDialog = WDialog.extend({
       return;
     }
     if (!this._map) return;
-    const setCommentHandler = this;
     this._dialog = window.dialog({
       title: this.dialogTitle,
       width: "auto",
       height: "auto",
       html: this._buildHtml(),
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
       closeCallback: () => {
-        setCommentHandler.disable();
-        delete setCommentHandler._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 
   _buildHtml: function() {
-    const container = L.DomUtil.create(
-      "div",
-      "wasabee-dialog wasabee-dialog-ops"
-    );
-    const desc = L.DomUtil.create("div", "", container);
-    const input = L.DomUtil.create("input", "", container);
+    const container = L.DomUtil.create("div", "container");
+    const desc = L.DomUtil.create("div", "desc", container);
+    const input = L.DomUtil.create("input", null, container);
     input.placeholder = "comment";
 
     if (this.commentType == "link") {
-      desc.innerHTML = "Set comment for link: ";
-      desc.appendChild(this.target.displayFormat(this.operation));
+      desc.textContent = wX("SET_LINK_COMMENT");
+      desc.appendChild(
+        this.target.displayFormat(this.operation, this._smallScreen)
+      );
       if (this.target.comment) input.value = this.target.comment;
       input.addEventListener(
         "change",
@@ -97,7 +95,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "marker") {
-      desc.innerHTML = "Set comment for marker on: ";
+      desc.textContent = wX("SET_MARKER_COMMENT");
       desc.appendChild(this.portal.displayFormat(this.operation));
 
       if (this.target.comment) input.value = this.target.comment;
@@ -111,8 +109,8 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     if (this.commentType == "portal") {
-      desc.innerHTML = "Set comment for portal: ";
-      desc.appendChild(this.portal.displayFormat(this.operation));
+      desc.textContent = wX("SET_PORT_COMMENT");
+      desc.appendChild(this.portal.displayFormat(this._smallScreen));
 
       if (this.portal.comment) input.value = this.portal.comment;
       input.addEventListener(
@@ -123,7 +121,16 @@ export const SetCommentDialog = WDialog.extend({
         false
       );
 
-      // add hardness here too
+      const hardnessInput = L.DomUtil.create("input", null, container);
+      hardnessInput.placeholder = "hardness";
+      if (this.portal.hardness) hardnessInput.value = this.portal.hardness;
+      hardnessInput.addEventListener(
+        "change",
+        () => {
+          this.operation.setPortalHardness(this.target, hardnessInput.value);
+        },
+        false
+      );
     }
 
     return container;

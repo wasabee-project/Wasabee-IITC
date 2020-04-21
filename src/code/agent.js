@@ -58,21 +58,23 @@ export default class WasabeeAgent {
     }
     display.href = `${server}/api/v1/agent/${this.id}?json=n`;
     display.target = "_new";
-    L.DomEvent.on(display, "click", () => {
+    L.DomEvent.on(display, "click", ev => {
       window.open(display.href, this.id);
+      L.DomEvent.stop(ev);
     });
     display.textContent = this.name;
     return display;
   }
 
   getPopup() {
-    const content = L.DomUtil.create("div", "temp-op-dialog");
+    const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
-    const sendTarget = L.DomUtil.create("a", "temp-op-dialog", content);
+    const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
-    L.DomEvent.on(sendTarget, "click", () => {
+    L.DomEvent.on(sendTarget, "click", ev => {
+      L.DomEvent.stop(ev);
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
         alert(wX("SELECT PORTAL"));
@@ -99,10 +101,12 @@ export default class WasabeeAgent {
 
   timeSinceformat() {
     if (!this.date) return "";
-    const date = new Date(this.date);
+    const date = Date.parse(this.date + " UTC");
+    if (Number.isNaN(date)) return `(${this.date} UTC)`; // FireFox Date.parse no good
     if (date == 0) return "";
 
     const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 0) return "";
     let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
 
     if (interval > 1) return wX("AGES");

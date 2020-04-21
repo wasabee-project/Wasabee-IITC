@@ -1,0 +1,725 @@
+/* wasabee-buttons used in addButtonss */
+.wasabee-buttons {
+  position: relative;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* currently applied to both the UL and LI */
+/* actions are the buttons, subactions are the flyouts from the button */
+/* actions are UL and LI, subactions are LI only */
+.wasabee-actions {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 26px;
+  top: 0;
+  white-space: nowrap;
+}
+.wasabee-actions li {
+  display: inline-block;
+}
+.wasabee-subactions li {
+  vertical-align: middle;
+}
+.wasabee-subactions a {
+  background-color: rgba(30, 130, 76, 0.66);
+  padding-left: 8px;
+  padding-right: 8px;
+  width: auto;
+  border-left: 1px solid #aaa;
+  color: #fff;
+}
+.wasabee-subactions a:hover {
+  background-color: #a0a098;
+  width: auto;
+}
+.wasabee-subactions li:first-child a {
+  border-left: none;
+}
+.wasabee-subactions li:last-child a {
+  -webkit-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+}
+.wasabee-actions-image {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/*non-iOS device wider screens*/
+@media screen and (min-width: 1001px) and (max-width: 1280px) {
+  .wasabee-subactions a {
+    width: 60px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+}
+
+/*non-iOS device small screens*/
+@media screen and (min-width: 401px) and (max-width: 1000px) {
+  .wasabee-subactions a {
+    width: 50px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+/*iOS device screens larger than 400 but not tablet sized */
+@media screen and (min-device-width: 401) and (max-device-width: 1000px) {
+  .wasabee-subactions a {
+    width: 50px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
+/*iOS screens smaller than 400px*/
+@media screen and (max-device-width: 400px) {
+  .wasabee-subactions a {
+    width: 50px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+/* wasabee-tooltip is used for the quickdraw mouse follower */
+.wasabee-tooltip {
+  background: rgba(30, 130, 76, 0.66);
+  border: 1px solid transparent;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  color: #fff;
+  /* font: 12px/18px "Helvetica Neue",Arial,Helvetica,sans-serif; */
+  margin-left: 20px;
+  margin-top: -21px;
+  padding: 2px 4px;
+  position: absolute;
+  white-space: nowrap;
+  z-index: 6;
+}
+.wasabee-tooltip:before {
+  border-right: 6px solid #000;
+  border-right-color: rgba(99, 99, 88, 0.66);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: -7px;
+}
+.wasabee-tooltip-single {
+  margin-top: -12px;
+}
+.wasabee-error-tooltip {
+  background-color: #f2dede;
+  border: 1px solid #e6b6bd;
+  color: #b94a48;
+}
+.wasabee-error-tooltip:before {
+  border-right-color: #e6b6bd;
+}
+
+/* used in anything that is a sortable table */
+/* .wasabee-table tbody tr:nth-child(2n + 1) td { border-color: rgba(50, 0, 125, 1); } */
+.wasabee-table tr {
+  /* background: rgba(225, 235, 225, 1); */
+  background: rgba(25, 63, 95, 0.75);
+}
+
+.wasabee-table tbody tr:nth-child(2n + 1) {
+  /* background: rgba(240, 240, 240, 1); */
+  background: rgba(8, 48, 78, 0.75);
+}
+.wasabee-table > thead .sortable:before {
+  content: " ";
+  display: inline-block;
+  float: right;
+  min-width: 1em;
+  text-align: right;
+}
+
+.wasabee-table {
+  border-collapse: collapse;
+  empty-cells: show;
+  width: 100%;
+  clear: both;
+}
+.wasabee-table td,
+.wasabee-table th {
+  border-width: 0 1px;
+  border-style: solid;
+  /* border-color: rgba(50, 0, 125, 1); */
+  padding: 3px 4px;
+  text-align: left;
+  /* color: rgba(0, 0, 0, 1); */
+}
+.wasabee-table td:first-child,
+.wasabee-table th:first-child {
+  border-left-width: 0;
+}
+.wasabee-table td:last-child,
+.wasabee-table th:last-child {
+  border-right-width: 0;
+}
+.wasabee-table > thead .sorted {
+  /* color: rgba(125, 90, 195, 1); */
+}
+.wasabee-table > thead .sortable.asc:before {
+  content: "\25b2";
+}
+.wasabee-table > thead .sortable.desc:before {
+  content: "\25bc";
+}
+// .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; }
+
+/* defined in agent.js, always on an <a> -- can this be pruned ? */
+.wasabee-agent-label a {
+  text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
+    0 0 5px #000;
+  color: #ffb;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  padding: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+/* this class is appended to leaflet-popup so we can adjust without stepping on other plugins */
+.wasabee-popup {
+  background: rgba(235, 235, 235, 0.75) !important;
+  -webkit-border-radius: 6px !important;
+  font-weight: bolder;
+}
+
+.wasabee-popup a.enl { color: rgb(56, 142, 60) !important; }
+.wasabee-popup a.res { color: rgb(0, 135, 255) !important; }
+
+.wasabee-marker-popup { }
+.wasabee-marker-popup div.desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #000;
+  padding: 4px 4px;
+}
+
+.wasabee-popup-assignment {
+  padding: 0px 4px 0px 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #000;
+}
+
+.wasabee-popup-assignment a.wasabee-agent-label {
+  margin-left: 4px;
+}
+
+.wasabee-marker-popup-kind {
+  margin-right: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #000;
+}
+
+.wasabee-marker-popup-comment {
+  font-weight: initial;
+}
+
+.wasabee-marker-buttonset { }
+.wasabee-marker-buttonset button {
+  display: block;
+  width: 100%;
+}
+
+.wasabee-agent-popup { }
+.wasabee-agent-popup div.desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #000;
+  padding: 0px 4px;
+}
+
+.wasabee-agent-popup button {
+  display: block;
+  width: 100%;
+}
+
+.wasabee-anchor-popup { }
+.wasabee-anchor-popup div.desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #000;
+  padding: 0px 4px;
+}
+
+.wasabee-anchor-buttonset { }
+.wasabee-anchor-buttonset button {
+  display: block;
+  width: 100%;
+}
+
+/* all dialogs get this class -- do global stuff with it */
+/* .wasabee-dialog {
+  background-color: rgba(250, 250, 250, 0.9);
+  border: 1px solid rgba(35, 175, 30, 0.75);
+  color: #000;
+}
+
+.wasabee-dialog button {
+  padding: 1px 7px 2px;
+  border: initial;
+  background-color: buttonface;
+  color: buttontext;
+  border-image: initial;
+  border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+  border-width: 1px;
+  border-style: solid;
+  margin: 2px 0px 2px 0px;
+}
+
+.wasabee-dialog input {
+  color: initial;
+  background-color: rgba(240, 255, 240, 1);
+  padding: 2px 4px;
+}
+
+.wasabee-dialog a {
+  color: rgba(125, 90, 195, 1);
+}
+
+.wasabee-dialog h3 {
+  color: rgba(125, 90, 195, 1);
+}
+
+.wasabee-dialog div.ui-dialog-titlebar {
+  background-color: rgba(150, 150, 150, 1);
+  color: #000;
+  text-align: left;
+  line-height: 14px;
+  font-size: 13px;
+  border: 1px solid rgba(180, 190, 180, 1);
+}
+
+.wasabee-dialog span.ui-dialog-title { }
+
+.wasabee-dialog span.ui-dialog-title-active {
+  color: rgba(15, 250, 5, 1);
+}
+
+.wasabee-dialog .ui-dialog-titlebar-button {
+  border: 1px solid rgba(15, 250, 5, 1);
+  color: rgba(15, 250, 5, 1);
+}
+
+.wasabee-dialog .ui-dialog-content {
+  background-color: rgba(180, 190, 180, .8);
+}
+
+.wasabee-dialog .ui-dialog-buttonpane {
+  background-color: rgba(180, 190, 180, .8);
+  padding: 4px;
+  border-top: initial;
+} */
+
+/* classes specific to various dialogs */
+.wasabee-dialog-about {
+  max-width: min-content;
+}
+.wasabee-dialog-assign {
+}
+.wasabee-agent-menu {
+  align-items: center;
+}
+
+/* this can be simplified now that the send location checkbox is not here */
+.wasabee-dialog-auth {
+  max-width: min-content;
+}
+.wasabee-dialog-auth div.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 4px;
+}
+.wasabee-dialog-auth div.useragent {
+  padding: 4px;
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth div.desc {
+  padding: 4px;
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth button.andriod {
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth button.gapi {
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth div.options {
+  margin: 4px;
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth button.webview {
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth button.server {
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+
+.wasabee-dialog-auth-buttonset {
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.wasabee-dialog-auth-buttonset button {
+  margin-right: 4px;
+}
+.wasabee-dialog-blockerlist { }
+.wasabee-dialog-confirm {
+  align-items: center;
+}
+.wasabee-dialog-confirm div.title { }
+.wasabee-dialog-wdkeys { }
+.wasabee-dialog-wdkeys div.container {
+  display: grid;
+}
+.wasabee-dialog-wdkeys div.portal {
+  padding: 4px 0px 8px 0px;
+}
+.wasabee-dialog-wdkeys input {
+  padding: 4px;
+}
+.wasabee-dialog-wdkeys button { }
+
+.wasabee-dialog-export { }
+.wasabee-dialog-export textarea {
+  width: 96%;
+  height: 250px;
+  resize: vertical;
+}
+
+.wasabee-dialog-fanfield { }
+/* fanfield also uses plugin-portal-names for the debug info, ignore for now */
+.wasabee-dialog-fanfield div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr;
+}
+.wasabee-dialog-fanfield div.desc {
+  grid-column-start: 1;
+  grid-column-end: 7;
+  padding: 4px;
+}
+.wasabee-dialog-fanfield label {
+  padding: 4px;
+}
+.wasabee-dialog-fanfield button { }
+.wasabee-dialog-fanfield span {
+  padding: 4px;
+  grid-column-start: 3;
+  grid-column-end: 7;
+}
+.wasabee-dialog-import { }
+.wasabee-dialog-import textarea {
+  width: 100%;
+  height: 250px;
+  resize: vertical;
+}
+.wasabee-dialog-keylistportal { }
+.wasabee-dialog-keyslist { }
+.wasabee-dialog-keyslist .enough {
+  color: #fff;
+  font-weight: bold;
+}
+.wasabee-dialog-keyslist .notenough {
+  color: #900;
+  font-weight: bold;
+}
+.wasabee-dialog-linklist { }
+.wasabee-dialog-link { }
+.wasabee-dialog-link div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+}
+.wasabee-dialog-link label {
+  padding: 4px;
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+.wasabee-dialog-link button.set {
+  grid-column-start: 2;
+  grid-column-end: 3;
+}
+.wasabee-dialog-link span.portal {
+  grid-column-start: 3;
+  grid-column-end: 4;
+}
+.wasabee-dialog-link button.add {
+  grid-column-start: 4;
+  grid-column-end: 5;
+}
+.wasabee-dialog-link input.desc {
+  padding: 4px;
+  grid-column-start: 4;
+}
+.wasabee-dialog-link button.clear {
+  grid-column-start: 5;
+}
+
+.wasabee-dialog-manageteam {
+}
+.wasabee-dialog-manageteam div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.wasabee-dialog-manageteam div.list {
+  grid-column-start: 1;
+  grid-column-end: 4;
+}
+.wasabee-dialog-manageteam label {
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+.wasabee-dialog-manageteam input {
+  margin: 2px 2px 2px 2px;
+  grid-column-start: 2;
+  grid-column-end: 3;
+}
+.wasabee-dialog-manageteam button {
+  grid-column-start: 3;
+  grid-column-end: 4;
+}
+
+.wasabee-dialog-markeradd {
+  max-width: min-content;
+}
+.wasabee-dialog-markeradd div.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+}
+.wasabee-dialog-markeradd div.portal {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  padding: 0px 0px 8px 0px;
+}
+.wasabee-dialog-markeradd div.content select {
+  margin: 4px;
+}
+.wasabee-dialog-markeradd div.content input {
+  margin: 4px;
+}
+.wasabee-dialog-markeradd div.content button {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+.wasabee-dialog-markerlist { }
+.wasabee-dialog-multimax { }
+.wasabee-dialog-multimax div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr;
+}
+.wasabee-dialog-multimax div.desc {
+  grid-column-start: 1;
+  grid-column-end: 7;
+  padding: 4px;
+}
+.wasabee-dialog-multimax label {
+  padding: 4px;
+}
+.wasabee-dialog-multimax button { }
+.wasabee-dialog-multimax span {
+  padding: 4px;
+  grid-column-start: 3;
+  grid-column-end: 7;
+}
+
+.wasabee-dialog-newop { }
+.wasabee-dialog-newop div.buttonset {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.wasabee-dialog-ops {
+}
+.wasabee-dialog-ops div.topset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 4px;
+}
+.wasabee-dialog-ops select {
+  width: auto;
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+.wasabee-dialog-ops textarea {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  width: auto;
+  height: 50px;
+  resize: vertical;
+}
+.wasabee-dialog-ops p.comment {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+.wasabee-dialog-ops input {
+  width: auto;
+}
+.wasabee-dialog-ops div.buttonset {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.wasabee-dialog-ops div.buttonset button {
+  width: 100%;
+}
+.wasabee-dialog-checklist {
+}
+.wasabee-dialog-perms {
+}
+.wasabee-dialog-prompt {
+}
+.wasabee-dialog-prompt div.container {
+  display: grid;
+}
+.wasabee-dialog-prompt label {
+  padding: 4px;
+}
+.wasabee-dialog-prompt input {
+  padding: 4px;
+}
+.wasabee-dialog-setcomment {
+}
+.wasabee-dialog-setcomment div.container {
+  display: grid;
+}
+.wasabee-dialog-setcomment div.desc {
+  padding: 4px;
+}
+.wasabee-dialog-setcomment input {
+  padding: 4px;
+  width: 96%;
+}
+.wasabee-dialog-settings {
+  max-width: min-content;
+}
+.wasabee-dialog-settings div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.wasabee-dialog-settings label {
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+.wasabee-dialog-settings select {
+  grid-column-start: 2;
+  grid-column-end: 3;
+}
+.wasabee-dialog-settings input {
+  grid-column-start: 2;
+  grid-column-end: 3;
+}
+.wasabee-dialog-settings div.desc {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.wasabee-dialog-starburst {
+}
+.wasabee-dialog-starburst div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+}
+.wasabee-dialog-starburst div.desc {
+  padding: 4px;
+  grid-column-start: 1;
+  grid-column-end: 4;
+}
+.wasabee-dialog-starburst label {
+  padding: 4px;
+}
+.wasabee-dialog-starburst button { }
+.wasabee-dialog-starburst div.anchor {
+  padding: 4px;
+}
+.wasabee-dialog-wasabee {
+}
+.wasabee-dialog-wasabee div.container {
+  display: grid;
+}
+.wasabee-dialog-wasabee button.server {
+  grid-column-start: 1;
+}
+.wasabee-dialog-wasabee button.sendloc {
+  grid-column-start: 1;
+}
+
+.wasabee-portal-comment {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness {
+  font-size: smaller;
+  font-weight: lighter;
+  margin-left: 12px;
+}
+
+.wasabee-portal-hardness a {
+  color: #F00 !important;
+}
+
+/* in our dialogs and popups, use a darker green for ENL for better contrast */
+/* .wasabee-dialog a.wasabee-portal {
+  color: #ff6600;
+  text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
+}
+.wasabee-dialog a.enl { color: rgb(56, 142, 60) !important; }
+.wasabee-dialog a.res { color: rgb(0, 135, 255) !important; }
+a.wasabee-portal {
+  color: #ff6600;
+  text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,
+}
+a.wasabee-portal.enl { color: rgb(56, 142, 60) !important; }
+a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
+ */
+
+/* marker color */
+.CapturePortalMarker { color: #7d7d7d; }
+.LetDecayPortalAlert { color: #000000; } 
+.DestroyPortalAlert { color: #CE3B37; }
+.FarmPortalMarker { color: #f17030; }
+.GotoPortalMarker { color: #e235a9; }
+.GetKeyPortalMarker { color: #78b32c; }
+.CreateLinkAlert { color: #0a5d00; }
+.MeetAgentPortalMarker { color: #6b553d; }
+.OtherPortalAlert { color: #3c3c3c; }
+.RechargePortalAlert { color: #298566; }
+.UpgradePortalAlert { color: #298566; }
+.UseVirusPortalAlert { color: #400080; }
+.ExcludeMarker { color: #000099; }
+

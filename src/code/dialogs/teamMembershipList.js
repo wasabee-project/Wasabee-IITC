@@ -29,13 +29,15 @@ const TeamMembershipList = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
+    // sometimes we are too quick, try again
+    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
 
     this._dialog = window.dialog({
       title: this._team.name,
       width: "auto",
       height: "auto",
       html: this._table.table,
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      dialogClass: "wasabee-dialog",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -72,14 +74,14 @@ const TeamMembershipList = WDialog.extend({
       {
         name: wX("SQUAD"),
         value: agent => agent.squad,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("LOC_UPDATE"),
-        value: agent => agent.date,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => (cell.textContent = value)
+        value: agent => agent.date + " GMT",
+        sort: (a, b) => a.localeCompare(b)
+        // , format: (cell, value) => (cell.textContent = value)
       }
     ];
     this._table.sortBy = 0;

@@ -3,6 +3,7 @@ import { deleteMarker } from "./uiCommands.js";
 import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 import wX from "./wX";
+import SetCommentDialog from "./dialogs/setCommentDialog";
 
 export default class WasabeeMarker {
   constructor(type, portalId, comment) {
@@ -60,16 +61,18 @@ export default class WasabeeMarker {
 
   getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
-    marker.className = "wasabee-dialog wasabee-dialog-ops";
-    const content = L.DomUtil.create("div", null);
-    const title = L.DomUtil.create("div", "desc", content);
-    title.innerHTML = this.getPopupBodyWithType(portal);
+    const content = L.DomUtil.create("div", "wasabee-marker-popup");
+    content.appendChild(this.getPopupBodyWithType(portal, operation, marker));
 
-    const assignment = L.DomUtil.create("div", null, content);
+    const assignment = L.DomUtil.create(
+      "div",
+      "wasabee-popup-assignment",
+      content
+    );
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
         function(a) {
-          assignment.innerHTML = wX("ASSIGNED TO"); // FIXME convert formatDisplay to html and add as value to wX
+          assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
           assignment.appendChild(a.formatDisplay());
         },
         function(err) {
@@ -81,18 +84,24 @@ export default class WasabeeMarker {
       assignment.innerHTML = wX("COMPLETED BY", this.completedBy);
     }
 
-    const buttonSet = L.DomUtil.create("div", "temp-op-dialog", content);
-    const deleteButton = L.DomUtil.create("a", null, buttonSet);
-    deleteButton.textContent = wX("DELETE");
-    L.DomEvent.on(deleteButton, "click", () => {
+    const buttonSet = L.DomUtil.create(
+      "div",
+      "wasabee-marker-buttonset",
+      content
+    );
+    const deleteButton = L.DomUtil.create("button", null, buttonSet);
+    deleteButton.textContent = wX("DELETE_ANCHOR");
+    L.DomEvent.on(deleteButton, "click", ev => {
+      L.DomEvent.stop(ev);
       deleteMarker(operation, this, portal);
       marker.closePopup();
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("a", null, buttonSet);
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN");
-      L.DomEvent.on(assignButton, "click", () => {
+      L.DomEvent.on(assignButton, "click", ev => {
+        L.DomEvent.stop(ev);
         const ad = new AssignDialog();
         ad.setup(this, operation);
         ad.enable();
@@ -103,14 +112,56 @@ export default class WasabeeMarker {
     return content;
   }
 
-  getPopupBodyWithType(portal) {
-    // is this paranoia left from ages past?
-    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
-      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+  getPopupBodyWithType(portal, operation, marker) {
+    const title = L.DomUtil.create("div", "desc");
+    const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
+    L.DomUtil.addClass(kind, this.type);
+    kind.textContent = wX(this.type);
+    title.appendChild(portal.displayFormat());
+
+    if (this.comment) {
+      const comment = L.DomUtil.create(
+        "div",
+        "wasabee-marker-popup-comment",
+        title
+      );
+      comment.textContent = this.comment;
+      L.DomEvent.on(comment, "click", ev => {
+        L.DomEvent.stop(ev);
+        const com = new SetCommentDialog();
+        com.setup(this, operation);
+        com.enable();
+        marker.closePopup();
+      });
     }
-    const type = window.plugin.wasabee.static.markerTypes.get(this.type);
-    let title = `${type.label}: ${portal.name}`;
-    if (this.comment) title = title + "\n" + this.comment;
+    const comment = L.DomUtil.create("div", "wasabee-portal-comment", title);
+    const cl = L.DomUtil.create("a", null, comment);
+    cl.textContent = portal.comment || wX("SET_PORTAL_COMMENT");
+    cl.href = "#";
+    L.DomEvent.on(cl, "click", ev => {
+      L.DomEvent.stop(ev);
+      const cd = new SetCommentDialog();
+      cd.setup(portal, operation);
+      cd.enable();
+      marker.closePopup();
+    });
+    if (portal.hardness) {
+      const hardness = L.DomUtil.create(
+        "div",
+        "wasabee-portal-hardness",
+        title
+      );
+      const hl = L.DomUtil.create("a", null, hardness);
+      hl.textContent = portal.hardness;
+      hl.href = "#";
+      L.DomEvent.on(hl, "click", ev => {
+        L.DomEvent.stop(ev);
+        const cd = new SetCommentDialog();
+        cd.setup(portal, operation);
+        cd.enable();
+        marker.closePopup();
+      });
+    }
     return title;
   }
 }

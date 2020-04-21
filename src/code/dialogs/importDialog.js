@@ -29,7 +29,6 @@ const ImportDialogControl = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
     this.idialog = new ImportDialog();
-    const idhandler = this;
     this._dialog = window.dialog({
       title: wX("IMP_WAS_OP"),
       width: "auto",
@@ -44,10 +43,10 @@ const ImportDialogControl = WDialog.extend({
           this.idialog.drawToolsFormat();
         }
       },
-      dialogClass: "wasabee-dialog-mustauth",
+      dialogClass: "wasabee-dialog wasabee-dialog-import",
       closeCallback: () => {
-        idhandler.disable();
-        delete idhandler._dialog;
+        this.disable();
+        delete this._dialog;
         const newop = getSelectedOperation();
         window.runHooks("wasabeeUIUpdate", newop);
         window.runHooks("wasabeeCrosslinks", newop);
@@ -77,8 +76,6 @@ class ImportDialog {
 
     // Input area
     this.textarea = L.DomUtil.create("textarea", null, this.container);
-    this.textarea.rows = 20;
-    this.textarea.cols = 80;
     this.textarea.placeholder = wX("PASTE_INSTRUCT");
   }
 
@@ -115,7 +112,7 @@ class ImportDialog {
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = wX("IMPORT_OP") + new Date().toGMTString();
+        newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
       }
       newop.store();
       makeSelectedOperation(newop.ID);
@@ -131,7 +128,7 @@ class ImportDialog {
       const importedOp = WasabeeOp.create(data);
       importedOp.store();
       makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP2") + importedOp.name + wX("SUCCESS"));
+      alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
     } catch (e) {
       console.warn("WasabeeTools: failed to import data: " + e);
       alert(wX("IMP_NOPE"));

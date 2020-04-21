@@ -2,9 +2,10 @@ import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
+import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
-import { listenForAddedPortals } from "../uiCommands";
+import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import wX from "../wX";
@@ -31,9 +32,10 @@ const OperationChecklistDialog = WDialog.extend({
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
+    window.addHook("portalDetailsLoaded", listenForPortalDetails);
 
     for (const f of this._operation.fakedPortals) {
-      if (f.id.length != 35) window.portalDetail.request(f.id);
+      window.portalDetail.request(f.id);
     }
 
     this._displayDialog();
@@ -43,6 +45,7 @@ const OperationChecklistDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
+    window.removeHook("portalDetailsLoaded", listenForPortalDetails);
   },
 
   _displayDialog: function() {
@@ -52,12 +55,8 @@ const OperationChecklistDialog = WDialog.extend({
       title: wX("OP_CHECKLIST", this._operation.name),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center"
-      },
       html: this.sortable.table,
-      dialogClass: "wasabee-dialog",
+      dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;
@@ -69,7 +68,11 @@ const OperationChecklistDialog = WDialog.extend({
 
   checklistUpdate: function(newOpData) {
     this._operation = newOpData;
-    this._dialog.dialog("option", "title", wX("OP_CHECKLIST", newOpData.name));
+    this._dialog.dialog(
+      wX("OPTION"),
+      wX("TITLE"),
+      wX("OP_CHECKLIST", newOpData.name)
+    );
     this.sortable = this.getListDialogContent(
       newOpData,
       this.sortable.sortBy,
@@ -87,18 +90,19 @@ const OperationChecklistDialog = WDialog.extend({
       {
         name: wX("ORDER"),
         value: thing => thing.opOrder,
-        sort: (a, b) => a - b,
-        format: (row, value, thing) => {
-          const oif = L.DomUtil.create("input", "");
+        // sort: (a, b) => a - b,
+        format: (cell, value, thing) => {
+          const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 3;
-          L.DomEvent.on(oif, "change", () => {
+          L.DomEvent.on(oif, "change", ev => {
+            L.DomEvent.stop(ev);
             thing.opOrder = oif.value;
             // since we are changing the values in the (thing)
             // let the op know it has changed (save/redraw);
             operation.update(); // OK - necessary
           });
-          row.appendChild(oif);
+          cell.appendChild(oif);
         }
       },
       {
@@ -107,12 +111,14 @@ const OperationChecklistDialog = WDialog.extend({
           return operation.getPortal(thing.portalId).name;
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value, thing) => {
+        format: (cell, value, thing) => {
           if (thing instanceof WasabeeLink) {
-            row.appendChild(thing.displayFormat(operation));
+            cell.appendChild(thing.displayFormat(operation, this._smallScreen));
           } else {
-            row.appendChild(
-              operation.getPortal(thing.portalId).displayFormat(operation)
+            cell.appendChild(
+              operation
+                .getPortal(thing.portalId)
+                .displayFormat(this._smallScreen)
             );
           }
         }
@@ -121,33 +127,34 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("TYPE"),
         value: thing => {
           if (thing instanceof WasabeeLink) {
-            return "link";
+            return "Link";
           } else {
             // push this shit in to the marker class
-            return (
-              window.plugin.wasabee.static.markerTypes.get(thing.type).label ||
-              "unknown"
-            );
+            return wX(thing.type);
           }
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value) => {
-          row.innerHTML = value;
+        format: (cell, value, thing) => {
+          const span = L.DomUtil.create("span", null, cell);
+          if (thing.type) L.DomUtil.addClass(span, thing.type);
+          span.textContent = value;
         }
       },
       {
         name: wX("COMMENT"),
         value: thing => thing.comment,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value, thing) => {
-          const comment = L.DomUtil.create("a", "", row);
-          comment.innerHTML = value;
-          L.DomEvent.on(row, "click", () => {
+        format: (cell, value, thing) => {
+          const comment = L.DomUtil.create("a", null, cell);
+          comment.textContent = value;
+          L.DomEvent.on(cell, "click", ev => {
+            L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(thing, operation);
             scd.enable();
           });
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: wX("ASS_TO"),
@@ -163,26 +170,54 @@ const OperationChecklistDialog = WDialog.extend({
           return "";
         },
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value, agent) => {
-          const assigned = L.DomUtil.create("a", "", row);
-          assigned.innerHTML = value;
-          // assigned.appendChild(agent.displayFormat());
+        format: (cell, value, thing) => {
+          const assigned = L.DomUtil.create("a", null, cell);
+          assigned.textContent = value;
+          // do not use agent.formatDisplay since that links and overwrites the assign event
           if (WasabeeMe.isLoggedIn()) {
             // XXX should be writable op
-            L.DomEvent.on(row, "click", () => {
+            L.DomEvent.on(cell, "click", ev => {
+              L.DomEvent.stop(ev);
               const ad = new AssignDialog();
-              ad.setup(agent, operation);
+              ad.setup(thing, operation);
               ad.enable();
             });
           }
-        }
+        },
+        smallScreenHide: true
       },
       {
         name: wX("STATE"),
         value: thing => thing.state,
         sort: (a, b) => a.localeCompare(b),
-        format: (row, value) => {
-          row.textContent = value;
+        format: (cell, value, thing) => {
+          const a = L.DomUtil.create("a", null, cell);
+          a.href = "#";
+          a.textContent = wX(value);
+          L.DomEvent.on(cell, "click", ev => {
+            L.DomEvent.stop(ev);
+            const sd = new StateDialog();
+            sd.setup(thing, operation);
+            sd.enable();
+          });
+        },
+        smallScreenHide: true
+      },
+      {
+        name: "Commands",
+        value: obj => typeof obj,
+        format: (cell, value, obj) => {
+          if (obj instanceof WasabeeLink) {
+            const rev = L.DomUtil.create("a", null, cell);
+            rev.href = "#";
+            rev.textContent = "Reverse";
+            L.DomEvent.on(rev, "click", ev => {
+              L.DomEvent.stop(ev);
+              operation.reverseLink(obj.fromPortalId, obj.toPortalId);
+            });
+          } else {
+            cell.textContent = "";
+          }
         }
       }
     ];

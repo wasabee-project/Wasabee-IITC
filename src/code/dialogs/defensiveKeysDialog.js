@@ -4,6 +4,7 @@ import WasabeeMe from "../me";
 import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
+import WasabeeDList from "./wasabeeDlist";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -21,9 +22,8 @@ const DefensiveKeysDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet();
     this._operation = getSelectedOperation();
-    const context = this;
     this._pch = portal => {
-      context._portalClickedHook(portal);
+      this._portalClickedHook(portal);
     };
     window.addHook("portalSelected", this._pch);
 
@@ -39,8 +39,10 @@ const DefensiveKeysDialog = WDialog.extend({
   _portalClickedHook: function() {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
-      this._portal.innerHTML = "";
-      this._portal.appendChild(this._selectedPortal.displayFormat());
+      this._portal.textContent = "";
+      this._portal.appendChild(
+        this._selectedPortal.displayFormat(this._smallScreen)
+      );
       const mine = this._getMyData(this._selectedPortal.id);
       if (mine) {
         this._count.value = mine.Count;
@@ -50,26 +52,33 @@ const DefensiveKeysDialog = WDialog.extend({
         this._capID.value = "";
       }
     } else {
-      this._portal.innerHTML = wX("PLEASE_SELECT_PORTAL");
+      this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
   },
 
   _buildContent: function() {
-    this._content = L.DomUtil.create("div", "temp-op-dialog");
-    this._portal = L.DomUtil.create("div", "", this._content);
+    this._content = L.DomUtil.create("div", "container");
+    this._portal = L.DomUtil.create("div", "portal", this._content);
 
-    const d = L.DomUtil.create("div", "", this._content);
-    this._count = L.DomUtil.create("input", "", d);
-    this._count.setAttribute("placeholder", "number of keys");
+    this._count = L.DomUtil.create("input", null, this._content);
+    this._count.placeholder = "number of keys";
     this._count.size = 3;
-    const dd = L.DomUtil.create("div", "", this._content);
-    this._capID = L.DomUtil.create("input", "", dd);
-    this._capID.setAttribute("placeholder", "Capsule ID");
+    this._capID = L.DomUtil.create("input", null, this._content);
+    this._capID.placeholder = "Capsule ID";
     this._capID.size = 8;
-    const addDKeyButton = L.DomUtil.create("a", "", this._content);
-    addDKeyButton.innerHTML = wX("UPDATE_COUNT");
-    L.DomEvent.on(addDKeyButton, "click", () => {
+    const addDKeyButton = L.DomUtil.create("button", null, this._content);
+    addDKeyButton.textContent = wX("UPDATE_COUNT");
+    L.DomEvent.on(addDKeyButton, "click", ev => {
+      L.DomEvent.stop(ev);
       this._addDKey();
+    });
+
+    const showDKeyButton = L.DomUtil.create("button", null, this._content);
+    showDKeyButton.textContent = wX("D_SHOW_LIST");
+    L.DomEvent.on(showDKeyButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      const dl = new WasabeeDList();
+      dl.enable();
     });
 
     this._portalClickedHook();
@@ -80,12 +89,9 @@ const DefensiveKeysDialog = WDialog.extend({
       title: wX("INPUT_DT_KEY_COUNT"),
       width: "auto",
       height: "auto",
-      position: {
-        my: "center top",
-        at: "center center+30"
-      },
+      // position: { my: "center top", at: "center center+30" },
       html: this._content,
-      dialogClass: "wasabee-dialog-alerts",
+      dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

@@ -3,6 +3,7 @@ import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawThings, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
+import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { sendLocation } from "./uiCommands";
@@ -28,10 +29,7 @@ window.plugin.wasabee.init = function() {
   initSelectedOperation();
   initServer();
 
-  addCSS(Wasabee.static.CSS.ui);
-  addCSS(Wasabee.static.CSS.main);
-  addCSS(Wasabee.static.CSS.toastr);
-  addCSS(Wasabee.static.CSS.leafletdraw);
+  addCSS("main", Wasabee.static.CSS.main);
 
   Wasabee.portalLayerGroup = new L.LayerGroup();
   Wasabee.linkLayerGroup = new L.LayerGroup();
@@ -82,15 +80,16 @@ window.plugin.wasabee.init = function() {
   initCrossLinks();
   initWasabeeD();
 
-  Wasabee.sendLocation =
-    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
-  if (Wasabee.sendLocation === undefined) {
-    window.plugin.wasabee.sendLocation = false;
-    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = false;
+  const sl = localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
+  if (sl !== "true") {
+    console.log(sl);
+    console.log("resetting sendlocation to false");
+    localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = "false";
   }
 
   // once everything else is done, do the initial draw
   addButtons(Wasabee._selectedOp);
+  setupToolbox();
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
   if (window.VALID_HOOKS.includes("wasabeeCrosslinks"))
     window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
@@ -98,8 +97,16 @@ window.plugin.wasabee.init = function() {
     window.runHooks("wasabeeDkeys");
 };
 
-const addCSS = content => {
-  $("head").append('<style type="text/css">\n' + content + "\n</style>");
+const addCSS = (name, content) => {
+  const c = L.DomUtil.create("style", null, document.head);
+  c.textContent = content;
+  c.id = "wasabee-css-" + name;
+
+  /* not used yet -- for future theme support */
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(content);
+  // adoptedStyleSheets is frozen, can't use .push(); just overwrite w/ all
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 };
 
 const initGoogleAPI = () => {

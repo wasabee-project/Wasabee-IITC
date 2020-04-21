@@ -1,18 +1,15 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
-import store from "../../lib/store";
 import {
   GetWasabeeServer,
+  SetWasabeeServer,
   SetTeamState,
-  locationPromise,
-  logoutPromise,
   leaveTeamPromise,
   newTeamPromise
 } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
-import AboutDialog from "./about";
 import TeamMembershipList from "./teamMembershipList";
 import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
@@ -59,10 +56,11 @@ const WasabeeDialog = WDialog.extend({
         format: (row, value, team) => {
           const link = L.DomUtil.create("a", null, row);
           link.href = "#";
-          link.innerHTML = value;
+          link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", () => {
+            L.DomEvent.on(link, "click", ev => {
+              L.DomEvent.stop(ev);
               const td = new TeamMembershipList();
               td.setup(team.ID);
               td.enable();
@@ -77,7 +75,7 @@ const WasabeeDialog = WDialog.extend({
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           let curstate = obj.State;
-          link.innerHTML = curstate;
+          link.textContent = curstate;
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             await this.toggleTeam(obj.ID, curstate);
@@ -89,11 +87,12 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("LEAVE"),
         value: team => team.State,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.innerHTML = "Leave";
-          L.DomEvent.on(link, "click", () => {
+          link.textContent = wX("LEAVE");
+          L.DomEvent.on(link, "click", ev => {
+            L.DomEvent.stop(ev);
             const cd = new ConfirmDialog();
             cd.setup(
               `Leave ${obj.Name}?`,
@@ -118,14 +117,15 @@ const WasabeeDialog = WDialog.extend({
       {
         name: wX("MANAGE"),
         value: team => team.ID,
-        sort: (a, b) => a.localeCompare(b),
+        sort: null,
         format: (row, value, obj) => {
           row.textContent = "";
           for (const ot of this._me.OwnedTeams) {
             if (obj.State == "On" && ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
               link.textContent = wX("MANAGE");
-              L.DomEvent.on(link, "click", () => {
+              L.DomEvent.on(link, "click", ev => {
+                L.DomEvent.stop(ev);
                 const mtd = new ManageTeamDialog();
                 mtd.setup(ot);
                 mtd.enable();
@@ -137,40 +137,18 @@ const WasabeeDialog = WDialog.extend({
     ];
     teamlist.sortBy = 0;
 
-    const html = L.DomUtil.create("div", "temp-op-dialog");
-    this.serverInfo = L.DomUtil.create("div", "", html);
-    this.serverInfo.innerHTML = "Server: " + GetWasabeeServer() + "<br/><br/>";
-    L.DomEvent.on(this.serverInfo, "click", this.setServer);
-
-    const options = L.DomUtil.create("div", "temp-op-dialog", html);
-    const locbutton = L.DomUtil.create("a", null, options);
-    locbutton.style.align = "center";
-    locbutton.textContent = wX("SEND_LOC");
-    L.DomEvent.on(locbutton, "click", () => {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          locationPromise(
-            position.coords.latitude,
-            position.coords.longitude
-          ).then(
-            () => {
-              alert(wX("LOC_PROC"));
-            },
-            err => {
-              console.log(err);
-            }
-          );
-        },
-        err => {
-          console.log(err);
-          console.log("unable to get location");
-        }
-      );
+    const container = L.DomUtil.create("div", "container");
+    const serverInfo = L.DomUtil.create("button", "server", container);
+    serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
+    serverInfo.href = "#";
+    L.DomEvent.on(serverInfo, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.setServer();
     });
 
-    html.appendChild(teamlist.table);
+    container.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
-    return html;
+    return container;
   },
 
   _displayDialog: function() {
@@ -180,27 +158,10 @@ const WasabeeDialog = WDialog.extend({
         width: "auto",
         height: "auto",
         html: this._buildContent(),
-        dialogClass: "wasabee-dialog-mustauth",
+        dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
         buttons: {
           OK: () => {
             this._dialog.dialog("close");
-          },
-          About: () => {
-            const ad = new AboutDialog();
-            ad.enable();
-          },
-          "Log out": () => {
-            logoutPromise().then(
-              () => {
-                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-                window.runHooks("wasabeeDkeys");
-                this._dialog.dialog("close");
-              },
-              err => {
-                alert(err);
-                console.log(err);
-              }
-            );
           },
           "New Team": () => {
             const p = new PromptDialog(window.map);
@@ -212,7 +173,7 @@ const WasabeeDialog = WDialog.extend({
               }
               newTeamPromise(newname).then(
                 () => {
-                  alert(wX("TEAM_CREATED"));
+                  alert(wX("TEAM_CREATED", newname));
                   window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                 },
                 reject => {
@@ -258,15 +219,13 @@ const WasabeeDialog = WDialog.extend({
     const serverDialog = new PromptDialog(window.map);
     serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
       if (serverDialog.inputField.value) {
-        store.set(
-          window.plugin.wasabee.static.constants.SERVER_BASE_KEY,
-          serverDialog.inputField.value
-        );
-        store.remove(window.plugin.wasabee.static.constants.AGENT_INFO_KEY);
+        SetWasabeeServer(serverDialog.inputField.value);
+        WasabeeMe.purge();
       }
     });
     serverDialog.current = GetWasabeeServer();
-    serverDialog.placeholder = "https://server.wasabee.rocks/";
+    serverDialog.placeholder =
+      window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
     serverDialog.enable();
   }
 });

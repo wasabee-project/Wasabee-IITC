@@ -4,7 +4,10 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
+import { updateOpPromise } from "./server";
+// import wX from "./wX";
 
+// this should be in statics.js
 const DEFAULT_OPERATION_COLOR = "groupa";
 
 export default class WasabeeOp {
@@ -85,10 +88,21 @@ export default class WasabeeOp {
     return this.containsLinkFromTo(link.fromPortalId, link.toPortalId);
   }
 
-  containsMarker(portal, markerType) {
+  // unused
+  /* containsMarker(portal, markerType) {
     if (this.markers.length == 0) return false;
     for (const m of this.markers) {
       if (m.portalId == portal.id && m.type == markerType) {
+        return true;
+      }
+    }
+    return false;
+  } */
+
+  containsMarkerByID(portalID, markerType) {
+    if (this.markers.length == 0) return false;
+    for (const m of this.markers) {
+      if (m.portalId == portalID && m.type == markerType) {
         return true;
       }
     }
@@ -151,6 +165,42 @@ export default class WasabeeOp {
       }
     }
     this.update(true);
+  }
+
+  setMarkerState(markerID, state) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.state = state;
+      }
+    }
+    this.update(true);
+  }
+
+  setLinkState(linkID, state) {
+    for (const v of this.links) {
+      if (v.ID == linkID) {
+        v.state = state;
+      }
+    }
+    this.update(true);
+  }
+
+  setPortalComment(portal, comment) {
+    for (const p of this.opportals) {
+      if (p.id == portal.id) {
+        p.comment = comment;
+        this.update(true);
+      }
+    }
+  }
+
+  setPortalHardness(portal, hardness) {
+    for (const p of this.opportals) {
+      if (p.id == portal.id) {
+        p.hardness = hardness;
+        this.update(true);
+      }
+    }
   }
 
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)
@@ -242,7 +292,7 @@ export default class WasabeeOp {
       }
     }
 
-    // ensue unique
+    // ensure unique
     /* this should be faster, test when I get a moment
      finalPortals = newPortals.filter((value, index, self) => {
        return self.indexOf(value) === index;
@@ -287,6 +337,10 @@ export default class WasabeeOp {
   }
 
   addLink(fromPortal, toPortal, description, order) {
+    if (!fromPortal || !toPortal) {
+      console.log("missing portal for link");
+      return;
+    }
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."
@@ -418,20 +472,17 @@ export default class WasabeeOp {
   }
 
   addMarker(markerType, portal, comment) {
-    if (portal) {
-      if (!this.containsMarker(portal, markerType)) {
-        this.addPortal(portal);
-        const marker = new WasabeeMarker(markerType, portal.id, comment);
-        this.markers.push(marker);
-        this.update(true);
-        this.runCrosslinks();
-      } else {
-        alert("This portal already has a marker. Chose a different portal.");
-      }
-    }
+    if (!portal) return;
+    // if (!this.containsMarker(portal, markerType)) {
+    this.addPortal(portal);
+    const marker = new WasabeeMarker(markerType, portal.id, comment);
+    this.markers.push(marker);
+    this.update(true);
+    // only need this for virus/destroy
+    this.runCrosslinks();
+    // } else alert(wX("ALREADY_HAS_MARKER"));
   }
 
-  // strictly speaking, this doesn't do anything since the server does it all, but this is for UI changes real-time
   assignMarker(id, gid) {
     for (const v of this.markers) {
       if (v.ID == id) {
@@ -459,18 +510,65 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  clearAllLinks() {
+    this.links = Array();
+    this.blockers = Array();
+    this.cleanAnchorList();
+    this.cleanPortalList();
+    this.update(true);
+  }
+
   // call update to save the op and redraw everything on the map
-  update(updateLocalchanged) {
+  update(updateLocalchanged = true) {
+    // batchmode skips all this, for bulk adding links/etc
     if (this._batchmode === true) return;
-    if (updateLocalchanged) {
-      if (window.plugin.wasabee.battleMode) {
-        console.log("would push to server...");
-      } else {
-        this.localchanged = true;
+
+    if (this.fetched) {
+      // server op
+      if (updateLocalchanged) {
+        // caller requested store (default)
+        const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
+        const mode = localStorage[modeKey];
+        if (mode == "active") {
+          if (!WasabeeMe.isLoggedIn()) {
+            alert("Not Logged in, disabling active mode");
+            localStorage[modeKey] = "design";
+            this.localchanged = true;
+          } else {
+            // active mode
+            this._updateOnServer();
+          }
+        } else {
+          // design mode
+          this.localchanged = true;
+        }
       }
     }
+
+    // even if not server
     this.store();
     window.runHooks("wasabeeUIUpdate", this);
+  }
+
+  // only for use by "active" mode
+  _updateOnServer() {
+    const now = Date.now();
+    if (this._AMpushed && now - this._AMpushed < 1000) {
+      this._AMpushed = now;
+      console.log("skipping active mode push");
+      return;
+    }
+
+    this._AMpushed = now;
+    updateOpPromise(this).then(
+      () => {
+        console.log("active mode change pushed", new Date().toGMTString());
+      },
+      err => {
+        console.log(err);
+        alert("Active Mode Update failed: " + err);
+      }
+    );
   }
 
   runCrosslinks() {
@@ -484,9 +582,7 @@ export default class WasabeeOp {
 
   endBatchMode() {
     this._batchmode = false;
-    this.store();
-    this.localchanged = true;
-    window.runHooks("wasabeeUIUpdate", this);
+    this.update(true);
     this.runCrosslinks();
   }
 

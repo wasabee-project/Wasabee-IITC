@@ -1,18 +1,15 @@
 export const WTooltip = L.Class.extend({
   initialize: function(map) {
     this._map = map;
-    this._popupPane = map._panes.popupPane;
+    // this._pane = map._panes.popupPane;
+    this._pane = map._panes.tooltipPane;
 
-    this._container = L.DomUtil.create(
-      "div",
-      "wasabee-tooltip",
-      this._popupPane
-    );
+    this._container = L.DomUtil.create("div", "wasabee-tooltip", this._pane);
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
   },
 
   dispose: function() {
-    this._popupPane.removeChild(this._container);
+    this._pane.removeChild(this._container);
     this._container = null;
   },
 
@@ -46,7 +43,7 @@ export const WDialog = L.Handler.extend({
     this._container = map._container;
     L.Util.extend(this.options, options);
     this._enabled = false;
-    this._smallScreen = false;
+    this._smallScreen = this._isMobile();
     this._dialog = null;
     // look for operation in options, if not set, get it
     // determine large or small screen dialog sizes
@@ -64,7 +61,14 @@ export const WDialog = L.Handler.extend({
 
   addHooks: function() {},
 
-  removeHooks: function() {}
+  removeHooks: function() {},
+
+  _isMobile: function() {
+    // return true;
+    // XXX this is a cheap hack -- determine a better check
+    if (window.plugin.userLocation) return true;
+    return false;
+  }
 });
 
 export const WButton = L.Class.extend({
@@ -78,6 +82,7 @@ export const WButton = L.Class.extend({
 
   // make sure all these bases are covered in your button
   initialize: function(map, container) {
+    console.log("Wbutton init");
     if (!map) map = window.map;
     this._map = map;
 
@@ -95,10 +100,7 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function() {
-    // called Wupdate because I think update might conflict with L.*
-    // console.log("WButton Wupdate called");
-  },
+  Wupdate: function() {},
 
   _toggleActions: function() {
     if (this._enabled) {
@@ -136,49 +138,52 @@ export const WButton = L.Class.extend({
       options.container
     );
     link.href = "#";
-    if (options.text) {
-      link.innerHTML = options.text;
-    }
+    if (options.text) link.innerHTML = options.text;
+
     if (options.buttonImage) {
-      $(link).append(
-        $("<img/>")
-          .prop("src", options.buttonImage)
-          .css("vertical-align", "middle")
-          .css("align", "center")
-      );
+      const img = L.DomUtil.create("img", "wasabee-actions-image", link);
+      img.src = options.buttonImage;
     }
-    if (options.title) {
-      link.title = options.title;
-    }
+
+    if (options.title) link.title = options.title;
+
     L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
       .on(link, "mousedown", L.DomEvent.stopPropagation)
       .on(link, "dblclick", L.DomEvent.stopPropagation)
       .on(link, "click", L.DomEvent.preventDefault)
       .on(link, "click", options.callback, options.context);
+
+    /* 
+    L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
+      .on(link, "touchstart", L.DomEvent.preventDefault)
+      .on(link, "touchstart", this.touchstart, options.context)
+      .on(link, "touchend", this.touchend, options.context); */
     return link;
   },
 
+  touchstart: function() {
+    console.log("Wbutton touchstart");
+    // console.log(ev);
+  },
+
+  touchend: function(ev) {
+    console.log("Wbutton touchend");
+    console.log(ev);
+    console.log(this);
+    if (this._enabled) {
+      this.disable();
+    } else {
+      this.enable();
+    }
+  },
+
   _disposeButton: function(button, callback) {
+    console.log("Wbutton _disposeButton");
     L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
       .off(button, "mousedown", L.DomEvent.stopPropagation)
       .off(button, "dblclick", L.DomEvent.stopPropagation)
       .off(button, "click", L.DomEvent.preventDefault)
       .off(button, "click", callback);
-  },
-
-  _createActions: function(buttons) {
-    const container = L.DomUtil.create("ul", "wasabee-actions");
-    for (const b of buttons) {
-      const li = L.DomUtil.create("li", "", container);
-      this._createButton({
-        title: b.title,
-        text: b.text,
-        container: li,
-        callback: b.callback,
-        context: b.context
-      });
-    }
-    return container;
   },
 
   _createSubActions: function(buttons) {
@@ -188,13 +193,12 @@ export const WButton = L.Class.extend({
       this._createButton({
         title: b.title,
         text: b.text,
+        buttonImage: b.img,
         container: li,
         callback: b.callback,
-        context: b.context
+        context: b.context,
+        className: "wasabee-subactions"
       });
-      // these should be in the css for wasabee-subactions now
-      li.style.setProperty("width", "auto", "important");
-      li.firstChild.style.setProperty("width", "auto", "important");
     }
     return container;
   }

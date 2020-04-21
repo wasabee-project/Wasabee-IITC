@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 
 // generic confirmation screen w/ ok and cancel buttons
 
@@ -12,8 +13,8 @@ const ConfirmDialog = WDialog.extend({
     if (!map) map = window.map;
     this.type = ConfirmDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = "No title set";
-    this._label = "No label set";
+    this._title = wX("NO_TITLE");
+    this._label = wX("NO_LABEL");
   },
 
   addHooks: function() {
@@ -29,13 +30,12 @@ const ConfirmDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
-    const confirmDialog = this;
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
       height: "auto",
       html: this._buildContent(),
-      dialogClass: "wasabee-dialog",
+      dialogClass: "wasabee-dialog wasabee-dialog-confirm",
       buttons: {
         OK: () => {
           if (this._callback) this._callback();
@@ -47,8 +47,8 @@ const ConfirmDialog = WDialog.extend({
         }
       },
       closeCallback: () => {
-        confirmDialog.disable();
-        delete confirmDialog._dialog;
+        this.disable();
+        delete this._dialog;
       }
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
@@ -62,9 +62,9 @@ const ConfirmDialog = WDialog.extend({
   },
 
   _buildContent: function() {
-    const content = L.DomUtil.create("div", "");
+    const content = L.DomUtil.create("div", "title");
     if (typeof this._label == "string") {
-      content.innerText = this._label;
+      content.textContent = this._label;
     } else {
       content.appendChild(this._label);
     }

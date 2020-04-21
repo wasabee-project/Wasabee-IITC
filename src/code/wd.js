@@ -2,6 +2,7 @@
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
 import { getAgent } from "./server";
+import wX from "./wX";
 
 // setup function
 export const initWasabeeD = () => {
@@ -137,21 +138,18 @@ const dLoadDetails = e => {
   marker.addTo(window.plugin.wasabee.defensiveLayers);
 
   window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...");
-  marker.off("click", marker.openPopup, marker);
+  marker.bindPopup("loading...", {
+    className: "wasabee-popup",
+    closeButton: false
+  });
   marker.on(
-    "click",
-    () => {
+    "click spiderfiedclick",
+    ev => {
+      L.DomEvent.stop(ev);
+      if (marker.isPopupOpen && marker.isPopupOpen()) return;
       marker.setPopupContent(getMarkerPopup(e.guid));
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.on(
-    "spiderfiedclick",
-    () => {
-      marker.setPopupContent(getMarkerPopup(e.guid));
+      if (marker._popup._wrapper)
+        marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },
@@ -184,14 +182,14 @@ const getMarkerPopup = PortalID => {
           li.appendChild(a.formatDisplay());
         } else {
           const fake = L.DomUtil.create("span", null, li);
-          fake.innerHTML = "[loading]";
+          fake.textContent = wX("LOADING");
         }
         const c = L.DomUtil.create("span", null, li);
-        c.innerHTML = `:  ${v.Count} ${v.CapID}`;
+        c.textContent = `:  ${v.Count} ${v.CapID}`;
       }
     }
   } else {
-    container.innerHTML = "No data";
+    container.textContent = wX("NO_DATA");
   }
   return container;
 };
