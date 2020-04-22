@@ -2,6 +2,7 @@ import { WButton } from "../leafletClasses";
 import MultimaxButtonControl from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";
+import OnionfieldDialog from "../dialogs/onionfield";
 import LinkDialog from "../dialogs/linkDialog";
 import wX from "../wX";
 
@@ -66,6 +67,16 @@ const LinkButton = WButton.extend({
           this.disable();
           const sb = new StarburstDialog(map);
           sb.enable();
+        },
+        context: context
+      },
+      {
+        title: "Onion/Rose",
+        text: "Onion/Rose",
+        callback: () => {
+          this.disable();
+          const o = new OnionfieldDialog(map);
+          o.enable();
         },
         context: context
       }
