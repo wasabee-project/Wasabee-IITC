@@ -99,17 +99,6 @@ const OnionfieldDialog = WDialog.extend({
     this._operation = getSelectedOperation();
     let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
-    let urp =
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ];
-    if (!urp) {
-      urp = '{"lat":-74.2,"lng":-143.4}';
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = urp;
-    }
-    this._urp = JSON.parse(urp);
   },
 
   onion: function() {
@@ -127,9 +116,11 @@ const OnionfieldDialog = WDialog.extend({
     }
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
+    // this should be a map type
     this._portalsRemaining = getAllPortalsOnScreen(this._operation);
     this._order = 1;
 
+    this._layerGroup.clearLayers();
     this._operation.startBatchMode();
     this._addLabel(this._anchor);
     this._recurser(this._anchor);
@@ -137,6 +128,7 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   _removeFromList: function(guid) {
+    // this would be cleaner if _pR were a map type
     const x = new Array();
     for (const p of this._portalsRemaining) {
       if (p.options.guid != guid) x.push(p);
@@ -147,11 +139,6 @@ const OnionfieldDialog = WDialog.extend({
   _recurser: function(one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
-
-    if (this._order > 40) {
-      console.log("went too deep, stopping");
-      return;
-    }
 
     const m = new Map();
     for (const p of this._portalsRemaining) {
@@ -171,6 +158,7 @@ const OnionfieldDialog = WDialog.extend({
       const pDist = window.map.distance(one.latLng, p._latlng);
       m.set(pDist, p.options.guid);
     }
+    // sort by distance
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.length == 0) return;
 
@@ -226,7 +214,6 @@ const OnionfieldDialog = WDialog.extend({
       if (!aBlock && !bBlock && !cBlock) {
         this._removeFromList(v);
         this._addLabel(wp);
-        // console.log(wp.name, "worked");
 
         // the longer two get added
         const longest = [a, b, c].sort(
@@ -249,7 +236,7 @@ const OnionfieldDialog = WDialog.extend({
         this._operation.setLinkColor(bID, this._color);
 
         // instead of just returing here, taking the first path it finds
-        // run both 1 and 0 first and see which goes deeper
+        // run both 2 and 1 first and see which goes deeper
         return this._recurser(longest[2]._ofsrc, longest[1]._ofsrc, wp);
       }
       // console.log(wp.name, "didn't work, trying next closest portal");
