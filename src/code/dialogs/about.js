@@ -47,7 +47,7 @@ const AboutDialog = WDialog.extend({
 
     const tips = L.DomUtil.create("div", null, html);
     tips.innerHTML =
-      "<h3>Show your love</h3><a href='https://paypal.me/pools/c/8osG170xBE'>Tip Jar@paypal</a>";
+      "<h3>Show your love</h3><a href='https://paypal.me/pools/c/8osG170xBE' target=\"_blank\">Tip Jar@paypal</a>";
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
       "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
