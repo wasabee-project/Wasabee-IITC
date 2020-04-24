@@ -303,6 +303,8 @@
   "LINK STATE": "Set link status",
   "D_SHOW_LIST": "Input Defensive Keys",
   "WASABEE_D_LIST": "Input Defensive Key Count",
+  "ONION": "Draw",
+  "SELECT_ONION_PORTALS": "Select starting portal. Layers build from the inside out.",
   "smallScreen": {
     "LOG IN": "Log In",
     "LOG_OUT": "Log Out",
