@@ -209,10 +209,15 @@
   font-weight: bolder;
 }
 
-.wasabee-popup a.enl { color: rgb(56, 142, 60) !important; }
-.wasabee-popup a.res { color: rgb(0, 135, 255) !important; }
+.wasabee-popup a.enl {
+  color: rgb(56, 142, 60) !important;
+}
+.wasabee-popup a.res {
+  color: rgb(0, 135, 255) !important;
+}
 
-.wasabee-marker-popup { }
+.wasabee-marker-popup {
+}
 .wasabee-marker-popup div.desc {
   overflow: hidden;
   white-space: nowrap;
@@ -243,13 +248,15 @@
   font-weight: initial;
 }
 
-.wasabee-marker-buttonset { }
+.wasabee-marker-buttonset {
+}
 .wasabee-marker-buttonset button {
   display: block;
   width: 100%;
 }
 
-.wasabee-agent-popup { }
+.wasabee-agent-popup {
+}
 .wasabee-agent-popup div.desc {
   overflow: hidden;
   white-space: nowrap;
@@ -263,7 +270,8 @@
   width: 100%;
 }
 
-.wasabee-anchor-popup { }
+.wasabee-anchor-popup {
+}
 .wasabee-anchor-popup div.desc {
   overflow: hidden;
   white-space: nowrap;
@@ -272,7 +280,8 @@
   padding: 0px 4px;
 }
 
-.wasabee-anchor-buttonset { }
+.wasabee-anchor-buttonset {
+}
 .wasabee-anchor-buttonset button {
   display: block;
   width: 100%;
@@ -399,12 +408,15 @@
 .wasabee-dialog-auth-buttonset button {
   margin-right: 4px;
 }
-.wasabee-dialog-blockerlist { }
+.wasabee-dialog-blockerlist {
+}
 .wasabee-dialog-confirm {
   align-items: center;
 }
-.wasabee-dialog-confirm div.title { }
-.wasabee-dialog-wdkeys { }
+.wasabee-dialog-confirm div.title {
+}
+.wasabee-dialog-wdkeys {
+}
 .wasabee-dialog-wdkeys div.container {
   display: grid;
 }
@@ -414,22 +426,26 @@
 .wasabee-dialog-wdkeys input {
   padding: 4px;
 }
-.wasabee-dialog-wdkeys button { }
+.wasabee-dialog-wdkeys button {
+}
 
-.wasabee-dialog-export { }
+.wasabee-dialog-export {
+}
 .wasabee-dialog-export textarea {
   width: 96%;
   height: 250px;
   resize: vertical;
 }
 
-.wasabee-dialog-fanfield { }
+.wasabee-dialog-fanfield {
+}
 /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-fanfield div.desc {
+  padding-top: 15px;
   grid-column-start: 1;
   grid-column-end: 7;
   padding: 4px;
@@ -437,20 +453,24 @@
 .wasabee-dialog-fanfield label {
   padding: 4px;
 }
-.wasabee-dialog-fanfield button { }
+.wasabee-dialog-fanfield button {
+}
 .wasabee-dialog-fanfield span {
   padding: 4px;
   grid-column-start: 3;
   grid-column-end: 7;
 }
-.wasabee-dialog-import { }
+.wasabee-dialog-import {
+}
 .wasabee-dialog-import textarea {
   width: 100%;
   height: 250px;
   resize: vertical;
 }
-.wasabee-dialog-keylistportal { }
-.wasabee-dialog-keyslist { }
+.wasabee-dialog-keylistportal {
+}
+.wasabee-dialog-keyslist {
+}
 .wasabee-dialog-keyslist .enough {
   color: #fff;
   font-weight: bold;
@@ -459,8 +479,10 @@
   color: #900;
   font-weight: bold;
 }
-.wasabee-dialog-linklist { }
-.wasabee-dialog-link { }
+.wasabee-dialog-linklist {
+}
+.wasabee-dialog-link {
+}
 .wasabee-dialog-link div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
@@ -537,8 +559,10 @@
   grid-column-start: 1;
   grid-column-end: 3;
 }
-.wasabee-dialog-markerlist { }
-.wasabee-dialog-multimax { }
+.wasabee-dialog-markerlist {
+}
+.wasabee-dialog-multimax {
+}
 .wasabee-dialog-multimax div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr;
@@ -551,14 +575,16 @@
 .wasabee-dialog-multimax label {
   padding: 4px;
 }
-.wasabee-dialog-multimax button { }
+.wasabee-dialog-multimax button {
+}
 .wasabee-dialog-multimax span {
   padding: 4px;
   grid-column-start: 3;
   grid-column-end: 7;
 }
 
-.wasabee-dialog-newop { }
+.wasabee-dialog-newop {
+}
 .wasabee-dialog-newop div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
@@ -658,10 +684,35 @@
   grid-column-start: 1;
   grid-column-end: 4;
 }
+
+.wasabee-dialog-onion {
+}
+.wasabee-dialog-onion div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr;
+}
+.wasabee-dialog-onion div.desc {
+  padding-top: 15px;
+  grid-column-start: 1;
+  grid-column-end: 7;
+  padding: 4px;
+}
+.wasabee-dialog-onion label {
+  padding: 4px;
+}
+.wasabee-dialog-onion button {
+}
+.wasabee-dialog-onion span {
+  padding: 4px;
+  grid-column-start: 3;
+  grid-column-end: 7;
+}
+
 .wasabee-dialog-starburst label {
   padding: 4px;
 }
-.wasabee-dialog-starburst button { }
+.wasabee-dialog-starburst button {
+}
 .wasabee-dialog-starburst div.anchor {
   padding: 4px;
 }
@@ -690,7 +741,7 @@
 }
 
 .wasabee-portal-hardness a {
-  color: #F00 !important;
+  color: #f00 !important;
 }
 
 /* in our dialogs and popups, use a darker green for ENL for better contrast */
@@ -709,17 +760,42 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
  */
 
 /* marker color */
-.CapturePortalMarker { color: #7d7d7d; }
-.LetDecayPortalAlert { color: #000000; } 
-.DestroyPortalAlert { color: #CE3B37; }
-.FarmPortalMarker { color: #f17030; }
-.GotoPortalMarker { color: #e235a9; }
-.GetKeyPortalMarker { color: #78b32c; }
-.CreateLinkAlert { color: #0a5d00; }
-.MeetAgentPortalMarker { color: #6b553d; }
-.OtherPortalAlert { color: #3c3c3c; }
-.RechargePortalAlert { color: #298566; }
-.UpgradePortalAlert { color: #298566; }
-.UseVirusPortalAlert { color: #400080; }
-.ExcludeMarker { color: #000099; }
-
+.CapturePortalMarker {
+  color: #7d7d7d;
+}
+.LetDecayPortalAlert {
+  color: #000000;
+}
+.DestroyPortalAlert {
+  color: #ce3b37;
+}
+.FarmPortalMarker {
+  color: #f17030;
+}
+.GotoPortalMarker {
+  color: #e235a9;
+}
+.GetKeyPortalMarker {
+  color: #78b32c;
+}
+.CreateLinkAlert {
+  color: #0a5d00;
+}
+.MeetAgentPortalMarker {
+  color: #6b553d;
+}
+.OtherPortalAlert {
+  color: #3c3c3c;
+}
+.RechargePortalAlert {
+  color: #298566;
+}
+.UpgradePortalAlert {
+  color: #298566;
+}
+.UseVirusPortalAlert {
+  color: #400080;
+}
+.ExcludeMarker {
+  color: #000099;
+}
