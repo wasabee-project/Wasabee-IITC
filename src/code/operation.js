@@ -185,6 +185,15 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  setLinkColor(linkID, color) {
+    for (const v of this.links) {
+      if (v.ID == linkID) {
+        v.color = color;
+      }
+    }
+    this.update(true);
+  }
+
   setPortalComment(portal, comment) {
     for (const p of this.opportals) {
       if (p.id == portal.id) {
@@ -339,13 +348,13 @@ export default class WasabeeOp {
   addLink(fromPortal, toPortal, description, order) {
     if (!fromPortal || !toPortal) {
       console.log("missing portal for link");
-      return;
+      return null;
     }
     if (fromPortal.id === toPortal.id) {
       console.log(
         "Operation: Ignoring link where source and target are the same portal."
       );
-      return;
+      return null;
     }
 
     this.addAnchor(fromPortal);
@@ -362,6 +371,7 @@ export default class WasabeeOp {
         "Link Already Exists In Operation -> " + JSON.stringify(link)
       );
     }
+    return link.ID;
   }
 
   containsAnchor(portalId) {
