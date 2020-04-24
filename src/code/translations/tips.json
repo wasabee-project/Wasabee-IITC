@@ -19,6 +19,6 @@
     "LOGOUT_FAIL": "If you try to log out and get any sort of failure, click the download button. This will force the server to recognize you are not logged in and reset your status. You will be able to log on and continue work.",
     "FIREFOX_SUCKS": "If you are using firefox, you should be aware that there are many issues with how that browser handles many of the features of Wasabee. Issues will be handled as possible, but for the best experience you are advised to move to Chrome.",
     "COMPENSATION": "If you are enjoying the project, please '<a href=\"https://paypal.me/pools/c/8osG170xBE\" target=\"_blank\">click here<\/a>' and make a small donation.",
-    "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS.
+    "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS."
  }
 }
