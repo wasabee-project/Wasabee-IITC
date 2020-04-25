@@ -13,15 +13,17 @@ const OnionfieldDialog = WDialog.extend({
 
   addHooks: function() {
     if (!this._map) return;
+    // requires newer leaflet, poke user to upgrade their IITC
+    if (!this._map.distance) {
+      alert("Requires IITC 0.30.1 or newer");
+      return;
+    }
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-    this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Onion Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
     WDialog.prototype.removeHooks.call(this);
-    window.removeLayerGroup(this._layerGroup);
   },
 
   _displayDialog: function() {
@@ -117,45 +119,57 @@ const OnionfieldDialog = WDialog.extend({
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
     // this should be a map type
-    this._portalsRemaining = getAllPortalsOnScreen(this._operation);
-    this._order = 1;
+    const allPortals = getAllPortalsOnScreen(this._operation);
 
-    this._layerGroup.clearLayers();
     this._operation.startBatchMode();
-    this._addLabel(this._anchor);
-    this._recurser(this._anchor);
+    this._operation.addPortal(this._anchor);
+    const onion = this._recurser(allPortals, [], this._anchor);
+    // XXX there is probably some cute JS construct to do this more quickly
+    for (const link of onion) {
+      this._operation.links.push(link);
+    }
+    this._operation.cleanPortalList();
     this._operation.endBatchMode();
   },
 
-  _removeFromList: function(guid) {
-    // this would be cleaner if _pR were a map type
+  // no longer operates on a a class var, different paths have different lists
+  _removeFromList: function(portalsRemaining, guid) {
     const x = new Array();
-    for (const p of this._portalsRemaining) {
+    for (const p of portalsRemaining) {
       if (p.options.guid != guid) x.push(p);
     }
-    this._portalsRemaining = x;
+    return x;
   },
 
-  _recurser: function(one, two, three) {
+  _recurser: function(portalsRemaining, thisPath, one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
 
     const m = new Map();
-    for (const p of this._portalsRemaining) {
+    for (const p of portalsRemaining) {
       if (p.options.guid == one.id) {
-        this._removeFromList(p.options.guid);
+        portalsRemaining = this._removeFromList(
+          portalsRemaining,
+          p.options.guid
+        );
         continue;
       }
       if (two && p.options.guid == two.id) {
-        this._removeFromList(p.options.guid);
+        portalsRemaining = this._removeFromList(
+          portalsRemaining,
+          p.options.guid
+        );
         continue;
       }
       if (three && p.options.guid == three.id) {
-        this._removeFromList(p.options.guid);
+        portalsRemaining = this._removeFromList(
+          portalsRemaining,
+          p.options.guid
+        );
         continue;
       }
 
-      const pDist = window.map.distance(one.latLng, p._latlng);
+      const pDist = this._map.distance(one.latLng, p._latlng);
       m.set(pDist, p.options.guid);
     }
     // sort by distance
@@ -165,106 +179,100 @@ const OnionfieldDialog = WDialog.extend({
     for (const [k, v] of sorted) {
       this._trash = k;
       const wp = WasabeePortal.get(v);
+      this._operation.addPortal(wp);
 
       // do the intial field
       if (!two) {
-        this._removeFromList(v);
-        this._addLabel(wp);
-        const aID = this._operation.addLink(
-          one,
-          wp,
-          "First Link",
-          this._order++
-        );
-        this._operation.setLinkColor(aID, this._color);
-        return this._recurser(one, wp);
+        portalsRemaining = this._removeFromList(portalsRemaining, v);
+        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        a.color = this._color;
+        a.throwOrderPos = 1;
+        thisPath.push(a);
+        return this._recurser(portalsRemaining, thisPath, one, wp);
       }
       if (!three) {
-        this._removeFromList(v);
-        this._addLabel(wp);
-        const aID = this._operation.addLink(
-          two,
-          wp,
-          "Second Link",
-          this._order++
-        );
-        this._operation.setLinkColor(aID, this._color);
-        const bID = this._operation.addLink(
-          wp,
-          one,
-          "Third Link",
-          this._order++
-        );
-        this._operation.setLinkColor(bID, this._color);
-        return this._recurser(one, two, wp);
+        portalsRemaining = this._removeFromList(portalsRemaining, v);
+        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        a.color = this._color;
+        a.throwOrderPos = 2;
+        thisPath.push(a);
+        const b = new WasabeeLink(this._operation, two.id, wp.id);
+        b.color = this._color;
+        b.throwOrderPos = 3;
+        thisPath.push(b);
+        // now we are bootstrapped, dive in
+        return this._recurser(portalsRemaining, thisPath, one, two, wp);
       }
       // initial field done
 
-      this._operation.addPortal(wp);
       const a = new WasabeeLink(this._operation, one.id, wp.id);
-      if (!a._ofsrc) a._ofsrc = one;
       const b = new WasabeeLink(this._operation, two.id, wp.id);
-      if (!b._ofsrc) b._ofsrc = two;
       const c = new WasabeeLink(this._operation, three.id, wp.id);
-      if (!c._ofsrc) c._ofsrc = three;
-      const aBlock = this._testBlock(a);
-      const bBlock = this._testBlock(b);
-      const cBlock = this._testBlock(c);
+      a.color = this._color;
+      b.color = this._color;
+      c.color = this._color;
+      const aBlock = this._testBlock(thisPath, a);
+      const bBlock = this._testBlock(thisPath, b);
+      const cBlock = this._testBlock(thisPath, c);
 
       if (!aBlock && !bBlock && !cBlock) {
-        this._removeFromList(v);
-        this._addLabel(wp);
+        portalsRemaining = this._removeFromList(portalsRemaining, v);
 
-        // the longer two get added
-        const longest = [a, b, c].sort(
-          (a, b) => a.length(this._operation) - b.length(this.operation)
-        );
+        let Y = one;
+        let Z = two;
+        const angOneTwo = this._angle(wp, one, two);
+        const angTwoThree = this._angle(wp, two, three);
+        const angThreeOne = this._angle(wp, three, one);
+        if (angOneTwo >= angTwoThree && angOneTwo >= angThreeOne) {
+          Y = one;
+          Z = two;
+          thisPath.push(a);
+          a.throwOrderPos = thisPath.length;
+          thisPath.push(b);
+          b.throwOrderPos = thisPath.length;
+        } else if (angTwoThree >= angThreeOne) {
+          Y = two;
+          Z = three;
+          thisPath.push(b);
+          b.throwOrderPos = thisPath.length;
+          thisPath.push(c);
+          c.throwOrderPos = thisPath.length;
+        } else {
+          Y = three;
+          Z = one;
+          thisPath.push(c);
+          c.throwOrderPos = thisPath.length;
+          thisPath.push(a);
+          a.throwOrderPos = thisPath.length;
+        }
 
-        const aID = this._operation.addLink(
-          longest[2]._ofsrc,
-          wp,
-          null,
-          this._order++
-        );
-        this._operation.setLinkColor(aID, this._color);
-        const bID = this._operation.addLink(
-          longest[1]._ofsrc,
-          wp,
-          null,
-          this._order++
-        );
-        this._operation.setLinkColor(bID, this._color);
-
-        // instead of just returing here, taking the first path it finds
-        // run both 2 and 1 first and see which goes deeper
-        return this._recurser(longest[2]._ofsrc, longest[1]._ofsrc, wp);
+        // XXX instead of just returing here, taking the first path it finds
+        // run both Y and Z first and see which goes deeper
+        return this._recurser(portalsRemaining, thisPath, Y, Z, wp);
       }
-      // console.log(wp.name, "didn't work, trying next closest portal");
     }
-    // console.log("hit bottom");
-    return;
+    return thisPath;
   },
 
-  _addLabel: function(p) {
-    if (!this._curLabel) this._curLabel = 1;
-    const label = L.marker(p.latLng, {
-      icon: L.divIcon({
-        className: "plugin-portal-names",
-        iconAnchor: [15],
-        iconSize: [30, 12],
-        html: this._curLabel
-      }),
-      guid: p.id
-    });
-    label.addTo(this._layerGroup);
-    this._curLabel += 1;
-  },
-
-  _testBlock: function(incoming) {
-    for (const against of this._operation.links) {
-      if (greatCircleArcIntersect(against, incoming)) return true;
+  _testBlock: function(current, testing) {
+    for (const against of current) {
+      if (greatCircleArcIntersect(against, testing)) return true;
     }
     return false;
+  },
+
+  // angle a<bc
+  _angle: function(a, b, c) {
+    // this formua finds b, swap a&b for our purposes
+    const A = this._map.project(b.latLng || b._latlng);
+    const B = this._map.project(a.latLng || a._latlng);
+    const C = this._map.project(c.latLng || c._latlng);
+
+    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    const Z = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+    return Z;
   }
 });
 
