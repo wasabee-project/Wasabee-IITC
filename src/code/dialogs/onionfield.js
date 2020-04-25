@@ -129,6 +129,7 @@ const OnionfieldDialog = WDialog.extend({
       this._operation.links.push(link);
     }
     this._operation.cleanPortalList();
+    this._operation.cleanAnchorList();
     this._operation.endBatchMode();
   },
 
