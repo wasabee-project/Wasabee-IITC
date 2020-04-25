@@ -255,17 +255,11 @@ export default class WasabeeOp {
 
   cleanAnchorList() {
     const newAnchorList = [];
-    for (const a of this.anchors) {
-      let foundAnchor = false;
-      for (const l of this.links) {
-        if (l.fromPortalId == a || l.toPortalId == a) {
-          foundAnchor = true;
-        }
-      }
-
-      if (foundAnchor) {
-        newAnchorList.push(a);
-      }
+    for (const l of this.links) {
+      if (!newAnchorList.includes(l.fromPortalId))
+        newAnchorList.push(l.fromPortalId);
+      if (!newAnchorList.includes(l.toPortalId))
+        newAnchorList.push(l.toPortalId);
     }
     this.anchors = newAnchorList;
   }
