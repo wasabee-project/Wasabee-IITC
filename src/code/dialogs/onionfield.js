@@ -142,10 +142,19 @@ const OnionfieldDialog = WDialog.extend({
     return x;
   },
 
+  // the data passing for this (portalsRemaining, thisPath)
+  // is designed to allow for determining optimum path, the fast route is quick
+  // and gets a reasonable set, optimum path determination is VERY slow and nets
+  // only a few extra layers
   _recurser: function(portalsRemaining, thisPath, one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
+    if (this._color.name == "self-block") {
+      this._colorIterator = (this._colorIterator + 1) % this._colors.length;
+      this._color = this._colors[this._colorIterator];
+    }
 
+    // build a map of all portals still in-play
     const m = new Map();
     for (const p of portalsRemaining) {
       if (p.options.guid == one.id) {
@@ -177,14 +186,20 @@ const OnionfieldDialog = WDialog.extend({
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.length == 0) return;
 
+    // for each of the portals in play
     for (const [k, v] of sorted) {
+      // silence lint
       this._trash = k;
+
+      // convert to wasabee portal
       const wp = WasabeePortal.get(v);
       if (!wp || !wp.id) {
-        console.log("IITC confused again..?", wp);
+        console.log("IITC has not loaded portal data for:", wp);
         continue;
       }
+      // we need it in the op (this prevents dupes) for links later 
       this._operation.addPortal(wp);
+      // unused ones will be purged at the end
 
       // do the intial field
       if (!two) {
@@ -210,21 +225,26 @@ const OnionfieldDialog = WDialog.extend({
       }
       // initial field done
 
+      // create the three links, this does not add them to the operation
       const a = new WasabeeLink(this._operation, one.id, wp.id);
       const b = new WasabeeLink(this._operation, two.id, wp.id);
       const c = new WasabeeLink(this._operation, three.id, wp.id);
       a.color = this._color;
       b.color = this._color;
       c.color = this._color;
+
+      // testBlock does not look in the op or live map data, but in thisPath
       const aBlock = this._testBlock(thisPath, a);
       const bBlock = this._testBlock(thisPath, b);
       const cBlock = this._testBlock(thisPath, c);
 
+      // if none of the links are blocked by existing linkes in thisPath, we found an option
       if (!aBlock && !bBlock && !cBlock) {
         portalsRemaining = this._removeFromList(portalsRemaining, v);
 
         let Y = one;
         let Z = two;
+	// determine the widest angle, wp<YZ, use that
         const angOneTwo = this._angle(wp, one, two);
         const angTwoThree = this._angle(wp, two, three);
         const angThreeOne = this._angle(wp, three, one);
@@ -235,6 +255,7 @@ const OnionfieldDialog = WDialog.extend({
           a.throwOrderPos = thisPath.length;
           thisPath.push(b);
           b.throwOrderPos = thisPath.length;
+	  // XXX add back-link to c if requested
         } else if (angTwoThree >= angThreeOne) {
           Y = two;
           Z = three;
@@ -242,6 +263,7 @@ const OnionfieldDialog = WDialog.extend({
           b.throwOrderPos = thisPath.length;
           thisPath.push(c);
           c.throwOrderPos = thisPath.length;
+	  // XXX add back-link to a if requested
         } else {
           Y = three;
           Z = one;
@@ -249,12 +271,13 @@ const OnionfieldDialog = WDialog.extend({
           c.throwOrderPos = thisPath.length;
           thisPath.push(a);
           a.throwOrderPos = thisPath.length;
+	  // XXX add back-link to b if requested
         }
 
         // allow users to turn this on if they want...
         if (
-          localStorage["feelingStupid"] &&
-          localStorage["feelingStupid"] == "I feel stupid!"
+          localStorage["wasabee-onion-recursive"] &&
+          localStorage["wasabee-onion-recursive"] == "slowAF"
         ) {
           // you might find 2 or 3 more layers on a small field, but it takes an hour to run
           // two is enough, three gets crazy even with a small number of portals
@@ -276,6 +299,7 @@ const OnionfieldDialog = WDialog.extend({
           if (pathTwo.length > pathOne.lenght) return pathTwo;
           return pathOne;
         }
+	// default to the fast mode, which gets gets us 90+% in my testing
         return this._recurser(portalsRemaining, thisPath, Y, Z, wp);
       }
     }
@@ -283,6 +307,7 @@ const OnionfieldDialog = WDialog.extend({
     return thisPath;
   },
 
+  // looks only at links in current (not op or live data)
   _testBlock: function(current, testing) {
     for (const against of current) {
       if (greatCircleArcIntersect(against, testing)) return true;
@@ -290,7 +315,7 @@ const OnionfieldDialog = WDialog.extend({
     return false;
   },
 
-  // angle a<bc
+  // angle a<bc in radians
   _angle: function(a, b, c) {
     // this formua finds b, swap a&b for our purposes
     const A = this._map.project(b.latLng || b._latlng);
