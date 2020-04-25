@@ -179,6 +179,10 @@ const OnionfieldDialog = WDialog.extend({
     for (const [k, v] of sorted) {
       this._trash = k;
       const wp = WasabeePortal.get(v);
+      if (!wp || !wp.id) {
+        console.log("IITC confused again..?", wp);
+        continue;
+      }
       this._operation.addPortal(wp);
 
       // do the intial field
@@ -246,11 +250,35 @@ const OnionfieldDialog = WDialog.extend({
           a.throwOrderPos = thisPath.length;
         }
 
-        // XXX instead of just returing here, taking the first path it finds
-        // run both Y and Z first and see which goes deeper
+        // allow users to turn this on if they want...
+        if (
+          localStorage["feelingStupid"] &&
+          localStorage["feelingStupid"] == "I feel stupid!"
+        ) {
+          // you might find 2 or 3 more layers on a small field, but it takes an hour to run
+          // two is enough, three gets crazy even with a small number of portals
+          const pathOne = this._recurser(
+            new Array(...portalsRemaining),
+            new Array(...thisPath),
+            Y,
+            Z,
+            wp
+          );
+          const pathTwo = this._recurser(
+            new Array(...portalsRemaining),
+            new Array(...thisPath),
+            Z,
+            Y,
+            wp
+          );
+          // console.log(pathOne.length, pathTwo.length);
+          if (pathTwo.length > pathOne.lenght) return pathTwo;
+          return pathOne;
+        }
         return this._recurser(portalsRemaining, thisPath, Y, Z, wp);
       }
     }
+    // console.log("hit bottom", thisPath.length);
     return thisPath;
   },
 
