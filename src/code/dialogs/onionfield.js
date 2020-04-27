@@ -104,9 +104,6 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   onion: function() {
-    // where we put the links
-    this._links = new Map();
-
     if (!this._anchor) {
       alert("no anchor selected");
       return;
@@ -118,22 +115,27 @@ const OnionfieldDialog = WDialog.extend({
     }
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
-    // this should be a map type
     const allPortals = getAllPortalsOnScreen(this._operation);
 
-    this._operation.startBatchMode();
+    // add the anchor to the operation, needed to check for crosslinks
     this._operation.addPortal(this._anchor);
+    // start digging for onions
     const onion = this._recurser(allPortals, [], this._anchor);
-    // XXX there is probably some cute JS construct to do this more quickly
-    for (const link of onion) {
-      this._operation.links.push(link);
-    }
-    this._operation.cleanPortalList();
+
+    // batch mode isn't strictly necessary since we are loading the links in one operation
+    this._operation.startBatchMode();
+    // add all the found links at once
+    // this is a minor abuse of the _operation object since we aren't using the  operation.addLink() method to add links
+    this._operation.links.push(...onion);
+    // that didn't add the anchors, so we have to do that here
     this._operation.cleanAnchorList();
+    // now, remove the portals that are unused
+    this._operation.cleanPortalList();
+    // signal to the operation that we are done abusing it
     this._operation.endBatchMode();
   },
 
-  // no longer operates on a a class var, different paths have different lists
+  // no longer operates on a a class var, different paths (if not using the fast route) have different lists
   _removeFromList: function(portalsRemaining, guid) {
     const x = new Array();
     for (const p of portalsRemaining) {
@@ -197,7 +199,7 @@ const OnionfieldDialog = WDialog.extend({
         console.log("IITC has not loaded portal data for:", wp);
         continue;
       }
-      // we need it in the op (this prevents dupes) for links later 
+      // we need it in the op (this prevents dupes) for links later
       this._operation.addPortal(wp);
       // unused ones will be purged at the end
 
@@ -244,7 +246,7 @@ const OnionfieldDialog = WDialog.extend({
 
         let Y = one;
         let Z = two;
-	// determine the widest angle, wp<YZ, use that
+        // determine the widest angle, wp<YZ, use that
         const angOneTwo = this._angle(wp, one, two);
         const angTwoThree = this._angle(wp, two, three);
         const angThreeOne = this._angle(wp, three, one);
@@ -255,7 +257,7 @@ const OnionfieldDialog = WDialog.extend({
           a.throwOrderPos = thisPath.length;
           thisPath.push(b);
           b.throwOrderPos = thisPath.length;
-	  // XXX add back-link to c if requested
+          // XXX add back-link to c if requested
         } else if (angTwoThree >= angThreeOne) {
           Y = two;
           Z = three;
@@ -263,7 +265,7 @@ const OnionfieldDialog = WDialog.extend({
           b.throwOrderPos = thisPath.length;
           thisPath.push(c);
           c.throwOrderPos = thisPath.length;
-	  // XXX add back-link to a if requested
+          // XXX add back-link to a if requested
         } else {
           Y = three;
           Z = one;
@@ -271,7 +273,7 @@ const OnionfieldDialog = WDialog.extend({
           c.throwOrderPos = thisPath.length;
           thisPath.push(a);
           a.throwOrderPos = thisPath.length;
-	  // XXX add back-link to b if requested
+          // XXX add back-link to b if requested
         }
 
         // allow users to turn this on if they want...
@@ -299,7 +301,7 @@ const OnionfieldDialog = WDialog.extend({
           if (pathTwo.length > pathOne.lenght) return pathTwo;
           return pathOne;
         }
-	// default to the fast mode, which gets gets us 90+% in my testing
+        // default to the fast route, which gets gets us 90+% in my testing
         return this._recurser(portalsRemaining, thisPath, Y, Z, wp);
       }
     }
