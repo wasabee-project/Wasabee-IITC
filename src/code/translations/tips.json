@@ -19,6 +19,10 @@
     "LOGOUT_FAIL": "If you try to log out and get any sort of failure, click the download button. This will force the server to recognize you are not logged in and reset your status. You will be able to log on and continue work.",
     "FIREFOX_SUCKS": "If you are using firefox, you should be aware that there are many issues with how that browser handles many of the features of Wasabee. Issues will be handled as possible, but for the best experience you are advised to move to Chrome.",
     "COMPENSATION": "If you are enjoying the project, please '<a href=\"https://paypal.me/pools/c/8osG170xBE\" target=\"_blank\">click here<\/a>' and make a small donation.",
+    "WAIT_TIME": "Some fields take a while to calculate. After pressing draw, please be patient.",
+    "OLD_IITC": "Disclaimer:  Full functionality requires  iitc-ce v0.30 or newer found at iitc.app. Most features are backwards compatible, but not all are. As always no guarantees. Chrome is the recommended browser.",
+    "TESTING": "Have you found an issue or want to suggest a feature? Consider joining our telegram testers group '<a href=\"https://t.me/joinchat/PQGX2xo17HW3TLrANBPA3g\" target=\"_blank\">here<\/a>' or submit a request '<a href=\"https://forms.gle/3jsSHhtJyMv3cpwL9\" target=\"_blank\">here<\/a>'.",
+    "BATTLE_MODE": "If you are running an operation with multiple agents, Battle Mode can push notifications of changes to agents on telegram. Just click the bee>settings and change mode to battle.",
     "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS."
  }
 }
