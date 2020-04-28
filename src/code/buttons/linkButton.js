@@ -82,8 +82,8 @@ const LinkButton = WButton.extend({
         context: context
       },
       {
-        title: "Homogenious",
-        text: "Homogenious",
+        title: "Homogeneous",
+        text: "H-Genius",
         callback: () => {
           this.disable();
           const h = new HomogeneousDialog(map);
