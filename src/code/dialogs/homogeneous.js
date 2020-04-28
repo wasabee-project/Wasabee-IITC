@@ -1,0 +1,375 @@
+import { WDialog } from "../leafletClasses";
+import WasabeePortal from "../portal";
+import { getSelectedOperation } from "../selectedOp";
+import { greatCircleArcIntersect } from "../crosslinks";
+// import WasabeeLink from "../link";
+import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
+import wX from "../wX";
+
+const HomogeneousDialog = WDialog.extend({
+  statics: {
+    TYPE: "HomogeneousDialog"
+  },
+
+  addHooks: function() {
+    if (!this._map) return;
+    // requires newer leaflet, poke user to upgrade their IITC
+    if (!this._map.distance) {
+      alert("Requires IITC 0.30.1 or newer");
+      return;
+    }
+    WDialog.prototype.addHooks.call(this);
+    this._displayDialog();
+  },
+
+  removeHooks: function() {
+    WDialog.prototype.removeHooks.call(this);
+  },
+
+  _displayDialog: function() {
+    if (!this._map) return;
+
+    const container = L.DomUtil.create("div", "container");
+    const description = L.DomUtil.create("div", "desc", container);
+    description.textContent = wX("SELECT_ONION_PORTALS");
+
+    const anchorLabelOne = L.DomUtil.create("label", null, container);
+    anchorLabelOne.textContent = wX("ANCHOR_PORTAL");
+    const anchorButtonOne = L.DomUtil.create("button", null, container);
+    anchorButtonOne.textContent = wX("SET");
+    this._anchorDisplayOne = L.DomUtil.create("span", null, container);
+    if (this._anchorOne) {
+      this._anchorDisplayOne.appendChild(
+        this._anchorOne.displayFormat(this._smallScreen)
+      );
+    } else {
+      this._anchorDisplayOne.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorButtonOne, "click", ev => {
+      L.DomEvent.stop(ev);
+      this._anchorOne = WasabeePortal.getSelected();
+      if (this._anchorOne) {
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        this._anchorDisplayOne.textContent = "";
+        this._anchorDisplayOne.appendChild(
+          this._anchorOne.displayFormat(this._smallScreen)
+        );
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+
+    const anchorLabelTwo = L.DomUtil.create("label", null, container);
+    anchorLabelTwo.textContent = wX("ANCHOR_PORTAL");
+    const anchorButtonTwo = L.DomUtil.create("button", null, container);
+    anchorButtonTwo.textContent = wX("SET");
+    this._anchorDisplayTwo = L.DomUtil.create("span", null, container);
+    if (this._anchorTwo) {
+      this._anchorDisplayTwo.appendChild(
+        this._anchorTwo.displayFormat(this._smallScreen)
+      );
+    } else {
+      this._anchorDisplayTwo.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorButtonTwo, "click", ev => {
+      L.DomEvent.stop(ev);
+      this._anchorTwo = WasabeePortal.getSelected();
+      if (this._anchorTwo) {
+        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        this._anchorDisplayTwo.textContent = "";
+        this._anchorDisplayTwo.appendChild(
+          this._anchorTwo.displayFormat(this._smallScreen)
+        );
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+
+    const anchorLabelThree = L.DomUtil.create("label", null, container);
+    anchorLabelThree.textContent = wX("ANCHOR_PORTAL");
+    const anchorButtonThree = L.DomUtil.create("button", null, container);
+    anchorButtonThree.textContent = wX("SET");
+    this._anchorDisplayThree = L.DomUtil.create("span", null, container);
+    if (this._anchorThree) {
+      this._anchorDisplayThree.appendChild(
+        this._anchorThree.displayFormat(this._smallScreen)
+      );
+    } else {
+      this._anchorDisplayThree.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchorButtonThree, "click", ev => {
+      L.DomEvent.stop(ev);
+      this._anchorThree = WasabeePortal.getSelected();
+      if (this._anchorThree) {
+        localStorage["wasabee-anchor-3"] = JSON.stringify(this._anchorThree);
+        this._anchorDisplayThree.textContent = "";
+        this._anchorDisplayThree.appendChild(
+          this._anchorThree.displayFormat(this._smallScreen)
+        );
+      } else {
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+
+    const depthLabel = L.DomUtil.create("label", null, container);
+    depthLabel.textContent = "Max Depth";
+    this.depthMenu = L.DomUtil.create("select", null, container);
+    let dc = 2;
+    while (dc <= 6) {
+      const depthOption = L.DomUtil.create("option", null, this.depthMenu);
+      depthOption.vaue = dc;
+      depthOption.textContent = dc;
+      dc++;
+    } // no need for an event, we will read the value directly below
+
+    // Bottom buttons bar
+    // Enter arrow
+    const opt = L.DomUtil.create("label", "arrow", container);
+    opt.textContent = "\u21b3";
+    // Go button
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("ONION");
+    L.DomEvent.on(button, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.hfield.call(this);
+    });
+
+    this._dialog = window.dialog({
+      title: "Homogeneous",
+      width: "auto",
+      height: "auto",
+      html: container,
+      dialogClass: "wasabee-dialog wasabee-dialog-homogeneous",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
+      },
+      buttons: {
+        OK: () => {
+          this._dialog.dialog("close");
+        },
+        "Clear Links": () => {
+          clearAllLinks(getSelectedOperation());
+        }
+      }
+    });
+  },
+
+  initialize: function(map, options) {
+    if (!map) map = window.map;
+    this.type = HomogeneousDialog.TYPE;
+    WDialog.prototype.initialize.call(this, map, options);
+    this.title = "Homogeneous";
+    this.label = "Homogeneous";
+    this._operation = getSelectedOperation();
+    let p = localStorage["wasabee-anchor-1"];
+    if (p) this._anchorOne = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-2"];
+    if (p) this._anchorTwo = WasabeePortal.create(p);
+    p = localStorage["wasabee-anchor-3"];
+    if (p) this._anchorThree = WasabeePortal.create(p);
+
+    let urp =
+      localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ];
+    if (!urp) {
+      urp = '{"lat":-74.2,"lng":-143.4}';
+      localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ] = urp;
+    }
+    this._urp = JSON.parse(urp);
+  },
+
+  hfield: function() {
+    if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
+      alert("please select three anchors");
+      return;
+    }
+    this._colors = new Array();
+    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+      this._colors.push(k);
+      this._trash = c;
+    }
+    this._colorIterator = 0;
+    this._color = this._colors[this._colorIterator];
+
+    this._operation.startBatchMode();
+    this._operation.addPortal(this._anchorOne);
+    this._operation.addPortal(this._anchorTwo);
+    this._operation.addPortal(this._anchorThree);
+    this._operation.addLink(this._anchorOne, this._anchorTwo, "Outer 1");
+    this._operation.addLink(this._anchorOne, this._anchorThree, "Outer 2");
+    this._operation.addLink(this._anchorTwo, this._anchorThree, "Outer 3");
+    this._operation.endBatchMode();
+    const portals = new Array();
+    for (const p of getAllPortalsOnScreen(this._operation)) {
+      if (
+        this._fieldCovers(
+          this._anchorOne,
+          this._anchorTwo,
+          this._anchorThree,
+          p
+        )
+      )
+        portals.push(p);
+    }
+    this._operation.startBatchMode();
+    this._recurser(
+      0,
+      portals,
+      this._anchorOne,
+      this._anchorTwo,
+      this._anchorThree
+    );
+    this._operation.endBatchMode();
+
+    // that didn't add the anchors, so we have to do that here
+    this._operation.cleanAnchorList();
+    // now, remove the portals that are unused
+    this._operation.cleanPortalList();
+  },
+
+  _recurser: function(depth, portalsCovered, one, two, three) {
+    if (depth >= this.depthMenu.value) {
+      console.log("gone too deep");
+      return;
+    }
+    this._colorIterator = (this._colorIterator + 1) % this._colors.length;
+    this._color = this._colors[this._colorIterator];
+    if (this._color.name == "self-block") {
+      this._colorIterator = (this._colorIterator + 1) % this._colors.length;
+      this._color = this._colors[this._colorIterator];
+    }
+
+    console.log(depth, "portals in consideration", portalsCovered);
+
+    // build a map of all portals coverd by field one,two,three
+    // keyed by distance to the centeroid of the field
+    // does this get us much in reality? doesn't seem like it
+    const m = new Map();
+    const center = this._getCenter(one, two, three);
+    for (const p of portalsCovered) {
+      if (p == one.id || p == two.id || p == three.id) continue;
+      const cDist = this._map.distance(center, p.latLng || p._latlng);
+      m.set(cDist, p.id || p.options.guid);
+    }
+    // sort by distance to centeroid the field
+    const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
+    if (sorted.length == 0) return;
+
+    // find the portal that divides the area into regions with the closest number of portals
+    // starts at the center-most and works outwards
+    let differential = portalsCovered.length;
+    let best = [];
+    let bestp = {};
+    // for each of the portals in play
+    for (const [k, v] of sorted) {
+      // silence lint
+      this._trash = k;
+      // convert to wasabee portal
+      const wp = WasabeePortal.get(v);
+      if (!wp || !wp.id) {
+        console.log("IITC has not loaded portal data for:", v);
+        continue;
+      }
+      const subregions = this._getSubregions(
+        wp,
+        new Array(...portalsCovered),
+        one,
+        two,
+        three
+      );
+      // one of the regions didn't have enough
+      if (!subregions) continue;
+      // is this one better than the previous?
+      // smallest difference in the number of portals between the greatest and least, 0 being ideal
+      const temp =
+        Math.max(
+          subregions[0].length,
+          subregions[1].length,
+          subregions[2].length
+        ) -
+        Math.min(
+          subregions[0].length,
+          subregions[1].length,
+          subregions[2].length
+        );
+      if (temp < differential) {
+        best = subregions;
+        differential = temp;
+        bestp = wp;
+      }
+      // found one with equal number of portals in all 3, quit digging
+      // if (differential == 0) break;
+    }
+    console.log("best balance: ", bestp.name, differential, best);
+    this._operation.addLink(one, bestp);
+    this._operation.addLink(two, bestp);
+    this._operation.addLink(three, bestp);
+
+    depth++;
+    console.log("going deeper");
+    if (best[0]) {
+      console.log("region one", one.name, two.name, bestp.name);
+      this._recurser(depth, new Array(...best[0]), one, two, bestp);
+    }
+    if (best[1]) {
+      console.log("region two", two.name, three.name, bestp.name);
+      this._recurser(depth, new Array(...best[1]), two, three, bestp);
+    }
+    if (best[2]) {
+      console.log("region three", three.name, one.name, bestp.name);
+      this._recurser(depth, new Array(...best[2]), one, three, bestp);
+    }
+  },
+
+  _getSubregions: function(centerPoint, possibles, one, two, three) {
+    this._operation.addPortal(centerPoint);
+
+    const onePortals = new Array();
+    for (const p of possibles) {
+      if (this._fieldCovers(one, two, centerPoint, p)) onePortals.push(p);
+    }
+
+    const twoPortals = new Array();
+    for (const p of possibles) {
+      if (this._fieldCovers(two, three, centerPoint, p)) twoPortals.push(p);
+    }
+
+    const threePortals = new Array();
+    for (const p of possibles) {
+      if (this._fieldCovers(three, one, centerPoint, p)) threePortals.push(p);
+    }
+
+    return [onePortals, twoPortals, threePortals];
+  },
+
+  _getCenter: function(a, b, c) {
+    const A = this._map.project(a.latLng || a._latlng);
+    const B = this._map.project(b.latLng || b._latlng);
+    const C = this._map.project(c.latLng || c._latlng);
+
+    const point = L.point((A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3);
+    return this._map.unproject(point);
+  },
+
+  _fieldCovers: function(a, b, c, test) {
+    const unreachableMapPoint = this._urp;
+    const p = test.latLng || test.getLatLng();
+
+    const urp = L.polyline([unreachableMapPoint, p]);
+    const lab = L.polyline([a.latLng, b.latLng]);
+    const lac = L.polyline([a.latLng, c.latLng]);
+    const lbc = L.polyline([c.latLng, b.latLng]);
+
+    let crossings = 0;
+    if (greatCircleArcIntersect(urp, lab)) crossings++;
+    if (greatCircleArcIntersect(urp, lac)) crossings++;
+    if (greatCircleArcIntersect(urp, lbc)) crossings++;
+    return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
+  }
+});
+
+export default HomogeneousDialog;
