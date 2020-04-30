@@ -180,9 +180,11 @@ const HomogeneousDialog = WDialog.extend({
       ] = urp;
     }
     this._urp = JSON.parse(urp);
+    this._failed = 0;
   },
 
   hfield: function() {
+    this._failed = 0;
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
       alert("please select three anchors");
       return;
@@ -192,8 +194,6 @@ const HomogeneousDialog = WDialog.extend({
       this._colors.push(k);
       this._trash = c;
     }
-    this._colorIterator = 0;
-    this._color = this._colors[this._colorIterator];
 
     this._operation.startBatchMode();
     this._operation.addPortal(this._anchorOne);
@@ -217,7 +217,7 @@ const HomogeneousDialog = WDialog.extend({
     }
     this._operation.startBatchMode();
     this._recurser(
-      0,
+      1,
       portals,
       this._anchorOne,
       this._anchorTwo,
@@ -225,25 +225,24 @@ const HomogeneousDialog = WDialog.extend({
     );
     this._operation.endBatchMode();
 
-    // that didn't add the anchors, so we have to do that here
-    this._operation.cleanAnchorList();
+    // this._operation.cleanAnchorList();
     // now, remove the portals that are unused
     this._operation.cleanPortalList();
+    if (this._failed > 0) {
+      alert(
+        `Unable to find ${this._failed} splits, try less depth or a different region`
+      );
+    }
   },
 
   _recurser: function(depth, portalsCovered, one, two, three) {
     if (depth >= this.depthMenu.value) {
-      console.log("gone too deep");
+      // console.log("gone too deep");
       return;
     }
-    this._colorIterator = (this._colorIterator + 1) % this._colors.length;
-    this._color = this._colors[this._colorIterator];
-    if (this._color.name == "self-block") {
-      this._colorIterator = (this._colorIterator + 1) % this._colors.length;
-      this._color = this._colors[this._colorIterator];
-    }
+    this._color = this._colors[depth % this._colors.length];
 
-    console.log(depth, "portals in consideration", portalsCovered);
+    // console.log(depth, "portals in consideration", portalsCovered);
 
     // build a map of all portals coverd by field one,two,three
     // keyed by distance to the centeroid of the field
@@ -304,23 +303,35 @@ const HomogeneousDialog = WDialog.extend({
       // found one with equal number of portals in all 3, quit digging
       // if (differential == 0) break;
     }
-    console.log("best balance: ", bestp.name, differential, best);
-    this._operation.addLink(one, bestp);
-    this._operation.addLink(two, bestp);
-    this._operation.addLink(three, bestp);
+
+    if (best.length == 0) {
+      console.log("hit bottom first");
+      this._failed++;
+      return;
+    }
+
+    // console.log("best balance: ", bestp.name, differential, best);
+    let linkID = this._operation.addLink(one, bestp);
+    this._operation.setLinkColor(linkID, this._color);
+    linkID = this._operation.addLink(two, bestp);
+    this._operation.setLinkColor(linkID, this._color);
+    linkID = this._operation.addLink(three, bestp);
+    this._operation.setLinkColor(linkID, this._color);
 
     depth++;
-    console.log("going deeper");
+    // console.log("going deeper");
+    if (depth == this.depthMenu.value) return;
+
     if (best[0]) {
-      console.log("region one", one.name, two.name, bestp.name);
+      // console.log("region one", one.name, two.name, bestp.name);
       this._recurser(depth, new Array(...best[0]), one, two, bestp);
     }
     if (best[1]) {
-      console.log("region two", two.name, three.name, bestp.name);
+      // console.log("region two", two.name, three.name, bestp.name);
       this._recurser(depth, new Array(...best[1]), two, three, bestp);
     }
     if (best[2]) {
-      console.log("region three", three.name, one.name, bestp.name);
+      // console.log("region three", three.name, one.name, bestp.name);
       this._recurser(depth, new Array(...best[2]), one, three, bestp);
     }
   },
