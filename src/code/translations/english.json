@@ -205,6 +205,7 @@
   "PICK_TARGETDEST_Portals": "Please select target and destination portals first!",
   "PLEASE_SELECT_PORTAL": "Please select a portal",
   "PORTAL": "Portal",
+  "PORTAL_COUNT": "${value} portals",
   "PORT_FAKE": " portals. Faked ",
   "QD BUTTON END": "Click to stop drawing fields",
   "QD END": "End",

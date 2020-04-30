@@ -437,8 +437,7 @@
   resize: vertical;
 }
 
-.wasabee-dialog-fanfield {
-}
+.wasabee-dialog-fanfield { }
 /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
@@ -460,6 +459,29 @@
   grid-column-start: 3;
   grid-column-end: 7;
 }
+
+.wasabee-dialog-homogeneous { }
+.wasabee-dialog-homogeneous div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr;
+}
+.wasabee-dialog-homogeneous div.desc {
+  padding-top: 15px;
+  grid-column-start: 1;
+  grid-column-end: 7;
+  padding: 4px;
+}
+.wasabee-dialog-homogeneous label {
+  padding: 4px;
+}
+.wasabee-dialog-homogeneous button {
+}
+.wasabee-dialog-homogeneous span {
+  padding: 4px;
+  grid-column-start: 3;
+  grid-column-end: 7;
+}
+
 .wasabee-dialog-import {
 }
 .wasabee-dialog-import textarea {
