@@ -561,6 +561,29 @@
 }
 .wasabee-dialog-markerlist {
 }
+
+.wasabee-dialog-madrid {
+}
+.wasabee-dialog-madrid div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr;
+}
+.wasabee-dialog-madrid div.desc {
+  grid-column-start: 1;
+  grid-column-end: 7;
+  padding: 4px;
+}
+.wasabee-dialog-madrid label {
+  padding: 4px;
+}
+.wasabee-dialog-madrid button {
+}
+.wasabee-dialog-madrid span {
+  padding: 4px;
+  grid-column-start: 3;
+  grid-column-end: 7;
+}
+
 .wasabee-dialog-multimax {
 }
 .wasabee-dialog-multimax div.container {

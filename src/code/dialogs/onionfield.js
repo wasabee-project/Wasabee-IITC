@@ -159,21 +159,11 @@ const OnionfieldDialog = WDialog.extend({
     // build a map of all portals still in-play
     const m = new Map();
     for (const p of portalsRemaining) {
-      if (p.options.guid == one.id) {
-        portalsRemaining = this._removeFromList(
-          portalsRemaining,
-          p.options.guid
-        );
-        continue;
-      }
-      if (two && p.options.guid == two.id) {
-        portalsRemaining = this._removeFromList(
-          portalsRemaining,
-          p.options.guid
-        );
-        continue;
-      }
-      if (three && p.options.guid == three.id) {
+      if (
+        (two && p.options.guid == two.id) ||
+        (three && p.options.guid == three.id) ||
+        p.options.guid == one.id
+      ) {
         portalsRemaining = this._removeFromList(
           portalsRemaining,
           p.options.guid
