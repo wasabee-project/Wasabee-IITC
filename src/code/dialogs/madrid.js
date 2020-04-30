@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import { getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
 
@@ -51,10 +52,21 @@ const MadridDialog = MultimaxDialog.extend({
     setOneButton.textContent = wX("SET");
     this._setOneDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetOne) {
-      this._setOneDisplay = wX("PORTAL_COUNT", this._portalSetOne.length);
+      this._setOneDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetOne.length
+      );
     } else {
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
+    L.DomEvent.on(setOneButton, "click", () => {
+      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      console.log(this._portalSetOne);
+      this._setOneDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetOne.length
+      );
+    });
 
     const anchorTwoLabel = L.DomUtil.create("label", null, container);
     anchorTwoLabel.textContent = wX("ANCHOR2");
@@ -79,6 +91,28 @@ const MadridDialog = MultimaxDialog.extend({
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
+    });
+
+    const setTwoLabel = L.DomUtil.create("label", null, container);
+    setTwoLabel.textContent = wX("MADRID_SET_1");
+    const setTwoButton = L.DomUtil.create("button", null, container);
+    setTwoButton.textContent = wX("SET");
+    this._setTwoDisplay = L.DomUtil.create("span", null, container);
+    if (this._portalSetTwo) {
+      this._setTwoDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetTwo.length
+      );
+    } else {
+      this._setTwoDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(setTwoButton, "click", () => {
+      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
+      console.log(this._portalSetTwo);
+      this._setTwoDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetTwo.length
+      );
     });
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
@@ -106,6 +140,28 @@ const MadridDialog = MultimaxDialog.extend({
       }
     });
 
+    const setThreeLabel = L.DomUtil.create("label", null, container);
+    setThreeLabel.textContent = wX("MADRID_SET_1");
+    const setThreeButton = L.DomUtil.create("button", null, container);
+    setThreeButton.textContent = wX("SET");
+    this._setThreeDisplay = L.DomUtil.create("span", null, container);
+    if (this._portalSetThree) {
+      this._setThreeDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetThree.length
+      );
+    } else {
+      this._setThreeDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(setThreeButton, "click", () => {
+      this._portalSetThree = getAllPortalsOnScreen(this._operation);
+      console.log(this._portalSetThree);
+      this._setThreeDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetThree.length
+      );
+    });
+
     // Bottom buttons bar
     // Enter arrow
     const opt = L.DomUtil.create("label", "arrow", container);
@@ -116,8 +172,8 @@ const MadridDialog = MultimaxDialog.extend({
     button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMadrid.call(this);
-      alert(`Multimax found ${total} layers`);
-      this._dialog.dialog("close");
+      alert(`Madrid found ${total} layers`);
+      // this._dialog.dialog("close");
     });
 
     const fllabel = L.DomUtil.create("label", null, container);
@@ -206,16 +262,20 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     let len = 0;
-    len += this.madridMM(this._anchorOne, this._anchorTwo, this._portalSetOne);
+    len += this.madridMM(
+      this._anchorOne,
+      this._anchorTwo,
+      this._portalSetThree
+    );
     len += this.madridMM(
       this._anchorTwo,
       this._anchorThree,
-      this._portalSetTwo
+      this._portalSetOne
     );
     len += this.madridMM(
       this._anchorThree,
       this._anchorOne,
-      this._portalSetThree
+      this._portalSetTwo
     );
     this._operation.endBatchMode(); // save and run crosslinks
     return len;
