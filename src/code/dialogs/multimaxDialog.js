@@ -174,6 +174,10 @@ const MultimaxDialog = WDialog.extend({
 
     for (const node of sequence) {
       let p = WasabeePortal.get(node);
+      if (!p) {
+        console.log("data not loaded, skipping: " + node);
+        continue;
+      }
       if (this._flcheck.checked && prev) {
         this._operation.addLink(
           prev,
@@ -182,11 +186,6 @@ const MultimaxDialog = WDialog.extend({
           order + 3
         );
         order--;
-      }
-      if (!p) {
-        console.log("skipping: " + node);
-        continue;
-        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
       }
       this._operation.addLink(
         p,
