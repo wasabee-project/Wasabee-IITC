@@ -61,7 +61,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setOneButton, "click", () => {
       this._portalSetOne = getAllPortalsOnScreen(this._operation);
-      console.log(this._portalSetOne);
+      // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
         "PORTAL_COUNT",
         this._portalSetOne.length
@@ -94,7 +94,7 @@ const MadridDialog = MultimaxDialog.extend({
     });
 
     const setTwoLabel = L.DomUtil.create("label", null, container);
-    setTwoLabel.textContent = wX("MADRID_SET_1");
+    setTwoLabel.textContent = wX("MADRID_SET_2");
     const setTwoButton = L.DomUtil.create("button", null, container);
     setTwoButton.textContent = wX("SET");
     this._setTwoDisplay = L.DomUtil.create("span", null, container);
@@ -108,7 +108,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setTwoButton, "click", () => {
       this._portalSetTwo = getAllPortalsOnScreen(this._operation);
-      console.log(this._portalSetTwo);
+      // XXX cache
       this._setTwoDisplay.textContent = wX(
         "PORTAL_COUNT",
         this._portalSetTwo.length
@@ -117,31 +117,11 @@ const MadridDialog = MultimaxDialog.extend({
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
     anchorThreeLabel.textContent = wX("ANCHOR3");
-    const anchorThreeButton = L.DomUtil.create("button", null, container);
-    anchorThreeButton.textContent = wX("SET");
-    this._anchorThreeDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchorThree) {
-      this._anchorThreeDisplay.appendChild(
-        this._anchorThree.displayFormat(this._smallScreen)
-      );
-    } else {
-      this._anchorThreeDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorThreeButton, "click", () => {
-      this._anchorThree = WasabeePortal.getSelected();
-      if (this._anchorThree) {
-        localStorage["wasabee-anchor-3"] = JSON.stringify(this._anchorThree);
-        this._anchorThreeDisplay.textContent = "";
-        this._anchorThreeDisplay.appendChild(
-          this._anchorThree.displayFormat(this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    const anchorThreeDisplay = L.DomUtil.create("span", null, container);
+    anchorThreeDisplay.textContent = "Auto-determined";
 
     const setThreeLabel = L.DomUtil.create("label", null, container);
-    setThreeLabel.textContent = wX("MADRID_SET_1");
+    setThreeLabel.textContent = wX("MADRID_SET_3");
     const setThreeButton = L.DomUtil.create("button", null, container);
     setThreeButton.textContent = wX("SET");
     this._setThreeDisplay = L.DomUtil.create("span", null, container);
@@ -155,7 +135,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setThreeButton, "click", () => {
       this._portalSetThree = getAllPortalsOnScreen(this._operation);
-      console.log(this._portalSetThree);
+      // XXX cache
       this._setThreeDisplay.textContent = wX(
         "PORTAL_COUNT",
         this._portalSetThree.length
@@ -206,9 +186,6 @@ const MadridDialog = MultimaxDialog.extend({
     if (p) this._anchorOne = WasabeePortal.create(p);
     p = localStorage["wasabee-anchor-2"];
     if (p) this._anchorTwo = WasabeePortal.create(p);
-    p = localStorage["wasabee-anchor-3"];
-    if (p) this._anchorThree = WasabeePortal.create(p);
-    this._previousOrder = 3;
 
     // the unreachable point (urp) to test from
     let urp =
@@ -233,7 +210,6 @@ const MadridDialog = MultimaxDialog.extend({
     if (
       !this._anchorOne ||
       !this._anchorTwo ||
-      !this._anchorThree ||
       !this._portalSetOne ||
       !this._portalSetTwo ||
       !this._portalSetThree
@@ -242,24 +218,7 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(
-      this._anchorOne,
-      this._anchorTwo,
-      "madrid core one",
-      1
-    );
-    this._operation.addLink(
-      this._anchorTwo,
-      this._anchorThree,
-      "madrid core two",
-      2
-    );
-    this._operation.addLink(
-      this._anchorThree,
-      this._anchorOne,
-      "madrid core three",
-      3
-    );
+    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
 
     let len = 0;
     len += this.madridMM(
@@ -267,16 +226,12 @@ const MadridDialog = MultimaxDialog.extend({
       this._anchorTwo,
       this._portalSetThree
     );
-    len += this.madridMM(
-      this._anchorTwo,
-      this._anchorThree,
-      this._portalSetOne
-    );
-    len += this.madridMM(
-      this._anchorThree,
-      this._anchorOne,
-      this._portalSetTwo
-    );
+
+    const newThree = this._prev;
+    len += this.madridMM(this._anchorTwo, newThree, this._portalSetOne);
+    // _anchorOne is no longer useful, use _prev
+    const newOne = this._prev;
+    len += this.madridMM(newThree, newOne, this._portalSetTwo);
     this._operation.endBatchMode(); // save and run crosslinks
     return len;
   },
@@ -297,18 +252,20 @@ const MadridDialog = MultimaxDialog.extend({
     // draw inner 3 links
     for (const node of sequence) {
       const p = WasabeePortal.get(node);
-      if (this._flcheck.checked && prev) {
-        this._operation.addLink(prev, p, "back link", order + 3);
-        order--;
-      }
       if (!p) {
         console.log("skipping: " + node);
         continue;
+      }
+      if (this._flcheck.checked && prev) {
+        this._operation.addLink(prev, p, "back link", order + 3);
+        order--;
       }
       this._operation.addLink(p, pOne, "madrid protocol link", order--);
       this._operation.addLink(p, pTwo, "madrid protocol link", order--);
       prev = p;
     }
+    // store the last portal in the set so we can use it as the anchor for the next set
+    this._prev = prev;
     return sequence.length;
   }
 });
