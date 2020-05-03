@@ -3,7 +3,11 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect } from "../crosslinks";
 // import WasabeeLink from "../link";
-import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
+import {
+  clearAllLinks,
+  getAllPortalsOnScreen,
+  testPortal
+} from "../uiCommands";
 import wX from "../wX";
 
 const HomogeneousDialog = WDialog.extend({
@@ -169,17 +173,7 @@ const HomogeneousDialog = WDialog.extend({
     p = localStorage["wasabee-anchor-3"];
     if (p) this._anchorThree = WasabeePortal.create(p);
 
-    let urp =
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ];
-    if (!urp) {
-      urp = '{"lat":-74.2,"lng":-143.4}';
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = urp;
-    }
-    this._urp = JSON.parse(urp);
+    this._urp = testPortal();
     this._failed = 0;
   },
 

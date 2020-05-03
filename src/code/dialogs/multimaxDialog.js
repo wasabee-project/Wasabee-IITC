@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { getAllPortalsOnScreen } from "../uiCommands";
+import { getAllPortalsOnScreen, testPortal } from "../uiCommands";
 import { greatCircleArcIntersect } from "../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
@@ -123,19 +123,7 @@ const MultimaxDialog = WDialog.extend({
     if (p) this._anchorOne = WasabeePortal.create(p);
     p = localStorage["wasabee-anchor-2"];
     if (p) this._anchorTwo = WasabeePortal.create(p);
-
-    // the unreachable point (urp) to test from
-    let urp =
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ];
-    if (!urp) {
-      urp = '{"lat":-74.2,"lng":-143.4}';
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = urp;
-    }
-    this._urp = JSON.parse(urp);
+    this._urp = testPortal();
   },
 
   doMultimax: function() {

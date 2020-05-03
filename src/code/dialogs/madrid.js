@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-import { getAllPortalsOnScreen } from "../uiCommands";
+import { getAllPortalsOnScreen, testPortal } from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
 
@@ -186,19 +186,7 @@ const MadridDialog = MultimaxDialog.extend({
     if (p) this._anchorOne = WasabeePortal.create(p);
     p = localStorage["wasabee-anchor-2"];
     if (p) this._anchorTwo = WasabeePortal.create(p);
-
-    // the unreachable point (urp) to test from
-    let urp =
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ];
-    if (!urp) {
-      urp = '{"lat":-74.2,"lng":-143.4}';
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = urp;
-    }
-    this._urp = JSON.parse(urp);
+    this._urp = testPortal();
   },
 
   // fieldCoversPortal inherited from MultimaxDialog
