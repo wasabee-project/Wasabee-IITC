@@ -47,7 +47,9 @@ const FanfieldDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchor);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)
@@ -147,7 +149,7 @@ const FanfieldDialog = WDialog.extend({
     this.title = wX("FAN_FIELD3");
     this.label = wX("FAN_FIELD3");
     this._operation = getSelectedOperation();
-    let p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
+    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
     p = localStorage["wasabee-fanfield-start"];
     if (p) this._start = WasabeePortal.create(p);

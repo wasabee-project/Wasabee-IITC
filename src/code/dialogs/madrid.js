@@ -36,7 +36,9 @@ const MadridDialog = MultimaxDialog.extend({
     L.DomEvent.on(anchorOneButton, "click", () => {
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchorOne);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
         this._anchorOneDisplay.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -83,7 +85,9 @@ const MadridDialog = MultimaxDialog.extend({
     L.DomEvent.on(anchorTwoButton, "click", () => {
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY] = JSON.stringify(this._anchorTwo);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+        ] = JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
         this._anchorTwoDisplay.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)
@@ -182,9 +186,9 @@ const MadridDialog = MultimaxDialog.extend({
     this.title = wX("MADRID");
     this.label = wX("MADRID");
     this._operation = getSelectedOperation();
-    let p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
+    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = WasabeePortal.create(p);
-    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY];
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
     this._urp = testPortal();
   },

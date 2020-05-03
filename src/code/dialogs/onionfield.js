@@ -49,7 +49,9 @@ const OnionfieldDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchor);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)
@@ -99,7 +101,8 @@ const OnionfieldDialog = WDialog.extend({
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
     this._operation = getSelectedOperation();
-    const p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
+    const p =
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
   },
 

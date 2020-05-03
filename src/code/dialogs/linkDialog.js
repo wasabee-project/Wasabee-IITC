@@ -16,9 +16,9 @@ const LinkDialog = WDialog.extend({
     let p =
       localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
     if (p) this._source = WasabeePortal.create(p);
-    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor1 = WasabeePortal.create(p);
-    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY];
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchor2 = WasabeePortal.create(p);
     /* p = localStorage["wasabee-link-prev"];
     if (p) this._prev = WasabeePortal.create(p); */
@@ -92,7 +92,9 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor1 = WasabeePortal.getSelected();
       if (this._anchor1) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchor1);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchor1);
         this._anchor1Display.textContent = "";
         this._anchor1Display.appendChild(
           this._anchor1.displayFormat(this._smallScreen)
@@ -120,7 +122,9 @@ const LinkDialog = WDialog.extend({
     clearAnchor1Button.textContent = wX("CLEAR");
     L.DomEvent.on(clearAnchor1Button, "click", ev => {
       L.DomEvent.stop(ev);
-      delete localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
+      delete localStorage[
+        window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+      ];
       this._anchor1Display.textContent = wX("NOT_SET");
     });
 
@@ -140,7 +144,9 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor2 = WasabeePortal.getSelected();
       if (this._anchor2) {
-        localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY] = JSON.stringify(this._anchor2);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+        ] = JSON.stringify(this._anchor2);
         this._anchor2Display.textContent = "";
         this._anchor2Display.appendChild(
           this._anchor2.displayFormat(this._smallScreen)
@@ -168,7 +174,9 @@ const LinkDialog = WDialog.extend({
     clearAnchor2Button.textContent = wX("CLEAR");
     L.DomEvent.on(clearAnchor2Button, "click", ev => {
       L.DomEvent.stop(ev);
-      delete localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY];
+      delete localStorage[
+        window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+      ];
       this._anchor2Display.textContent = wX("NOT_SET");
     });
 
