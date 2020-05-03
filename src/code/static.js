@@ -53,7 +53,6 @@ W.static = {
     ANCHOR_ONE_KEY: "wasabee-anchor-1",
     ANCHOR_TWO_KEY: "wasabee-anchor-2",
     ANCHOR_THREE_KEY: "wasabee-anchor-3",
-    LINK_SOURCE_KEY: "wasabee-link-source",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",
