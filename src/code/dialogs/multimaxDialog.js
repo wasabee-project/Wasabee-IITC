@@ -275,46 +275,76 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
   },
 
   longestSequence: function(poset) {
-    const out = new Array();
+    const paths = new Map();
 
-    // the recursive function
-    const recurse = () => {
-      if (poset.size == 0) return; // hit bottom
+    // Initialize longest sequences from each portal
+    for (const k of poset.keys()) {
+      paths.set(k, [k]);
+    }
 
-      let longest = "";
-      let length = 0;
+    // Duplicate the POSet with guid only
+    const guidPoset = new Map();
+    const guidRevPoset = new Map();
+    for (const [k, v] of poset) {
+      const vg = new Set(v.map(l => l.options.guid).filter(l => l != k));
+      guidPoset.set(k, vg);
+      guidRevPoset.set(k, new Set());
+    }
 
-      // let prev = null;
-      // determine the longest
-      for (const [k, v] of poset) {
-        if (v.length > length) {
-          length = v.length;
-          longest = k;
-          // TODO build array of all with this same length
-          // TODO determine which is closest to previous
-        }
-        // record previous
+    // Build the reverse POSet
+    for (const [k, v] of guidPoset) {
+      for (const l of v) {
+        guidRevPoset.get(l).add(k);
       }
-      out.push(longest);
-      const thisList = poset.get(longest);
-      poset.delete(longest);
+    }
 
-      // remove any portals not under this layer
-      // eslint-disable-next-line
-      for (const [k, v] of poset) {
-        let under = false;
-        for (const l of thisList) {
-          if (l.options.guid == k) under = true;
-        }
-        if (!under) {
-          poset.delete(k);
+    // Build set of the lowest portals (those that do not cover any portal)
+    let minPortals = new Set();
+    for (const [k, v] of guidPoset) {
+      if (v.size == 0) {
+        minPortals.add(k);
+      }
+    }
+
+    poset = guidPoset;
+
+    // Build maximal sequences by pruning the lowest portals from the poset
+    while (minPortals.size > 0) {
+      let nextMinPortals = new Set();
+
+      // For any portal, use its longer sequence to build the longer sequence of its ancestors
+      for (const l of minPortals) {
+        const path = paths.get(l);
+        const nextPortals = guidRevPoset.get(l);
+        for (const k of nextPortals) {
+          const oldPath = paths.get(k);
+          if (oldPath.length < path.length + 1) {
+            const newPath = Array.from(path);
+            newPath.push(k);
+            paths.set(k, newPath);
+            // TODO build array of all with this same length
+          }
+
+          // Update covered portals to select the next set of lowest portals
+          const coveredPortals = guidPoset.get(k);
+          coveredPortals.delete(l);
+          if (coveredPortals.size == 0) {
+            nextMinPortals.add(k);
+          }
         }
       }
-      if (poset.size == 0) return; // hit bottom
-      recurse(); // keep digging
-    };
 
-    recurse();
+      minPortals = nextMinPortals;
+    }
+
+    // Select the first longest sequence of portals
+    let out = new Array();
+    for (const path of paths.values()) {
+      if (path.length > out.length) {
+        out = path;
+      }
+    }
+
     return out;
   }
 });
