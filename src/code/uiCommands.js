@@ -199,3 +199,28 @@ const _hasMarker = function(portalid, markerType, operation) {
   }
   return false;
 };
+
+// this is the test point used in several auto-draws
+// settings allow there to be several different due to
+// rouding errors resulting from long distances
+export const testPortal = function(recursed = false) {
+  let urp =
+    localStorage[
+      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+    ];
+  if (!urp) {
+    urp = '{"lat":-74.2,"lng":-143.4}';
+    localStorage[
+      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+    ] = urp;
+  }
+  const parsed = JSON.parse(urp);
+  if (!parsed && !recursed) {
+    delete localStorage[
+      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+    ];
+    return testPortal(true);
+  }
+  // if recrused and still getting garbage, we have a problem
+  return parsed;
+};
