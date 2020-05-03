@@ -214,13 +214,19 @@ export const testPortal = function(recursed = false) {
       window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
     ] = urp;
   }
-  const parsed = JSON.parse(urp);
-  if (!parsed && !recursed) {
-    delete localStorage[
-      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-    ];
-    return testPortal(true);
+
+  let parsed = null;
+  try {
+    parsed = JSON.parse(urp);
+  } catch (err) {
+    if (!recursed) {
+      delete localStorage[
+        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
+      ];
+      return testPortal(true);
+    }
   }
+
   // if recrused and still getting garbage, we have a problem
   return parsed;
 };

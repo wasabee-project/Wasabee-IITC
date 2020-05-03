@@ -160,7 +160,6 @@ const QuickDrawControl = L.Handler.extend({
   _dynamicUpdate: function(e) {
     for (const l of this._layerGroup.getLayers()) {
       l.setLatLngs([l.options.anchorLL, e.latlng]);
-      // l.redraw();
     }
   },
 
@@ -185,9 +184,9 @@ const QuickDrawControl = L.Handler.extend({
       this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
-      localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
+      localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchor1);
 
-      this._dynamicA = L.geodesicPolyline(
+      const dynamicA = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
         {
           color: "#0f0",
@@ -199,7 +198,7 @@ const QuickDrawControl = L.Handler.extend({
           smoothFactor: 1
         }
       );
-      this._dynamicA.addTo(this._layerGroup);
+      dynamicA.addTo(this._layerGroup);
       return;
     }
     if (!this._anchor2) {
@@ -212,8 +211,8 @@ const QuickDrawControl = L.Handler.extend({
         this._throwOrder++
       );
       this._tooltip.updateContent(this._getTooltipText());
-      localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
-      this._dynamicB = L.geodesicPolyline(
+      localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY] = JSON.stringify(this._anchor2);
+      const dynamicB = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
         {
           color: "#0f0",
@@ -225,7 +224,7 @@ const QuickDrawControl = L.Handler.extend({
           smoothFactor: 1
         }
       );
-      this._dynamicB.addTo(this._layerGroup);
+      dynamicB.addTo(this._layerGroup);
       return;
     }
 

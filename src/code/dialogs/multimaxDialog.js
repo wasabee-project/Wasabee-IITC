@@ -44,7 +44,7 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorOneButton, "click", () => {
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
         this._anchorOneDisplay.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -69,7 +69,7 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorTwoButton, "click", () => {
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY] = JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
         this._anchorTwoDisplay.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)
@@ -119,9 +119,9 @@ const MultimaxDialog = WDialog.extend({
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-anchor-1"];
+    let p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = WasabeePortal.create(p);
-    p = localStorage["wasabee-anchor-2"];
+    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
     this._urp = testPortal();
   },
@@ -162,7 +162,7 @@ const MultimaxDialog = WDialog.extend({
 
     for (const node of sequence) {
       let p = WasabeePortal.get(node);
-      if (!p) {
+      if (!p || !p.lat) {
         console.log("data not loaded, skipping: " + node);
         continue;
       }

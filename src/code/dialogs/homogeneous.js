@@ -53,7 +53,7 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchorOne);
         this._anchorDisplayOne.textContent = "";
         this._anchorDisplayOne.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -79,7 +79,7 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY] = JSON.stringify(this._anchorTwo);
         this._anchorDisplayTwo.textContent = "";
         this._anchorDisplayTwo.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)
@@ -105,7 +105,7 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorThree = WasabeePortal.getSelected();
       if (this._anchorThree) {
-        localStorage["wasabee-anchor-3"] = JSON.stringify(this._anchorThree);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_THREE_KEY] = JSON.stringify(this._anchorThree);
         this._anchorDisplayThree.textContent = "";
         this._anchorDisplayThree.appendChild(
           this._anchorThree.displayFormat(this._smallScreen)
@@ -166,11 +166,11 @@ const HomogeneousDialog = WDialog.extend({
     this.title = "Homogeneous";
     this.label = "Homogeneous";
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-anchor-1"];
+    let p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = WasabeePortal.create(p);
-    p = localStorage["wasabee-anchor-2"];
+    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
-    p = localStorage["wasabee-anchor-3"];
+    p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_THREE_KEY];
     if (p) this._anchorThree = WasabeePortal.create(p);
 
     this._urp = testPortal();

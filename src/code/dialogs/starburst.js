@@ -42,7 +42,7 @@ const StarburstDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
+        localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)
@@ -92,11 +92,10 @@ const StarburstDialog = WDialog.extend({
     this.title = wX("STARBURST");
     this.label = wX("STARBURST TITLE");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-anchor-1"];
+    const p = localStorage[window.plugin.wasabee.static.constant.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
   },
 
-  // fanfiled determines the portals between start/end and their angle (and order)
   starburst: function() {
     if (!this._anchor) {
       alert("Select an anchor portal");
