@@ -49,7 +49,9 @@ const OnionfieldDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)
@@ -99,7 +101,8 @@ const OnionfieldDialog = WDialog.extend({
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-anchor-1"];
+    const p =
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
   },
 
@@ -159,21 +162,11 @@ const OnionfieldDialog = WDialog.extend({
     // build a map of all portals still in-play
     const m = new Map();
     for (const p of portalsRemaining) {
-      if (p.options.guid == one.id) {
-        portalsRemaining = this._removeFromList(
-          portalsRemaining,
-          p.options.guid
-        );
-        continue;
-      }
-      if (two && p.options.guid == two.id) {
-        portalsRemaining = this._removeFromList(
-          portalsRemaining,
-          p.options.guid
-        );
-        continue;
-      }
-      if (three && p.options.guid == three.id) {
+      if (
+        (two && p.options.guid == two.id) ||
+        (three && p.options.guid == three.id) ||
+        p.options.guid == one.id
+      ) {
         portalsRemaining = this._removeFromList(
           portalsRemaining,
           p.options.guid

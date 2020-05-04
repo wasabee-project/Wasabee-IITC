@@ -92,10 +92,17 @@ const QuickDrawControl = L.Handler.extend({
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
+    this._layerGroup = new L.LayerGroup();
+    window.addLayerGroup(
+      "Wasabee Quickdraw Dynamic Display",
+      this._layerGroup,
+      false
+    );
   },
 
   disable: function() {
     if (!this._enabled) return;
+    window.removeLayerGroup(this._layerGroup);
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
@@ -143,8 +150,17 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _onMouseMove: function(e) {
-    if (e.latlng) this._tooltip.updatePosition(e.latlng);
+    if (e.latlng) {
+      this._tooltip.updatePosition(e.latlng);
+      this._dynamicUpdate(e);
+    }
     L.DomEvent.preventDefault(e.originalEvent);
+  },
+
+  _dynamicUpdate: function(e) {
+    for (const l of this._layerGroup.getLayers()) {
+      l.setLatLngs([l.options.anchorLL, e.latlng]);
+    }
   },
 
   _getTooltipText: function() {
@@ -156,12 +172,35 @@ const QuickDrawControl = L.Handler.extend({
   _portalClicked: function() {
     const selectedPortal = WasabeePortal.getSelected();
 
-    if (!selectedPortal) return;
+    if (!selectedPortal) {
+      // XXX wX this
+      this._tooltip.updateContent(
+        "Portal data not loaded, please try again in a moment"
+      );
+      return;
+    }
 
     if (!this._anchor1) {
       this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
+      localStorage[
+        window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+      ] = JSON.stringify(this._anchor1);
+
+      const dynamicA = L.geodesicPolyline(
+        [selectedPortal.latLng, selectedPortal.latLng],
+        {
+          color: "#0f0",
+          anchorLL: selectedPortal.latLng,
+          dashArray: [8, 2],
+          opacity: 0.7,
+          weight: 5,
+          guid: selectedPortal.id,
+          smoothFactor: 1
+        }
+      );
+      dynamicA.addTo(this._layerGroup);
       return;
     }
     if (!this._anchor2) {
@@ -174,11 +213,24 @@ const QuickDrawControl = L.Handler.extend({
         this._throwOrder++
       );
       this._tooltip.updateContent(this._getTooltipText());
+      localStorage[
+        window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+      ] = JSON.stringify(this._anchor2);
+      const dynamicB = L.geodesicPolyline(
+        [selectedPortal.latLng, selectedPortal.latLng],
+        {
+          color: "#0f0",
+          anchorLL: selectedPortal.latLng,
+          dashArray: [8, 2],
+          opacity: 0.7,
+          weight: 5,
+          guid: selectedPortal.id,
+          smoothFactor: 1
+        }
+      );
+      dynamicB.addTo(this._layerGroup);
       return;
     }
-
-    localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor1);
-    localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchor2);
 
     if (selectedPortal.id in this._spinePortals) {
       return; //ignore duplicates

@@ -4,6 +4,7 @@ import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
+import MadridDialog from "../dialogs/madrid";
 import LinkDialog from "../dialogs/linkDialog";
 import wX from "../wX";
 
@@ -88,6 +89,16 @@ const LinkButton = WButton.extend({
           this.disable();
           const h = new HomogeneousDialog(map);
           h.enable();
+        },
+        context: context
+      },
+      {
+        title: "Madrid Protocol",
+        text: "Madrid Protocol",
+        callback: () => {
+          this.disable();
+          const m = new MadridDialog(map);
+          m.enable();
         },
         context: context
       }

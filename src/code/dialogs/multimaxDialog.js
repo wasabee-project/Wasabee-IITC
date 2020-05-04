@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { getAllPortalsOnScreen } from "../uiCommands";
+import { getAllPortalsOnScreen, testPortal } from "../uiCommands";
 import { greatCircleArcIntersect } from "../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
@@ -44,7 +44,9 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorOneButton, "click", () => {
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchorOne);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+        ] = JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
         this._anchorOneDisplay.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -69,7 +71,9 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorTwoButton, "click", () => {
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage["wasabee-anchor-2"] = JSON.stringify(this._anchorTwo);
+        localStorage[
+          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+        ] = JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
         this._anchorTwoDisplay.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)
@@ -119,23 +123,11 @@ const MultimaxDialog = WDialog.extend({
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
     this._operation = getSelectedOperation();
-    let p = localStorage["wasabee-anchor-1"];
+    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = WasabeePortal.create(p);
-    p = localStorage["wasabee-anchor-2"];
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
-
-    // the unreachable point (urp) to test from
-    let urp =
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ];
-    if (!urp) {
-      urp = '{"lat":-74.2,"lng":-143.4}';
-      localStorage[
-        window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
-      ] = urp;
-    }
-    this._urp = JSON.parse(urp);
+    this._urp = testPortal();
   },
 
   doMultimax: function() {
@@ -174,6 +166,10 @@ const MultimaxDialog = WDialog.extend({
 
     for (const node of sequence) {
       let p = WasabeePortal.get(node);
+      if (!p || !p.lat) {
+        console.log("data not loaded, skipping: " + node);
+        continue;
+      }
       if (this._flcheck.checked && prev) {
         this._operation.addLink(
           prev,
@@ -182,11 +178,6 @@ const MultimaxDialog = WDialog.extend({
           order + 3
         );
         order--;
-      }
-      if (!p) {
-        console.log("skipping: " + node);
-        continue;
-        // const ll = node.getLatLng(); p = WasabeePortal.fake(ll.lat, ll.lng, node);
       }
       this._operation.addLink(
         p,
@@ -235,9 +226,11 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     for (const i of visible) {
       poset.set(
         i.options.guid,
-        visible.filter(j => {
-          return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
-        })
+        visible
+          .filter(j => {
+            return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
+          })
+          .map(l => l.options.guid)
       );
     }
     return poset;
@@ -276,47 +269,24 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
   },
 
   longestSequence: function(poset) {
-    const out = new Array();
-
-    // the recursive function
-    const recurse = () => {
-      if (poset.size == 0) return; // hit bottom
-
-      let longest = "";
-      let length = 0;
-
-      // let prev = null;
-      // determine the longest
-      for (const [k, v] of poset) {
-        if (v.length > length) {
-          length = v.length;
-          longest = k;
-          // TODO build array of all with this same length
-          // TODO determine which is closest to previous
-        }
-        // record previous
+    const alreadyCalculatedSequences = new Map();
+    const sequence_from = c => {
+      if (alreadyCalculatedSequences.get(c) === undefined) {
+        let sequence = Array.from(
+          poset
+            .get(c)
+            .filter(i => i !== c)
+            .map(sequence_from)
+            .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), [])
+        );
+        sequence.push(c);
+        alreadyCalculatedSequences.set(c, sequence);
       }
-      out.push(longest);
-      const thisList = poset.get(longest);
-      poset.delete(longest);
-
-      // remove any portals not under this layer
-      // eslint-disable-next-line
-      for (const [k, v] of poset) {
-        let under = false;
-        for (const l of thisList) {
-          if (l.options.guid == k) under = true;
-        }
-        if (!under) {
-          poset.delete(k);
-        }
-      }
-      if (poset.size == 0) return; // hit bottom
-      recurse(); // keep digging
+      return alreadyCalculatedSequences.get(c);
     };
-
-    recurse();
-    return out;
+    return Array.from(poset.keys())
+      .map(sequence_from)
+      .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
   }
 });
 
