@@ -21,6 +21,12 @@ const MadridDialog = MultimaxDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
 
+    const dividerBeforePortals = L.DomUtil.create("span", null, container);
+    dividerBeforePortals.textContent = "";
+
+    const dividerBeforeButtons = L.DomUtil.create("span", null, container);
+    dividerBeforeButtons.textContent = "Select anchor portals";
+
     const anchorOneLabel = L.DomUtil.create("label", null, container);
     anchorOneLabel.textContent = wX("ANCHOR1");
     const anchorOneButton = L.DomUtil.create("button", null, container);
@@ -46,28 +52,6 @@ const MadridDialog = MultimaxDialog.extend({
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
-    });
-
-    const setOneLabel = L.DomUtil.create("label", null, container);
-    setOneLabel.textContent = wX("MADRID_SET_1");
-    const setOneButton = L.DomUtil.create("button", null, container);
-    setOneButton.textContent = wX("SET");
-    this._setOneDisplay = L.DomUtil.create("span", null, container);
-    if (this._portalSetOne) {
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
-    } else {
-      this._setOneDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation);
-      // XXX this is not enough, need to cache them in case IITC purges them
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
     });
 
     const anchorTwoLabel = L.DomUtil.create("label", null, container);
@@ -97,6 +81,42 @@ const MadridDialog = MultimaxDialog.extend({
       }
     });
 
+    /*anchor three set by the code*/
+    const anchorThreeLabel = L.DomUtil.create("label", null, container);
+    anchorThreeLabel.textContent = wX("ANCHOR3");
+    const anchorThreeDisplay = L.DomUtil.create("button", null, container);
+    anchorThreeDisplay.textContent = "Auto-determined";
+
+    const newLine2 = L.DomUtil.create("label", "newline", container);
+    newLine2.textContent = "\u0085";
+    const dividerBeforeAreas = L.DomUtil.create("span", null, container);
+    dividerBeforeAreas.textContent = "";
+
+    const dividerBetweenButtons = L.DomUtil.create("span", null, container);
+    dividerBetweenButtons.textContent = "Set up the areas";
+
+    const setOneLabel = L.DomUtil.create("label", null, container);
+    setOneLabel.textContent = wX("MADRID_SET_1");
+    const setOneButton = L.DomUtil.create("button", null, container);
+    setOneButton.textContent = wX("SET");
+    this._setOneDisplay = L.DomUtil.create("span", null, container);
+    if (this._portalSetOne) {
+      this._setOneDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetOne.length
+      );
+    } else {
+      this._setOneDisplay.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(setOneButton, "click", () => {
+      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      // XXX this is not enough, need to cache them in case IITC purges them
+      this._setOneDisplay.textContent = wX(
+        "PORTAL_COUNT",
+        this._portalSetOne.length
+      );
+    });
+
     const setTwoLabel = L.DomUtil.create("label", null, container);
     setTwoLabel.textContent = wX("MADRID_SET_2");
     const setTwoButton = L.DomUtil.create("button", null, container);
@@ -118,11 +138,6 @@ const MadridDialog = MultimaxDialog.extend({
         this._portalSetTwo.length
       );
     });
-
-    const anchorThreeLabel = L.DomUtil.create("label", null, container);
-    anchorThreeLabel.textContent = wX("ANCHOR3");
-    const anchorThreeDisplay = L.DomUtil.create("span", null, container);
-    anchorThreeDisplay.textContent = "Auto-determined";
 
     const setThreeLabel = L.DomUtil.create("label", null, container);
     setThreeLabel.textContent = wX("MADRID_SET_3");
@@ -146,6 +161,17 @@ const MadridDialog = MultimaxDialog.extend({
       );
     });
 
+    const fllabel = L.DomUtil.create("label", null, container);
+    fllabel.textContent = wX("ADD_BL");
+    this._flcheck = L.DomUtil.create("input", null, container);
+    this._flcheck.type = "checkbox";
+
+    const newLine = L.DomUtil.create("label", "newline", container);
+    const dividerBeforeDraw = L.DomUtil.create("span", null, container);
+    newLine.textContent = "\u0085";
+    dividerBeforeDraw.textContent = "";
+    dividerBeforeDraw.textContent = "";
+
     // Bottom buttons bar
     // Enter arrow
     const opt = L.DomUtil.create("label", "arrow", container);
@@ -159,11 +185,6 @@ const MadridDialog = MultimaxDialog.extend({
       alert(`Madrid found ${total} layers`);
       // this._dialog.dialog("close");
     });
-
-    const fllabel = L.DomUtil.create("label", null, container);
-    fllabel.textContent = wX("ADD_BL");
-    this._flcheck = L.DomUtil.create("input", null, container);
-    this._flcheck.type = "checkbox";
 
     this._dialog = window.dialog({
       title: wX("MADRID_TITLE"),
