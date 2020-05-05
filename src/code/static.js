@@ -70,7 +70,16 @@ W.static = {
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
     MARKER_TYPE_EXCLUDE: "ExcludeMarker",
-    DEFAULT_MARKER_TYPE: "DestroyPortalAlert"
+    DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
+    QUICKDRAW_GUIDE_STYLE: {
+      color: "#0f0",
+      dashArray: [8, 2],
+      opacity: 0.7,
+      weight: 5,
+      smoothFactor: 1,
+      clickable: false,
+      interactive: true
+    }
   }
 };
 

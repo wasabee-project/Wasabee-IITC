@@ -32,46 +32,11 @@ const QuickdrawButton = WButton.extend({
       callback: this.handler.disable,
       context: this.handler
     };
-    this._qdModeSubAction = {
-      title: "QuickDraw Mode",
-      text: "Draws one layer per click",
-      callback: this.toggleMode,
-      context: this
-    };
-    this._slModeSubAction = {
-      title: "Single Link Mode",
-      text: "Draws one link per click",
-      callback: this.toggleMode,
-      context: this
-    };
 
-    this.actionsContainer = this._createSubActions([
-      this._endSubAction
-      // this._qdModeSubAction
-    ]);
+    this.actionsContainer = this._createSubActions([this._endSubAction]);
     // this should be automaticly detected
     this.actionsContainer.style.top = "52px";
     this._container.appendChild(this.actionsContainer);
-  },
-
-  toggleMode: function() {
-    console.log(this);
-    const from = this.handler.drawMode;
-    if (from == "quickdraw") {
-      console.log("switching to single link");
-      this.handler.drawMode = "singlelink";
-      this.actionsContainer = this._createSubActions([
-        this._endSubAction,
-        this._slModeSubAction
-      ]);
-    } else {
-      console.log("switching to layers");
-      this.handler.drawMode = "quickdraw";
-      this.actionsContainer = this._createSubActions([
-        this._endSubAction,
-        this._qdModeSubAction
-      ]);
-    }
   }
 
   // Wupdate: function(container) { }
@@ -83,7 +48,7 @@ const QuickDrawControl = L.Handler.extend({
     this._container = map._container;
     this.type = "QuickDrawControl";
     this.buttonName = "quickdrawButton";
-    this.drawMode = "quickdraw";
+    this._drawMode = "quickdraw";
     L.Handler.prototype.initialize.call(this, map, options);
     L.Util.extend(this.options, options);
   },
@@ -98,18 +63,12 @@ const QuickDrawControl = L.Handler.extend({
   disable: function() {
     console.log("qd disable called");
     if (!this._enabled) return;
-
-    if (this._guideLayerGroup) {
-      window.removeLayerGroup(this._guideLayerGroup);
-      delete this._guideLayerGroup; // = null;
-      delete this._guideA; // = null;
-      delete this._guideB; // = null;
-    }
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
 
   addHooks: function() {
+    console.log("qd addHooks called");
     if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
@@ -119,6 +78,7 @@ const QuickDrawControl = L.Handler.extend({
     this._operation = getSelectedOperation();
     this._anchor1 = null;
     this._anchor2 = null;
+    this._previous = null;
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
@@ -130,17 +90,25 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   removeHooks: function() {
+    console.log("qd removeHooks called");
     if (!this._map) return;
-    delete this._anchor1;
-    delete this._anchor2;
-    delete this._spinePortals;
-    delete this._operation;
+    if (this._guideLayerGroup) {
+      window.removeLayerGroup(this._guideLayerGroup);
+      delete this._guideLayerGroup;
+    }
+    if (this._operation) delete this._operation;
+    if (this._anchor1) delete this._anchor1;
+    if (this._anchor2) delete this._anchor2;
+    if (this._previous) delete this._previous;
+    if (this._spinePortals) delete this._spinePortals;
+    if (this._guideA) delete this._guideA;
+    if (this._guideB) delete this._guideB;
 
     L.DomUtil.enableTextSelection();
     this._tooltip.dispose();
     this._tooltip = null;
-    L.DomEvent.removeListener(this._container, "keyup", this._keyUpListener);
 
+    L.DomEvent.removeListener(this._container, "keyup", this._keyUpListener);
     window.removeHook("portalSelected", this._portalClickedHook);
     this._map.off("mousemove", this._onMouseMove, this);
   },
@@ -150,8 +118,11 @@ const QuickDrawControl = L.Handler.extend({
     if (e.keyCode === 27) {
       this.disable();
     }
-    if (e.key === "/") {
+    if (e.key === "/" || e.key === "g") {
       this._guideLayerToggle();
+    }
+    if (e.key === "t" || e.key === "m") {
+      this._toggleMode();
     }
   },
 
@@ -171,6 +142,7 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _guideLayerToggle: function() {
+    console.log("toggle guide layer");
     if (!this._guideLayerGroup) {
       this._guideLayerGroup = new L.LayerGroup();
       window.addLayerGroup(
@@ -188,37 +160,38 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _getTooltipText: function() {
-    if (!this._anchor1) return { text: wX("QDSTART") };
-    if (!this._anchor2) return { text: wX("QDNEXT") };
-    return { text: wX("QDCONT") };
+    if (this._drawMode == "quickdraw") {
+      if (!this._anchor1) return { text: wX("QDSTART") };
+      if (!this._anchor2) return { text: wX("QDNEXT") };
+      return { text: wX("QDCONT") };
+    }
+    // must be in single-link mode
+    // XXX wX this
+    if (!this._previous) return { text: "Click first portal" };
+    return { text: "Click next portal" };
   },
 
   _portalClicked: function() {
     const selectedPortal = WasabeePortal.getSelected();
-
     if (!selectedPortal) {
       // XXX wX this
       this._tooltip.updateContent("Portal data not loaded, please try again");
       return;
     }
+    if (this._drawMode == "quickdraw") {
+      this._portalClickedQD(selectedPortal);
+    } else {
+      this._portalClickedSingle(selectedPortal);
+    }
+  },
 
-    // XXX move this to statics.js
-    const guideStyle = {
-      color: "#0f0",
-      dashArray: [8, 2],
-      opacity: 0.7,
-      weight: 5,
-      smoothFactor: 1,
-      clickable: false,
-      interactive: true,
-      anchorLL: selectedPortal.latLng,
-      guid: selectedPortal.id
-      // renderer: window.map._renderer
-    };
-    // anchorLL and guid (unnecessary ATM) can be added here
+  _portalClickedQD: function(selectedPortal) {
+    const guideStyle =
+      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
+    guideStyle.anchorLL = selectedPortal.latLng;
 
     if (!this._anchor1) {
-      this._throwOrder = this._operation.nextOrder;
+      // this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
@@ -271,6 +244,57 @@ const QuickDrawControl = L.Handler.extend({
       );
       this._tooltip.updateContent(this._getTooltipText());
     }
+  },
+
+  _toggleMode: function() {
+    // changing mode resets all the things
+    if (this._anchor1) delete this._anchor1;
+    if (this._anchor2) delete this._anchor2;
+    if (this._previous) delete this._anchor2;
+    if (this._spinePortals) delete this._spinePortals;
+    this._spinePortals = {};
+    if (this._guideA) delete this._guideA;
+    if (this._guideB) delete this._guideB;
+
+    if (this._drawMode == "quickdraw") {
+      console.log("switching to single link");
+      this._drawMode = "singlelink";
+    } else {
+      console.log("switching to layers");
+      this._drawMode = "quickdraw";
+    }
+    this._tooltip.updateContent(this._getTooltipText());
+  },
+
+  _portalClickedSingle: function(selectedPortal) {
+    // click the same portal twice to disable like in drawtools
+    if (this._previous && this._previous.id == selectedPortal.id) {
+      this.disable();
+      return;
+    }
+
+    // not the first portal in the chain, draw a link
+    if (this._previous) {
+      this._operation.addLink(
+        this._previous,
+        selectedPortal,
+        null,
+        this._throwOrder++
+      );
+    }
+
+    // all portals, including the first
+    const guideStyle =
+      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
+    guideStyle.anchorLL = selectedPortal.latLng;
+
+    this._guideA = L.geodesicPolyline(
+      [selectedPortal.latLng, selectedPortal.latLng],
+      guideStyle
+    );
+    if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
+    this._previous = selectedPortal;
+    this._tooltip.updateContent(this._getTooltipText());
   }
 });
 
