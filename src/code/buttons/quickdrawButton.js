@@ -99,8 +99,12 @@ const QuickDrawControl = L.Handler.extend({
     console.log("qd disable called");
     if (!this._enabled) return;
 
-    console.log(this._guideLayerGroup);
-    if (this._guideLayerGroup) window.removeLayerGroup(this._guideLayerGroup);
+    if (this._guideLayerGroup) {
+      window.removeLayerGroup(this._guideLayerGroup);
+      delete this._guideLayerGroup; // = null;
+      delete this._guideA; // = null;
+      delete this._guideB; // = null;
+    }
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
@@ -142,13 +146,12 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _keyUpListener: function(e) {
-    console.log(e);
     // [esc]
     if (e.keyCode === 27) {
       this.disable();
     }
     if (e.key === "/") {
-      this._guideLayerToggle(e);
+      this._guideLayerToggle();
     }
   },
 
@@ -167,11 +170,14 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  _guideLayerToggle: function(e) {
-    console.log(this._guideLayerGroup, e);
+  _guideLayerToggle: function() {
     if (!this._guideLayerGroup) {
       this._guideLayerGroup = new L.LayerGroup();
-      window.addLayerGroup("Wasabee Quickdraw Guide", this._guideLayerGroup, true);
+      window.addLayerGroup(
+        "Wasabee Quickdraw Guide",
+        this._guideLayerGroup,
+        true
+      );
       if (this._guideA) this._guideA.addTo(this._guideLayerGroup);
       if (this._guideB) this._guideB.addTo(this._guideLayerGroup);
     } else {
@@ -192,24 +198,24 @@ const QuickDrawControl = L.Handler.extend({
 
     if (!selectedPortal) {
       // XXX wX this
-      this._tooltip.updateContent(
-        "Portal data not loaded, please try again in a moment"
-      );
+      this._tooltip.updateContent("Portal data not loaded, please try again");
       return;
     }
 
+    // XXX move this to statics.js
     const guideStyle = {
       color: "#0f0",
-      anchorLL: selectedPortal.latLng,
       dashArray: [8, 2],
       opacity: 0.7,
       weight: 5,
-      guid: selectedPortal.id,
       smoothFactor: 1,
       clickable: false,
-      interactive: true
+      interactive: true,
+      anchorLL: selectedPortal.latLng,
+      guid: selectedPortal.id
       // renderer: window.map._renderer
     };
+    // anchorLL and guid (unnecessary ATM) can be added here
 
     if (!this._anchor1) {
       this._throwOrder = this._operation.nextOrder;
