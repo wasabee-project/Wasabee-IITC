@@ -767,9 +767,11 @@
   grid-column-end: 7;
   padding: 4px;
 }
+
 .wasabee-dialog-onion label {
   padding: 4px;
 }
+
 .wasabee-dialog-onion button {
 }
 
@@ -792,8 +794,27 @@
 .wasabee-dialog-starburst label {
   padding: 4px;
 }
+
+.wasabee-dialog-starburst blank {
+  padding: 20px;
+  width: 4px;
+  height: 4px;
+  border: 2px solid goldenrod;
+}
+
 .wasabee-dialog-starburst button {
 }
+
+.wasabee-dialog-starburst drawb {
+  border-radius: 35px;
+  border-style: groove;
+  padding: 4px;
+  width: 35px;
+  height: 35px;
+  border: 2px solid goldenrod;
+  text-align: center;
+}
+
 .wasabee-dialog-starburst div.anchor {
   padding: 4px;
 }
