@@ -481,12 +481,13 @@
 }
 
 .wasabee-dialog-homogeneous drawb {
-  border-radius: 25px;
+  border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 30px;
-  height: 20px;
+  width: 35px;
+  height: 35px;
   border: 2px solid goldenrod;
+  text-align: center;
 }
 
 .wasabee-dialog-homogeneous span {
@@ -771,6 +772,17 @@
 }
 .wasabee-dialog-onion button {
 }
+
+.wasabee-dialog-onion drawb {
+  border-radius: 35px;
+  border-style: groove;
+  padding: 4px;
+  width: 35px;
+  height: 35px;
+  border: 2px solid goldenrod;
+  text-align: center;
+}
+
 .wasabee-dialog-onion span {
   padding: 4px;
   grid-column-start: 3;

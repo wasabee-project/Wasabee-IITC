@@ -172,14 +172,12 @@ const MadridDialog = MultimaxDialog.extend({
     dividerBeforeDraw.textContent = "";
     dividerBeforeDraw.textContent = "";
 
-    // Bottom buttons bar
-    // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
+    const placeholder = L.DomUtil.create("label", "placeholder", container);
+    placeholder.textContent = "\u2063";
 
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("MADRID");
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);
