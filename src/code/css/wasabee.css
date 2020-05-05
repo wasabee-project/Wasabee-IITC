@@ -437,7 +437,8 @@
   resize: vertical;
 }
 
-.wasabee-dialog-fanfield { }
+.wasabee-dialog-fanfield {
+}
 /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
@@ -460,7 +461,8 @@
   grid-column-end: 7;
 }
 
-.wasabee-dialog-homogeneous { }
+.wasabee-dialog-homogeneous {
+}
 .wasabee-dialog-homogeneous div.container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr;
@@ -474,8 +476,19 @@
 .wasabee-dialog-homogeneous label {
   padding: 4px;
 }
+
 .wasabee-dialog-homogeneous button {
 }
+
+.wasabee-dialog-homogeneous drawb {
+  border-radius: 25px;
+  border-style: groove;
+  padding: 4px;
+  width: 30px;
+  height: 20px;
+  border: 2px solid goldenrod;
+}
+
 .wasabee-dialog-homogeneous span {
   padding: 4px;
   grid-column-start: 3;
@@ -600,6 +613,17 @@
 }
 .wasabee-dialog-madrid button {
 }
+
+.wasabee-dialog-madrid drawb {
+  border-radius: 35px;
+  border-style: groove;
+  padding: 4px;
+  width: 35px;
+  height: 35px;
+  border: 2px solid goldenrod;
+  text-align: center;
+}
+
 .wasabee-dialog-madrid span {
   padding: 4px;
   grid-column-start: 3;
