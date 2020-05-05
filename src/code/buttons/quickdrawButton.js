@@ -89,20 +89,18 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   enable: function() {
+    console.log("qd enable called");
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
-    this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup(
-      "Wasabee Quickdraw Dynamic Display",
-      this._layerGroup,
-      false
-    );
   },
 
   disable: function() {
+    console.log("qd disable called");
     if (!this._enabled) return;
-    window.removeLayerGroup(this._layerGroup);
+
+    console.log(this._guideLayerGroup);
+    if (this._guideLayerGroup) window.removeLayerGroup(this._guideLayerGroup);
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
@@ -112,7 +110,7 @@ const QuickDrawControl = L.Handler.extend({
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
-    L.DomEvent.addListener(this._container, "keyup", this._cancelDrawing, this);
+    L.DomEvent.addListener(this._container, "keyup", this._keyUpListener, this);
 
     this._operation = getSelectedOperation();
     this._anchor1 = null;
@@ -137,29 +135,49 @@ const QuickDrawControl = L.Handler.extend({
     L.DomUtil.enableTextSelection();
     this._tooltip.dispose();
     this._tooltip = null;
-    L.DomEvent.removeListener(this._container, "keyup", this._cancelDrawing);
+    L.DomEvent.removeListener(this._container, "keyup", this._keyUpListener);
 
     window.removeHook("portalSelected", this._portalClickedHook);
     this._map.off("mousemove", this._onMouseMove, this);
   },
 
-  _cancelDrawing: function(e) {
+  _keyUpListener: function(e) {
+    console.log(e);
+    // [esc]
     if (e.keyCode === 27) {
       this.disable();
+    }
+    if (e.key === "/") {
+      this._guideLayerToggle(e);
     }
   },
 
   _onMouseMove: function(e) {
     if (e.latlng) {
       this._tooltip.updatePosition(e.latlng);
-      this._dynamicUpdate(e);
+      this._guideUpdate(e);
     }
     L.DomEvent.preventDefault(e.originalEvent);
   },
 
-  _dynamicUpdate: function(e) {
-    for (const l of this._layerGroup.getLayers()) {
+  _guideUpdate: function(e) {
+    if (!this._guideLayerGroup) return;
+    for (const l of this._guideLayerGroup.getLayers()) {
       l.setLatLngs([l.options.anchorLL, e.latlng]);
+    }
+  },
+
+  _guideLayerToggle: function(e) {
+    console.log(this._guideLayerGroup, e);
+    if (!this._guideLayerGroup) {
+      this._guideLayerGroup = new L.LayerGroup();
+      window.addLayerGroup("Wasabee Quickdraw Guide", this._guideLayerGroup, true);
+      if (this._guideA) this._guideA.addTo(this._guideLayerGroup);
+      if (this._guideB) this._guideB.addTo(this._guideLayerGroup);
+    } else {
+      window.removeLayerGroup(this._guideLayerGroup);
+      delete this._guideLayerGroup;
+      this._guideLayerGroup = null;
     }
   },
 
@@ -180,6 +198,19 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
+    const guideStyle = {
+      color: "#0f0",
+      anchorLL: selectedPortal.latLng,
+      dashArray: [8, 2],
+      opacity: 0.7,
+      weight: 5,
+      guid: selectedPortal.id,
+      smoothFactor: 1,
+      clickable: false,
+      interactive: true
+      // renderer: window.map._renderer
+    };
+
     if (!this._anchor1) {
       this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
@@ -188,19 +219,11 @@ const QuickDrawControl = L.Handler.extend({
         window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
       ] = JSON.stringify(this._anchor1);
 
-      const dynamicA = L.geodesicPolyline(
+      this._guideA = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
-        {
-          color: "#0f0",
-          anchorLL: selectedPortal.latLng,
-          dashArray: [8, 2],
-          opacity: 0.7,
-          weight: 5,
-          guid: selectedPortal.id,
-          smoothFactor: 1
-        }
+        guideStyle
       );
-      dynamicA.addTo(this._layerGroup);
+      if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
       return;
     }
     if (!this._anchor2) {
@@ -216,19 +239,11 @@ const QuickDrawControl = L.Handler.extend({
       localStorage[
         window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
       ] = JSON.stringify(this._anchor2);
-      const dynamicB = L.geodesicPolyline(
+      this._guideB = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
-        {
-          color: "#0f0",
-          anchorLL: selectedPortal.latLng,
-          dashArray: [8, 2],
-          opacity: 0.7,
-          weight: 5,
-          guid: selectedPortal.id,
-          smoothFactor: 1
-        }
+        guideStyle
       );
-      dynamicB.addTo(this._layerGroup);
+      if (this._guideLayerGroup) this._guideB.addTo(this._guideLayerGroup);
       return;
     }
 
