@@ -23,6 +23,8 @@
     "OLD_IITC": "Disclaimer:  Full functionality requires  iitc-ce v0.30 or newer found at iitc.app. Most features are backwards compatible, but not all are. As always no guarantees. Chrome is the recommended browser.",
     "TESTING": "Have you found an issue or want to suggest a feature? Consider joining our telegram testers group '<a href=\"https://t.me/joinchat/PQGX2xo17HW3TLrANBPA3g\" target=\"_blank\">here<\/a>' or submit a request '<a href=\"https://forms.gle/3jsSHhtJyMv3cpwL9\" target=\"_blank\">here<\/a>'.",
     "BATTLE_MODE": "If you are running an operation with multiple agents, Battle Mode can push notifications of changes to agents on telegram. Just click the bee>settings and change mode to battle.",
-    "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS."
+    "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS.",
+    "QD_MODES": "QuickDraw can do single-link plans. Press 'm' on the keyboard to switch modes.",
+    "QD_GUIDES": "QuickDraw has guides, use the 'g' key to display them. You will need to disable them (with the 'g' key) to click the next portal."
  }
 }
