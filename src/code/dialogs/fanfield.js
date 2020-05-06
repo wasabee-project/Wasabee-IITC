@@ -31,7 +31,7 @@ const FanfieldDialog = WDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const anchorLabel = L.DomUtil.create("label", null, container);
+    const anchorLabel = L.DomUtil.create("lable", null, container);
     anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = wX("SET");
@@ -110,12 +110,11 @@ const FanfieldDialog = WDialog.extend({
     });
 
     // Bottom buttons bar
-    // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("FANFIELD");
+    const placeholder = L.DomUtil.create("label", "placeholder", container);
+    placeholder.textContent = "\u2063";
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("FANFIELD");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.fanfield.call(this);

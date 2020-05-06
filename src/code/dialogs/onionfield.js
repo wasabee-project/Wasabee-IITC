@@ -32,11 +32,13 @@ const OnionfieldDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_ONION_PORTALS");
+    const description3 = L.DomUtil.create("div", "desc", container);
+    description3.textContent = wX("SEL_SB_ANCHOR2");
 
     const dividerBeforePortals = L.DomUtil.create("span", null, container);
     dividerBeforePortals.textContent = "";
 
-    const anchorLabel = L.DomUtil.create("label", null, container);
+    const anchorLabel = L.DomUtil.create("div", null, container);
     anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = wX("SET");

@@ -34,10 +34,8 @@ const HomogeneousDialog = WDialog.extend({
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
-    const description = L.DomUtil.create("div", "desc", container);
     const description2 = L.DomUtil.create("div", "desc", container);
-    description.textContent = wX("SELECT_ONION_PORTALS");
-    description2.textContent = wX("SELECT_ONION_PORTALS2");
+    description2.textContent = wX("H-GEN_INST");
     const anchorDisplay = L.DomUtil.create("span", null, container);
     anchorDisplay.textContent = "";
 
@@ -126,7 +124,7 @@ const HomogeneousDialog = WDialog.extend({
     });
 
     const depthLabel = L.DomUtil.create("label", null, container);
-    depthLabel.textContent = "MAX_SPLITS";
+    depthLabel.textContent = wX("MAX_SPLITS");
     this.depthMenu = L.DomUtil.create("select", null, container);
     let dc = 2;
     while (dc <= 6) {
@@ -136,13 +134,10 @@ const HomogeneousDialog = WDialog.extend({
       dc++;
     } // no need for an event, we will read the value directly below
 
-    const dividerBeforeDraw = L.DomUtil.create("span", null, container);
-    const dividerBeforeDraw2 = L.DomUtil.create("span", null, container);
-    const newLine = L.DomUtil.create("label", "newline", container);
-
-    newLine.textContent = "\u0085";
-    dividerBeforeDraw.textContent = "";
-    dividerBeforeDraw2.textContent = "";
+    const placeholder = L.DomUtil.create("div", "null", container);
+    placeholder.textContent = "\u2063";
+    const placeholder2 = L.DomUtil.create("span", "null", container);
+    placeholder2.textContent = "\u2063";
 
     // Bottom buttons bar
     // Enter arrow
