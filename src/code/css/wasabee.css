@@ -442,10 +442,7 @@
 /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-template-rows: auto auto auto auto auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-fanfield div.desc {
   padding-top: 15px;
@@ -462,7 +459,7 @@
 .wasabee-dialog-fanfield drawb {
   border-radius: 35px;
   border-style: groove;
-  padding: 6px;
+  padding: 4px;
   width: 35px;
   height: 35px;
   border: 2px solid goldenrod;
@@ -479,10 +476,7 @@
 }
 .wasabee-dialog-homogeneous div.container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-template-rows: auto auto auto auto auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-homogeneous div.desc {
   padding-top: 15px;
@@ -619,13 +613,11 @@
 }
 .wasabee-dialog-madrid div.container {
   display: grid;
-  grid-template-columns: auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-madrid div.desc {
   grid-column-start: 1;
-  grid-column-end: 3;
+  grid-column-end: 7;
   padding: 4px;
 }
 .wasabee-dialog-madrid label {
@@ -654,10 +646,7 @@
 }
 .wasabee-dialog-multimax div.container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-template-rows: auto auto auto auto auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-multimax div.desc {
   grid-column-start: 1;
@@ -780,10 +769,7 @@
 }
 .wasabee-dialog-starburst div.container {
   display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 2fr;
 }
 .wasabee-dialog-starburst div.desc {
   padding: 4px;
@@ -795,10 +781,7 @@
 }
 .wasabee-dialog-onion div.container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-template-rows: auto auto auto auto auto;
-  grid-row-gap: 3px;
-  grid-column-gap: 3px;
+  grid-template-columns: 1fr 1fr 4fr;
 }
 .wasabee-dialog-onion div.desc {
   padding-top: 15px;
