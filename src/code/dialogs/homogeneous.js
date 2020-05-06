@@ -22,11 +22,13 @@ const HomogeneousDialog = WDialog.extend({
       alert("Requires IITC 0.30.1 or newer");
       return;
     }
-    WDialog.prototype.addHooks.call(this);
+    this._layerGroup = new L.LayerGroup();
+    window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
     this._displayDialog();
   },
 
   removeHooks: function() {
+    window.removeLayerGroup(this._layerGroup);
     WDialog.prototype.removeHooks.call(this);
   },
 
@@ -192,6 +194,8 @@ const HomogeneousDialog = WDialog.extend({
 
   hfield: function() {
     this._failed = 0;
+    this._layerGroup.clearLayers();
+
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
       alert("please select three anchors");
       return;
@@ -314,6 +318,9 @@ const HomogeneousDialog = WDialog.extend({
     if (best.length == 0) {
       console.log("hit bottom first");
       this._failed++;
+      var latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+      const polygon = L.polygon(latlngs, { color: "red" });
+      polygon.addTo(this._layerGroup);
       return;
     }
 

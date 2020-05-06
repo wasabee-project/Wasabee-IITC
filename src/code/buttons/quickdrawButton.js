@@ -73,7 +73,6 @@ const QuickDrawControl = L.Handler.extend({
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
-    L.DomEvent.addListener(this._container, "keyup", this._keyUpListener, this);
 
     this._operation = getSelectedOperation();
     this._anchor1 = null;
@@ -82,11 +81,21 @@ const QuickDrawControl = L.Handler.extend({
     this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
-    this._portalClickedHook = () => {
-      QuickDrawControl.prototype._portalClicked.call(this);
+
+    // IITC hook format for IITC event
+    this._portalClickedHook = data => {
+      QuickDrawControl.prototype._portalClicked.call(this, data);
     };
     window.addHook("portalSelected", this._portalClickedHook);
+    // Leaflet format for leaflet DOM event
+    this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
+    // this._map.on("click", this._clickHook, this);
+  },
+
+  _clickHook: function(e) {
+    console.log("click detected");
+    console.log(e);
   },
 
   removeHooks: function() {
@@ -108,21 +117,27 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.dispose();
     this._tooltip = null;
 
-    L.DomEvent.removeListener(this._container, "keyup", this._keyUpListener);
     window.removeHook("portalSelected", this._portalClickedHook);
+    this._map.off("keyup", this._keyUpListener, this);
     this._map.off("mousemove", this._onMouseMove, this);
+    // this._map.off("click", this._clickHook, this);
   },
 
   _keyUpListener: function(e) {
+    if (!this._enabled) return;
+
     // [esc]
-    if (e.keyCode === 27) {
+    if (e.originalEvent.keyCode === 27) {
       this.disable();
     }
-    if (e.key === "/" || e.key === "g") {
+    if (e.originalEvent.key === "/" || e.originalEvent.key === "g") {
       this._guideLayerToggle();
     }
-    if (e.key === "t" || e.key === "m") {
+    if (e.originalEvent.key === "t" || e.originalEvent.key === "m") {
       this._toggleMode();
+    }
+    if (e.originalEvent.key === "X") {
+      this._operation.clearAllLinks();
     }
   },
 
@@ -152,6 +167,7 @@ const QuickDrawControl = L.Handler.extend({
       );
       if (this._guideA) this._guideA.addTo(this._guideLayerGroup);
       if (this._guideB) this._guideB.addTo(this._guideLayerGroup);
+      window.Render.prototype.bringPortalsToFront();
     } else {
       window.removeLayerGroup(this._guideLayerGroup);
       delete this._guideLayerGroup;
@@ -171,8 +187,16 @@ const QuickDrawControl = L.Handler.extend({
     return { text: "Click next portal" };
   },
 
-  _portalClicked: function() {
-    const selectedPortal = WasabeePortal.getSelected();
+  _portalClicked: function(data) {
+    // console.log(data);
+    if (data.selectedPortalGuid == data.unselectedPortalGuid) {
+      console.log("same portal clicked");
+      // return;
+    }
+
+    // const selectedPortal = WasabeePortal.getSelected();
+    // this way saves a small step
+    const selectedPortal = WasabeePortal.get(data.selectedPortalGuid);
     if (!selectedPortal) {
       // XXX wX this
       this._tooltip.updateContent("Portal data not loaded, please try again");
@@ -267,9 +291,10 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _portalClickedSingle: function(selectedPortal) {
-    // click the same portal twice to disable like in drawtools
+    // console.log("portal clicked", selectedPortal);
+    // IITC sending 2 portalClicked for 1 mouse click
     if (this._previous && this._previous.id == selectedPortal.id) {
-      this.disable();
+      // this.disable();
       return;
     }
 
