@@ -29,6 +29,9 @@ const MultimaxDialog = WDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
 
+    const description2 = L.DomUtil.create("div", "desc", container);
+    description2.textContent = wX("SEL_SB_ANCHOR2");
+
     const anchorOneLabel = L.DomUtil.create("label", null, container);
     anchorOneLabel.textContent = wX("ANCHOR1");
     const anchorOneButton = L.DomUtil.create("button", null, container);
@@ -83,24 +86,19 @@ const MultimaxDialog = WDialog.extend({
       }
     });
 
-    // Bottom buttons bar
-    // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
+    const fllabel = L.DomUtil.create("label", null, container);
+    fllabel.textContent = wX("ADD_BL");
+    this._flcheck = L.DomUtil.create("input", null, container);
+    this._flcheck.type = "checkbox";
 
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("MULTI_M");
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
       alert(`Multimax found ${total} layers`);
       this._dialog.dialog("close");
     });
-
-    const fllabel = L.DomUtil.create("label", null, container);
-    fllabel.textContent = wX("ADD_BL");
-    this._flcheck = L.DomUtil.create("input", null, container);
-    this._flcheck.type = "checkbox";
 
     this._dialog = window.dialog({
       title: wX("MULTI_M_TITLE"),

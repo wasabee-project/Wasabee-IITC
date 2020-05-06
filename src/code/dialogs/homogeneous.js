@@ -34,8 +34,10 @@ const HomogeneousDialog = WDialog.extend({
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
-    const description = L.DomUtil.create("div", "desc", container);
-    description.textContent = wX("SELECT_ONION_PORTALS");
+    const description2 = L.DomUtil.create("div", "desc", container);
+    description2.textContent = wX("H-GEN_INST");
+    const anchorDisplay = L.DomUtil.create("span", null, container);
+    anchorDisplay.textContent = "";
 
     const anchorLabelOne = L.DomUtil.create("label", null, container);
     anchorLabelOne.textContent = wX("ANCHOR_PORTAL");
@@ -66,7 +68,7 @@ const HomogeneousDialog = WDialog.extend({
     });
 
     const anchorLabelTwo = L.DomUtil.create("label", null, container);
-    anchorLabelTwo.textContent = wX("ANCHOR_PORTAL");
+    anchorLabelTwo.textContent = wX("ANCHOR_PORTAL2");
     const anchorButtonTwo = L.DomUtil.create("button", null, container);
     anchorButtonTwo.textContent = wX("SET");
     this._anchorDisplayTwo = L.DomUtil.create("span", null, container);
@@ -94,7 +96,7 @@ const HomogeneousDialog = WDialog.extend({
     });
 
     const anchorLabelThree = L.DomUtil.create("label", null, container);
-    anchorLabelThree.textContent = wX("ANCHOR_PORTAL");
+    anchorLabelThree.textContent = wX("ANCHOR_PORTAL3");
     const anchorButtonThree = L.DomUtil.create("button", null, container);
     anchorButtonThree.textContent = wX("SET");
     this._anchorDisplayThree = L.DomUtil.create("span", null, container);
@@ -122,7 +124,7 @@ const HomogeneousDialog = WDialog.extend({
     });
 
     const depthLabel = L.DomUtil.create("label", null, container);
-    depthLabel.textContent = "Max Depth";
+    depthLabel.textContent = wX("MAX_SPLITS");
     this.depthMenu = L.DomUtil.create("select", null, container);
     let dc = 2;
     while (dc <= 6) {
@@ -132,13 +134,18 @@ const HomogeneousDialog = WDialog.extend({
       dc++;
     } // no need for an event, we will read the value directly below
 
+    const placeholder = L.DomUtil.create("div", "null", container);
+    placeholder.textContent = "\u2063";
+    const placeholder2 = L.DomUtil.create("span", "null", container);
+    placeholder2.textContent = "\u2063";
+
     // Bottom buttons bar
     // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
+    //const opt = L.DomUtil.create("label", "arrow", container);
+    //opt.textContent = "\u21b3";
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("ONION");
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("ONION");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.hfield.call(this);

@@ -23,14 +23,23 @@ const StarburstDialog = WDialog.extend({
   _displayDialog: function() {
     if (!this._map) return;
 
+    //Instructions
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SEL_SB_ANCHOR");
+    const description2 = L.DomUtil.create("div", "desc", container);
+    description2.textContent = wX("SEL_SB_ANCHOR2");
+
+    //anchor portal text
     const anchorLabel = L.DomUtil.create("label", null, container);
     anchorLabel.textContent = wX("ANCHOR_PORTAL");
+
+    //Set Button
     const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = wX("SET");
     this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
+
+    //do magic
     if (this._anchor) {
       this._anchorDisplay.appendChild(
         this._anchor.displayFormat(this._smallScreen)
@@ -38,6 +47,7 @@ const StarburstDialog = WDialog.extend({
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
+
     L.DomEvent.on(anchorButton, "click", ev => {
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
@@ -54,13 +64,13 @@ const StarburstDialog = WDialog.extend({
       }
     });
 
-    // Bottom buttons bar
-    // Enter arrow
-    const opt = L.DomUtil.create("div", "arrow", container);
-    opt.textContent = "\u21b3";
+    //blank placeholder
+    const placeholder = L.DomUtil.create("label", "placeholder", container);
+    placeholder.textContent = "\u2063";
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("STARBURST_DRAW");
+
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("STARBURST_DRAW");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.starburst.call(this);
