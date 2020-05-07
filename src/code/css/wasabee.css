@@ -292,9 +292,11 @@
   background-color: rgba(250, 250, 250, 0.9);
   border: 1px solid rgba(35, 175, 30, 0.75);
   color: #000;
+  cursor: pointer;
 }
 
 .wasabee-dialog button {
+  cursor: pointer;
   padding: 1px 7px 2px;
   border: initial;
   background-color: buttonface;
@@ -457,11 +459,12 @@
 }
 
 .wasabee-dialog-fanfield drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -492,11 +495,12 @@
 }
 
 .wasabee-dialog-homogeneous drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -627,11 +631,12 @@
 }
 
 .wasabee-dialog-madrid drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -660,11 +665,12 @@
 }
 
 .wasabee-dialog-multimax drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -765,18 +771,6 @@
   grid-column-end: 3;
 }
 
-.wasabee-dialog-starburst {
-}
-.wasabee-dialog-starburst div.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-}
-.wasabee-dialog-starburst div.desc {
-  padding: 4px;
-  grid-column-start: 1;
-  grid-column-end: 4;
-}
-
 .wasabee-dialog-onion {
 }
 .wasabee-dialog-onion div.container {
@@ -798,11 +792,12 @@
 }
 
 .wasabee-dialog-onion drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -811,6 +806,20 @@
   padding: 4px;
   grid-column-start: 3;
   grid-column-end: 7;
+}
+
+.wasabee-dialog-starburst {
+}
+
+.wasabee-dialog-starburst div.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+}
+
+.wasabee-dialog-starburst div.desc {
+  padding: 4px;
+  grid-column-start: 1;
+  grid-column-end: 4;
 }
 
 .wasabee-dialog-starburst label {
@@ -828,11 +837,12 @@
 }
 
 .wasabee-dialog-starburst drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
