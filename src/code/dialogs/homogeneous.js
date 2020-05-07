@@ -168,6 +168,7 @@ const HomogeneousDialog = WDialog.extend({
           this._dialog.dialog("close");
         },
         "Clear Links": () => {
+          this._layerGroup.clearLayers();
           clearAllLinks(getSelectedOperation());
         }
       }
@@ -266,9 +267,10 @@ const HomogeneousDialog = WDialog.extend({
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.size == 0) {
       console.log("empty set");
-      let latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-      const polygon = L.polygon(latlngs, { color: "purple" });
+      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+      const polygon = L.polygon(latlngs, { color: "red" });
       polygon.addTo(this._layerGroup);
+      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
       return;
     }
 
@@ -286,8 +288,8 @@ const HomogeneousDialog = WDialog.extend({
       this._operation.setLinkColor(linkID, this._color);
 
       if (depth + 1 < this.depthMenu.value) {
-        this._failed += (this.depthMenu.value - depth) * 3;
-        let latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+        this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2 - 1;
+        const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
         const polygon = L.polygon(latlngs, { color: "orange" });
         polygon.addTo(this._layerGroup);
       }
@@ -341,20 +343,10 @@ const HomogeneousDialog = WDialog.extend({
     }
 
     if (best.length == 0) {
-      console.log(
-        "hit bottom at: ",
-        depth,
-        portalsCovered,
-        one.name,
-        two.name,
-        three.name,
-        differential,
-        best,
-        bestp
-      );
-      this._failed++;
-      let latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-      const polygon = L.polygon(latlngs, { color: "red" });
+      console.log("hit bottom at: ", depth, one.name, two.name, three.name);
+      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
+      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+      const polygon = L.polygon(latlngs, { color: "yellow" });
       polygon.addTo(this._layerGroup);
       return;
     }
