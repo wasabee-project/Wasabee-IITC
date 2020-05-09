@@ -447,7 +447,7 @@
 .wasabee-dialog-fanfield div.container {
   display: grid;
   grid-template-columns: auto auto auto;
-  grid-template-rows: auto auto auto auto auto auto auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto auto;
   justify-content: space-evenly;
   align-content: space-evenly;
 }
@@ -462,21 +462,7 @@
   padding-top: 15px;
   padding: 4px;
   grid-column: 1 / span 3;
-  grid-row: 2;
-}
-
-.wasabee-dialog-fanfield div.desc3 {
-  padding-top: 15px;
-  padding: 4px;
-  grid-column: 1 / span 3;
   grid-row: 6;
-}
-
-.wasabee-dialog-fanfield div.desc4 {
-  padding-top: 15px;
-  padding: 4px;
-  grid-column: 1 / span 3;
-  grid-row: 8;
 }
 
 .wasabee-dialog-fanfield label {
@@ -497,7 +483,7 @@
   border: 2px solid goldenrod;
   text-align: center;
   grid-column: 2;
-  grid-row: 9;
+  grid-row: 7;
 }
 
 .wasabee-dialog-fanfield span {
@@ -508,12 +494,13 @@
 }
 .wasabee-dialog-homogeneous div.container {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto;
 }
 .wasabee-dialog-homogeneous div.desc {
   padding-top: 15px;
-  grid-column-start: 1;
-  grid-column-end: 7;
+  grid-column: 1 / span 3;
+  grid-row: 1;
   padding: 4px;
 }
 .wasabee-dialog-homogeneous label {
@@ -532,6 +519,8 @@
   height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
+  grid-column: 2;
+  grid-row: 5;
 }
 
 .wasabee-dialog-homogeneous span {
@@ -743,6 +732,7 @@
 }
 .wasabee-dialog-ops input {
   width: auto;
+  -moz-transform: scale(1);
 }
 .wasabee-dialog-ops div.buttonset {
   display: grid;
