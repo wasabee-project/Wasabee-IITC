@@ -234,6 +234,22 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return poset;
   },
 
+  // build a map that shows which and how many portals are covering each possible field
+  buildRevPOSet: function(anchor1, anchor2, visible) {
+    const poset = new Map();
+    for (const i of visible) {
+      poset.set(
+        i.options.guid,
+        visible
+          .filter(j => {
+            return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
+          })
+          .map(l => l.options.guid)
+      );
+    }
+    return poset;
+  },
+
   /* not working properly */
   buildPOSetFaster: function(a, b, visible) {
     const poset = new Map();
