@@ -201,8 +201,8 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
   fieldCoversPortal: function(a, b, field3, portal) {
     const unreachableMapPoint = this._urp;
 
-    const p = portal.getLatLng();
-    const c = field3.getLatLng();
+    const p = portal.latLng || portal.getLatLng();
+    const c = field3.latLng || field3.getLatLng();
 
     // greatCircleArcIntersect now takes either WasabeeLink or window.link format
     // needs link.getLatLngs(); and to be an object we can cache in
