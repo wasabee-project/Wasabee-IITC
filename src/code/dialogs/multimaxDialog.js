@@ -282,7 +282,7 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return poset;
   },
 
-  longestSequence: function(poset) {
+  longestSequence: function(poset, start) {
     const alreadyCalculatedSequences = new Map();
     const sequence_from = c => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
@@ -298,6 +298,9 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
       }
       return alreadyCalculatedSequences.get(c);
     };
+
+    if (start) return sequence_from(start);
+
     return Array.from(poset.keys())
       .map(sequence_from)
       .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
