@@ -140,9 +140,7 @@ const HomogeneousDialog = WDialog.extend({
     placeholder2.textContent = "\u2063";
 
     // Bottom buttons bar
-    // Enter arrow
-    //const opt = L.DomUtil.create("label", "arrow", container);
-    //opt.textContent = "\u21b3";
+
     // Go button
     const button = L.DomUtil.create("drawb", null, container);
     button.textContent = "\uD83D\uDC1D" + wX("ONION");
