@@ -59,6 +59,7 @@ W.static = {
     SERVER_BASE_DEFAULT: "https://server.wasabee.rocks",
     MARKER_TYPE_CAPTURE: "CapturePortalMarker",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
+    MARKER_TYPE_EXCLUDE: "ExcludeMarker",
     MARKER_TYPE_DESTROY: "DestroyPortalAlert",
     MARKER_TYPE_FARM: "FarmPortalMarker",
     MARKER_TYPE_GOTO: "GotoPortalMarker",
@@ -69,7 +70,6 @@ W.static = {
     MARKER_TYPE_RECHARGE: "RechargePortalAlert",
     MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
     MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
-    MARKER_TYPE_EXCLUDE: "ExcludeMarker",
     DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
     QUICKDRAW_GUIDE_STYLE: {
       color: "#0f0",
