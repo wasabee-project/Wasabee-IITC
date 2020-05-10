@@ -39,6 +39,7 @@ W.static = {
     keyListPortal: "wasabee-keyByPortal",
     wasabeeDKeyButton: "wasabee-DKey",
     wasabeeDList: "wasabee-DList"
+    madrid: "wasabee-madrid"
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",

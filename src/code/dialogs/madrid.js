@@ -187,7 +187,7 @@ const MadridDialog = MultimaxDialog.extend({
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = MultimaxDialog.TYPE;
+    this.type = MadridDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MADRID");
     this.label = wX("MADRID");
