@@ -220,10 +220,22 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     const newThree = this._prev;
-    len += this.madridMM(this._anchorTwo, newThree, this._portalSetOne);
+    len += this.madridMM(
+      this._anchorTwo,
+      newThree,
+      this._portalSetOne.filter(p =>
+        this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
+      )
+    );
     // _anchorOne is no longer useful, use _prev
     const newOne = this._prev;
-    len += this.madridMM(newThree, newOne, this._portalSetTwo);
+    len += this.madridMM(
+      newThree,
+      newOne,
+      this._portalSetTwo.filter(p =>
+        this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+      )
+    );
     this._operation.endBatchMode(); // save and run crosslinks
     return len;
   },
