@@ -62,7 +62,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      this._portalSetOne = getAllPortalsOnScreen(this._operation)
+        .map(p => WasabeePortal.get(p.options.guid))
+        .filter(p => p);
       // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -111,7 +113,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
+      this._portalSetTwo = getAllPortalsOnScreen(this._operation)
+        .map(p => WasabeePortal.get(p.options.guid))
+        .filter(p => p);
       // XXX cache
       this._setTwoDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -138,7 +142,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(this._operation);
+      this._portalSetThree = getAllPortalsOnScreen(this._operation)
+        .map(p => WasabeePortal.get(p.options.guid))
+        .filter(p => p);
       // XXX cache
       this._setThreeDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -220,10 +226,22 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     const newThree = this._prev;
-    len += this.madridMM(this._anchorTwo, newThree, this._portalSetOne);
+    len += this.madridMM(
+      this._anchorTwo,
+      newThree,
+      this._portalSetOne.filter(p =>
+        this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
+      )
+    );
     // _anchorOne is no longer useful, use _prev
     const newOne = this._prev;
-    len += this.madridMM(newThree, newOne, this._portalSetTwo);
+    len += this.madridMM(
+      newThree,
+      newOne,
+      this._portalSetTwo.filter(p =>
+        this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+      )
+    );
     this._operation.endBatchMode(); // save and run crosslinks
     return len;
   },
@@ -231,6 +249,8 @@ const MadridDialog = MultimaxDialog.extend({
   madridMM: function(pOne, pTwo, portals) {
     const poset = this.buildPOSet(pOne, pTwo, portals);
     const sequence = this.longestSequence(poset);
+
+    const portalsMap = new Map(portals.map(p => [p.id, p]));
 
     if (!Array.isArray(sequence) || !sequence.length) {
       // alert("No layers found");
@@ -243,7 +263,7 @@ const MadridDialog = MultimaxDialog.extend({
 
     // draw inner 3 links
     for (const node of sequence) {
-      const p = WasabeePortal.get(node);
+      const p = portalsMap.get(node);
       if (!p) {
         console.log("skipping: " + node);
         continue;
