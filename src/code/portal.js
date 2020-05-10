@@ -109,6 +109,7 @@ export default class WasabeePortal {
   }
 
   static get(id) {
+    // we have all the details
     if (window.portals[id] && window.portals[id].options.data.title) {
       const data = window.portals[id].options.data;
       return new WasabeePortal(
@@ -118,6 +119,16 @@ export default class WasabeePortal {
         (data.lngE6 / 1e6).toFixed(6).toString()
       );
     }
+    // do we have enough to fake it?
+    if (window.portals[id] && window.portals[id].options.data.latE6) {
+      const data = window.portals[id].options.data;
+      return WasabeePortal.fake(
+        (data.latE6 / 1e6).toFixed(6).toString(),
+        (data.lngE6 / 1e6).toFixed(6).toString(),
+        id
+      );
+    }
+    // nothing to get
     return null;
   }
 
