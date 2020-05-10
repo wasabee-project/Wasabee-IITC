@@ -292,9 +292,13 @@
   background-color: rgba(250, 250, 250, 0.9);
   border: 1px solid rgba(35, 175, 30, 0.75);
   color: #000;
+  cursor: pointer;
+  margin-top: 4px;
+  margin-bottom: 2px;
 }
 
 .wasabee-dialog button {
+  cursor: pointer;
   padding: 1px 7px 2px;
   border: initial;
   background-color: buttonface;
@@ -442,46 +446,61 @@
 /* fanfield also uses plugin-portal-names for the debug info, ignore for now */
 .wasabee-dialog-fanfield div.container {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto auto;
+  justify-content: space-evenly;
+  align-content: space-evenly;
 }
 .wasabee-dialog-fanfield div.desc {
   padding-top: 15px;
-  grid-column-start: 1;
-  grid-column-end: 7;
   padding: 4px;
+  grid-column: 1 / span 3;
+  grid-row: 1;
 }
+
+.wasabee-dialog-fanfield div.desc2 {
+  padding-top: 15px;
+  padding: 4px;
+  grid-column: 1 / span 3;
+  grid-row: 6;
+}
+
 .wasabee-dialog-fanfield label {
   padding: 4px;
 }
-.wasabee-dialog-fanfield button {
+
+.wsabee-dialog-fanfield button {
+  padding: 4px;
 }
 
 .wasabee-dialog-fanfield drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
+  grid-column: 2;
+  grid-row: 7;
 }
 
 .wasabee-dialog-fanfield span {
   padding: 4px;
-  grid-column-start: 3;
-  grid-column-end: 7;
 }
 
 .wasabee-dialog-homogeneous {
 }
 .wasabee-dialog-homogeneous div.container {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto;
 }
 .wasabee-dialog-homogeneous div.desc {
   padding-top: 15px;
-  grid-column-start: 1;
-  grid-column-end: 7;
+  grid-column: 1 / span 3;
+  grid-row: 1;
   padding: 4px;
 }
 .wasabee-dialog-homogeneous label {
@@ -492,13 +511,16 @@
 }
 
 .wasabee-dialog-homogeneous drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
+  grid-column: 2;
+  grid-row: 5;
 }
 
 .wasabee-dialog-homogeneous span {
@@ -588,24 +610,40 @@
 }
 .wasabee-dialog-markeradd div.content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 100px auto auto;
+  grid-template-rows: auto 15px auto auto 15px auto;
   padding: 4px;
 }
 .wasabee-dialog-markeradd div.portal {
-  grid-column-start: 1;
-  grid-column-end: 3;
-  padding: 0px 0px 8px 0px;
+  grid-column: 1 / span 3;
+  grid-row: 1;
 }
 .wasabee-dialog-markeradd div.content select {
   margin: 4px;
+  grid-column: 1;
+  grid-row: 3;
 }
+
+.wasabee-dialog-markeradd div.bee {
+  grid-column: 4;
+  grid-row: 1;
+}
+
 .wasabee-dialog-markeradd div.content input {
   margin: 4px;
+  grid-column: 2 / span 2;
+  grid-row: 3;
 }
 .wasabee-dialog-markeradd div.content button {
-  grid-column-start: 1;
-  grid-column-end: 3;
+  grid-column: 2;
+  grid-row: 6 / span 2;
+  height: 35px;
+  cursor: pointer;
+  background-color: 255, 255, 255;
+  text-align: center;
+  text-decoration: underline;
 }
+
 .wasabee-dialog-markerlist {
 }
 
@@ -624,14 +662,17 @@
   padding: 4px;
 }
 .wasabee-dialog-madrid button {
+  border-collapse: separate;
+  border-spacing: 5px;
 }
 
 .wasabee-dialog-madrid drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -660,11 +701,12 @@
 }
 
 .wasabee-dialog-multimax drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -706,6 +748,7 @@
 }
 .wasabee-dialog-ops input {
   width: auto;
+  -moz-transform: scale(1);
 }
 .wasabee-dialog-ops div.buttonset {
   display: grid;
@@ -765,18 +808,6 @@
   grid-column-end: 3;
 }
 
-.wasabee-dialog-starburst {
-}
-.wasabee-dialog-starburst div.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-}
-.wasabee-dialog-starburst div.desc {
-  padding: 4px;
-  grid-column-start: 1;
-  grid-column-end: 4;
-}
-
 .wasabee-dialog-onion {
 }
 .wasabee-dialog-onion div.container {
@@ -798,11 +829,12 @@
 }
 
 .wasabee-dialog-onion drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  width: 150px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -813,33 +845,71 @@
   grid-column-end: 7;
 }
 
-.wasabee-dialog-starburst label {
-  padding: 4px;
+.wasabee-dialog-starburst {
 }
 
-.wasabee-dialog-starburst blank {
-  padding: 20px;
-  width: 4px;
-  height: 4px;
-  border: 2px solid goldenrod;
+.wasabee-dialog-starburst div.container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto;
+  justify-content: space-evenly;
+  align-content: space-evenly;
+}
+
+.wasabee-dialog-starburst div.desc {
+  height: 20px;
+  padding: 4px;
+  grid-column: 1 / span 3;
+  color: white;
+}
+
+.wasabee-dialog-starburst div.desc2 {
+  height: 20px;
+  padding: 4px;
+  padding-top: 7px;
+  padding-botton: 6px;
+  grid-column: 1 / span 3;
+  grid-row: 3;
+  color: lightgrey;
+}
+
+.wasabee-dialog-starburst div.desc3 {
+  padding-top: 3px;
+  padding: 4px;
+  grid-column: 1 / span 3;
+  grid-row: 5;
+  color: lightgrey;
+  align-items: ;
+}
+
+.wasabee-dialog-starburst label {
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .wasabee-dialog-starburst button {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .wasabee-dialog-starburst drawb {
+  cursor: pointer;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  width: 35px;
-  height: 35px;
+  height: 15px;
   border: 2px solid goldenrod;
   text-align: center;
+  grid-column: 2;
+  grid-row: 4;
 }
 
 .wasabee-dialog-starburst div.anchor {
-  padding: 4px;
+  grid-colunn: 3;
+  grid-row: 2;
+  text-align: center;
 }
+
 .wasabee-dialog-wasabee {
 }
 .wasabee-dialog-wasabee div.container {

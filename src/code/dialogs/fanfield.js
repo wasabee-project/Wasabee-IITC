@@ -31,7 +31,7 @@ const FanfieldDialog = WDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const anchorLabel = L.DomUtil.create("lable", null, container);
+    const anchorLabel = L.DomUtil.create("label", null, container);
     anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = wX("SET");
@@ -47,9 +47,7 @@ const FanfieldDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-        ] = JSON.stringify(this._anchor);
+        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)
@@ -109,10 +107,11 @@ const FanfieldDialog = WDialog.extend({
       }
     });
 
+    const description2 = L.DomUtil.create("div", "desc2", container);
+    description2.textContent = wX("SELECT_FAN_PORTALS2");
+
     // Bottom buttons bar
     // Go button
-    const placeholder = L.DomUtil.create("label", "placeholder", container);
-    placeholder.textContent = "\u2063";
     const button = L.DomUtil.create("drawb", null, container);
     button.textContent = "\uD83D\uDC1D" + wX("FANFIELD");
     L.DomEvent.on(button, "click", ev => {
@@ -148,7 +147,7 @@ const FanfieldDialog = WDialog.extend({
     this.title = wX("FAN_FIELD3");
     this.label = wX("FAN_FIELD3");
     this._operation = getSelectedOperation();
-    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = WasabeePortal.create(p);
     p = localStorage["wasabee-fanfield-start"];
     if (p) this._start = WasabeePortal.create(p);
@@ -156,7 +155,7 @@ const FanfieldDialog = WDialog.extend({
     if (p) this._end = WasabeePortal.create(p);
   },
 
-  // fanfield determines the portals between start/end and their angle (and order)
+  // fanfiled determines the portals between start/end and their angle (and order)
   fanfield: function() {
     this._layerGroup.clearLayers();
 
