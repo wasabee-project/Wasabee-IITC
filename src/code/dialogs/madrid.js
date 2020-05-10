@@ -62,7 +62,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      this._portalSetOne = getAllPortalsOnScreen(this._operation).map(p =>
+        WasabeePortal.get(p.options.guid)
+      );
       // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -111,7 +113,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
+      this._portalSetTwo = getAllPortalsOnScreen(this._operation).map(p =>
+        WasabeePortal.get(p.options.guid)
+      );
       // XXX cache
       this._setTwoDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -138,7 +142,9 @@ const MadridDialog = MultimaxDialog.extend({
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(this._operation);
+      this._portalSetThree = getAllPortalsOnScreen(this._operation).map(p =>
+        WasabeePortal.get(p.options.guid)
+      );
       // XXX cache
       this._setThreeDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -244,6 +250,8 @@ const MadridDialog = MultimaxDialog.extend({
     const poset = this.buildPOSet(pOne, pTwo, portals);
     const sequence = this.longestSequence(poset);
 
+    const portalsMap = new Map(portals.map(p => [p.id, p]));
+
     if (!Array.isArray(sequence) || !sequence.length) {
       // alert("No layers found");
       return 0;
@@ -255,7 +263,7 @@ const MadridDialog = MultimaxDialog.extend({
 
     // draw inner 3 links
     for (const node of sequence) {
-      const p = WasabeePortal.get(node);
+      const p = portalsMap.get(node);
       if (!p) {
         console.log("skipping: " + node);
         continue;
