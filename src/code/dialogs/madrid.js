@@ -152,24 +152,28 @@ const MadridDialog = MultimaxDialog.extend({
       );
     });
 
-    // Bottom buttons bar
-    // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
+    //Add backlinks after all the rest is set up
+    const fllabel = L.DomUtil.create("label", null, container);
+    fllabel.textContent = wX("ADD_BL");
+    this._flcheck = L.DomUtil.create("input", null, container);
+    this._flcheck.type = "checkbox";
 
+    const newLine = L.DomUtil.create("label", "newline", container);
+    const dividerBeforeDraw = L.DomUtil.create("span", null, container);
+    newLine.textContent = "\u0000";
+    dividerBeforeDraw.textContent = "\u0000";
+    //   dividerBeforeDraw.textContent = "";
+
+    const placeholder = L.DomUtil.create("label", "placeholder", container);
+    placeholder.textContent = "\u2063";
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("MADRID");
+    const button = L.DomUtil.create("drawb", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);
       // this._dialog.dialog("close");
     });
-
-    const fllabel = L.DomUtil.create("label", null, container);
-    fllabel.textContent = wX("ADD_BL");
-    this._flcheck = L.DomUtil.create("input", null, container);
-    this._flcheck.type = "checkbox";
 
     this._dialog = window.dialog({
       title: wX("MADRID_TITLE"),

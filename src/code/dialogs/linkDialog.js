@@ -104,7 +104,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
-    anchor1AddButton.textContent = wX("ADD");
+    anchor1AddButton.textContent = wX("ADD1");
     L.DomEvent.on(anchor1AddButton, "click", ev => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
@@ -156,7 +156,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
-    anchor2AddButton.textContent = wX("ADD");
+    anchor2AddButton.textContent = wX("ADD2");
     L.DomEvent.on(anchor2AddButton, "click", ev => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
@@ -183,7 +183,7 @@ const LinkDialog = WDialog.extend({
     // Bottom buttons bar
     // Enter arrow
     const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\u21b3";
+    opt.textContent = "\uD83E\uDCA7";
     // Go button
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("ADD_BUTTON_LINKS");
@@ -208,7 +208,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     this._desc = L.DomUtil.create("input", "desc", container);
-    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
+    this._desc.placeholder = "\uD83D\uDC1D" + wX("DESCRIP_PLACEHOLD");
 
     this._dialog = window.dialog({
       title: wX("ADD_LINKS"),
