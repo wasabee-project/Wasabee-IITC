@@ -223,12 +223,12 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     const poset = new Map();
     for (const i of visible) {
       poset.set(
-        i.options.guid,
+        i.id || i.options.guid,
         visible
           .filter(j => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
           })
-          .map(l => l.options.guid)
+          .map(l => l.id || l.options.guid)
       );
     }
     return poset;
@@ -239,12 +239,12 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     const poset = new Map();
     for (const i of visible) {
       poset.set(
-        i.options.guid,
+        i.id || i.options.guid,
         visible
           .filter(j => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
           })
-          .map(l => l.options.guid)
+          .map(l => l.id || l.options.guid)
       );
     }
     return poset;
