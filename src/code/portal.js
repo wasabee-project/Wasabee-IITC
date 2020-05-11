@@ -10,12 +10,12 @@ export default class WasabeePortal {
 
     // check window.portals[id].options.data for updated name ?
     if (typeof lat == "number") {
-      this.lat = lat.toString();
+      this.lat = lat.toFixed(6);
     } else {
       this.lat = lat;
     }
     if (typeof lng == "number") {
-      this.lng = lng.toString();
+      this.lng = lng.toFixed(6);
     } else {
       this.lng = lng;
     }
@@ -51,15 +51,15 @@ export default class WasabeePortal {
         return new WasabeePortal(
           id,
           data.title,
-          (data.latE6 / 1e6).toFixed(6).toString(),
-          (data.lngE6 / 1e6).toFixed(6).toString()
+          (data.latE6 / 1e6).toFixed(6),
+          (data.lngE6 / 1e6).toFixed(6)
         );
       }
       // do we have enough to fake it?
       if (data.latE6) {
         return WasabeePortal.fake(
-          (data.latE6 / 1e6).toFixed(6).toString(),
-          (data.lngE6 / 1e6).toFixed(6).toString(),
+          (data.latE6 / 1e6).toFixed(6),
+          (data.lngE6 / 1e6).toFixed(6),
           id
         );
       }
@@ -76,8 +76,8 @@ export default class WasabeePortal {
       res => {
         if (res.title) {
           this.name = res.title;
-          this.lat = (res.latE6 / 1e6).toFixed(6).toString();
-          this.lng = (res.lngE6 / 1e6).toFixed(6).toString();
+          this.lat = (res.latE6 / 1e6).toFixed(6);
+          this.lng = (res.lngE6 / 1e6).toFixed(6);
         }
       },
       reject => {

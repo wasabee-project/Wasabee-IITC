@@ -106,16 +106,14 @@ export const listenForAddedPortals = newPortal => {
 
     // if we only had location -- from drawtools import
     if (
-      faked.lat ==
-        (newPortal.portal.options.data.latE6 / 1e6).toFixed(6).toString() &&
-      faked.lng ==
-        (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6).toString()
+      faked.lat == (newPortal.portal.options.data.latE6 / 1e6).toFixed(6) &&
+      faked.lng == (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6)
     ) {
       const np = new WasabeePortal(
         newPortal.portal.options.guid,
         newPortal.portal.options.data.title,
-        (newPortal.portal.options.data.latE6 / 1e6).toFixed(6).toString(),
-        (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6).toString()
+        (newPortal.portal.options.data.latE6 / 1e6).toFixed(6),
+        (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6)
       );
 
       op.swapPortal(faked, np);
