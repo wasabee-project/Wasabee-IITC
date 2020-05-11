@@ -205,12 +205,7 @@ const ImportDialog = WDialog.extend({
     const key = latLng.lat + "/" + latLng.lng;
     if (pmap.has(key)) {
       const portalID = pmap.get(key);
-      const np = new WasabeePortal(
-        portalID,
-        wX("LOADING1") + portalID + wX("LOADING2"),
-        latLng.lat,
-        latLng.lng
-      );
+      const np = WasabeePortal.fake(latLng.lat, latLng.lng, portalID);
       return np;
     }
     return false;
