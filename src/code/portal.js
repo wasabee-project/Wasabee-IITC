@@ -1,9 +1,13 @@
 import { generateId } from "./auxiliar";
+import wX from "./wX";
 
 export default class WasabeePortal {
   constructor(id, name, lat, lng, comment, hardness) {
     this.id = id;
+    // migration: don't use a locale dependent name
+    if (name.includes(id)) name = id;
     this.name = name;
+
     // check window.portals[id].options.data for updated name ?
     if (typeof lat == "number") {
       this.lat = lat.toString();
@@ -98,14 +102,20 @@ export default class WasabeePortal {
     return "";
   }
 
+  get displayName() {
+    if (this.id === this.name) return wX("LOADING1") + this.id + wX("LOADING2");
+    return this.name;
+  }
+
   displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
+    const name = this.displayName;
     const e = L.DomUtil.create("a", "wasabee-portal");
     if (shortName === true && this.name.length > 12) {
-      e.textContent = this.name.slice(0, 8) + "...";
+      e.textContent = name.slice(0, 8) + "...";
     } else {
-      e.textContent = this.name;
+      e.textContent = name;
     }
 
     const team = this.team;
@@ -154,7 +164,7 @@ export default class WasabeePortal {
     }
 
     if (!id) id = generateId();
-    if (!name) name = `Loading: [${id}]`;
+    if (!name) name = id;
     const n = new WasabeePortal(id, name, lat, lng);
     return n;
   }

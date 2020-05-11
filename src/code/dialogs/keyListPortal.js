@@ -52,7 +52,7 @@ const KeyListPortal = WDialog.extend({
     }
 
     this._dialog = window.dialog({
-      title: `Key List for Portal ${this._portal.name}`,
+      title: `Key List for Portal ${this._portal.displayName}`,
       width: "auto",
       height: "auto",
       // position: { my: "center top", at: "center center" },

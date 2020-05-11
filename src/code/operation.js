@@ -420,10 +420,7 @@ export default class WasabeeOp {
   }
 
   get fakedPortals() {
-    const c = this.opportals.filter(p => {
-      if (p.name && p.name.match("^Loading: .*")) return true;
-      return false;
-    });
+    const c = this.opportals.filter(p => p.name && p.name == p.id);
     return c;
   }
 
