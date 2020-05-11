@@ -467,10 +467,12 @@
 
 .wasabee-dialog-fanfield label {
   padding: 4px;
+  grid-column: 1;
 }
 
 .wsabee-dialog-fanfield button {
   padding: 4px;
+  grid-column: 2;
 }
 
 .wasabee-dialog-fanfield drawb {
