@@ -5,14 +5,14 @@ import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
 
-const ImportDialogControl = WDialog.extend({
+const ImportDialog = WDialog.extend({
   statics: {
     TYPE: "importDialog"
   },
 
   initialize: function(map, options) {
     if (!map) map = window.map;
-    this.type = ImportDialogControl.TYPE;
+    this.type = ImportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
@@ -217,4 +217,4 @@ const ImportDialogControl = WDialog.extend({
   }
 });
 
-export default ImportDialogControl;
+export default ImportDialog;

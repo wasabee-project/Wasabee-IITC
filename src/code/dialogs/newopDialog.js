@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeOp from "../operation";
-import ImportDialogControl from "./importDialog";
+import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -33,7 +33,7 @@ const NewopDialog = WDialog.extend({
     L.DomEvent.on(importButton, "click", ev => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
-      const id = new ImportDialogControl(this._map, null);
+      const id = new ImportDialog(this._map, null);
       id.enable();
     });
 
