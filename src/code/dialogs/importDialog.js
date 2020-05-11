@@ -137,6 +137,8 @@ class ImportDialog {
 
   parseDrawTools(string) {
     const newop = new WasabeeOp();
+    // Don't check crosslink
+    newop.startBatchMode();
     newop.name = wX("IMP_DT_OP") + new Date().toGMTString();
     const data = JSON.parse(string);
 
