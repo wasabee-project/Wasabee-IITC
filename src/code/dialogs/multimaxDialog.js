@@ -129,7 +129,9 @@ const MultimaxDialog = WDialog.extend({
   },
 
   doMultimax: function() {
-    const portalsOnScreen = getAllPortalsOnScreen(this._operation);
+    const portalsOnScreen = getAllPortalsOnScreen(this._operation).map(
+      WasabeePortal.fromIITC
+    );
 
     // Calculate the multimax
     if (!this._anchorOne || !this._anchorTwo || !portalsOnScreen) {
@@ -198,18 +200,15 @@ const MultimaxDialog = WDialog.extend({
   /*
 Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
  */
-  fieldCoversPortal: function(a, b, field3, portal) {
+  fieldCoversPortal: function(a, b, c, p) {
     const unreachableMapPoint = this._urp;
-
-    const p = portal.latLng || portal.getLatLng();
-    const c = field3.latLng || field3.getLatLng();
 
     // greatCircleArcIntersect now takes either WasabeeLink or window.link format
     // needs link.getLatLngs(); and to be an object we can cache in
-    const urp = L.polyline([unreachableMapPoint, p]);
+    const urp = L.polyline([unreachableMapPoint, p.latLng]);
     const lab = L.polyline([a.latLng, b.latLng]);
-    const lac = L.polyline([a.latLng, c]);
-    const lbc = L.polyline([c, b.latLng]);
+    const lac = L.polyline([a.latLng, c.latLng]);
+    const lbc = L.polyline([c.latLng, b.latLng]);
 
     let crossings = 0;
     if (greatCircleArcIntersect(urp, lab)) crossings++;
@@ -218,33 +217,33 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
   },
 
-  // build a map that shows which and how many portals are covered by each possible field
+  // build a map that shows which and how many portals are covered by each possible field by guid
   buildPOSet: function(anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
       poset.set(
-        i.id || i.options.guid,
+        i.id,
         visible
           .filter(j => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
           })
-          .map(l => l.id || l.options.guid)
+          .map(j => j.id)
       );
     }
     return poset;
   },
 
-  // build a map that shows which and how many portals are covering each possible field
+  // build a map that shows which and how many portals are covering each possible field by guid
   buildRevPOSet: function(anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
       poset.set(
-        i.id || i.options.guid,
+        i.id,
         visible
           .filter(j => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
           })
-          .map(l => l.id || l.options.guid)
+          .map(j => j.id)
       );
     }
     return poset;
@@ -257,27 +256,27 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
       const iCovers = new Array();
       for (const j of visible) {
         // console.log(iCovers);
-        if (iCovers.includes(j.options.guid)) {
+        if (iCovers.includes(j.id)) {
           // we've already found this one
           // console.log("saved some searching");
           continue;
         }
-        if (j.options.guid == i.options.guid) {
+        if (j.id == i.id) {
           // iCovers.push(j.options.guid);
           continue;
         }
         if (this.fieldCoversPortal(a, b, i, j)) {
-          iCovers.push(j.options.guid);
-          if (poset.has(j.options.guid)) {
+          iCovers.push(j.id);
+          if (poset.has(j.id)) {
             // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
             // console.log("found savings");
-            for (const n of poset.get(j.options.guid)) {
-              if (!iCovers.includes(j.options.guid)) iCovers.push(n);
+            for (const n of poset.get(j.id)) {
+              if (!iCovers.includes(j.id)) iCovers.push(n);
             }
           }
         }
       }
-      poset.set(i.options.guid, iCovers);
+      poset.set(i.id, iCovers);
     }
     return poset;
   },

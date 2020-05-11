@@ -63,7 +63,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setOneButton, "click", () => {
       this._portalSetOne = getAllPortalsOnScreen(this._operation)
-        .map(p => WasabeePortal.get(p.options.guid))
+        .map(WasabeePortal.fromIITC)
         .filter(p => p);
       // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
@@ -114,7 +114,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setTwoButton, "click", () => {
       this._portalSetTwo = getAllPortalsOnScreen(this._operation)
-        .map(p => WasabeePortal.get(p.options.guid))
+        .map(WasabeePortal.fromIITC)
         .filter(p => p);
       // XXX cache
       this._setTwoDisplay.textContent = wX(
@@ -143,7 +143,7 @@ const MadridDialog = MultimaxDialog.extend({
     }
     L.DomEvent.on(setThreeButton, "click", () => {
       this._portalSetThree = getAllPortalsOnScreen(this._operation)
-        .map(p => WasabeePortal.get(p.options.guid))
+        .map(WasabeePortal.fromIITC)
         .filter(p => p);
       // XXX cache
       this._setThreeDisplay.textContent = wX(
