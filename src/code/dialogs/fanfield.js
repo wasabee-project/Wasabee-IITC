@@ -174,24 +174,6 @@ const FanfieldDialog = WDialog.extend({
         (2 * Math.PI) >
       Math.PI
     ) {
-      let swap = this._start;
-      this._start = this._end;
-      this._end = swap;
-
-      swap = startAngle;
-      startAngle = endAngle;
-      endAngle = swap;
-
-      // update interface
-      localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
-      this._startDisplay.textContent = "";
-      this._startDisplay.appendChild(
-        this._start.displayFormat(this._smallScreen)
-      );
-      localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
-      this._endDisplay.textContent = "";
-      this._endDisplay.appendChild(this._end.displayFormat(this._smallScreen));
-
       this._invert = true;
     }
 
@@ -225,8 +207,12 @@ const FanfieldDialog = WDialog.extend({
     const sorted = new Array(...good.entries())
       .sort((a, b) => a[0] - b[0])
       .map(v => v[1]);
+
+    if (this._invert) {
+      sorted.reverse();
+    }
     // Build the sequence of portals between start/end
-    let slice = new Array();
+    const slice = new Array();
     let start = 0;
     for (start = 0; sorted[start].id != this._start.id; start++);
     for (; sorted[start % sorted.length].id != this._end.id; start++) {
@@ -267,10 +253,8 @@ const FanfieldDialog = WDialog.extend({
     this._operation.endBatchMode();
     const ap = 313 * order + 1250 * fields;
     // too many parameters for wX();
-    let message = `Fanfield found ${order} links and ${fields} fields for ${ap} AP.`;
-    if (this._invert)
-      message +=
-        "\nNB: start/end portals were swapped due to angle exceeding 180°.";
+    let message = `Fanfield found ${order} links and ${fields} fields for ${ap} AP`;
+    if (this._invert) message += " (counter clockwise)";
     alert(message);
   },
 
