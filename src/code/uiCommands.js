@@ -175,7 +175,7 @@ export const getAllPortalsOnScreen = function(operation) {
         )
       )
         continue;
-      x.push(window.portals[portal]);
+      x.push(WasabeePortal.fromIITC(window.portals[portal]));
     }
   }
   return x;

@@ -129,9 +129,7 @@ const MultimaxDialog = WDialog.extend({
   },
 
   doMultimax: function() {
-    const portalsOnScreen = getAllPortalsOnScreen(this._operation).map(
-      WasabeePortal.fromIITC
-    );
+    const portalsOnScreen = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax
     if (!this._anchorOne || !this._anchorTwo || !portalsOnScreen) {

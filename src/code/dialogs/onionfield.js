@@ -125,9 +125,7 @@ const OnionfieldDialog = WDialog.extend({
     }
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
-    const allPortals = getAllPortalsOnScreen(this._operation).map(
-      WasabeePortal.fromIITC
-    );
+    const allPortals = getAllPortalsOnScreen(this._operation);
 
     // add the anchor to the operation, needed to check for crosslinks
     this._operation.addPortal(this._anchor);

@@ -214,9 +214,7 @@ const HomogeneousDialog = WDialog.extend({
     this._operation.addLink(this._anchorTwo, this._anchorThree, "Outer 3");
     this._operation.endBatchMode();
     const portals = new Array();
-    for (const p of getAllPortalsOnScreen(this._operation).map(
-      WasabeePortal.fromIITC
-    )) {
+    for (const p of getAllPortalsOnScreen(this._operation)) {
       if (
         this._fieldCovers(
           this._anchorOne,
