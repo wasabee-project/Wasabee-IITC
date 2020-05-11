@@ -571,31 +571,55 @@
 }
 .wasabee-dialog-link div.container {
   display: grid;
-  grid-template-columns: auto auto auto auto auto;
-  grid-tempate-rows: auto auto auto auto;
+  grid-template-columns: (repeat 5, auto);
+  grid-tempate-rows: (repeat 4, auto);
 }
+
 .wasabee-dialog-link label {
-  padding: 4px;
+  padding: 5px;
   grid-column: 1 / span;
+  margin: 5px;
 }
 .wasabee-dialog-link button.set {
-  grid-column-start: 2;
-  grid-column-end: 3;
+  grid-column: 2;
+  text-decoration: underline;
+  cursor: pointer;
 }
 .wasabee-dialog-link span.portal {
-  grid-column-start: 3;
-  grid-column-end: 4;
+  grid-column: 3;
+  margin: 5px;
 }
 .wasabee-dialog-link button.add {
-  grid-column-start: 4;
-  grid-column-end: 5;
+  grid-column: 4;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 5px;
 }
 .wasabee-dialog-link input.desc {
   padding: 4px;
-  grid-column-start: 4;
+  grid-column: 4;
+  margin: 5px;
 }
 .wasabee-dialog-link button.clear {
-  grid-column-start: 5;
+  grid-column: 5;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.wasabee-dialog-link buttonall {
+  cursor: pointer;
+  margin: 5px;
+  grid-column: 3;
+  grid-row: 4;
+  border-radius: 35px;
+  border-style: groove;
+  padding: 4px;
+  width: 150px;
+  height: 15px;
+  border: 2px solid goldenrod;
+  text-align: center;
+  text-color: #ffcc00;
 }
 
 .wasabee-dialog-manageteam {
