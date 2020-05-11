@@ -63,9 +63,6 @@ const MarkerAddDialog = WDialog.extend({
     this._comment = L.DomUtil.create("input", null, content);
     this._comment.placeholder = "Input comment";
 
-    const bee = L.DomUtil.create("bee", null, content);
-    bee.textContent = "\uD83D\uDC1D";
-
     const addMarkerButton = L.DomUtil.create("button", null, content);
     addMarkerButton.textContent = wX("ADD_MARKER2");
 
