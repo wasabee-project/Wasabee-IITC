@@ -199,12 +199,7 @@ const BlockerList = WDialog.extend({
 
     // add marker
     let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
-    if (
-      window.portals[portalId] &&
-      window.portals[portalId].options &&
-      window.portals[portalId].options.data &&
-      window.portals[portalId].options.data.team == "E"
-    ) {
+    if (wportal.team == "E") {
       type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
     }
     this._operation.addMarker(type, wportal, "auto-marked");

@@ -92,6 +92,12 @@ export default class WasabeePortal {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
+  get team() {
+    if (window.portals[this.id] && window.portals[this.id].options.data)
+      return window.portals[this.id].options.data.team;
+    return "";
+  }
+
   displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
@@ -102,19 +108,15 @@ export default class WasabeePortal {
       e.textContent = this.name;
     }
 
-    if (window.portals[this.id]) {
-      const data = window.portals[this.id].options.data;
-      if (data) {
-        if (data.team == "E") {
-          e.classList.add("enl");
-        }
-        if (data.team == "R") {
-          e.classList.add("res");
-        }
-        if (data.team == "N") {
-          e.classList.add("unclaimed");
-        }
-      }
+    const team = this.team;
+    if (team == "E") {
+      e.classList.add("enl");
+    }
+    if (team == "R") {
+      e.classList.add("res");
+    }
+    if (team == "N") {
+      e.classList.add("unclaimed");
     }
 
     // e.title = this.name;
