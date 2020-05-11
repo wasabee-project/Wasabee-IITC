@@ -201,8 +201,8 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
   fieldCoversPortal: function(a, b, field3, portal) {
     const unreachableMapPoint = this._urp;
 
-    const p = portal.getLatLng();
-    const c = field3.getLatLng();
+    const p = portal.latLng || portal.getLatLng();
+    const c = field3.latLng || field3.getLatLng();
 
     // greatCircleArcIntersect now takes either WasabeeLink or window.link format
     // needs link.getLatLngs(); and to be an object we can cache in
@@ -223,12 +223,28 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     const poset = new Map();
     for (const i of visible) {
       poset.set(
-        i.options.guid,
+        i.id || i.options.guid,
         visible
           .filter(j => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
           })
-          .map(l => l.options.guid)
+          .map(l => l.id || l.options.guid)
+      );
+    }
+    return poset;
+  },
+
+  // build a map that shows which and how many portals are covering each possible field
+  buildRevPOSet: function(anchor1, anchor2, visible) {
+    const poset = new Map();
+    for (const i of visible) {
+      poset.set(
+        i.id || i.options.guid,
+        visible
+          .filter(j => {
+            return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
+          })
+          .map(l => l.id || l.options.guid)
       );
     }
     return poset;
@@ -266,7 +282,7 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return poset;
   },
 
-  longestSequence: function(poset) {
+  longestSequence: function(poset, start) {
     const alreadyCalculatedSequences = new Map();
     const sequence_from = c => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
@@ -282,6 +298,9 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
       }
       return alreadyCalculatedSequences.get(c);
     };
+
+    if (start) return sequence_from(start);
+
     return Array.from(poset.keys())
       .map(sequence_from)
       .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));

@@ -22,11 +22,13 @@ const HomogeneousDialog = WDialog.extend({
       alert("Requires IITC 0.30.1 or newer");
       return;
     }
-    WDialog.prototype.addHooks.call(this);
+    this._layerGroup = new L.LayerGroup();
+    window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
     this._displayDialog();
   },
 
   removeHooks: function() {
+    window.removeLayerGroup(this._layerGroup);
     WDialog.prototype.removeHooks.call(this);
   },
 
@@ -164,6 +166,7 @@ const HomogeneousDialog = WDialog.extend({
           this._dialog.dialog("close");
         },
         "Clear Links": () => {
+          this._layerGroup.clearLayers();
           clearAllLinks(getSelectedOperation());
         }
       }
@@ -190,6 +193,8 @@ const HomogeneousDialog = WDialog.extend({
 
   hfield: function() {
     this._failed = 0;
+    this._layerGroup.clearLayers();
+
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
       alert("please select three anchors");
       return;
@@ -241,10 +246,7 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _recurser: function(depth, portalsCovered, one, two, three) {
-    if (depth >= this.depthMenu.value) {
-      // console.log("gone too deep");
-      return;
-    }
+    if (depth >= this.depthMenu.value) return;
     this._color = this._colors[depth % this._colors.length];
 
     // console.log(depth, "portals in consideration", portalsCovered);
@@ -261,7 +263,36 @@ const HomogeneousDialog = WDialog.extend({
     }
     // sort by distance to centeroid the field
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
-    if (sorted.length == 0) return;
+    if (sorted.size == 0) {
+      console.log("empty set");
+      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+      const polygon = L.polygon(latlngs, { color: "red" });
+      polygon.addTo(this._layerGroup);
+      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
+      return;
+    }
+
+    // if there is exactly one portal, use it
+    if (sorted.size == 1) {
+      // console.log("one portal fast-path");
+      const i = sorted.keys();
+      const v = sorted.get(i.next().value);
+      const onlyp = WasabeePortal.get(v);
+      let linkID = this._operation.addLink(one, onlyp);
+      this._operation.setLinkColor(linkID, this._color);
+      linkID = this._operation.addLink(two, onlyp);
+      this._operation.setLinkColor(linkID, this._color);
+      linkID = this._operation.addLink(three, onlyp);
+      this._operation.setLinkColor(linkID, this._color);
+
+      if (depth + 1 < this.depthMenu.value) {
+        this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2 - 1;
+        const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+        const polygon = L.polygon(latlngs, { color: "orange" });
+        polygon.addTo(this._layerGroup);
+      }
+      return;
+    }
 
     // find the portal that divides the area into regions with the closest number of portals
     // starts at the center-most and works outwards
@@ -310,8 +341,11 @@ const HomogeneousDialog = WDialog.extend({
     }
 
     if (best.length == 0) {
-      console.log("hit bottom first");
-      this._failed++;
+      console.log("hit bottom at: ", depth, one.name, two.name, three.name);
+      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
+      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
+      const polygon = L.polygon(latlngs, { color: "yellow" });
+      polygon.addTo(this._layerGroup);
       return;
     }
 
