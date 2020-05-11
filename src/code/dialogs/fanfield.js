@@ -15,13 +15,10 @@ const FanfieldDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-    this._layerGroup = new L.LayerGroup();
-    window.addLayerGroup("Wasabee Fan Field Debug", this._layerGroup, true);
   },
 
   removeHooks: function() {
     WDialog.prototype.removeHooks.call(this);
-    window.removeLayerGroup(this._layerGroup);
   },
 
   _displayDialog: function() {
@@ -157,15 +154,13 @@ const FanfieldDialog = WDialog.extend({
 
   // fanfiled determines the portals between start/end and their angle (and order)
   fanfield: function() {
-    this._layerGroup.clearLayers();
-
     if (!this._anchor || !this._start || !this._end) {
       alert(wX("SET_3_PORT"));
       return;
     }
 
-    let startAngle = this._angle(this._anchor, this._start);
-    let endAngle = this._angle(this._anchor, this._end);
+    const startAngle = this._angle(this._anchor, this._start);
+    const endAngle = this._angle(this._anchor, this._end);
 
     // swap start/end if more than 180°
     this._invert = false;
@@ -177,26 +172,12 @@ const FanfieldDialog = WDialog.extend({
       this._invert = true;
     }
 
-    // const text = min + " ... " + max + " " + this._cw + " " + (max - min);
-    // console.log(text);
-
     const good = new Map();
     for (const p of getAllPortalsOnScreen(this._operation).map(p =>
       WasabeePortal.get(p.options.guid)
     )) {
       if (p.id == this._anchor.id) continue;
-      let pAngle = this._angle(this._anchor, p);
-
-      const label = L.marker(p.latLng, {
-        icon: L.divIcon({
-          className: "plugin-portal-names",
-          iconAnchor: [15],
-          iconSize: [30, 12],
-          html: pAngle
-        }),
-        guid: p.id
-      });
-      label.addTo(this._layerGroup);
+      const pAngle = this._angle(this._anchor, p);
 
       good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
     }
