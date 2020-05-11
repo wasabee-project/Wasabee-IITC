@@ -131,10 +131,11 @@ const StarburstDialog = WDialog.extend({
     }
 
     this._operation.startBatchMode();
-    for (const p of getAllPortalsOnScreen(this._operation)) {
-      if (p.options.guid == this._anchor.id) continue;
-      const wp = WasabeePortal.get(p.options.guid);
-      this._operation.addLink(wp, this._anchor, "auto starburst");
+    for (const p of getAllPortalsOnScreen(this._operation).map(
+      WasabeePortal.fromIITC
+    )) {
+      if (p.id == this._anchor.id) continue;
+      this._operation.addLink(p, this._anchor, "auto starburst");
     }
     this._operation.endBatchMode();
   }
