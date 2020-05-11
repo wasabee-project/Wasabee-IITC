@@ -1,11 +1,6 @@
 import { WButton } from "../leafletClasses";
-import MultimaxButtonControl from "../dialogs/multimaxDialog";
-import FanfieldDialog from "../dialogs/fanfield";
-import StarburstDialog from "../dialogs/starburst";
-import OnionfieldDialog from "../dialogs/onionfield";
-import HomogeneousDialog from "../dialogs/homogeneous";
-import MadridDialog from "../dialogs/madrid";
 import LinkDialog from "../dialogs/linkDialog";
+import AutodrawsDialog from "../dialogs/autodraws";
 import wX from "../wX";
 
 const LinkButton = WButton.extend({
@@ -13,8 +8,7 @@ const LinkButton = WButton.extend({
     TYPE: "LinkButton"
   },
 
-  initialize: function(map, container) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, container) {
     this._map = map;
 
     this.type = LinkButton.TYPE;
@@ -43,62 +37,12 @@ const LinkButton = WButton.extend({
         context: context
       },
       {
-        title: wX("MM TITLE"),
-        text: wX("MM"),
+        title: wX("AUTO_DRAWS"),
+        text: wX("AUTO_DRAWS"),
         callback: () => {
           this.disable();
-          const mm = new MultimaxButtonControl(map);
-          mm.enable();
-        },
-        context: context
-      },
-      {
-        title: wX("MAX TITLE"),
-        text: wX("MAX"),
-        callback: () => {
-          this.disable();
-          const ff = new FanfieldDialog(map);
-          ff.enable();
-        },
-        context: context
-      },
-      {
-        title: wX("STARBURST TITLE"),
-        text: wX("STARBURST"),
-        callback: () => {
-          this.disable();
-          const sb = new StarburstDialog(map);
-          sb.enable();
-        },
-        context: context
-      },
-      {
-        title: "Onion/Rose",
-        text: "Onion/Rose",
-        callback: () => {
-          this.disable();
-          const o = new OnionfieldDialog(map);
-          o.enable();
-        },
-        context: context
-      },
-      {
-        title: "Homogeneous",
-        text: "H-Genius",
-        callback: () => {
-          this.disable();
-          const h = new HomogeneousDialog(map);
-          h.enable();
-        },
-        context: context
-      },
-      {
-        title: "Madrid Protocol",
-        text: "Madrid Protocol",
-        callback: () => {
-          this.disable();
-          const m = new MadridDialog(map);
-          m.enable();
+          const a = new AutodrawsDialog(map);
+          a.enable();
         },
         context: context
       }

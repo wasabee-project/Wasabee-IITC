@@ -412,6 +412,18 @@
 .wasabee-dialog-auth-buttonset button {
   margin-right: 4px;
 }
+
+.wasabee-dialog-autodraws {}
+.wasabee-dialog-autodraws div.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 4px;
+}
+.wasabee-dialog-autodraws a {
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+
 .wasabee-dialog-blockerlist {
 }
 .wasabee-dialog-confirm {
