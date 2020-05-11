@@ -234,9 +234,7 @@ const FanfieldDialog = WDialog.extend({
     this._operation.endBatchMode();
     const ap = 313 * order + 1250 * fields;
     // too many parameters for wX();
-    let message = `Fanfield found ${order} links and ${fields} fields for ${ap} AP`;
-    if (this._invert) message += " (counter clockwise)";
-    alert(message);
+    alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
   _angle: function(a, p) {
