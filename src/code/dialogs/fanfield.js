@@ -238,11 +238,8 @@ const FanfieldDialog = WDialog.extend({
   },
 
   _angle: function(a, p) {
-    const all = a.latLng; // anchor is always a WasabeePortal
-    const pll = p.latLng || p._latlng; // probably not a WasabeePortal (except start/end)
-
-    // work in radians since no one sees it and degrees would be slower
-    return Math.atan2(pll.lng - all.lng, pll.lat - all.lat);
+    // assume world is flat or portals not too far
+    return Math.atan2(p.latLng.lng - a.latLng.lng, p.latLng.lat - a.latLng.lat);
   }
 });
 
