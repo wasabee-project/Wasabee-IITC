@@ -59,6 +59,12 @@ export default class WasabeePortal {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
+  // easy compat with IITC's format -- just here for safety as we use more WP
+  get _latlng() {
+    console.log("calling WasabeePortal._latlng() compat");
+    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+  }
+
   displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
