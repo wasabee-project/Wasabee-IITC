@@ -226,8 +226,8 @@ const testLink = (link, operation) => {
       let fromPortal = WasabeePortal.get(link.options.data.oGuid);
       if (!fromPortal)
         fromPortal = WasabeePortal.fake(
-          (link.options.data.oLatE6 / 1e6).toFixed(6).toString(),
-          (link.options.data.oLngE6 / 1e6).toFixed(6).toString(),
+          (link.options.data.oLatE6 / 1e6).toFixed(6),
+          (link.options.data.oLngE6 / 1e6).toFixed(6),
           link.options.data.oGuid
         );
       if (!operation.containsPortal(fromPortal)) {
@@ -237,8 +237,8 @@ const testLink = (link, operation) => {
       let toPortal = WasabeePortal.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
-          (link.options.data.dLatE6 / 1e6).toFixed(6).toString(),
-          (link.options.data.dLngE6 / 1e6).toFixed(6).toString(),
+          (link.options.data.dLatE6 / 1e6).toFixed(6),
+          (link.options.data.dLngE6 / 1e6).toFixed(6),
           link.options.data.dGuid
         );
       if (!operation.containsPortal(toPortal)) {

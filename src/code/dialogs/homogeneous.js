@@ -259,7 +259,7 @@ const HomogeneousDialog = WDialog.extend({
     for (const p of portalsCovered) {
       if (p == one.id || p == two.id || p == three.id) continue;
       const cDist = this._map.distance(center, p.latLng || p._latlng);
-      m.set(cDist, p.id || p.options.guid);
+      m.set(cDist, p);
     }
     // sort by distance to centeroid the field
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
@@ -276,8 +276,7 @@ const HomogeneousDialog = WDialog.extend({
     if (sorted.size == 1) {
       // console.log("one portal fast-path");
       const i = sorted.keys();
-      const v = sorted.get(i.next().value);
-      const onlyp = WasabeePortal.get(v);
+      const onlyp = sorted.get(i.next().value);
       let linkID = this._operation.addLink(one, onlyp);
       this._operation.setLinkColor(linkID, this._color);
       linkID = this._operation.addLink(two, onlyp);
@@ -300,15 +299,9 @@ const HomogeneousDialog = WDialog.extend({
     let best = [];
     let bestp = {};
     // for each of the portals in play
-    for (const [k, v] of sorted) {
+    for (const [k, wp] of sorted) {
       // silence lint
       this._trash = k;
-      // convert to wasabee portal
-      const wp = WasabeePortal.get(v);
-      if (!wp || !wp.id) {
-        console.log("IITC has not loaded portal data for:", v);
-        continue;
-      }
       const subregions = this._getSubregions(
         wp,
         new Array(...portalsCovered),
@@ -405,11 +398,10 @@ const HomogeneousDialog = WDialog.extend({
     return this._map.unproject(point);
   },
 
-  _fieldCovers: function(a, b, c, test) {
+  _fieldCovers: function(a, b, c, p) {
     const unreachableMapPoint = this._urp;
-    const p = test.latLng || test.getLatLng();
 
-    const urp = L.polyline([unreachableMapPoint, p]);
+    const urp = L.polyline([unreachableMapPoint, p.latLng]);
     const lab = L.polyline([a.latLng, b.latLng]);
     const lac = L.polyline([a.latLng, c.latLng]);
     const lbc = L.polyline([c.latLng, b.latLng]);

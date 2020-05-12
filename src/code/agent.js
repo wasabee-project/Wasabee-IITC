@@ -81,7 +81,7 @@ export default class WasabeeAgent {
         return;
       }
 
-      const f = selectedPortal.name;
+      const f = selectedPortal.displayName;
       const name = this.name;
       const d = new ConfirmDialog();
       d.setup(wX("SEND TARGET"), wX("SEND TARGET CONFIRM", f, name), () => {

@@ -149,7 +149,7 @@ const OnionfieldDialog = WDialog.extend({
   _removeFromList: function(portalsRemaining, guid) {
     const x = new Array();
     for (const p of portalsRemaining) {
-      if (p.options.guid != guid) x.push(p);
+      if (p.id != guid) x.push(p);
     }
     return x;
   },
@@ -170,42 +170,33 @@ const OnionfieldDialog = WDialog.extend({
     const m = new Map();
     for (const p of portalsRemaining) {
       if (
-        (two && p.options.guid == two.id) ||
-        (three && p.options.guid == three.id) ||
-        p.options.guid == one.id
+        (two && p.id == two.id) ||
+        (three && p.id == three.id) ||
+        p.id == one.id
       ) {
-        portalsRemaining = this._removeFromList(
-          portalsRemaining,
-          p.options.guid
-        );
+        portalsRemaining = this._removeFromList(portalsRemaining, p.id);
         continue;
       }
 
-      const pDist = this._map.distance(one.latLng, p._latlng);
-      m.set(pDist, p.options.guid);
+      const pDist = this._map.distance(one.latLng, p.latLng);
+      m.set(pDist, p);
     }
     // sort by distance
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.length == 0) return;
 
     // for each of the portals in play
-    for (const [k, v] of sorted) {
+    for (const [k, wp] of sorted) {
       // silence lint
       this._trash = k;
 
-      // convert to wasabee portal
-      const wp = WasabeePortal.get(v);
-      if (!wp || !wp.id) {
-        console.log("IITC has not loaded portal data for:", wp);
-        continue;
-      }
       // we need it in the op (this prevents dupes) for links later
       this._operation.addPortal(wp);
       // unused ones will be purged at the end
 
       // do the intial field
       if (!two) {
-        portalsRemaining = this._removeFromList(portalsRemaining, v);
+        portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
         const a = new WasabeeLink(this._operation, one.id, wp.id);
         a.color = this._color;
         a.throwOrderPos = 1;
@@ -213,7 +204,7 @@ const OnionfieldDialog = WDialog.extend({
         return this._recurser(portalsRemaining, thisPath, one, wp);
       }
       if (!three) {
-        portalsRemaining = this._removeFromList(portalsRemaining, v);
+        portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
         const a = new WasabeeLink(this._operation, one.id, wp.id);
         a.color = this._color;
         a.throwOrderPos = 2;
@@ -242,7 +233,7 @@ const OnionfieldDialog = WDialog.extend({
 
       // if none of the links are blocked by existing linkes in thisPath, we found an option
       if (!aBlock && !bBlock && !cBlock) {
-        portalsRemaining = this._removeFromList(portalsRemaining, v);
+        portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
 
         let Y = one;
         let Z = two;
@@ -320,9 +311,9 @@ const OnionfieldDialog = WDialog.extend({
   // angle a<bc in radians
   _angle: function(a, b, c) {
     // this formua finds b, swap a&b for our purposes
-    const A = this._map.project(b.latLng || b._latlng);
-    const B = this._map.project(a.latLng || a._latlng);
-    const C = this._map.project(c.latLng || c._latlng);
+    const A = this._map.project(b.latLng);
+    const B = this._map.project(a.latLng);
+    const C = this._map.project(c.latLng);
 
     const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
     const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));

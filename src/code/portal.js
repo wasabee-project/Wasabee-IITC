@@ -1,17 +1,21 @@
 import { generateId } from "./auxiliar";
+import wX from "./wX";
 
 export default class WasabeePortal {
   constructor(id, name, lat, lng, comment, hardness) {
     this.id = id;
+    // migration: don't use a locale dependent name
+    if (name.includes(id)) name = id;
     this.name = name;
+
     // check window.portals[id].options.data for updated name ?
     if (typeof lat == "number") {
-      this.lat = lat.toString();
+      this.lat = lat.toFixed(6);
     } else {
       this.lat = lat;
     }
     if (typeof lng == "number") {
-      this.lng = lng.toString();
+      this.lng = lng.toFixed(6);
     } else {
       this.lng = lng;
     }
@@ -37,6 +41,33 @@ export default class WasabeePortal {
     return wp;
   }
 
+  // create a wasabee portal from a IITC portal (leaflet marker)
+  static fromIITC(p) {
+    // we have all the details
+    if (p && p.options && p.options.data && p.options.guid) {
+      const data = p.options.data;
+      const id = p.options.guid;
+      if (data.title) {
+        return new WasabeePortal(
+          id,
+          data.title,
+          (data.latE6 / 1e6).toFixed(6),
+          (data.lngE6 / 1e6).toFixed(6)
+        );
+      }
+      // do we have enough to fake it?
+      if (data.latE6) {
+        return WasabeePortal.fake(
+          (data.latE6 / 1e6).toFixed(6),
+          (data.lngE6 / 1e6).toFixed(6),
+          id
+        );
+      }
+    }
+    // nothing to get
+    return null;
+  }
+
   // if the name or location changes, this will catch it
   fullUpdate() {
     if (this.id.length != 35) return; // ignore faked ones from DrawTools imports
@@ -45,8 +76,8 @@ export default class WasabeePortal {
       res => {
         if (res.title) {
           this.name = res.title;
-          this.lat = (res.latE6 / 1e6).toFixed(6).toString();
-          this.lng = (res.lngE6 / 1e6).toFixed(6).toString();
+          this.lat = (res.latE6 / 1e6).toFixed(6);
+          this.lng = (res.lngE6 / 1e6).toFixed(6);
         }
       },
       reject => {
@@ -65,29 +96,37 @@ export default class WasabeePortal {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
+  get team() {
+    if (window.portals[this.id] && window.portals[this.id].options.data)
+      return window.portals[this.id].options.data.team;
+    return "";
+  }
+
+  get displayName() {
+    if (this.id === this.name) return wX("LOADING1") + this.id + wX("LOADING2");
+    return this.name;
+  }
+
   displayFormat(shortName = false) {
     const pt = this.latLng;
     const v = `${this.lat},${this.lng}`;
+    const name = this.displayName;
     const e = L.DomUtil.create("a", "wasabee-portal");
     if (shortName === true && this.name.length > 12) {
-      e.textContent = this.name.slice(0, 8) + "...";
+      e.textContent = name.slice(0, 8) + "...";
     } else {
-      e.textContent = this.name;
+      e.textContent = name;
     }
 
-    if (window.portals[this.id]) {
-      const data = window.portals[this.id].options.data;
-      if (data) {
-        if (data.team == "E") {
-          e.classList.add("enl");
-        }
-        if (data.team == "R") {
-          e.classList.add("res");
-        }
-        if (data.team == "N") {
-          e.classList.add("unclaimed");
-        }
-      }
+    const team = this.team;
+    if (team == "E") {
+      e.classList.add("enl");
+    }
+    if (team == "R") {
+      e.classList.add("res");
+    }
+    if (team == "N") {
+      e.classList.add("unclaimed");
     }
 
     // e.title = this.name;
@@ -115,27 +154,7 @@ export default class WasabeePortal {
   }
 
   static get(id) {
-    // we have all the details
-    if (window.portals[id] && window.portals[id].options.data.title) {
-      const data = window.portals[id].options.data;
-      return new WasabeePortal(
-        id,
-        data.title,
-        (data.latE6 / 1e6).toFixed(6).toString(),
-        (data.lngE6 / 1e6).toFixed(6).toString()
-      );
-    }
-    // do we have enough to fake it?
-    if (window.portals[id] && window.portals[id].options.data.latE6) {
-      const data = window.portals[id].options.data;
-      return WasabeePortal.fake(
-        (data.latE6 / 1e6).toFixed(6).toString(),
-        (data.lngE6 / 1e6).toFixed(6).toString(),
-        id
-      );
-    }
-    // nothing to get
-    return null;
+    return WasabeePortal.fromIITC(window.portals[id]);
   }
 
   static fake(lat, lng, id, name) {
@@ -145,7 +164,7 @@ export default class WasabeePortal {
     }
 
     if (!id) id = generateId();
-    if (!name) name = `Loading: [${id}]`;
+    if (!name) name = id;
     const n = new WasabeePortal(id, name, lat, lng);
     return n;
   }

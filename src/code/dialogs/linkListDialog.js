@@ -42,7 +42,7 @@ const LinkListDialog = WDialog.extend({
     if (!this._map) return;
 
     this._dialog = window.dialog({
-      title: this._portal.name + wX("LINKS2"),
+      title: this._portal.displayName + wX("LINKS2"),
       width: "auto",
       height: "auto",
       html: this._table.table,

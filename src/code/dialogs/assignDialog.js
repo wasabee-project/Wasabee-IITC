@@ -54,7 +54,7 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(target.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("LINK ASSIGNMENT");
-      this._name = wX("ASSIGN LINK PROMPT", portal.name);
+      this._name = wX("ASSIGN LINK PROMPT", portal.displayName);
     }
 
     if (target instanceof WasabeeMarker) {
@@ -63,7 +63,7 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("MARKER ASSIGNMENT");
-      this._name = wX("ASSIGN MARKER PROMPT", portal.name);
+      this._name = wX("ASSIGN MARKER PROMPT", portal.displayName);
     }
 
     if (target instanceof WasabeeAnchor) {
@@ -72,7 +72,7 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("ANCHOR ASSIGNMENT");
-      this._name = wX("ASSIGN OUTBOUND PROMPT", portal.name);
+      this._name = wX("ASSIGN OUTBOUND PROMPT", portal.displayName);
     }
 
     const menu = this._getAgentMenu(target.assignedTo);

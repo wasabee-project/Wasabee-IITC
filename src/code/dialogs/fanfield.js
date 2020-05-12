@@ -199,9 +199,7 @@ const FanfieldDialog = WDialog.extend({
     // console.log(text);
 
     const good = new Map();
-    for (const p of getAllPortalsOnScreen(this._operation).map(p =>
-      WasabeePortal.get(p.options.guid)
-    )) {
+    for (const p of getAllPortalsOnScreen(this._operation)) {
       if (p.id == this._anchor.id) continue;
       let pAngle = this._angle(this._anchor, p);
 
