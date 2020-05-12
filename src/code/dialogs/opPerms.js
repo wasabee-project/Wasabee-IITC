@@ -37,7 +37,6 @@ const OpPermList = WDialog.extend({
   },
 
   update: function(op) {
-    console.log(this);
     this._operation = op;
     this.buildTable();
     this._html.firstChild.replaceWith(this._table.table);
@@ -150,13 +149,12 @@ const OpPermList = WDialog.extend({
     // send to server
     addPermPromise(this._operation.ID, teamID, role).then(
       () => {
-        // then add locally
+        // then add locally for display
         this._operation.teamlist.push({
           teamid: teamID,
           role: role
         });
         this._operation.store();
-        console.log(this._operation.teamlist);
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
       err => {
@@ -170,7 +168,7 @@ const OpPermList = WDialog.extend({
     // send change to server
     delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
       () => {
-        // then replicate here for display
+        // then remove locally for display
         const n = new Array();
         for (const p of this._operation.teamlist) {
           if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
