@@ -91,6 +91,7 @@ W.static.strings.Espanol = require("./translations/spanish.json");
 W.static.strings.English = require("./translations/english.json");
 W.static.strings.Italiano = require("./translations/italian.json");
 W.static.strings.Tagalog = require("./translations/filipino.json");
+W.static.strings.French = require("./translations/french.json");
 W.static.strings.Squirrel = require("./translations/squirrel.json");
 W.static.strings.Emoji = require("./translations/emoji.json");
 W.static.tips = require("./translations/tips.json");
