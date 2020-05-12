@@ -92,7 +92,7 @@ const MultimaxDialog = WDialog.extend({
     this._flcheck.type = "checkbox";
 
     // Go button
-    const button = L.DomUtil.create("drawb", null, container);
+    const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = "\uD83D\uDC1D" + wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);

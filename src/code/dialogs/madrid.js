@@ -167,7 +167,7 @@ const MadridDialog = MultimaxDialog.extend({
     const placeholder = L.DomUtil.create("label", "placeholder", container);
     placeholder.textContent = "\u2063";
     // Go button
-    const button = L.DomUtil.create("drawb", null, container);
+    const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = "\uD83D\uDC1D" + wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMadrid.call(this);

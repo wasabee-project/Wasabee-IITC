@@ -488,7 +488,7 @@
   grid-column: 2;
 }
 
-.wasabee-dialog-fanfield drawb {
+.wasabee-dialog-fanfield button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
@@ -525,7 +525,7 @@
 .wasabee-dialog-homogeneous button {
 }
 
-.wasabee-dialog-homogeneous drawb {
+.wasabee-dialog-homogeneous button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
@@ -707,7 +707,7 @@
   border-spacing: 5px;
 }
 
-.wasabee-dialog-madrid drawb {
+.wasabee-dialog-madrid button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
@@ -741,7 +741,7 @@
 .wasabee-dialog-multimax button {
 }
 
-.wasabee-dialog-multimax drawb {
+.wasabee-dialog-multimax button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
@@ -869,7 +869,7 @@
 .wasabee-dialog-onion button {
 }
 
-.wasabee-dialog-onion drawb {
+.wasabee-dialog-onion button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
@@ -933,7 +933,7 @@
   grid-row: 2;
 }
 
-.wasabee-dialog-starburst drawb {
+.wasabee-dialog-starburst button.drawb {
   cursor: pointer;
   border-radius: 35px;
   border-style: groove;
