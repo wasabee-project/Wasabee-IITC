@@ -494,7 +494,7 @@
   border-style: groove;
   padding: 4px;
   width: 150px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
   grid-column: 2;
@@ -531,7 +531,7 @@
   border-style: groove;
   padding: 4px;
   width: 150px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
   grid-column: 2;
@@ -713,7 +713,7 @@
   border-style: groove;
   padding: 4px;
   width: 150px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -747,7 +747,7 @@
   border-style: groove;
   padding: 4px;
   width: 150px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -875,7 +875,7 @@
   border-style: groove;
   padding: 4px;
   width: 150px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
 }
@@ -938,7 +938,7 @@
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
-  height: 15px;
+  height: 30px;
   border: 2px solid goldenrod;
   text-align: center;
   grid-column: 2;
