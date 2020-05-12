@@ -10,12 +10,22 @@ export default class WasabeeTeam {
   }
 
   static create(data) {
-    const d = JSON.parse(data);
+    // all consumers curently send JSON, but for API consistency
+    // support both obj and JSON
+    if (typeof data == "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.log("corrupted team");
+        return null;
+      }
+    }
+
     const team = new WasabeeTeam();
-    team.id = d.id;
-    team.name = d.name;
+    team.id = data.id;
+    team.name = data.name;
     team.fetched = Date.now();
-    for (const agent of d.agents) {
+    for (const agent of data.agents) {
       team.agents.push(WasabeeAgent.create(agent));
       // WasabeeAgent.create takes care of caching it for us
     }

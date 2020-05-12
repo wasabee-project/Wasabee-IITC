@@ -21,7 +21,12 @@ export default class WasabeeAgent {
 
   static create(obj) {
     if (typeof obj == "string") {
-      obj = JSON.parse(obj);
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
     }
     const a = new WasabeeAgent();
     a.id = obj.id;

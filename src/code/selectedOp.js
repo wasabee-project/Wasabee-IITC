@@ -86,6 +86,8 @@ export const getOperationByID = opID => {
   let op = null;
   try {
     const v = store.get(opID);
+    // parse the JSON here so we can alert based on it
+    // .create can parse for us, but this gives better alerting
     if (v) op = WasabeeOp.create(JSON.parse(v));
   } catch (e) {
     console.log(e);

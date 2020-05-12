@@ -31,7 +31,13 @@ export default class WasabeeMe {
     if (!lsme || typeof lsme !== "string") {
       return false;
     }
-    const me = JSON.parse(lsme);
+    let me = null;
+    try {
+      me = JSON.parse(lsme);
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
     if (me.fetched > maxCacheAge) {
       return true;
     }
@@ -104,7 +110,12 @@ export default class WasabeeMe {
   static create(data) {
     if (!data) return null;
     if (typeof data == "string") {
-      data = JSON.parse(data);
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
     }
     const wme = new WasabeeMe();
     wme.GoogleID = data.GoogleID;

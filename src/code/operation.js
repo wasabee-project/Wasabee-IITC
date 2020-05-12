@@ -746,7 +746,12 @@ export default class WasabeeOp {
 
   static create(obj) {
     if (typeof obj == "string") {
-      obj = JSON.parse(obj);
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log("corrupted operation");
+        return null;
+      }
     }
     const operation = new WasabeeOp(obj.creator, obj.name);
     if (obj.ID) operation.ID = obj.ID;
@@ -775,6 +780,7 @@ export default class WasabeeOp {
 
     // this should not be needed past 0.16
     if (operation.keysonhand.length > 0) {
+      console.log("in migration path for keys at op load");
       for (const k in operation.keysonhand) {
         if (typeof operation.keysonhand[k].onhand == "string") {
           operation.keysonhand[k].onhand = Number.parseInt(
