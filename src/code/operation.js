@@ -780,9 +780,9 @@ export default class WasabeeOp {
 
     // this should not be needed past 0.16
     if (operation.keysonhand.length > 0) {
-      console.log("in migration path for keys at op load");
       for (const k in operation.keysonhand) {
         if (typeof operation.keysonhand[k].onhand == "string") {
+          console.log("in migration path for keys at op load");
           operation.keysonhand[k].onhand = Number.parseInt(
             operation.keysonhand[k].onhand,
             10
