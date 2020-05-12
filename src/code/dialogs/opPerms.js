@@ -21,7 +21,11 @@ const OpPermList = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
-    this._me = await WasabeeMe.waitGet();
+    if (WasabeeMe.isLoggedIn()) {
+      this._me = await WasabeeMe.waitGet();
+    } else {
+      this._me = null;
+    }
     const context = this;
     this._UIUpdateHook = newOpData => {
       context.update(newOpData);
@@ -37,6 +41,11 @@ const OpPermList = WDialog.extend({
   },
 
   update: function(op) {
+    // logged in while dialog open...
+    if (!this._me && WasabeeMe.isLoggedIn()) {
+      this._me = WasabeeMe.get();
+    }
+
     this._operation = op;
     this.buildTable();
     this._html.firstChild.replaceWith(this._table.table);
@@ -50,7 +59,7 @@ const OpPermList = WDialog.extend({
     this._html = L.DomUtil.create("div", null);
 
     this._html.appendChild(this._table.table);
-    if (this._operation.IsOwnedOp()) {
+    if (this._me && this._operation.IsOwnedOp()) {
       const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
@@ -105,10 +114,12 @@ const OpPermList = WDialog.extend({
         value: perm => {
           const t = WasabeeTeam.get(perm.teamid);
           if (t) return t.name;
-          for (const mt of this._me.Teams) {
-            if (mt.ID == perm.teamid) return mt.Name + " (off)";
+          if (this._me) {
+            for (const mt of this._me.Teams) {
+              if (mt.ID == perm.teamid) return mt.Name + " (off)";
+            }
           }
-          return "[" + perm.teamid + "] denied";
+          return "[" + perm.teamid + "]";
         },
         sort: (a, b) => a.localeCompare(b)
         // , format: (cell, value) => (cell.textContent = value)
@@ -118,8 +129,11 @@ const OpPermList = WDialog.extend({
         value: perm => perm.role,
         sort: (a, b) => a.localeCompare(b)
         // , format: (cell, value) => (cell.textContent = value)
-      },
-      {
+      }
+    ];
+
+    if (WasabeeMe.isLoggedIn()) {
+      this._table.fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
         sort: (a, b) => a.localeCompare(b),
@@ -132,13 +146,17 @@ const OpPermList = WDialog.extend({
             this.delPerm(obj); // calls wasabeeUIUpdate
           });
         }
-      }
-    ];
+      });
+    }
     this._table.sortBy = 0;
     this._table.items = this._operation.teamlist;
   },
 
   addPerm: function(teamID, role) {
+    if (!WasabeeMe.isLoggedIn()) {
+      alert(wX("NOT LOGGED IN SHORT"));
+      return;
+    }
     for (const p of this._operation.teamlist) {
       if (p.teamid == teamID && p.role == role) {
         console.log("not adding duplicate");
@@ -165,6 +183,10 @@ const OpPermList = WDialog.extend({
   },
 
   delPerm: function(obj) {
+    if (!WasabeeMe.isLoggedIn()) {
+      alert(wX("NOT LOGGED IN SHORT"));
+      return;
+    }
     // send change to server
     delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
       () => {
