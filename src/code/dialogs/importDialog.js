@@ -38,7 +38,6 @@ const ImportDialog = WDialog.extend({
     this._namefield = L.DomUtil.create("input", null, label);
     this._namefield.value = wX("IMPORT_OP") + new Date().toGMTString();
     this._namefield.placeholder = "noodles";
-    // this._namefield.width = 16;
     const note = L.DomUtil.create("span", null, nameblock);
     note.textContent = wX("ONLY_DT_IMP");
 
@@ -74,12 +73,6 @@ const ImportDialog = WDialog.extend({
 
   drawToolsFormat() {
     if (window.plugin.drawTools.drawnItems) {
-      /* const tmp = new Array();
-      for (const l of window.plugin.drawTools.drawnItems._layers) {
-        if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
-	}
-      } */
-      // this._textarea.value = JSON.stringify(tmp);
       this._textarea.value = localStorage["plugin-draw-tools-layer"];
     } else {
       this._textarea.placeholder = wX("NO_DT_ITEMS");
@@ -134,7 +127,15 @@ const ImportDialog = WDialog.extend({
     // Don't check crosslink
     newop.startBatchMode();
     newop.name = wX("IMP_DT_OP") + new Date().toGMTString();
-    const data = JSON.parse(string);
+
+    let data = null;
+    try {
+      data = JSON.parse(string);
+    } catch (e) {
+      console.warn("Failed parseDrawTools: " + e);
+      alert(e);
+      return null;
+    }
 
     // pass one, try to prime the pump
     /* for (const line of data) {
@@ -187,6 +188,9 @@ const ImportDialog = WDialog.extend({
     alert(
       wX("IMP_COMP") + found + wX("PORT_FAKE") + faked + wX("USE_SWAP_INSTRUCT")
     );
+
+    // unnecessary since this isn't the selected op yet, but good form
+    newop.endBatchMode();
     return newop;
   },
 
