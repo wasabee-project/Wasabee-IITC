@@ -29,8 +29,8 @@ const StarburstDialog = WDialog.extend({
     description.textContent = wX("SEL_SB_ANCHOR");
     const description2 = L.DomUtil.create("div", "desc2", container);
     description2.textContent = wX("SEL_SB_ANCHOR2");
-    const description3 = L.DomUtil.create("div", "desc3", container);
-    description3.textContent = wX("SEL_SB_ANCHOR3");
+    // const description3 = L.DomUtil.create("div", "desc3", container);
+    // description3.textContent = wX("SEL_SB_ANCHOR3");
 
     //    const dividerAI = L.DomUtil.create("div", null, container);
     //   dividerAI.textContent = "\u0000";
@@ -72,11 +72,7 @@ const StarburstDialog = WDialog.extend({
     });
 
     const newLine = L.DomUtil.create("label", "newline", container);
-    //  const dividerBeforeDraw = L.DomUtil.create("span", null, container);
     newLine.textContent = "\u0000";
-    //  dividerBeforeDraw.textContent = "\u0000";
-    //   dividerBeforeDraw.textContent = "";
-
     const placeholder = L.DomUtil.create("label", "placeholder", container);
     placeholder.textContent = "\u2063";
     const placeholder2 = L.DomUtil.create("label", "placeholder", container);

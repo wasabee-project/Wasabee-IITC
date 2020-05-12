@@ -184,9 +184,10 @@ const LinkDialog = WDialog.extend({
     // Enter arrow
     const opt = L.DomUtil.create("label", "arrow", container);
     opt.textContent = "\uD83E\uDCA7";
+
     // Go button
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("ADD_BUTTON_LINKS");
+    const button = L.DomUtil.create("buttonall", null, container);
+    button.textContent = "\uD83D\uDC1D" + wX("ADD_BUTTON_LINKS");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));
@@ -208,7 +209,7 @@ const LinkDialog = WDialog.extend({
       }
     });
     this._desc = L.DomUtil.create("input", "desc", container);
-    this._desc.placeholder = "\uD83D\uDC1D" + wX("DESCRIP_PLACEHOLD");
+    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
 
     this._dialog = window.dialog({
       title: wX("ADD_LINKS"),
