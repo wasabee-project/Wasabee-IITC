@@ -68,11 +68,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   checklistUpdate: function(newOpData) {
     this._operation = newOpData;
-    this._dialog.dialog(
-      wX("OPTION"),
-      wX("TITLE"),
-      wX("OP_CHECKLIST", newOpData.name)
-    );
+    this._dialog.dialog("option", "title", wX("OP_CHECKLIST", newOpData.name));
     this.sortable = this.getListDialogContent(
       newOpData,
       this.sortable.sortBy,

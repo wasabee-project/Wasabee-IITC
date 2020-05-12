@@ -89,11 +89,7 @@ const BlockerList = WDialog.extend({
       this.sortable.sortAsc
     );
     this._dialog.html(this.sortable.table);
-    this._dialog.dialog(
-      wX("OPTION"),
-      wX("TITLE"),
-      wX("KNOWN_BLOCK", newOpData.name)
-    );
+    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name));
   },
 
   _getListDialogContent(sortBy, sortAsc) {
