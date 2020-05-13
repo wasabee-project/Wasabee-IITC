@@ -57,6 +57,8 @@
   "AUTH TOKEN REJECTED": "Sending auth token to server rejected: ${value}",
   "AUTODRAWS": "Wasabee Auto-draw Options",
   "AUTO_DRAWS": "Auto-draw",
+  "AUTOLOAD": "Automatically Load Missing Portal Details",
+  "AUTOLOAD_RATE": "Portal Detail Request Rate (ms)",
   "AUTOMARK STOP": "Auto-Mark stopped due to portals not being loaded",
   "AMAZ_TEAM_NAME": "Amazing Team Name.",
   "BAT_TOAD": "Battle Toads",

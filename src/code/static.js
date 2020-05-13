@@ -56,6 +56,7 @@ W.static = {
     ANCHOR_TWO_KEY: "wasabee-anchor-2",
     ANCHOR_THREE_KEY: "wasabee-anchor-3",
     PORTAL_DETAIL_RATE_KEY: "wasabee-portaldetail-rate",
+    AUTO_LOAD_FAKED: "wasabee-autoload-faked",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",

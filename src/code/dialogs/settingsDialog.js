@@ -148,8 +148,20 @@ const SettingsDialog = WDialog.extend({
       localStorage[urpKey] = urpSelect.value;
     });
 
+    const autoLoadTitle = L.DomUtil.create("label", null, container);
+    autoLoadTitle.textContent = wX("AUTOLOAD");
+    const autoLoadCheck = L.DomUtil.create("input", null, container);
+    autoLoadCheck.type = "checkbox";
+    const alc = window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED;
+    const al = localStorage[alc];
+    if (al === "true") autoLoadCheck.checked = true;
+    L.DomEvent.on(autoLoadCheck, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[alc] = autoLoadCheck.checked;
+    });
+
     const pdqTitle = L.DomUtil.create("label", null, container);
-    pdqTitle.textContent = "Portal Detail Request Rate (ms)";
+    pdqTitle.textContent = wX("AUTOLOAD_RATE");
     const pdqSelect = L.DomUtil.create("select", null, container);
     const pdqKey =
       window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY;
