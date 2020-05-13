@@ -4,7 +4,6 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
-import { loadFaked } from "../auxiliar";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -97,17 +96,26 @@ const ImportDialog = WDialog.extend({
       console.log("trying to import IITC Drawtools format... wish me luck");
 
       const newop = this.parseDrawTools(string);
-      loadFaked(newop, true);
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
         newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
       }
-      newop.store();
-      makeSelectedOperation(newop.ID);
-      const checklist = new OperationChecklistDialog();
-      checklist.enable();
-      this._map.fitBounds(newop.mbr);
+
+      // force load even if auto-load disabled for checklist
+      this.loadFaked(newop).then(
+        () => {
+          newop.store();
+          makeSelectedOperation(newop.ID);
+          const checklist = new OperationChecklistDialog();
+          checklist.enable();
+          this._map.fitBounds(newop.mbr);
+        },
+        reject => {
+          console.log(reject);
+          alert(reject);
+        }
+      );
       return;
     }
 
@@ -139,21 +147,11 @@ const ImportDialog = WDialog.extend({
       return null;
     }
 
-    // pass one, try to prime the pump
-    /* for (const line of data) {
-      if (line.type == "polyline") {
-        for (const point of line.latLngs) {
-          window.selectPortalByLatLng(point.lat, point.lng);
-        }
-      }
-    } */
-
     // build a hash map for fast searching of window.portals
     const pmap = this.buildWindowPortalMap();
 
     let faked = 0;
     let found = 0;
-    // pass two, convert points to portals
     for (const line of data) {
       if (line.type != "polyline") {
         continue;
@@ -194,6 +192,31 @@ const ImportDialog = WDialog.extend({
     // unnecessary since this isn't the selected op yet, but good form
     newop.endBatchMode();
     return newop;
+  },
+
+  // since we aren't using the IITC hook, can't use the normal route
+  loadFaked(op) {
+    const promises = new Array();
+
+    for (const p of op.fakedPortals) {
+      if (p.id.length != 35) continue; // ignore our faked
+      promises.push(
+        window.portalDetail.request(p.id).then(
+          res => {
+            if (res.title) {
+              p.name = res.title;
+              p.lat = (res.latE6 / 1e6).toFixed(6);
+              p.lng = (res.lngE6 / 1e6).toFixed(6);
+            }
+          },
+          reject => {
+            console.log(reject);
+          }
+        )
+      );
+    }
+    // return one single promise that resolves when all these promises resolve
+    return Promise.all(promises);
   },
 
   // build a fast lookup map of known portals

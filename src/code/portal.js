@@ -85,7 +85,10 @@ export default class WasabeePortal {
   }
 
   get displayName() {
-    if (this.id === this.name) return wX("LOADING1") + this.id + wX("LOADING2");
+    if (this.id === this.name) {
+      if (this.id.length == 35) return wX("LOADING1", this.id);
+      return wX("FAKED", this.id);
+    }
     return this.name;
   }
 
