@@ -355,7 +355,7 @@
 } */
 
 .wasabee-dialog button.drawb::before {
-  content: "🐝 "; 
+  content: "🐝 ";
 }
 
 /* classes specific to various dialogs */
@@ -527,6 +527,7 @@
 }
 
 .wasabee-dialog-homogeneous button {
+  margin: 4px;
 }
 
 .wasabee-dialog-homogeneous button.drawb {
@@ -709,6 +710,7 @@
 .wasabee-dialog-madrid button {
   border-collapse: separate;
   border-spacing: 5px;
+  margin: 4px;
 }
 
 .wasabee-dialog-madrid button.drawb {
