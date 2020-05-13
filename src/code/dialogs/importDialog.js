@@ -155,11 +155,12 @@ const ImportDialog = WDialog.extend({
     let found = 0;
     // pass two, convert points to portals
     for (const line of data) {
-      if (line.type != "polyline") {
+      if (line.type != "polyline" && line.type != "polygon") {
         continue;
       }
 
       let prev = false;
+      let first = false;
 
       for (const point of line.latLngs) {
         // try the op first
@@ -185,6 +186,10 @@ const ImportDialog = WDialog.extend({
           newop.addLink(prev, portal);
         }
         prev = portal;
+        if (!first) first = portal;
+      }
+      if (line.type == "polygon" && first && prev && first != prev) {
+        newop.addLink(prev, first);
       }
     }
     alert(
