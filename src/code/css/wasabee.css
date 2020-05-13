@@ -354,6 +354,10 @@
   border-top: initial;
 } */
 
+.wasabee-dialog button.drawb::before {
+  content: "🐝 "; 
+}
+
 /* classes specific to various dialogs */
 .wasabee-dialog-about {
   max-width: min-content;

@@ -110,7 +110,7 @@ const FanfieldDialog = WDialog.extend({
     // Bottom buttons bar
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = "\uD83D\uDC1D" + wX("FANFIELD");
+    button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.fanfield.call(this);

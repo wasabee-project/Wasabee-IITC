@@ -93,7 +93,7 @@ const MultimaxDialog = WDialog.extend({
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = "\uD83D\uDC1D" + wX("MULTI_M");
+    button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
       alert(`Multimax found ${total} layers`);

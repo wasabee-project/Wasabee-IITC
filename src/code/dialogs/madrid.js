@@ -168,7 +168,7 @@ const MadridDialog = MultimaxDialog.extend({
     placeholder.textContent = "\u2063";
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = "\uD83D\uDC1D" + wX("MADRID");
+    button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);

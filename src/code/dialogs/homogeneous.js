@@ -145,7 +145,7 @@ const HomogeneousDialog = WDialog.extend({
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = "\uD83D\uDC1D" + wX("ONION");
+    button.textContent = wX("ONION");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.hfield.call(this);

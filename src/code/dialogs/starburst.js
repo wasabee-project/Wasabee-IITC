@@ -81,7 +81,7 @@ const StarburstDialog = WDialog.extend({
     // Go button
 
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = "\uD83D\uDC1D" + wX("STARBURST_DRAW");
+    button.textContent = wX("STARBURST_DRAW");
     L.DomEvent.on(button, "click", ev => {
       L.DomEvent.stop(ev);
       this.starburst.call(this);
