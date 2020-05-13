@@ -93,7 +93,7 @@ const ImportDialog = WDialog.extend({
     }
 
     // check to see if it is drawtools
-    if (string.match(new RegExp(".*polyline.*"))) {
+    if (string.match(new RegExp(".*(polyline|polygon).*"))) {
       console.log("trying to import IITC Drawtools format... wish me luck");
 
       const newop = this.parseDrawTools(string);
