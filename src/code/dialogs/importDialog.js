@@ -92,7 +92,7 @@ const ImportDialog = WDialog.extend({
     }
 
     // check to see if it is drawtools
-    if (string.match(new RegExp(".*polyline.*"))) {
+    if (string.match(new RegExp(".*(polyline|polygon).*"))) {
       console.log("trying to import IITC Drawtools format... wish me luck");
 
       const newop = this.parseDrawTools(string);
@@ -153,11 +153,12 @@ const ImportDialog = WDialog.extend({
     let faked = 0;
     let found = 0;
     for (const line of data) {
-      if (line.type != "polyline") {
+      if (line.type != "polyline" && line.type != "polygon") {
         continue;
       }
 
       let prev = false;
+      let first = false;
 
       for (const point of line.latLngs) {
         // try the op first
@@ -183,6 +184,10 @@ const ImportDialog = WDialog.extend({
           newop.addLink(prev, portal);
         }
         prev = portal;
+        if (!first) first = portal;
+      }
+      if (line.type == "polygon" && first && prev && first != prev) {
+        newop.addLink(prev, first);
       }
     }
     alert(
