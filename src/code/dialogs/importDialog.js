@@ -4,6 +4,7 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
+import { loadFaked } from "../auxiliar";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -96,7 +97,7 @@ const ImportDialog = WDialog.extend({
       console.log("trying to import IITC Drawtools format... wish me luck");
 
       const newop = this.parseDrawTools(string);
-      newop.updatePortalsFromIITCData();
+      loadFaked(newop, true);
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
