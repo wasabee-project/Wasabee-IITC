@@ -3,6 +3,7 @@ import Sortable from "../../lib/sortable";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
+import { getPortalDetails } from "../auxiliar";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -74,7 +75,7 @@ const WasabeeDList = WDialog.extend({
             const p = WasabeePortal.get(n.PortalID);
             cell.appendChild(p.displayFormat(this._smallScreen));
           } else {
-            window.portalDetail.request(n.PortalID);
+            getPortalDetails(n.PortalID);
             cell.textContent = value;
           }
         }

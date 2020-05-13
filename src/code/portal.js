@@ -68,24 +68,6 @@ export default class WasabeePortal {
     return null;
   }
 
-  // if the name or location changes, this will catch it
-  fullUpdate() {
-    if (this.id.length != 35) return; // ignore faked ones from DrawTools imports
-
-    window.portalDetail.request(this.id).then(
-      res => {
-        if (res.title) {
-          this.name = res.title;
-          this.lat = (res.latE6 / 1e6).toFixed(6);
-          this.lng = (res.lngE6 / 1e6).toFixed(6);
-        }
-      },
-      reject => {
-        console.log("unable to update portal: " + reject);
-      }
-    );
-  }
-
   get latLng() {
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }

@@ -3,6 +3,7 @@ import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
 import { getAgent } from "./server";
 import wX from "./wX";
+import { getPortalDetails } from "./auxiliar";
 
 // setup function
 export const initWasabeeD = () => {
@@ -84,7 +85,7 @@ export const drawWasabeeDkeys = () => {
                 "window.requests does not exist yet... expect an error"
               );
             }
-            window.portalDetail.request(n.PortalID); // listener deals with the replies
+            getPortalDetails(n.PortalID); // listener deals with the replies
           }
         }
       }

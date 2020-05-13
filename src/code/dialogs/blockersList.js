@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
+import { getPortalDetails } from "../auxiliar";
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -42,9 +43,9 @@ const BlockerList = WDialog.extend({
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
 
-    for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
-    }
+    const f = new Array();
+    for (const x of this._operation.fakedPortals) f.push(x.id);
+    if (f.length > 0) getPortalDetails(f);
 
     this._dialog = window.dialog({
       title: wX("KNOWN_BLOCK", this._operation.name),
@@ -67,9 +68,9 @@ const BlockerList = WDialog.extend({
           window.runHooks("wasabeeCrosslinks", this._operation);
         },
         "Force Load": () => {
-          for (const f of this._operation.fakedPortals) {
-            window.portalDetail.request(f.id);
-          }
+          const f = new Array();
+          for (const x of this._operation.fakedPortals) f.push(x.id);
+          if (f.length > 0) getPortalDetails(f);
         }
       },
       closeCallback: () => {

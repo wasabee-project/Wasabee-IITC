@@ -9,6 +9,7 @@ import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import wX from "../wX";
+import { getPortalDetails } from "../auxiliar";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -34,9 +35,9 @@ const OperationChecklistDialog = WDialog.extend({
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
 
-    for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
-    }
+    const f = new Array();
+    for (const x of this._operation.fakedPortals) f.push(x.id);
+    if (f.length > 0) getPortalDetails(f);
 
     this._displayDialog();
   },

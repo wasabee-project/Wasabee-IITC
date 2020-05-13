@@ -191,6 +191,7 @@
   "NOT_SET": "not set",
   "NO_STOCK_INTEL": "Wasabee doesn't support stock intel draw imports",
   "NTNAME": "Name",
+  "OK": "OK",
   "ON_HAND": "On Hand",
   "ONLY_DT_IMP": " (only for DrawTools imports)",
   "OP PERM DENIED": "Permission denied to operation: ${value}",

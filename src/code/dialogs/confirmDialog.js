@@ -30,22 +30,24 @@ const ConfirmDialog = WDialog.extend({
 
   _displayDialog: function() {
     if (!this._map) return;
+
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      if (this._callback) this._callback();
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CANCEL")] = () => {
+      if (this._cancelCallback) this._cancelCallback();
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: this._title,
       width: "auto",
       height: "auto",
       html: this._buildContent(),
       dialogClass: "wasabee-dialog wasabee-dialog-confirm",
-      buttons: {
-        OK: () => {
-          if (this._callback) this._callback();
-          this._dialog.dialog("close");
-        },
-        Cancel: () => {
-          if (this._cancelCallback) this._cancelCallback();
-          this._dialog.dialog("close");
-        }
-      },
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;

@@ -7,6 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
 import wX from "../wX";
+import { getPortalDetails } from "../auxiliar";
 
 const MarkerList = WDialog.extend({
   statics: {
@@ -41,9 +42,9 @@ const MarkerList = WDialog.extend({
   },
 
   _displayDialog: function() {
-    for (const f of this._operation.fakedPortals) {
-      window.portalDetail.request(f.id);
-    }
+    const f = new Array();
+    for (const x of this._operation.fakedPortals) f.push(x.id);
+    if (f.length > 0) getPortalDetails(f);
 
     this._dialog = window.dialog({
       title: wX("MARKER_LIST", this._operation.name),

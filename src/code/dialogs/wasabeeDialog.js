@@ -1,13 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
-import {
-  GetWasabeeServer,
-  SetWasabeeServer,
-  SetTeamState,
-  leaveTeamPromise,
-  newTeamPromise
-} from "../server";
+import { SetTeamState, leaveTeamPromise, newTeamPromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
@@ -138,14 +132,6 @@ const WasabeeDialog = WDialog.extend({
     teamlist.sortBy = 0;
 
     const container = L.DomUtil.create("div", "container");
-    const serverInfo = L.DomUtil.create("button", "server", container);
-    serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
-    serverInfo.href = "#";
-    L.DomEvent.on(serverInfo, "click", ev => {
-      L.DomEvent.stop(ev);
-      this.setServer();
-    });
-
     container.appendChild(teamlist.table);
     teamlist.items = this._me.Teams;
     return container;
@@ -213,20 +199,6 @@ const WasabeeDialog = WDialog.extend({
 
   removeHooks: function() {
     WDialog.prototype.removeHooks.call(this);
-  },
-
-  setServer: function() {
-    const serverDialog = new PromptDialog(window.map);
-    serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
-      if (serverDialog.inputField.value) {
-        SetWasabeeServer(serverDialog.inputField.value);
-        WasabeeMe.purge();
-      }
-    });
-    serverDialog.current = GetWasabeeServer();
-    serverDialog.placeholder =
-      window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
-    serverDialog.enable();
   }
 });
 

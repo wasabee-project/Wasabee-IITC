@@ -246,20 +246,20 @@ export const mePromise = function() {
         case 200:
           me = WasabeeMe.create(req.response);
           if (!me) {
-            reject(wX("NOT LOGGED IN", req.responseText));
+            reject(wX("NOT LOGGED IN", "200, invalid"));
           } else {
             resolve(me);
           }
           break;
         case 401:
-          reject(wX("NOT LOGGED IN", req.responseText));
+          reject(wX("NOT LOGGED IN", "401"));
           break;
         case 403:
           // 403 is a detected RES agent
           alert(`${req.responseText}`);
           WasabeeMe.purge();
           resetOps();
-          reject(wX("NOT LOGGED IN", req.responseText));
+          reject(wX("NOT LOGGED IN", "blacklist"));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.responseText}`);

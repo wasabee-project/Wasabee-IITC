@@ -9,11 +9,11 @@ import { initWasabeeD } from "./wd";
 import { sendLocation } from "./uiCommands";
 import wX from "./wX";
 import WasabeeMe from "./me";
-
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = function() {
   if (Wasabee._inited) return;
+  Wasabee.portalDetailQueue = new Array();
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 

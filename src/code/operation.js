@@ -322,20 +322,8 @@ export default class WasabeeOp {
 
   addPortal(portal) {
     if (!this.containsPortal(portal)) {
-      // window.portalDetail.request(portal.id);
       this.opportals.push(portal);
       this.update(false); // adding a portal may just be due to a blocker
-    }
-  }
-
-  // this updates all portal data from IITC (if moved/renamed)
-  updatePortalsFromIITCData() {
-    // prime the cache -- hopefully
-    for (const p of this.opportals) {
-      window.portalDetail.request(p.id);
-    }
-    for (const p of this.opportals) {
-      p.fullUpdate();
     }
   }
 

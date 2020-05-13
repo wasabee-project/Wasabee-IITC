@@ -849,6 +849,11 @@
   grid-column-end: 3;
 }
 
+.wasabee-dialog-settings button {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
 .wasabee-dialog-onion {
 }
 .wasabee-dialog-onion div.container {

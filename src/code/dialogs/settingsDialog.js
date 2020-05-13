@@ -3,6 +3,8 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import addButtons from "../addButtons";
 import WasabeeMe from "../me";
+import { GetWasabeeServer, SetWasabeeServer } from "../server";
+import PromptDialog from "./promptDialog";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -145,7 +147,48 @@ const SettingsDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       localStorage[urpKey] = urpSelect.value;
     });
+
+    const pdqTitle = L.DomUtil.create("label", null, container);
+    pdqTitle.textContent = "Portal Detail Request Rate (ms)";
+    const pdqSelect = L.DomUtil.create("select", null, container);
+    const pdqKey =
+      window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY;
+    let pdq = localStorage[pdqKey] || 1000;
+    const pdqOpts = [1, 100, 250, 500, 750, 1000];
+    for (const p of pdqOpts) {
+      const option = L.DomUtil.create("option", null, pdqSelect);
+      option.textContent = p;
+      option.value = p;
+      if (pdq == p) option.selected = true;
+    }
+    L.DomEvent.on(pdqSelect, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[pdqKey] = pdqSelect.value;
+    });
+
+    const serverInfo = L.DomUtil.create("button", "server", container);
+    serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
+    serverInfo.href = "#";
+    L.DomEvent.on(serverInfo, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.setServer();
+    });
+
     return container;
+  },
+
+  setServer: function() {
+    const serverDialog = new PromptDialog(window.map);
+    serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
+      if (serverDialog.inputField.value) {
+        SetWasabeeServer(serverDialog.inputField.value);
+        WasabeeMe.purge();
+      }
+    });
+    serverDialog.current = GetWasabeeServer();
+    serverDialog.placeholder =
+      window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
+    serverDialog.enable();
   },
 
   // define our work in _displayDialog
@@ -166,7 +209,7 @@ const SettingsDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.linkList
+      id: window.plugin.wasabee.static.dialogNames.settings
     });
   },
 
