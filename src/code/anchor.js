@@ -1,8 +1,9 @@
-import { showLinksDialog, swapPortal, deletePortal } from "./uiCommands.js";
+import { swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
+import LinkListDialog from "./dialogs/linkListDialog";
 
 // this class exists to satisfy the interface for the assignment dialog
 // allows assigining all links FROM this anchor en mass
@@ -100,7 +101,9 @@ export default class WasabeeAnchor {
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", ev => {
       L.DomEvent.stop(ev);
-      showLinksDialog(operation, this._portal);
+      const lld = new LinkListDialog();
+      lld.setup(operation, this._portal);
+      lld.enable();
       marker.closePopup();
     });
     const swapButton = L.DomUtil.create("button", null, buttonSet);

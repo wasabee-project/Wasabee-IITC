@@ -4,6 +4,7 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
+import { pointTileDataRequest } from "../uiCommands";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -153,26 +154,41 @@ const ImportDialog = WDialog.extend({
       return null;
     }
 
+    // try to prime the cache
+    const latlngs = new Array();
+    for (const line of data) {
+      if (line.type != "polyline" && line.type != "polygon") continue;
+      for (const point of line.latLngs) {
+        latlngs.push(point);
+      }
+    }
+    console.log("import requesting load of points: ", latlngs);
+    pointTileDataRequest(latlngs);
+    // XXX do something here to wait loading
+
     // build a hash map for fast searching of window.portals
     const pmap = this.buildWindowPortalMap();
 
     let faked = 0;
     let found = 0;
     for (const line of data) {
-      if (line.type != "polyline" && line.type != "polygon") {
-        continue;
-      }
+      if (line.type != "polyline" && line.type != "polygon") continue;
 
       let prev = false;
       let first = false;
 
       for (const point of line.latLngs) {
+        // use fixed precision
+        const truncPoint = L.LatLng(
+          parseFloat(point.lat.toFixed(6)),
+          parseFloat(point.lng.toFixed(6))
+        );
         // try the op first
-        let portal = newop.getPortalByLatLng(point.lat, point.lng);
+        let portal = newop.getPortalByLatLng(truncPoint.lat, truncPoint.lng);
 
         // look to see if it is known
         if (!portal) {
-          portal = this.searchWindowPortals(point, pmap);
+          portal = this.searchWindowPortals(truncPoint, pmap);
           if (portal) {
             newop.addPortal(portal);
             found++;
@@ -181,7 +197,7 @@ const ImportDialog = WDialog.extend({
 
         // worst case: fake it
         if (!portal) {
-          const p = WasabeePortal.fake(point.lat, point.lng);
+          const p = WasabeePortal.fake(truncPoint.lat, truncPoint.lng);
           newop.addPortal(p);
           portal = p;
           faked++;

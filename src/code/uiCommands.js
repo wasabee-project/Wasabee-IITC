@@ -1,6 +1,5 @@
 // import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
-import LinkListDialog from "./dialogs/linkListDialog";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import { getSelectedOperation } from "./selectedOp";
 import { locationPromise } from "./server";
@@ -83,12 +82,6 @@ export const clearAllLinks = operation => {
     }
   );
   con.enable();
-};
-
-export const showLinksDialog = (operation, portal) => {
-  const lld = new LinkListDialog();
-  lld.setup(operation, portal);
-  lld.enable();
 };
 
 export const listenForAddedPortals = newPortal => {
@@ -290,4 +283,29 @@ export const testPortal = function(recursed = false) {
 
   // if recrused and still getting garbage, we have a problem
   return parsed;
+};
+
+// do not use, this is experimental
+export const pointTileDataRequest = function(latlngs) {
+  // for trawl and import, use zoom 15
+  // const mapZoom = window.map.getZoom();
+  const mapZoom = 15;
+  const dataZoom = window.getDataZoomForMapZoom(mapZoom);
+  const tileParams = window.getMapZoomTileParameters(dataZoom);
+
+  // use a map to prevent dupes
+  const list = new Map();
+
+  for (const ll of latlngs) {
+    const x = window.lngToTile(ll.lat, tileParams);
+    const y = window.lngToTile(ll.lng, tileParams);
+    const tileID = window.pointToTileId(tileParams, x, y);
+    list.set(tileID, 0);
+  }
+
+  for (const [k, v] of list) {
+    console.log(k, v);
+    window.mapDataRequest.requeueTile(k, null);
+  }
+  window.mapDataRequest.start();
 };
