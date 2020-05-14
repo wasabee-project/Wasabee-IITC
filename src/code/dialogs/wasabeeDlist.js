@@ -3,7 +3,7 @@ import Sortable from "../../lib/sortable";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
-import { getPortalDetails } from "../auxiliar";
+import { getPortalDetails } from "../uiCommands";
 
 const WasabeeDList = WDialog.extend({
   statics: {

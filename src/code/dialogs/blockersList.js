@@ -1,10 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
-import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
+import {
+  listenForAddedPortals,
+  listenForPortalDetails,
+  loadFaked
+} from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
-import { loadFaked } from "../auxiliar";
 
 const BlockerList = WDialog.extend({
   statics: {

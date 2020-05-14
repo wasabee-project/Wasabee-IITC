@@ -63,6 +63,7 @@ const ImportDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
+        // XXX is this still necessary?
         const newop = getSelectedOperation();
         window.runHooks("wasabeeUIUpdate", newop);
         window.runHooks("wasabeeCrosslinks", newop);
@@ -103,12 +104,18 @@ const ImportDialog = WDialog.extend({
       }
 
       // force load even if auto-load disabled for checklist
-      this.loadFaked(newop).then(
+      this.loadHalfloaded(newop).then(
         () => {
+          // needs to be saved, but not update UI
           newop.store();
+          // this updates the UI and runs crosslinks
           makeSelectedOperation(newop.ID);
+          // open the checklist to get another pass at loading portals
+          // although that is now off-by-default, at least let the user
+          // see which portals need attention
           const checklist = new OperationChecklistDialog();
           checklist.enable();
+          // zoom to it
           this._map.fitBounds(newop.mbr);
         },
         reject => {
@@ -134,9 +141,8 @@ const ImportDialog = WDialog.extend({
 
   parseDrawTools(string) {
     const newop = new WasabeeOp();
-    // Don't check crosslink
+    // Don't check crosslink or save on each portal/link add
     newop.startBatchMode();
-    newop.name = wX("IMP_DT_OP") + new Date().toGMTString();
 
     let data = null;
     try {
@@ -194,17 +200,17 @@ const ImportDialog = WDialog.extend({
       wX("IMP_COMP") + found + wX("PORT_FAKE") + faked + wX("USE_SWAP_INSTRUCT")
     );
 
-    // unnecessary since this isn't the selected op yet, but good form
-    newop.endBatchMode();
+    // get the op out of batchmode, but do not update UI or run crosslinks yet
+    newop._batchmode = false;
     return newop;
   },
 
   // since we aren't using the IITC hook, can't use the normal route
-  loadFaked(op) {
+  loadHalfloaded(op) {
     const promises = new Array();
 
     for (const p of op.fakedPortals) {
-      if (p.id.length != 35) continue; // ignore our faked
+      if (p.id.length != 35) continue; // ignore the truly fake
       promises.push(
         window.portalDetail.request(p.id).then(
           res => {
