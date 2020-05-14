@@ -285,7 +285,9 @@ export const testPortal = function(recursed = false) {
   return parsed;
 };
 
-// do not use, this is experimental
+// this is still experimental
+// pass in an array of L.LatLngs, it determines the zoom-15 tiles
+// and requests those tiles be loaded with IITC's queuing and caching
 export const pointTileDataRequest = function(latlngs) {
   // for trawl and import, use zoom 15
   // const mapZoom = window.map.getZoom();
@@ -295,7 +297,6 @@ export const pointTileDataRequest = function(latlngs) {
 
   // use a map to prevent dupes
   const list = new Map();
-
   for (const ll of latlngs) {
     const x = window.lngToTile(ll.lat, tileParams);
     const y = window.lngToTile(ll.lng, tileParams);
@@ -303,9 +304,11 @@ export const pointTileDataRequest = function(latlngs) {
     list.set(tileID, 0);
   }
 
+  // walk the list
   for (const [k, v] of list) {
-    console.log(k, v);
+    console.log("requesting tile: ", k, v);
     window.mapDataRequest.requeueTile(k, null);
   }
+  // trigger IITC's queue runner
   window.mapDataRequest.start();
 };

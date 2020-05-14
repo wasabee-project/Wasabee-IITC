@@ -162,7 +162,6 @@ const ImportDialog = WDialog.extend({
         latlngs.push(point);
       }
     }
-    console.log("import requesting load of points: ", latlngs);
     pointTileDataRequest(latlngs);
     // XXX do something here to wait loading
 
@@ -179,14 +178,14 @@ const ImportDialog = WDialog.extend({
 
       for (const point of line.latLngs) {
         // use fixed precision
-        const truncPoint = L.LatLng(
+        const truncPoint = new L.LatLng(
           parseFloat(point.lat.toFixed(6)),
           parseFloat(point.lng.toFixed(6))
         );
-        // try the op first
+        // check the op first
         let portal = newop.getPortalByLatLng(truncPoint.lat, truncPoint.lng);
 
-        // look to see if it is known
+        // look to see if it is known to IITC
         if (!portal) {
           portal = this.searchWindowPortals(truncPoint, pmap);
           if (portal) {
