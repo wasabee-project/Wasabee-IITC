@@ -19,6 +19,13 @@ const ImportDialog = WDialog.extend({
 
   addHooks: function() {
     if (!this._map) return;
+    this._autoload = false;
+    if (
+      localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ===
+      "true"
+    ) {
+      this._autoload = true;
+    }
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
@@ -104,7 +111,7 @@ const ImportDialog = WDialog.extend({
         newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
       }
 
-      // force load even if auto-load disabled for checklist
+      // load half loaded portals, if autoload is disabled let the user to clean the mess up
       this.loadHalfloaded(newop).then(
         () => {
           // needs to be saved, but not update UI
@@ -155,15 +162,17 @@ const ImportDialog = WDialog.extend({
     }
 
     // try to prime the cache
-    const latlngs = new Array();
-    for (const line of data) {
-      if (line.type != "polyline" && line.type != "polygon") continue;
-      for (const point of line.latLngs) {
-        latlngs.push(point);
+    if (this._autoload) {
+      const latlngs = new Array();
+      for (const line of data) {
+        if (line.type != "polyline" && line.type != "polygon") continue;
+        for (const point of line.latLngs) {
+          latlngs.push(point);
+        }
       }
+      pointTileDataRequest(latlngs);
+      // XXX do something here to wait loading
     }
-    pointTileDataRequest(latlngs);
-    // XXX do something here to wait loading
 
     // build a hash map for fast searching of window.portals
     const pmap = this.buildWindowPortalMap();
@@ -222,6 +231,8 @@ const ImportDialog = WDialog.extend({
 
   // since we aren't using the IITC hook, can't use the normal route
   loadHalfloaded(op) {
+    if (!this._autoload) return Promise.resolve();
+
     const promises = new Array();
 
     for (const p of op.fakedPortals) {
