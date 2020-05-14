@@ -137,6 +137,69 @@ export const listenForPortalDetails = e => {
   // TODO listen for by location
 };
 
+// This is what should be called to add to the queue
+// can take either an entire array of portal GUID or a single GUID
+// this depends on something listening for the IITC PortalDetailsLoaded hook to process the result
+// see listenForPortalDetails above
+export const getPortalDetails = function(guid) {
+  if (Array.isArray(guid)) {
+    window.plugin.wasabee.portalDetailQueue = window.plugin.wasabee.portalDetailQueue.concat(
+      guid
+    );
+  } else {
+    window.plugin.wasabee.portalDetailQueue.push(guid);
+  }
+
+  const rate =
+    localStorage[
+      window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY
+    ] || 1000;
+
+  // if not already processing the queue, start it
+  if (!window.plugin.wasabee.portalDetailIntervalID) {
+    window.plugin.wasabee.portalDetailIntervalID = window.setInterval(
+      pdqDoNext,
+      rate
+    );
+    console.log(
+      "starting portal details request queue: " +
+        window.plugin.wasabee.portalDetailIntervalID
+    );
+  }
+};
+
+const pdqDoNext = function() {
+  const p = window.plugin.wasabee.portalDetailQueue.shift();
+
+  // are we done?
+  if (p === undefined) {
+    console.log(
+      "closing portal details request queue: " +
+        window.plugin.wasabee.portalDetailIntervalID
+    );
+    window.clearInterval(window.plugin.wasabee.portalDetailIntervalID);
+    window.plugin.wasabee.portalDetailIntervalID = null;
+    return;
+  }
+
+  if (!p.length || p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
+  // this is the bit everyone is so worried about
+  window.portalDetail.request(p);
+};
+
+export const loadFaked = function(operation, force = false) {
+  const flag =
+    localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
+    false;
+
+  // local storage always returns as string
+  if (flag !== "true" && !force) return;
+
+  const f = new Array();
+  for (const x of operation.fakedPortals) f.push(x.id);
+  if (f.length > 0) getPortalDetails(f);
+};
+
 export const sendLocation = () => {
   if (!WasabeeMe.isLoggedIn()) return;
   const sl =

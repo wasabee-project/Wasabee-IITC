@@ -5,11 +5,14 @@ import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
-import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
+import {
+  listenForAddedPortals,
+  listenForPortalDetails,
+  loadFaked
+} from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import wX from "../wX";
-import { loadFaked } from "../auxiliar";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {

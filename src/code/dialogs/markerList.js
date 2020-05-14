@@ -5,9 +5,12 @@ import SetCommentDialog from "./setCommentDialog";
 import { getAgent } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
-import { listenForAddedPortals, listenForPortalDetails } from "../uiCommands";
+import {
+  listenForAddedPortals,
+  listenForPortalDetails,
+  loadFaked
+} from "../uiCommands";
 import wX from "../wX";
-import { loadFaked } from "../auxiliar";
 
 const MarkerList = WDialog.extend({
   statics: {

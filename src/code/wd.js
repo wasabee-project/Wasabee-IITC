@@ -3,7 +3,7 @@ import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
 import { getAgent } from "./server";
 import wX from "./wX";
-import { getPortalDetails } from "./auxiliar";
+import { getPortalDetails } from "./uiCommands";
 
 // setup function
 export const initWasabeeD = () => {
