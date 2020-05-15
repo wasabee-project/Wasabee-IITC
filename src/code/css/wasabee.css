@@ -860,6 +860,11 @@
   grid-column-end: 3;
 }
 
+.wasabee-dialog-trawl div.container {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
 .wasabee-dialog-onion {
 }
 .wasabee-dialog-onion div.container {

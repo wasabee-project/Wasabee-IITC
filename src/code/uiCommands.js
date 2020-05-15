@@ -289,8 +289,40 @@ export const testPortal = function(recursed = false) {
 // pass in an array of L.LatLngs, it determines the zoom-15 tiles
 // and requests those tiles be loaded with IITC's queuing and caching
 export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
+  // abuse the window.mapDataRequest
+  const mdr = window.mapDataRequest;
+  mdr.debugTiles.reset();
+  // restore this
+  // const oldDebugTiles = mdr.debugTiles();
+  mdr.debugTiles = new FakeDebugTiles();
+  mdr.resetRenderQueue();
+  mdr.tileErrorCount = {}; // if (!mdr.tileErrorCount) mdr.tileErrorCount = {};
+  mdr.queuedTiles = {}; // if (!mdr.queuedTiles) mdr.queuedTiles = {};
+
   const dataZoom = window.getDataZoomForMapZoom(mapZoom);
   const tileParams = window.getMapZoomTileParameters(dataZoom);
+  const bounds = window.clampLatLngBounds(new L.LatLngBounds(latlngs));
+
+  // used by mapMoveEnd
+  mdr.fetchedDataParams = {
+    bounds: bounds,
+    mapZoom: mapZoom,
+    dataZoom: dataZoom
+  };
+
+  window.runHooks("mapDataRefreshStart", {
+    bounds: bounds,
+    mapZoom: mapZoom,
+    dataZoom: dataZoom,
+    minPortalLevel: tileParams.level,
+    tileBounds: bounds
+  });
+  mdr.render.startRenderPass(tileParams.level, bounds);
+  const _render = mdr.render;
+  window.runHooks("mapDataEntityInject", {
+    callback: e => _render.processGameEntities(e)
+  });
+  // mdr.render.processGameEntities(window.artifact.getArtifactEntities());
 
   // use a map to prevent dupes
   const list = new Map();
@@ -300,15 +332,36 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
     const tileID = window.pointToTileId(tileParams, x, y);
     list.set(tileID, 0);
   }
-
-  console.log(list);
   const tiles = Array.from(list.keys());
-  const mdr = window.mapDataRequest;
-  if (!mdr.queuedTiles) mdr.queuedTiles = {};
+  console.log(tiles);
   for (const t of tiles) mdr.queuedTiles[t] = t;
-  mdr.processRequestQueue.call(mdr, true);
 
   mdr.setStatus("trawling", undefined, -1);
   window.runHooks("requestFinished", { success: true });
-  mdr.delayProcessRequestQueue.call(mdr, mdr.DOWNLOAD_DELAY, true);
+  mdr.processRequestQueue(true);
 };
+
+// I'll send a patch to IITC once I get our stuff working
+class FakeDebugTiles {
+  constructor() {
+    console.log(
+      "creating fake debug tile class -- breaking debug tiles for now"
+    );
+  }
+
+  reset() {
+    // console.log("fdtc reset");
+  }
+
+  create() {
+    // console.log("fdtc create");
+  }
+
+  setState() {
+    // console.log("fdtc setState");
+  }
+
+  runClearPass() {
+    console.log("fdtc runClearPass");
+  }
+}

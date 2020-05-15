@@ -31,6 +31,8 @@ const TrawlDialog = WDialog.extend({
   _displayDialog: function() {
     const html = L.DomUtil.create("html");
     const container = L.DomUtil.create("div", "container", html);
+    const notice = L.DomUtil.create("label", null, container);
+    notice.innerHTML = "<h1>THIS DOES NOT WORK YET</h1>";
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWL WARNING");
     const button = L.DomUtil.create("button", null, container);
