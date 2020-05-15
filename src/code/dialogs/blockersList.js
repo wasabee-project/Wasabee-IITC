@@ -8,6 +8,7 @@ import {
 } from "../uiCommands";
 import WasabeePortal from "../portal";
 import wX from "../wX";
+import TrawlDialog from "./trawl";
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -67,8 +68,12 @@ const BlockerList = WDialog.extend({
           this._operation.update(false); // blockers do not need to be sent to server
           window.runHooks("wasabeeCrosslinks", this._operation);
         },
-        "Force Load": () => {
+        "Load Portals": () => {
           loadFaked(this._operation, true); // force
+        },
+        "Trawl Lanes": () => {
+          const td = new TrawlDialog();
+          td.enable();
         }
       },
       closeCallback: () => {

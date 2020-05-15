@@ -288,10 +288,7 @@ export const testPortal = function(recursed = false) {
 // this is still experimental
 // pass in an array of L.LatLngs, it determines the zoom-15 tiles
 // and requests those tiles be loaded with IITC's queuing and caching
-export const pointTileDataRequest = function(latlngs) {
-  // for trawl and import, use zoom 15
-  // const mapZoom = window.map.getZoom();
-  const mapZoom = 15;
+export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
   const dataZoom = window.getDataZoomForMapZoom(mapZoom);
   const tileParams = window.getMapZoomTileParameters(dataZoom);
 
@@ -304,11 +301,14 @@ export const pointTileDataRequest = function(latlngs) {
     list.set(tileID, 0);
   }
 
-  // walk the list
-  for (const [k, v] of list) {
-    console.log("requesting tile: ", k, v);
-    window.mapDataRequest.requeueTile(k, null);
-  }
-  // trigger IITC's queue runner
-  window.mapDataRequest.start();
+  console.log(list);
+  const tiles = Array.from(list.keys());
+  const mdr = window.mapDataRequest;
+  if (!mdr.queuedTiles) mdr.queuedTiles = {};
+  for (const t of tiles) mdr.queuedTiles[t] = t;
+  mdr.processRequestQueue.call(mdr, true);
+
+  mdr.setStatus("trawling", undefined, -1);
+  window.runHooks("requestFinished", { success: true });
+  mdr.delayProcessRequestQueue.call(mdr, mdr.DOWNLOAD_DELAY, true);
 };
