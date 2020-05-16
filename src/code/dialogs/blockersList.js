@@ -47,6 +47,27 @@ const BlockerList = WDialog.extend({
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
     loadFaked(this._operation);
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+      window.runHooks("wasabeeUIUpdate", this._operation);
+    };
+    buttons[wX("AUTOMARK")] = () => {
+      this.automark();
+    };
+    buttons[wX("RESET")] = () => {
+      this._operation.blockers = new Array();
+      this.blockerlistUpdate(this._operation);
+      this._operation.update(false); // blockers do not need to be sent to server
+      window.runHooks("wasabeeCrosslinks", this._operation);
+    };
+    buttons[wX("LOAD PORTALS")] = () => {
+      loadFaked(this._operation, true); // force
+    };
+    buttons[wX("TRAWL TITLE")] = () => {
+      const td = new TrawlDialog();
+      td.enable();
+    };
 
     this._dialog = window.dialog({
       title: wX("KNOWN_BLOCK", this._operation.name),
@@ -54,28 +75,7 @@ const BlockerList = WDialog.extend({
       height: "auto",
       html: this.sortable.table,
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
-      buttons: {
-        OK: () => {
-          this._dialog.dialog("close");
-          window.runHooks("wasabeeUIUpdate", this._operation);
-        },
-        "Auto Mark": () => {
-          this.automark();
-        },
-        Reset: () => {
-          this._operation.blockers = new Array();
-          this.blockerlistUpdate(this._operation);
-          this._operation.update(false); // blockers do not need to be sent to server
-          window.runHooks("wasabeeCrosslinks", this._operation);
-        },
-        "Load Portals": () => {
-          loadFaked(this._operation, true); // force
-        },
-        "Trawl Lanes": () => {
-          const td = new TrawlDialog();
-          td.enable();
-        }
-      },
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
