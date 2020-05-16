@@ -87,6 +87,14 @@ const StarburstDialog = WDialog.extend({
       this.starburst.call(this);
     });
 
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CLEAR LINKS")] = () => {
+      clearAllLinks(getSelectedOperation());
+    };
+
     this._dialog = window.dialog({
       title: wX("STARBURST TITLE"),
       width: "auto",
@@ -97,15 +105,9 @@ const StarburstDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      buttons: {
-        OK: () => {
-          this._dialog.dialog("close");
-        },
-        "Clear Links": () => {
-          clearAllLinks(getSelectedOperation());
-        }
-      }
+      id: window.plugin.wasabee.static.dialogNames.starburst
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function(map, options) {

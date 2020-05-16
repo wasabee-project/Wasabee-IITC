@@ -40,7 +40,8 @@ W.static = {
     wasabeeDKeyButton: "wasabee-DKey",
     wasabeeDList: "wasabee-DList",
     madrid: "wasabee-madrid",
-    autodraws: "wasabee-autodraws"
+    autodraws: "wasabee-autodraws",
+    starburst: "wasabee-starburst"
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",

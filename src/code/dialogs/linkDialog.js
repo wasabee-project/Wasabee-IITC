@@ -211,18 +211,26 @@ const LinkDialog = WDialog.extend({
     this._desc = L.DomUtil.create("input", "desc", container);
     this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
 
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("ADD_LINKS"),
       width: "auto",
       height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-link",
+      // buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.linkDialogButton
     });
+    // overwrite the buttons, otherwise OK is still there
+    this._dialog.dialog("option", "buttons", buttons);
   }
 });
 

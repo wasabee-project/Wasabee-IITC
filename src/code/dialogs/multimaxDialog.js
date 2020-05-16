@@ -2,7 +2,11 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { getAllPortalsOnScreen, testPortal } from "../uiCommands";
+import {
+  getAllPortalsOnScreen,
+  testPortal,
+  clearAllLinks
+} from "../uiCommands";
 import { greatCircleArcIntersect } from "../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
@@ -100,6 +104,14 @@ const MultimaxDialog = WDialog.extend({
       this._dialog.dialog("close");
     });
 
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CLEAR LINKS")] = () => {
+      clearAllLinks(getSelectedOperation());
+    };
+
     this._dialog = window.dialog({
       title: wX("MULTI_M_TITLE"),
       width: "auto",
@@ -112,6 +124,7 @@ const MultimaxDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.multimaxButton
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function(map, options) {
