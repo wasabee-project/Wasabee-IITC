@@ -182,8 +182,8 @@ const LinkDialog = WDialog.extend({
 
     // Bottom buttons bar
     // Enter arrow
-    const opt = L.DomUtil.create("label", "arrow", container);
-    opt.textContent = "\uD83E\uDCA7";
+    //const opt = L.DomUtil.create("label", "arrow", container);
+    //opt.textContent = "\uD83E\uDCA7";
 
     // Go button
     const button = L.DomUtil.create("buttonall", null, container);
