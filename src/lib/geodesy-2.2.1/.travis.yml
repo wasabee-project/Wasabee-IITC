@@ -1,0 +1,13 @@
+language: node_js
+
+node_js:
+- "node"
+- "13"
+
+os:
+- linux
+- osx
+- windows
+
+after_success:
+- c8 -r text-lcov npm test | coveralls
