@@ -802,6 +802,7 @@
   grid-template-columns: 1fr;
 }
 .wasabee-dialog-ops div.buttonset button {
+  margin: 4px;
   width: 100%;
 }
 .wasabee-dialog-checklist {
