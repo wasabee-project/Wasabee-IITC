@@ -61,6 +61,7 @@ export const SetCommentDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: this.dialogTitle,
       html: this._buildHtml(),
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
       closeCallback: () => {
         this.disable();

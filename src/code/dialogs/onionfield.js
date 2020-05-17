@@ -90,6 +90,7 @@ const OnionfieldDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: "Onion/Rose",
       html: container,
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-onion",
       closeCallback: () => {
         this.disable();

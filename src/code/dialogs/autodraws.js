@@ -105,6 +105,7 @@ const AutodrawsDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("AUTODRAWS"),
       html: html,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-autodraws",
       closeCallback: () => {
         this.disable();

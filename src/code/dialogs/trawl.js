@@ -49,6 +49,7 @@ const TrawlDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("TRAWL TITLE"),
       html: html,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
       closeCallback: () => {
         this.disable();

@@ -54,6 +54,7 @@ const MarkerList = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("MARKER_LIST", this._operation.name),
       html: this.getListDialogContent(this._operation).table,
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
         this.disable();

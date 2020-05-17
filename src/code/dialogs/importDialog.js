@@ -63,6 +63,7 @@ const ImportDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("IMP_WAS_OP"),
       html: container,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-import",
       closeCallback: () => {
         this.disable();

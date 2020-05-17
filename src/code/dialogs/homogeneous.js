@@ -162,6 +162,7 @@ const HomogeneousDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: "Homogeneous",
       html: container,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-homogeneous",
       closeCallback: () => {
         this.disable();

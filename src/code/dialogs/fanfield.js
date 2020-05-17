@@ -126,6 +126,7 @@ const FanfieldDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("FANFIELD2"),
       html: container,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
       closeCallback: () => {
         this.disable();

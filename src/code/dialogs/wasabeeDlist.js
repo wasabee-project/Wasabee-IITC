@@ -46,6 +46,7 @@ const WasabeeDList = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("WASABEE_D_LIST"),
       html: this.getListDialogContent().table,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-wasabeedlist",
       closeCallback: () => {
         this.disable();

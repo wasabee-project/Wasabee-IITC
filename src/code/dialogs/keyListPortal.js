@@ -58,6 +58,7 @@ const KeyListPortal = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("PORTAL KEY LIST", this._portal.displayName),
       html: this.getListDialogContent(this._operation, this._portalID),
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
         delete this._dialog;

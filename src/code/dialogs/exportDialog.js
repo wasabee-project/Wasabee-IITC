@@ -36,6 +36,7 @@ const ExportDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("EXPORT") + this._operation.name,
       html: this._buildContent(),
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-export",
       closeCallback: () => {
         this.disable();

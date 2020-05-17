@@ -71,6 +71,7 @@ const BlockerList = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("KNOWN_BLOCK", this._operation.name),
       html: this.sortable.table,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: buttons,
       closeCallback: () => {

@@ -59,6 +59,7 @@ const OperationChecklistDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("OP_CHECKLIST", this._operation.name),
       html: this.sortable.table,
+      height: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();

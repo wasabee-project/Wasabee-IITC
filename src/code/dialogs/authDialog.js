@@ -168,6 +168,7 @@ const AuthDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("AUTH REQUIRED"),
       html: content,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-auth",
       closeCallback: () => {
         if (

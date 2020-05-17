@@ -215,6 +215,7 @@ const SettingsDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("SETTINGS"),
       html: container,
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-settings",
       closeCallback: () => {
         this.disable();

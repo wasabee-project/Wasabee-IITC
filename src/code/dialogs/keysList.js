@@ -47,6 +47,7 @@ const KeysList = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("KEY_LIST2", this._operation.name),
       html: this.getListDialogContent(this._operation).table,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
         delete this._dialog;

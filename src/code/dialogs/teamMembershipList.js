@@ -35,7 +35,8 @@ const TeamMembershipList = WDialog.extend({
     this._dialog = window.dialog({
       title: this._team.name,
       html: this._table.table,
-      dialogClass: "wasabee-dialog",
+      width: "auto",
+      dialogClass: "wasabee-dialog wasabee-dialog-teamlist",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

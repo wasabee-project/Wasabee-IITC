@@ -29,13 +29,6 @@ const StarburstDialog = WDialog.extend({
     description.textContent = wX("SEL_SB_ANCHOR");
     const description2 = L.DomUtil.create("div", "desc2", container);
     description2.textContent = wX("SEL_SB_ANCHOR2");
-    // const description3 = L.DomUtil.create("div", "desc3", container);
-    // description3.textContent = wX("SEL_SB_ANCHOR3");
-
-    //    const dividerAI = L.DomUtil.create("div", null, container);
-    //   dividerAI.textContent = "\u0000";
-    //   const dividerAI2 = L.DomUtil.create("span", null, container);
-    //  dividerAI2.textContent = "\u0000";
 
     //anchor portal text
     const anchorLabel = L.DomUtil.create("label", null, container);
@@ -78,8 +71,6 @@ const StarburstDialog = WDialog.extend({
     const placeholder2 = L.DomUtil.create("label", "placeholder", container);
     placeholder2.textContent = "\u2063";
 
-    // Go button
-
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("STARBURST_DRAW");
     L.DomEvent.on(button, "click", ev => {
@@ -98,6 +89,7 @@ const StarburstDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("STARBURST TITLE"),
       html: container,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-starburst",
       closeCallback: () => {
         this.disable();

@@ -42,6 +42,7 @@ const PromptDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: this._title,
       html: this._buildContent(),
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-prompt",
       closeCallback: () => {
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());

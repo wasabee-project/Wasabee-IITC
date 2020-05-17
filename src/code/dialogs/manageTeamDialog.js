@@ -272,7 +272,6 @@ const ManageTeamDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("MANAGE_TEAM", this._team.Name),
       width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-manageteam",
       closeCallback: () => {

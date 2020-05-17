@@ -67,6 +67,7 @@ const NewopDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("NEW_OP"),
       html: content,
+      height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-newop",
       closeCallback: function() {
         noHandler.disable();

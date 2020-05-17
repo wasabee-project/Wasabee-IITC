@@ -93,6 +93,7 @@ const DefensiveKeysDialog = WDialog.extend({
       title: wX("INPUT_DT_KEY_COUNT"),
       // position: { my: "center top", at: "center center+30" },
       html: this._content,
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
       closeCallback: () => {
         this.disable();
