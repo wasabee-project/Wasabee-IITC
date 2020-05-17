@@ -265,9 +265,9 @@ const ManageTeamDialog = WDialog.extend({
   _displayDialog: function() {
     const container = this._dialogContent();
     const buttons = {};
-        buttons[wX("CLOSE")] = () => {
-	      this._dialog.dialog("close");
-	          };
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
 
     this._dialog = window.dialog({
       title: wX("MANAGE_TEAM", this._team.Name),
