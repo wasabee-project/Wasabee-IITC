@@ -1,7 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-import { getAllPortalsOnScreen, testPortal } from "../uiCommands";
+import {
+  getAllPortalsOnScreen,
+  testPortal,
+  clearAllLinks
+} from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
 
@@ -175,6 +179,14 @@ const MadridDialog = MultimaxDialog.extend({
       // this._dialog.dialog("close");
     });
 
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CLEAR LINKS")] = () => {
+      clearAllLinks(getSelectedOperation());
+    };
+
     this._dialog = window.dialog({
       title: wX("MADRID_TITLE"),
       width: "auto",
@@ -187,6 +199,7 @@ const MadridDialog = MultimaxDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.madrid
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function(map, options) {

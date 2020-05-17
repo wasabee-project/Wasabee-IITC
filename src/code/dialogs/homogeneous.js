@@ -151,6 +151,14 @@ const HomogeneousDialog = WDialog.extend({
       this.hfield.call(this);
     });
 
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CLEAR LINKS")] = () => {
+      clearAllLinks(getSelectedOperation());
+    };
+
     this._dialog = window.dialog({
       title: "Homogeneous",
       width: "auto",
@@ -160,17 +168,9 @@ const HomogeneousDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      },
-      buttons: {
-        OK: () => {
-          this._dialog.dialog("close");
-        },
-        "Clear Links": () => {
-          this._layerGroup.clearLayers();
-          clearAllLinks(getSelectedOperation());
-        }
       }
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function(map, options) {

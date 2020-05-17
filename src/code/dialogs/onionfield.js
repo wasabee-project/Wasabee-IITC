@@ -79,6 +79,13 @@ const OnionfieldDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this.onion.call(this);
     });
+    const buttons = {};
+    buttons[wX("CLOSE")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CLEAR LINKS")] = () => {
+      clearAllLinks(getSelectedOperation());
+    };
 
     this._dialog = window.dialog({
       title: "Onion/Rose",
@@ -89,16 +96,9 @@ const OnionfieldDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      },
-      buttons: {
-        OK: () => {
-          this._dialog.dialog("close");
-        },
-        "Clear Links": () => {
-          clearAllLinks(getSelectedOperation());
-        }
       }
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function(map, options) {
