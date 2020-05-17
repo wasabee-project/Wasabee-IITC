@@ -37,8 +37,7 @@ export const SetCommentDialog = WDialog.extend({
     TYPE: "setCommentDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = SetCommentDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -54,23 +53,22 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (!this.commentType) {
-      console.log("SetupCommentDialog called before being setup");
-      return;
-    }
-    if (!this._map) return;
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: this.dialogTitle,
-      width: "auto",
-      height: "auto",
       html: this._buildHtml(),
       dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      }
-      // id: window.plugin.wasabee.static.dialogNames.XXX
+      },
+      id: window.plugin.wasabee.static.dialogNames.setComment
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildHtml: function() {

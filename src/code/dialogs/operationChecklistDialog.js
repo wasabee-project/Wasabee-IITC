@@ -19,8 +19,7 @@ const OperationChecklistDialog = WDialog.extend({
     TYPE: "operationChecklist"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = OperationChecklistDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -52,19 +51,22 @@ const OperationChecklistDialog = WDialog.extend({
   _displayDialog: function() {
     this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("OP_CHECKLIST", this._operation.name),
-      width: "auto",
-      height: "auto",
       html: this.sortable.table,
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;
       },
-      resizable: true,
       id: window.plugin.wasabee.static.dialogNames.operationChecklist
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   checklistUpdate: function(newOpData) {

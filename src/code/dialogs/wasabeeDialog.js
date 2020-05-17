@@ -15,8 +15,7 @@ const WasabeeDialog = WDialog.extend({
     TYPE: "wasabeeButton"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = WasabeeDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -138,54 +137,52 @@ const WasabeeDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (this._me) {
-      this._dialog = window.dialog({
-        title: wX("CUR_USER_INFO"),
-        width: "auto",
-        height: "auto",
-        html: this._buildContent(),
-        dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
-        buttons: {
-          OK: () => {
-            this._dialog.dialog("close");
-          },
-          "New Team": () => {
-            const p = new PromptDialog(window.map);
-            p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
-              const newname = p.inputField.value;
-              if (!newname) {
-                alert(wX("NAME_REQ"));
-                return;
-              }
-              newTeamPromise(newname).then(
-                () => {
-                  alert(wX("TEAM_CREATED", newname));
-                  window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-                },
-                reject => {
-                  console.log(reject);
-                  alert(reject);
-                }
-              );
-            });
-            p.current = wX("NEW_TEAM_NAME");
-            p.placeholder = wX("AMAZ_TEAM_NAME");
-            p.enable();
-          }
-        },
-
-        closeCallback: () => {
-          // window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-          this.disable();
-          delete this._dialog;
-        },
-        id: window.plugin.wasabee.static.dialogNames.wasabeeButton
-      });
-    } else {
+    if (!this._me) {
       this.disable();
       const ad = new AuthDialog();
       ad.enable();
+      return;
     }
+
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("NEW TEAM")] = () => {
+      const p = new PromptDialog(window.map);
+      p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
+        const newname = p.inputField.value;
+        if (!newname) {
+          alert(wX("NAME_REQ"));
+          return;
+        }
+        newTeamPromise(newname).then(
+          () => {
+            alert(wX("TEAM_CREATED", newname));
+            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+          },
+          reject => {
+            console.log(reject);
+            alert(reject);
+          }
+        );
+      });
+      p.current = wX("NEW_TEAM_NAME");
+      p.placeholder = wX("AMAZ_TEAM_NAME");
+      p.enable();
+    };
+
+    this._dialog = window.dialog({
+      title: wX("CUR_USER_INFO"),
+      html: this._buildContent(),
+      dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
+      },
+      id: window.plugin.wasabee.static.dialogNames.wasabeeButton
+    });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   toggleTeam: async function(teamID, currentState) {

@@ -97,10 +97,13 @@ const AutodrawsDialog = WDialog.extend({
         .on(link, "click", i.callback, this);
     }
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("AUTODRAWS"),
-      width: "auto",
-      height: "auto",
       html: html,
       dialogClass: "wasabee-dialog wasabee-dialog-autodraws",
       closeCallback: () => {
@@ -109,6 +112,7 @@ const AutodrawsDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.autodraws
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _displaySmallDialog: function() {

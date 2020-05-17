@@ -11,8 +11,7 @@ const DefensiveKeysDialog = WDialog.extend({
     TYPE: "defensiveKeysDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = DefensiveKeysDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -85,10 +84,13 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("INPUT_DT_KEY_COUNT"),
-      width: "auto",
-      height: "auto",
       // position: { my: "center top", at: "center center+30" },
       html: this._content,
       dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
@@ -98,6 +100,7 @@ const DefensiveKeysDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _addDKey: function() {

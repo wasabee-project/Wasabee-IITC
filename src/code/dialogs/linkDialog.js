@@ -8,8 +8,7 @@ const LinkDialog = WDialog.extend({
     TYPE: "linkDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = LinkDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
 
@@ -20,8 +19,6 @@ const LinkDialog = WDialog.extend({
     if (p) this._anchor1 = WasabeePortal.create(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchor2 = WasabeePortal.create(p);
-    /* p = localStorage["wasabee-link-prev"];
-    if (p) this._prev = WasabeePortal.create(p); */
   },
 
   addHooks: function() {
@@ -218,18 +215,14 @@ const LinkDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("ADD_LINKS"),
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-link",
-      // buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.linkDialogButton
     });
-    // overwrite the buttons, otherwise OK is still there
     this._dialog.dialog("option", "buttons", buttons);
   }
 });

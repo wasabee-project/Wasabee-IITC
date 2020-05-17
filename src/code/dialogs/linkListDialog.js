@@ -12,8 +12,7 @@ const LinkListDialog = WDialog.extend({
     TYPE: "linkListDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = LinkListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE");
@@ -39,21 +38,22 @@ const LinkListDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (!this._map) return;
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
 
     this._dialog = window.dialog({
       title: this._portal.displayName + wX("LINKS2"),
-      width: "auto",
-      height: "auto",
       html: this._table.table,
       dialogClass: "wasabee-dialog wasabee-dialog-linklist",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
-      resizable: true,
       id: window.plugin.wasabee.static.dialogNames.linkList
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   setup: function(operation, portal) {

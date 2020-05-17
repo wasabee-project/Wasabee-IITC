@@ -10,8 +10,7 @@ const KeyListPortal = WDialog.extend({
     TYPE: "keyListPortal"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = KeyListPortal.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -51,11 +50,13 @@ const KeyListPortal = WDialog.extend({
       return;
     }
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
-      title: `Key List for Portal ${this._portal.displayName}`,
-      width: "auto",
-      height: "auto",
-      // position: { my: "center top", at: "center center" },
+      title: wX("PORTAL KEY LIST", ${this._portal.displayName}),
       html: this.getListDialogContent(this._operation, this._portalID),
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
@@ -64,6 +65,7 @@ const KeyListPortal = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.keyListPortal
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   keyListUpdate: function(operation) {

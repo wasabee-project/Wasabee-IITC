@@ -97,8 +97,6 @@ const StarburstDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("STARBURST TITLE"),
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-starburst",
       closeCallback: () => {
@@ -110,8 +108,7 @@ const StarburstDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = StarburstDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("STARBURST");

@@ -161,8 +161,6 @@ const HomogeneousDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: "Homogeneous",
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-homogeneous",
       closeCallback: () => {
@@ -173,10 +171,9 @@ const HomogeneousDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
-    this.type = HomogeneousDialog.TYPE;
+  initialize: function(map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
+    this.type = HomogeneousDialog.TYPE;
     this.title = "Homogeneous";
     this.label = "Homogeneous";
     this._operation = getSelectedOperation();

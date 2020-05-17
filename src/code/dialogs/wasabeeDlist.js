@@ -10,8 +10,7 @@ const WasabeeDList = WDialog.extend({
     TYPE: "wasabeeDList"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = WasabeeDList.TYPE;
     this._me = WasabeeMe.get();
     WDialog.prototype.initialize.call(this, map, options);
@@ -39,10 +38,13 @@ const WasabeeDList = WDialog.extend({
   },
 
   _displayDialog: function() {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("WASABEE_D_LIST"),
-      width: "auto",
-      height: "auto",
       html: this.getListDialogContent().table,
       dialogClass: "wasabee-dialog wasabee-dialog-wasabeedlist",
       closeCallback: () => {
@@ -51,6 +53,7 @@ const WasabeeDList = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDList
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   getListDialogContent: function() {

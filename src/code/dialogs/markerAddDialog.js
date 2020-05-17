@@ -8,8 +8,7 @@ const MarkerAddDialog = WDialog.extend({
     TYPE: "markerButton"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = MarkerAddDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -71,10 +70,13 @@ const MarkerAddDialog = WDialog.extend({
       this._addMarker(this._type.value, this._operation, this._comment.value);
     });
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("ADD MARKER TITLE"),
-      width: "auto",
-      height: "auto",
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
       closeCallback: () => {
@@ -83,6 +85,7 @@ const MarkerAddDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.markerButton
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _addMarker: function(selectedType, operation, comment) {

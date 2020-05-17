@@ -207,14 +207,13 @@ const SettingsDialog = WDialog.extend({
   _displayDialog: function() {
     const container = this._getContent();
 
-    // create a JQueryUI dialog, store it in _dialog
-    // set closeCallback to report that we are done and free up the memory
-    // set id if you want only one instance of this dialog to be displayed at a time
-    // enable/disable are inherited from L.Handler via WDialog
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
-      title: "Settings",
-      width: "auto",
-      height: "auto",
+      title: wX("SETTINGS"),
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-settings",
       closeCallback: () => {
@@ -223,6 +222,7 @@ const SettingsDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.settings
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // small-screen versions go in _displaySmallDialog

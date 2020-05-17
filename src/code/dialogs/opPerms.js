@@ -11,8 +11,7 @@ const OpPermList = WDialog.extend({
     TYPE: "opPermList"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = OpPermList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -91,10 +90,13 @@ const OpPermList = WDialog.extend({
       });
     }
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("PERMS", this._operation.name),
-      width: "auto",
-      height: "auto",
       html: this._html,
       dialogClass: "wasabee-dialog wasabee-dialog-perms",
       closeCallback: () => {
@@ -103,6 +105,7 @@ const OpPermList = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.linkList
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // needs this._operation.teamlist;

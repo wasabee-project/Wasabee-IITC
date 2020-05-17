@@ -10,8 +10,7 @@ const NewopDialog = WDialog.extend({
     TYPE: "newopButton"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = NewopDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -60,10 +59,13 @@ const NewopDialog = WDialog.extend({
       addDialog.enable();
     });
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("NEW_OP"),
-      width: "auto",
-      height: "auto",
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-newop",
       closeCallback: function() {
@@ -72,6 +74,7 @@ const NewopDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.newopButton
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   removeHooks: function() {

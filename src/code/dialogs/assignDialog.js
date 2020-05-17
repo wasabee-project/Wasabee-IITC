@@ -27,10 +27,13 @@ const AssignDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: this._name,
-      width: "auto",
-      height: "auto",
       html: this._html,
       dialogClass: "wasabee-dialog wasabee-dialog-assign",
       closeCallback: () => {
@@ -39,6 +42,7 @@ const AssignDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.assign
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   setup: function(target, operation) {

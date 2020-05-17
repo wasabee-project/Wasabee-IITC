@@ -89,8 +89,6 @@ const OnionfieldDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: "Onion/Rose",
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-onion",
       closeCallback: () => {
@@ -101,8 +99,7 @@ const OnionfieldDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = OnionfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = "Onion/Rose";

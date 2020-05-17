@@ -17,8 +17,7 @@ const MarkerList = WDialog.extend({
     TYPE: "markerList"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = MarkerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -47,11 +46,13 @@ const MarkerList = WDialog.extend({
   _displayDialog: function() {
     loadFaked(this._operation);
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("MARKER_LIST", this._operation.name),
-      width: "auto",
-      height: "auto",
-      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
@@ -60,6 +61,7 @@ const MarkerList = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.markerList
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   markerListUpdate: function(operation) {

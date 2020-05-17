@@ -11,8 +11,7 @@ const ImportDialog = WDialog.extend({
     TYPE: "importDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = ImportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -53,20 +52,17 @@ const ImportDialog = WDialog.extend({
     this._textarea = L.DomUtil.create("textarea", null, container);
     this._textarea.placeholder = wX("PASTE_INSTRUCT");
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("GET DT")] = () => {
+      this.drawToolsFormat();
+    };
+
     this._dialog = window.dialog({
       title: wX("IMP_WAS_OP"),
-      width: "auto",
-      height: "auto",
       html: container,
-      buttons: {
-        OK: () => {
-          this.importTextareaAsOp();
-          this._dialog.dialog("close");
-        },
-        "Get existing DrawTools draw": () => {
-          this.drawToolsFormat();
-        }
-      },
       dialogClass: "wasabee-dialog wasabee-dialog-import",
       closeCallback: () => {
         this.disable();
@@ -78,6 +74,7 @@ const ImportDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   drawToolsFormat() {

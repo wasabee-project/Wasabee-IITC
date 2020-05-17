@@ -21,8 +21,7 @@ const ManageTeamDialog = WDialog.extend({
     TYPE: "manageTeamDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = ManageTeamDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -265,6 +264,10 @@ const ManageTeamDialog = WDialog.extend({
 
   _displayDialog: function() {
     const container = this._dialogContent();
+    const buttons = {};
+        buttons[wX("CLOSE")] = () => {
+	      this._dialog.dialog("close");
+	          };
 
     this._dialog = window.dialog({
       title: wX("MANAGE_TEAM", this._team.Name),
@@ -275,9 +278,10 @@ const ManageTeamDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      }
-      // id: window.plugin.wasabee.static.dialogNames.linkList
+      },
+      id: window.plugin.wasabee.static.dialogNames.manageTeam
     });
+    this._dialog.dialog("option", "buttons", buttons);
   }
 });
 

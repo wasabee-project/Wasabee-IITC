@@ -15,8 +15,7 @@ const BlockerList = WDialog.extend({
     TYPE: "blockerList"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = BlockerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
@@ -71,8 +70,6 @@ const BlockerList = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("KNOWN_BLOCK", this._operation.name),
-      width: "auto",
-      height: "auto",
       html: this.sortable.table,
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
       buttons: buttons,

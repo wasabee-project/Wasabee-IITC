@@ -189,8 +189,6 @@ const MadridDialog = MultimaxDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("MADRID_TITLE"),
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-madrid",
       closeCallback: () => {
@@ -202,8 +200,7 @@ const MadridDialog = MultimaxDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = MadridDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MADRID");

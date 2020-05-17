@@ -16,8 +16,7 @@ const AuthDialog = WDialog.extend({
     TYPE: "authDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = AuthDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -161,10 +160,13 @@ const AuthDialog = WDialog.extend({
       serverDialog.enable();
     });
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("AUTH REQUIRED"),
-      width: "auto",
-      height: "auto",
       html: content,
       dialogClass: "wasabee-dialog wasabee-dialog-auth",
       closeCallback: () => {
@@ -180,6 +182,7 @@ const AuthDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   gsapiAuthImmediate: function() {

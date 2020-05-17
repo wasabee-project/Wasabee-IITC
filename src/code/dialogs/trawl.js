@@ -41,10 +41,13 @@ const TrawlDialog = WDialog.extend({
       this._doTrawl();
     });
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("TRAWL TITLE"),
-      width: "auto",
-      height: "auto",
       html: html,
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
       closeCallback: () => {
@@ -53,6 +56,7 @@ const TrawlDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.trawl
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _doTrawl: function() {

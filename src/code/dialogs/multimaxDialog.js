@@ -114,8 +114,6 @@ const MultimaxDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("MULTI_M_TITLE"),
-      width: "auto",
-      height: "auto",
       html: container,
       dialogClass: "wasabee-dialog wasabee-dialog-multimax",
       closeCallback: () => {
@@ -127,8 +125,7 @@ const MultimaxDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MULTI_M");

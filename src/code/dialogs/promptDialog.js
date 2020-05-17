@@ -9,8 +9,7 @@ const PromptDialog = WDialog.extend({
     TYPE: "promptDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = PromptDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE"); // should never be displayed
@@ -30,30 +29,27 @@ const PromptDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (!this._map) return;
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      if (this._callback) this._callback();
+      this._dialog.dialog("close");
+    };
+    buttons[wX("CANCEL")] = () => {
+      if (this._cancelCallback) this._cancelCallback();
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: this._title,
-      width: "auto",
-      height: "auto",
       html: this._buildContent(),
       dialogClass: "wasabee-dialog wasabee-dialog-prompt",
-      buttons: {
-        OK: () => {
-          if (this._callback) this._callback();
-          this._dialog.dialog("close");
-        },
-        Cancel: () => {
-          if (this._cancelCallback) this._cancelCallback();
-          this._dialog.dialog("close");
-        }
-      },
       closeCallback: () => {
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         this.disable();
         delete this._dialog;
       }
-      // id: window.plugin.wasabee.static.dialogNames.XXX
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   setup: function(title, label, callback, cancelCallback) {

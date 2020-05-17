@@ -9,8 +9,7 @@ const ConfirmDialog = WDialog.extend({
     TYPE: "confirmDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = ConfirmDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE");
@@ -43,8 +42,6 @@ const ConfirmDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: this._title,
-      width: "auto",
-      height: "auto",
       html: this._buildContent(),
       dialogClass: "wasabee-dialog wasabee-dialog-confirm",
       buttons: buttons,

@@ -18,8 +18,7 @@ const OpsDialog = WDialog.extend({
     TYPE: "opsDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = OpsDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
@@ -44,10 +43,13 @@ const OpsDialog = WDialog.extend({
   _displayDialog: function() {
     this.makeContent(getSelectedOperation());
 
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
       title: wX("OPERATIONS"),
-      width: "auto",
-      height: "auto",
       html: this._content,
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
       closeCallback: () => {
@@ -57,6 +59,7 @@ const OpsDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.opsButton
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: function(selectedOp) {

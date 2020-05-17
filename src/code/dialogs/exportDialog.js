@@ -8,8 +8,7 @@ const ExportDialog = WDialog.extend({
     TYPE: "exportDialog"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
+  initialize: function(map = window.map, options) {
     this.type = ExportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
@@ -26,27 +25,25 @@ const ExportDialog = WDialog.extend({
   },
 
   _displayDialog: function() {
-    if (!this._map) return;
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+    buttons[wX("DRAW TOOLS FORMAT")] = () => {
+      this._drawToolsFormat();
+    };
+
     this._dialog = window.dialog({
       title: wX("EXPORT") + this._operation.name,
-      width: "auto",
-      height: "auto",
       html: this._buildContent(),
       dialogClass: "wasabee-dialog wasabee-dialog-export",
-      buttons: {
-        OK: () => {
-          this._dialog.dialog("close");
-        },
-        "Draw Tools Format": () => {
-          this._drawToolsFormat();
-        }
-      },
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.exportDialog
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildContent: function() {

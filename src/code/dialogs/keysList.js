@@ -11,10 +11,9 @@ const KeysList = WDialog.extend({
     TYPE: "keysList"
   },
 
-  initialize: function(map, options) {
-    if (!map) map = window.map;
-    this.type = KeysList.TYPE;
+  initialize: function(map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
+    this.type = KeysList.TYPE;
   },
 
   addHooks: function() {
@@ -40,12 +39,13 @@ const KeysList = WDialog.extend({
   },
 
   _displayDialog: function() {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     this._dialog = window.dialog({
-      //      title: wX("KEY_LIST", this._operation.name),
       title: wX("KEY_LIST2", this._operation.name),
-      width: "auto",
-      height: "auto",
-      // position: { my: "center top", at: "center center" },
       html: this.getListDialogContent(this._operation).table,
       dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
@@ -54,6 +54,7 @@ const KeysList = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.keysList
     });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: function(operation) {

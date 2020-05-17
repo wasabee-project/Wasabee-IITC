@@ -55,22 +55,29 @@ const AboutDialog = WDialog.extend({
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
 
+    // Since the JqueryUI dialog buttons are hard-coded, we have to override them to translate them
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
     // create a JQueryUI dialog, store it in _dialog
     // set closeCallback to report that we are done and free up the memory
     // set id if you want only one instance of this dialog to be displayed at a time
     // enable/disable are inherited from L.Handler via WDialog
     this._dialog = window.dialog({
       title: wX("ABOUT_WASABEE"),
-      width: "auto",
-      height: "auto",
       html: html,
       dialogClass: "wasabee-dialog wasabee-dialog-about",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
+      // setting buttons: buttons here would append them -- swap in below
       id: window.plugin.wasabee.static.dialogNames.linkList
     });
+    // swap in our buttons, replacing the defaults
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // small-screen versions go in _displaySmallDialog
