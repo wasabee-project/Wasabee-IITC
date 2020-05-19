@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersect } from "../crosslinks";
+import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
@@ -235,8 +235,8 @@ const FanfieldDialog = WDialog.extend({
   },
 
   _angle: function(a, p) {
-    // assume world is flat or portals not too far
-    return Math.atan2(p.latLng.lng - a.latLng.lng, p.latLng.lat - a.latLng.lat);
+    const link = new GeodesicLine(a.latLng, p.latLng);
+    return link.bearing();
   }
 });
 

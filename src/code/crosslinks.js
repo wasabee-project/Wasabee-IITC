@@ -349,7 +349,7 @@ export const initCrossLinks = () => {
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
 };
 
-class GeodesicLine {
+export class GeodesicLine {
   constructor(start, end) {
     let d2r = Math.PI / 180.0;
     // let r2d = 180.0 / Math.PI; //eslint-disable-line
