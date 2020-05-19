@@ -395,5 +395,14 @@ class GeodesicLine {
     }
     return (lat * 180) / Math.PI; // return value in degrees
   }
+
+  // bearing in radians
+  bearing() {
+    const dLng = this.lng1 - this.lng2;
+    const cosLat2 = Math.cos(this.lat2);
+    const y = Math.sin(dLng) * cosLat2;
+    const x = this.sinLat2CosLat1 - this.sinLat1CosLat2 * Math.cos(dLng);
+    return Math.atan2(y, x);
+  }
 }
 //*** END CROSSLINK THINGS */'
