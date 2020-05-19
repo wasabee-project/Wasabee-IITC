@@ -215,6 +215,10 @@ const FanfieldDialog = WDialog.extend({
       const wp = available[i];
       order++;
       this._operation.addLink(wp, this._anchor, "fan anchor", order);
+
+      // skip back links if first portal
+      if (i + 1 == available.length) continue;
+
       // Find the interval of portals that are linkable
       let j = i + 1;
       for (; j < available.length; j++) {
