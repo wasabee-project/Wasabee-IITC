@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersect } from "../crosslinks";
+import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
@@ -207,26 +207,48 @@ const FanfieldDialog = WDialog.extend({
     this._operation.startBatchMode();
     let order = 0;
     let fields = 0;
-    for (const wp of sorted) {
+
+    const available = Array.from(sorted);
+    available.reverse();
+
+    for (let i = available.length - 1; i >= 0; i--) {
+      const wp = available[i];
       order++;
       this._operation.addLink(wp, this._anchor, "fan anchor", order);
-      for (const check of sorted) {
-        if (wp.id == check.id) break; // stop if we've gone too far
-        const testlink = new WasabeeLink(this._operation, wp.id, check.id);
+
+      // skip back links if first portal
+      if (i + 1 == available.length) continue;
+
+      // Find the interval of portals that are linkable
+      let j = i + 1;
+      for (; j < available.length; j++) {
+        const testlink = new WasabeeLink(
+          this._operation,
+          wp.id,
+          available[j].id
+        );
         let crossed = false;
         for (const real of this._operation.links) {
+          // Check links to anchor only
+          if (real.toPortalId != this._anchor.id) continue;
           if (greatCircleArcIntersect(real, testlink)) {
             crossed = true;
             break;
           }
         }
-        if (!crossed) {
-          testlink.throwOrderPos = ++order;
-          testlink.description = "fan subfield";
-          fields++;
-          this._operation.links.push(testlink);
-        }
+        if (crossed) break;
       }
+      j--;
+      this._operation.addLink(wp, available[j], "fan subfield", ++order);
+      fields++;
+
+      for (var k = j - 1; k > i; k--) {
+        const check = available[k];
+        this._operation.addLink(wp, check, "fan double subfield", ++order);
+        fields += 2;
+      }
+      // remove covered portals
+      available.splice(i + 1, j - i - 1);
     }
     this._operation.endBatchMode();
     const ap = 313 * order + 1250 * fields;
@@ -235,8 +257,8 @@ const FanfieldDialog = WDialog.extend({
   },
 
   _angle: function(a, p) {
-    // assume world is flat or portals not too far
-    return Math.atan2(p.latLng.lng - a.latLng.lng, p.latLng.lat - a.latLng.lat);
+    const link = new GeodesicLine(a.latLng, p.latLng);
+    return link.bearing();
   }
 });
 
