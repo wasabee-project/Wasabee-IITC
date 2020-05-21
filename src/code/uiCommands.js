@@ -289,6 +289,12 @@ export const testPortal = function(recursed = false) {
 // pass in an array of L.LatLngs, it determines the zoom-15 tiles
 // and requests those tiles be loaded with IITC's queuing and caching
 export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
+  if (latlngs.length == 0) return;
+  if (window.plugin.wasabee.ptdrIntervalID) {
+    console.log("pintTileDataRequest already running");
+    return;
+  }
+
   // abuse the window.mapDataRequest
   const mdr = window.mapDataRequest;
   mdr.debugTiles.reset();
@@ -333,12 +339,32 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
     list.set(tileID, 0);
   }
   const tiles = Array.from(list.keys());
-  console.log(tiles);
+  // console.log(tiles);
   for (const t of tiles) mdr.queuedTiles[t] = t;
-
+  const totaltiles = tiles.length;
   mdr.setStatus("trawling", undefined, -1);
+  // shut mdr down for now
+  mdr.pauseRenderQueue(true);
+  mdr.clearTimeout();
+
+  const rate = 330;
+  window.plugin.wasabee.ptdrIntervalID = window.setInterval(() => {
+    const t = tiles.pop();
+    if (t) {
+      mdr.sendTileRequest([t]);
+      // XXX counts wrong direction
+      mdr.setStatus("trawling", t, tiles.length / totaltiles);
+      return;
+    }
+    window.clearInterval(window.plugin.wasabee.ptdrIntervalID);
+    delete window.plugin.wasabee.ptdrIntervalID;
+    mdr.setStatus("trawl complete", undefined, -1);
+  }, rate);
+  mdr.pauseRenderQueue(false);
+
+  // mdr.processRequestQueue(true);
+  // mdr.processRenderQueue();
   window.runHooks("requestFinished", { success: true });
-  mdr.processRequestQueue(true);
 };
 
 // I'll send a patch to IITC once I get our stuff working
@@ -358,7 +384,8 @@ class FakeDebugTiles {
   }
 
   setState() {
-    // console.log("fdtc setState");
+    //setState(id, state) {
+    // console.log("fdtc setState: " + id + " " + state);
   }
 
   runClearPass() {

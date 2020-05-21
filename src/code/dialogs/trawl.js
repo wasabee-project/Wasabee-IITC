@@ -32,13 +32,19 @@ const TrawlDialog = WDialog.extend({
     const html = L.DomUtil.create("html");
     const container = L.DomUtil.create("div", "container", html);
     const notice = L.DomUtil.create("label", null, container);
-    notice.innerHTML = "<h1>THIS DOES NOT WORK YET</h1>";
+    notice.innerHTML = "<h3>Still in development: do not rely on this</h3>";
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWL WARNING");
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
     L.DomEvent.on(button, "click", () => {
-      this._doTrawl();
+      const points = this._doTrawl();
+      alert(
+        "do not do anything until trawling is complete: looking at " +
+          points +
+          " different map points"
+      );
+      this._dialog.dialog("close");
     });
 
     const buttons = {};
@@ -61,11 +67,13 @@ const TrawlDialog = WDialog.extend({
   },
 
   _doTrawl: function() {
-    const trawlPrecision = 250;
     const operation = getSelectedOperation();
 
-    // precision can be dynamic based on bearing, closer to 0 or 90 can be larger
+    const trawlPrecision = 250;
+    // XXX precision can be dynamic based on bearing, closer to 0 or 90 can be larger
     // closer to 45 must be smaller
+    const bearingRecalc = 10;
+    // XXX bearingRecalc can be dynamic too
 
     window.mapDataRequest.setStatus("calculating", undefined, -1);
 
@@ -85,9 +93,9 @@ const TrawlDialog = WDialog.extend({
       while (traveled < distance) {
         traveled += trawlPrecision;
         bearingTick++;
-        let tmp = p.destinationPoint(trawlPrecision, bearing);
+        const tmp = p.destinationPoint(trawlPrecision, bearing);
         // recalc bearing every X -- good enough, save some CPU
-        if (bearingTick % 10 == 0) {
+        if (bearingTick % bearingRecalc == 0) {
           bearing = p.initialBearingTo(end);
         }
         points.push(
@@ -99,7 +107,8 @@ const TrawlDialog = WDialog.extend({
 
     // this gets the tiles from the latlngs, reduces to uniques, puts them in IITCs queue and starts the queue runner
     console.log("total points", points.length);
-    pointTileDataRequest(points, 12);
+    pointTileDataRequest(points, 13);
+    return points.length;
   }
 });
 
