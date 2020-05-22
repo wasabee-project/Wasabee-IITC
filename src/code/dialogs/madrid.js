@@ -241,20 +241,30 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     const newThree = this._prev;
+    // the set 1 must contain anchor 1
+    if (this._portalSetOne.find(p => this._anchorOne.id == p.id) == undefined)
+      this._portalSetOne.push(this._anchorOne);
     len += this.madridMM(
       this._anchorTwo,
       newThree,
-      this._portalSetOne.filter(p =>
-        this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
+      this._portalSetOne.filter(
+        p =>
+          this._anchorOne.id == p.id ||
+          this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
       )
     );
     // _anchorOne is no longer useful, use _prev
     const newOne = this._prev;
+    // the set 2 must contain anchor 2
+    if (this._portalSetTwo.find(p => this._anchorTwo.id == p.id) == undefined)
+      this._portalSetTwo.push(this._anchorTwo);
     len += this.madridMM(
       newThree,
       newOne,
-      this._portalSetTwo.filter(p =>
-        this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+      this._portalSetTwo.filter(
+        p =>
+          this._anchorTwo.id == p.id ||
+          this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
       )
     );
     this._operation.endBatchMode(); // save and run crosslinks
