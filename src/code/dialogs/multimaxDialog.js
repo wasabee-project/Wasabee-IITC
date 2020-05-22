@@ -311,7 +311,7 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
 
     return Array.from(poset.keys())
       .map(sequence_from)
-      .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2));
+      .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
   }
 });
 
