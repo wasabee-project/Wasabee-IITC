@@ -318,8 +318,8 @@ const MadridDialog = MultimaxDialog.extend({
       );
       if (this._flcheck.checked && prev) {
         this._operation.addLink(
-          prev,
           p,
+          prev,
           "back link",
           this._operation.links.length + this._orderOffset
         );
