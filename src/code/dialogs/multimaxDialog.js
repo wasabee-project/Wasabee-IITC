@@ -139,6 +139,9 @@ const MultimaxDialog = WDialog.extend({
     this._urp = testPortal();
   },
 
+  /*
+  Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
+  */
   doMultimax: function() {
     const portalsOnScreen = getAllPortalsOnScreen(this._operation);
 
@@ -205,9 +208,6 @@ const MultimaxDialog = WDialog.extend({
     return sequence.length;
   },
 
-  /*
-Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
- */
   fieldCoversPortal: function(a, b, c, p) {
     const unreachableMapPoint = this._urp;
 
@@ -225,7 +225,8 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
   },
 
-  // build a map that shows which and how many portals are covered by each possible field by guid
+  // given two anchor, build a map that shows which and how many portals are covered by each possible field by guid
+  // note: a portal always covers itself
   buildPOSet: function(anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
@@ -242,6 +243,7 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
   },
 
   // build a map that shows which and how many portals are covering each possible field by guid
+  // note: a portal is always covered by itself
   buildRevPOSet: function(anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
@@ -289,6 +291,12 @@ Calculate, given two anchors and a set of portals, the best posible sequence of 
     return poset;
   },
 
+  // given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
+  // notes:
+  // - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
+  // - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
+  //   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
+  //   (inner to outer)
   longestSequence: function(poset, start) {
     const alreadyCalculatedSequences = new Map();
     const sequence_from = c => {
