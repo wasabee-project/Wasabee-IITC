@@ -231,7 +231,13 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
+    this._orderOffset = 1 - this._operation.links.length;
+    this._operation.addLink(
+      this._anchorOne,
+      this._anchorTwo,
+      "madrid base",
+      this._operation.links.length + this._orderOffset
+    );
 
     let len = 0;
     len += this.madridMM(
@@ -241,32 +247,39 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     const newThree = this._prev;
-    // the set 1 must contain anchor 1
+    // the set 1 must contain anchor 1 (first back link)
     if (this._portalSetOne.find(p => this._anchorOne.id == p.id) == undefined)
       this._portalSetOne.push(this._anchorOne);
-    len += this.madridMM(
-      this._anchorTwo,
-      newThree,
-      this._portalSetOne.filter(
-        p =>
-          this._anchorOne.id == p.id ||
-          this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
-      )
-    );
+    len +=
+      this.madridMM(
+        this._anchorTwo,
+        newThree,
+        this._portalSetOne.filter(
+          p =>
+            this._anchorOne.id == p.id ||
+            this.fieldCoversPortal(
+              this._anchorTwo,
+              newThree,
+              p,
+              this._anchorOne
+            )
+        )
+      ) - 1;
     // _anchorOne is no longer useful, use _prev
     const newOne = this._prev;
-    // the set 2 must contain anchor 2
+    // the set 2 must contain anchor 2 (first back link)
     if (this._portalSetTwo.find(p => this._anchorTwo.id == p.id) == undefined)
       this._portalSetTwo.push(this._anchorTwo);
-    len += this.madridMM(
-      newThree,
-      newOne,
-      this._portalSetTwo.filter(
-        p =>
-          this._anchorTwo.id == p.id ||
-          this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
-      )
-    );
+    len +=
+      this.madridMM(
+        newThree,
+        newOne,
+        this._portalSetTwo.filter(
+          p =>
+            this._anchorTwo.id == p.id ||
+            this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+        )
+      ) - 1;
     this._operation.endBatchMode(); // save and run crosslinks
     return len;
   },
@@ -282,9 +295,7 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
 
-    let order = sequence.length * (this._flcheck ? 3 : 2) + this._previousOrder;
     let prev = null;
-    this._previousOrder = order;
 
     // draw inner 3 links
     for (const node of sequence) {
@@ -293,12 +304,26 @@ const MadridDialog = MultimaxDialog.extend({
         console.log("skipping: " + node);
         continue;
       }
+      this._operation.addLink(
+        p,
+        pOne,
+        "madrid protocol link",
+        this._operation.links.length + this._orderOffset
+      );
+      this._operation.addLink(
+        p,
+        pTwo,
+        "madrid protocol link",
+        this._operation.links.length + this._orderOffset
+      );
       if (this._flcheck.checked && prev) {
-        this._operation.addLink(prev, p, "back link", order + 3);
-        order--;
+        this._operation.addLink(
+          prev,
+          p,
+          "back link",
+          this._operation.links.length + this._orderOffset
+        );
       }
-      this._operation.addLink(p, pOne, "madrid protocol link", order--);
-      this._operation.addLink(p, pTwo, "madrid protocol link", order--);
       prev = p;
     }
     // store the last portal in the set so we can use it as the anchor for the next set
