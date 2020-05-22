@@ -162,7 +162,7 @@ const MultimaxDialog = WDialog.extend({
       return 0;
     }
 
-    let order = sequence.length * (this._flcheck ? 3 : 2);
+    let order = 0;
     let prev = null;
 
     this._operation.startBatchMode(); // bypass save and crosslinks checks
@@ -170,7 +170,7 @@ const MultimaxDialog = WDialog.extend({
       this._anchorOne,
       this._anchorTwo,
       "multimax base",
-      1
+      ++order
     );
 
     for (const node of sequence) {
@@ -179,27 +179,26 @@ const MultimaxDialog = WDialog.extend({
         console.log("data not loaded, skipping: " + node);
         continue;
       }
-      if (this._flcheck.checked && prev) {
-        this._operation.addLink(
-          prev,
-          p,
-          "multimax generated back link",
-          order + 3
-        );
-        order--;
-      }
       this._operation.addLink(
         p,
         this._anchorOne,
         "multimax generated link",
-        order--
+        ++order
       );
       this._operation.addLink(
         p,
         this._anchorTwo,
         "multimax generated link",
-        order--
+        ++order
       );
+      if (this._flcheck.checked && prev) {
+        this._operation.addLink(
+          p,
+          prev,
+          "multimax generated back link",
+          ++order
+        );
+      }
       prev = p;
     }
     this._operation.endBatchMode(); // save and run crosslinks
