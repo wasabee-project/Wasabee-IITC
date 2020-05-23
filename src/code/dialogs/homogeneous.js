@@ -242,8 +242,8 @@ const HomogeneousDialog = WDialog.extend({
   _recurser: function(depth, portalsCovered, one, two, three) {
     if (depth >= this.depthMenu.value)
       return { success: true, anchors: [one, two, three], split: 0 };
-    //this._color = this._colors[depth % this._colors.length];
 
+    // empty tree
     let bestResult = {
       success: false,
       anchors: [one, two, three],
@@ -268,33 +268,8 @@ const HomogeneousDialog = WDialog.extend({
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.size == 0) {
       // console.log("empty set");
-      // const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-      // const polygon = L.polygon(latlngs, { color: "red" });
-      // polygon.addTo(this._layerGroup);
-      //this._failed += getNbSplitPerDepth(this.depthMenu.value - depth);
       return bestResult;
     }
-
-    // if there is exactly one portal, use it
-    // if (sorted.size == 1) {
-    //   // console.log("one portal fast-path");
-    //   const i = sorted.keys();
-    //   const onlyp = sorted.get(i.next().value);
-    //   let linkID = this._operation.addLink(one, onlyp);
-    //   this._operation.setLinkColor(linkID, this._color);
-    //   linkID = this._operation.addLink(two, onlyp);
-    //   this._operation.setLinkColor(linkID, this._color);
-    //   linkID = this._operation.addLink(three, onlyp);
-    //   this._operation.setLinkColor(linkID, this._color);
-
-    //   if (depth + 1 < this.depthMenu.value) {
-    //     this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2 - 1;
-    //     const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-    //     const polygon = L.polygon(latlngs, { color: "orange" });
-    //     polygon.addTo(this._layerGroup);
-    //   }
-    //   return;
-    // }
 
     // find the portal that divides the area into regions with the closest number of portals
     // starts at the center-most and works outwards
@@ -336,28 +311,8 @@ const HomogeneousDialog = WDialog.extend({
       // if (differential == 0) break;
     }
 
-    // no portal never happen
-    // if (best.length == 0) {
-    //   console.log("hit bottom at: ", depth, one.name, two.name, three.name);
-    //   this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
-    //   const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-    //   const polygon = L.polygon(latlngs, { color: "yellow" });
-    //   polygon.addTo(this._layerGroup);
-    //   return;
-    // }
-
     // console.log("best balance: ", bestp.name, differential, best);
     bestResult.portal = bestp;
-    // let linkID = this._operation.addLink(one, bestp);
-    // this._operation.setLinkColor(linkID, this._color);
-    // linkID = this._operation.addLink(two, bestp);
-    // this._operation.setLinkColor(linkID, this._color);
-    // linkID = this._operation.addLink(three, bestp);
-    // this._operation.setLinkColor(linkID, this._color);
-
-    // depth++;
-    // // console.log("going deeper");
-    // if (depth == this.depthMenu.value) return;
 
     bestResult.children = [
       this._recurser(depth + 1, new Array(...best[0]), one, two, bestp),
