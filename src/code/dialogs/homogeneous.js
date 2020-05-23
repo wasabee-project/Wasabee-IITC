@@ -197,20 +197,7 @@ const HomogeneousDialog = WDialog.extend({
       alert("please select three anchors");
       return;
     }
-    this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
-      this._colors.push(k);
-      this._trash = c;
-    }
 
-    this._operation.startBatchMode();
-    this._operation.addPortal(this._anchorOne);
-    this._operation.addPortal(this._anchorTwo);
-    this._operation.addPortal(this._anchorThree);
-    this._operation.addLink(this._anchorOne, this._anchorTwo, "Outer 1");
-    this._operation.addLink(this._anchorOne, this._anchorThree, "Outer 2");
-    this._operation.addLink(this._anchorTwo, this._anchorThree, "Outer 3");
-    this._operation.endBatchMode();
     const portals = new Array();
     for (const p of getAllPortalsOnScreen(this._operation)) {
       if (
@@ -223,14 +210,23 @@ const HomogeneousDialog = WDialog.extend({
       )
         portals.push(p);
     }
-    this._operation.startBatchMode();
-    this._recurser(
+
+    const tree = this._recurser(
       1,
       portals,
       this._anchorOne,
       this._anchorTwo,
       this._anchorThree
     );
+
+    this._colors = new Array();
+    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+      this._colors.push(k);
+      this._trash = c;
+    }
+
+    this._operation.startBatchMode();
+    this._drawTree(tree);
     this._operation.endBatchMode();
 
     // this._operation.cleanAnchorList();
@@ -244,8 +240,17 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _recurser: function(depth, portalsCovered, one, two, three) {
-    if (depth >= this.depthMenu.value) return;
-    this._color = this._colors[depth % this._colors.length];
+    if (depth >= this.depthMenu.value)
+      return { success: true, anchors: [one, two, three], split: 0 };
+
+    // empty tree
+    let bestResult = {
+      success: false,
+      anchors: [one, two, three],
+      split: 0,
+      portal: null,
+      children: null
+    };
 
     // console.log(depth, "portals in consideration", portalsCovered);
 
@@ -262,33 +267,8 @@ const HomogeneousDialog = WDialog.extend({
     // sort by distance to centeroid the field
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
     if (sorted.size == 0) {
-      console.log("empty set");
-      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-      const polygon = L.polygon(latlngs, { color: "red" });
-      polygon.addTo(this._layerGroup);
-      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
-      return;
-    }
-
-    // if there is exactly one portal, use it
-    if (sorted.size == 1) {
-      // console.log("one portal fast-path");
-      const i = sorted.keys();
-      const onlyp = sorted.get(i.next().value);
-      let linkID = this._operation.addLink(one, onlyp);
-      this._operation.setLinkColor(linkID, this._color);
-      linkID = this._operation.addLink(two, onlyp);
-      this._operation.setLinkColor(linkID, this._color);
-      linkID = this._operation.addLink(three, onlyp);
-      this._operation.setLinkColor(linkID, this._color);
-
-      if (depth + 1 < this.depthMenu.value) {
-        this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2 - 1;
-        const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-        const polygon = L.polygon(latlngs, { color: "orange" });
-        polygon.addTo(this._layerGroup);
-      }
-      return;
+      // console.log("empty set");
+      return bestResult;
     }
 
     // find the portal that divides the area into regions with the closest number of portals
@@ -308,7 +288,7 @@ const HomogeneousDialog = WDialog.extend({
         three
       );
       // one of the regions didn't have enough
-      if (!subregions) continue;
+      // if (!subregions) continue; // never
       // is this one better than the previous?
       // smallest difference in the number of portals between the greatest and least, 0 being ideal
       const temp =
@@ -331,56 +311,142 @@ const HomogeneousDialog = WDialog.extend({
       // if (differential == 0) break;
     }
 
-    if (best.length == 0) {
-      console.log("hit bottom at: ", depth, one.name, two.name, three.name);
-      this._failed += (3 ** (this.depthMenu.value - depth) - 1) / 2;
-      const latlngs = [one.latLng, two.latLng, three.latLng, one.latLng];
-      const polygon = L.polygon(latlngs, { color: "yellow" });
-      polygon.addTo(this._layerGroup);
-      return;
-    }
-
     // console.log("best balance: ", bestp.name, differential, best);
-    let linkID = this._operation.addLink(one, bestp);
-    this._operation.setLinkColor(linkID, this._color);
-    linkID = this._operation.addLink(two, bestp);
-    this._operation.setLinkColor(linkID, this._color);
-    linkID = this._operation.addLink(three, bestp);
-    this._operation.setLinkColor(linkID, this._color);
+    bestResult.portal = bestp;
 
-    depth++;
-    // console.log("going deeper");
-    if (depth == this.depthMenu.value) return;
+    bestResult.children = [
+      this._recurser(depth + 1, new Array(...best[0]), one, two, bestp),
+      this._recurser(depth + 1, new Array(...best[1]), two, three, bestp),
+      this._recurser(depth + 1, new Array(...best[2]), one, three, bestp)
+    ];
+    bestResult.success =
+      bestResult.children[0].success &&
+      bestResult.children[1].success &&
+      bestResult.children[2].success;
+    bestResult.split =
+      bestResult.children[0].split +
+      bestResult.children[1].split +
+      bestResult.children[2].split;
+    return bestResult;
+  },
 
-    if (best[0]) {
-      // console.log("region one", one.name, two.name, bestp.name);
-      this._recurser(depth, new Array(...best[0]), one, two, bestp);
-    }
-    if (best[1]) {
-      // console.log("region two", two.name, three.name, bestp.name);
-      this._recurser(depth, new Array(...best[1]), two, three, bestp);
-    }
-    if (best[2]) {
-      // console.log("region three", three.name, one.name, bestp.name);
-      this._recurser(depth, new Array(...best[2]), one, three, bestp);
-    }
+  _drawTree: function(tree) {
+    const depthValue = +this.depthMenu.value - 1;
+    const [one, two, three] = tree.anchors;
+    const computeDepth = (depth, tree, map) => {
+      if (tree.portal) {
+        map.set(tree.portal.id, depth);
+        for (const child of tree.children) computeDepth(depth + 1, child, map);
+      }
+    };
+
+    const portalDepth = new Map([
+      [one.id, 0],
+      [two.id, 0],
+      [three.id, 0]
+    ]);
+    computeDepth(1, tree, portalDepth);
+
+    const orderByDepth = (a, b) => {
+      let ad = portalDepth.get(a.id);
+      let bd = portalDepth.get(b.id);
+
+      const baseOrder = ((depthValue - bd) * (depthValue - bd - 1)) / 2 + 1;
+
+      if (bd != 0 || b.id == one.id) return baseOrder + ad - bd - 1;
+
+      if (b.id == two.id) return baseOrder + depthValue + ad;
+
+      return baseOrder + 2 * depthValue + ad + 1;
+    };
+
+    const getNbSplitPerDepth = depth => (3 ** (depth - 1) - 1) / 2;
+    const draw = (depth, r) => {
+      if (r.portal) {
+        const dp = portalDepth.get(r.portal.id);
+        for (const anchor of r.anchors) {
+          const ap = portalDepth.get(anchor.id);
+          const linkID = this._operation.addLink(
+            anchor,
+            r.portal,
+            "intern link",
+            orderByDepth(r.portal, anchor)
+          );
+          if (ap > 0 && dp == ap + 1)
+            this._operation.reverseLink(anchor.id, r.portal.id);
+          this._operation.setLinkColor(
+            linkID,
+            this._colors[depth % this._colors.length]
+          );
+        }
+        for (const child of r.children) draw(depth + 1, child);
+      } else if (!r.success) {
+        this._failed +=
+          getNbSplitPerDepth(this.depthMenu.value - depth + 1) - r.split;
+        // debug layer
+        const color = this.depthMenu.value - depth == 1 ? "orange" : "red";
+        const latlngs = [
+          r.anchors[0].latLng,
+          r.anchors[1].latLng,
+          r.anchors[2].latLng,
+          r.anchors[0].latLng
+        ];
+        const polygon = L.polygon(latlngs, { color: color });
+        polygon.addTo(this._layerGroup);
+      }
+    };
+
+    this._operation.addPortal(one);
+    this._operation.addPortal(two);
+    this._operation.addPortal(three);
+    this._operation.addLink(
+      two,
+      one,
+      "Outer 1",
+      (depthValue * (depthValue - 1)) / 2 + depthValue + 1
+    );
+    this._operation.addLink(
+      three,
+      one,
+      "Outer 2",
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+    );
+    this._operation.addLink(
+      three,
+      two,
+      "Outer 3",
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+    );
+    draw(1, tree);
   },
 
   _getSubregions: function(centerPoint, possibles, one, two, three) {
     this._operation.addPortal(centerPoint);
 
-    const onePortals = new Array();
+    const possibleExceptAnchors = new Array();
     for (const p of possibles) {
+      const guid = p.id || p.options.guid;
+      if (
+        guid !== centerPoint.id &&
+        guid !== one.id &&
+        guid !== two.id &&
+        guid !== three.id
+      )
+        possibleExceptAnchors.push(p);
+    }
+
+    const onePortals = new Array();
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(one, two, centerPoint, p)) onePortals.push(p);
     }
 
     const twoPortals = new Array();
-    for (const p of possibles) {
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(two, three, centerPoint, p)) twoPortals.push(p);
     }
 
     const threePortals = new Array();
-    for (const p of possibles) {
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(three, one, centerPoint, p)) threePortals.push(p);
     }
 
