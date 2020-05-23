@@ -369,18 +369,30 @@ const HomogeneousDialog = WDialog.extend({
   _getSubregions: function(centerPoint, possibles, one, two, three) {
     this._operation.addPortal(centerPoint);
 
-    const onePortals = new Array();
+    const possibleExceptAnchors = new Array();
     for (const p of possibles) {
+      const guid = p.id || p.options.guid;
+      if (
+        guid !== centerPoint.id &&
+        guid !== one.id &&
+        guid !== two.id &&
+        guid !== three.id
+      )
+        possibleExceptAnchors.push(p);
+    }
+
+    const onePortals = new Array();
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(one, two, centerPoint, p)) onePortals.push(p);
     }
 
     const twoPortals = new Array();
-    for (const p of possibles) {
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(two, three, centerPoint, p)) twoPortals.push(p);
     }
 
     const threePortals = new Array();
-    for (const p of possibles) {
+    for (const p of possibleExceptAnchors) {
       if (this._fieldCovers(three, one, centerPoint, p)) threePortals.push(p);
     }
 
