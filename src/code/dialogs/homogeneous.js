@@ -366,6 +366,96 @@ const HomogeneousDialog = WDialog.extend({
     }
   },
 
+  _drawTree: function(tree) {
+    const depthValue = +this.depthMenu.value - 1;
+    const [one, two, three] = tree.anchors;
+    const computeDepth = (depth, tree, map) => {
+      if (tree.portal) {
+        map.set(tree.portal.id, depth);
+        for (const child of tree.children) computeDepth(depth + 1, child, map);
+      }
+    };
+
+    const portalDepth = new Map([
+      [one.id, 0],
+      [two.id, 0],
+      [three.id, 0]
+    ]);
+    computeDepth(1, tree, portalDepth);
+
+    const orderByDepth = (a, b) => {
+      let ad = portalDepth.get(a.id);
+      let bd = portalDepth.get(b.id);
+
+      const baseOrder = ((depthValue - bd) * (depthValue - bd - 1)) / 2 + 1;
+
+      if (bd != 0 || b.id == one.id) return baseOrder + ad - bd - 1;
+
+      if (b.id == two.id) return baseOrder + depthValue + ad;
+
+      return baseOrder + 2 * depthValue + ad + 1;
+    };
+
+    const getNbSplitPerDepth = depth => (3 ** (depth - 1) - 1) / 2;
+    const draw = (depth, r) => {
+      if (r.portal) {
+        const dp = portalDepth.get(r.portal.id);
+        for (const anchor of r.anchors) {
+          const ap = portalDepth.get(anchor.id);
+          const linkID = this._operation.addLink(
+            anchor,
+            r.portal,
+            "intern link",
+            orderByDepth(r.portal, anchor)
+          );
+          if (ap > 0 && dp == ap + 1)
+            this._operation.reverseLink(anchor.id, r.portal.id);
+          this._operation.setLinkColor(
+            linkID,
+            this._colors[depth % this._colors.length]
+          );
+        }
+        for (const child of r.children) draw(depth + 1, child);
+      } else if (!r.success) {
+        this._failed +=
+          getNbSplitPerDepth(this.depthMenu.value - depth + 1) - r.split;
+        // debug layer
+        const color = this.depthMenu.value - depth == 1 ? "orange" : "red";
+        const latlngs = [
+          r.anchors[0].latLng,
+          r.anchors[1].latLng,
+          r.anchors[2].latLng,
+          r.anchors[0].latLng
+        ];
+        const polygon = L.polygon(latlngs, { color: color });
+        polygon.addTo(this._layerGroup);
+      }
+    };
+
+    this._operation.addPortal(one);
+    this._operation.addPortal(two);
+    this._operation.addPortal(three);
+    this._operation.addLink(
+      two,
+      one,
+      "Outer 1",
+      (depthValue * (depthValue - 1)) / 2 + depthValue + 1
+    );
+    this._operation.addLink(
+      three,
+      one,
+      "Outer 2",
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+    );
+    this._operation.addLink(
+      three,
+      two,
+      "Outer 3",
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+    );
+    draw(1, tree);
+  },
+
   _getSubregions: function(centerPoint, possibles, one, two, three) {
     this._operation.addPortal(centerPoint);
 
