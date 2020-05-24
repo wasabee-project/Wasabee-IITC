@@ -122,6 +122,7 @@ const ImportDialog = WDialog.extend({
           const checklist = new OperationChecklistDialog();
           checklist.enable();
           // zoom to it
+	  // OR use pointTileDataRequest to try to load faked portals?
           this._map.fitBounds(newop.mbr);
         },
         reject => {
@@ -157,20 +158,6 @@ const ImportDialog = WDialog.extend({
       console.warn("Failed parseDrawTools: " + e);
       alert(e);
       return null;
-    }
-
-    // try to prime the cache
-    if (this._autoload) {
-      const latlngs = new Array();
-      for (const line of data) {
-        if (line.type != "polyline" && line.type != "polygon") continue;
-        for (const point of line.latLngs) {
-          latlngs.push(point);
-        }
-      }
-      // wait until this works
-      // pointTileDataRequest(latlngs);
-      // XXX do something here to wait loading
     }
 
     // build a hash map for fast searching of window.portals

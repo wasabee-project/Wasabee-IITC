@@ -293,25 +293,23 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 13) {
   }
 
   if (latlngs.length == 0) return;
-
-  const bounds = window.clampLatLngBounds(new L.LatLngBounds(latlngs));
-  // window.map.fitBounds(bounds);
-  console.log(bounds);
   const dataZoom = window.getDataZoomForMapZoom(mapZoom);
   const tileParams = window.getMapZoomTileParameters(dataZoom);
 
-  const mdr = window.mapDataRequest;
-  mdr.setStatus("trawling", undefined, -1);
+  window.mapDataRequest.setStatus("trawling", undefined, -1);
 
   window.plugin.wasabee.tileTrawlQueue = new Map();
   for (const ll of latlngs) {
+    // figure out which thile this point is in
     const x = window.latToTile(ll.lat, tileParams);
     const y = window.lngToTile(ll.lng, tileParams);
     const tileID = window.pointToTileId(tileParams, x, y);
+    // center point of the tile
     const tilePoint = L.latLng([
       Number(window.tileToLat(x, tileParams).toFixed(6)),
       Number(window.tileToLng(y, tileParams).toFixed(6))
     ]);
+    // map so no duplicate tiles are requested
     window.plugin.wasabee.tileTrawlQueue.set(tileID, JSON.stringify(tilePoint));
   }
 
@@ -320,6 +318,7 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 13) {
   // dive in
   window.map.setZoom(mapZoom);
   tileRequestNext();
+  return window.plugin.wasabee.tileTrawlQueue.size;
 };
 
 const tileRequestNext = function() {
@@ -330,8 +329,19 @@ const tileRequestNext = function() {
     alert("trawl done");
     return;
   }
-  const current = tiles.next().value;
-  const point = JSON.parse(window.plugin.wasabee.tileTrawlQueue.get(current));
-  window.plugin.wasabee.tileTrawlQueue.delete(current);
-  window.map.panTo(point, { duration: 0.25, animate: true });
+
+  let current = tiles.next().value;
+  while (current && window.mapDataRequest.cache.get(current)) {
+    console.log("found in cache, skipping", current);
+    window.plugin.wasabee.tileTrawlQueue.delete(current);
+    current = tiles.next().value;
+  }
+  if (current) {
+    const point = JSON.parse(window.plugin.wasabee.tileTrawlQueue.get(current));
+    window.plugin.wasabee.tileTrawlQueue.delete(current);
+    window.map.panTo(point, { duration: 0.25, animate: true });
+  } else {
+    // one last time, to clear
+    window.runHooks("mapDataRefreshEnd");
+  }
 };

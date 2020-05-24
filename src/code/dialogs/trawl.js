@@ -38,11 +38,11 @@ const TrawlDialog = WDialog.extend({
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
     L.DomEvent.on(button, "click", () => {
-      const points = this._doTrawl();
+      const tiles = this._doTrawl();
       alert(
-        "do not do anything until trawling is complete: looking at " +
-          points +
-          " different map points (which will be reduced a smaller number of tiles)"
+        "Do not do anything until trawling is complete. Loading " +
+          tiles +
+          " map tiles."
       );
       this._dialog.dialog("close");
     });
@@ -107,8 +107,7 @@ const TrawlDialog = WDialog.extend({
 
     // this gets the tiles from the latlngs, reduces to uniques, puts them in IITCs queue and starts the queue runner
     console.log("total points", points.length);
-    pointTileDataRequest(points, 13);
-    return points.length;
+    return pointTileDataRequest(points, 13);
   }
 });
 
