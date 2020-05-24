@@ -291,44 +291,43 @@ export const testPortal = function(recursed = false) {
 export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
   if (latlngs.length == 0) return;
   if (window.plugin.wasabee.ptdrIntervalID) {
-    console.log("pintTileDataRequest already running");
+    console.log("pointTileDataRequest already running");
     return;
   }
 
   // abuse the window.mapDataRequest
   const mdr = window.mapDataRequest;
+  mdr.idle = true;
+
+  const bounds = window.clampLatLngBounds(new L.LatLngBounds(latlngs));
+  window.map.fitBounds(bounds);
+
   mdr.debugTiles.reset();
-  // restore this
-  // const oldDebugTiles = mdr.debugTiles();
+  const oldDebugTiles = mdr.debugTiles;
   mdr.debugTiles = new FakeDebugTiles();
   mdr.resetRenderQueue();
-  mdr.tileErrorCount = {}; // if (!mdr.tileErrorCount) mdr.tileErrorCount = {};
-  mdr.queuedTiles = {}; // if (!mdr.queuedTiles) mdr.queuedTiles = {};
+  mdr.tileErrorCount = {};
 
   const dataZoom = window.getDataZoomForMapZoom(mapZoom);
   const tileParams = window.getMapZoomTileParameters(dataZoom);
-  const bounds = window.clampLatLngBounds(new L.LatLngBounds(latlngs));
 
   // used by mapMoveEnd
-  mdr.fetchedDataParams = {
-    bounds: bounds,
-    mapZoom: mapZoom,
-    dataZoom: dataZoom
-  };
-
-  window.runHooks("mapDataRefreshStart", {
-    bounds: bounds,
-    mapZoom: mapZoom,
-    dataZoom: dataZoom,
-    minPortalLevel: tileParams.level,
-    tileBounds: bounds
-  });
-  mdr.render.startRenderPass(tileParams.level, bounds);
+  // mdr.fetchedDataParams = { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom };
+  /* window.runHooks("mapDataRefreshStart", { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: bounds });
   const _render = mdr.render;
+  _render.render.startRenderPass(tileParams.level, bounds);
   window.runHooks("mapDataEntityInject", {
     callback: e => _render.processGameEntities(e)
   });
-  // mdr.render.processGameEntities(window.artifact.getArtifactEntities());
+  mdr.render.processGameEntities(window.artifact.getArtifactEntities());
+   */
+
+  mdr.setStatus("trawling", undefined, -1);
+  // shut mdr down for now
+  // mdr.pauseRenderQueue(true);
+  mdr.clearTimeout();
+  mdr.cache.runExpire();
+  mdr.cache.debug();
 
   // use a map to prevent dupes
   const list = new Map();
@@ -339,32 +338,58 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
     list.set(tileID, 0);
   }
   const tiles = Array.from(list.keys());
-  // console.log(tiles);
-  for (const t of tiles) mdr.queuedTiles[t] = t;
   const totaltiles = tiles.length;
-  mdr.setStatus("trawling", undefined, -1);
-  // shut mdr down for now
-  mdr.pauseRenderQueue(true);
-  mdr.clearTimeout();
+  // embiggen cache
+  if (mdr.cache) {
+    mdr.cache.REQUEST_CACHE_MAX_ITEMS = totaltiles + 1000;
+    mdr.cache.REQUEST_CACHE_MAX_CHARS = 1000000000;
+  }
+  // console.log(tiles);
+  const qt = {};
+  for (const t of tiles) {
+    if (mdr.cache && mdr.cache._cache[t]) continue;
+    qt[t] = t;
+  }
+  // why does this kick off the IITC queue runner?
+  mdr.queuedTiles = qt;
 
   const rate = 330;
   window.plugin.wasabee.ptdrIntervalID = window.setInterval(() => {
     const t = tiles.pop();
     if (t) {
+      mdr.setStatus("trawl: " + t, undefined, -1);
+      mdr.cache.debug();
+      if (mdr.cache && mdr.cache._cache[t]) {
+        // console.log("already cached?", t, mdr.cache._cache[t]);
+        return;
+      }
+      if (!Object.prototype.hasOwnProperty.call(mdr.queuedTiles, t)) {
+        console.log("not in queue?", t, mdr.cache._cache[t]);
+        console.log(mdr.queuedTiles);
+        return;
+      }
       mdr.sendTileRequest([t]);
+      // call mdr.handleRequest when data loads
       // XXX counts wrong direction
-      mdr.setStatus("trawling", t, tiles.length / totaltiles);
+      // mdr.setStatus("trawling", t, tiles.length / totaltiles);
       return;
     }
+
+    // nothing left in the queue, shut it down
     window.clearInterval(window.plugin.wasabee.ptdrIntervalID);
     delete window.plugin.wasabee.ptdrIntervalID;
     mdr.setStatus("trawl complete", undefined, -1);
-  }, rate);
-  mdr.pauseRenderQueue(false);
+    console.log(mdr);
+    mdr.cache.debug();
+    mdr.pauseRenderQueue(false);
+    mdr.idleResume();
+    mdr.debugTiles = oldDebugTiles;
 
-  // mdr.processRequestQueue(true);
-  // mdr.processRenderQueue();
-  window.runHooks("requestFinished", { success: true });
+    // mdr.processRequestQueue(true);
+    // mdr.processRenderQueue();
+    window.runHooks("requestFinished", { success: true });
+    alert("trawl done");
+  }, rate);
 };
 
 // I'll send a patch to IITC once I get our stuff working
