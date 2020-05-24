@@ -286,134 +286,52 @@ export const testPortal = function(recursed = false) {
 };
 
 // this is still experimental
-// pass in an array of L.LatLngs, it determines the zoom-15 tiles
-// and requests those tiles be loaded with IITC's queuing and caching
-export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
-  if (latlngs.length == 0) return;
-  if (window.plugin.wasabee.ptdrIntervalID) {
+export const pointTileDataRequest = function(latlngs, mapZoom = 13) {
+  if (window.plugin.wasabee.tileTrawlQueue) {
     console.log("pointTileDataRequest already running");
     return;
   }
 
-  // abuse the window.mapDataRequest
-  const mdr = window.mapDataRequest;
-  mdr.idle = true;
+  if (latlngs.length == 0) return;
 
   const bounds = window.clampLatLngBounds(new L.LatLngBounds(latlngs));
-  window.map.fitBounds(bounds);
-
-  mdr.debugTiles.reset();
-  const oldDebugTiles = mdr.debugTiles;
-  mdr.debugTiles = new FakeDebugTiles();
-  mdr.resetRenderQueue();
-  mdr.tileErrorCount = {};
-
+  // window.map.fitBounds(bounds);
+  console.log(bounds);
   const dataZoom = window.getDataZoomForMapZoom(mapZoom);
   const tileParams = window.getMapZoomTileParameters(dataZoom);
 
-  // used by mapMoveEnd
-  // mdr.fetchedDataParams = { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom };
-  /* window.runHooks("mapDataRefreshStart", { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: bounds });
-  const _render = mdr.render;
-  _render.render.startRenderPass(tileParams.level, bounds);
-  window.runHooks("mapDataEntityInject", {
-    callback: e => _render.processGameEntities(e)
-  });
-  mdr.render.processGameEntities(window.artifact.getArtifactEntities());
-   */
-
+  const mdr = window.mapDataRequest;
   mdr.setStatus("trawling", undefined, -1);
-  // shut mdr down for now
-  // mdr.pauseRenderQueue(true);
-  mdr.clearTimeout();
-  mdr.cache.runExpire();
-  mdr.cache.debug();
 
-  // use a map to prevent dupes
-  const list = new Map();
+  window.plugin.wasabee.tileTrawlQueue = new Map();
   for (const ll of latlngs) {
     const x = window.latToTile(ll.lat, tileParams);
     const y = window.lngToTile(ll.lng, tileParams);
     const tileID = window.pointToTileId(tileParams, x, y);
-    list.set(tileID, 0);
+    const tilePoint = L.latLng([
+      Number(window.tileToLat(x, tileParams).toFixed(6)),
+      Number(window.tileToLng(y, tileParams).toFixed(6))
+    ]);
+    window.plugin.wasabee.tileTrawlQueue.set(tileID, JSON.stringify(tilePoint));
   }
-  const tiles = Array.from(list.keys());
-  const totaltiles = tiles.length;
-  // embiggen cache
-  if (mdr.cache) {
-    mdr.cache.REQUEST_CACHE_MAX_ITEMS = totaltiles + 1000;
-    mdr.cache.REQUEST_CACHE_MAX_CHARS = 1000000000;
-  }
-  // console.log(tiles);
-  const qt = {};
-  for (const t of tiles) {
-    if (mdr.cache && mdr.cache._cache[t]) continue;
-    qt[t] = t;
-  }
-  // why does this kick off the IITC queue runner?
-  mdr.queuedTiles = qt;
 
-  const rate = 330;
-  window.plugin.wasabee.ptdrIntervalID = window.setInterval(() => {
-    const t = tiles.pop();
-    if (t) {
-      mdr.setStatus("trawl: " + t, undefined, -1);
-      mdr.cache.debug();
-      if (mdr.cache && mdr.cache._cache[t]) {
-        // console.log("already cached?", t, mdr.cache._cache[t]);
-        return;
-      }
-      if (!Object.prototype.hasOwnProperty.call(mdr.queuedTiles, t)) {
-        console.log("not in queue?", t, mdr.cache._cache[t]);
-        console.log(mdr.queuedTiles);
-        return;
-      }
-      mdr.sendTileRequest([t]);
-      // call mdr.handleRequest when data loads
-      // XXX counts wrong direction
-      // mdr.setStatus("trawling", t, tiles.length / totaltiles);
-      return;
-    }
-
-    // nothing left in the queue, shut it down
-    window.clearInterval(window.plugin.wasabee.ptdrIntervalID);
-    delete window.plugin.wasabee.ptdrIntervalID;
-    mdr.setStatus("trawl complete", undefined, -1);
-    console.log(mdr);
-    mdr.cache.debug();
-    mdr.pauseRenderQueue(false);
-    mdr.idleResume();
-    mdr.debugTiles = oldDebugTiles;
-
-    // mdr.processRequestQueue(true);
-    // mdr.processRenderQueue();
-    window.runHooks("requestFinished", { success: true });
-    alert("trawl done");
-  }, rate);
+  // setup listener
+  window.addHook("mapDataRefreshEnd", () => tileRequestNext());
+  // dive in
+  window.map.setZoom(mapZoom);
+  tileRequestNext();
 };
 
-// I'll send a patch to IITC once I get our stuff working
-class FakeDebugTiles {
-  constructor() {
-    console.log(
-      "creating fake debug tile class -- breaking debug tiles for now"
-    );
+const tileRequestNext = function() {
+  const tiles = window.plugin.wasabee.tileTrawlQueue.keys();
+  if (tiles.length == 0) {
+    delete window.plugin.wasabee.tileTrawlQueue;
+    window.removeHook("mapDataRefreshEnd", () => tileRequestNext());
+    alert("trawl done");
+    return;
   }
-
-  reset() {
-    // console.log("fdtc reset");
-  }
-
-  create() {
-    // console.log("fdtc create");
-  }
-
-  setState() {
-    //setState(id, state) {
-    // console.log("fdtc setState: " + id + " " + state);
-  }
-
-  runClearPass() {
-    console.log("fdtc runClearPass");
-  }
-}
+  const current = tiles.next().value;
+  const point = JSON.parse(window.plugin.wasabee.tileTrawlQueue.get(current));
+  window.plugin.wasabee.tileTrawlQueue.delete(current);
+  window.map.panTo(point, { duration: 0.25, animate: true });
+};

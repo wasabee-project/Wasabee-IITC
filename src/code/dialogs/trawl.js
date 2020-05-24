@@ -42,7 +42,7 @@ const TrawlDialog = WDialog.extend({
       alert(
         "do not do anything until trawling is complete: looking at " +
           points +
-          " different map points"
+          " different map points (which will be reduced a smaller number of tiles)"
       );
       this._dialog.dialog("close");
     });
