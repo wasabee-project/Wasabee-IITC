@@ -332,7 +332,7 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 15) {
   // use a map to prevent dupes
   const list = new Map();
   for (const ll of latlngs) {
-    const x = window.lngToTile(ll.lat, tileParams);
+    const x = window.latToTile(ll.lat, tileParams);
     const y = window.lngToTile(ll.lng, tileParams);
     const tileID = window.pointToTileId(tileParams, x, y);
     list.set(tileID, 0);
