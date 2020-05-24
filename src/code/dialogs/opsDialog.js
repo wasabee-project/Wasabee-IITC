@@ -51,7 +51,7 @@ const OpsDialog = WDialog.extend({
     this._dialog = window.dialog({
       title: wX("OPERATIONS"),
       html: this._content,
-      height: "auto",
+      width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
       closeCallback: () => {
         this.disable();

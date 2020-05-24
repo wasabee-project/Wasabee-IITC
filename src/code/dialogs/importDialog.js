@@ -4,7 +4,7 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
-import { pointTileDataRequest } from "../uiCommands";
+// import { pointTileDataRequest } from "../uiCommands";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -168,7 +168,8 @@ const ImportDialog = WDialog.extend({
           latlngs.push(point);
         }
       }
-      pointTileDataRequest(latlngs);
+      // wait until this works
+      // pointTileDataRequest(latlngs);
       // XXX do something here to wait loading
     }
 
