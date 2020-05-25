@@ -304,6 +304,8 @@
   "TRAWL": "Trawl for Blockers",
   "TRAWL TITLE": "Trawl Lanes",
   "TRAWL WARNING": "This will load the tile data under all drawn links. This is a slow processes.",
+  "TRAWLING": "Trawling the lanes for blockers, close this dialog to stop",
+  "TRAWL_REMAINING": "${value} tiles remaining",
   "TO_PORT": "To Portal",
   "TYPE": "Type",
   "UNASSIGNED": "Unassigned",
