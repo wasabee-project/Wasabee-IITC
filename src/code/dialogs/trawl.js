@@ -31,8 +31,6 @@ const TrawlDialog = WDialog.extend({
   _displayDialog: function() {
     const html = L.DomUtil.create("html");
     const container = L.DomUtil.create("div", "container", html);
-    const notice = L.DomUtil.create("label", null, container);
-    notice.innerHTML = "<h3>Still in development: do not rely on this</h3>";
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWL WARNING");
     const button = L.DomUtil.create("button", null, container);
@@ -40,9 +38,7 @@ const TrawlDialog = WDialog.extend({
     L.DomEvent.on(button, "click", () => {
       const tiles = this._doTrawl();
       alert(
-        "Do not do anything until trawling is complete. Loading " +
-          tiles +
-          " map tiles."
+        "Please wait until process finishes. Loading " + tiles + " map tiles."
       );
       this._dialog.dialog("close");
     });
