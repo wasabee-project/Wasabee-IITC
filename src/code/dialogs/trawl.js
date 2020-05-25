@@ -85,13 +85,36 @@ const TrawlDialog = WDialog.extend({
   _displayDialog: function() {
     const html = L.DomUtil.create("html");
     const container = L.DomUtil.create("div", "container", html);
-    const warning = L.DomUtil.create("label", null, container);
+    const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");
+    const zoomLabel = L.DomUtil.create("label", null, container);
+    zoomLabel.textContent = "Zoom Level:";
+    const zoomLevel = L.DomUtil.create("select", null, container);
+    let zl = 13;
+    while (zl < 16) {
+      const option = L.DomUtil.create("option", null, zoomLevel);
+      option.textContent = zl;
+      option.value = zl;
+      zl++;
+    }
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
     L.DomEvent.on(button, "click", () => {
-      const tiles = this._doTrawl();
+      const points = this._getTrawlPoints();
+      this._pointTileDataRequest(points, zoomLevel.value);
+      const tiles = window.plugin.wasabee.tileTrawlQueue.size;
       this._displayTrawlerDialog(tiles);
+      this._dialog.dialog("close");
+    });
+
+    const crazyWarning = L.DomUtil.create("h4", null, container);
+    crazyWarning.textContent =
+      "This method loads the tile data as quickly as possible. Use at your own risk.";
+    const crazyButton = L.DomUtil.create("button", null, container);
+    crazyButton.textContent = "Bulk Load Tile Data";
+    L.DomEvent.on(crazyButton, "click", () => {
+      const points = this._getTrawlPoints();
+      this._bulkLoad(points, zoomLevel.value);
       this._dialog.dialog("close");
     });
 
@@ -114,7 +137,7 @@ const TrawlDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _doTrawl: function() {
+  _getTrawlPoints: function() {
     const operation = getSelectedOperation();
 
     const trawlPrecision = 250;
@@ -152,14 +175,11 @@ const TrawlDialog = WDialog.extend({
         p = tmp;
       }
     }
-
-    // this gets the tiles from the latlngs, reduces to uniques, puts them in IITCs queue and starts the queue runner
-    // console.log("total points", points.length);
-    return this.pointTileDataRequest(points, 13);
+    return points;
   },
 
   // converts lat/lon points to tile names, gets center points of each tile, starts the map moves
-  pointTileDataRequest: function(latlngs, mapZoom = 13) {
+  _pointTileDataRequest: function(latlngs, mapZoom = 13) {
     if (!localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS])
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] = 0;
 
@@ -199,8 +219,6 @@ const TrawlDialog = WDialog.extend({
     window.map.setZoom(mapZoom);
     // this is async
     this.tileRequestNext();
-    // returns before the first request starts
-    return window.plugin.wasabee.tileTrawlQueue.size;
   },
 
   tileRequestNext: function() {
@@ -258,7 +276,66 @@ const TrawlDialog = WDialog.extend({
       this.tileRequestNext.call(this)
     );
     alert("trawl done");
+  },
+
+  _bulkLoad: function(latlngs, mapZoom) {
+    if (latlngs.length == 0) return;
+    mdr.debugTiles.reset();
+    const oldDebugTiles = window.mapDataRequest.debugTiles;
+    window.mapDataRequest.debugTiles = new FakeDebugTiles();
+
+    const dataZoom = window.getDataZoomForMapZoom(mapZoom);
+    const tileParams = window.getMapZoomTileParameters(dataZoom);
+
+    const bounds = new L.latLngBounds(latlngs);
+    window.map.fitBounds(bounds);
+
+    const tiles = new Map();
+    for (const ll of latlngs) {
+      const x = window.latToTile(ll.lat, tileParams);
+      const y = window.lngToTile(ll.lng, tileParams);
+      const tileID = window.pointToTileId(tileParams, y, x);
+      tiles.set(tileID, tileID);
+    }
+    const q = {};
+    for (const t of tiles.keys()) {
+      q[t] = t;
+    }l
+
+    const mdr = window.mapDataRequest;
+    // stop the render queue to not trigger crosslinks etc
+    mdr.resetRenderQueue();
+    mdr.pauseRenderQueue(true);
+    mdr.clearTimeout();
+    // put our requests in the queue
+    mdr.queuedTiles = q;
+    // run the queue
+    mdr.processRequestQueue(true);
+    // render the results
+    mdr.pauseRenderQueue(false);
+
+    // do a real dialog, close on mapDataRefreshEnd, restore oldDebugTiles then
+    // mdr.debugTiles = oldDebugTiles;
+    alert("please wait until status says 'done' ..., if the first didn't trigger a load, close this and do it again");
   }
 });
+
+class FakeDebugTiles {
+  reset() {
+    console.log("fdt reset");
+  }
+
+  create() {
+    console.log("fdt create");
+  }
+
+  setState() {
+    console.log("fdt setState");
+  }
+
+  runClearPass() {
+    console.log("fdt runClearPass");
+  }
+}
 
 export default TrawlDialog;
