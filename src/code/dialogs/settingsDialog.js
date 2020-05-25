@@ -186,6 +186,26 @@ const SettingsDialog = WDialog.extend({
       this.setServer();
     });
 
+    const trawlTitle = L.DomUtil.create("label", null, container);
+    trawlTitle.textContent = "Trawl Skip Tiles";
+    const trawlSelect = L.DomUtil.create("select", null, container);
+    const tss = Number(
+      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
+    );
+    let trawlCount = 0;
+    while (trawlCount < 15) {
+      const option = L.DomUtil.create("option", null, trawlSelect);
+      option.textContent = trawlCount;
+      option.value = trawlCount;
+      if (tss == trawlCount) option.selected = true;
+      trawlCount++;
+    }
+    L.DomEvent.on(trawlSelect, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] =
+        trawlSelect.value;
+    });
+
     return container;
   },
 

@@ -122,7 +122,7 @@ const ImportDialog = WDialog.extend({
           const checklist = new OperationChecklistDialog();
           checklist.enable();
           // zoom to it
-	  // OR use pointTileDataRequest to try to load faked portals?
+          // OR use pointTileDataRequest to try to load faked portals?
           this._map.fitBounds(newop.mbr);
         },
         reject => {
