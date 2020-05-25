@@ -287,6 +287,9 @@ export const testPortal = function(recursed = false) {
 
 // this is still experimental
 export const pointTileDataRequest = function(latlngs, mapZoom = 13) {
+  if (!localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS])
+    localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] = 0;
+
   if (window.plugin.wasabee.tileTrawlQueue) {
     console.log("pointTileDataRequest already running");
     return;
@@ -303,7 +306,8 @@ export const pointTileDataRequest = function(latlngs, mapZoom = 13) {
     // figure out which thile this point is in
     const x = window.latToTile(ll.lat, tileParams);
     const y = window.lngToTile(ll.lng, tileParams);
-    const tileID = window.pointToTileId(tileParams, x, y);
+    // why the hell is this swapped?
+    const tileID = window.pointToTileId(tileParams, y, x);
     // center point of the tile
     const tilePoint = L.latLng([
       Number(window.tileToLat(x, tileParams).toFixed(6)),
@@ -330,18 +334,35 @@ const tileRequestNext = function() {
     return;
   }
 
+  let toSkip = Number(
+    localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
+  );
   let current = tiles.next().value;
   while (current && window.mapDataRequest.cache.get(current)) {
-    console.log("found in cache, skipping", current);
     window.plugin.wasabee.tileTrawlQueue.delete(current);
     current = tiles.next().value;
+    if (toSkip > 0) toSkip--;
   }
+
+  for (const cached of Object.keys(window.mapDataRequest.cache._cache)) {
+    if (window.plugin.wasabee.tileTrawlQueue.has(cached)) {
+      window.plugin.wasabee.tileTrawlQueue.delete(cached);
+    }
+  }
+
+  while (current && toSkip > 0) {
+    window.plugin.wasabee.tileTrawlQueue.delete(current);
+    current = tiles.next().value;
+    toSkip--;
+  }
+
   if (current) {
     const point = JSON.parse(window.plugin.wasabee.tileTrawlQueue.get(current));
     window.plugin.wasabee.tileTrawlQueue.delete(current);
     window.map.panTo(point, { duration: 0.25, animate: true });
-  } else {
+  }
+  /* else {
     // one last time, to clear
     window.runHooks("mapDataRefreshEnd");
-  }
+  } */
 };
