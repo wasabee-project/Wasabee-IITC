@@ -33,8 +33,9 @@ export default class WasabeeOp {
     this.blockers = Array();
     this.keysonhand = Array();
 
-    this.buildLookupTables();
-    this.removeDuplicate();
+    this._idToOpportals = new Map();
+    this._coordsToOpportals = new Map();
+    this.buildCoordsLookupTable();
   }
 
   store() {
@@ -63,48 +64,44 @@ export default class WasabeeOp {
     };
   }
 
-  buildLookupTables() {
-    this._coordsToOpportals = new Map();
-    this._idToOpportals = new Map();
+  buildCoordsLookupTable() {
+    this._coordsToOpportals.clear();
+    this._dirtyCoordsTable = false;
 
-    for (const p of this.opportals) {
-      this._idToOpportals.set(p.id, p);
-
+    for (const p of this._idToOpportals.values()) {
       const key = p.lat + "/" + p.lng;
       const old = this._coordsToOpportals.get(key);
       if (!old) this._coordsToOpportals.set(key, p);
       else {
-        if (p.id.lenght != 35) continue;
-        if (old.name != 35) this._coordsToOpportals.set(key, p);
-        else if (old.name == old.id)
-          // should not happen since opportals is supposed not to contains the same id twice
-          this._coordsToOpportals.set(key, p);
-      }
-    }
-  }
-
-  // It is possible (however unlikely) to have a truly fake portal and a real (wasabee) portal inside an operation
-  removeDuplicate() {
-    // batchmode to skip udpate/crosslink at each swap
-    this._batchmode = true;
-
-    const toRemove = new Array();
-
-    for (const [id, p] of this._idToOpportals) {
-      const key = p.lat + "/" + p.lng;
-      const preferredPortal = this._idToOpportals(this._coordsToOpportals.get(key).id);
-      if (p.id != preferredPortal.id) {
-        this.swapPortal(p, this._idToOpportals(this._coordsToOpportals.get(key).id));
-        toRemove.push(id);
+        if (old.pureFaked) this._coordsToOpportals.set(key, p);
+        if (!p.pureFaked && old.loading) this._coordsToOpportals.set(key, p);
+        this._dirtyCoordsTable = true;
       }
     }
 
-    for (const id of toRemove)
-      this._idToOpportals.delete(id);
+    if (!this._dirtyCoordsTable) {
+      const toRemove = new Array();
 
-    this.opportals = Array.from(this._idToOpportals.values());
+      for (const [id, p] of this._idToOpportals) {
+        const key = p.lat + "/" + p.lng;
+        const preferredPortal = this._idToOpportals(
+          this._coordsToOpportals.get(key).id
+        );
+        if (id != preferredPortal.id) {
+          this._swapPortal(
+            p,
+            this._idToOpportals(this._coordsToOpportals.get(key).id)
+          );
+          toRemove.push(id);
+        }
+      }
 
-    this._batchmode = false;
+      for (const id of toRemove) this._idToOpportals.delete(id);
+
+      this.opportals = Array.from(this._idToOpportals.values());
+    }
+
+    this._dirtyCoordsTable = false;
   }
 
   getColor() {
@@ -120,22 +117,15 @@ export default class WasabeeOp {
       console.log("containsPortal w/o args");
       return false;
     }
-    if (this.opportals.length == 0) return false;
-    for (const opp of this.opportals) {
-      if (opp && opp.id == portal.id) {
-        return true;
-      }
-    }
-    return false;
+    return this._idToOpportals.has(portal.id);
   }
 
+  // assume lat and lng are strings from .toFixed(6)
   getPortalByLatLng(lat, lng) {
-    for (const portal of this.opportals) {
-      if (portal.lat == lat && portal.lng == lng) {
-        return portal;
-      }
+    if (this._dirtyCoordsTable) {
+      this.buildCoordsLookupTable();
     }
-    return false;
+    return this._coordsToOpportals.get(lat + "/" + lng);
   }
 
   containsLinkFromTo(fromPortalId, toPortalId) {
@@ -334,65 +324,48 @@ export default class WasabeeOp {
 
   //This removes opportals with no links and removes duplicates
   cleanPortalList() {
-    const newPortals = [];
-    for (const p of this.opportals) {
-      // if (!typeof p == "WasabeePortal") continue;
-      let foundPortal = false;
-      for (const l of this.links) {
-        if (p.id == l.fromPortalId || p.id == l.toPortalId) {
-          foundPortal = true;
-        }
-      }
-      for (const m of this.markers) {
-        if (p.id == m.portalId) {
-          foundPortal = true;
-        }
-      }
-      for (const a of this.anchors) {
-        if (p.id == a) {
-          foundPortal = true;
-        }
-      }
-      for (const b of this.blockers) {
-        if (p.id == b.fromPortalId || p.id == b.toPortalId) {
-          foundPortal = true;
-        }
-      }
-      if (foundPortal) {
-        newPortals.push(p);
-      }
+    const newPortals = new Map();
+    for (const l of this.links) {
+      newPortals.set(l.fromPortalId, this._idToOpportals.get(l.fromPortalId));
+      newPortals.set(l.toPortalId, this._idToOpportals.get(l.toPortalId));
+    }
+    for (const m of this.markers) {
+      newPortals.set(m.portalId, this._idToOpportals.get(m.portalId));
+    }
+    for (const a of this.anchors) {
+      newPortals.set(a, this._idToOpportals.get(a));
+    }
+    for (const b of this.blockers) {
+      newPortals.set(b.fromPortalId, this._idToOpportals.get(b.fromPortalId));
+      newPortals.set(b.toPortalId, this._idToOpportals.get(b.toPortalId));
     }
 
-    // ensure unique
-    /* this should be faster, test when I get a moment
-     finalPortals = newPortals.filter((value, index, self) => {
-       return self.indexOf(value) === index;
-     });
-     */
-    const finalPortals = [];
-    for (const p of newPortals) {
-      if (finalPortals.length == 0) {
-        finalPortals.push(p);
-      } else {
-        let foundFinalPortal = false;
-        for (const fp of finalPortals) {
-          if (p.id == fp.id) {
-            foundFinalPortal = true;
-          }
-        }
-        if (!foundFinalPortal) {
-          finalPortals.push(p);
-        }
-      }
-    }
-    this.opportals = finalPortals;
+    this._idToOpportals = newPortals;
+    this.buildCoordsLookupTable();
+
+    this.opportals = Array.from(this._idToOpportals.values());
   }
 
   addPortal(portal) {
     if (!this.containsPortal(portal)) {
-      this.opportals.push(portal);
+      this._addPortal(portal);
       this.update(false); // adding a portal may just be due to a blocker
     }
+  }
+
+  _addPortal(portal) {
+    const key = portal.lat + "/" + portal.lng;
+    if (this._coordsToOpportals.has(key)) {
+      // the portal is likely to be a real portal while old is a faked one
+      // this is addressed later when rebuilding coords lookup table
+      console.log(
+        "try to add a portal at same coordinates of another, need cleaning at some point"
+      );
+      this._dirtyCoordsTable = true;
+    }
+    this._idToOpportals.set(portal.id, portal);
+    this._coordsToOpportals.set(key, portal);
+    this.opportals.push(portal);
   }
 
   addLink(fromPortal, toPortal, description, order) {
@@ -437,7 +410,7 @@ export default class WasabeeOp {
   addAnchor(portal) {
     // doing this ourselves saves a trip to update();
     if (!this.containsPortal(portal)) {
-      this.opportals.push(portal);
+      this._addPortal(portal);
     }
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
@@ -480,7 +453,18 @@ export default class WasabeeOp {
     return c;
   }
 
-  swapPortal(originalPortal, newPortal) {
+  _swapPortal(originalPortal, newPortal) {
+    const oldkey = originalPortal.lat + "/" + originalPortal.lng;
+    const newkey = newPortal.lat + "/" + newPortal.lng;
+
+    this._idToOpportals.delete(originalPortal.id);
+    this._idToOpportals.set(newPortal.id, newPortal);
+
+    this._coordsToOpportals.delete(oldkey);
+    this._coordsToOpportals.set(newkey, newPortal);
+
+    this.opportals = Array.from(this._idToOpportals.values());
+
     this.anchors = this.anchors.filter(function(listAnchor) {
       return listAnchor !== originalPortal.id;
     });
@@ -524,6 +508,10 @@ export default class WasabeeOp {
     }
     // Remove the invalid links from the array (after we are done iterating through it)
     this.links = this.links.filter(element => !linksToRemove.includes(element));
+  }
+
+  swapPortal(originalPortal, newPortal) {
+    this._swapPortal(originalPortal, newPortal);
     this.update(true);
     this.runCrosslinks();
   }
@@ -564,6 +552,10 @@ export default class WasabeeOp {
     this.links = Array();
     this.markers = Array();
     this.blockers = Array();
+
+    this._idToOpportals.clear();
+    this._coordsToOpportals.clear();
+
     this.update(true);
   }
 
@@ -829,7 +821,10 @@ export default class WasabeeOp {
     if (!operation.markers) operation.markers = new Array();
     if (!operation.blockers) operation.blockers = new Array();
     // if (!operation.teamlist) operation.teamlist = new Array();
-    // if (!operation.keysonhand) operation.keysonhand = new Array();
+    // if (!operation.keysonhand) operation.keysonhand = new Array()
+
+    for (const p of operation.opportals) this._idToOpportals.set(p.id, p);
+    operation.buildCoordsLookupTable();
 
     operation.cleanAnchorList();
     operation.cleanPortalList();
