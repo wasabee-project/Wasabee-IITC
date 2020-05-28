@@ -454,21 +454,11 @@ export default class WasabeeOp {
   }
 
   _swapPortal(originalPortal, newPortal) {
-    const oldkey = originalPortal.lat + "/" + originalPortal.lng;
-    const newkey = newPortal.lat + "/" + newPortal.lng;
-
-    this._idToOpportals.delete(originalPortal.id);
-    this._idToOpportals.set(newPortal.id, newPortal);
-
-    this._coordsToOpportals.delete(oldkey);
-    this._coordsToOpportals.set(newkey, newPortal);
-
-    this.opportals = Array.from(this._idToOpportals.values());
-
     this.anchors = this.anchors.filter(function(listAnchor) {
       return listAnchor !== originalPortal.id;
     });
     this.addAnchor(newPortal);
+
     const linksToRemove = [];
     for (const l of this.links) {
       // purge any crosslink check cache
@@ -511,6 +501,17 @@ export default class WasabeeOp {
   }
 
   swapPortal(originalPortal, newPortal) {
+    const oldkey = originalPortal.lat + "/" + originalPortal.lng;
+
+    this._idToOpportals.delete(originalPortal.id);
+    this._coordsToOpportals.delete(oldkey);
+
+    if (!this.containsPortal(newPortal)) {
+      this._addPortal(newPortal);
+    }
+
+    this.opportals = Array.from(this._idToOpportals.values());
+
     this._swapPortal(originalPortal, newPortal);
     this.update(true);
     this.runCrosslinks();
