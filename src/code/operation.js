@@ -374,6 +374,28 @@ export default class WasabeeOp {
     }
   }
 
+  updatePortal(portal) {
+    const old = this.getPortal(portal.id);
+    if (old) {
+      if (!portal.faked) {
+        old.name = portal.name;
+        this.update(true);
+      }
+    } else {
+      const almostFaked = this.getPortalByLatLng(portal.lat, portal.lng);
+      if (almostFaked) {
+        if (almostFaked.pureFaked) {
+          this.swapPortal(almostFaked, portal);
+          this.update(true);
+        } else {
+          console.log(
+            "try to update a real portal at another one, what did you do?"
+          );
+        }
+      }
+    }
+  }
+
   addLink(fromPortal, toPortal, description, order) {
     if (!fromPortal || !toPortal) {
       console.log("missing portal for link");
