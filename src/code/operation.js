@@ -351,13 +351,13 @@ export default class WasabeeOp {
   }
 
   addPortal(portal) {
-    if (this._addPortal(portal)) {
+    if (!this.updatePortal(portal) && this._addPortal(portal)) {
       this.update(false); // adding a portal may just be due to a blocker
     }
   }
 
   _addPortal(portal) {
-    if (!this._updatePortal(portal) && !this.containsPortal(portal)) {
+    if (!this.containsPortal(portal)) {
       const key = portal.lat + "/" + portal.lng;
       if (this._coordsToOpportals.has(key)) {
         // the portal is likely to be a real portal while old is a faked one
@@ -395,7 +395,12 @@ export default class WasabeeOp {
       const almostFaked = this.getPortalByLatLng(portal.lat, portal.lng);
       if (almostFaked) {
         if (almostFaked.pureFaked) {
-          this.swapPortal(almostFaked, portal);
+          // prevent dirty
+          this._coordsToOpportals.delete(portal.lat + "/" + portal.lng);
+          this._addPortal(portal);
+          this._swapPortal(almostFaked, portal);
+          this._idToOpportals.delete(almostFaked.id);
+          // NB: truly faked portal are anchors only so we can delete them if swaped
           return true;
         } else {
           console.log(
@@ -490,11 +495,12 @@ export default class WasabeeOp {
     return c;
   }
 
+  // silently swap two anchors
   _swapPortal(originalPortal, newPortal) {
     this.anchors = this.anchors.filter(function(listAnchor) {
       return listAnchor !== originalPortal.id;
     });
-    this.addAnchor(newPortal);
+    if (!this.containsAnchor(newPortal.id)) this.anchors.push(newPortal.id);
 
     const linksToRemove = [];
     for (const l of this.links) {

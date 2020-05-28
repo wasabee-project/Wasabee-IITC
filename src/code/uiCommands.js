@@ -95,7 +95,7 @@ export const listenForPortalDetails = e => {
   if (!e.success) return;
   const op = getSelectedOperation();
   op.updatePortal(
-    WasabeePortal(
+    new WasabeePortal(
       e.guid,
       e.details.title,
       (e.details.latE6 / 1e6).toFixed(6),
