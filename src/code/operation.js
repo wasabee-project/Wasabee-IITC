@@ -79,13 +79,13 @@ export default class WasabeeOp {
       }
     }
 
-    if (!this._dirtyCoordsTable) {
+    if (this._dirtyCoordsTable) {
       const toRemove = new Array();
       const rename = new Map();
 
       for (const [id, p] of this._idToOpportals) {
         const key = p.lat + "/" + p.lng;
-        const preferredPortal = this._idToOpportals(
+        const preferredPortal = this._idToOpportals.get(
           this._coordsToOpportals.get(key).id
         );
         rename.set(id, preferredPortal.id);
@@ -353,8 +353,6 @@ export default class WasabeeOp {
 
     this._idToOpportals = newPortals;
     this.buildCoordsLookupTable();
-
-    this.opportals = Array.from(this._idToOpportals.values());
   }
 
   addPortal(portal) {
@@ -512,11 +510,6 @@ export default class WasabeeOp {
   }
 
   swapPortal(originalPortal, newPortal) {
-    const oldkey = originalPortal.lat + "/" + originalPortal.lng;
-
-    this._idToOpportals.delete(originalPortal.id);
-    this._coordsToOpportals.delete(oldkey);
-
     this._addPortal(newPortal);
 
     this.opportals = Array.from(this._idToOpportals.values());
@@ -833,7 +826,7 @@ export default class WasabeeOp {
     // if (!operation.teamlist) operation.teamlist = new Array();
     // if (!operation.keysonhand) operation.keysonhand = new Array()
 
-    for (const p of operation.opportals) this._idToOpportals.set(p.id, p);
+    for (const p of operation.opportals) operation._idToOpportals.set(p.id, p);
     operation.buildCoordsLookupTable();
 
     operation.cleanAnchorList();
