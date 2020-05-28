@@ -81,19 +81,30 @@ export default class WasabeeOp {
 
     if (!this._dirtyCoordsTable) {
       const toRemove = new Array();
+      const rename = new Map();
 
       for (const [id, p] of this._idToOpportals) {
         const key = p.lat + "/" + p.lng;
         const preferredPortal = this._idToOpportals(
           this._coordsToOpportals.get(key).id
         );
+        rename.set(id, preferredPortal.id);
         if (id != preferredPortal.id) {
-          this._swapPortal(
-            p,
-            this._idToOpportals(this._coordsToOpportals.get(key).id)
-          );
           toRemove.push(id);
         }
+      }
+      // swap IDs
+      for (const l of this.links) {
+        l.fromPortalId = rename.get(l.fromPortalId);
+        l.toPortalId = rename.get(l.toPortalId);
+      }
+      for (const m of this.markers) {
+        m.portalId = rename.get(m.portalId);
+      }
+      this.anchors = this.anchors.map(a => rename.get(a));
+      for (const b of this.blockers) {
+        b.fromPortalId = rename.get(b.fromPortalId);
+        b.toPortalId = rename.get(b.toPortalId);
       }
 
       for (const id of toRemove) this._idToOpportals.delete(id);
