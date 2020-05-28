@@ -351,14 +351,13 @@ export default class WasabeeOp {
   }
 
   addPortal(portal) {
-    if (!this.containsPortal(portal)) {
-      this._addPortal(portal);
+    if (this._addPortal(portal)) {
       this.update(false); // adding a portal may just be due to a blocker
     }
   }
 
   _addPortal(portal) {
-    if (!this.containsPortal(portal)) {
+    if (!this._updatePortal(portal) && !this.containsPortal(portal)) {
       const key = portal.lat + "/" + portal.lng;
       if (this._coordsToOpportals.has(key)) {
         // the portal is likely to be a real portal while old is a faked one
@@ -371,22 +370,33 @@ export default class WasabeeOp {
       this._idToOpportals.set(portal.id, portal);
       this._coordsToOpportals.set(key, portal);
       this.opportals.push(portal);
+      return true;
     }
+    return false;
   }
 
   updatePortal(portal) {
+    if (this._updatePortal(portal)) {
+      this.update(true);
+      return true;
+    }
+    return false;
+  }
+
+  // update portal silently if one with mathching ID or fake one with matching position
+  _updatePortal(portal) {
     const old = this.getPortal(portal.id);
     if (old) {
       if (!portal.faked) {
         old.name = portal.name;
-        this.update(true);
+        return true;
       }
     } else {
       const almostFaked = this.getPortalByLatLng(portal.lat, portal.lng);
       if (almostFaked) {
         if (almostFaked.pureFaked) {
           this.swapPortal(almostFaked, portal);
-          this.update(true);
+          return true;
         } else {
           console.log(
             "try to update a real portal at another one, what did you do?"
@@ -394,6 +404,7 @@ export default class WasabeeOp {
         }
       }
     }
+    return false;
   }
 
   addLink(fromPortal, toPortal, description, order) {
