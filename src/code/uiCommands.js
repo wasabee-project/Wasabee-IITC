@@ -175,7 +175,7 @@ const pdqDoNext = function() {
     return;
   }
 
-  if (!p.length || p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
+  if (p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
   // this is the bit everyone is so worried about
   window.portalDetail.request(p);
 };

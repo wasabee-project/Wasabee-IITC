@@ -223,7 +223,7 @@ const ImportDialog = WDialog.extend({
     const promises = new Array();
 
     for (const p of op.fakedPortals) {
-      if (p.id.length != 35) continue; // ignore the truly fake
+      if (p.pureFaked) continue; // ignore the truly fake
       promises.push(
         window.portalDetail.request(p.id).then(
           res => {

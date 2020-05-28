@@ -476,7 +476,7 @@ export default class WasabeeOp {
   }
 
   get fakedPortals() {
-    const c = this.opportals.filter(p => p.name && p.name == p.id);
+    const c = this.opportals.filter(p => p.faked);
     return c;
   }
 
