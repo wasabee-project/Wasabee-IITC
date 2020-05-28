@@ -188,10 +188,7 @@ export default class WasabeeOp {
   }
 
   getPortal(portalID) {
-    for (const p of this.opportals) {
-      if (p.id == portalID) return p;
-    }
-    return null;
+    return this._idToOpportals.get(portalID);
   }
 
   removeAnchor(portalId) {
@@ -264,20 +261,18 @@ export default class WasabeeOp {
   }
 
   setPortalComment(portal, comment) {
-    for (const p of this.opportals) {
-      if (p.id == portal.id) {
-        p.comment = comment;
-        this.update(true);
-      }
+    const p = this.getPortal(portal.id);
+    if (p) {
+      p.comment = comment;
+      this.update(true);
     }
   }
 
   setPortalHardness(portal, hardness) {
-    for (const p of this.opportals) {
-      if (p.id == portal.id) {
-        p.hardness = hardness;
-        this.update(true);
-      }
+    const p = this.getPortal(portal.id);
+    if (p) {
+      p.hardness = hardness;
+      this.update(true);
     }
   }
 
