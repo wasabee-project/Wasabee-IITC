@@ -6,7 +6,7 @@ import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
-import { sendLocation } from "./uiCommands";
+import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
@@ -52,6 +52,14 @@ window.plugin.wasabee.init = function() {
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
+  });
+
+  window.addHook("portalDetailsUpdated", e => {
+    listenForPortalDetails({
+      success: true,
+      guid: e.guid,
+      details: e.portalDetails
+    });
   });
 
   // custom hook for updating our UI
