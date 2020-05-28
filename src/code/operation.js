@@ -354,18 +354,20 @@ export default class WasabeeOp {
   }
 
   _addPortal(portal) {
-    const key = portal.lat + "/" + portal.lng;
-    if (this._coordsToOpportals.has(key)) {
-      // the portal is likely to be a real portal while old is a faked one
-      // this is addressed later when rebuilding coords lookup table
-      console.log(
-        "try to add a portal at same coordinates of another, need cleaning at some point"
-      );
-      this._dirtyCoordsTable = true;
+    if (!this.containsPortal(portal)) {
+      const key = portal.lat + "/" + portal.lng;
+      if (this._coordsToOpportals.has(key)) {
+        // the portal is likely to be a real portal while old is a faked one
+        // this is addressed later when rebuilding coords lookup table
+        console.log(
+          "try to add a portal at same coordinates of another, need cleaning at some point"
+        );
+        this._dirtyCoordsTable = true;
+      }
+      this._idToOpportals.set(portal.id, portal);
+      this._coordsToOpportals.set(key, portal);
+      this.opportals.push(portal);
     }
-    this._idToOpportals.set(portal.id, portal);
-    this._coordsToOpportals.set(key, portal);
-    this.opportals.push(portal);
   }
 
   addLink(fromPortal, toPortal, description, order) {
@@ -409,9 +411,7 @@ export default class WasabeeOp {
 
   addAnchor(portal) {
     // doing this ourselves saves a trip to update();
-    if (!this.containsPortal(portal)) {
-      this._addPortal(portal);
-    }
+    this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
       this.update(true);
@@ -506,9 +506,7 @@ export default class WasabeeOp {
     this._idToOpportals.delete(originalPortal.id);
     this._coordsToOpportals.delete(oldkey);
 
-    if (!this.containsPortal(newPortal)) {
-      this._addPortal(newPortal);
-    }
+    this._addPortal(newPortal);
 
     this.opportals = Array.from(this._idToOpportals.values());
 
