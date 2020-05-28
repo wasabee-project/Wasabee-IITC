@@ -15,6 +15,11 @@ export default class WasabeeMe {
     this.Assignments = Array();
   }
 
+  toJSON() {
+    // default
+    return this;
+  }
+
   store() {
     localStorage[Wasabee.static.constants.AGENT_INFO_KEY] = JSON.stringify(
       this

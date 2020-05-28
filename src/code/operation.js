@@ -39,6 +39,27 @@ export default class WasabeeOp {
     store.set(this.ID, JSON.stringify(this));
   }
 
+  // build object to serialize
+  toJSON() {
+    return {
+      ID: this.ID,
+      name: this.name,
+      creator: this.creator,
+      opportals: this.opportals,
+      anchors: this.anchors,
+      links: this.links,
+      markers: this.markers,
+      color: this.color,
+      comment: this.comment,
+      teamlist: this.teamlist,
+      fetched: this.fetched,
+      stored: this.stored,
+      localchanged: this.localchanged,
+      blockers: this.blockers,
+      keysonhand: this.keysonhand
+    };
+  }
+
   getColor() {
     if (this.color == null) {
       return DEFAULT_OPERATION_COLOR;

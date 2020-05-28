@@ -18,6 +18,20 @@ export default class WasabeeLink {
     this.completed = false;
   }
 
+  // build object to serialize
+  toJSON() {
+    return {
+      ID: this.ID,
+      fromPortalId: this.fromPortalId,
+      toPortalId: this.toPortalId,
+      description: this.description,
+      assignedTo: this.assignedTo,
+      throwOrderPos: this.throwOrderPos,
+      color: this.color,
+      completed: this.completed
+    };
+  }
+
   static create(obj, operation) {
     const link = new WasabeeLink(
       operation,
