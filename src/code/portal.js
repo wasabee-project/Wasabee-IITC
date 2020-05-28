@@ -23,6 +23,18 @@ export default class WasabeePortal {
     this.hardness = hardness;
   }
 
+  // build object to serialize
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      lat: this.lat,
+      lng: this.lng,
+      comment: this.comment,
+      hardness: this.hardness
+    };
+  }
+
   static create(obj) {
     if (typeof obj == "string") obj = JSON.parse(obj);
     if (!obj || !obj.id) {

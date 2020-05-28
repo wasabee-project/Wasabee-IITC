@@ -54,6 +54,7 @@ const ImportDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
+      this.importTextareaAsOp();
       this._dialog.dialog("close");
     };
     buttons[wX("GET DT")] = () => {
