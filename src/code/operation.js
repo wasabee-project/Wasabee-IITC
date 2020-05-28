@@ -32,6 +32,9 @@ export default class WasabeeOp {
     this.localchanged = true;
     this.blockers = Array();
     this.keysonhand = Array();
+
+    this.buildLookupTables();
+    this.removeDuplicate();
   }
 
   store() {
@@ -58,6 +61,50 @@ export default class WasabeeOp {
       blockers: this.blockers,
       keysonhand: this.keysonhand
     };
+  }
+
+  buildLookupTables() {
+    this._coordsToOpportals = new Map();
+    this._idToOpportals = new Map();
+
+    for (const p of this.opportals) {
+      this._idToOpportals.set(p.id, p);
+
+      const key = p.lat + "/" + p.lng;
+      const old = this._coordsToOpportals.get(key);
+      if (!old) this._coordsToOpportals.set(key, p);
+      else {
+        if (p.id.lenght != 35) continue;
+        if (old.name != 35) this._coordsToOpportals.set(key, p);
+        else if (old.name == old.id)
+          // should not happen since opportals is supposed not to contains the same id twice
+          this._coordsToOpportals.set(key, p);
+      }
+    }
+  }
+
+  // It is possible (however unlikely) to have a truly fake portal and a real (wasabee) portal inside an operation
+  removeDuplicate() {
+    // batchmode to skip udpate/crosslink at each swap
+    this._batchmode = true;
+
+    const toRemove = new Array();
+
+    for (const [id, p] of this._idToOpportals) {
+      const key = p.lat + "/" + p.lng;
+      const preferredPortal = this._idToOpportals(this._coordsToOpportals.get(key).id);
+      if (p.id != preferredPortal.id) {
+        this.swapPortal(p, this._idToOpportals(this._coordsToOpportals.get(key).id));
+        toRemove.push(id);
+      }
+    }
+
+    for (const id of toRemove)
+      this._idToOpportals.delete(id);
+
+    this.opportals = Array.from(this._idToOpportals.values());
+
+    this._batchmode = false;
   }
 
   getColor() {
