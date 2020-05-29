@@ -73,13 +73,23 @@ export default class WasabeeOp {
       const old = this._coordsToOpportals.get(key);
       if (!old) this._coordsToOpportals.set(key, p);
       else {
-        if (old.pureFaked) this._coordsToOpportals.set(key, p);
-        if (!p.pureFaked && old.loading) this._coordsToOpportals.set(key, p);
         this._dirtyCoordsTable = true;
+        if (old.pureFaked) this._coordsToOpportals.set(key, p);
+        else if (!p.pureFaked) {
+          // this shouldn't happen unless corrupted data or portal location changes...
+          console.warn(
+            "operation: portals %s and %s have same coordinates: %s",
+            old.id,
+            p.id,
+            key
+          );
+          // NB: one of them will be removed on the next round
+        }
       }
     }
 
     if (this._dirtyCoordsTable) {
+      console.log("operation: removing duplicates");
       const toRemove = new Array();
       const rename = new Map();
 
@@ -93,7 +103,7 @@ export default class WasabeeOp {
           toRemove.push(id);
         }
       }
-      // swap IDs
+      // replace IDs
       for (const l of this.links) {
         l.fromPortalId = rename.get(l.fromPortalId);
         l.toPortalId = rename.get(l.toPortalId);
@@ -361,9 +371,13 @@ export default class WasabeeOp {
       const key = portal.lat + "/" + portal.lng;
       if (this._coordsToOpportals.has(key)) {
         // the portal is likely to be a real portal while old is a faked one
-        // this is addressed later when rebuilding coords lookup table
+        // this is addressed later when rebuilding coords lookup table.
+        // use _updatePortal to replace old one by the new one
         console.log(
-          "try to add a portal at same coordinates of another, need cleaning at some point"
+          "add portal %s on portal %s location %s",
+          this._coordsToOpportals.get(key).id,
+          portal.id,
+          key
         );
         this._dirtyCoordsTable = true;
       }
@@ -383,7 +397,7 @@ export default class WasabeeOp {
     return false;
   }
 
-  // update portal silently if one with mathching ID or fake one with matching position
+  // update portal silently if one with mathching ID or with matching position
   _updatePortal(portal) {
     const old = this.getPortal(portal.id);
     if (old) {
@@ -392,21 +406,29 @@ export default class WasabeeOp {
         return true;
       }
     } else {
-      const almostFaked = this.getPortalByLatLng(portal.lat, portal.lng);
-      if (almostFaked) {
-        if (almostFaked.pureFaked) {
-          // prevent dirty
-          this._coordsToOpportals.delete(portal.lat + "/" + portal.lng);
-          this._addPortal(portal);
-          this._swapPortal(almostFaked, portal);
-          this._idToOpportals.delete(almostFaked.id);
-          // NB: truly faked portal are anchors only so we can delete them if swaped
-          return true;
-        } else {
-          console.log(
-            "try to update a real portal at another one, what did you do?"
+      const old = this.getPortalByLatLng(portal.lat, portal.lng);
+      if (old) {
+        if (!old.pureFaked)
+          console.warn(
+            "update real portal %s by portal %s at location %s",
+            old.id,
+            portal.id,
+            portal.lat + "/" + portal.lng
           );
+        // prevent dirty
+        this._coordsToOpportals.delete(portal.lat + "/" + portal.lng);
+        this._addPortal(portal);
+        this._swapPortal(old, portal);
+        for (const m of this.markers) {
+          if (m.portalId == old.id) m.portalId = portal.id;
         }
+        for (const b of this.blockers) {
+          if (b.fromPortalId == old.id) b.fromPortalId = portal.id;
+          if (b.toPortalId == old.id) b.toPortalId = portal.id;
+        }
+        this._idToOpportals.delete(old.id);
+        // NB: truly faked portal are anchors only so we can delete them if swaped
+        return true;
       }
     }
     return false;
