@@ -220,7 +220,8 @@
   "ONION": "Draw",
   "MAX_SPLITS": "Max Splits",
   "smallScreen": {
-    "LOG_OUT": "D\u00e9connection",
+    "LOG IN": "Se connecter",
+    "LOG_OUT": "Se d\u00e9connecter",
     "KEYS": "Cl\u00e9s",
     "ADD_LINKS": "+ Liens",
     "MM": "Multi",
