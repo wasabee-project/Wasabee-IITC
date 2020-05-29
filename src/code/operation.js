@@ -20,7 +20,7 @@ export default class WasabeeOp {
     this.ID = generateId();
     this.name = name;
     this.creator = creator;
-    this.opportals = Array();
+    //this.opportals = Array();
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
@@ -49,7 +49,7 @@ export default class WasabeeOp {
       ID: this.ID,
       name: this.name,
       creator: this.creator,
-      opportals: this.opportals,
+      opportals: Array.from(this._idToOpportals.values()),
       anchors: this.anchors,
       links: this.links,
       markers: this.markers,
@@ -62,6 +62,11 @@ export default class WasabeeOp {
       blockers: this.blockers,
       keysonhand: this.keysonhand
     };
+  }
+
+  // read only (for inspection)
+  get opportals() {
+    return Array.from(this._idToOpportals.values());
   }
 
   buildCoordsLookupTable() {
@@ -119,7 +124,7 @@ export default class WasabeeOp {
 
       for (const id of toRemove) this._idToOpportals.delete(id);
 
-      this.opportals = Array.from(this._idToOpportals.values());
+      //this.opportals = Array.from(this._idToOpportals.values());
     }
 
     this._dirtyCoordsTable = false;
@@ -383,7 +388,7 @@ export default class WasabeeOp {
       }
       this._idToOpportals.set(portal.id, portal);
       this._coordsToOpportals.set(key, portal);
-      this.opportals.push(portal);
+      //this.opportals.push(portal);
       return true;
     }
     return false;
@@ -428,7 +433,7 @@ export default class WasabeeOp {
         }
         this._idToOpportals.delete(old.id);
 
-        this.opportals = Array.from(this._idToOpportals.values());
+        //this.opportals = Array.from(this._idToOpportals.values());
 
         // NB: truly faked portal are anchors only so we can delete them if swaped
         return true;
@@ -516,7 +521,7 @@ export default class WasabeeOp {
   }
 
   get fakedPortals() {
-    const c = this.opportals.filter(p => p.faked);
+    const c = Array.from(this._idToOpportals.values()).filter(p => p.faked);
     return c;
   }
 
@@ -571,7 +576,7 @@ export default class WasabeeOp {
   swapPortal(originalPortal, newPortal) {
     this._addPortal(newPortal);
 
-    this.opportals = Array.from(this._idToOpportals.values());
+    //this.opportals = Array.from(this._idToOpportals.values());
 
     this._swapPortal(originalPortal, newPortal);
     this.update(true);
@@ -609,7 +614,7 @@ export default class WasabeeOp {
   }
 
   clearAllItems() {
-    this.opportals = Array();
+    //this.opportals = Array();
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
@@ -761,10 +766,10 @@ export default class WasabeeOp {
 
   // minimum bounds rectangle
   get mbr() {
-    if (!this.opportals || this.opportals.length == 0) return null;
+    if (this._idToOpportals.size == 0) return null;
     const lats = [];
     const lngs = [];
-    for (const a of this.opportals) {
+    for (const a of this._idToOpportals.values()) {
       lats.push(a.lat);
       lngs.push(a.lng);
     }
@@ -865,7 +870,7 @@ export default class WasabeeOp {
     }
     const operation = new WasabeeOp(obj.creator, obj.name);
     if (obj.ID) operation.ID = obj.ID;
-    operation.opportals = operation.convertPortalsToObjs(obj.opportals);
+    const opportals = operation.convertPortalsToObjs(obj.opportals);
     operation.anchors = obj.anchors ? obj.anchors : Array();
     operation.links = operation.convertLinksToObjs(obj.links);
     operation.markers = operation.convertMarkersToObjs(obj.markers);
@@ -878,14 +883,15 @@ export default class WasabeeOp {
     operation.blockers = operation.convertBlockersToObjs(obj.blockers);
     operation.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
 
-    if (!operation.opportals) operation.opportals = new Array();
+    //if (!operation.opportals) operation.opportals = new Array();
     if (!operation.links) operation.links = new Array();
     if (!operation.markers) operation.markers = new Array();
     if (!operation.blockers) operation.blockers = new Array();
     // if (!operation.teamlist) operation.teamlist = new Array();
     // if (!operation.keysonhand) operation.keysonhand = new Array()
 
-    for (const p of operation.opportals) operation._idToOpportals.set(p.id, p);
+    if (opportals)
+      for (const p of opportals) operation._idToOpportals.set(p.id, p);
     operation.buildCoordsLookupTable();
 
     operation.cleanAnchorList();
