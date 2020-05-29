@@ -427,6 +427,9 @@ export default class WasabeeOp {
           if (b.toPortalId == old.id) b.toPortalId = portal.id;
         }
         this._idToOpportals.delete(old.id);
+
+        this.opportals = Array.from(this._idToOpportals.values());
+
         // NB: truly faked portal are anchors only so we can delete them if swaped
         return true;
       }
