@@ -130,22 +130,19 @@ export default class WasabeePortal {
     e.href = `/intel?ll=${v}&pll=${v}`;
 
     L.DomEvent.on(e, "click", event => {
-      return (
-        window.selectedPortal != this.id
-          ? window.renderPortalDetails(this.id)
-          : window.map.panTo(pt),
-        event.preventDefault(),
-        false
-      );
+      if (window.selectedPortal != this.id && this.id.length == 35)
+        window.renderPortalDetails(this.id);
+      else window.map.panTo(pt);
+      event.preventDefault();
+      return false;
     }).on(e, "dblclick", event => {
-      return (
-        window.map.getBounds().contains(pt)
-          ? (window.portals[this.id] || window.renderPortalDetails(this.id),
-            window.zoomToAndShowPortal(this.id, pt))
-          : (window.map.panTo(pt), window.renderPortalDetails(this.id)),
-        event.preventDefault(),
-        false
-      );
+      if (window.selectedPortal != this.id && this.id.length == 35)
+        window.renderPortalDetails(this.id);
+      if (window.map.getBounds().contains(pt))
+        window.zoomToAndShowPortal(this.id, pt);
+      else window.map.panTo(pt);
+      event.preventDefault();
+      return false;
     });
     return e;
   }
