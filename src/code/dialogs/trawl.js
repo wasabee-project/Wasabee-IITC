@@ -281,7 +281,7 @@ const TrawlDialog = WDialog.extend({
   _bulkLoad: function(latlngs, mapZoom) {
     if (latlngs.length == 0) return;
     mdr.debugTiles.reset();
-    const oldDebugTiles = window.mapDataRequest.debugTiles;
+    // const oldDebugTiles = window.mapDataRequest.debugTiles;
     window.mapDataRequest.debugTiles = new FakeDebugTiles();
 
     const dataZoom = window.getDataZoomForMapZoom(mapZoom);
@@ -300,7 +300,7 @@ const TrawlDialog = WDialog.extend({
     const q = {};
     for (const t of tiles.keys()) {
       q[t] = t;
-    }l
+    }
 
     const mdr = window.mapDataRequest;
     // stop the render queue to not trigger crosslinks etc
@@ -316,7 +316,9 @@ const TrawlDialog = WDialog.extend({
 
     // do a real dialog, close on mapDataRefreshEnd, restore oldDebugTiles then
     // mdr.debugTiles = oldDebugTiles;
-    alert("please wait until status says 'done' ..., if the first didn't trigger a load, close this and do it again");
+    alert(
+      "please wait until status says 'done' ..., if the first didn't trigger a load, close this and do it again"
+    );
   }
 });
 
