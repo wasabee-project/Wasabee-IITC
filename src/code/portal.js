@@ -97,10 +97,8 @@ export default class WasabeePortal {
   }
 
   get displayName() {
-    if (this.id === this.name) {
-      if (this.id.length == 35) return wX("LOADING1", this.id);
-      return wX("FAKED", this.id);
-    }
+    if (this.pureFaked) return wX("FAKED", this.id);
+    if (this.loading) return wX("LOADING1", this.id);
     return this.name;
   }
 
@@ -161,6 +159,18 @@ export default class WasabeePortal {
     if (!name) name = id;
     const n = new WasabeePortal(id, name, lat, lng);
     return n;
+  }
+
+  get faked() {
+    return this.id.length != 35 || this.id == this.name;
+  }
+
+  get loading() {
+    return this.id.length == 35 && this.id == this.name;
+  }
+
+  get pureFaked() {
+    return this.id.length != 35;
   }
 
   static getSelected() {

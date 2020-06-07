@@ -88,46 +88,20 @@ export const listenForAddedPortals = newPortal => {
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    // if we had a GUID -- normal faked
-    if (faked.id == newPortal.portal.options.guid) {
-      faked.name = newPortal.portal.options.data.title;
-      op.update(true);
-      return;
-    }
-
-    // if we only had location -- from drawtools import
-    if (
-      faked.lat == (newPortal.portal.options.data.latE6 / 1e6).toFixed(6) &&
-      faked.lng == (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6)
-    ) {
-      const np = new WasabeePortal(
-        newPortal.portal.options.guid,
-        newPortal.portal.options.data.title,
-        (newPortal.portal.options.data.latE6 / 1e6).toFixed(6),
-        (newPortal.portal.options.data.lngE6 / 1e6).toFixed(6)
-      );
-
-      op.swapPortal(faked, np);
-      op.update(true);
-      // don't bail just yet, more may match
-    }
-  }
+  op.updatePortal(WasabeePortal.fromIITC(newPortal.portal));
 };
 
 export const listenForPortalDetails = e => {
   if (!e.success) return;
   const op = getSelectedOperation();
-
-  for (const faked of op.fakedPortals) {
-    if (faked.id == e.guid) {
-      faked.name = e.details.title;
-      op.update(true);
-      return;
-    }
-  }
-  // TODO listen for by location
+  op.updatePortal(
+    new WasabeePortal(
+      e.guid,
+      e.details.title,
+      (e.details.latE6 / 1e6).toFixed(6),
+      (e.details.lngE6 / 1e6).toFixed(6)
+    )
+  );
 };
 
 // This is what should be called to add to the queue
@@ -175,7 +149,7 @@ const pdqDoNext = function() {
     return;
   }
 
-  if (!p.length || p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
+  if (p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
   // this is the bit everyone is so worried about
   window.portalDetail.request(p);
 };

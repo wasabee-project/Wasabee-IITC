@@ -230,10 +230,7 @@ const testLink = (link, operation) => {
           (link.options.data.oLngE6 / 1e6).toFixed(6),
           link.options.data.oGuid
         );
-      if (!operation.containsPortal(fromPortal)) {
-        // saves one call to op.update();
-        operation.opportals.push(fromPortal);
-      }
+      operation._addPortal(fromPortal);
       let toPortal = WasabeePortal.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
@@ -241,10 +238,7 @@ const testLink = (link, operation) => {
           (link.options.data.dLngE6 / 1e6).toFixed(6),
           link.options.data.dGuid
         );
-      if (!operation.containsPortal(toPortal)) {
-        // saves one call to op.update();
-        operation.opportals.push(toPortal);
-      }
+      operation._addPortal(toPortal);
       const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
       operation.addBlocker(blocker); // op.update() is called here
       break;

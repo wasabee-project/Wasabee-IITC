@@ -166,10 +166,10 @@ const ImportDialog = WDialog.extend({
 
       for (const point of line.latLngs) {
         // use fixed precision
-        const truncPoint = new L.LatLng(
-          parseFloat(point.lat.toFixed(6)),
-          parseFloat(point.lng.toFixed(6))
-        );
+        const truncPoint = {
+          lat: point.lat.toFixed(6),
+          lng: point.lng.toFixed(6)
+        };
         // check the op first
         let portal = newop.getPortalByLatLng(truncPoint.lat, truncPoint.lng);
 
@@ -213,7 +213,7 @@ const ImportDialog = WDialog.extend({
     const pmap = new Map();
     for (const portalID in window.portals) {
       const ll = window.portals[portalID].getLatLng();
-      const key = ll.lat + "/" + ll.lng;
+      const key = ll.lat.toFixed(6) + "/" + ll.lng.toFixed(6);
       pmap.set(key, portalID);
     }
     return pmap;
