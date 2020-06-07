@@ -55,6 +55,9 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
+    buttons[wX("LOAD PORTALS")] = () => {
+      loadFaked(this._operation, true); // force
+    };
 
     this._dialog = window.dialog({
       title: wX("OP_CHECKLIST", this._operation.name),

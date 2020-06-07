@@ -110,27 +110,19 @@ const ImportDialog = WDialog.extend({
         newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
       }
 
-      // load half loaded portals, if autoload is disabled let the user to clean the mess up
-      this.loadHalfloaded(newop).then(
-        () => {
-          // needs to be saved, but not update UI
-          newop.store();
-          // this updates the UI and runs crosslinks
-          makeSelectedOperation(newop.ID);
-          // open the checklist to get another pass at loading portals
-          // although that is now off-by-default, at least let the user
-          // see which portals need attention
-          const checklist = new OperationChecklistDialog();
-          checklist.enable();
-          // zoom to it
-          // OR use pointTileDataRequest to try to load faked portals?
-          this._map.fitBounds(newop.mbr);
-        },
-        reject => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+      // needs to be saved, but not update UI
+      newop.store();
+      // this updates the UI and runs crosslinks
+      makeSelectedOperation(newop.ID);
+      // open the checklist to get a pass at loading portals
+      // although that is now off-by-default, at least let the user
+      // see which portals need attention
+      const checklist = new OperationChecklistDialog();
+      checklist.enable();
+      // zoom to it
+      // OR use pointTileDataRequest to try to load faked portals?
+      this._map.fitBounds(newop.mbr);
+
       return;
     }
 
@@ -214,33 +206,6 @@ const ImportDialog = WDialog.extend({
     // get the op out of batchmode, but do not update UI or run crosslinks yet
     newop._batchmode = false;
     return newop;
-  },
-
-  // since we aren't using the IITC hook, can't use the normal route
-  loadHalfloaded(op) {
-    if (!this._autoload) return Promise.resolve();
-
-    const promises = new Array();
-
-    for (const p of op.fakedPortals) {
-      if (p.id.length != 35) continue; // ignore the truly fake
-      promises.push(
-        window.portalDetail.request(p.id).then(
-          res => {
-            if (res.title) {
-              p.name = res.title;
-              p.lat = (res.latE6 / 1e6).toFixed(6);
-              p.lng = (res.lngE6 / 1e6).toFixed(6);
-            }
-          },
-          reject => {
-            console.log(reject);
-          }
-        )
-      );
-    }
-    // return one single promise that resolves when all these promises resolve
-    return Promise.all(promises);
   },
 
   // build a fast lookup map of known portals
