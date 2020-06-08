@@ -280,6 +280,7 @@ const TrawlDialog = WDialog.extend({
 
   _bulkLoad: function(latlngs, mapZoom) {
     if (latlngs.length == 0) return;
+    const mdr = window.mapDataRequest;
     mdr.debugTiles.reset();
     // const oldDebugTiles = window.mapDataRequest.debugTiles;
     window.mapDataRequest.debugTiles = new FakeDebugTiles();
@@ -302,7 +303,6 @@ const TrawlDialog = WDialog.extend({
       q[t] = t;
     }
 
-    const mdr = window.mapDataRequest;
     // stop the render queue to not trigger crosslinks etc
     mdr.resetRenderQueue();
     mdr.pauseRenderQueue(true);
