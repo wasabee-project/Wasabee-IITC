@@ -52,35 +52,38 @@ const AssignDialog = WDialog.extend({
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
+    const menu = this._getAgentMenu(target.assignedTo);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
-      const t = L.DomUtil.create("span", null, divtitle);
-      t.textContent = wX("LINK ASSIGNMENT");
       this._name = wX("ASSIGN LINK PROMPT", portal.displayName);
+      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
+      const t = L.DomUtil.create("label", null);
+      t.textContent = wX("LINK ASSIGNMENT");
+      menu.prepend(t);
     }
 
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
-      const t = L.DomUtil.create("span", null, divtitle);
-      t.textContent = wX("MARKER ASSIGNMENT");
       this._name = wX("ASSIGN MARKER PROMPT", portal.displayName);
+      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      const t = L.DomUtil.create("label", null);
+      t.textContent = wX("MARKER ASSIGNMENT");
+      menu.prepend(t);
     }
 
     if (target instanceof WasabeeAnchor) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
-      const t = L.DomUtil.create("span", null, divtitle);
-      t.textContent = wX("ANCHOR ASSIGNMENT");
       this._name = wX("ASSIGN OUTBOUND PROMPT", portal.displayName);
+      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      const t = L.DomUtil.create("label", null);
+      t.textContent = wX("ANCHOR ASSIGNMENT");
+      menu.prepend(t);
     }
 
-    const menu = this._getAgentMenu(target.assignedTo);
     this._html.appendChild(menu);
   },
 
