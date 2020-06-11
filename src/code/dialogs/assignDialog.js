@@ -56,7 +56,7 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      divtitle.appendChild(target.displayFormat(this._smallScreen));
+      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
       const t = L.DomUtil.create("span", null, divtitle);
       t.textContent = wX("LINK ASSIGNMENT");
       this._name = wX("ASSIGN LINK PROMPT", portal.displayName);
