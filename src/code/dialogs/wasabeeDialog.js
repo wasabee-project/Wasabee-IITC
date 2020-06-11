@@ -148,7 +148,7 @@ const WasabeeDialog = WDialog.extend({
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
-    buttons[wX("NEW TEAM")] = () => {
+    buttons[wX("NEW_TEAM")] = () => {
       const p = new PromptDialog(window.map);
       p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
         const newname = p.inputField.value;

@@ -185,6 +185,7 @@
   "NAME": "Name: ",
   "NAME_REQ": "Name Required",
   "NEW_OP": "New Operation",
+  "NEW_TEAM": "Click to create New Team",
   "NEW_TEAM_NAME": "New Team Name",
   "NEW_WAS_SERVER": "New Waasbee Server",
   "NOT LOGGED IN": "Not Logged in: ${value}",
