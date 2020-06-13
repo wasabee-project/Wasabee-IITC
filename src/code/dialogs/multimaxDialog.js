@@ -101,7 +101,7 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
       alert(`Multimax found ${total} layers`);
-      this._dialog.dialog("close");
+      // this._dialog.dialog("close");
     });
 
     const buttons = {};
