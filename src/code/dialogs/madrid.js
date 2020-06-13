@@ -285,53 +285,6 @@ const MadridDialog = MultimaxDialog.extend({
     this._operation.endBatchMode(); // save and run crosslinks
 
     return len;
-  },
-
-  madridMM: function(pOne, pTwo, portals) {
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-    const sequence = this.longestSequence(poset);
-
-    const portalsMap = new Map(portals.map(p => [p.id, p]));
-
-    if (!Array.isArray(sequence) || !sequence.length) {
-      // alert("No layers found");
-      return 0;
-    }
-
-    let prev = null;
-
-    // draw inner 3 links
-    for (const node of sequence) {
-      const p = portalsMap.get(node);
-      if (!p) {
-        console.log("skipping: " + node);
-        continue;
-      }
-      this._operation.addLink(
-        p,
-        pOne,
-        "madrid protocol link",
-        this._operation.links.length + this._orderOffset
-      );
-      this._operation.addLink(
-        p,
-        pTwo,
-        "madrid protocol link",
-        this._operation.links.length + this._orderOffset
-      );
-      if (this._flcheck.checked && prev) {
-        this._operation.addLink(
-          p,
-          prev,
-          "back link",
-          this._operation.links.length + this._orderOffset
-        );
-      }
-      prev = p;
-    }
-    // store the last portal in the set so we can use it as the anchor for the next set
-    this._prev = prev;
-    return sequence.length;
   }
 });
 
