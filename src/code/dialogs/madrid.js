@@ -209,8 +209,7 @@ const MadridDialog = MultimaxDialog.extend({
   },
 
   // fieldCoversPortal inherited from MultimaxDialog
-  // buildPOSet "
-  // longestSequence "
+  // MM "
 
   doMadrid: function() {
     // Calculate the multimax
@@ -234,47 +233,57 @@ const MadridDialog = MultimaxDialog.extend({
     );
 
     let len = 0;
-    len += this.madridMM(
+    const [len1, order1, last1] = this.MM(
       this._anchorOne,
       this._anchorTwo,
-      this._portalSetThree
+      this._portalSetThree,
+      0,
+      false,
+      "madrid protocol "
     );
+    len += len1;
 
-    const newThree = this._prev;
+    const newThree = last1;
     // the set 1 must contain anchor 1 (first back link)
     if (this._portalSetOne.find(p => this._anchorOne.id == p.id) == undefined)
       this._portalSetOne.push(this._anchorOne);
-    len +=
-      this.madridMM(
-        this._anchorTwo,
-        newThree,
-        this._portalSetOne.filter(
-          p =>
-            this._anchorOne.id == p.id ||
-            this.fieldCoversPortal(
-              this._anchorTwo,
-              newThree,
-              p,
-              this._anchorOne
-            )
-        )
-      ) - 1;
-    // _anchorOne is no longer useful, use _prev
-    const newOne = this._prev;
+
+    const [len2, order2, last2] = this.MM(
+      this._anchorTwo,
+      newThree,
+      this._portalSetOne.filter(
+        p =>
+          this._anchorOne.id == p.id ||
+          this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
+      ),
+      order1,
+      false,
+      "madrid protocol "
+    );
+    len += len2 - 1;
+
+    // _anchorOne is no longer useful, use last2
+    const newOne = last2;
     // the set 2 must contain anchor 2 (first back link)
     if (this._portalSetTwo.find(p => this._anchorTwo.id == p.id) == undefined)
       this._portalSetTwo.push(this._anchorTwo);
-    len +=
-      this.madridMM(
-        newThree,
-        newOne,
-        this._portalSetTwo.filter(
-          p =>
-            this._anchorTwo.id == p.id ||
-            this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
-        )
-      ) - 1;
+
+    const len3 = this.MM(
+      newThree,
+      newOne,
+      this._portalSetTwo.filter(
+        p =>
+          this._anchorTwo.id == p.id ||
+          this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+      ),
+      order2,
+      false,
+      "madrid protocol "
+    )[0];
+    len += len3 - 1;
+
     this._operation.endBatchMode(); // save and run crosslinks
+
     return len;
   },
 
