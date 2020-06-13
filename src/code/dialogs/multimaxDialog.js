@@ -142,10 +142,48 @@ const MultimaxDialog = WDialog.extend({
   /*
   Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
   */
-  doMultimax: function() {
-    const portals = getAllPortalsOnScreen(this._operation);
+  MM: function(
+    pOne,
+    pTwo,
+    portals,
+    order = 0,
+    base = true,
+    commentPrefix = "multimax "
+  ) {
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+    const sequence = this.longestSequence(poset);
 
     const portalsMap = new Map(portals.map(p => [p.id, p]));
+
+    if (base)
+      this._operation.addLink(pOne, pTwo, commentPrefix + "base", ++order);
+
+    if (!Array.isArray(sequence) || !sequence.length) {
+      // alert("No layers found");
+      return [0, order, null];
+    }
+
+    let prev = null;
+
+    for (const node of sequence) {
+      const p = portalsMap.get(node);
+      if (!p) {
+        console.log("skipping: " + node);
+        continue;
+      }
+      this._operation.addLink(p, pOne, commentPrefix + "link", ++order);
+      this._operation.addLink(p, pTwo, commentPrefix + "link", ++order);
+      if (this._flcheck.checked && prev) {
+        this._operation.addLink(p, prev, commentPrefix + "back link", ++order);
+      }
+      prev = p;
+    }
+    // return number of layers, last link order and last portal
+    return [sequence.length, order, prev];
+  },
+
+  doMultimax: function() {
+    const portals = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax
     if (!this._anchorOne || !this._anchorTwo || !portals) {
@@ -153,57 +191,15 @@ const MultimaxDialog = WDialog.extend({
       return 0;
     }
 
+    this._operation.startBatchMode();
+
     console.log("starting multimax");
-    const poset = this.buildPOSet(this._anchorOne, this._anchorTwo, portals);
-    const sequence = this.longestSequence(poset);
+    const length = this.MM(this._anchorOne, this._anchorTwo, portals)[0];
     console.log("multimax done");
 
-    if (!Array.isArray(sequence) || !sequence.length) {
-      // alert("No layers found");
-      return 0;
-    }
-
-    let order = 0;
-    let prev = null;
-
-    this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(
-      this._anchorOne,
-      this._anchorTwo,
-      "multimax base",
-      ++order
-    );
-
-    for (const node of sequence) {
-      let p = portalsMap.get(node);
-      if (!p || !p.lat) {
-        console.log("data not loaded, skipping: " + node);
-        continue;
-      }
-      this._operation.addLink(
-        p,
-        this._anchorOne,
-        "multimax generated link",
-        ++order
-      );
-      this._operation.addLink(
-        p,
-        this._anchorTwo,
-        "multimax generated link",
-        ++order
-      );
-      if (this._flcheck.checked && prev) {
-        this._operation.addLink(
-          p,
-          prev,
-          "multimax generated back link",
-          ++order
-        );
-      }
-      prev = p;
-    }
     this._operation.endBatchMode(); // save and run crosslinks
-    return sequence.length;
+
+    return length;
   },
 
   fieldCoversPortal: function(a, b, c, p) {
