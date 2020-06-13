@@ -224,20 +224,14 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._orderOffset = 1 - this._operation.links.length;
-    this._operation.addLink(
-      this._anchorOne,
-      this._anchorTwo,
-      "madrid base",
-      this._operation.links.length + this._orderOffset
-    );
+    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
 
     let len = 0;
     const [len1, order1, last1] = this.MM(
       this._anchorOne,
       this._anchorTwo,
       this._portalSetThree,
-      0,
+      1,
       false,
       "madrid protocol "
     );
