@@ -203,7 +203,8 @@ export const getAllPortalsOnScreen = function(operation) {
         )
       )
         continue;
-      x.push(WasabeePortal.fromIITC(window.portals[portal]));
+      const wp = WasabeePortal.fromIITC(window.portals[portal]);
+      if (wp) x.push(wp);
     }
   }
   return x;
