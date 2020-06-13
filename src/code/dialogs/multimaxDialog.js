@@ -143,20 +143,18 @@ const MultimaxDialog = WDialog.extend({
   Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
   */
   doMultimax: function() {
-    const portalsOnScreen = getAllPortalsOnScreen(this._operation);
+    const portals = getAllPortalsOnScreen(this._operation);
+
+    const portalsMap = new Map(portals.map(p => [p.id, p]));
 
     // Calculate the multimax
-    if (!this._anchorOne || !this._anchorTwo || !portalsOnScreen) {
+    if (!this._anchorOne || !this._anchorTwo || !portals) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }
 
     console.log("starting multimax");
-    const poset = this.buildPOSet(
-      this._anchorOne,
-      this._anchorTwo,
-      portalsOnScreen
-    );
+    const poset = this.buildPOSet(this._anchorOne, this._anchorTwo, portals);
     const sequence = this.longestSequence(poset);
     console.log("multimax done");
 
@@ -177,7 +175,7 @@ const MultimaxDialog = WDialog.extend({
     );
 
     for (const node of sequence) {
-      let p = WasabeePortal.get(node);
+      let p = portalsMap.get(node);
       if (!p || !p.lat) {
         console.log("data not loaded, skipping: " + node);
         continue;
