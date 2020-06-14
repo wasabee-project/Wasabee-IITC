@@ -121,6 +121,19 @@ export default class WasabeeAnchor {
       marker.closePopup();
     });
 
+    const gmapButton = L.DomUtil.create("button", null, buttonSet);
+    gmapButton.textContent = wX("ANCHOR_GMAP");
+    L.DomEvent.on(gmapButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      marker.closePopup();
+      window.open(
+        "https://www.google.com/maps/search/?api=1&query=" +
+          this._portal.lat +
+          "," +
+          this._portal.lng
+      );
+    });
+
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
