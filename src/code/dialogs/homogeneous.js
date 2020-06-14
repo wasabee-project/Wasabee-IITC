@@ -136,11 +136,13 @@ const HomogeneousDialog = WDialog.extend({
       dc++;
     } // no need for an event, we will read the value directly below
 
+    L.DomUtil.create("span", "null", container);
+
     const orderLabel = L.DomUtil.create("label", null, container);
     orderLabel.textContent = "Order";
     this.orderMenu = L.DomUtil.create("select", null, container);
     for (const [text, value] of [
-      ["from the depth", "core"],
+      ["from the depth", "core"], // need wX on first column
       ["from base 1-2", "base12"],
       ["from base 1-3", "base13"],
       ["from base 2-3", "base23"]
@@ -149,11 +151,10 @@ const HomogeneousDialog = WDialog.extend({
       orderOption.value = value;
       orderOption.textContent = text;
     }
+    L.DomUtil.create("span", "null", container);
 
     const placeholder = L.DomUtil.create("div", "null", container);
     placeholder.textContent = "\u2063";
-    const placeholder2 = L.DomUtil.create("span", "null", container);
-    placeholder2.textContent = "\u2063";
 
     // Go button
     const drawButton = L.DomUtil.create("button", "drawb", container);
@@ -162,8 +163,10 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this.hfield.call(this);
     });
-    this._redrawButton = L.DomUtil.create("button", null, container);
-    this._redrawButton.textContent = "Redraw";
+
+    const spanRedraw = L.DomUtil.create("span", "null", container);
+    this._redrawButton = L.DomUtil.create("button", null, spanRedraw);
+    this._redrawButton.textContent = "Redraw"; // need wX
     this._redrawButton.style.display = "none";
     L.DomEvent.on(this._redrawButton, "click", ev => {
       L.DomEvent.stop(ev);
