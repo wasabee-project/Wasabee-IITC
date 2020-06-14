@@ -131,24 +131,43 @@ const HomogeneousDialog = WDialog.extend({
     let dc = 2;
     while (dc <= 6) {
       const depthOption = L.DomUtil.create("option", null, this.depthMenu);
-      depthOption.vaue = dc;
+      depthOption.value = dc;
       depthOption.textContent = dc;
       dc++;
     } // no need for an event, we will read the value directly below
+
+    const orderLabel = L.DomUtil.create("label", null, container);
+    orderLabel.textContent = "Order";
+    this.orderMenu = L.DomUtil.create("select", null, container);
+    for (const [text, value] of [
+      ["from the depth", "core"],
+      ["from base 1-2", "base12"],
+      ["from base 1-3", "base13"],
+      ["from base 2-3", "base23"]
+    ]) {
+      const orderOption = L.DomUtil.create("option", null, this.orderMenu);
+      orderOption.value = value;
+      orderOption.textContent = text;
+    }
 
     const placeholder = L.DomUtil.create("div", "null", container);
     placeholder.textContent = "\u2063";
     const placeholder2 = L.DomUtil.create("span", "null", container);
     placeholder2.textContent = "\u2063";
 
-    // Bottom buttons bar
-
     // Go button
-    const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = wX("ONION");
-    L.DomEvent.on(button, "click", ev => {
+    const drawButton = L.DomUtil.create("button", "drawb", container);
+    drawButton.textContent = wX("ONION");
+    L.DomEvent.on(drawButton, "click", ev => {
       L.DomEvent.stop(ev);
       this.hfield.call(this);
+    });
+    this._redrawButton = L.DomUtil.create("button", null, container);
+    this._redrawButton.textContent = "Redraw";
+    this._redrawButton.style.display = "none";
+    L.DomEvent.on(this._redrawButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      if (this._tree) this._draw.call(this);
     });
 
     const buttons = {};
@@ -211,6 +230,7 @@ const HomogeneousDialog = WDialog.extend({
         portals.push(p);
     }
 
+    console.time("HF recurser");
     const tree = this._recurser(
       1,
       portals,
@@ -218,25 +238,42 @@ const HomogeneousDialog = WDialog.extend({
       this._anchorTwo,
       this._anchorThree
     );
+    console.timeEnd("HF recurser");
 
-    this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
-      this._colors.push(k);
-      this._trash = c;
-    }
+    this._tree = tree;
+    this._failed = (3 ** (+this.depthMenu.value - 1) - 1) / 2 - tree.split;
 
-    this._operation.startBatchMode();
-    this._drawTree(tree);
-    this._operation.endBatchMode();
+    this._draw();
 
-    // this._operation.cleanAnchorList();
-    // now, remove the portals that are unused
-    this._operation.cleanPortalList();
     if (this._failed > 0) {
       alert(
         `Unable to find ${this._failed} splits, try less depth or a different region`
       );
     }
+  },
+
+  _draw: function() {
+    this._colors = new Array();
+    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+      if (k != "self-block") this._colors.push(k);
+      this._trash = c;
+    }
+
+    this._operation.startBatchMode();
+    if (this.orderMenu.value == "base12")
+      this._drawTreeBase(this._tree, this._anchorOne, this._anchorTwo);
+    else if (this.orderMenu.value == "base13")
+      this._drawTreeBase(this._tree, this._anchorOne, this._anchorThree);
+    else if (this.orderMenu.value == "base23")
+      this._drawTreeBase(this._tree, this._anchorTwo, this._anchorThree);
+    else this._drawTreeCore(this._tree);
+    this._operation.endBatchMode();
+
+    // this._operation.cleanAnchorList();
+    // now, remove the portals that are unused
+    this._operation.cleanPortalList();
+
+    this._redrawButton.style.display = "";
   },
 
   _recurser: function(depth, portalsCovered, one, two, three) {
@@ -324,13 +361,14 @@ const HomogeneousDialog = WDialog.extend({
       bestResult.children[1].success &&
       bestResult.children[2].success;
     bestResult.split =
+      1 +
       bestResult.children[0].split +
       bestResult.children[1].split +
       bestResult.children[2].split;
     return bestResult;
   },
 
-  _drawTree: function(tree) {
+  _drawTreeCore: function(tree) {
     const depthValue = +this.depthMenu.value - 1;
     const [one, two, three] = tree.anchors;
     const computeDepth = (depth, tree, map) => {
@@ -372,7 +410,6 @@ const HomogeneousDialog = WDialog.extend({
       return baseOrder + 2 * depthValue + ad + 1;
     };
 
-    const getNbSplitPerDepth = depth => (3 ** (depth - 1) - 1) / 2;
     const draw = (depth, r) => {
       if (r.portal) {
         const dp = portalDepth.get(r.portal.id);
@@ -392,11 +429,14 @@ const HomogeneousDialog = WDialog.extend({
           );
         }
         for (const child of r.children) draw(depth + 1, child);
-      } else if (!r.success) {
-        this._failed +=
-          getNbSplitPerDepth(this.depthMenu.value - depth + 1) - r.split;
+      }
+    };
+
+    const drawDebug = (depth, r) => {
+      if (r.portal) for (const child of r.children) drawDebug(depth - 1, child);
+      if (!r.portal && !r.success) {
         // debug layer
-        const color = this.depthMenu.value - depth == 1 ? "orange" : "red";
+        const color = depth == 1 ? "orange" : "red";
         const latlngs = [
           r.anchors[0].latLng,
           r.anchors[1].latLng,
@@ -407,6 +447,7 @@ const HomogeneousDialog = WDialog.extend({
         polygon.addTo(this._layerGroup);
       }
     };
+    drawDebug(depthValue, tree);
 
     this._operation.addPortal(one);
     this._operation.addPortal(two);
@@ -430,6 +471,89 @@ const HomogeneousDialog = WDialog.extend({
       (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
     );
     draw(1, tree);
+  },
+
+  _drawTreeBase: function(tree, one, two) {
+    const depthValue = +this.depthMenu.value - 1;
+
+    const drawFractal = (depth, r, pOne, pTwo, order) => {
+      if (r.portal) {
+        // draw inner HF on base 1-2
+        const pThree = r.anchors.filter(p => p != pOne && p != pTwo)[0];
+        for (const child of r.children)
+          if (!child.anchors.includes(pThree))
+            order = draw(depth + 1, child, pOne, pTwo, order);
+
+        let order1, order2;
+        // draw fractal on 1-p
+        for (const child of r.children)
+          if (!child.anchors.includes(pTwo))
+            order1 = drawFractal(depth + 1, child, pOne, r.portal, order);
+
+        // draw fractal on 2-p
+        for (const child of r.children)
+          if (!child.anchors.includes(pOne))
+            order2 = drawFractal(depth + 1, child, pTwo, r.portal, order);
+
+        // should be computed with a formula
+        order = Math.max(order1, order2);
+      }
+      return order;
+    };
+
+    // link an anchor to inner portals in depth order
+    const drawBackLink = (depth, r, anchor, order) => {
+      if (r.portal) {
+        const linkID = this._operation.addLink(anchor, r.portal, "", order + 1);
+        this._operation.setLinkColor(
+          linkID,
+          this._colors[order % this._colors.length]
+        );
+        for (const child of r.children)
+          if (child.anchors.includes(anchor))
+            drawBackLink(depth + 1, child, anchor, order + 1);
+      }
+      return order + depthValue - depth + 1;
+    };
+
+    // draw a HF from base
+    const draw = (depth, r, pOne, pTwo, order = 1) => {
+      // draw fratal on 1-2
+      order = drawFractal(depth, r, pOne, pTwo, order);
+      const pThree = r.anchors.filter(p => p != pOne && p != pTwo)[0];
+      // draw outer link
+      for (const anchor of [pOne, pTwo]) {
+        const linkID = this._operation.addLink(pThree, anchor, "", order + 1);
+        this._operation.setLinkColor(
+          linkID,
+          this._colors[order % this._colors.length]
+        );
+      }
+      if (!r.portal) return order + 1;
+      // draw inner link from 3
+      return drawBackLink(depth, r, pThree, order + 1);
+    };
+
+    const drawDebug = (depth, r) => {
+      if (r.portal) for (const child of r.children) drawDebug(depth - 1, child);
+      if (!r.portal && !r.success) {
+        // debug layer
+        const color = depth == 1 ? "orange" : "red";
+        const latlngs = [
+          r.anchors[0].latLng,
+          r.anchors[1].latLng,
+          r.anchors[2].latLng,
+          r.anchors[0].latLng
+        ];
+        const polygon = L.polygon(latlngs, { color: color });
+        polygon.addTo(this._layerGroup);
+      }
+    };
+    drawDebug(depthValue, tree);
+
+    for (const p of tree.anchors) this._operation.addPortal(p);
+    this._operation.addLink(two, one, "Outer base", 1);
+    draw(1, tree, one, two);
   },
 
   _getSubregions: function(centerPoint, possibles, one, two, three) {
