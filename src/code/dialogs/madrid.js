@@ -66,9 +66,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation).filter(
-        p => p
-      );
+      this._portalSetOne = getAllPortalsOnScreen(this._operation);
       // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -117,9 +115,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(this._operation).filter(
-        p => p
-      );
+      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
       // XXX cache
       this._setTwoDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -146,9 +142,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(this._operation).filter(
-        p => p
-      );
+      this._portalSetThree = getAllPortalsOnScreen(this._operation);
       // XXX cache
       this._setThreeDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -215,8 +209,7 @@ const MadridDialog = MultimaxDialog.extend({
   },
 
   // fieldCoversPortal inherited from MultimaxDialog
-  // buildPOSet "
-  // longestSequence "
+  // MM "
 
   doMadrid: function() {
     // Calculate the multimax
@@ -231,104 +224,61 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._orderOffset = 1 - this._operation.links.length;
-    this._operation.addLink(
-      this._anchorOne,
-      this._anchorTwo,
-      "madrid base",
-      this._operation.links.length + this._orderOffset
-    );
+    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
 
     let len = 0;
-    len += this.madridMM(
+    const [len1, order1, last1] = this.MM(
       this._anchorOne,
       this._anchorTwo,
-      this._portalSetThree
+      this._portalSetThree,
+      1,
+      false,
+      "madrid protocol "
     );
+    len += len1;
 
-    const newThree = this._prev;
+    const newThree = last1;
     // the set 1 must contain anchor 1 (first back link)
     if (this._portalSetOne.find(p => this._anchorOne.id == p.id) == undefined)
       this._portalSetOne.push(this._anchorOne);
-    len +=
-      this.madridMM(
-        this._anchorTwo,
-        newThree,
-        this._portalSetOne.filter(
-          p =>
-            this._anchorOne.id == p.id ||
-            this.fieldCoversPortal(
-              this._anchorTwo,
-              newThree,
-              p,
-              this._anchorOne
-            )
-        )
-      ) - 1;
-    // _anchorOne is no longer useful, use _prev
-    const newOne = this._prev;
+
+    const [len2, order2, last2] = this.MM(
+      this._anchorTwo,
+      newThree,
+      this._portalSetOne.filter(
+        p =>
+          this._anchorOne.id == p.id ||
+          this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
+      ),
+      order1,
+      false,
+      "madrid protocol "
+    );
+    len += len2 - 1;
+
+    // _anchorOne is no longer useful, use last2
+    const newOne = last2;
     // the set 2 must contain anchor 2 (first back link)
     if (this._portalSetTwo.find(p => this._anchorTwo.id == p.id) == undefined)
       this._portalSetTwo.push(this._anchorTwo);
-    len +=
-      this.madridMM(
-        newThree,
-        newOne,
-        this._portalSetTwo.filter(
-          p =>
-            this._anchorTwo.id == p.id ||
-            this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
-        )
-      ) - 1;
+
+    const len3 = this.MM(
+      newThree,
+      newOne,
+      this._portalSetTwo.filter(
+        p =>
+          this._anchorTwo.id == p.id ||
+          this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
+      ),
+      order2,
+      false,
+      "madrid protocol "
+    )[0];
+    len += len3 - 1;
+
     this._operation.endBatchMode(); // save and run crosslinks
+
     return len;
-  },
-
-  madridMM: function(pOne, pTwo, portals) {
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-    const sequence = this.longestSequence(poset);
-
-    const portalsMap = new Map(portals.map(p => [p.id, p]));
-
-    if (!Array.isArray(sequence) || !sequence.length) {
-      // alert("No layers found");
-      return 0;
-    }
-
-    let prev = null;
-
-    // draw inner 3 links
-    for (const node of sequence) {
-      const p = portalsMap.get(node);
-      if (!p) {
-        console.log("skipping: " + node);
-        continue;
-      }
-      this._operation.addLink(
-        p,
-        pOne,
-        "madrid protocol link",
-        this._operation.links.length + this._orderOffset
-      );
-      this._operation.addLink(
-        p,
-        pTwo,
-        "madrid protocol link",
-        this._operation.links.length + this._orderOffset
-      );
-      if (this._flcheck.checked && prev) {
-        this._operation.addLink(
-          p,
-          prev,
-          "back link",
-          this._operation.links.length + this._orderOffset
-        );
-      }
-      prev = p;
-    }
-    // store the last portal in the set so we can use it as the anchor for the next set
-    this._prev = prev;
-    return sequence.length;
   }
 });
 
