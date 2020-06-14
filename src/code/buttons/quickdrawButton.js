@@ -78,7 +78,6 @@ const QuickDrawControl = L.Handler.extend({
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
-    this._spinePortals = {};
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
@@ -109,7 +108,6 @@ const QuickDrawControl = L.Handler.extend({
     if (this._anchor1) delete this._anchor1;
     if (this._anchor2) delete this._anchor2;
     if (this._previous) delete this._previous;
-    if (this._spinePortals) delete this._spinePortals;
     if (this._guideA) delete this._guideA;
     if (this._guideB) delete this._guideB;
 
@@ -250,24 +248,19 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
-    if (selectedPortal.id in this._spinePortals) {
-      return; //ignore duplicates
-    } else {
-      this._spinePortals[selectedPortal.id] = selectedPortal;
-      this._operation.addLink(
-        selectedPortal,
-        this._anchor1,
-        null,
-        this._throwOrder++
-      );
-      this._operation.addLink(
-        selectedPortal,
-        this._anchor2,
-        null,
-        this._throwOrder++
-      );
-      this._tooltip.updateContent(this._getTooltipText());
-    }
+    this._operation.addLink(
+      selectedPortal,
+      this._anchor1,
+      null,
+      this._throwOrder++
+    );
+    this._operation.addLink(
+      selectedPortal,
+      this._anchor2,
+      null,
+      this._throwOrder++
+    );
+    this._tooltip.updateContent(this._getTooltipText());
   },
 
   _toggleMode: function() {
@@ -275,8 +268,6 @@ const QuickDrawControl = L.Handler.extend({
     if (this._anchor1) delete this._anchor1;
     if (this._anchor2) delete this._anchor2;
     if (this._previous) delete this._anchor2;
-    if (this._spinePortals) delete this._spinePortals;
-    this._spinePortals = {};
     if (this._guideA) delete this._guideA;
     if (this._guideB) delete this._guideB;
 
