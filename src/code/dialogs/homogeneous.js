@@ -178,6 +178,7 @@ const HomogeneousDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
     buttons[wX("CLEAR LINKS")] = () => {
+      this._layerGroup.clearLayers();
       clearAllLinks(getSelectedOperation());
     };
 
