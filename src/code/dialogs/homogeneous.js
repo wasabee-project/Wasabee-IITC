@@ -142,10 +142,10 @@ const HomogeneousDialog = WDialog.extend({
     orderLabel.textContent = "Order";
     this.orderMenu = L.DomUtil.create("select", null, container);
     for (const [text, value] of [
-      ["from the depth", "core"], // need wX on first column
-      ["from base 1-2", "base12"],
-      ["from base 1-3", "base13"],
-      ["from base 2-3", "base23"]
+      [wX("FROM_DEPTH"), "core"], // need wX on first column
+      [wX("FROM_1-2"), "base12"],
+      [wX("FROM_1-3"), "base13"],
+      [wX("FROM_2-3"), "base23"]
     ]) {
       const orderOption = L.DomUtil.create("option", null, this.orderMenu);
       orderOption.value = value;
