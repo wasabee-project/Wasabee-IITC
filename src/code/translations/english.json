@@ -51,6 +51,7 @@
   "ASSIGN MARKER PROMPT": "Assign marker from: ${value}",
   "ASSIGN OUTBOUND": "Assign Outbound Links",
   "ASSIGN OUTBOUND PROMPT": "Assign all outbound links from: ${value}",
+  "ASSIGNED_ONLY": "Assigned Only",
   "AUTH ANDROID": "On Android, try 'quick' first. If that fails, try the main login with 'select_account'.",
   "AUTH INCOMPAT": "You have activated a plugin in TamperMonkey that is incompatable with Wasabee",
   "AUTH IOS": "On iOS, use the main 'Log In'. if that fails do 'Webview Log in', log in; then use the 'Verify Webview' button to complete the process.",
