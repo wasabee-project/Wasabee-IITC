@@ -303,7 +303,7 @@ const TrawlDialog = WDialog.extend({
   },
 
   _bulkLoad: function(latlngs, mapZoom) {
-    window.addHook("mapDataRefreshEnd", this.bulkLoadDone.call(this));
+    window.addHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
 
     if (latlngs.length == 0) return;
     const mdr = window.mapDataRequest;
@@ -346,11 +346,11 @@ const TrawlDialog = WDialog.extend({
   },
 
   bulkLoadDone: function() {
-    window.removeHook("mapDataRefreshEnd", this.bulkLoadDone.call(this));
+    if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
-    if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     alert("bulk data load done");
+    window.removeHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
   }
 });
 
