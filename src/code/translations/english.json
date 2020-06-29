@@ -308,6 +308,8 @@
   "TRAWL WARNING": "This will load the tile data under all drawn links. This is a slow process.",
   "TRAWLING": "Trawling the lanes for blockers, close this dialog to stop",
   "TRAWL_REMAINING": "${value} tiles remaining",
+  "TRAWL_CLEAR_MARKERS": "Clear virus/destroy markers before trawling",
+  "TRAWL_AUTOMARK": "Auto-mark blockers after trawling",
   "TO_PORT": "To Portal",
   "TYPE": "Type",
   "UNASSIGNED": "Unassigned",

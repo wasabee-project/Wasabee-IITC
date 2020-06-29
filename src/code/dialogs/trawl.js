@@ -26,8 +26,7 @@ const TrawlDialog = WDialog.extend({
   },
 
   _displayTrawlerDialog: function(tiles) {
-    const html = L.DomUtil.create("html");
-    const container = L.DomUtil.create("div", "container", html);
+    const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWLING", tiles);
     const stat = L.DomUtil.create("div", null, container);
@@ -62,7 +61,7 @@ const TrawlDialog = WDialog.extend({
 
     this._trawlerDialog = window.dialog({
       title: wX("TRAWL TITLE"),
-      html: html,
+      html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
       closeCallback: () => {
@@ -83,27 +82,38 @@ const TrawlDialog = WDialog.extend({
 
   // define our work in _displayDialog
   _displayDialog: function() {
-    const html = L.DomUtil.create("html");
-    const container = L.DomUtil.create("div", "container", html);
+    const container = L.DomUtil.create("div", "container");
+
+    const options = L.DomUtil.create("div", null, container);
+    const clearLabel = L.DomUtil.create("label", null, options);
+    clearLabel.textContent = wX("TRAWL_CLEAR_MARKERS");
+    const clearMarkers = L.DomUtil.create("input", null, clearLabel);
+    clearMarkers.type = "checkbox";
+    clearMarkers.checked = false;
+
+    const amLabel = L.DomUtil.create("label", null, options);
+    amLabel.textContent = wX("TRAWL_AUTOMARK");
+    const automark = L.DomUtil.create("input", null, amLabel);
+    automark.type = "checkbox";
+    automark.checked = false;
+    amLabel.display = "none";
+
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");
-    const zoomLabel = L.DomUtil.create("label", null, container);
-    zoomLabel.textContent = "Zoom Level:";
-    const zoomLevel = L.DomUtil.create("select", null, container);
-    let zl = 13;
-    while (zl < 16) {
-      const option = L.DomUtil.create("option", null, zoomLevel);
-      option.textContent = zl;
-      option.value = zl;
-      zl++;
-    }
+
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
     L.DomEvent.on(button, "click", () => {
+      if (clearMarkers.checked == true) {
+        this._clearMarkers();
+      }
       const points = this._getTrawlPoints();
-      this._pointTileDataRequest(points, zoomLevel.value);
+      this._pointTileDataRequest(points, 13);
       const tiles = window.plugin.wasabee.tileTrawlQueue.size;
       this._displayTrawlerDialog(tiles);
+      if (automark.checked == true) {
+        // move automark code from trawl dialog to uiCommands, call that
+      }
       this._dialog.dialog("close");
     });
 
@@ -113,8 +123,14 @@ const TrawlDialog = WDialog.extend({
     const crazyButton = L.DomUtil.create("button", null, container);
     crazyButton.textContent = "Bulk Load Tile Data";
     L.DomEvent.on(crazyButton, "click", () => {
+      if (clearMarkers.checked == true) {
+        this._clearMarkers();
+      }
       const points = this._getTrawlPoints();
-      this._bulkLoad(points, zoomLevel.value);
+      this._bulkLoad(points, 14);
+      if (automark.checked == true) {
+        // automark
+      }
       this._dialog.dialog("close");
     });
 
@@ -125,7 +141,7 @@ const TrawlDialog = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("TRAWL TITLE"),
-      html: html,
+      html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
       closeCallback: () => {
@@ -276,6 +292,20 @@ const TrawlDialog = WDialog.extend({
       this.tileRequestNext.call(this)
     );
     alert("trawl done");
+  },
+
+  _clearMarkers: function() {
+    const operation = getSelectedOperation();
+
+    operation.startBatchMode();
+    for (const m of operation.markers) {
+      if (
+        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY ||
+        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS
+      )
+        operation.removeMarker(m);
+    }
+    operation.endBatchMode();
   },
 
   _bulkLoad: function(latlngs, mapZoom) {
