@@ -94,9 +94,9 @@ const TrawlDialog = WDialog.extend({
 
     const amLabel = L.DomUtil.create("label", null, options);
     amLabel.textContent = wX("TRAWL_AUTOMARK");
-    const automark = L.DomUtil.create("input", null, amLabel);
-    automark.type = "checkbox";
-    automark.checked = false;
+    this.automark = L.DomUtil.create("input", null, amLabel);
+    this.automark.type = "checkbox";
+    this.automark.checked = false;
 
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");
@@ -104,29 +104,26 @@ const TrawlDialog = WDialog.extend({
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
     L.DomEvent.on(button, "click", () => {
-      if (clearMarkers.checked == true) {
-        this._clearMarkers();
-      }
+      const op = getSelectedOperation();
+      if (clearMarkers.checked == true) this._clearMarkers();
+      op.blockers = Array();
       const points = this._getTrawlPoints();
       this._pointTileDataRequest(points, 13);
       const tiles = window.plugin.wasabee.tileTrawlQueue.size;
       this._displayTrawlerDialog(tiles);
-      if (automark.checked == true) blockerAutomark(getSelectedOperation());
       this._dialog.dialog("close");
     });
 
     const crazyWarning = L.DomUtil.create("h4", null, container);
-    crazyWarning.textContent =
-      "This method loads the tile data as quickly as possible. Use at your own risk.";
+    crazyWarning.textContent = wX("TRAWL_BULK_LOAD_WARNING");
     const crazyButton = L.DomUtil.create("button", null, container);
-    crazyButton.textContent = "Bulk Load Tile Data";
+    crazyButton.textContent = wX("TRAWL_BULK_LOAD");
     L.DomEvent.on(crazyButton, "click", () => {
-      if (clearMarkers.checked == true) {
-        this._clearMarkers();
-      }
+      const op = getSelectedOperation();
+      op.blockers = Array();
+      if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
-      if (automark.checked == true) blockerAutomark(getSelectedOperation());
       this._dialog.dialog("close");
     });
 
@@ -287,6 +284,7 @@ const TrawlDialog = WDialog.extend({
     window.removeHook("mapDataRefreshEnd", () =>
       this.tileRequestNext.call(this)
     );
+    if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     alert("trawl done");
   },
 
@@ -305,10 +303,12 @@ const TrawlDialog = WDialog.extend({
   },
 
   _bulkLoad: function(latlngs, mapZoom) {
+    window.addHook("mapDataRefreshEnd", this.bulkLoadDone.call(this));
+
     if (latlngs.length == 0) return;
     const mdr = window.mapDataRequest;
     mdr.debugTiles.reset();
-    // const oldDebugTiles = window.mapDataRequest.debugTiles;
+    this.oldDebugTiles = window.mapDataRequest.debugTiles;
     window.mapDataRequest.debugTiles = new FakeDebugTiles();
 
     const dataZoom = window.getDataZoomForMapZoom(mapZoom);
@@ -340,11 +340,17 @@ const TrawlDialog = WDialog.extend({
     // render the results
     mdr.pauseRenderQueue(false);
 
-    // do a real dialog, close on mapDataRefreshEnd, restore oldDebugTiles then
-    // mdr.debugTiles = oldDebugTiles;
-    alert(
-      "please wait until status says 'done' ..., if the first didn't trigger a load, close this and do it again"
+    this.bulkAlert = alert(
+      "please wait until status says 'done'; If the first didn't trigger a load, close this dialog and try again"
     );
+  },
+
+  bulkLoadDone: function() {
+    window.removeHook("mapDataRefreshEnd", this.bulkLoadDone.call(this));
+    window.mapDataRequest.debugTiles = this.oldDebugTiles;
+    this.bulkAlert.dialog("close");
+    if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
+    alert("bulk data load done");
   }
 });
 
@@ -358,7 +364,7 @@ class FakeDebugTiles {
   }
 
   setState() {
-    console.log("fdt setState");
+    // console.log("fdt setState");
   }
 
   runClearPass() {
