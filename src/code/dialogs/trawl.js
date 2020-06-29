@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+import { blockerAutomark } from "../uiCommands";
 // why trust my own math when someone else has done the work?
 import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
 // import { datums } from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-datum";
@@ -96,7 +97,6 @@ const TrawlDialog = WDialog.extend({
     const automark = L.DomUtil.create("input", null, amLabel);
     automark.type = "checkbox";
     automark.checked = false;
-    amLabel.display = "none";
 
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");
@@ -111,9 +111,7 @@ const TrawlDialog = WDialog.extend({
       this._pointTileDataRequest(points, 13);
       const tiles = window.plugin.wasabee.tileTrawlQueue.size;
       this._displayTrawlerDialog(tiles);
-      if (automark.checked == true) {
-        // move automark code from trawl dialog to uiCommands, call that
-      }
+      if (automark.checked == true) blockerAutomark(getSelectedOperation());
       this._dialog.dialog("close");
     });
 
@@ -128,9 +126,7 @@ const TrawlDialog = WDialog.extend({
       }
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
-      if (automark.checked == true) {
-        // automark
-      }
+      if (automark.checked == true) blockerAutomark(getSelectedOperation());
       this._dialog.dialog("close");
     });
 

@@ -4,9 +4,9 @@ import { getSelectedOperation } from "../selectedOp";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
-  loadFaked
+  loadFaked,
+  blockerAutomark
 } from "../uiCommands";
-import WasabeePortal from "../portal";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
 
@@ -52,7 +52,7 @@ const BlockerList = WDialog.extend({
       window.runHooks("wasabeeUIUpdate", this._operation);
     };
     buttons[wX("AUTOMARK")] = () => {
-      this.automark();
+      blockerAutomark(this._operation);
     };
     buttons[wX("RESET")] = () => {
       this._operation.blockers = new Array();
@@ -150,66 +150,6 @@ const BlockerList = WDialog.extend({
     content.sortAsc = !sortAsc; // I don't know why this flips
     content.items = this._operation.blockers;
     return content;
-  },
-
-  automark() {
-    // build count list
-    const portals = new Array();
-    for (const b of this._operation.blockers) {
-      if (
-        !this._operation.containsMarkerByID(
-          b.fromPortalId,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
-        )
-      )
-        portals.push(b.fromPortalId);
-      if (
-        !this._operation.containsMarkerByID(
-          b.toPortalId,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
-        )
-      )
-        portals.push(b.toPortalId);
-    }
-    const reduced = {};
-    for (const p of portals) {
-      if (!reduced[p]) reduced[p] = 0;
-      reduced[p]++;
-    }
-    const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
-
-    // return from recursion
-    if (sorted.length == 0) return;
-
-    const portalId = sorted[0][0];
-
-    // put in some smarts for picking close portals, rather than random ones
-    // when the count gets > 3
-
-    // get WasabeePortal for portalId
-    let wportal = this._operation.getPortal(portalId);
-    if (!wportal) wportal = WasabeePortal.get(portalId);
-    if (!wportal) {
-      alert(wX("AUTOMARK STOP"));
-      return;
-    }
-    // console.log(wportal);
-
-    // add marker
-    let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
-    if (wportal.team == "E") {
-      type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
-    }
-    this._operation.addMarker(type, wportal, "auto-marked");
-
-    // remove nodes from blocker list
-    this._operation.blockers = this._operation.blockers.filter(b => {
-      if (b.fromPortalId == portalId || b.toPortalId == portalId) return false;
-      return true;
-    });
-    window.runHooks("wasabeeUIUpdate", this._operation);
-    // recurse
-    this.automark();
   }
 });
 

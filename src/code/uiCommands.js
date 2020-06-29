@@ -259,3 +259,68 @@ export const testPortal = function(recursed = false) {
   // if recrused and still getting garbage, we have a problem
   return parsed;
 };
+
+// recursive function to auto-mark blockers
+export const blockerAutomark = function(operation, first = true) {
+  if (first) operation.startBatchmode();
+  // build count list
+  const portals = new Array();
+  for (const b of operation.blockers) {
+    if (
+      !operation.containsMarkerByID(
+        b.fromPortalId,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+      )
+    )
+      portals.push(b.fromPortalId);
+    if (
+      !operation.containsMarkerByID(
+        b.toPortalId,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+      )
+    )
+      portals.push(b.toPortalId);
+  }
+  const reduced = {};
+  for (const p of portals) {
+    if (!reduced[p]) reduced[p] = 0;
+    reduced[p]++;
+  }
+  const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
+
+  // return from recursion
+  if (sorted.length == 0) {
+    if (first) operation.endBatchmode();
+    window.runHooks("wasabeeUIUpdate", operation);
+    return;
+  }
+
+  const portalId = sorted[0][0];
+
+  // put in some smarts for picking close portals, rather than random ones
+  // when the count gets > 3
+
+  // get WasabeePortal for portalId
+  let wportal = operation.getPortal(portalId);
+  if (!wportal) wportal = WasabeePortal.get(portalId);
+  if (!wportal) {
+    alert(wX("AUTOMARK STOP"));
+    return;
+  }
+  // console.log(wportal);
+
+  // add marker
+  let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
+  if (wportal.team == "E") {
+    type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
+  }
+  operation.addMarker(type, wportal, "auto-marked");
+
+  // remove nodes from blocker list
+  operation.blockers = operation.blockers.filter(b => {
+    if (b.fromPortalId == portalId || b.toPortalId == portalId) return false;
+    return true;
+  });
+  // recurse
+  blockerAutomark(operation, false);
+};
