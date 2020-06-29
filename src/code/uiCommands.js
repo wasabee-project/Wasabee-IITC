@@ -262,7 +262,7 @@ export const testPortal = function(recursed = false) {
 
 // recursive function to auto-mark blockers
 export const blockerAutomark = function(operation, first = true) {
-  if (first) operation.startBatchmode();
+  if (first) operation.startBatchMode();
   // build count list
   const portals = new Array();
   for (const b of operation.blockers) {
@@ -290,7 +290,7 @@ export const blockerAutomark = function(operation, first = true) {
 
   // return from recursion
   if (sorted.length == 0) {
-    if (first) operation.endBatchmode();
+    if (first) operation.endBatchMode();
     window.runHooks("wasabeeUIUpdate", operation);
     return;
   }
