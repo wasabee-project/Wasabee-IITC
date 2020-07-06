@@ -108,6 +108,18 @@ export default class WasabeeMarker {
         marker.closePopup();
       });
     }
+    const gmapButton = L.DomUtil.create("button", null, buttonSet);
+    gmapButton.textContent = wX("ANCHOR_GMAP");
+    L.DomEvent.on(gmapButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      marker.closePopup();
+      window.open(
+        "https://www.google.com/maps/search/?api=1&query=" +
+          portal.lat +
+          "," +
+          portal.lng
+      );
+    });
 
     return content;
   }
