@@ -11,7 +11,6 @@ import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
 export const initFirebase = () => {
   const server = GetWasabeeServer();
 
-  // const $iframe = $("<iframe></iframe>") .width(0) .height(0) .attr("src", server + "/static/firebase/");
   const iframe = L.DomUtil.create("iframe");
   iframe.width = 0;
   iframe.height = 0;
@@ -21,16 +20,15 @@ export const initFirebase = () => {
 
   window.addEventListener("message", event => {
     // ignore anything not from our server
-    console.log(event);
-
     if (event.origin.indexOf(server) === -1) return;
 
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
       case "Generic Message":
-        alert(JSON.stringify(event));
+        alert(JSON.stringify(event.data.data));
         break;
       case "Agent Location Change":
+        console.log("firebase update of agent location: ", event.data.data);
         drawAgents();
         break;
       case "Map Change":
@@ -38,7 +36,10 @@ export const initFirebase = () => {
           function(refreshed) {
             refreshed.store();
             if (refreshed.ID == operation.ID) {
-              console.log("firebase trigger reload of current op");
+              console.log(
+                "firebase trigger reload of current op: ",
+                event.data.data
+              );
               makeSelectedOperation(refreshed.ID);
             }
           },
@@ -47,8 +48,12 @@ export const initFirebase = () => {
           }
         );
         break;
+      case "Login":
+        // display to console somehow?
+        console.log("server reported teammate login: ", event.data.data.gid);
+        break;
       default:
-        console.log("ignored firebase event: ", event.data.data.cmd);
+        console.log("unknown firebase command: ", event.data.data);
     }
   });
 };
