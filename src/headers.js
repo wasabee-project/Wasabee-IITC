@@ -1,13 +1,13 @@
 // ==UserScript==
-// @id           
-// @name         
-// @namespace    
-// @version      
-// @updateURL    
-// @downloadURL  
-// @description  
-// @author       
+// @id
+// @name
+// @namespace
+// @version
+// @updateURL
+// @downloadURL
+// @description
+// @author
 // @include      https://intel.ingress.com/*
-// @category     
+// @category
 // @grant        none
 // ==/UserScript==

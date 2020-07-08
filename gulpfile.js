@@ -12,7 +12,6 @@ const del = require("del");
 const webpack = require("webpack");
 const PluginError = require("plugin-error");
 const log = require("fancy-log");
-const jest = require("gulp-jest").default;
 const prettier = require("gulp-prettier");
 
 const ensureDirectoryExistence = filePath => {
@@ -90,20 +89,6 @@ gulp.task("buildheaders", cb => {
   status.headers = newContent;
 
   cb();
-});
-
-gulp.task("jest", callback => {
-  process.env.NODE_ENV = "test";
-  gulp.src(cfg.src.test).pipe(
-    jest({
-      preprocessorIgnorePatterns: [
-        "<rootDir>/dist/",
-        "<rootDir>/node_modules/"
-      ],
-      automock: false
-    })
-  );
-  callback();
 });
 
 gulp.task("webpack", callback => {
@@ -204,14 +189,7 @@ gulp.task("prettier", () => {
 
 gulp.task(
   "build",
-  gulp.series([
-    "buildheaders",
-    "buildmeta",
-    //"jest",
-    "webpack",
-    "buildplugin",
-    "eslint"
-  ])
+  gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"])
 );
 
 gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
