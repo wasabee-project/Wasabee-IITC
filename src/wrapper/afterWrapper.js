@@ -1,8 +1,8 @@
 //wrapper end
 
 // inject code into site context
-var script = document.createElement("script");
-var info = {};
+const script = document.createElement("script");
+const info = {};
 if (typeof GM_info !== "undefined" && GM_info && GM_info.script) {
   info.script = {
     version: GM_info.script.version,
