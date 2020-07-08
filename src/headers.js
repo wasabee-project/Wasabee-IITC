@@ -1,13 +1,13 @@
 // ==UserScript==
-// @id           wasabee.user.js
-// @name         IITC plugin: Wasabee Draw Tools
-// @namespace    https://wasabee.rocks/
-// @version      0.18.BUILDDATE
-// @updateURL    https://server.wasabee.rocks/static/dev/wasabee.meta.js
-// @downloadURL  https://server.wasabee.rocks/static/dev/wasabee.user.js
-// @description  Wasabee is not for dating.
-// @author       Wasabee Project Team
+// @id           
+// @name         
+// @namespace    
+// @version      
+// @updateURL    
+// @downloadURL  
+// @description  
+// @author       
 // @include      https://intel.ingress.com/*
-// @category     Draw
+// @category     
 // @grant        none
 // ==/UserScript==
