@@ -1,7 +1,6 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import { teamPromise } from "./server";
-import { getLanguage } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -297,11 +296,7 @@ const updateAnchors = op => {
     return;
   }
 
-  const lang = getLanguage();
-  const restore = op.color;
-  if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
-    op.color = "SE";
-  }
+  // XXX skin logic here
 
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
@@ -326,7 +321,6 @@ const updateAnchors = op => {
   for (const [k, v] of layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
-  op.color = restore;
 };
 
 /** This function adds a portal to the portal layer group */

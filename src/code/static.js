@@ -48,7 +48,6 @@ W.static = {
     SEND_LOCATION_KEY: "wasabee-send-location",
     LANGUAGE_KEY: "wasabee-language",
     DEFAULT_LANGUAGE: "English",
-    SECONDARY_LANGUAGE: "Squirrel",
     MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
     MULTIMAX_UNREACHABLE_KEY: "wasabee-mm-unreachable",
@@ -96,8 +95,6 @@ W.static.strings.English = require("./translations/english.json");
 W.static.strings.Italiano = require("./translations/italian.json");
 W.static.strings.Tagalog = require("./translations/filipino.json");
 W.static.strings.French = require("./translations/french.json");
-W.static.strings.Squirrel = require("./translations/squirrel.json");
-W.static.strings.Emoji = require("./translations/emoji.json");
 W.static.tips = require("./translations/tips.json");
 
 W.static.markerTypes = new Map([
@@ -338,23 +335,6 @@ W.static.layerTypes = new Map([
       },
       portal: {
         iconUrl: require("./images/marker_layer_groupf.png")
-      }
-    }
-  ],
-  [
-    "SE",
-    {
-      name: "SE",
-      displayName: "Special Edition",
-      color: "#333333",
-      link: {
-        dashArray: [5, 1, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2
-      },
-      portal: {
-        iconUrl: require("./images/marker_layer_groupSE.png")
       }
     }
   ],

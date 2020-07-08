@@ -11,7 +11,7 @@ import {
   setupLocalStorage
 } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
-import { wX, getLanguage } from "../wX";
+import { wX } from "../wX";
 import { logoutPromise } from "../server";
 
 const WasabeeButton = WButton.extend({
@@ -156,18 +156,8 @@ const WasabeeButton = WButton.extend({
   },
 
   getIcon: function() {
-    const lang = getLanguage();
-    // if the seconary langauge is set, use its icon
-    if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
-      if (this._lastLoginState) {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg //green eyed
-          .default;
-      } else {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se //non-green eyed
-          .default;
-      }
-    }
-    // regular icon, two states
+    // XXX skin logic here
+
     if (this._lastLoginState) {
       return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in //green bee image
         .default;

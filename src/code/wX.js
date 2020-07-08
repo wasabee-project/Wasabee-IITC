@@ -32,6 +32,9 @@ export const wX = (key, value, option) => {
 };
 
 export const getLanguage = () => {
+  // XXX if a skin is set, check to see if it has a langauge pack
+  //
+
   // load the selected language, or use DEFAULT_LANGUAGE if not set
   let lang = localStorage[localStoreKey];
   if (!lang) {
