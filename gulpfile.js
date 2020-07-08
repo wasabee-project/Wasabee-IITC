@@ -49,26 +49,27 @@ gulp.task("clear", cb => {
 
 // build tasks
 gulp.task("buildheaders", cb => {
-  let content = fs.readFileSync(cfg.src.meta, "utf8"),
-    rmHeaders = cfg.headers[status.mode],
-    commonHeaders = cfg.headers.common;
+  const content = fs.readFileSync(cfg.src.meta, "utf8");
 
-  // release mode headers
-  for (const k in rmHeaders) {
-    content = content.replace(
-      new RegExp(`(//\\s*@${k}\\s+){{}}`),
-      `$1${rmHeaders[k]}`
-    );
+  let newContent = "";
+  for (const l of content.split("\n")) {
+    let newline = l;
+    for (const k of Object.keys(cfg.headers.common)) {
+      if (l.indexOf(`@${k} `) == 3) {
+        newline = `// @${k} 	 ${cfg.headers.common[k]}`;
+        break;
+      }
+    }
+    for (const k of Object.keys(cfg.headers[status.mode])) {
+      if (l.indexOf(`@${k} `) == 3) {
+        newline = `// @${k} 	 ${cfg.headers[status.mode][k]}`;
+        break;
+      }
+    }
+    newContent += newline + "\n";
   }
 
-  // common headers
-  for (let k in commonHeaders) {
-    content = content.replace(
-      new RegExp(`(//\\s*@${k}\\s+){{}}`),
-      `$1${commonHeaders[k]}`
-    );
-  }
-
+  // XXX just append to the version rather than overwriting a fixed string now
   const gbd = () => {
     const d = new Date();
     let bd = d.getFullYear();
@@ -84,9 +85,9 @@ gulp.task("buildheaders", cb => {
     bd += t;
     return bd;
   };
-  content = content.replace("BUILDDATE", gbd());
+  newContent = newContent.replace("BUILDDATE", gbd());
 
-  status.headers = content;
+  status.headers = newContent;
 
   cb();
 });
