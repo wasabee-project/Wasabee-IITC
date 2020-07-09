@@ -107,9 +107,9 @@ const resetLinks = operation => {
   if (!operation.links || operation.links.length == 0) return;
 
   // pre-fetch the op color outside the loop -- is this actually helpful?
-  let style = Wasabee.static.layerTypes.get("main");
-  if (Wasabee.static.layerTypes.has(operation.color)) {
-    style = Wasabee.static.layerTypes.get(operation.color);
+  let style = Wasabee.skin.layerTypes.get("main");
+  if (Wasabee.skin.layerTypes.has(operation.color)) {
+    style = Wasabee.skin.layerTypes.get(operation.color);
   }
   style.link.color = style.color;
 
@@ -133,9 +133,9 @@ const updateLinks = operation => {
   }
 
   // pre-fetch the op color outside the loop
-  let style = Wasabee.static.layerTypes.get("main");
-  if (Wasabee.static.layerTypes.has(operation.color)) {
-    style = Wasabee.static.layerTypes.get(operation.color);
+  let style = Wasabee.skin.layerTypes.get("main");
+  if (Wasabee.skin.layerTypes.has(operation.color)) {
+    style = Wasabee.skin.layerTypes.get(operation.color);
   }
   // because ... reasons?
   style.link.color = style.color;
@@ -166,8 +166,8 @@ const updateLinks = operation => {
 /** This function adds a link to the link layer group */
 const addLink = (wlink, style, operation) => {
   // determine per-link color
-  if (wlink.color != "main" && Wasabee.static.layerTypes.has(wlink.color)) {
-    const linkLt = Wasabee.static.layerTypes.get(wlink.color);
+  if (wlink.color != "main" && Wasabee.skin.layerTypes.has(wlink.color)) {
+    const linkLt = Wasabee.skin.layerTypes.get(wlink.color);
     style = linkLt.link;
     style.color = linkLt.color;
   }

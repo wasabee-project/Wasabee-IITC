@@ -136,7 +136,7 @@ const WasabeeButton = WButton.extend({
 
     this._SettingsActions = [
       {
-        img: window.plugin.wasabee.static.images.toolbar_settings.default,
+        img: window.plugin.wasabee.skin.images.toolbar_settings.default,
         title: "Settings",
         text: "",
         callback: () => {
@@ -159,10 +159,9 @@ const WasabeeButton = WButton.extend({
     // XXX skin logic here
 
     if (this._lastLoginState) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in //green bee image
-        .default;
+      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_in.default; //green bee image
     } else {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out //yellow bee image
+      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_out //yellow bee image
         .default;
     }
   },

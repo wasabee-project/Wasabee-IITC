@@ -112,9 +112,8 @@ const dLoadDetails = e => {
   submap.set("details", e.details);
   window.plugin.wasabee._Dkeys.set(e.guid, submap);
 
-  const icon = window.plugin.wasabee.static.markerTypes.get(
-    "GetKeyPortalMarker"
-  ).markerIconDone.default;
+  const icon = window.plugin.wasabee.skin.markerTypes.get("GetKeyPortalMarker")
+    .markerIconDone.default;
 
   const latLng = new L.LatLng(
     (e.details.latE6 / 1e6).toFixed(6),

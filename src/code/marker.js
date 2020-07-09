@@ -37,10 +37,10 @@ export default class WasabeeMarker {
   }
 
   get icon() {
-    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
-      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    if (!window.plugin.wasabee.skin.markerTypes.has(this.type)) {
+      this.type = window.plugin.wasabee.skin.constants.DEFAULT_MARKER_TYPE;
     }
-    const marker = window.plugin.wasabee.static.markerTypes.get(this.type);
+    const marker = window.plugin.wasabee.skin.markerTypes.get(this.type);
     let img = marker.markerIcon.default;
     switch (this.state) {
       case "pending":

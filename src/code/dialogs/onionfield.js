@@ -117,7 +117,7 @@ const OnionfieldDialog = WDialog.extend({
       return;
     }
     this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
       this._colors.push(k);
       this._trash = c;
     }

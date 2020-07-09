@@ -48,9 +48,9 @@ export default class WasabeeAnchor {
   }
 
   get icon() {
-    let lt = window.plugin.wasabee.static.layerTypes.get("main");
-    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
-      lt = window.plugin.wasabee.static.layerTypes.get(this.color);
+    let lt = window.plugin.wasabee.skin.layerTypes.get("main");
+    if (window.plugin.wasabee.skin.layerTypes.has(this.color)) {
+      lt = window.plugin.wasabee.skin.layerTypes.get(this.color);
     }
     return lt.portal.iconUrl.default;
   }

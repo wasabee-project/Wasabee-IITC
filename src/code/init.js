@@ -7,6 +7,7 @@ import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
+import { initSkin } from "./skin";
 import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
@@ -37,8 +38,7 @@ window.plugin.wasabee.init = function() {
   setupLocalStorage();
   initSelectedOperation();
   initServer();
-
-  addCSS("main", Wasabee.static.CSS.main);
+  initSkin();
 
   Wasabee.portalLayerGroup = new L.LayerGroup();
   Wasabee.linkLayerGroup = new L.LayerGroup();
@@ -130,19 +130,8 @@ window.plugin.wasabee.init = function() {
     window.runHooks("wasabeeDkeys");
 };
 
-const addCSS = (name, content) => {
-  const c = L.DomUtil.create("style", null, document.head);
-  c.textContent = content;
-  c.id = "wasabee-css-" + name;
-
-  /* not used yet -- for future theme support; firefox doesn't support this */
-  /* const sheet = new CSSStyleSheet();
-  sheet.replaceSync(content);
-  // adoptedStyleSheets is frozen, can't use .push(); just overwrite w/ all
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]; */
-};
-
 // this can be moved to auth dialog, no need to init it for people who never log in
+// and use webpack, rather than importing it ourself
 const initGoogleAPI = () => {
   if (typeof window.gapi !== "undefined") {
     alert(

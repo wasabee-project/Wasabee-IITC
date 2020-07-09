@@ -64,13 +64,7 @@ const SettingsDialog = WDialog.extend({
 
     const current =
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
-    for (const l in window.plugin.wasabee.static.strings) {
-      const option = L.DomUtil.create("option", null, langMenu);
-      option.value = l;
-      option.textContent = l;
-      if (l == current) option.selected = true;
-    }
-    for (const l in window.plugin.wasabee.static.stringsSilly) {
+    for (const l in window.plugin.wasabee.skin.strings) {
       const option = L.DomUtil.create("option", null, langMenu);
       option.value = l;
       option.textContent = l;
