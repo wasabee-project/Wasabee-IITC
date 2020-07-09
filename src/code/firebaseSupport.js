@@ -8,6 +8,8 @@ import { drawAgents } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
 
+const frameID = "wasabeeFirebaseFrame";
+
 export const initFirebase = () => {
   const server = GetWasabeeServer();
 
@@ -15,6 +17,7 @@ export const initFirebase = () => {
   iframe.width = 0;
   iframe.height = 0;
   iframe.src = server + "/static/firebase/index.html";
+  iframe.id = frameID;
 
   $(document.body).append(iframe);
 
@@ -56,4 +59,8 @@ export const initFirebase = () => {
         console.log("unknown firebase command: ", event.data.data);
     }
   });
+};
+
+export const postToFirebase = message => {
+  window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 };

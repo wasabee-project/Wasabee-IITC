@@ -11,6 +11,7 @@ import {
   loadFaked
 } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const MarkerList = WDialog.extend({
   statics: {
@@ -20,6 +21,7 @@ const MarkerList = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = MarkerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: MarkerList.TYPE });
   },
 
   addHooks: function() {

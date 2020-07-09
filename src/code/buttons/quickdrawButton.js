@@ -2,6 +2,7 @@ import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import { postToFirebase } from "../firebaseSupport";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -57,6 +58,7 @@ const QuickDrawControl = L.Handler.extend({
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
+    postToFirebase({ id: "analytics", action: "quickdrawStart" });
   },
 
   disable: function() {
@@ -64,6 +66,7 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
+    postToFirebase({ id: "analytics", action: "quickdrawEnd" });
   },
 
   addHooks: function() {
@@ -128,12 +131,15 @@ const QuickDrawControl = L.Handler.extend({
       this.disable();
     }
     if (e.originalEvent.key === "/" || e.originalEvent.key === "g") {
+      postToFirebase({ id: "analytics", action: "quickdrawGuides" });
       this._guideLayerToggle();
     }
     if (e.originalEvent.key === "t" || e.originalEvent.key === "m") {
+      postToFirebase({ id: "analytics", action: "quickdrawMode" });
       this._toggleMode();
     }
     if (e.originalEvent.key === "X") {
+      postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
     }
   },

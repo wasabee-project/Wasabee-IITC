@@ -4,7 +4,7 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
-// import { pointTileDataRequest } from "../uiCommands";
+import { postToFirebase } from "../firebaseSupport";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -14,6 +14,7 @@ const ImportDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = ImportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: ImportDialog.TYPE });
   },
 
   addHooks: function() {

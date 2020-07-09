@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 // generic prompt screen
 
@@ -16,6 +17,7 @@ const PromptDialog = WDialog.extend({
     this._label = wX("NO_LABEL"); // should never be displayed
     this.placeholder = "";
     this.current = "";
+    postToFirebase({ id: "analytics", action: PromptDialog.TYPE });
   },
 
   addHooks: function() {

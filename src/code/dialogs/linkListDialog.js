@@ -6,6 +6,7 @@ import ConfirmDialog from "./confirmDialog";
 import { getAgent } from "../server";
 import wX from "../wX";
 import WasabeeMe from "../me";
+import { postToFirebase } from "../firebaseSupport";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -19,6 +20,7 @@ const LinkListDialog = WDialog.extend({
     this._label = wX("NO_LABEL");
     this.placeholder = "";
     this.current = "";
+    postToFirebase({ id: "analytics", action: LinkListDialog.TYPE });
   },
 
   addHooks: function() {

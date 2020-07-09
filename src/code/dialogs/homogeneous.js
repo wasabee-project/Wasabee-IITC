@@ -9,6 +9,7 @@ import {
   testPortal
 } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const HomogeneousDialog = WDialog.extend({
   statics: {
@@ -210,6 +211,7 @@ const HomogeneousDialog = WDialog.extend({
 
     this._urp = testPortal();
     this._failed = 0;
+    postToFirebase({ id: "analytics", action: HomogeneousDialog.TYPE });
   },
 
   hfield: function() {

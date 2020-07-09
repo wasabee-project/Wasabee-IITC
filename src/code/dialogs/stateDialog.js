@@ -3,6 +3,7 @@ import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 // import { stateLinkPromise, stateMarkerPromise } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -12,6 +13,7 @@ const StateDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = StateDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: StateDialog.TYPE });
   },
 
   addHooks: function() {

@@ -5,6 +5,8 @@ import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
+import { postToFirebase } from "../firebaseSupport";
+import { changeSkin } from "../skin";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -21,6 +23,7 @@ const SettingsDialog = WDialog.extend({
     this.type = SettingsDialog.TYPE;
     // call the parent classes initialize as well
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: SettingsDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -198,6 +201,26 @@ const SettingsDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] =
         trawlSelect.value;
+    });
+
+    const skinTitle = L.DomUtil.create("label", null, container);
+    skinTitle.textContent = "Skin";
+    const skinSelect = L.DomUtil.create("select", null, container);
+    const ss = localStorage[window.plugin.wasabee.static.constants.SKIN_KEY];
+    const ssMain = L.DomUtil.create("option", null, skinSelect);
+    ssMain.textContent = "main";
+    ssMain.value = "main";
+    for (const k of Object.getOwnPropertyNames(window.plugin.wasabeeSkins)) {
+      const option = L.DomUtil.create("option", null, skinSelect);
+      option.textContent = k;
+      option.value = k;
+      if (ss == k) option.selected = true;
+    }
+    L.DomEvent.on(skinSelect, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[window.plugin.wasabee.static.constants.SKIN_KEY] =
+        skinSelect.value;
+      changeSkin(skinSelect.value);
     });
 
     return container;

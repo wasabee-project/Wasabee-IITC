@@ -9,6 +9,7 @@ import PromptDialog from "./promptDialog";
 import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
 import { wX, getLanguage } from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 
 const AuthDialog = WDialog.extend({
@@ -19,6 +20,7 @@ const AuthDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = AuthDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: AuthDialog.TYPE });
   },
 
   addHooks: function() {
@@ -47,8 +49,6 @@ const AuthDialog = WDialog.extend({
       alert(wX("AUTH INCOMPAT"));
       return;
     }
-
-    console.log(document.cookie);
 
     const content = L.DomUtil.create("div", "content");
 
@@ -132,6 +132,7 @@ const AuthDialog = WDialog.extend({
         mePromise().then(
           () => {
             this._dialog.dialog("close");
+            postToFirebase({ id: "wasabeeLogin", method: "iOS" });
           },
           err => {
             alert(err);
@@ -217,6 +218,10 @@ const AuthDialog = WDialog.extend({
             const me = await mePromise();
             // me.store(); // mePromise calls WasabeeMe.create, which calls .store()
             this._dialog.dialog("close");
+            postToFirebase({
+              id: "wasabeeLogin",
+              method: "gsapiAuthImmediate"
+            });
           },
           reject => {
             console.log(reject);
@@ -262,6 +267,7 @@ const AuthDialog = WDialog.extend({
                 } else {
                   this._dialog.dialog("close");
                 }
+                postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
               },
               tokErr => {
                 console.log(tokErr);
@@ -288,6 +294,7 @@ const AuthDialog = WDialog.extend({
           } else {
             this._dialog.dialog("close");
           }
+          postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
         },
         tokErr => {
           console.log(tokErr);
@@ -318,6 +325,7 @@ const AuthDialog = WDialog.extend({
           () => {
             mePromise(); // needs .then...
             this._dialog.dialog("close");
+            postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
           },
           reject => {
             console.log(reject);

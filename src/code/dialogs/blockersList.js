@@ -9,6 +9,7 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
+import { postToFirebase } from "../firebaseSupport";
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -19,6 +20,7 @@ const BlockerList = WDialog.extend({
     this.type = BlockerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
+    postToFirebase({ id: "analytics", action: BlockerList.TYPE });
   },
 
   addHooks: function() {

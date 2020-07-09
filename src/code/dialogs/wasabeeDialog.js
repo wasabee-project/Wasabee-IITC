@@ -9,6 +9,7 @@ import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeDialog = WDialog.extend({
   statics: {
@@ -18,6 +19,7 @@ const WasabeeDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = WasabeeDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: WasabeeDialog.TYPE });
   },
 
   addHooks: async function() {

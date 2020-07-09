@@ -12,6 +12,7 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -21,6 +22,7 @@ const OpsDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = OpsDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: OpsDialog.TYPE });
   },
 
   addHooks: function() {

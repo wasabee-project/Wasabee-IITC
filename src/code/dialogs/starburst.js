@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 // import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const StarburstDialog = WDialog.extend({
   statics: {
@@ -109,6 +110,7 @@ const StarburstDialog = WDialog.extend({
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
+    postToFirebase({ id: "analytics", action: StarburstDialog.TYPE });
   },
 
   starburst: function() {

@@ -5,6 +5,7 @@ import WasabeeTeam from "../team";
 import WasabeeMe from "../me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const OpPermList = WDialog.extend({
   statics: {
@@ -14,6 +15,7 @@ const OpPermList = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = OpPermList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: OpPermList.TYPE });
   },
 
   addHooks: async function() {

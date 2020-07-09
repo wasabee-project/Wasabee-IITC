@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AboutDialog = WDialog.extend({
@@ -16,6 +17,7 @@ const AboutDialog = WDialog.extend({
     this.type = AboutDialog.TYPE;
     // call the parent classes initialize as well
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: AboutDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks

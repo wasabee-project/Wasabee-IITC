@@ -8,6 +8,7 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
+import { postToFirebase } from "../firebaseSupport";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -206,6 +207,7 @@ const MadridDialog = MultimaxDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
     this._urp = testPortal();
+    postToFirebase({ id: "analytics", action: MadridDialog.TYPE });
   },
 
   // fieldCoversPortal inherited from MultimaxDialog

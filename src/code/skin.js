@@ -1,4 +1,4 @@
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
 import addButtons from "./addButtons";
 
 const Wasabee = window.plugin.wasabee;
@@ -73,16 +73,11 @@ export const changeSkin = name => {
     )) {
       addCSS(k, window.plugin.wasabee.skin.CSS[k]);
     }
+    makeSelectedOperation(op.ID);
     addButtons(op);
-
     window.runHooks("wasabeeUIUpdate", op);
     return true;
   }
   console.log("Unknown skin " + name);
   return false;
-};
-
-// for testing
-window.plugin.wasabee.changeSkin = name => {
-  changeSkin(name);
 };

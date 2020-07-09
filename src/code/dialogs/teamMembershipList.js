@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import { teamPromise } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -11,6 +12,7 @@ const TeamMembershipList = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = TeamMembershipList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: TeamMembershipList.TYPE });
   },
 
   addHooks: function() {

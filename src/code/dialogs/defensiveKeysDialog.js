@@ -5,6 +5,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
+import { postToFirebase } from "../firebaseSupport";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -14,6 +15,7 @@ const DefensiveKeysDialog = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = DefensiveKeysDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: DefensiveKeysDialog.TYPE });
   },
 
   addHooks: async function() {

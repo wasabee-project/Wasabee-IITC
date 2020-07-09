@@ -4,6 +4,7 @@ import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import WasabeeMe from "../me";
+import { postToFirebase } from "../firebaseSupport";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -13,6 +14,7 @@ const KeyListPortal = WDialog.extend({
   initialize: function(map = window.map, options) {
     this.type = KeyListPortal.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: KeyListPortal.TYPE });
   },
 
   addHooks: function() {
