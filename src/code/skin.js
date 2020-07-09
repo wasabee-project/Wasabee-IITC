@@ -37,10 +37,14 @@ const resetCSS = () => {
 };
 
 export const changeSkin = name => {
+  const op = getSelectedOperation();
   if (name == "main") {
+    delete localStorage[window.plugin.wasabee.static.constants.SKIN_KEY];
     resetCSS();
     initSkin();
-    return;
+    addButtons(op);
+    window.runHooks("wasabeeUIUpdate", op);
+    return true;
   }
 
   if (
@@ -69,10 +73,13 @@ export const changeSkin = name => {
     )) {
       addCSS(k, window.plugin.wasabee.skin.CSS[k]);
     }
-    addButtons(getSelectedOperation());
+    addButtons(op);
 
-    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    window.runHooks("wasabeeUIUpdate", op);
+    return true;
   }
+  console.log("Unknown skin " + name);
+  return false;
 };
 
 // for testing

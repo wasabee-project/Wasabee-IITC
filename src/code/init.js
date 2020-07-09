@@ -7,7 +7,7 @@ import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
-import { initSkin } from "./skin";
+import { initSkin, changeSkin } from "./skin";
 import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
@@ -26,8 +26,10 @@ window.plugin.wasabee.init = function() {
 
   // no longer necessary on IITC-CE, but still needed on 0.26
   window.pluginCreateHook("wasabeeUIUpdate");
-
-  if (window.VALID_HOOKS.hookLength > hookLength) Wasabee.usingOldIITC = true;
+  if (window.VALID_HOOKS.hookLength > hookLength) {
+    alert("Wasabee probably won't work on this old version of IITC");
+    Wasabee.usingOldIITC = true;
+  }
 
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();
@@ -39,6 +41,13 @@ window.plugin.wasabee.init = function() {
   initSelectedOperation();
   initServer();
   initSkin();
+
+  const skin = localStorage[Wasabee.static.constants.SKIN_KEY];
+  if (skin && skin != "main") {
+    window.addHook("iitcLoaded", () => {
+      changeSkin(skin);
+    });
+  }
 
   Wasabee.portalLayerGroup = new L.LayerGroup();
   Wasabee.linkLayerGroup = new L.LayerGroup();
