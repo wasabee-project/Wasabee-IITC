@@ -14,7 +14,6 @@ const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = function() {
   if (Wasabee._inited) return;
-  Wasabee.portalDetailQueue = new Array();
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 
@@ -22,18 +21,16 @@ window.plugin.wasabee.init = function() {
 
   // check if using 'old' iitc
   const hookLength = window.VALID_HOOKS.hookLength;
-  Wasabee.usingOldIITC = false;
-
   // no longer necessary on IITC-CE, but still needed on 0.26
   window.pluginCreateHook("wasabeeUIUpdate");
   if (window.VALID_HOOKS.hookLength > hookLength) {
     alert("Wasabee probably won't work on this old version of IITC");
-    Wasabee.usingOldIITC = true;
   }
 
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
+  Wasabee.portalDetailQueue = new Array();
 
   // can this be moved to the auth dialog?
   initGoogleAPI();
@@ -124,8 +121,7 @@ window.plugin.wasabee.init = function() {
   window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
 
   // run crosslinks
-  if (!Wasabee.usingOldIITC || window.VALID_HOOKS.includes("wasabeeCrosslinks"))
-    window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not
@@ -135,8 +131,7 @@ window.plugin.wasabee.init = function() {
     WasabeeMe.get(true);
   }
 
-  if (!Wasabee.usingOldIITC || window.VALID_HOOKS.includes("wasabeeDkeys"))
-    window.runHooks("wasabeeDkeys");
+  window.runHooks("wasabeeDkeys");
 };
 
 // this can be moved to auth dialog, no need to init it for people who never log in

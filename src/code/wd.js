@@ -14,7 +14,7 @@ export const initWasabeeD = () => {
     true
   );
 
-  window.pluginCreateHook("wasabeeDkeys");
+  // window.pluginCreateHook("wasabeeDkeys"); // not needed after IITC 0.30
   window.addHook("wasabeeDkeys", () => {
     drawWasabeeDkeys();
   });

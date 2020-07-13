@@ -74,16 +74,8 @@ export const makeSelectedOperation = opID => {
   // redraw the screen, old version of IITC might not have set the hooks up yet
   // so make sure the hooks are there
   // VALID_HOOKS seems to be empty now?
-  if (
-    !window.plugin.wasabee.usingOldIITC ||
-    window.VALID_HOOKS.includes("wasabeeUIUpdate")
-  )
-    window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
-  if (
-    !window.plugin.wasabee.usingOldIITC ||
-    window.VALID_HOOKS.includes("wasabeeCrosslinks")
-  )
-    window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
+  window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
 };
 

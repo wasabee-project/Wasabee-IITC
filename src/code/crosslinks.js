@@ -307,7 +307,7 @@ const onMapDataRefreshEnd = () => {
 };
 
 export const initCrossLinks = () => {
-  window.pluginCreateHook("wasabeeCrosslinks");
+  // window.pluginCreateHook("wasabeeCrosslinks"); // not needed after IITC 0.30
   window.addHook("wasabeeCrosslinks", operation => {
     checkAllLinks(operation);
   });
