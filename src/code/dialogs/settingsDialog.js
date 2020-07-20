@@ -210,6 +210,7 @@ const SettingsDialog = WDialog.extend({
     const ssMain = L.DomUtil.create("option", null, skinSelect);
     ssMain.textContent = "main";
     ssMain.value = "main";
+    if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
     for (const k of Object.getOwnPropertyNames(window.plugin.wasabeeSkins)) {
       const option = L.DomUtil.create("option", null, skinSelect);
       option.textContent = k;
