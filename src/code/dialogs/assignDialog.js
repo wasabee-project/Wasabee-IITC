@@ -104,7 +104,7 @@ const AssignDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "wasabee-agent-menu");
     const menu = L.DomUtil.create("select", null, container);
     let option = menu.appendChild(L.DomUtil.create("option", null));
-    option.value = null;
+    option.value = "";
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
