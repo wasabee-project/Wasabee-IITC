@@ -15,7 +15,8 @@
             "description": "Wasabee is not for dating.",
             "author": "Wasabee Project Team",
             "category": "Draw",
-            "include": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
+            "include": "https://intel.ingress.com/*",
+            "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
             "version": "0.18.BUILDDATE",
 	    "grant": "none"
         }

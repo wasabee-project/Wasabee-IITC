@@ -146,6 +146,17 @@ export default class WasabeeAnchor {
         ad.enable();
         marker.closePopup();
       });
+
+      // needs wX
+      const sendButton = L.DomUtil.create("button", null, buttonSet);
+      sendButton.textContent = "Send as Target";
+      L.DomEvent.on(assignButton, "click", ev => {
+        L.DomEvent.stop(ev);
+        alert(
+          "send as target coming soon... select agent, select portal or route..."
+        );
+        marker.closePopup();
+      });
     }
 
     return content;

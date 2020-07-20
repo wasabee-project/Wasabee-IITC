@@ -380,13 +380,12 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
   });
 };
 
-export const targetPromise = function(agent, portal) {
+export const targetPromise = function(agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
-  const id = agent.id;
 
   return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/agent/${id}/target`;
+    const url = `${SERVER_BASE}/api/v1/agent/${agentID}/target`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
@@ -408,7 +407,41 @@ export const targetPromise = function(agent, portal) {
     };
 
     const fd = new FormData();
-    fd.append("id", id);
+    fd.append("id", agentID);
+    fd.append("portal", portal.name);
+    fd.append("ll", ll);
+    req.send(fd);
+  });
+};
+
+export const routePromise = function(agentID, portal) {
+  const SERVER_BASE = GetWasabeeServer();
+  const ll = portal.lat + "," + portal.lng;
+
+  return new Promise(function(resolve, reject) {
+    const url = `${SERVER_BASE}/api/v1/agent/${agentID}/route`;
+    const req = new XMLHttpRequest();
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+
+    const fd = new FormData();
+    fd.append("id", agentID);
     fd.append("portal", portal.name);
     fd.append("ll", ll);
     req.send(fd);

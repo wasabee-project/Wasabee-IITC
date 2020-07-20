@@ -1,6 +1,6 @@
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import { targetPromise, GetWasabeeServer } from "./server";
+import { targetPromise, routePromise, GetWasabeeServer } from "./server";
 import wX from "./wX";
 
 export default class WasabeeAgent {
@@ -76,6 +76,7 @@ export default class WasabeeAgent {
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
+
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", ev => {
@@ -86,19 +87,50 @@ export default class WasabeeAgent {
         return;
       }
 
-      const f = selectedPortal.displayName;
-      const name = this.name;
       const d = new ConfirmDialog();
-      d.setup(wX("SEND TARGET"), wX("SEND TARGET CONFIRM", f, name), () => {
-        targetPromise(this, selectedPortal).then(
-          function() {
-            alert(wX("TARGET SENT"));
-          },
-          function(reject) {
-            console.log(reject);
-          }
-        );
-      });
+      d.setup(
+        wX("SEND TARGET"),
+        wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
+        () => {
+          targetPromise(this.id, selectedPortal).then(
+            () => {
+              alert(wX("TARGET SENT"));
+            },
+            reject => {
+              console.log(reject);
+            }
+          );
+        }
+      );
+      d.enable();
+    });
+
+    // this needs wX
+    const requestRoute = L.DomUtil.create("button", null, content);
+    requestRoute.textContent = "Send Route to Target";
+    L.DomEvent.on(requestRoute, "click", ev => {
+      L.DomEvent.stop(ev);
+      const selectedPortal = WasabeePortal.getSelected();
+      if (!selectedPortal) {
+        alert(wX("SELECT PORTAL"));
+        return;
+      }
+
+      const d = new ConfirmDialog();
+      d.setup(
+        "Send Route to Target",
+        "Do you really want to request the route to be sent?",
+        () => {
+          routePromise(this.id, selectedPortal).then(
+            () => {
+              alert("Route Sent");
+            },
+            reject => {
+              console.log(reject);
+            }
+          );
+        }
+      );
       d.enable();
     });
     return content;
