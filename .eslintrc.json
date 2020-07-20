@@ -1,15 +1,18 @@
 {
   "parserOptions": {
-    "ecmaVersion": 2017,
+    "ecmaVersion": 11,
     "sourceType": "module"
   },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "env": {
     "browser": true,
-    "jest": true,
+    "jest": false,
     "es6": true,
     "node": true,
-    "jquery": true
+    "jquery": true,
+    "greasemonkey": true,
+    "commonjs": true,
+    "es2020": true
   },
   "rules": {
     "no-console": "off",
