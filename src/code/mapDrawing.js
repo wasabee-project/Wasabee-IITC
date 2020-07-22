@@ -1,6 +1,7 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import { teamPromise } from "./server";
+import { wX } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -185,7 +186,41 @@ const addLink = (wlink, style, operation) => {
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
   newlink.options.Wcolor = wlink.Wcolor;
+
+  newlink.bindPopup("loading...", {
+    className: "wasabee-popup",
+    closeButton: false
+  });
+
+  newlink.on(
+    "click",
+    ev => {
+      if (ev.target._popup._wrapper)
+        ev.target._popup._wrapper.classList.add("wasabee-popup");
+      const div = L.DomUtil.create("div", null);
+      const del = L.DomUtil.create("button", null, div);
+      del.textContent = wX("DELETE_LINK");
+      L.DomEvent.on(del, "click", () => {
+        operation.removeLink(wlink.fromPortalId, wlink.toPortalId);
+      });
+      const rev = L.DomUtil.create("button", null, div);
+      rev.textContent = wX("REVERSE");
+      L.DomEvent.on(rev, "click", () => {
+        operation.reverseLink(wlink.fromPortalId, wlink.toPortalId);
+      });
+      ev.target.setPopupContent(div);
+      ev.target.openPopup();
+      L.DomEvent.stop(ev);
+      return true;
+    },
+    newlink
+  );
   newlink.addTo(Wasabee.linkLayerGroup);
+
+  // XXX
+  // setText only works on polylines, not geodesic ones.
+  // newlink.on("mouseover", () => { console.log(newlink); // newlink.setText("  ►  ", { repeat: true, attributes: { fill: "red" } }); });
+  // newlink.on("mouseout", () => { newlink.setText(null); });
 };
 
 /** this function fetches and displays agent location */
@@ -295,8 +330,6 @@ const updateAnchors = op => {
     Wasabee.portalLayerGroup.clearLayers();
     return;
   }
-
-  // XXX skin logic here
 
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
