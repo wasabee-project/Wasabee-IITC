@@ -82,12 +82,12 @@ const AuthDialog = WDialog.extend({
     if (this._ios) {
       title.textContent = wX("AUTH IOS");
     }
-    if (this._andoroid) {
+    if (this._android) {
       title.textContent = wX("AUTH ANDROID");
     }
 
     if (this._android) {
-      const gsapiButtonOLD = L.DomUtil.create("button", "andriod", content);
+      const gsapiButtonOLD = L.DomUtil.create("button", "android", content);
       gsapiButtonOLD.textContent = wX("LOG IN QUICK");
       L.DomEvent.on(gsapiButtonOLD, "click", ev => {
         L.DomEvent.stop(ev);
@@ -102,6 +102,11 @@ const AuthDialog = WDialog.extend({
     // XXX until we can figure out why IITC-M iOS doesn't set the cookie very often
     if (this._ios) gapiButton.style.display = "none";
 
+    L.DomEvent.on(gapiButton, "click", ev => {
+      L.DomEvent.stop(ev);
+      this.gapiAuth.call(this);
+    });
+
     // XXX this needs to go away
     const menus = L.DomUtil.create("div", "options", content);
     menus.innerHTML =
@@ -109,10 +114,14 @@ const AuthDialog = WDialog.extend({
       "<span><label>Immediate</label>: <select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
     if (!this._android) menus.style.display = "none";
 
-    L.DomEvent.on(gapiButton, "click", ev => {
-      L.DomEvent.stop(ev);
-      this.gapiAuth.call(this);
-    });
+    if (!this._android && !this._ios) {
+      const gapiSelectButton = L.DomUtil.create("button", "gapi", content);
+      gapiSelectButton.textContent = wX("AUTH_SELECT_ACCOUNT");
+      L.DomEvent.on(gapiSelectButton, "click", ev => {
+        L.DomEvent.stop(ev);
+        this.gsapiAuthChoose.call(this);
+      });
+    }
 
     // webview cannot work on android IITC-M
     if (this._ios) {

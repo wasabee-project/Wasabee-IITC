@@ -57,6 +57,7 @@
   "AUTH IOS": "On iOS, use the main 'Log In'. if that fails do 'Webview Log in', log in; then use the 'Verify Webview' button to complete the process.",
   "AUTH REQUIRED": "Authentication Required",
   "AUTH TOKEN REJECTED": "Sending auth token to server rejected: ${value}",
+  "AUTH_SELECT_ACCOUNT": "Select account",
   "AUTODRAWS": "Wasabee Auto-draw Options",
   "AUTO_DRAWS": "Auto-draw",
   "AUTOLOAD": "Automatically Load Missing Portal Details",
