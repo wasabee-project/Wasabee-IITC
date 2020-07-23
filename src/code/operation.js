@@ -836,17 +836,22 @@ export default class WasabeeOp {
   // KOH always takes place on the server because non-write-access
   // agents need to make changes & sync
   keyOnHand(portalId, gid, onhand, capsule) {
+    if (typeof onhand == "string") {
+      onhand = Number.parseInt(onhand, 10);
+    }
+
     for (const k of this.keysonhand) {
+      // fix broken ops
+      if (typeof k.onhand == "string") {
+        k.onhand = Number.parseInt(k.onhand, 10);
+      }
+
       if (k.portalId == portalId && k.gid == gid) {
         k.onhand = onhand;
         k.capsule = capsule;
         this.update(false);
         return;
       }
-    }
-
-    if (typeof onhand == "string") {
-      onhand = Number.parseInt(onhand, 10);
     }
 
     const k = {
