@@ -1,6 +1,6 @@
 import { WButton } from "../leafletClasses";
 import WasabeeMe from "../me";
-import WasabeeDialog from "../dialogs/wasabeeDialog";
+import TeamListDialog from "../dialogs/teamListDialog";
 import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
@@ -53,7 +53,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new WasabeeDialog(this._map);
+        const wd = new TeamListDialog(this._map);
         wd.enable();
       },
       context: this,
@@ -88,7 +88,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new WasabeeDialog(this._map);
+        const wd = new TeamListDialog(this._map);
         wd.enable();
       },
       context: this,

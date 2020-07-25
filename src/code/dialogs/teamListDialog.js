@@ -11,15 +11,15 @@ import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
-const WasabeeDialog = WDialog.extend({
+const TeamListDialog = WDialog.extend({
   statics: {
     TYPE: "wasabeeButton",
   },
 
   initialize: function (map = window.map, options) {
-    this.type = WasabeeDialog.TYPE;
+    this.type = TeamListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: WasabeeDialog.TYPE });
+    postToFirebase({ id: "analytics", action: TeamListDialog.TYPE });
   },
 
   addHooks: async function () {
@@ -203,4 +203,4 @@ const WasabeeDialog = WDialog.extend({
   },
 });
 
-export default WasabeeDialog;
+export default TeamListDialog;
