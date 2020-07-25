@@ -228,7 +228,7 @@
   "READ": "lire",
   "REMOVE": "Supprimer",
   "REMOVE_TEAM": "Supprimer une \u00e9quipe",
-  "REMOVE_TEAM_CONFIRM_LABEL": "Voulez vous vraiment supprimer $value du serveur Wasabee ?",
+  "REMOVE_TEAM_CONFIRM_LABEL": "Voulez vous vraiment supprimer ${value} du serveur Wasabee ?",
   "REMOVE_TEAM_CONFIRM_TITLE": "supprimer l'\u00e9quipe ${value}",
   "REM_LOC_CP": "Supprimer la copie locale de ${value}",
   "RENAME": "Renommer",
