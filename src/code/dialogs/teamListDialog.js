@@ -38,6 +38,7 @@ const TeamListDialog = WDialog.extend({
   update: function () {
     // async
     if (!this._enabled) return;
+    this._me = WasabeeMe.get();
     // this._me = await WasabeeMe.waitGet(); // breaks logout
     this._dialog.html(this._buildContent());
   },
@@ -97,7 +98,7 @@ const TeamListDialog = WDialog.extend({
                 leaveTeamPromise(obj.ID).then(
                   async () => {
                     this._me = await WasabeeMe.waitGet(true);
-                    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                    //window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                   },
                   (err) => {
                     console.log(err);
@@ -162,7 +163,7 @@ const TeamListDialog = WDialog.extend({
         newTeamPromise(newname).then(
           () => {
             alert(wX("TEAM_CREATED", newname));
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            this._me = WasabeeMe.get(true);
           },
           (reject) => {
             console.log(reject);
