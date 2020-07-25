@@ -236,6 +236,7 @@ const ManageTeamDialog = WDialog.extend({
           deleteTeamPromise(this._team.ID).then(
             () => {
               alert(`${this._team.Name} removed`);
+              this._dialog.dialog("close");
               window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             },
             (reject) => {
