@@ -576,7 +576,7 @@
 }
 .wasabee-dialog-link div.container {
   display: grid;
-  grid-template-columns: (repeat 5, auto);
+  grid-template-columns: (repeat 4, auto);
   grid-tempate-rows: (repeat 4, auto);
 }
 
@@ -605,12 +605,12 @@
   grid-column: 4;
   margin: 5px;
 }
-.wasabee-dialog-link button.clear {
+/*.wasabee-dialog-link button.clear {
   grid-column: 5;
   text-decoration: underline;
   cursor: pointer;
   margin: 5px;
-}
+}*/
 
 .wasabee-dialog-link buttonall {
   cursor: pointer;
