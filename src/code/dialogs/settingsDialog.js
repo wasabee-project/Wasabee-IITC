@@ -93,6 +93,22 @@ const SettingsDialog = WDialog.extend({
       localStorage[c] = sendLocCheck.checked;
     });
 
+    const analyticsTitle = L.DomUtil.create("label", null, container);
+    analyticsTitle.textContent = wX("SEND ANALYTICS");
+    const analyticsCheck = L.DomUtil.create("input", null, container);
+    analyticsCheck.type = "checkbox";
+    if (
+      localStorage[
+        window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
+      ] === "true"
+    )
+      analyticsCheck.checked = true;
+    L.DomEvent.on(analyticsCheck, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] =
+        analyticsCheck.checked;
+    });
+
     const modeTitle = L.DomUtil.create("label", null, container);
     modeTitle.textContent = wX("WASABEE_MODE_LABEL");
     const modeSelect = L.DomUtil.create("select", null, container);
