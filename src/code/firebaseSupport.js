@@ -62,5 +62,13 @@ export const initFirebase = () => {
 };
 
 export const postToFirebase = message => {
+  // prevent analytics data from being sent if not enabled by the user: GPDR
+  if (
+    message.id == "analytics" &&
+    localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
+      "true"
+  )
+    return;
+
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 };

@@ -270,6 +270,7 @@
   "SELECT PORTAL": "Please select a portal first",
   "SEL_PORT_FIRST": "Please select anchor portals first!",
   "SELF SWAP": "Cannot swap a portal with itself! Select a different portal.",
+  "SEND ANALYTICS": "Send Anonymous Analytics",
   "SEND LOCATION": "Send Location",
   "SEND_LOC": "Send Location",
   "SEND TARGET CONFIRM": "Do you want to send ${value} target to ${option}?",
