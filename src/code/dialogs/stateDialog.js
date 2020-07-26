@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
-// import { stateLinkPromise, stateMarkerPromise } from "../server";
+import { SetMarkerState, SetLinkState } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
@@ -126,8 +126,42 @@ const StateDialog = WDialog.extend({
   },
 
   activeSetState: function(value) {
-    alert("Active mode set state not written yet");
-    console.log("not written yet", value);
+    if (this._type == "Marker") {
+      SetMarkerState(
+        this._operation.ID,
+        this._targetID,
+        value.srcElement.value
+      ).then(
+        resolve => {
+          console.log(resolve);
+          // changing it locally in battle mode will push the entire draw...
+          this._operation.setMarkerState(
+            this._targetID,
+            value.srcElement.value
+          );
+        },
+        reject => {
+          console.log(reject);
+        }
+      );
+    }
+
+    if (this._type == "Link") {
+      SetLinkState(
+        this._operation.ID,
+        this._targetID,
+        value.srcElement.value
+      ).then(
+        resolve => {
+          console.log(resolve);
+          // changing it locally in battle mode will push the entire draw...
+          this._operation.setLinkState(this._targetID, value.srcElement.value);
+        },
+        reject => {
+          console.log(reject);
+        }
+      );
+    }
   }
 });
 

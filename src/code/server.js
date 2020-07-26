@@ -516,6 +516,94 @@ export const SetTeamState = function(teamID, state) {
   });
 };
 
+export const SetMarkerState = function(opID, markerID, state) {
+  let action = "incomplete";
+  switch (state) {
+    case "acknowledged":
+      action = "acknowledge";
+      break;
+    case "pending":
+      action = "incomplete";
+      break;
+    case "completed":
+      action = "complete";
+      break;
+    default:
+      action = "incomplete";
+  }
+
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/${action}`;
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+
+    req.send();
+  });
+};
+
+export const SetLinkState = function(opID, linkID, state) {
+  let action = "incomplete";
+  switch (state) {
+    // no acknowledge for links -- use incomplete
+    case "pending":
+      action = "incomplete";
+      break;
+    case "completed":
+      action = "complete";
+      break;
+    default:
+      action = "incomplete";
+  }
+
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/${action}`;
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function() {
+      switch (req.status) {
+        case 200:
+          resolve();
+          break;
+        default:
+          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function() {
+      reject(`Network Error: ${req.responseText}`);
+    };
+
+    req.send();
+  });
+};
+
 export const opKeyPromise = function(opID, portalID, onhand, capsule) {
   const SERVER_BASE = GetWasabeeServer();
 
