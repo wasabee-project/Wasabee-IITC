@@ -67,6 +67,7 @@ const WasabeeButton = WButton.extend({
       callback: () => {
         localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
           "design";
+        delete localStorage["sentToServer"]; // resend firebase token on login
 
         logoutPromise().then(
           () => {
