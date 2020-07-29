@@ -136,7 +136,8 @@ const AuthDialog = WDialog.extend({
       const postwebviewButton = L.DomUtil.create("button", "webview", content);
       postwebviewButton.textContent = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
-      L.DomEvent.on(postwebviewButton, "click", async (ev) => {
+      L.DomEvent.on(postwebviewButton, "click", (ev) => {
+        // async
         L.DomEvent.stop(ev);
         mePromise().then(
           () => {
@@ -243,7 +244,8 @@ const AuthDialog = WDialog.extend({
 
   // this is probably the most correct, but doesn't seem to work properly
   // does making it async change anything?
-  gapiAuth: async function () {
+  gapiAuth: function () {
+    // async
     // console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,

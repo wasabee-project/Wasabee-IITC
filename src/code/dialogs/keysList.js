@@ -86,8 +86,8 @@ const KeysList = WDialog.extend({
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           cell.textContent = value;
-          const oh = parseInt(key.onHand);
-          const req = parseInt(key.Required);
+          const oh = parseInt(key.onHand, 10);
+          const req = parseInt(key.Required, 10);
           if (oh >= req) {
             L.DomUtil.addClass(cell, "enough");
           } else {
@@ -97,7 +97,7 @@ const KeysList = WDialog.extend({
       },
       {
         name: wX("ON_HAND"),
-        value: (key) => parseInt(key.onHand),
+        value: (key) => parseInt(key.onHand, 10),
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
@@ -120,7 +120,7 @@ const KeysList = WDialog.extend({
       sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
-          value: (key) => parseInt(key.iHave),
+          value: (key) => parseInt(key.iHave, 10),
           // sort: (a, b) => a - b,
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");

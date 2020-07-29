@@ -15,10 +15,9 @@ const log = require("fancy-log");
 const prettier = require("gulp-prettier");
 
 const ensureDirectoryExistence = (filePath) => {
-  var dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
+  const dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) return;
+
   ensureDirectoryExistence(dirname);
   fs.mkdirSync(dirname);
 };
@@ -187,11 +186,13 @@ gulp.task("prettier", () => {
     .pipe(gulp.dest("."));
 });
 
+// eslint at the end to catch unused variables, etc
 gulp.task(
   "build",
   gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"])
 );
 
+// eslint-fix to
 gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
 
 gulp.task(

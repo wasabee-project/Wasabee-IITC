@@ -183,7 +183,7 @@ const OnionfieldDialog = WDialog.extend({
     }
     // sort by distance
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
-    if (sorted.length == 0) return;
+    if (sorted.length == 0) return null;
 
     // for each of the portals in play
     for (const [k, wp] of sorted) {

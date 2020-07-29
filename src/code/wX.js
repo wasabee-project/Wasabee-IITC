@@ -29,7 +29,9 @@ export const wX = (key, value, option) => {
   if (!s) s = `${key} not in ${lang} or ${defaultLang}`;
 
   // do any necessary replacements
+  // eslint-disable-next-line
   if (option) s = s.replace("${option}", option);
+  // eslint-disable-next-line
   if (value) s = s.replace("${value}", value);
   return s;
 };

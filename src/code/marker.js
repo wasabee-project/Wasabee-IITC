@@ -55,6 +55,8 @@ export default class WasabeeMarker {
       case "acknowledged":
         img = marker.markerIconAcknowledged.default;
         break;
+      default:
+        img = marker.markerIcon.default;
     }
     return img;
   }

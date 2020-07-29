@@ -125,11 +125,11 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _getMyData(portalID) {
-    if (!window.plugin.wasabee._Dkeys) return;
-    if (!window.plugin.wasabee._Dkeys.has(portalID)) return;
+    if (!window.plugin.wasabee._Dkeys) return null;
+    if (!window.plugin.wasabee._Dkeys.has(portalID)) return null;
     const l = window.plugin.wasabee._Dkeys.get(portalID);
     if (l.has(this._me.GoogleID)) return l.get(this._me.GoogleID);
-    return;
+    return null;
   },
 });
 

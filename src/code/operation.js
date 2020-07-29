@@ -711,7 +711,7 @@ export default class WasabeeOp {
   }
 
   convertLinksToObjs(links) {
-    if (!links || links.length == 0) return;
+    if (!links || links.length == 0) return null;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -724,7 +724,7 @@ export default class WasabeeOp {
   }
 
   convertBlockersToObjs(links) {
-    if (!links || links.length == 0) return;
+    if (!links || links.length == 0) return null;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -737,7 +737,7 @@ export default class WasabeeOp {
   }
 
   convertMarkersToObjs(markers) {
-    if (!markers || markers.length == 0) return;
+    if (!markers || markers.length == 0) return null;
     const tmpMarkers = new Array();
     if (markers) {
       for (const m of markers) {
@@ -752,7 +752,7 @@ export default class WasabeeOp {
   }
 
   convertPortalsToObjs(portals) {
-    if (!portals || portals.length == 0) return;
+    if (!portals || portals.length == 0) return null;
     const tmpPortals = Array();
     for (const p of portals) {
       if (p instanceof WasabeePortal) {

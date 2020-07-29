@@ -173,7 +173,7 @@ const dLoadDetails = (e) => {
 };
 
 const getMarkerPopup = (PortalID) => {
-  if (!window.plugin.wasabee._Dkeys) return;
+  if (!window.plugin.wasabee._Dkeys) return null;
 
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
   if (window.plugin.wasabee._Dkeys.has(PortalID)) {

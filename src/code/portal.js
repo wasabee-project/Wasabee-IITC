@@ -36,10 +36,17 @@ export default class WasabeePortal {
   }
 
   static create(obj) {
-    if (typeof obj == "string") obj = JSON.parse(obj);
+    if (typeof obj == "string") {
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    }
     if (!obj || !obj.id) {
       console.log("can't create WasabeePortal from this");
-      return;
+      return null;
     }
     const wp = new WasabeePortal(
       obj.id,

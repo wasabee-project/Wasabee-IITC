@@ -349,7 +349,7 @@ export class GeodesicLine {
     // let r2d = 180.0 / Math.PI; //eslint-disable-line
     // maths based on http://williams.best.vwh.net/avform.htm#Int
     if (start.lng == end.lng) {
-      throw "Error: cannot calculate latitude for meridians";
+      throw new Error("Error: cannot calculate latitude for meridians");
     }
     // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
     this.lat1 = start.lat * d2r;

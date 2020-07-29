@@ -8,7 +8,8 @@ import wX from "./wX";
 
 export const addPortal = (operation, portal) => {
   if (!portal) {
-    return void alert(wX("SELECT PORTAL"));
+    alert(wX("SELECT PORTAL"));
+    return;
   }
   operation.addPortal(portal);
 };
