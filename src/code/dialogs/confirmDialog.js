@@ -21,7 +21,15 @@ const ConfirmDialog = WDialog.extend({
   addHooks: function() {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._displayDialog();
+    if (
+      localStorage[window.plugin.wasabee.static.constants.EXPERT_MODE_KEY] ==
+      "true"
+    ) {
+      console.log("expert mode: skipping dialog display");
+      if (this._callback) this._callback();
+    } else {
+      this._displayDialog();
+    }
   },
 
   removeHooks: function() {

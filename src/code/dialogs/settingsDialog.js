@@ -93,6 +93,18 @@ const SettingsDialog = WDialog.extend({
       localStorage[c] = sendLocCheck.checked;
     });
 
+    const expertTitle = L.DomUtil.create("label", null, container);
+    expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
+    const expertCheck = L.DomUtil.create("input", null, container);
+    expertCheck.type = "checkbox";
+    const exm = window.plugin.wasabee.static.constants.EXPERT_MODE_KEY;
+    const ex = localStorage[exm];
+    if (ex === "true") expertCheck.checked = true;
+    L.DomEvent.on(expertCheck, "change", ev => {
+      L.DomEvent.stop(ev);
+      localStorage[exm] = expertCheck.checked;
+    });
+
     const analyticsTitle = L.DomUtil.create("label", null, container);
     analyticsTitle.textContent = wX("SEND ANALYTICS");
     const analyticsCheck = L.DomUtil.create("input", null, container);
