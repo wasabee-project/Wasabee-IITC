@@ -13,40 +13,40 @@ import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeDialog = WDialog.extend({
   statics: {
-    TYPE: "wasabeeButton"
+    TYPE: "wasabeeButton",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = WasabeeDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     postToFirebase({ id: "analytics", action: WasabeeDialog.TYPE });
   },
 
-  addHooks: async function() {
+  addHooks: async function () {
     if (!this._map) return;
     this._me = await WasabeeMe.waitGet(true);
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     // magic context incantation to make "this" work...
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  update: async function() {
+  update: async function () {
     if (!this._enabled) return;
     // this._me = await WasabeeMe.waitGet(); // breaks logout
     this._dialog.html(this._buildContent());
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const teamlist = new Sortable();
     teamlist.fields = [
       {
         name: wX("TEAM_NAME"),
-        value: team => team.Name,
+        value: (team) => team.Name,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
           const link = L.DomUtil.create("a", null, row);
@@ -54,18 +54,18 @@ const WasabeeDialog = WDialog.extend({
           link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", ev => {
+            L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
               const td = new TeamMembershipList();
               td.setup(team.ID);
               td.enable();
             });
           }
-        }
+        },
       },
       {
         name: wX("STATE"),
-        value: team => team.State,
+        value: (team) => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
@@ -77,16 +77,16 @@ const WasabeeDialog = WDialog.extend({
             this._me = await WasabeeMe.waitGet(true);
             window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           };
-        }
+        },
       },
       {
         name: wX("LEAVE"),
-        value: team => team.State,
+        value: (team) => team.State,
         sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = wX("LEAVE");
-          L.DomEvent.on(link, "click", ev => {
+          L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
             const cd = new ConfirmDialog();
             cd.setup(
@@ -98,7 +98,7 @@ const WasabeeDialog = WDialog.extend({
                     this._me = await WasabeeMe.waitGet(true);
                     window.runHooks("wasabeeUIUpdate", getSelectedOperation());
                   },
-                  err => {
+                  (err) => {
                     console.log(err);
                     alert(err);
                   }
@@ -107,11 +107,11 @@ const WasabeeDialog = WDialog.extend({
             );
             cd.enable();
           });
-        }
+        },
       },
       {
         name: wX("MANAGE"),
-        value: team => team.ID,
+        value: (team) => team.ID,
         sort: null,
         format: (row, value, obj) => {
           row.textContent = "";
@@ -119,7 +119,7 @@ const WasabeeDialog = WDialog.extend({
             if (obj.State == "On" && ot.ID == obj.ID) {
               const link = L.DomUtil.create("a", "enl", row);
               link.textContent = wX("MANAGE");
-              L.DomEvent.on(link, "click", ev => {
+              L.DomEvent.on(link, "click", (ev) => {
                 L.DomEvent.stop(ev);
                 const mtd = new ManageTeamDialog();
                 mtd.setup(ot);
@@ -127,8 +127,8 @@ const WasabeeDialog = WDialog.extend({
               });
             }
           }
-        }
-      }
+        },
+      },
     ];
     teamlist.sortBy = 0;
 
@@ -138,7 +138,7 @@ const WasabeeDialog = WDialog.extend({
     return container;
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._me) {
       this.disable();
       const ad = new AuthDialog();
@@ -163,7 +163,7 @@ const WasabeeDialog = WDialog.extend({
             alert(wX("TEAM_CREATED", newname));
             window.runHooks("wasabeeUIUpdate", getSelectedOperation());
           },
-          reject => {
+          (reject) => {
             console.log(reject);
             alert(reject);
           }
@@ -183,12 +183,12 @@ const WasabeeDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.wasabeeButton
+      id: window.plugin.wasabee.static.dialogNames.wasabeeButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  toggleTeam: async function(teamID, currentState) {
+  toggleTeam: async function (teamID, currentState) {
     let newState = "Off";
     if (currentState == "Off") newState = "On";
 
@@ -197,9 +197,9 @@ const WasabeeDialog = WDialog.extend({
     return newState;
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-  }
+  },
 });
 
 export default WasabeeDialog;

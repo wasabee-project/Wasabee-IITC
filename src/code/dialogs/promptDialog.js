@@ -7,10 +7,10 @@ import { postToFirebase } from "../firebaseSupport";
 
 const PromptDialog = WDialog.extend({
   statics: {
-    TYPE: "promptDialog"
+    TYPE: "promptDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = PromptDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE"); // should never be displayed
@@ -20,17 +20,17 @@ const PromptDialog = WDialog.extend({
     postToFirebase({ id: "analytics", action: PromptDialog.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       if (this._callback) this._callback();
@@ -50,19 +50,19 @@ const PromptDialog = WDialog.extend({
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         this.disable();
         delete this._dialog;
-      }
+      },
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function(title, label, callback, cancelCallback) {
+  setup: function (title, label, callback, cancelCallback) {
     this._title = title;
     this._label = label;
     if (callback) this._callback = callback;
     if (cancelCallback) this._cancelCallback = cancelCallback;
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const content = L.DomUtil.create("div", "container");
     if (typeof this._label == "string") {
       const label = L.DomUtil.create("label", null, content);
@@ -75,7 +75,7 @@ const PromptDialog = WDialog.extend({
     this.inputField.placeholder = this.placeholder;
     this.inputField.value = this.current;
     return content;
-  }
+  },
 });
 
 export default PromptDialog;

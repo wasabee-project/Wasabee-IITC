@@ -36,7 +36,7 @@ const resetCSS = () => {
   window.plugin.wasabee._css = new Array();
 };
 
-export const changeSkin = name => {
+export const changeSkin = (name) => {
   const op = getSelectedOperation();
   if (name == "main") {
     delete localStorage[window.plugin.wasabee.static.constants.SKIN_KEY];

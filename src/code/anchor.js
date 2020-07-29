@@ -68,7 +68,7 @@ export default class WasabeeAnchor {
     const pcLink = L.DomUtil.create("a", null, portalComment);
     pcLink.textContent = this._portal.comment || wX("SET_PORTAL_COMMENT");
     pcLink.href = "#";
-    L.DomEvent.on(pcLink, "click", ev => {
+    L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
       const cd = new SetCommentDialog();
       cd.setup(this._portal, this._operation);
@@ -84,7 +84,7 @@ export default class WasabeeAnchor {
       const phLink = L.DomUtil.create("a", null, portalHardness);
       phLink.textContent = this._portal.hardness;
       phLink.href = "#";
-      L.DomEvent.on(phLink, "click", ev => {
+      L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
         const cd = new SetCommentDialog();
         cd.setup(this._portal, this._operation);
@@ -99,7 +99,7 @@ export default class WasabeeAnchor {
     );
     const linksButton = L.DomUtil.create("button", null, buttonSet);
     linksButton.textContent = wX("LINKS");
-    L.DomEvent.on(linksButton, "click", ev => {
+    L.DomEvent.on(linksButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const lld = new LinkListDialog();
       lld.setup(operation, this._portal);
@@ -108,14 +108,14 @@ export default class WasabeeAnchor {
     });
     const swapButton = L.DomUtil.create("button", null, buttonSet);
     swapButton.textContent = wX("SWAP");
-    L.DomEvent.on(swapButton, "click", ev => {
+    L.DomEvent.on(swapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       swapPortal(operation, this._portal);
       marker.closePopup();
     });
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
     deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", ev => {
+    L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       deletePortal(operation, this._portal);
       marker.closePopup();
@@ -123,7 +123,7 @@ export default class WasabeeAnchor {
 
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
-    L.DomEvent.on(gmapButton, "click", ev => {
+    L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
       window.open(
@@ -137,7 +137,7 @@ export default class WasabeeAnchor {
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
-      L.DomEvent.on(assignButton, "click", ev => {
+      L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         // XXX why can't I just use "this"? instead of making a new anchor?
         const anchor = new WasabeeAnchor(this.ID);
@@ -150,7 +150,7 @@ export default class WasabeeAnchor {
       // needs wX
       const sendButton = L.DomUtil.create("button", null, buttonSet);
       sendButton.textContent = "Send as Target";
-      L.DomEvent.on(assignButton, "click", ev => {
+      L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         alert(
           "send as target coming soon... select agent, select portal or route..."

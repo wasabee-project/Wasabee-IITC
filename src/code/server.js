@@ -7,11 +7,11 @@ import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
-export default function() {
+export default function () {
   return GetWasabeeServer();
 }
 
-export const uploadOpPromise = function() {
+export const uploadOpPromise = function () {
   const SERVER_BASE = GetWasabeeServer();
 
   const operation = getSelectedOperation();
@@ -19,25 +19,25 @@ export const uploadOpPromise = function() {
   const json = JSON.stringify(operation);
   // console.log(json);
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           WasabeeMe.create(req.response); // free update
           opPromise(operation.ID).then(
-            function(newop) {
+            function (newop) {
               newop.localchanged = false;
               newop.store();
               console.log(newop);
               resolve(newop);
             },
-            function(err) {
+            function (err) {
               console.log("failure to fetch newly uploaded op: " + err);
               reject(err);
             }
@@ -59,7 +59,7 @@ export const uploadOpPromise = function() {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -68,7 +68,7 @@ export const uploadOpPromise = function() {
   });
 };
 
-export const updateOpPromise = operation => {
+export const updateOpPromise = (operation) => {
   const SERVER_BASE = GetWasabeeServer();
 
   // let the server know how to process assignments etc
@@ -80,14 +80,14 @@ export const updateOpPromise = operation => {
   // console.log(json);
   delete operation.mode;
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
     const req = new XMLHttpRequest();
     req.open("PUT", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           operation.localchanged = false;
@@ -102,7 +102,7 @@ export const updateOpPromise = operation => {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -111,16 +111,16 @@ export const updateOpPromise = operation => {
   });
 };
 
-export const deleteOpPromise = function(opID) {
+export const deleteOpPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
     req.open("DELETE", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(wX("DELETED"));
@@ -134,7 +134,7 @@ export const deleteOpPromise = function(opID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -142,9 +142,9 @@ export const deleteOpPromise = function(opID) {
   });
 };
 
-export const teamPromise = function(teamid) {
+export const teamPromise = function (teamid) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (teamid == "owned") {
       const owned = new WasabeeTeam();
       owned.id = "owned";
@@ -159,7 +159,7 @@ export const teamPromise = function(teamid) {
     req.crossDomain = true;
 
     let newteam = null;
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           // add this team to the cache
@@ -176,7 +176,7 @@ export const teamPromise = function(teamid) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -184,9 +184,9 @@ export const teamPromise = function(teamid) {
   });
 };
 
-export const opPromise = function(opID) {
+export const opPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
     const localop = getOperationByID(opID);
@@ -201,7 +201,7 @@ export const opPromise = function(opID) {
     req.crossDomain = true;
 
     let newop = null;
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           newop = WasabeeOp.create(req.response);
@@ -222,7 +222,7 @@ export const opPromise = function(opID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -230,10 +230,10 @@ export const opPromise = function(opID) {
   });
 };
 
-export const mePromise = function() {
+export const mePromise = function () {
   const SERVER_BASE = GetWasabeeServer();
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/me`;
     const req = new XMLHttpRequest();
     req.open("GET", url);
@@ -241,7 +241,7 @@ export const mePromise = function() {
     req.crossDomain = true;
 
     let me = null;
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           me = WasabeeMe.create(req.response);
@@ -267,7 +267,7 @@ export const mePromise = function() {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -275,9 +275,9 @@ export const mePromise = function() {
   });
 };
 
-export const agentPromise = function(GID, force) {
+export const agentPromise = function (GID, force) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (GID == null) {
       reject("null gid");
     }
@@ -291,7 +291,7 @@ export const agentPromise = function(GID, force) {
       req.withCredentials = true;
       req.crossDomain = true;
 
-      req.onload = function() {
+      req.onload = function () {
         switch (req.status) {
           case 200:
             resolve(WasabeeAgent.create(req.response));
@@ -305,7 +305,7 @@ export const agentPromise = function(GID, force) {
         }
       };
 
-      req.onerror = function() {
+      req.onerror = function () {
         reject(`Network Error: ${req.responseText}`);
       };
 
@@ -314,16 +314,16 @@ export const agentPromise = function(GID, force) {
   });
 };
 
-export const assignMarkerPromise = function(opID, markerID, agentID) {
+export const assignMarkerPromise = function (opID, markerID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/assign`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -337,7 +337,7 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -347,16 +347,16 @@ export const assignMarkerPromise = function(opID, markerID, agentID) {
   });
 };
 
-export const assignLinkPromise = function(opID, linkID, agentID) {
+export const assignLinkPromise = function (opID, linkID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/assign`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -370,7 +370,7 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -380,18 +380,18 @@ export const assignLinkPromise = function(opID, linkID, agentID) {
   });
 };
 
-export const targetPromise = function(agentID, portal) {
+export const targetPromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/agent/${agentID}/target`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -402,7 +402,7 @@ export const targetPromise = function(agentID, portal) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -414,18 +414,18 @@ export const targetPromise = function(agentID, portal) {
   });
 };
 
-export const routePromise = function(agentID, portal) {
+export const routePromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/api/v1/agent/${agentID}/route`;
     const req = new XMLHttpRequest();
     req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -436,7 +436,7 @@ export const routePromise = function(agentID, portal) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -448,10 +448,10 @@ export const routePromise = function(agentID, portal) {
   });
 };
 
-export const SendAccessTokenAsync = function(accessToken) {
+export const SendAccessTokenAsync = function (accessToken) {
   const SERVER_BASE = GetWasabeeServer();
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const url = `${SERVER_BASE}/aptok`;
     const req = new XMLHttpRequest();
 
@@ -459,7 +459,7 @@ export const SendAccessTokenAsync = function(accessToken) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       // console.log(req.getAllResponseHeaders());
       switch (req.status) {
         case 200:
@@ -473,7 +473,7 @@ export const SendAccessTokenAsync = function(accessToken) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       console.log(req.getAllResponseHeaders());
       reject(`Network Error: ${req.statusText}`);
     };
@@ -483,7 +483,7 @@ export const SendAccessTokenAsync = function(accessToken) {
   });
 };
 
-export const SetTeamState = function(teamID, state) {
+export const SetTeamState = function (teamID, state) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -494,7 +494,7 @@ export const SetTeamState = function(teamID, state) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve();
@@ -508,7 +508,7 @@ export const SetTeamState = function(teamID, state) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -516,7 +516,7 @@ export const SetTeamState = function(teamID, state) {
   });
 };
 
-export const SetMarkerState = function(opID, markerID, state) {
+export const SetMarkerState = function (opID, markerID, state) {
   let action = "incomplete";
   switch (state) {
     case "acknowledged":
@@ -542,7 +542,7 @@ export const SetMarkerState = function(opID, markerID, state) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve();
@@ -553,7 +553,7 @@ export const SetMarkerState = function(opID, markerID, state) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -561,7 +561,7 @@ export const SetMarkerState = function(opID, markerID, state) {
   });
 };
 
-export const SetLinkState = function(opID, linkID, state) {
+export const SetLinkState = function (opID, linkID, state) {
   let action = "incomplete";
   switch (state) {
     // no acknowledge for links -- use incomplete
@@ -585,7 +585,7 @@ export const SetLinkState = function(opID, linkID, state) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve();
@@ -596,7 +596,7 @@ export const SetLinkState = function(opID, linkID, state) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -604,7 +604,7 @@ export const SetLinkState = function(opID, linkID, state) {
   });
 };
 
-export const opKeyPromise = function(opID, portalID, onhand, capsule) {
+export const opKeyPromise = function (opID, portalID, onhand, capsule) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -615,7 +615,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve();
@@ -629,7 +629,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -640,7 +640,7 @@ export const opKeyPromise = function(opID, portalID, onhand, capsule) {
   });
 };
 
-export const dKeyPromise = function(portalID, onhand, capsule) {
+export const dKeyPromise = function (portalID, onhand, capsule) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -651,7 +651,7 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve();
@@ -665,7 +665,7 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -677,7 +677,7 @@ export const dKeyPromise = function(portalID, onhand, capsule) {
   });
 };
 
-export const dKeylistPromise = function() {
+export const dKeylistPromise = function () {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -688,7 +688,7 @@ export const dKeylistPromise = function() {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(req.response);
@@ -702,7 +702,7 @@ export const dKeylistPromise = function() {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -710,7 +710,7 @@ export const dKeylistPromise = function() {
   });
 };
 
-export const locationPromise = function(lat, lng) {
+export const locationPromise = function (lat, lng) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -721,7 +721,7 @@ export const locationPromise = function(lat, lng) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(req.response);
@@ -735,7 +735,7 @@ export const locationPromise = function(lat, lng) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -743,7 +743,7 @@ export const locationPromise = function(lat, lng) {
   });
 };
 
-export const logoutPromise = function() {
+export const logoutPromise = function () {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -754,7 +754,7 @@ export const logoutPromise = function() {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           WasabeeMe.purge();
@@ -766,7 +766,7 @@ export const logoutPromise = function() {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -774,7 +774,7 @@ export const logoutPromise = function() {
   });
 };
 
-export const addPermPromise = function(opID, teamID, role) {
+export const addPermPromise = function (opID, teamID, role) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -785,7 +785,7 @@ export const addPermPromise = function(opID, teamID, role) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -799,7 +799,7 @@ export const addPermPromise = function(opID, teamID, role) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -810,7 +810,7 @@ export const addPermPromise = function(opID, teamID, role) {
   });
 };
 
-export const delPermPromise = function(opID, teamID, role) {
+export const delPermPromise = function (opID, teamID, role) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -821,7 +821,7 @@ export const delPermPromise = function(opID, teamID, role) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -832,7 +832,7 @@ export const delPermPromise = function(opID, teamID, role) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -843,7 +843,7 @@ export const delPermPromise = function(opID, teamID, role) {
   });
 };
 
-export const leaveTeamPromise = function(teamID) {
+export const leaveTeamPromise = function (teamID) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -854,7 +854,7 @@ export const leaveTeamPromise = function(teamID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -865,14 +865,14 @@ export const leaveTeamPromise = function(teamID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
 };
 
-export const removeAgentFromTeamPromise = function(agentID, teamID) {
+export const removeAgentFromTeamPromise = function (agentID, teamID) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -883,7 +883,7 @@ export const removeAgentFromTeamPromise = function(agentID, teamID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -894,14 +894,14 @@ export const removeAgentFromTeamPromise = function(agentID, teamID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
 };
 
-export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
+export const setAgentTeamSquadPromise = function (agentID, teamID, squad) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -912,7 +912,7 @@ export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -923,7 +923,7 @@ export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     const fd = new FormData();
@@ -932,7 +932,7 @@ export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
   });
 };
 
-export const addAgentToTeamPromise = function(agentID, teamID) {
+export const addAgentToTeamPromise = function (agentID, teamID) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -943,7 +943,7 @@ export const addAgentToTeamPromise = function(agentID, teamID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -958,14 +958,14 @@ export const addAgentToTeamPromise = function(agentID, teamID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
 };
 
-export const renameTeamPromise = function(teamID, name) {
+export const renameTeamPromise = function (teamID, name) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -976,7 +976,7 @@ export const renameTeamPromise = function(teamID, name) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -987,7 +987,7 @@ export const renameTeamPromise = function(teamID, name) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     const fd = new FormData();
@@ -996,7 +996,7 @@ export const renameTeamPromise = function(teamID, name) {
   });
 };
 
-export const rocksPromise = function(teamID, community, apikey) {
+export const rocksPromise = function (teamID, community, apikey) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -1007,7 +1007,7 @@ export const rocksPromise = function(teamID, community, apikey) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -1018,14 +1018,14 @@ export const rocksPromise = function(teamID, community, apikey) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
 };
 
-export const newTeamPromise = function(name) {
+export const newTeamPromise = function (name) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -1036,7 +1036,7 @@ export const newTeamPromise = function(name) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -1047,14 +1047,14 @@ export const newTeamPromise = function(name) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
   });
 };
 
-export const deleteTeamPromise = function(teamID) {
+export const deleteTeamPromise = function (teamID) {
   const SERVER_BASE = GetWasabeeServer();
 
   return new Promise((resolve, reject) => {
@@ -1065,7 +1065,7 @@ export const deleteTeamPromise = function(teamID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
           resolve(true);
@@ -1076,7 +1076,7 @@ export const deleteTeamPromise = function(teamID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
@@ -1092,7 +1092,7 @@ export const GetWasabeeServer = () => {
   return server;
 };
 
-export const SetWasabeeServer = server => {
+export const SetWasabeeServer = (server) => {
   // sanity checking here please:
   // starts w/ https://
   // does not end with /
@@ -1100,7 +1100,7 @@ export const SetWasabeeServer = server => {
 };
 
 // don't use this unless you just can't use the promise directly
-export const getAgent = gid => {
+export const getAgent = (gid) => {
   // when a team is loaded from the server, all agents are pushed into the cache
   if (window.plugin.wasabee._agentCache.has(gid)) {
     return window.plugin.wasabee._agentCache.get(gid);
@@ -1108,11 +1108,11 @@ export const getAgent = gid => {
 
   let agent = null;
   agentPromise(gid, false).then(
-    function(resolve) {
+    function (resolve) {
       agent = resolve;
       window.plugin.wasabee._agentCache.set(gid, agent);
     },
-    function(reject) {
+    function (reject) {
       console.log(reject);
     }
   );

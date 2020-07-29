@@ -9,21 +9,21 @@ import { postToFirebase } from "../firebaseSupport";
 
 const FanfieldDialog = WDialog.extend({
   statics: {
-    TYPE: "FanfieldDialog"
+    TYPE: "FanfieldDialog",
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
     postToFirebase({ id: "analytics", action: FanfieldDialog.TYPE });
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
@@ -42,7 +42,7 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButton, "click", ev => {
+    L.DomEvent.on(anchorButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
@@ -68,7 +68,7 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._startDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(startButton, "click", ev => {
+    L.DomEvent.on(startButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._start = WasabeePortal.getSelected();
       if (this._start) {
@@ -92,7 +92,7 @@ const FanfieldDialog = WDialog.extend({
     } else {
       this._endDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(endButton, "click", ev => {
+    L.DomEvent.on(endButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._end = WasabeePortal.getSelected();
       if (this._end) {
@@ -113,7 +113,7 @@ const FanfieldDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("FANFIELD");
-    L.DomEvent.on(button, "click", ev => {
+    L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.fanfield.call(this);
     });
@@ -134,12 +134,12 @@ const FanfieldDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.fanfield
+      id: window.plugin.wasabee.static.dialogNames.fanfield,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = FanfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("FAN_FIELD3");
@@ -154,7 +154,7 @@ const FanfieldDialog = WDialog.extend({
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)
-  fanfield: function() {
+  fanfield: function () {
     if (!this._anchor || !this._start || !this._end) {
       alert(wX("SET_3_PORT"));
       return;
@@ -186,7 +186,7 @@ const FanfieldDialog = WDialog.extend({
 
     const sorted = new Array(...good.entries())
       .sort((a, b) => a[0] - b[0])
-      .map(v => v[1]);
+      .map((v) => v[1]);
 
     if (this._invert) {
       sorted.reverse();
@@ -205,7 +205,7 @@ const FanfieldDialog = WDialog.extend({
 
   // draw takes the sorted list of poratls and draws the links
   // determining any sub-fields can be added
-  _draw: function(sorted) {
+  _draw: function (sorted) {
     this._operation.startBatchMode();
     let order = 0;
     let fields = 0;
@@ -258,10 +258,10 @@ const FanfieldDialog = WDialog.extend({
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
   },
 
-  _angle: function(a, p) {
+  _angle: function (a, p) {
     const link = new GeodesicLine(a.latLng, p.latLng);
     return link.bearing();
-  }
+  },
 });
 
 export default FanfieldDialog;

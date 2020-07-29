@@ -63,7 +63,7 @@ export default class WasabeeAgent {
     }
     display.href = `${server}/api/v1/agent/${this.id}?json=n`;
     display.target = "_new";
-    L.DomEvent.on(display, "click", ev => {
+    L.DomEvent.on(display, "click", (ev) => {
       window.open(display.href, this.id);
       L.DomEvent.stop(ev);
     });
@@ -79,7 +79,7 @@ export default class WasabeeAgent {
 
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
-    L.DomEvent.on(sendTarget, "click", ev => {
+    L.DomEvent.on(sendTarget, "click", (ev) => {
       L.DomEvent.stop(ev);
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
@@ -96,7 +96,7 @@ export default class WasabeeAgent {
             () => {
               alert(wX("TARGET SENT"));
             },
-            reject => {
+            (reject) => {
               console.log(reject);
             }
           );
@@ -108,7 +108,7 @@ export default class WasabeeAgent {
     // this needs wX
     const requestRoute = L.DomUtil.create("button", null, content);
     requestRoute.textContent = "Send Route to Target";
-    L.DomEvent.on(requestRoute, "click", ev => {
+    L.DomEvent.on(requestRoute, "click", (ev) => {
       L.DomEvent.stop(ev);
       const selectedPortal = WasabeePortal.getSelected();
       if (!selectedPortal) {
@@ -125,7 +125,7 @@ export default class WasabeeAgent {
             () => {
               alert("Route Sent");
             },
-            reject => {
+            (reject) => {
               console.log(reject);
             }
           );

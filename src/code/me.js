@@ -66,12 +66,12 @@ export default class WasabeeMe {
       force
     ) {
       mePromise().then(
-        function(nme) {
+        function (nme) {
           me = nme;
           // mePromise calls WasabeeMe.create, which calls me.store()
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
-        function(err) {
+        function (err) {
           console.log(err);
           delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
           me = null;

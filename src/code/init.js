@@ -12,7 +12,7 @@ import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
 
-window.plugin.wasabee.init = function() {
+window.plugin.wasabee.init = function () {
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -60,16 +60,16 @@ window.plugin.wasabee.init = function() {
     drawAgents(Wasabee._selectedOp);
   });
 
-  window.addHook("portalDetailsUpdated", e => {
+  window.addHook("portalDetailsUpdated", (e) => {
     listenForPortalDetails({
       success: true,
       guid: e.guid,
-      details: e.portalDetails
+      details: e.portalDetails,
     });
   });
 
   // custom hook for updating our UI
-  window.addHook("wasabeeUIUpdate", operation => {
+  window.addHook("wasabeeUIUpdate", (operation) => {
     drawThings(operation);
   });
 
@@ -82,7 +82,7 @@ window.plugin.wasabee.init = function() {
   }
 
   // hooks called when layers are enabled/disabled
-  window.map.on("layeradd", obj => {
+  window.map.on("layeradd", (obj) => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
@@ -92,7 +92,7 @@ window.plugin.wasabee.init = function() {
     }
   });
 
-  window.map.on("layerremove", obj => {
+  window.map.on("layerremove", (obj) => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
@@ -142,7 +142,8 @@ const initGoogleAPI = () => {
       "Wasabee detected another GAPI instance; there may be authentication issues"
     );
     window.gapi.load("auth2", () => {
-      window.gapi.auth2.enableDebugLogs(true);
+      window.gapi.auth2.enableDebugLogs(false);
+      console.log("loading GAPI auth2");
     });
     return;
   }

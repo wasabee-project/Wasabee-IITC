@@ -9,21 +9,21 @@ import { postToFirebase } from "../firebaseSupport";
 
 const KeysList = WDialog.extend({
   statics: {
-    TYPE: "keysList"
+    TYPE: "keysList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
     this.type = KeysList.TYPE;
     postToFirebase({ id: "analytics", action: KeysList.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
@@ -35,12 +35,12 @@ const KeysList = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -55,34 +55,34 @@ const KeysList = WDialog.extend({
         delete this._dialog;
         this.disable();
       },
-      id: window.plugin.wasabee.static.dialogNames.keysList
+      id: window.plugin.wasabee.static.dialogNames.keysList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function(operation) {
+  update: function (operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
     this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
   },
 
-  getListDialogContent: function(operation) {
+  getListDialogContent: function (operation) {
     const sortable = new Sortable();
     const always = [
       {
         name: wX("PORTAL"),
-        value: key => operation.getPortal(key.id).name,
+        value: (key) => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
           cell.appendChild(
             operation.getPortal(key.id).displayFormat(this._smallScreen)
           );
-        }
+        },
       },
       {
         name: wX("REQUIRED"),
-        value: key => key.Required,
+        value: (key) => key.Required,
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           cell.textContent = value;
@@ -93,11 +93,11 @@ const KeysList = WDialog.extend({
           } else {
             L.DomUtil.addClass(cell, "notenough");
           }
-        }
+        },
       },
       {
         name: wX("ON_HAND"),
-        value: key => parseInt(key.onHand),
+        value: (key) => parseInt(key.onHand),
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
@@ -110,8 +110,8 @@ const KeysList = WDialog.extend({
 
           a.textContent = value;
           cell.appendChild(a);
-        }
-      }
+        },
+      },
     ];
 
     let gid = "no-user";
@@ -120,7 +120,7 @@ const KeysList = WDialog.extend({
       sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
-          value: key => parseInt(key.iHave),
+          value: (key) => parseInt(key.iHave),
           // sort: (a, b) => a - b,
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");
@@ -131,11 +131,11 @@ const KeysList = WDialog.extend({
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
             cell.appendChild(oif);
-          }
+          },
         },
         {
           name: wX("MY_CAP_ID"),
-          value: key => key.capsule,
+          value: (key) => key.capsule,
           sort: (a, b) => a.localeCompare(b),
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");
@@ -146,8 +146,8 @@ const KeysList = WDialog.extend({
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });
             cell.appendChild(oif);
-          }
-        }
+          },
+        },
       ]);
     } else {
       sortable.fields = always;
@@ -157,7 +157,7 @@ const KeysList = WDialog.extend({
 
     for (const a of operation.anchors) {
       const k = {};
-      const links = operation.links.filter(function(listLink) {
+      const links = operation.links.filter(function (listLink) {
         return listLink.toPortalId == a;
       });
 
@@ -168,7 +168,7 @@ const KeysList = WDialog.extend({
       k.capsule = "";
       // if (k.Required == 0) continue;
 
-      const thesekeys = operation.keysonhand.filter(function(keys) {
+      const thesekeys = operation.keysonhand.filter(function (keys) {
         return keys.portalId == a;
       });
       if (thesekeys && thesekeys.length > 0) {
@@ -183,7 +183,7 @@ const KeysList = WDialog.extend({
       keys.push(k);
     }
 
-    for (const p of operation.markers.filter(function(marker) {
+    for (const p of operation.markers.filter(function (marker) {
       return (
         marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
       );
@@ -195,7 +195,7 @@ const KeysList = WDialog.extend({
       k.iHave = 0;
       k.capsule = "";
 
-      const thesekeys = operation.keysonhand.filter(function(keys) {
+      const thesekeys = operation.keysonhand.filter(function (keys) {
         return keys.portalId == k.id;
       });
       if (thesekeys && thesekeys.length > 0) {
@@ -215,11 +215,11 @@ const KeysList = WDialog.extend({
     return sortable;
   },
 
-  showKeyByPortal: function(e) {
+  showKeyByPortal: function (e) {
     const klp = new KeyListPortal();
     klp.setup(e.srcElement.name);
     klp.enable();
-  }
+  },
 });
 
 export default KeysList;

@@ -8,28 +8,28 @@ import WasabeeMe from "../me";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
-  loadFaked
+  loadFaked,
 } from "../uiCommands";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
 const MarkerList = WDialog.extend({
   statics: {
-    TYPE: "markerList"
+    TYPE: "markerList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = MarkerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     postToFirebase({ id: "analytics", action: MarkerList.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.markerListUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
@@ -38,14 +38,14 @@ const MarkerList = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     loadFaked(this._operation);
 
     const buttons = {};
@@ -62,29 +62,29 @@ const MarkerList = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.markerList
+      id: window.plugin.wasabee.static.dialogNames.markerList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  markerListUpdate: function(operation) {
+  markerListUpdate: function (operation) {
     if (operation.ID != this._operation.ID) this._operation = operation;
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
     this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
   },
 
-  getListDialogContent: function(operation) {
+  getListDialogContent: function (operation) {
     const content = new Sortable();
     content.fields = [
       {
         name: wX("ORDER"),
-        value: marker => marker.order,
-        format: (a, m) => (a.textContent = m)
+        value: (marker) => marker.order,
+        format: (a, m) => (a.textContent = m),
       },
       {
         name: wX("PORTAL"),
-        value: marker => operation.getPortal(marker.portalId).name,
+        value: (marker) => operation.getPortal(marker.portalId).name,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, marker) => {
           a.appendChild(
@@ -92,35 +92,35 @@ const MarkerList = WDialog.extend({
               .getPortal(marker.portalId)
               .displayFormat(this._smallScreen)
           );
-        }
+        },
       },
       {
         name: wX("TYPE"),
-        value: marker => wX(marker.type),
+        value: (marker) => wX(marker.type),
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, marker) => {
           const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
-        }
+        },
       },
       {
         name: wX("COMMENT"),
-        value: marker => marker.comment,
+        value: (marker) => marker.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, marker) => {
           const comment = L.DomUtil.create("a", "", cell);
           comment.textContent = value;
-          L.DomEvent.on(cell, "click", ev => {
+          L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
             const scd = new SetCommentDialog(window.map);
             scd.setup(marker, operation);
             scd.enable();
           });
-        }
+        },
       },
       {
         name: wX("ASS_TO"),
-        value: marker => {
+        value: (marker) => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
             if (!WasabeeMe.isLoggedIn()) return "not logged in";
             const agent = getAgent(marker.assignedTo);
@@ -141,11 +141,11 @@ const MarkerList = WDialog.extend({
             ad.setup(agent, operation);
             ad.enable();
           });
-        }
+        },
       },
       {
         name: wX("DONE"),
-        value: marker => marker.state,
+        value: (marker) => marker.state,
         sort: (a, b) => a.localeCompare(b),
         format: (a, m) => {
           if (m == "completed") {
@@ -153,12 +153,12 @@ const MarkerList = WDialog.extend({
           } else {
             a.textContent = wX("NO");
           }
-        }
+        },
       },
       {
         name: wX("DELETE_MARKER"),
         sort: null,
-        value: m => m,
+        value: (m) => m,
         format: (cell, data) => {
           const d = L.DomUtil.create("a", null, cell);
           d.href = "#";
@@ -166,13 +166,13 @@ const MarkerList = WDialog.extend({
           L.DomEvent.on(d, "click", () => {
             operation.removeMarker(data);
           });
-        }
-      }
+        },
+      },
     ];
     content.sortBy = 0;
     content.items = operation.markers;
     return content;
-  }
+  },
 });
 
 export default MarkerList;

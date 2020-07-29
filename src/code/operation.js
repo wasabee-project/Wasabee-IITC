@@ -60,7 +60,7 @@ export default class WasabeeOp {
       stored: this.stored,
       localchanged: this.localchanged,
       blockers: this.blockers,
-      keysonhand: this.keysonhand
+      keysonhand: this.keysonhand,
     };
   }
 
@@ -116,7 +116,7 @@ export default class WasabeeOp {
       for (const m of this.markers) {
         m.portalId = rename.get(m.portalId);
       }
-      this.anchors = this.anchors.map(a => rename.get(a));
+      this.anchors = this.anchors.map((a) => rename.get(a));
       for (const b of this.blockers) {
         b.fromPortalId = rename.get(b.fromPortalId);
         b.toPortalId = rename.get(b.toPortalId);
@@ -194,7 +194,7 @@ export default class WasabeeOp {
   }
 
   getLinkListFromPortal(portal) {
-    const links = this.links.filter(function(listLink) {
+    const links = this.links.filter(function (listLink) {
       return (
         listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id
       );
@@ -207,14 +207,20 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
-    this.anchors = this.anchors.filter(function(anchor) {
+    console.log("removing anchor");
+    console.log(this.links);
+
+    this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
-    this.links = this.links.filter(function(listLink) {
+    this.links = this.links.filter(function (listLink) {
       return (
         listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId
       );
     });
+
+    console.log(this.links);
+
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update(true);
@@ -222,7 +228,7 @@ export default class WasabeeOp {
   }
 
   removeMarker(marker) {
-    this.markers = this.markers.filter(function(listMarker) {
+    this.markers = this.markers.filter(function (listMarker) {
       return listMarker.ID !== marker.ID;
     });
     this.cleanPortalList();
@@ -521,13 +527,13 @@ export default class WasabeeOp {
   }
 
   get fakedPortals() {
-    const c = Array.from(this._idToOpportals.values()).filter(p => p.faked);
+    const c = Array.from(this._idToOpportals.values()).filter((p) => p.faked);
     return c;
   }
 
   // silently swap two anchors
   _swapPortal(originalPortal, newPortal) {
-    this.anchors = this.anchors.filter(function(listAnchor) {
+    this.anchors = this.anchors.filter(function (listAnchor) {
       return listAnchor !== originalPortal.id;
     });
     if (!this.containsAnchor(newPortal.id)) this.anchors.push(newPortal.id);
@@ -570,7 +576,9 @@ export default class WasabeeOp {
       }
     }
     // Remove the invalid links from the array (after we are done iterating through it)
-    this.links = this.links.filter(element => !linksToRemove.includes(element));
+    this.links = this.links.filter(
+      (element) => !linksToRemove.includes(element)
+    );
   }
 
   swapPortal(originalPortal, newPortal) {
@@ -680,7 +688,7 @@ export default class WasabeeOp {
       () => {
         console.log("active mode change pushed", new Date().toGMTString());
       },
-      err => {
+      (err) => {
         console.log(err);
         alert("Active Mode Update failed: " + err);
       }
@@ -858,7 +866,7 @@ export default class WasabeeOp {
       portalId: portalId,
       gid: gid,
       onhand: onhand,
-      capsule: capsule
+      capsule: capsule,
     };
     this.keysonhand.push(k);
     this.update(false);

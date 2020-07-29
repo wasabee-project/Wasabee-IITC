@@ -6,17 +6,17 @@ import { greatCircleArcIntersect } from "../crosslinks";
 import {
   clearAllLinks,
   getAllPortalsOnScreen,
-  testPortal
+  testPortal,
 } from "../uiCommands";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
 const HomogeneousDialog = WDialog.extend({
   statics: {
-    TYPE: "HomogeneousDialog"
+    TYPE: "HomogeneousDialog",
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     // requires newer leaflet, poke user to upgrade their IITC
     if (!this._map.distance) {
@@ -28,12 +28,12 @@ const HomogeneousDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     window.removeLayerGroup(this._layerGroup);
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
@@ -54,7 +54,7 @@ const HomogeneousDialog = WDialog.extend({
     } else {
       this._anchorDisplayOne.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButtonOne, "click", ev => {
+    L.DomEvent.on(anchorButtonOne, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
@@ -82,7 +82,7 @@ const HomogeneousDialog = WDialog.extend({
     } else {
       this._anchorDisplayTwo.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButtonTwo, "click", ev => {
+    L.DomEvent.on(anchorButtonTwo, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
@@ -110,7 +110,7 @@ const HomogeneousDialog = WDialog.extend({
     } else {
       this._anchorDisplayThree.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButtonThree, "click", ev => {
+    L.DomEvent.on(anchorButtonThree, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchorThree = WasabeePortal.getSelected();
       if (this._anchorThree) {
@@ -146,7 +146,7 @@ const HomogeneousDialog = WDialog.extend({
       [wX("FROM_DEPTH"), "core"], // need wX on first column
       [wX("FROM_1-2"), "base12"],
       [wX("FROM_1-3"), "base13"],
-      [wX("FROM_2-3"), "base23"]
+      [wX("FROM_2-3"), "base23"],
     ]) {
       const orderOption = L.DomUtil.create("option", null, this.orderMenu);
       orderOption.value = value;
@@ -160,7 +160,7 @@ const HomogeneousDialog = WDialog.extend({
     // Go button
     const drawButton = L.DomUtil.create("button", "drawb", container);
     drawButton.textContent = wX("ONION");
-    L.DomEvent.on(drawButton, "click", ev => {
+    L.DomEvent.on(drawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.hfield.call(this);
     });
@@ -169,7 +169,7 @@ const HomogeneousDialog = WDialog.extend({
     this._redrawButton = L.DomUtil.create("button", null, spanRedraw);
     this._redrawButton.textContent = "Redraw"; // need wX
     this._redrawButton.style.display = "none";
-    L.DomEvent.on(this._redrawButton, "click", ev => {
+    L.DomEvent.on(this._redrawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._tree) this._draw.call(this);
     });
@@ -191,12 +191,12 @@ const HomogeneousDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      }
+      },
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
     this.type = HomogeneousDialog.TYPE;
     this.title = "Homogeneous";
@@ -214,7 +214,7 @@ const HomogeneousDialog = WDialog.extend({
     postToFirebase({ id: "analytics", action: HomogeneousDialog.TYPE });
   },
 
-  hfield: function() {
+  hfield: function () {
     this._failed = 0;
     this._layerGroup.clearLayers();
 
@@ -258,7 +258,7 @@ const HomogeneousDialog = WDialog.extend({
     }
   },
 
-  _draw: function() {
+  _draw: function () {
     this._colors = new Array();
     for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
       if (k != "self-block") this._colors.push(k);
@@ -282,7 +282,7 @@ const HomogeneousDialog = WDialog.extend({
     this._redrawButton.style.display = "";
   },
 
-  _recurser: function(depth, portalsCovered, one, two, three) {
+  _recurser: function (depth, portalsCovered, one, two, three) {
     if (depth >= this.depthMenu.value)
       return { success: true, anchors: [one, two, three], split: 0 };
 
@@ -292,7 +292,7 @@ const HomogeneousDialog = WDialog.extend({
       anchors: [one, two, three],
       split: 0,
       portal: null,
-      children: null
+      children: null,
     };
 
     // console.log(depth, "portals in consideration", portalsCovered);
@@ -360,7 +360,7 @@ const HomogeneousDialog = WDialog.extend({
     bestResult.children = [
       this._recurser(depth + 1, new Array(...best[0]), one, two, bestp),
       this._recurser(depth + 1, new Array(...best[1]), two, three, bestp),
-      this._recurser(depth + 1, new Array(...best[2]), one, three, bestp)
+      this._recurser(depth + 1, new Array(...best[2]), one, three, bestp),
     ];
     bestResult.success =
       bestResult.children[0].success &&
@@ -374,7 +374,7 @@ const HomogeneousDialog = WDialog.extend({
     return bestResult;
   },
 
-  _drawTreeCore: function(tree) {
+  _drawTreeCore: function (tree) {
     const depthValue = +this.depthMenu.value - 1;
     const [one, two, three] = tree.anchors;
     const computeDepth = (depth, tree, map) => {
@@ -387,7 +387,7 @@ const HomogeneousDialog = WDialog.extend({
     const portalDepth = new Map([
       [one.id, 0],
       [two.id, 0],
-      [three.id, 0]
+      [three.id, 0],
     ]);
     computeDepth(1, tree, portalDepth);
 
@@ -447,7 +447,7 @@ const HomogeneousDialog = WDialog.extend({
           r.anchors[0].latLng,
           r.anchors[1].latLng,
           r.anchors[2].latLng,
-          r.anchors[0].latLng
+          r.anchors[0].latLng,
         ];
         const polygon = L.polygon(latlngs, { color: color });
         polygon.addTo(this._layerGroup);
@@ -479,13 +479,13 @@ const HomogeneousDialog = WDialog.extend({
     draw(1, tree);
   },
 
-  _drawTreeBase: function(tree, one, two) {
+  _drawTreeBase: function (tree, one, two) {
     const depthValue = +this.depthMenu.value - 1;
 
     const drawFractal = (depth, r, pOne, pTwo, order) => {
       if (r.portal) {
         // draw inner HF on base 1-2
-        const pThree = r.anchors.filter(p => p != pOne && p != pTwo)[0];
+        const pThree = r.anchors.filter((p) => p != pOne && p != pTwo)[0];
         for (const child of r.children)
           if (!child.anchors.includes(pThree))
             order = draw(depth + 1, child, pOne, pTwo, order);
@@ -526,7 +526,7 @@ const HomogeneousDialog = WDialog.extend({
     const draw = (depth, r, pOne, pTwo, order = 1) => {
       // draw fratal on 1-2
       order = drawFractal(depth, r, pOne, pTwo, order);
-      const pThree = r.anchors.filter(p => p != pOne && p != pTwo)[0];
+      const pThree = r.anchors.filter((p) => p != pOne && p != pTwo)[0];
       // draw outer link
       for (const anchor of [pOne, pTwo]) {
         const linkID = this._operation.addLink(pThree, anchor, "", order + 1);
@@ -549,7 +549,7 @@ const HomogeneousDialog = WDialog.extend({
           r.anchors[0].latLng,
           r.anchors[1].latLng,
           r.anchors[2].latLng,
-          r.anchors[0].latLng
+          r.anchors[0].latLng,
         ];
         const polygon = L.polygon(latlngs, { color: color });
         polygon.addTo(this._layerGroup);
@@ -562,7 +562,7 @@ const HomogeneousDialog = WDialog.extend({
     draw(1, tree, one, two);
   },
 
-  _getSubregions: function(centerPoint, possibles, one, two, three) {
+  _getSubregions: function (centerPoint, possibles, one, two, three) {
     this._operation.addPortal(centerPoint);
 
     const possibleExceptAnchors = new Array();
@@ -595,7 +595,7 @@ const HomogeneousDialog = WDialog.extend({
     return [onePortals, twoPortals, threePortals];
   },
 
-  _getCenter: function(a, b, c) {
+  _getCenter: function (a, b, c) {
     const A = this._map.project(a.latLng || a._latlng);
     const B = this._map.project(b.latLng || b._latlng);
     const C = this._map.project(c.latLng || c._latlng);
@@ -604,7 +604,7 @@ const HomogeneousDialog = WDialog.extend({
     return this._map.unproject(point);
   },
 
-  _fieldCovers: function(a, b, c, p) {
+  _fieldCovers: function (a, b, c, p) {
     const unreachableMapPoint = this._urp;
 
     const urp = L.polyline([unreachableMapPoint, p.latLng]);
@@ -617,7 +617,7 @@ const HomogeneousDialog = WDialog.extend({
     if (greatCircleArcIntersect(urp, lac)) crossings++;
     if (greatCircleArcIntersect(urp, lbc)) crossings++;
     return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
-  }
+  },
 });
 
 export default HomogeneousDialog;

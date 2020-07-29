@@ -3,7 +3,7 @@ import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 
-const setRestoreOpID = opID => {
+const setRestoreOpID = (opID) => {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
 };
 
@@ -49,7 +49,7 @@ const loadNewDefaultOp = () => {
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-export const makeSelectedOperation = opID => {
+export const makeSelectedOperation = (opID) => {
   // _selectedOp is null at first load (or page reload), should never be after that
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
@@ -80,7 +80,7 @@ export const makeSelectedOperation = opID => {
 };
 
 // use this to pull an op from local store by ID
-export const getOperationByID = opID => {
+export const getOperationByID = (opID) => {
   let op = null;
   try {
     const v = store.get(opID);
@@ -119,7 +119,7 @@ export const setupLocalStorage = () => {
 };
 
 //** This function removes an operation from the main list */
-export const removeOperation = opID => {
+export const removeOperation = (opID) => {
   try {
     store.remove(opID);
   } catch (e) {
@@ -138,7 +138,7 @@ export const resetOps = () => {
 export const opsList = () => {
   var out = new Array();
 
-  store.each(function(value, key) {
+  store.each(function (value, key) {
     if (key.length == 40) {
       out.push(key);
     }
@@ -146,7 +146,7 @@ export const opsList = () => {
   return out;
 };
 
-export const duplicateOperation = opID => {
+export const duplicateOperation = (opID) => {
   let op = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;

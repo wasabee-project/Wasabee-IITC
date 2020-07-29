@@ -38,10 +38,10 @@ export default class WasabeeTeam {
     }
     let t = null;
     teamPromise(teamID).then(
-      team => {
+      (team) => {
         t = team;
       },
-      err => {
+      (err) => {
         console.log(err);
       }
     );

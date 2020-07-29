@@ -8,7 +8,7 @@ import {
   makeSelectedOperation,
   opsList,
   removeOperation,
-  duplicateOperation
+  duplicateOperation,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
@@ -16,33 +16,33 @@ import { postToFirebase } from "../firebaseSupport";
 
 const OpsDialog = WDialog.extend({
   statics: {
-    TYPE: "opsDialog"
+    TYPE: "opsDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = OpsDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     postToFirebase({ id: "analytics", action: OpsDialog.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
 
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     this.makeContent(getSelectedOperation());
 
     const buttons = {};
@@ -60,19 +60,19 @@ const OpsDialog = WDialog.extend({
         delete this._content;
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.opsButton
+      id: window.plugin.wasabee.static.dialogNames.opsButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function(selectedOp) {
+  update: function (selectedOp) {
     if (this._enabled && this._dialog && this._dialog.html) {
       this.makeContent(selectedOp);
       this._dialog.html(this._content);
     }
   },
 
-  makeContent: function(selectedOp) {
+  makeContent: function (selectedOp) {
     const content = L.DomUtil.create("div");
     const topSet = L.DomUtil.create("div", "topset", content);
     const operationSelect = L.DomUtil.create("select", null, topSet);
@@ -86,7 +86,7 @@ const OpsDialog = WDialog.extend({
       if (opID == selectedOp.ID) option.selected = true;
     }
 
-    L.DomEvent.on(operationSelect, "change", ev => {
+    L.DomEvent.on(operationSelect, "change", (ev) => {
       L.DomEvent.stop(ev);
       const newop = makeSelectedOperation(operationSelect.value);
       const mbr = newop.mbr;
@@ -105,7 +105,7 @@ const OpsDialog = WDialog.extend({
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
       input.value = selectedOp.name;
-      L.DomEvent.on(input, "change", ev => {
+      L.DomEvent.on(input, "change", (ev) => {
         L.DomEvent.stop(ev);
         if (!input.value || input.value == "") {
           alert(wX("USE_VALID_NAME"));
@@ -135,7 +135,7 @@ const OpsDialog = WDialog.extend({
         option.value = c.name;
         option.textContent = c.displayName;
       }
-      L.DomEvent.on(opColor, "change", ev => {
+      L.DomEvent.on(opColor, "change", (ev) => {
         L.DomEvent.stop(ev);
         selectedOp.color = opColor.value;
         selectedOp.store();
@@ -147,7 +147,7 @@ const OpsDialog = WDialog.extend({
       const commentInput = L.DomUtil.create("textarea", null, topSet);
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
-      L.DomEvent.on(commentInput, "change", ev => {
+      L.DomEvent.on(commentInput, "change", (ev) => {
         L.DomEvent.stop(ev);
         selectedOp.comment = commentInput.value;
         selectedOp.store();
@@ -163,7 +163,7 @@ const OpsDialog = WDialog.extend({
       const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
       // adding a comment so that github will let me create a pull request to fix the issue with CLEAR_EVERYTHING showing up on the button instead of the correct text. Scott, pleae double check the line below this - I left off the wX code in the previous version.
       clearOpButton.textContent = wX("CLEAR_EVERYTHING");
-      L.DomEvent.on(clearOpButton, "click", ev => {
+      L.DomEvent.on(clearOpButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         clearAllItems(selectedOp);
         selectedOp.store();
@@ -180,7 +180,7 @@ const OpsDialog = WDialog.extend({
       } else {
         deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
       }
-      L.DomEvent.on(deleteButton, "click", ev => {
+      L.DomEvent.on(deleteButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         // this should be moved to uiCommands
         const con = new ConfirmDialog(window.map);
@@ -190,10 +190,10 @@ const OpsDialog = WDialog.extend({
           () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
               deleteOpPromise(selectedOp.ID).then(
-                function() {
+                function () {
                   console.log("delete from server successful");
                 },
-                function(err) {
+                function (err) {
                   console.log(err);
                   alert(err);
                 }
@@ -234,7 +234,7 @@ const OpsDialog = WDialog.extend({
       const permsDiv = L.DomUtil.create("div", null, buttonSection);
       const permsButton = L.DomUtil.create("button", null, permsDiv);
       permsButton.textContent = wX("OP_PERMS");
-      L.DomEvent.on(permsButton, "click", ev => {
+      L.DomEvent.on(permsButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         const opl = new OpPermList();
         opl.enable();
@@ -244,14 +244,14 @@ const OpsDialog = WDialog.extend({
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
     dupeButton.textContent = wX("DUPE_OP");
-    L.DomEvent.on(dupeButton, "click", ev => {
+    L.DomEvent.on(dupeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       duplicateOperation(selectedOp.ID);
       window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
     });
 
     this._content = content;
-  }
+  },
 });
 
 export default OpsDialog;

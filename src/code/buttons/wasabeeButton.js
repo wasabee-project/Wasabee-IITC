@@ -8,7 +8,7 @@ import SettingsDialog from "../dialogs/settingsDialog.js";
 import {
   getSelectedOperation,
   resetOps,
-  setupLocalStorage
+  setupLocalStorage,
 } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
@@ -16,10 +16,10 @@ import { logoutPromise } from "../server";
 
 const WasabeeButton = WButton.extend({
   statics: {
-    TYPE: "wasabeeButton"
+    TYPE: "wasabeeButton",
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -32,7 +32,7 @@ const WasabeeButton = WButton.extend({
       container: container,
       buttonImage: this.getIcon(),
       callback: this.handler,
-      context: this
+      context: this,
     });
 
     this._lastLoginState = false;
@@ -45,7 +45,7 @@ const WasabeeButton = WButton.extend({
         const ad = new AuthDialog(this._map);
         ad.enable();
       },
-      context: this
+      context: this,
     };
 
     this._teamAction = {
@@ -56,7 +56,7 @@ const WasabeeButton = WButton.extend({
         const wd = new WasabeeDialog(this._map);
         wd.enable();
       },
-      context: this
+      context: this,
     };
 
     //logout out function
@@ -74,13 +74,13 @@ const WasabeeButton = WButton.extend({
             window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             window.runHooks("wasabeeDkeys");
           },
-          err => {
+          (err) => {
             alert(err);
             console.log(err);
           }
         );
       },
-      context: this
+      context: this,
     };
 
     this._teamAction = {
@@ -91,7 +91,7 @@ const WasabeeButton = WButton.extend({
         const wd = new WasabeeDialog(this._map);
         wd.enable();
       },
-      context: this
+      context: this,
     };
 
     this._alwaysActions = [
@@ -104,7 +104,7 @@ const WasabeeButton = WButton.extend({
           const nb = new NewopDialog(this._map);
           nb.enable();
         },
-        context: this
+        context: this,
       },
       {
         title: wX("CLEAROPS BUTTON TITLE"),
@@ -118,8 +118,8 @@ const WasabeeButton = WButton.extend({
           });
           con.enable();
         },
-        context: this
-      }
+        context: this,
+      },
     ];
 
     this._Dactions = [
@@ -131,8 +131,8 @@ const WasabeeButton = WButton.extend({
           const dkd = new DefensiveKeysDialog();
           dkd.enable();
         },
-        context: this
-      }
+        context: this,
+      },
     ];
 
     this._SettingsActions = [
@@ -145,8 +145,8 @@ const WasabeeButton = WButton.extend({
           const sd = new SettingsDialog();
           sd.enable();
         },
-        context: this
-      }
+        context: this,
+      },
     ];
 
     // build and display as if not logged in
@@ -156,7 +156,7 @@ const WasabeeButton = WButton.extend({
     this.Wupdate(); // takes container and operation, not needed here
   },
 
-  getIcon: function() {
+  getIcon: function () {
     // XXX skin logic here
 
     if (this._lastLoginState) {
@@ -167,7 +167,7 @@ const WasabeeButton = WButton.extend({
     }
   },
 
-  _getActions: function() {
+  _getActions: function () {
     let tmp = [];
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
@@ -189,7 +189,7 @@ const WasabeeButton = WButton.extend({
     return this._createSubActions(tmp);
   },
 
-  Wupdate: function() {
+  Wupdate: function () {
     // takes container and operation as args, but we don't need them
     const loggedIn = WasabeeMe.isLoggedIn();
 
@@ -202,7 +202,7 @@ const WasabeeButton = WButton.extend({
       this.actionsContainer = this._getActions();
       old.parentNode.replaceChild(this.actionsContainer, old);
     }
-  }
+  },
 });
 
 export default WasabeeButton;

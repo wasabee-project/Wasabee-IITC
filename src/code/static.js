@@ -3,7 +3,7 @@ const W = window.plugin.wasabee || {};
 
 W.static = {
   CSS: {
-    main: require("./css/wasabee.css")
+    main: require("./css/wasabee.css"),
   },
   images: {
     toolbar_addlinks: require("./images/toolbar_addlinks.png"),
@@ -17,7 +17,7 @@ W.static = {
     toolbar_wasabeebutton_se: require("./images/toolbar_wasabeebutton_se.png"),
     toolbar_wasabeebutton_seg: require("./images/toolbar_wasabeebutton_seg.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
-    toolbar_settings: require("./images/toolbar_settings.png")
+    toolbar_settings: require("./images/toolbar_settings.png"),
   },
   dialogNames: {
     linkDialogButton: "wasabee-addlinks",
@@ -41,7 +41,7 @@ W.static = {
     wasabeeDList: "wasabee-DList",
     madrid: "wasabee-madrid",
     autodraws: "wasabee-autodraws",
-    starburst: "wasabee-starburst"
+    starburst: "wasabee-starburst",
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
@@ -86,9 +86,9 @@ W.static = {
       weight: 5,
       smoothFactor: 1,
       clickable: false,
-      interactive: true
-    }
-  }
+      interactive: true,
+    },
+  },
 };
 
 W.static.strings = {}; // empty object, fill it below
@@ -107,8 +107,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_capture_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_capture_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_capture_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_capture_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_capture_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_DECAY,
@@ -116,8 +116,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_decay_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_decay_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_decay_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_decay_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_decay_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_DESTROY,
@@ -125,8 +125,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_destroy_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_destroy_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_destroy_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_destroy_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_destroy_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_FARM,
@@ -134,8 +134,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_farm_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_farm_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_farm_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_GOTO,
@@ -143,8 +143,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_goto_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_goto_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_goto_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_goto_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_goto_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_KEY,
@@ -152,8 +152,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_key_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_key_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_key_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_key_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_key_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_LINK,
@@ -161,8 +161,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_link_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_link_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_link_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_link_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_link_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_MEETAGENT,
@@ -170,8 +170,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_meetagent_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_meetagent_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_OTHER,
@@ -179,8 +179,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_other_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_other_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_other_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_RECHARGE,
@@ -188,8 +188,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_recharge_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_recharge_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_UPGRADE,
@@ -197,8 +197,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_upgrade_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_upgrade_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_upgrade_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_upgrade_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_upgrade_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_VIRUS,
@@ -206,8 +206,8 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_virus_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_virus_done.png")
-    }
+      markerIconDone: require("./images/wasabee_markers_virus_done.png"),
+    },
   ],
   [
     W.static.constants.MARKER_TYPE_EXCLUDE,
@@ -215,9 +215,9 @@ W.static.markerTypes = new Map([
       markerIcon: require("./images/wasabee_markers_exclude_pending.png"),
       markerIconAssigned: require("./images/wasabee_markers_exclude_assigned.png"),
       markerIconAcknowledged: require("./images/wasabee_markers_exclude_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_exclude_done.png")
-    }
-  ]
+      markerIconDone: require("./images/wasabee_markers_exclude_done.png"),
+    },
+  ],
 ]);
 
 // https://leafletjs.com/reference-1.0.3.html#path
@@ -232,12 +232,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_main.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_main.png"),
+      },
+    },
   ],
   [
     "groupa",
@@ -249,12 +249,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupa.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupa.png"),
+      },
+    },
   ],
   [
     "groupb",
@@ -266,12 +266,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 1, 4, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupb.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupb.png"),
+      },
+    },
   ],
   [
     "groupc",
@@ -283,12 +283,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupc.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupc.png"),
+      },
+    },
   ],
   [
     "groupd",
@@ -300,12 +300,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupd.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupd.png"),
+      },
+    },
   ],
   [
     "groupe",
@@ -317,12 +317,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupe.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupe.png"),
+      },
+    },
   ],
   [
     "groupf",
@@ -334,12 +334,12 @@ W.static.layerTypes = new Map([
         dashArray: [5, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 1,
-        weight: 2
+        weight: 2,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupf.png")
-      }
-    }
+        iconUrl: require("./images/marker_layer_groupf.png"),
+      },
+    },
   ],
   [
     "self-block",
@@ -351,11 +351,11 @@ W.static.layerTypes = new Map([
         dashArray: [1, 5, 1, 5],
         assignedDashArray: [4, 2, 1],
         opacity: 4,
-        weight: 3
+        weight: 3,
       },
       portal: {
-        iconUrl: require("./images/marker_layer_groupa.png")
-      }
-    }
-  ]
+        iconUrl: require("./images/marker_layer_groupa.png"),
+      },
+    },
+  ],
 ]);
