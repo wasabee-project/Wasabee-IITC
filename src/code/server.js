@@ -1083,6 +1083,38 @@ export const deleteTeamPromise = function (teamID) {
   });
 };
 
+export const oneTimeToken = function (token) {
+  const SERVER_BASE = GetWasabeeServer();
+
+  return new Promise((resolve, reject) => {
+    const url = `${SERVER_BASE}/oneTimeToken`;
+    const req = new XMLHttpRequest();
+
+    req.open("POST", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function () {
+      switch (req.status) {
+        case 200:
+          resolve(true);
+          break;
+        default:
+          reject(`${req.responseText}`);
+          break;
+      }
+    };
+
+    req.onerror = function () {
+      reject(`Network Error: ${req.responseText}`);
+    };
+
+    const fd = new FormData();
+    fd.append("token", token);
+    req.send(fd);
+  });
+};
+
 export const GetWasabeeServer = () => {
   let server = localStorage[Wasabee.static.constants.SERVER_BASE_KEY];
   if (server == null) {
