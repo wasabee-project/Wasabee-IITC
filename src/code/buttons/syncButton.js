@@ -43,8 +43,9 @@ const SyncButton = WButton.extend({
         }
 
         const promises = new Array();
-        for (const op of me.Ops) {
-          promises.push(opPromise(op.ID));
+        const opsID = new Set(me.Ops.map((o) => o.ID));
+        for (const opID of opsID) {
+          promises.push(opPromise(opID));
         }
         Promise.all(promises).then(
           (ops) => {
