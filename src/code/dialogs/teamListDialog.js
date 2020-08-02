@@ -5,7 +5,6 @@ import { SetTeamState, leaveTeamPromise, newTeamPromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
-import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
@@ -74,10 +73,10 @@ const TeamListDialog = WDialog.extend({
           let curstate = obj.State;
           link.textContent = curstate;
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
-          link.onclick = async () => {
-            await this.toggleTeam(obj.ID, curstate);
-            this._me = await WasabeeMe.waitGet(true);
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+          link.onclick = () => {
+            this.toggleTeam(obj.ID, curstate);
+            // WasabeeMe.get(true); // called by toggleTeam
+            // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
           };
         },
       },
@@ -96,9 +95,9 @@ const TeamListDialog = WDialog.extend({
               `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
               () => {
                 leaveTeamPromise(obj.ID).then(
-                  async () => {
-                    this._me = await WasabeeMe.waitGet(true);
-                    //window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                  () => {
+                    WasabeeMe.get(true);
+                    // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
                   },
                   (err) => {
                     console.log(err);
@@ -163,7 +162,7 @@ const TeamListDialog = WDialog.extend({
         newTeamPromise(newname).then(
           () => {
             alert(wX("TEAM_CREATED", newname));
-            this._me = WasabeeMe.get(true);
+            WasabeeMe.get(true); // triggers UIUpdate
           },
           (reject) => {
             console.log(reject);
@@ -195,7 +194,7 @@ const TeamListDialog = WDialog.extend({
     if (currentState == "Off") newState = "On";
 
     await SetTeamState(teamID, newState);
-    this._me = await WasabeeMe.waitGet(true);
+    await WasabeeMe.get(true);
     return newState;
   },
 
