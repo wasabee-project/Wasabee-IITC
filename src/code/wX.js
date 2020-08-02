@@ -30,9 +30,9 @@ export const wX = (key, value, option) => {
 
   // do any necessary replacements
   // eslint-disable-next-line
-  if (option) s = s.replace("${option}", option);
+  if (option !== undefined) s = s.replace("${option}", option);
   // eslint-disable-next-line
-  if (value) s = s.replace("${value}", value);
+  if (value !== undefined) s = s.replace("${value}", value);
   return s;
 };
 
