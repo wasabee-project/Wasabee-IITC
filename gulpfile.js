@@ -94,6 +94,7 @@ gulp.task("webpack", (callback) => {
   const webpackConfig = require("./webpack.config.js");
   if (status.mode === "dev") {
     webpackConfig.mode = "development";
+    webpackConfig.devtool = "eval-source-map";
   }
   webpack(webpackConfig, function (err, stats) {
     log(
