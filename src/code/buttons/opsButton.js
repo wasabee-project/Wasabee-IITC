@@ -8,10 +8,10 @@ import wX from "../wX";
 
 const OpsButton = WButton.extend({
   statics: {
-    TYPE: "opsButton"
+    TYPE: "opsButton",
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -26,7 +26,7 @@ const OpsButton = WButton.extend({
       container: this._container,
       buttonImage: window.plugin.wasabee.static.images.toolbar_viewOps.default,
       callback: this._toggleActions,
-      context: context
+      context: context,
     });
 
     this.actionsContainer = this._createSubActions([
@@ -38,7 +38,7 @@ const OpsButton = WButton.extend({
           const od = new OpsDialog(map);
           od.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("CHECKLIST BUTTON TITLE"),
@@ -48,7 +48,7 @@ const OpsButton = WButton.extend({
           const cl = new OperationChecklistDialog(map);
           cl.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("BLOCKER LIST TITLE"),
@@ -58,7 +58,7 @@ const OpsButton = WButton.extend({
           const bl = new BlockersList(map);
           bl.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("KEYS"),
@@ -68,7 +68,7 @@ const OpsButton = WButton.extend({
           const kl = new KeysList(map);
           kl.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("EXPORT OP TITLE"),
@@ -78,13 +78,13 @@ const OpsButton = WButton.extend({
           const ed = new ExportDialog(map);
           ed.enable();
         },
-        context: context
-      }
+        context: context,
+      },
     ]);
 
     this.actionsContainer.style.top = "26px";
     this._container.appendChild(this.actionsContainer); // parentNode
-  }
+  },
 
   // enable: // default is good
   // disable: // default is good

@@ -5,10 +5,10 @@ import { getSelectedOperation } from "../selectedOp";
 
 const QuickdrawButton = WButton.extend({
   statics: {
-    TYPE: "quickdrawButton"
+    TYPE: "quickdrawButton",
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -23,27 +23,27 @@ const QuickdrawButton = WButton.extend({
       buttonImage:
         window.plugin.wasabee.static.images.toolbar_quickdraw.default,
       callback: this.handler.enable,
-      context: this.handler
+      context: this.handler,
     });
 
     this._endSubAction = {
       title: wX("QD BUTTON END"),
       text: wX("QD END"),
       callback: this.handler.disable,
-      context: this.handler
+      context: this.handler,
     };
 
     this.actionsContainer = this._createSubActions([this._endSubAction]);
     // this should be automaticly detected
     this.actionsContainer.style.top = "52px";
     this._container.appendChild(this.actionsContainer);
-  }
+  },
 
   // Wupdate: function(container) { }
 });
 
 const QuickDrawControl = L.Handler.extend({
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this._map = map;
     this._container = map._container;
     this.type = "QuickDrawControl";
@@ -53,21 +53,21 @@ const QuickDrawControl = L.Handler.extend({
     L.Util.extend(this.options, options);
   },
 
-  enable: function() {
+  enable: function () {
     console.log("qd enable called");
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
   },
 
-  disable: function() {
+  disable: function () {
     console.log("qd disable called");
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
   },
 
-  addHooks: function() {
+  addHooks: function () {
     console.log("qd addHooks called");
     if (!this._map) return;
     L.DomUtil.disableTextSelection();
@@ -82,7 +82,7 @@ const QuickDrawControl = L.Handler.extend({
     this._throwOrder = this._operation.nextOrder;
 
     // IITC hook format for IITC event
-    this._portalClickedHook = data => {
+    this._portalClickedHook = (data) => {
       QuickDrawControl.prototype._portalClicked.call(this, data);
     };
     window.addHook("portalSelected", this._portalClickedHook);
@@ -92,12 +92,12 @@ const QuickDrawControl = L.Handler.extend({
     // this._map.on("click", this._clickHook, this);
   },
 
-  _clickHook: function(e) {
+  _clickHook: function (e) {
     console.log("click detected");
     console.log(e);
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     console.log("qd removeHooks called");
     if (!this._map) return;
     if (this._guideLayerGroup) {
@@ -121,7 +121,7 @@ const QuickDrawControl = L.Handler.extend({
     // this._map.off("click", this._clickHook, this);
   },
 
-  _keyUpListener: function(e) {
+  _keyUpListener: function (e) {
     if (!this._enabled) return;
 
     // [esc]
@@ -139,7 +139,7 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  _onMouseMove: function(e) {
+  _onMouseMove: function (e) {
     if (e.latlng) {
       this._tooltip.updatePosition(e.latlng);
       this._guideUpdate(e);
@@ -147,14 +147,14 @@ const QuickDrawControl = L.Handler.extend({
     L.DomEvent.preventDefault(e.originalEvent);
   },
 
-  _guideUpdate: function(e) {
+  _guideUpdate: function (e) {
     if (!this._guideLayerGroup) return;
     for (const l of this._guideLayerGroup.getLayers()) {
       l.setLatLngs([l.options.anchorLL, e.latlng]);
     }
   },
 
-  _guideLayerToggle: function() {
+  _guideLayerToggle: function () {
     console.log("toggle guide layer");
     if (!this._guideLayerGroup) {
       this._guideLayerGroup = new L.LayerGroup();
@@ -173,7 +173,7 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  _getTooltipText: function() {
+  _getTooltipText: function () {
     if (this._drawMode == "quickdraw") {
       if (!this._anchor1) return { text: wX("QDSTART") };
       if (!this._anchor2) return { text: wX("QDNEXT") };
@@ -185,7 +185,7 @@ const QuickDrawControl = L.Handler.extend({
     return { text: "Click next portal" };
   },
 
-  _portalClicked: function(data) {
+  _portalClicked: function (data) {
     // console.log(data);
     if (data.selectedPortalGuid == data.unselectedPortalGuid) {
       console.log("same portal clicked");
@@ -207,7 +207,7 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  _portalClickedQD: function(selectedPortal) {
+  _portalClickedQD: function (selectedPortal) {
     const guideStyle =
       window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
     guideStyle.anchorLL = selectedPortal.latLng;
@@ -263,7 +263,7 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.updateContent(this._getTooltipText());
   },
 
-  _toggleMode: function() {
+  _toggleMode: function () {
     // changing mode resets all the things
     if (this._anchor1) delete this._anchor1;
     if (this._anchor2) delete this._anchor2;
@@ -281,7 +281,7 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.updateContent(this._getTooltipText());
   },
 
-  _portalClickedSingle: function(selectedPortal) {
+  _portalClickedSingle: function (selectedPortal) {
     // console.log("portal clicked", selectedPortal);
     // IITC sending 2 portalClicked for 1 mouse click
     if (this._previous && this._previous.id == selectedPortal.id) {
@@ -311,7 +311,7 @@ const QuickDrawControl = L.Handler.extend({
     if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
     this._previous = selectedPortal;
     this._tooltip.updateContent(this._getTooltipText());
-  }
+  },
 });
 
 export default QuickdrawButton;

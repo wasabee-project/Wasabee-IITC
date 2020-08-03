@@ -1,5 +1,5 @@
 export const WTooltip = L.Class.extend({
-  initialize: function(map) {
+  initialize: function (map) {
     this._map = map;
     // this._pane = map._panes.popupPane;
     this._pane = map._panes.tooltipPane;
@@ -8,36 +8,36 @@ export const WTooltip = L.Class.extend({
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
   },
 
-  dispose: function() {
+  dispose: function () {
     this._pane.removeChild(this._container);
     this._container = null;
   },
 
-  updateContent: function(labelText) {
+  updateContent: function (labelText) {
     // const span = L.DomUtil.create("span", null, this._container);
     this._container.textContent = labelText.text;
     return this;
   },
 
-  updatePosition: function(latlng) {
+  updatePosition: function (latlng) {
     const pos = this._map.latLngToLayerPoint(latlng);
     L.DomUtil.setPosition(this._container, pos);
     return this;
   },
 
-  showAsError: function() {
+  showAsError: function () {
     L.DomUtil.addClass(this._container, "wasabee-error-tooltip");
     return this;
   },
 
-  removeError: function() {
+  removeError: function () {
     L.DomUtil.removeClass(this._container, "wasabee-error-tooltip");
     return this;
-  }
+  },
 });
 
 export const WDialog = L.Handler.extend({
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = "Unextended Wasabee Dialog";
     this._map = map;
     this._container = map._container;
@@ -49,31 +49,31 @@ export const WDialog = L.Handler.extend({
     // determine large or small screen dialog sizes
   },
 
-  enable: function() {
+  enable: function () {
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
   },
 
-  disable: function() {
+  disable: function () {
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
   },
 
-  addHooks: function() {},
+  addHooks: function () {},
 
-  removeHooks: function() {},
+  removeHooks: function () {},
 
-  _isMobile: function() {
+  _isMobile: function () {
     // return true;
     // XXX this is a cheap hack -- determine a better check
     if (window.plugin.userLocation) return true;
     return false;
-  }
+  },
 });
 
 export const WButton = L.Class.extend({
   statics: {
-    TYPE: "unextendedWButton"
+    TYPE: "unextendedWButton",
   },
 
   // always have these
@@ -81,7 +81,7 @@ export const WButton = L.Class.extend({
   title: "Unset",
 
   // make sure all these bases are covered in your button
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     console.log("Wbutton init");
     if (!map) map = window.map;
     this._map = map;
@@ -95,14 +95,14 @@ export const WButton = L.Class.extend({
       container: container,
       // buttonImage: null,
       callback: this.handler,
-      context: this
+      context: this,
       // className: ...,
     });
   },
 
-  Wupdate: function() {},
+  Wupdate: function () {},
 
-  _toggleActions: function() {
+  _toggleActions: function () {
     if (this._enabled) {
       this.disable();
     } else {
@@ -110,7 +110,7 @@ export const WButton = L.Class.extend({
     }
   },
 
-  disable: function() {
+  disable: function () {
     if (!this._enabled) return;
     this._enabled = false;
     if (this.actionsContainer) {
@@ -118,7 +118,7 @@ export const WButton = L.Class.extend({
     }
   },
 
-  enable: function() {
+  enable: function () {
     if (this._enabled) return;
     this._enabled = true;
     if (this.actionsContainer) {
@@ -131,7 +131,7 @@ export const WButton = L.Class.extend({
     }
   },
 
-  _createButton: function(options) {
+  _createButton: function (options) {
     const link = L.DomUtil.create(
       "a",
       options.className || "",
@@ -161,12 +161,12 @@ export const WButton = L.Class.extend({
     return link;
   },
 
-  touchstart: function() {
+  touchstart: function () {
     console.log("Wbutton touchstart");
     // console.log(ev);
   },
 
-  touchend: function(ev) {
+  touchend: function (ev) {
     console.log("Wbutton touchend");
     console.log(ev);
     console.log(this);
@@ -177,7 +177,7 @@ export const WButton = L.Class.extend({
     }
   },
 
-  _disposeButton: function(button, callback) {
+  _disposeButton: function (button, callback) {
     console.log("Wbutton _disposeButton");
     L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
       .off(button, "mousedown", L.DomEvent.stopPropagation)
@@ -186,7 +186,7 @@ export const WButton = L.Class.extend({
       .off(button, "click", callback);
   },
 
-  _createSubActions: function(buttons) {
+  _createSubActions: function (buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
     for (const b of buttons) {
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
@@ -197,9 +197,9 @@ export const WButton = L.Class.extend({
         container: li,
         callback: b.callback,
         context: b.context,
-        className: "wasabee-subactions"
+        className: "wasabee-subactions",
       });
     }
     return container;
-  }
+  },
 });

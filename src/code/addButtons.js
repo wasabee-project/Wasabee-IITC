@@ -8,7 +8,7 @@ import UploadButton from "./buttons/uploadButton";
 import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
-export default function(selectedOp) {
+export default function (selectedOp) {
   selectedOp = selectedOp || getSelectedOperation();
 
   if (window.plugin.wasabee.buttons) {
@@ -19,9 +19,9 @@ export default function(selectedOp) {
 
   const ButtonsControl = L.Control.extend({
     options: {
-      position: "topleft"
+      position: "topleft",
     },
-    onAdd: function(map) {
+    onAdd: function (map) {
       const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
       this._container = L.DomUtil.create("div", "leaflet-bar", outerDiv);
       this._modes = {};
@@ -43,14 +43,14 @@ export default function(selectedOp) {
       return outerDiv;
     },
 
-    update: function(operation) {
+    update: function (operation) {
       for (const id in window.plugin.wasabee.buttons._modes) {
         window.plugin.wasabee.buttons._modes[id].Wupdate(
           window.plugin.wasabee.buttons._container,
           operation
         );
       }
-    }
+    },
   });
 
   if (typeof window.plugin.wasabee.buttons === "undefined") {

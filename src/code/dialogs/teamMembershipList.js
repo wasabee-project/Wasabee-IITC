@@ -5,25 +5,25 @@ import wX from "../wX";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
-    TYPE: "teamMembershipList"
+    TYPE: "teamMembershipList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = TeamMembershipList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     // sometimes we are too quick, try again
     if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
 
@@ -41,12 +41,12 @@ const TeamMembershipList = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.linkList
+      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function(teamID) {
+  setup: async function (teamID) {
     this._teamID = teamID;
 
     if (window.plugin.wasabee.teams.has(teamID)) {
@@ -67,28 +67,28 @@ const TeamMembershipList = WDialog.extend({
     this._table.fields = [
       {
         name: wX("AGENT"),
-        value: agent => agent.name,
+        value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value, agent) => cell.appendChild(agent.formatDisplay())
+        format: (cell, value, agent) => cell.appendChild(agent.formatDisplay()),
       },
       {
         name: wX("SQUAD"),
-        value: agent => agent.squad,
-        sort: (a, b) => a.localeCompare(b)
+        value: (agent) => agent.squad,
+        sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("LOC_UPDATE"),
-        value: agent => agent.date + " GMT",
-        sort: (a, b) => a.localeCompare(b)
+        value: (agent) => agent.date + " GMT",
+        sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
-      }
+      },
     ];
     this._table.sortBy = 0;
     // if team owner, don't show non-enabled agents
-    const a = this._team.agents.filter(agent => agent.state);
+    const a = this._team.agents.filter((agent) => agent.state);
     this._table.items = a;
-  }
+  },
 });
 
 export default TeamMembershipList;

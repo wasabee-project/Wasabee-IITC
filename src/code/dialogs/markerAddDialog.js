@@ -5,20 +5,20 @@ import wX from "../wX";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
-    TYPE: "markerButton"
+    TYPE: "markerButton",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = MarkerAddDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     const context = this;
-    this._pch = portal => {
+    this._pch = (portal) => {
       context._portalClickedHook(portal);
     };
     window.addHook("portalSelected", this._pch);
@@ -26,12 +26,12 @@ const MarkerAddDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalSelected", this._pch);
   },
 
-  _portalClickedHook: function() {
+  _portalClickedHook: function () {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
@@ -44,7 +44,7 @@ const MarkerAddDialog = WDialog.extend({
     }
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     this._marker = null;
 
     const content = L.DomUtil.create("div", "content");
@@ -65,7 +65,7 @@ const MarkerAddDialog = WDialog.extend({
     const addMarkerButton = L.DomUtil.create("button", null, content);
     addMarkerButton.textContent = wX("ADD_MARKER2");
 
-    L.DomEvent.on(addMarkerButton, "click", ev => {
+    L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._addMarker(this._type.value, this._operation, this._comment.value);
     });
@@ -84,14 +84,14 @@ const MarkerAddDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.markerButton
+      id: window.plugin.wasabee.static.dialogNames.markerButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _addMarker: function(selectedType, operation, comment) {
+  _addMarker: function (selectedType, operation, comment) {
     operation.addMarker(selectedType, WasabeePortal.getSelected(), comment);
-  }
+  },
 });
 
 export default MarkerAddDialog;

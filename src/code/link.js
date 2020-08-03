@@ -28,7 +28,7 @@ export default class WasabeeLink {
       assignedTo: this.assignedTo,
       throwOrderPos: this.throwOrderPos,
       color: this.color,
-      completed: this.completed
+      completed: this.completed,
     };
   }
 

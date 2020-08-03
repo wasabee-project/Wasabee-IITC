@@ -6,25 +6,25 @@ import wX from "../wX";
 
 const StateDialog = WDialog.extend({
   statics: {
-    TYPE: "stateDialog"
+    TYPE: "stateDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = StateDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -39,12 +39,12 @@ const StateDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.state
+      id: window.plugin.wasabee.static.dialogNames.state,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function(target, operation) {
+  setup: function (target, operation) {
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
@@ -75,7 +75,7 @@ const StateDialog = WDialog.extend({
     this._html.appendChild(menu);
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const content = L.DomUtil.create("div");
     if (typeof this._label == "string") {
       content.textContent = this._label;
@@ -86,7 +86,7 @@ const StateDialog = WDialog.extend({
   },
 
   // TODO this should return a promise so the draw routine can .then() it...
-  _getStateMenu: function(current) {
+  _getStateMenu: function (current) {
     const container = L.DomUtil.create("div", "wasabee-state-menu");
     const menu = L.DomUtil.create("select", null, container);
 
@@ -101,11 +101,11 @@ const StateDialog = WDialog.extend({
 
     const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
     if (mode == "active") {
-      menu.addEventListener("change", value => {
+      menu.addEventListener("change", (value) => {
         this.activeSetState(value);
       });
     } else {
-      menu.addEventListener("change", value => {
+      menu.addEventListener("change", (value) => {
         this.designSetState(value);
       });
     }
@@ -113,7 +113,7 @@ const StateDialog = WDialog.extend({
     return container;
   },
 
-  designSetState: function(value) {
+  designSetState: function (value) {
     if (this._type == "Marker") {
       this._operation.setMarkerState(this._targetID, value.srcElement.value);
     }
@@ -123,10 +123,10 @@ const StateDialog = WDialog.extend({
     }
   },
 
-  activeSetState: function(value) {
+  activeSetState: function (value) {
     alert("Active mode set state not written yet");
     console.log("not written yet", value);
-  }
+  },
 });
 
 export default StateDialog;

@@ -10,7 +10,7 @@ export const setupToolbox = () => {
   const aboutLink = L.DomUtil.create("a", null, toolbox);
   aboutLink.href = "#";
   aboutLink.textContent = wX("ABOUT_WASABEE");
-  L.DomEvent.on(aboutLink, "click", ev => {
+  L.DomEvent.on(aboutLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     const ad = new AboutDialog();
     ad.enable();
@@ -20,7 +20,7 @@ export const setupToolbox = () => {
   settingsLink.href = "#";
   settingsLink.textContent = wX("SETTINGS");
 
-  L.DomEvent.on(settingsLink, "click", ev => {
+  L.DomEvent.on(settingsLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     const sd = new SettingsDialog();
     sd.enable();
@@ -28,10 +28,10 @@ export const setupToolbox = () => {
 
   const locationLink = L.DomUtil.create("a", null, toolbox);
   locationLink.textContent = wX("SEND_LOC");
-  L.DomEvent.on(locationLink, "click", ev => {
+  L.DomEvent.on(locationLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     navigator.geolocation.getCurrentPosition(
-      position => {
+      (position) => {
         locationPromise(
           position.coords.latitude,
           position.coords.longitude
@@ -39,12 +39,12 @@ export const setupToolbox = () => {
           () => {
             alert(wX("LOC_PROC"));
           },
-          err => {
+          (err) => {
             console.log(err);
           }
         );
       },
-      err => {
+      (err) => {
         console.log(err);
       }
     );

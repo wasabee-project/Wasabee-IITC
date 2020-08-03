@@ -5,10 +5,10 @@ import wX from "../wX";
 
 const LinkDialog = WDialog.extend({
   statics: {
-    TYPE: "linkDialog"
+    TYPE: "linkDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = LinkDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
 
@@ -21,18 +21,18 @@ const LinkDialog = WDialog.extend({
     if (p) this._anchor2 = WasabeePortal.create(p);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
     const container = L.DomUtil.create("div", "container");
 
@@ -48,7 +48,7 @@ const LinkDialog = WDialog.extend({
     } else {
       this._sourceDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(sourceButton, "click", ev => {
+    L.DomEvent.on(sourceButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._source = WasabeePortal.getSelected();
       if (this._source) {
@@ -65,7 +65,7 @@ const LinkDialog = WDialog.extend({
     });
     const clearSourceButton = L.DomUtil.create("button", "clear", container);
     clearSourceButton.textContent = wX("CLEAR");
-    L.DomEvent.on(clearSourceButton, "click", ev => {
+    L.DomEvent.on(clearSourceButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       delete localStorage[
         window.plugin.wasabee.static.constants.LINK_SOURCE_KEY
@@ -85,7 +85,7 @@ const LinkDialog = WDialog.extend({
     } else {
       this._anchor1Display.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchor1Button, "click", ev => {
+    L.DomEvent.on(anchor1Button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchor1 = WasabeePortal.getSelected();
       if (this._anchor1) {
@@ -102,7 +102,7 @@ const LinkDialog = WDialog.extend({
     });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
     anchor1AddButton.textContent = wX("ADD1");
-    L.DomEvent.on(anchor1AddButton, "click", ev => {
+    L.DomEvent.on(anchor1AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
         this._operation.addLink(
@@ -117,7 +117,7 @@ const LinkDialog = WDialog.extend({
     });
     const clearAnchor1Button = L.DomUtil.create("button", "clear", container);
     clearAnchor1Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor1Button, "click", ev => {
+    L.DomEvent.on(clearAnchor1Button, "click", (ev) => {
       L.DomEvent.stop(ev);
       delete localStorage[
         window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
@@ -137,7 +137,7 @@ const LinkDialog = WDialog.extend({
     } else {
       this._anchor2Display.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchor2Button, "click", ev => {
+    L.DomEvent.on(anchor2Button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchor2 = WasabeePortal.getSelected();
       if (this._anchor2) {
@@ -154,7 +154,7 @@ const LinkDialog = WDialog.extend({
     });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
     anchor2AddButton.textContent = wX("ADD2");
-    L.DomEvent.on(anchor2AddButton, "click", ev => {
+    L.DomEvent.on(anchor2AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
         this._operation.addLink(
@@ -169,7 +169,7 @@ const LinkDialog = WDialog.extend({
     });
     const clearAnchor2Button = L.DomUtil.create("button", "clear", container);
     clearAnchor2Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor2Button, "click", ev => {
+    L.DomEvent.on(clearAnchor2Button, "click", (ev) => {
       L.DomEvent.stop(ev);
       delete localStorage[
         window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
@@ -185,7 +185,7 @@ const LinkDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("buttonall", null, container);
     button.textContent = "\uD83D\uDC1D" + wX("ADD_BUTTON_LINKS");
-    L.DomEvent.on(button, "click", ev => {
+    L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));
       if (this._anchor1) {
@@ -222,10 +222,10 @@ const LinkDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.linkDialogButton
+      id: window.plugin.wasabee.static.dialogNames.linkDialogButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
-  }
+  },
 });
 
 export default LinkDialog;

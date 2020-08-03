@@ -8,20 +8,20 @@ import WasabeeDList from "./wasabeeDlist";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
-    TYPE: "defensiveKeysDialog"
+    TYPE: "defensiveKeysDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = DefensiveKeysDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: async function() {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet();
     this._operation = getSelectedOperation();
-    this._pch = portal => {
+    this._pch = (portal) => {
       this._portalClickedHook(portal);
     };
     window.addHook("portalSelected", this._pch);
@@ -30,12 +30,12 @@ const DefensiveKeysDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalSelected", this._pch);
   },
 
-  _portalClickedHook: function() {
+  _portalClickedHook: function () {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
@@ -55,7 +55,7 @@ const DefensiveKeysDialog = WDialog.extend({
     }
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     this._content = L.DomUtil.create("div", "container");
     this._portal = L.DomUtil.create("div", "portal", this._content);
 
@@ -67,14 +67,14 @@ const DefensiveKeysDialog = WDialog.extend({
     this._capID.size = 8;
     const addDKeyButton = L.DomUtil.create("button", null, this._content);
     addDKeyButton.textContent = wX("UPDATE_COUNT");
-    L.DomEvent.on(addDKeyButton, "click", ev => {
+    L.DomEvent.on(addDKeyButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._addDKey();
     });
 
     const showDKeyButton = L.DomUtil.create("button", null, this._content);
     showDKeyButton.textContent = wX("D_SHOW_LIST");
-    L.DomEvent.on(showDKeyButton, "click", ev => {
+    L.DomEvent.on(showDKeyButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const dl = new WasabeeDList();
       dl.enable();
@@ -83,7 +83,7 @@ const DefensiveKeysDialog = WDialog.extend({
     this._portalClickedHook();
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -99,23 +99,23 @@ const DefensiveKeysDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton
+      id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _addDKey: function() {
+  _addDKey: function () {
     // send it to the server
     dKeyPromise(
       this._selectedPortal.id,
       this._count.value,
       this._capID.value
     ).then(
-      function() {
+      function () {
         alert("Registered with server");
         window.runHooks("wasabeeDkeys");
       },
-      function(reject) {
+      function (reject) {
         console.log(reject);
         alert(reject);
       }
@@ -128,7 +128,7 @@ const DefensiveKeysDialog = WDialog.extend({
     const l = window.plugin.wasabee._Dkeys.get(portalID);
     if (l.has(this._me.GoogleID)) return l.get(this._me.GoogleID);
     return;
-  }
+  },
 });
 
 export default DefensiveKeysDialog;

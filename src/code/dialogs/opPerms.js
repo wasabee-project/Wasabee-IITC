@@ -8,15 +8,15 @@ import wX from "../wX";
 
 const OpPermList = WDialog.extend({
   statics: {
-    TYPE: "opPermList"
+    TYPE: "opPermList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = OpPermList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: async function() {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
@@ -26,7 +26,7 @@ const OpPermList = WDialog.extend({
       this._me = null;
     }
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.update(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
@@ -34,12 +34,12 @@ const OpPermList = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     WDialog.prototype.removeHooks.call(this);
   },
 
-  update: function(op) {
+  update: function (op) {
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
       this._me = WasabeeMe.get();
@@ -50,7 +50,7 @@ const OpPermList = WDialog.extend({
     this._html.firstChild.replaceWith(this._table.table);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     this.buildTable();
@@ -83,7 +83,7 @@ const OpPermList = WDialog.extend({
       ab.value = "Add";
       ab.textContent = wX("ADD");
 
-      L.DomEvent.on(ab, "click", ev => {
+      L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
         this.addPerm(teamMenu.value, permMenu.value);
         // addPerm calls wasabeeUIUpdate, which redraws the screen
@@ -104,18 +104,18 @@ const OpPermList = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.linkList
+      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
   // needs this._operation.teamlist;
-  buildTable: function() {
+  buildTable: function () {
     this._table = new Sortable();
     this._table.fields = [
       {
         name: wX("TEAM"),
-        value: perm => {
+        value: (perm) => {
           const t = WasabeeTeam.get(perm.teamid);
           if (t) return t.name;
           if (this._me) {
@@ -125,15 +125,15 @@ const OpPermList = WDialog.extend({
           }
           return "[" + perm.teamid + "]";
         },
-        sort: (a, b) => a.localeCompare(b)
+        sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("ROLE"),
-        value: perm => perm.role,
-        sort: (a, b) => a.localeCompare(b)
+        value: (perm) => perm.role,
+        sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
-      }
+      },
     ];
 
     if (WasabeeMe.isLoggedIn()) {
@@ -145,18 +145,18 @@ const OpPermList = WDialog.extend({
           const link = L.DomUtil.create("a", null, cell);
           link.href = "#";
           link.textContent = value;
-          L.DomEvent.on(link, "click", ev => {
+          L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
             this.delPerm(obj); // calls wasabeeUIUpdate
           });
-        }
+        },
       });
     }
     this._table.sortBy = 0;
     this._table.items = this._operation.teamlist;
   },
 
-  addPerm: function(teamID, role) {
+  addPerm: function (teamID, role) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
@@ -174,19 +174,19 @@ const OpPermList = WDialog.extend({
         // then add locally for display
         this._operation.teamlist.push({
           teamid: teamID,
-          role: role
+          role: role,
         });
         this._operation.store();
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
-      err => {
+      (err) => {
         console.log(err);
         alert(err);
       }
     );
   },
 
-  delPerm: function(obj) {
+  delPerm: function (obj) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
@@ -203,12 +203,12 @@ const OpPermList = WDialog.extend({
         this._operation.store();
         window.runHooks("wasabeeUIUpdate", getSelectedOperation());
       },
-      err => {
+      (err) => {
         console.log(err);
         alert(err);
       }
     );
-  }
+  },
 });
 
 export default OpPermList;

@@ -5,7 +5,7 @@ function wrapper(plugin_info) {
   window.plugin.Wasabee = window.plugin.wasabee = {};
 
   // Code injection
-  let setup = function() {
+  let setup = function () {
     /* inject: ../dist/static-bundle.js                     */
 
     /* inject: ../dist/init-bundle.js                     */

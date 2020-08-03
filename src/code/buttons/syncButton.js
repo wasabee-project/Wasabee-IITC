@@ -7,10 +7,10 @@ import wX from "../wX";
 
 const SyncButton = WButton.extend({
   statics: {
-    TYPE: "syncButton"
+    TYPE: "syncButton",
   },
 
-  Wupdate: function() {
+  Wupdate: function () {
     // takes container & operation, not needed here
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn) {
@@ -20,7 +20,7 @@ const SyncButton = WButton.extend({
     }
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -47,7 +47,7 @@ const SyncButton = WButton.extend({
           promises.push(opPromise(op.ID));
         }
         Promise.all(promises).then(
-          ops => {
+          (ops) => {
             for (const newop of ops) {
               newop.store();
               if (newop.ID == so.ID) {
@@ -56,17 +56,17 @@ const SyncButton = WButton.extend({
             }
             alert(wX("SYNC DONE"));
           },
-          function(err) {
+          function (err) {
             console.log(err);
             alert(err);
           }
         );
-      }
+      },
     });
 
     // hide or show depeneding on logged in state
     this.Wupdate(); // container & operation not needed
-  }
+  },
 });
 
 export default SyncButton;

@@ -18,7 +18,7 @@ export const initFirebase = () => {
 
   $(document.body).append(iframe);
 
-  window.addEventListener("message", event => {
+  window.addEventListener("message", (event) => {
     // ignore anything not from our server
     if (event.origin.indexOf(server) === -1) return;
 
@@ -33,7 +33,7 @@ export const initFirebase = () => {
         break;
       case "Map Change":
         opPromise(event.data.data.opID).then(
-          function(refreshed) {
+          function (refreshed) {
             refreshed.store();
             if (refreshed.ID == operation.ID) {
               console.log(
@@ -43,7 +43,7 @@ export const initFirebase = () => {
               makeSelectedOperation(refreshed.ID);
             }
           },
-          function(err) {
+          function (err) {
             console.log(err);
           }
         );

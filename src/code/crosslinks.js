@@ -207,7 +207,7 @@ const showCrossLink = (link, operation) => {
     weight: 5,
     clickable: false,
     dashArray: [8, 8],
-    guid: link.options.guid
+    guid: link.options.guid,
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
@@ -259,7 +259,7 @@ const testSelfBlock = (incoming, operation) => {
   }
 };
 
-export const checkAllLinks = operation => {
+export const checkAllLinks = (operation) => {
   console.time("checkAllLinks");
   // console.log("checkAllLinks called: " + operation.ID);
   window.plugin.wasabee.crossLinkLayers.clearLayers();
@@ -276,7 +276,7 @@ export const checkAllLinks = operation => {
   console.timeEnd("checkAllLinks");
 };
 
-const onLinkAdded = data => {
+const onLinkAdded = (data) => {
   testLink(data.link, getSelectedOperation());
 };
 
@@ -308,7 +308,7 @@ const onMapDataRefreshEnd = () => {
 
 export const initCrossLinks = () => {
   window.pluginCreateHook("wasabeeCrosslinks");
-  window.addHook("wasabeeCrosslinks", operation => {
+  window.addHook("wasabeeCrosslinks", (operation) => {
     checkAllLinks(operation);
   });
 
@@ -321,7 +321,7 @@ export const initCrossLinks = () => {
   );
 
   // rerun crosslinks on re-enable
-  window.map.on("layeradd", obj => {
+  window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee._crosslinkCache = new Map();
       const operation = getSelectedOperation();
@@ -332,7 +332,7 @@ export const initCrossLinks = () => {
   });
 
   // clear crosslinks on disable
-  window.map.on("layerremove", obj => {
+  window.map.on("layerremove", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
       delete window.plugin.wasabee._crosslinkCache;

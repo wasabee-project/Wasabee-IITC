@@ -5,7 +5,7 @@ import WasabeeMarker from "../marker";
 import wX from "../wX";
 
 export const SetCommentDialog = WDialog.extend({
-  setup: function(target, operation) {
+  setup: function (target, operation) {
     this.operation = operation;
     this.target = target;
 
@@ -34,25 +34,25 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   statics: {
-    TYPE: "setCommentDialog"
+    TYPE: "setCommentDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = SetCommentDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -67,12 +67,12 @@ export const SetCommentDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.setComment
+      id: window.plugin.wasabee.static.dialogNames.setComment,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _buildHtml: function() {
+  _buildHtml: function () {
     const container = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", container);
     const input = L.DomUtil.create("input", null, container);
@@ -133,7 +133,7 @@ export const SetCommentDialog = WDialog.extend({
     }
 
     return container;
-  }
+  },
 });
 
 export default SetCommentDialog;

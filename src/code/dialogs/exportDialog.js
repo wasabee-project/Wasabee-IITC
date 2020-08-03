@@ -5,26 +5,26 @@ import wX from "../wX";
 // export screen
 const ExportDialog = WDialog.extend({
   statics: {
-    TYPE: "exportDialog"
+    TYPE: "exportDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = ExportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -42,12 +42,12 @@ const ExportDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.exportDialog
+      id: window.plugin.wasabee.static.dialogNames.exportDialog,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const mainContent = L.DomUtil.create("div", null);
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
@@ -56,7 +56,7 @@ const ExportDialog = WDialog.extend({
     return mainContent;
   },
 
-  _drawToolsFormat: function() {
+  _drawToolsFormat: function () {
     const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Array();
     for (const link of this._operation.links) {
@@ -68,7 +68,7 @@ const ExportDialog = WDialog.extend({
     }
 
     ta.value = JSON.stringify(output);
-  }
+  },
 });
 
 export default ExportDialog;

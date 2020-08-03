@@ -7,21 +7,21 @@ import wX from "../wX";
 
 const NewopDialog = WDialog.extend({
   statics: {
-    TYPE: "newopButton"
+    TYPE: "newopButton",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = NewopDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog(this);
   },
 
-  _displayDialog: function(noHandler) {
+  _displayDialog: function (noHandler) {
     const content = L.DomUtil.create("div", null);
     const buttonSet = L.DomUtil.create("div", "buttonset", content);
     const addButton = L.DomUtil.create("button", null, buttonSet);
@@ -29,14 +29,14 @@ const NewopDialog = WDialog.extend({
 
     const importButton = L.DomUtil.create("button", null, buttonSet);
     importButton.textContent = wX("IMPORT_OP");
-    L.DomEvent.on(importButton, "click", ev => {
+    L.DomEvent.on(importButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
       const id = new ImportDialog(this._map, null);
       id.enable();
     });
 
-    L.DomEvent.on(addButton, "click", ev => {
+    L.DomEvent.on(addButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
       const addDialog = new PromptDialog(this._map);
@@ -69,18 +69,18 @@ const NewopDialog = WDialog.extend({
       html: content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-newop",
-      closeCallback: function() {
+      closeCallback: function () {
         noHandler.disable();
         delete noHandler._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.newopButton
+      id: window.plugin.wasabee.static.dialogNames.newopButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-  }
+  },
 });
 
 export default NewopDialog;

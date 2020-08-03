@@ -8,25 +8,25 @@ import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
 
 const TrawlDialog = WDialog.extend({
   statics: {
-    TYPE: "trawl"
+    TYPE: "trawl",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
     this.type = TrawlDialog.TYPE;
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
-  addHooks: function() {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayTrawlerDialog: function(tiles) {
+  _displayTrawlerDialog: function (tiles) {
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWLING", tiles);
@@ -49,7 +49,7 @@ const TrawlDialog = WDialog.extend({
       if (tss == trawlCount) option.selected = true;
       trawlCount++;
     }
-    L.DomEvent.on(trawlSelect, "change", ev => {
+    L.DomEvent.on(trawlSelect, "change", (ev) => {
       L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] =
         trawlSelect.value;
@@ -70,19 +70,19 @@ const TrawlDialog = WDialog.extend({
           delete window.plugin.wasabee.tileTrawlQueue;
         this.disable();
         delete this._trawlerDialog;
-      }
+      },
       // id: window.plugin.wasabee.static.dialogNames.trawl
     });
     this._trawlerDialog.dialog("option", "buttons", buttons);
   },
 
-  _updateTrawlerDialog: function(tiles) {
+  _updateTrawlerDialog: function (tiles) {
     if (this && this.remaining)
       this.remaining.textContent = wX("TRAWL_REMAINING", tiles);
   },
 
   // define our work in _displayDialog
-  _displayDialog: function() {
+  _displayDialog: function () {
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
@@ -141,12 +141,12 @@ const TrawlDialog = WDialog.extend({
         // this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.trawl
+      id: window.plugin.wasabee.static.dialogNames.trawl,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _getTrawlPoints: function() {
+  _getTrawlPoints: function () {
     const operation = getSelectedOperation();
 
     const trawlPrecision = 250;
@@ -188,7 +188,7 @@ const TrawlDialog = WDialog.extend({
   },
 
   // converts lat/lon points to tile names, gets center points of each tile, starts the map moves
-  _pointTileDataRequest: function(latlngs, mapZoom = 13) {
+  _pointTileDataRequest: function (latlngs, mapZoom = 13) {
     if (!localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS])
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] = 0;
 
@@ -213,7 +213,7 @@ const TrawlDialog = WDialog.extend({
       // center point of the tile
       const tilePoint = L.latLng([
         Number(window.tileToLat(x, tileParams).toFixed(6)),
-        Number(window.tileToLng(y, tileParams).toFixed(6))
+        Number(window.tileToLng(y, tileParams).toFixed(6)),
       ]);
       // map so no duplicate tiles are requested
       window.plugin.wasabee.tileTrawlQueue.set(
@@ -230,7 +230,7 @@ const TrawlDialog = WDialog.extend({
     this.tileRequestNext();
   },
 
-  tileRequestNext: function() {
+  tileRequestNext: function () {
     if (!window.plugin.wasabee.tileTrawlQueue) {
       window.removeHook("mapDataRefreshEnd", () =>
         this.tileRequestNext.call(this)
@@ -288,7 +288,7 @@ const TrawlDialog = WDialog.extend({
     alert("trawl done");
   },
 
-  _clearMarkers: function() {
+  _clearMarkers: function () {
     const operation = getSelectedOperation();
 
     operation.startBatchMode();
@@ -302,7 +302,7 @@ const TrawlDialog = WDialog.extend({
     operation.endBatchMode();
   },
 
-  _bulkLoad: function(latlngs, mapZoom) {
+  _bulkLoad: function (latlngs, mapZoom) {
     window.addHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
 
     if (latlngs.length == 0) return;
@@ -345,13 +345,13 @@ const TrawlDialog = WDialog.extend({
     );
   },
 
-  bulkLoadDone: function() {
+  bulkLoadDone: function () {
     if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
     alert("bulk data load done");
     window.removeHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
-  }
+  },
 });
 
 class FakeDebugTiles {

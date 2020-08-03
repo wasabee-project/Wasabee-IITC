@@ -7,20 +7,20 @@ import wX from "../wX";
 
 const StarburstDialog = WDialog.extend({
   statics: {
-    TYPE: "StarburstDialog"
+    TYPE: "StarburstDialog",
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     //Instructions
@@ -48,7 +48,7 @@ const StarburstDialog = WDialog.extend({
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
 
-    L.DomEvent.on(anchorButton, "click", ev => {
+    L.DomEvent.on(anchorButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
@@ -73,7 +73,7 @@ const StarburstDialog = WDialog.extend({
 
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("STARBURST_DRAW");
-    L.DomEvent.on(button, "click", ev => {
+    L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.starburst.call(this);
     });
@@ -95,12 +95,12 @@ const StarburstDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.starburst
+      id: window.plugin.wasabee.static.dialogNames.starburst,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = StarburstDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("STARBURST");
@@ -111,7 +111,7 @@ const StarburstDialog = WDialog.extend({
     if (p) this._anchor = WasabeePortal.create(p);
   },
 
-  starburst: function() {
+  starburst: function () {
     if (!this._anchor) {
       alert("Select an anchor portal");
       return;
@@ -123,7 +123,7 @@ const StarburstDialog = WDialog.extend({
       this._operation.addLink(p, this._anchor, "auto starburst");
     }
     this._operation.endBatchMode();
-  }
+  },
 });
 
 export default StarburstDialog;
