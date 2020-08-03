@@ -2,7 +2,6 @@ import WasabeePortal from "./portal";
 import WasabeeLink from "./link";
 import { getSelectedOperation } from "./selectedOp";
 
-//*** CROSSLINK THINGS */
 const Wasabee = window.plugin.wasabee;
 
 // takes WasabeeLink or L.geodesicPolyline format
@@ -180,7 +179,6 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
       return true;
     }
 
-    // XXX  my gut says there is a way to do this more quickly
     for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
@@ -201,6 +199,7 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
 };
 
 const showCrossLink = (link, operation) => {
+  // this should be in static.js or skin
   const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
     color: "#d22",
     opacity: 0.7,
@@ -260,8 +259,7 @@ const testSelfBlock = (incoming, operation) => {
 };
 
 export const checkAllLinks = (operation) => {
-  console.time("checkAllLinks");
-  // console.log("checkAllLinks called: " + operation.ID);
+  // console.time("checkAllLinks");
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
@@ -273,24 +271,12 @@ export const checkAllLinks = (operation) => {
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
-  console.timeEnd("checkAllLinks");
+  // console.timeEnd("checkAllLinks");
 };
 
 const onLinkAdded = (data) => {
   testLink(data.link, getSelectedOperation());
 };
-
-/* probably unused now -- remove in 0.16
-const testForDeletedLinks = () => {
-  for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
-    const guid = layer.options.guid;
-    if (!window.links[guid]) {
-      console.log("testForDeletedLinks FOUND SOMETHING!!!");
-      window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
-      window.plugin.wasabee._crosslinkCache.delete(guid);
-    }
-  }
-}; */
 
 const onMapDataRefreshStart = () => {
   window.removeHook("linkAdded", onLinkAdded);
@@ -307,7 +293,6 @@ const onMapDataRefreshEnd = () => {
 };
 
 export const initCrossLinks = () => {
-  // window.pluginCreateHook("wasabeeCrosslinks"); // not needed after IITC 0.30
   window.addHook("wasabeeCrosslinks", (operation) => {
     checkAllLinks(operation);
   });
@@ -399,4 +384,3 @@ export class GeodesicLine {
     return Math.atan2(y, x);
   }
 }
-//*** END CROSSLINK THINGS */'
