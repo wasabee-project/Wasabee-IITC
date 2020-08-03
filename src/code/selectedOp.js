@@ -57,6 +57,7 @@ export const makeSelectedOperation = (opID) => {
         "makeSelectedOperation called on the current op; replacing with version from local store. not saving live changes first"
       );
     } else {
+      // should not be necessary now, but still safe
       window.plugin.wasabee._selectedOp.store();
     }
   }
@@ -68,6 +69,7 @@ export const makeSelectedOperation = (opID) => {
     alert("attempted to load invalid opID");
   }
   // the only place we should change the selected op.
+  delete window.plugin.wasabee._selectedOp;
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
