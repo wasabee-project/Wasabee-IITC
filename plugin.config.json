@@ -1,8 +1,8 @@
 {
     "headers": {
         "prod": {
-            "downloadURL": "https://server.wasabee.rocks/static/prod/wasabee.user.js",
-            "updateURL": "https://server.wasabee.rocks/static/prod/wasabee.meta.js"
+            "downloadURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.user.js",
+            "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js"
         },
         "dev": {
             "downloadURL": "https://server.wasabee.rocks/static/dev/wasabee.user.js",
