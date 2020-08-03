@@ -128,7 +128,7 @@ window.plugin.wasabee.init = function () {
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
-    // this updates the UI if needed
+    // this updates the UI
     WasabeeMe.get(true);
   }
 

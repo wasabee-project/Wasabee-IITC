@@ -9,6 +9,7 @@ import {
   deleteTeamPromise,
   GetWasabeeServer,
 } from "../server";
+import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
@@ -236,7 +237,9 @@ const ManageTeamDialog = WDialog.extend({
           deleteTeamPromise(this._team.ID).then(
             () => {
               alert(`${this._team.Name} removed`);
-              window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+              this._dialog.dialog("close");
+              WasabeeMe.get(true);
+              //window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             },
             (reject) => {
               console.log(reject);

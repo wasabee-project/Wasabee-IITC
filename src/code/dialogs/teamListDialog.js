@@ -5,21 +5,20 @@ import { SetTeamState, leaveTeamPromise, newTeamPromise } from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
-import { getSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
-const WasabeeDialog = WDialog.extend({
+const TeamListDialog = WDialog.extend({
   statics: {
     TYPE: "wasabeeButton",
   },
 
   initialize: function (map = window.map, options) {
-    this.type = WasabeeDialog.TYPE;
+    this.type = TeamListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: WasabeeDialog.TYPE });
+    postToFirebase({ id: "analytics", action: TeamListDialog.TYPE });
   },
 
   addHooks: async function () {
@@ -38,6 +37,7 @@ const WasabeeDialog = WDialog.extend({
   update: function () {
     // async
     if (!this._enabled) return;
+    this._me = WasabeeMe.get();
     // this._me = await WasabeeMe.waitGet(); // breaks logout
     this._dialog.html(this._buildContent());
   },
@@ -73,10 +73,10 @@ const WasabeeDialog = WDialog.extend({
           let curstate = obj.State;
           link.textContent = curstate;
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
-          link.onclick = async () => {
-            await this.toggleTeam(obj.ID, curstate);
-            this._me = await WasabeeMe.waitGet(true);
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+          link.onclick = () => {
+            this.toggleTeam(obj.ID, curstate);
+            // WasabeeMe.get(true); // called by toggleTeam
+            // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
           };
         },
       },
@@ -95,9 +95,9 @@ const WasabeeDialog = WDialog.extend({
               `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
               () => {
                 leaveTeamPromise(obj.ID).then(
-                  async () => {
-                    this._me = await WasabeeMe.waitGet(true);
-                    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                  () => {
+                    WasabeeMe.get(true);
+                    // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
                   },
                   (err) => {
                     console.log(err);
@@ -162,7 +162,7 @@ const WasabeeDialog = WDialog.extend({
         newTeamPromise(newname).then(
           () => {
             alert(wX("TEAM_CREATED", newname));
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            WasabeeMe.get(true); // triggers UIUpdate
           },
           (reject) => {
             console.log(reject);
@@ -194,7 +194,7 @@ const WasabeeDialog = WDialog.extend({
     if (currentState == "Off") newState = "On";
 
     await SetTeamState(teamID, newState);
-    this._me = await WasabeeMe.waitGet(true);
+    await WasabeeMe.get(true);
     return newState;
   },
 
@@ -203,4 +203,4 @@ const WasabeeDialog = WDialog.extend({
   },
 });
 
-export default WasabeeDialog;
+export default TeamListDialog;

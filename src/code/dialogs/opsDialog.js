@@ -166,7 +166,6 @@ const OpsDialog = WDialog.extend({
       L.DomEvent.on(clearOpButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         clearAllItems(selectedOp);
-        selectedOp.store();
       });
     }
 

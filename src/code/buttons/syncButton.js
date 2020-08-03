@@ -34,33 +34,36 @@ const SyncButton = WButton.extend({
       context: this,
       callback: () => {
         const so = getSelectedOperation();
-        const me = WasabeeMe.get(true); // force update of ops list
-        // const me = await WasabeeMe.waitGet(true); // force update of ops list
-        if (!me) {
-          const ad = new AuthDialog();
-          ad.enable();
-          return;
-        }
-
-        const promises = new Array();
-        for (const op of me.Ops) {
-          promises.push(opPromise(op.ID));
-        }
-        Promise.all(promises).then(
-          (ops) => {
-            for (const newop of ops) {
-              newop.store();
-              if (newop.ID == so.ID) {
-                makeSelectedOperation(newop.ID);
-              }
-            }
-            alert(wX("SYNC DONE"));
-          },
-          function (err) {
-            console.log(err);
-            alert(err);
+        // force update of ops list
+        // const me = WasabeeMe.get(true); // force update of ops list
+        WasabeeMe.waitGet(true).then((me) => {
+          if (!me) {
+            const ad = new AuthDialog();
+            ad.enable();
+            return;
           }
-        );
+
+          const promises = new Array();
+          const opsID = new Set(me.Ops.map((o) => o.ID));
+          for (const opID of opsID) {
+            promises.push(opPromise(opID));
+          }
+          Promise.all(promises).then(
+            (ops) => {
+              for (const newop of ops) {
+                newop.store();
+                if (newop.ID == so.ID) {
+                  makeSelectedOperation(newop.ID);
+                }
+              }
+              alert(wX("SYNC DONE"));
+            },
+            function (err) {
+              console.log(err);
+              alert(err);
+            }
+          );
+        });
       },
     });
 
