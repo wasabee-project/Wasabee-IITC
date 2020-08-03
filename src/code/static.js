@@ -14,8 +14,6 @@ W.static = {
     toolbar_download: require("./images/toolbar_download.png"),
     toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
     toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
-    toolbar_wasabeebutton_se: require("./images/toolbar_wasabeebutton_se.png"),
-    toolbar_wasabeebutton_seg: require("./images/toolbar_wasabeebutton_seg.png"),
     toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
     toolbar_settings: require("./images/toolbar_settings.png"),
   },
@@ -104,10 +102,10 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_CAPTURE,
     {
-      markerIcon: require("./images/wasabee_markers_capture_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_capture_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_capture_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_capture_done.png"),
+      markerIcon: require("./images/wasabee_markers_capture_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_capture_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_capture_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_capture_done.svg"),
     },
   ],
   [
@@ -131,10 +129,10 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_FARM,
     {
-      markerIcon: require("./images/wasabee_markers_farm_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_farm_done.png"),
+      markerIcon: require("./images/wasabee_markers_farm_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_farm_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_farm_done.svg"),
     },
   ],
   [
@@ -167,10 +165,10 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_MEETAGENT,
     {
-      markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_meetagent_done.png"),
+      markerIcon: require("./images/wasabee_markers_meetagent_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_meetagent_done.svg"),
     },
   ],
   [
@@ -194,10 +192,10 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_UPGRADE,
     {
-      markerIcon: require("./images/wasabee_markers_upgrade_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_upgrade_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_upgrade_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_upgrade_done.png"),
+      markerIcon: require("./images/wasabee_markers_upgrade_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_upgrade_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_upgrade_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_upgrade_done.svg"),
     },
   ],
   [
