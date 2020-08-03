@@ -26,9 +26,6 @@ const TeamMembershipList = WDialog.extend({
   },
 
   _displayDialog: function () {
-    // sometimes we are too quick, try again
-    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
-
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");

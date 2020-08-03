@@ -55,10 +55,10 @@ const WasabeeDialog = WDialog.extend({
           link.textContent = value;
           if (team.State == "On") {
             L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", (ev) => {
+            L.DomEvent.on(link, "click", async (ev) => {
               L.DomEvent.stop(ev);
               const td = new TeamMembershipList();
-              td.setup(team.ID);
+              await td.setup(team.ID);
               td.enable();
             });
           }
