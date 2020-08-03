@@ -58,6 +58,9 @@ const QuickDrawControl = L.Handler.extend({
     if (this._enabled) return;
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
+    window.plugin.wasabee.buttons._modes[
+      this.buttonName
+    ].button.style.backgroundColor = "#55bb55";
     postToFirebase({ id: "analytics", action: "quickdrawStart" });
   },
 
@@ -66,6 +69,9 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
+    window.plugin.wasabee.buttons._modes[
+      this.buttonName
+    ].button.style.backgroundColor = "#ffffff";
     postToFirebase({ id: "analytics", action: "quickdrawEnd" });
   },
 
