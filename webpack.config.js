@@ -5,36 +5,29 @@ module.exports = {
   mode: "production",
   entry: {
     static: "./src/code/static.js",
-    init: "./src/code/init.js"
+    init: "./src/code/init.js",
   },
   output: {
     path: outputPath,
-    filename: "[name]-bundle.js"
+    filename: "[name]-bundle.js",
   },
   resolve: {
-    modules: ["node_modules"]
+    modules: ["node_modules"],
   },
   module: {
     rules: [
       {
-        test: /\.(png|gif)$/,
-        use: "url-loader"
+        test: /\.(png|gif|svg)$/,
+        use: "url-loader",
       },
       {
         test: /\.css$/,
-        use: ["to-string-loader", "css-loader"]
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.html$/,
-        use: ["to-string-loader", "html-loader"]
-      }
-      // {
-      //   test:  /\.ts$/,
-      //   use: [
-      //     "babel-loader",
-      //     "awesome-typescript-loader"
-      //   ]
-      // },
-    ]
-  }
+        use: ["to-string-loader", "html-loader"],
+      },
+    ],
+  },
 };

@@ -1,4 +1,4 @@
 module.exports = {
   verbose: true,
-  browser: true
+  browser: true,
 };
