@@ -231,97 +231,116 @@ export const drawAgents = async () => {
     return;
   }
 
-  const layerMap = new Map();
-  for (const agent of Wasabee.agentLayerGroup.getLayers()) {
-    layerMap.set(agent.options.id, agent._leaflet_id);
+  const layerMap = agentLayerMap();
+
+  let doneAgents = new Array();
+  const me = await WasabeeMe.waitGet();
+  for (const t of me.Teams) {
+    const freshlyDone = await drawSingleTeam(t, layerMap, doneAgents);
+    doneAgents = doneAgents.concat(freshlyDone);
   }
 
-  const doneAgents = new Array();
-  const me = await WasabeeMe.waitGet();
-  const now = Date.now();
-  for (const t of me.Teams) {
-    // must be older than 15 seconds
-    if (t.fetched && now - t.fetched < 15000) {
-      console.log("skipping team");
-      continue;
-    }
-
-    // remove whatever data we have for this team, start fresh
-    if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
-      Wasabee.teams.delete(t.ID);
-    }
-
-    // only display enabled teams
-    if (t.State != "On") continue;
-
-    /* this also caches the team into Wasabee.teams for uses elsewhere */
-    teamPromise(t.ID).then(
-      (team) => {
-        for (const agent of team.agents) {
-          if (!layerMap.has(agent.id) && !doneAgents.includes(agent.id)) {
-            // new, add to map
-            doneAgents.push(agent.id);
-            if (agent.lat && agent.lng) {
-              const marker = L.marker(agent.latLng, {
-                title: agent.name,
-                icon: L.icon({
-                  iconUrl: agent.pic,
-                  shadowUrl: null,
-                  iconSize: L.point(41, 41),
-                  iconAnchor: L.point(25, 41),
-                  popupAnchor: L.point(-1, -48),
-                }),
-                id: agent.id,
-              });
-
-              window.registerMarkerForOMS(marker);
-              marker.bindPopup("Loading...", {
-                className: "wasabee-popup",
-                closeButton: false,
-              });
-              // marker.off("click", agent.openPopup, agent);
-              marker.on(
-                "click spiderfiedclick",
-                (ev) => {
-                  L.DomEvent.stop(ev);
-                  if (marker.isPopupOpen && marker.isPopupOpen()) return;
-                  const a = window.plugin.wasabee._agentCache.get(agent.id);
-                  marker.setPopupContent(a.getPopup());
-                  if (marker._popup._wrapper)
-                    marker._popup._wrapper.classList.add("wasabee-popup");
-                  marker.update();
-                  marker.openPopup();
-                },
-                marker
-              );
-              marker.addTo(Wasabee.agentLayerGroup);
-            }
-          } else {
-            // just move existing if not already moved
-            if (!doneAgents.includes(agent.id)) {
-              const a = layerMap.get(agent.id);
-              const al = Wasabee.agentLayerGroup.getLayer(a);
-              if (agent.lat && agent.lng) {
-                al.setLatLng(agent.latLng);
-                layerMap.delete(agent.id);
-                doneAgents.push(agent.id);
-                al.update();
-              }
-            }
-          }
-        }
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-  } // for t of whichlist
-
   // remove those not found in this fetch
+  // there is probably a cute filter one-liner to do this
+  for (const d of doneAgents) {
+    layerMap.delete(d.id);
+  }
   for (const agent in layerMap) {
     console.log("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
+};
+
+const agentLayerMap = () => {
+  const layerMap = new Map();
+  for (const agent of Wasabee.agentLayerGroup.getLayers()) {
+    layerMap.set(agent.options.id, agent._leaflet_id);
+  }
+  return layerMap;
+};
+
+// use layerMap and alreadyDone to reduce processing when using this in a loop, otherwise leave them unset
+export const drawSingleTeam = async (
+  t,
+  layerMap = agentLayerMap(),
+  alreadyDone = new Array()
+) => {
+  const done = new Array();
+
+  // must be older than 5 seconds
+  const now = Date.now();
+  if (t.fetched && now - t.fetched < 5000) {
+    console.log("skipping team: recently fetched");
+    return done;
+  }
+
+  // remove whatever data we have for this team, start fresh
+  if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
+    Wasabee.teams.delete(t.ID);
+  }
+
+  // only display enabled teams
+  if (t.State != "On") return done;
+
+  /* this also caches the team into Wasabee.teams for uses elsewhere */
+  try {
+    const team = await teamPromise(t.ID);
+    for (const agent of team.agents) {
+      if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
+        // new, add to map
+        done.push(agent.id);
+        if (agent.lat && agent.lng) {
+          const marker = L.marker(agent.latLng, {
+            title: agent.name,
+            icon: L.icon({
+              iconUrl: agent.pic,
+              shadowUrl: null,
+              iconSize: L.point(41, 41),
+              iconAnchor: L.point(25, 41),
+              popupAnchor: L.point(-1, -48),
+            }),
+            id: agent.id,
+          });
+
+          window.registerMarkerForOMS(marker);
+          marker.bindPopup("Loading...", {
+            className: "wasabee-popup",
+            closeButton: false,
+          });
+          // marker.off("click", agent.openPopup, agent);
+          marker.on(
+            "click spiderfiedclick",
+            (ev) => {
+              L.DomEvent.stop(ev);
+              if (marker.isPopupOpen && marker.isPopupOpen()) return;
+              const a = window.plugin.wasabee._agentCache.get(agent.id);
+              marker.setPopupContent(a.getPopup());
+              if (marker._popup._wrapper)
+                marker._popup._wrapper.classList.add("wasabee-popup");
+              marker.update();
+              marker.openPopup();
+            },
+            marker
+          );
+          marker.addTo(Wasabee.agentLayerGroup);
+        }
+      } else {
+        // just move existing if not already moved
+        if (!alreadyDone.includes(agent.id)) {
+          const a = layerMap.get(agent.id);
+          const al = Wasabee.agentLayerGroup.getLayer(a);
+          if (agent.lat && agent.lng) {
+            al.setLatLng(agent.latLng);
+            done.push(agent.id);
+            al.update();
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return done;
 };
 
 const updateAnchors = (op) => {
