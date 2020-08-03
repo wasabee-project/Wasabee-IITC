@@ -30,6 +30,7 @@ window.plugin.wasabee.init = function () {
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
+  Wasabee.onlineAgents = new Map();
   Wasabee.portalDetailQueue = new Array();
 
   // can this be moved to the auth dialog?

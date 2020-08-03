@@ -32,6 +32,10 @@ export const initFirebase = () => {
         break;
       case "Agent Location Change":
         console.log("firebase update of agent location: ", event.data.data);
+        // update the online list
+        // window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        //
+        // XXX use the new drawSingleTeam()
         drawAgents();
         break;
       case "Map Change":
@@ -54,6 +58,7 @@ export const initFirebase = () => {
       case "Login":
         // display to console somehow?
         console.log("server reported teammate login: ", event.data.data.gid);
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       default:
         console.log("unknown firebase command: ", event.data.data);
