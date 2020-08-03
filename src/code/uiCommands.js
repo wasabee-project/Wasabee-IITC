@@ -323,4 +323,6 @@ export const blockerAutomark = function(operation, first = true) {
   });
   // recurse
   blockerAutomark(operation, false);
+
+  if (first) operation.endBatchMode();
 };
