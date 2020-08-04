@@ -21,7 +21,7 @@ const MarkerAddDialog = WDialog.extend({
     this._operation = getSelectedOperation();
     const context = this;
     this._pch = (portal) => {
-      context._portalClickedHook(portal);
+      context.update(portal);
     };
     window.addHook("portalSelected", this._pch);
 
@@ -33,7 +33,7 @@ const MarkerAddDialog = WDialog.extend({
     window.removeHook("portalSelected", this._pch);
   },
 
-  _portalClickedHook: function () {
+  update: function () {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
@@ -68,7 +68,7 @@ const MarkerAddDialog = WDialog.extend({
     this._portal = L.DomUtil.create("div", "portal", content);
 
     this._type = L.DomUtil.create("select", null, content);
-    this._portalClickedHook();
+    this.update();
 
     this._comment = L.DomUtil.create("input", null, content);
     this._comment.placeholder = "Input comment";
@@ -102,7 +102,7 @@ const MarkerAddDialog = WDialog.extend({
 
   _addMarker: function (selectedType, operation, comment) {
     operation.addMarker(selectedType, WasabeePortal.getSelected(), comment);
-    this._portalClickedHook();
+    this.update();
   },
 });
 
