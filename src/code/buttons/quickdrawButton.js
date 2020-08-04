@@ -150,6 +150,7 @@ const QuickDrawControl = L.Handler.extend({
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", this._operation);
     }
   },
 
