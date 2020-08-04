@@ -44,6 +44,21 @@ const MarkerAddDialog = WDialog.extend({
     } else {
       this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
+
+    const markers = this._operation.getPortalMarkers(this._selectedPortal);
+    let defaultType =
+      window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    defaultType = markers.has(defaultType) ? null : defaultType;
+
+    this._type.innerHTML = "";
+    for (const k of window.plugin.wasabee.skin.markerTypes) {
+      const o = L.DomUtil.create("option", null, this._type);
+      o.value = k[0];
+      o.textContent = wX(k[0]);
+      if (markers.has(k[0])) o.disabled = true;
+      else if (!defaultType) defaultType = k[0];
+    }
+    this._type.value = defaultType;
   },
 
   _displayDialog: function () {
@@ -51,16 +66,10 @@ const MarkerAddDialog = WDialog.extend({
 
     const content = L.DomUtil.create("div", "content");
     this._portal = L.DomUtil.create("div", "portal", content);
-    this._portalClickedHook();
 
     this._type = L.DomUtil.create("select", null, content);
-    for (const k of window.plugin.wasabee.skin.markerTypes) {
-      const o = L.DomUtil.create("option", null, this._type);
-      o.value = k[0];
-      o.textContent = wX(k[0]);
-    }
-    this._type.value =
-      window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    this._portalClickedHook();
+
     this._comment = L.DomUtil.create("input", null, content);
     this._comment.placeholder = "Input comment";
 
@@ -93,6 +102,7 @@ const MarkerAddDialog = WDialog.extend({
 
   _addMarker: function (selectedType, operation, comment) {
     operation.addMarker(selectedType, WasabeePortal.getSelected(), comment);
+    this._portalClickedHook();
   },
 });
 

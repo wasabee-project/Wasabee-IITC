@@ -5,7 +5,8 @@ import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
 import { updateOpPromise } from "./server";
-// import wX from "./wX";
+
+import wX from "./wX";
 
 // this should be in statics.js
 const DEFAULT_OPERATION_COLOR = "groupa";
@@ -172,16 +173,9 @@ export default class WasabeeOp {
     return this.containsLinkFromTo(link.fromPortalId, link.toPortalId);
   }
 
-  // unused
-  /* containsMarker(portal, markerType) {
-    if (this.markers.length == 0) return false;
-    for (const m of this.markers) {
-      if (m.portalId == portal.id && m.type == markerType) {
-        return true;
-      }
-    }
-    return false;
-  } */
+  containsMarker(portal, markerType) {
+    return this.containsMarkerByID(portal.id, markerType);
+  }
 
   containsMarkerByID(portalID, markerType) {
     if (this.markers.length == 0) return false;
@@ -191,6 +185,17 @@ export default class WasabeeOp {
       }
     }
     return false;
+  }
+
+  getPortalMarkers(portal) {
+    const markers = new Map();
+    if (!portal) return markers;
+    for (const m of this.markers) {
+      if (m.portalId == portal.id) {
+        markers.set(m.type, m);
+      }
+    }
+    return markers;
   }
 
   getLinkListFromPortal(portal) {
@@ -593,14 +598,22 @@ export default class WasabeeOp {
 
   addMarker(markerType, portal, comment) {
     if (!portal) return;
-    // if (!this.containsMarker(portal, markerType)) {
-    this.addPortal(portal);
-    const marker = new WasabeeMarker(markerType, portal.id, comment);
-    this.markers.push(marker);
-    this.update(true);
-    // only need this for virus/destroy
-    this.runCrosslinks();
-    // } else alert(wX("ALREADY_HAS_MARKER"));
+    const destructMarkerTypes = [
+      window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
+      window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
+      window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
+    ];
+    if (this.containsMarker(portal, markerType)) {
+      alert(wX("ALREADY_HAS_MARKER"));
+    } else {
+      this.addPortal(portal);
+      const marker = new WasabeeMarker(markerType, portal.id, comment);
+      this.markers.push(marker);
+      this.update(true);
+
+      // only need this for virus/destroy
+      if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
+    }
   }
 
   assignMarker(id, gid) {
