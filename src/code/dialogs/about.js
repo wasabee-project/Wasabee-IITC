@@ -52,7 +52,10 @@ const AboutDialog = WDialog.extend({
       "<h3>Show your love</h3><a href='https://paypal.me/pools/c/8osG170xBE' target=\"_blank\">Tip Jar@paypal</a>";
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
-      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
+      "<h3>About Wasabee-IITC</h3>" +
+      "Current version: " +
+      window.plugin.wasabee.info.version +
+      "<ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
