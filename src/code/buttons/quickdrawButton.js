@@ -248,7 +248,7 @@ const QuickDrawControl = L.Handler.extend({
         this._anchor1,
         this._anchor2,
         wX("QDBASE"),
-        this._throwOrder++
+        this._operation.nextOrder
       );
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
@@ -266,13 +266,13 @@ const QuickDrawControl = L.Handler.extend({
       selectedPortal,
       this._anchor1,
       null,
-      this._throwOrder++
+      this._operation.nextOrder
     );
     this._operation.addLink(
       selectedPortal,
       this._anchor2,
       null,
-      this._throwOrder++
+      this._operation.nextOrder
     );
     this._tooltip.updateContent(this._getTooltipText());
   },
