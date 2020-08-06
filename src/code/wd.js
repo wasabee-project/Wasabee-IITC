@@ -1,7 +1,7 @@
 // the counter-op / defensive tools are Wasabee-D
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
-import { getAgent } from "./server";
+import { agentPromise } from "./server";
 import wX from "./wX";
 import { getPortalDetails } from "./uiCommands";
 
@@ -149,13 +149,19 @@ const dLoadDetails = (e) => {
   });
   marker.on(
     "click spiderfiedclick",
-    (ev) => {
+    async (ev) => {
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      marker.setPopupContent(getMarkerPopup(e.guid));
-      if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup");
-      marker.update();
+      try {
+        const content = await getMarkerPopup(e.guid);
+        marker.setPopupContent(content);
+        if (marker._popup._wrapper)
+          marker._popup._wrapper.classList.add("wasabee-popup");
+        marker.update();
+      } catch (e) {
+        marker.setPopupContent(e);
+        marker.update();
+      }
       marker.openPopup();
     },
     marker
@@ -172,7 +178,7 @@ const dLoadDetails = (e) => {
   }
 };
 
-const getMarkerPopup = (PortalID) => {
+const getMarkerPopup = async (PortalID) => {
   if (!window.plugin.wasabee._Dkeys) return null;
 
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
@@ -181,7 +187,12 @@ const getMarkerPopup = (PortalID) => {
     const l = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of l) {
       if (k != "details") {
-        const a = getAgent(v.GID);
+        let a;
+        if (window.plugin.wasabee._agentCache.has(v.GID)) {
+          a = window.plugin.wasabee._agentCache.get(v.GID);
+        } else {
+          a = await agentPromise(v.GID, false);
+        }
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());
