@@ -359,6 +359,10 @@
   border-top: initial;
 } */
 
+.wasabee-dialog input[type=checkbox] {
+  margin: auto;
+}
+
 .wasabee-dialog button.drawb::before {
   content: "🐝";
 }
