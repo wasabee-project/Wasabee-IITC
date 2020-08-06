@@ -225,44 +225,18 @@ export const mePromise = function () {
   });
 };
 
-// come back to this one -- could be made generic with a little effort
-export const agentPromise = function (GID, force) {
+// returns (a resolved promise of) the actual WasabeeAgent
+// this is inconsistent with the rest of the framework but done so because of the agent cache
+// async functions return promises
+export const agentPromise = async function (GID, force) {
+  if (!force && window.plugin.wasabee._agentCache.has(GID)) {
+    return window.plugin.wasabee._agentCache.get(GID);
+  }
+
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function (resolve, reject) {
-    if (GID == null) {
-      reject("null gid");
-    }
-
-    if (!force && window.plugin.wasabee._agentCache.has(GID)) {
-      resolve(window.plugin.wasabee._agentCache.get(GID));
-    } else {
-      const url = `${SERVER_BASE}/api/v1/agent/${GID}`;
-      const req = new XMLHttpRequest();
-      req.open("GET", url);
-      req.withCredentials = true;
-      req.crossDomain = true;
-
-      req.onload = function () {
-        switch (req.status) {
-          case 200:
-            resolve(WasabeeAgent.create(req.response));
-            break;
-          case 401:
-            reject(wX("NOT LOGGED IN", req.responseText));
-            break;
-          default:
-            reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-            break;
-        }
-      };
-
-      req.onerror = function () {
-        reject(`Network Error: ${req.responseText}`);
-      };
-
-      req.send();
-    }
-  });
+  const response = await _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
+  const wa = WasabeeAgent.create(response);
+  return wa;
 };
 
 export const assignMarkerPromise = function (opID, markerID, agentID) {
@@ -615,24 +589,4 @@ export const SetWasabeeServer = (server) => {
   // starts w/ https://
   // does not end with /
   localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
-};
-
-// don't use this unless you just can't use the promise directly
-export const getAgent = (gid) => {
-  // when a team is loaded from the server, all agents are pushed into the cache
-  if (window.plugin.wasabee._agentCache.has(gid)) {
-    return window.plugin.wasabee._agentCache.get(gid);
-  }
-
-  let agent = null;
-  agentPromise(gid, false).then(
-    function (resolve) {
-      agent = resolve;
-      window.plugin.wasabee._agentCache.set(gid, agent);
-    },
-    function (reject) {
-      console.log(reject);
-    }
-  );
-  return agent;
 };

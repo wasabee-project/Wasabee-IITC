@@ -4,7 +4,7 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
-import { getAgent } from "../server";
+import { agentPromise } from "../server";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
@@ -165,12 +165,15 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("ASS_TO"),
         value: (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            const agent = getAgent(thing.assignedTo);
-            if (agent) {
+            if (window.plugin.wasabee._agentCache.has(thing.assignedTo)) {
+              const agent = window.plugin.wasabee._agentCache.get(
+                thing.assignedTo
+              );
               return agent.name;
-            } else {
-              return "looking up: [" + thing.assignedTo + "]";
             }
+            // we can't use async or then here, so just request it now and it should be in cache next time
+            agentPromise(thing.assignedTo);
+            return "looking up: [" + thing.assignedTo + "]";
           }
           return "";
         },

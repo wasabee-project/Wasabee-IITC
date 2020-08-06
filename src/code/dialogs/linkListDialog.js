@@ -3,9 +3,9 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
-import { getAgent } from "../server";
+import { agentPromise } from "../server";
 import wX from "../wX";
-import WasabeeMe from "../me";
+// import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
 
 const LinkListDialog = WDialog.extend({
@@ -128,14 +128,17 @@ const LinkListDialog = WDialog.extend({
         name: "Assigned To",
         value: (link) => {
           if (link.assignedTo != null && link.assignedTo != "") {
-            if (!WasabeeMe.isLoggedIn()) return "not logged in";
-            const agent = getAgent(link.assignedTo);
-            if (agent != null) {
+            if (window.plugin.wasabee._agentCache.has(link.assignedTo)) {
+              const agent = window.plugin.wasabee._agentCache.get(
+                link.assignedTo
+              );
               return agent.name;
-            } else {
-              return "looking up: [" + link.assignedTo + "]";
             }
+            // we can't use async or then here, so just request it now and it should be in cache next time
+            agentPromise(link.assignedTo);
+            return "looking up: [" + link.assignedTo + "]";
           }
+
           return "";
         },
         sort: (a, b) => a.localeCompare(b),

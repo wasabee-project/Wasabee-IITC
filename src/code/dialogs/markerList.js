@@ -2,9 +2,9 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
-import { getAgent } from "../server";
+import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeMe from "../me";
+// import WasabeeMe from "../me";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
@@ -122,13 +122,15 @@ const MarkerList = WDialog.extend({
         name: wX("ASS_TO"),
         value: (marker) => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
-            if (!WasabeeMe.isLoggedIn()) return "not logged in";
-            const agent = getAgent(marker.assignedTo);
-            if (agent != null) {
+            if (window.plugin.wasabee._agentCache.has(marker.assignedTo)) {
+              const agent = window.plugin.wasabee._agentCache.get(
+                marker.assignedTo
+              );
               return agent.name;
-            } else {
-              return "Loading: [" + marker.assignedTo + "]";
             }
+            // we can't use async or then here, so just request it now and it should be in cache next time
+            agentPromise(marker.assignedTo);
+            return "looking up: [" + marker.assignedTo + "]";
           }
           return "";
         },
