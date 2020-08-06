@@ -211,7 +211,7 @@ const ManageTeamDialog = WDialog.extend({
         rocksapiField.value
       ).then(
         () => {
-          alert(`updated rocks info`);
+          alert("updated rocks info");
           this._team.RocksComm = rockscommField.value; // for display
           this._team.RocksKey = rocksapiField.value; // for display
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());

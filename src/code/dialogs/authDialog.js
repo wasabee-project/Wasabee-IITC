@@ -240,7 +240,8 @@ const AuthDialog = WDialog.extend({
             }
             // console.log("sending to Wasabee (immediate_failed)");
             SendAccessTokenAsync(responseSelect.access_token).then(
-              () => {
+              (response) => {
+                WasabeeMe.create(response);
                 if (this._ios) {
                   window.setTimeout(() => {
                     this._dialog.dialog("close");
@@ -251,8 +252,8 @@ const AuthDialog = WDialog.extend({
                 postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
               },
               (tokErr) => {
+                alert(wX("AUTH TOKEN REJECTED", tokErr));
                 console.log(tokErr);
-                alert(tokErr);
                 this._dialog.dialog("close");
               }
             );
@@ -267,7 +268,8 @@ const AuthDialog = WDialog.extend({
       }
       // console.log("sending to Wasabee");
       SendAccessTokenAsync(response.access_token).then(
-        () => {
+        (response) => {
+          WasabeeMe.create(response);
           if (this._ios) {
             window.setTimeout(() => {
               this._dialog.dialog("close");
@@ -303,7 +305,8 @@ const AuthDialog = WDialog.extend({
           return;
         }
         SendAccessTokenAsync(response.access_token).then(
-          () => {
+          (response) => {
+            WasabeeMe.create(response);
             mePromise(); // needs .then...
             this._dialog.dialog("close");
             postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
