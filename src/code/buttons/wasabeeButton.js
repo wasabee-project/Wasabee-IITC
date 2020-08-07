@@ -71,11 +71,13 @@ const WasabeeButton = WButton.extend({
 
         logoutPromise().then(
           () => {
+            WasabeeMe.purge();
             window.runHooks("wasabeeUIUpdate", getSelectedOperation());
             window.runHooks("wasabeeDkeys");
           },
           (err) => {
             alert(err);
+            WasabeeMe.purge();
             console.log(err);
           }
         );

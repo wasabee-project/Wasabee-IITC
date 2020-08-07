@@ -11,61 +11,23 @@ export default function () {
   return GetWasabeeServer();
 }
 
-// not generic due to ... lot of stuff
-export const uploadOpPromise = function () {
+export const uploadOpPromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
 
   const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
 
-  return new Promise(function (resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw`;
-    const req = new XMLHttpRequest();
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          WasabeeMe.create(req.response); // free update
-          opPromise(operation.ID).then(
-            function (newop) {
-              newop.localchanged = false;
-              newop.store();
-              console.log(newop);
-              resolve(newop);
-            },
-            function (err) {
-              console.log("failure to fetch newly uploaded op: " + err);
-              reject(err);
-            }
-          );
-          break;
-        case 401:
-          reject(wX("UPLOAD PERM DENIED"));
-          break;
-        case 500:
-          console.log(
-            "probably trying to upload an op with an ID already taken... use update"
-          );
-          operation.fetched = null; // make it look like it came from the server
-          reject(req.response);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send(json);
-  });
+  const response = await _genericPost(
+    `${SERVER_BASE}/api/v1/draw`,
+    json,
+    "application/json;charset=UTF-8"
+  );
+  WasabeeMe.create(response); // free update to the cache
+  const newop = await opPromise(operation.ID);
+  newop.localchanged = false;
+  newop.store();
+  return newop;
 };
 
 export const updateOpPromise = (operation) => {
@@ -89,56 +51,33 @@ export const deleteOpPromise = function (opID) {
   return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}`, new FormData());
 };
 
-// not generic since it is odd
-export const teamPromise = function (teamid) {
+// returns a resolved promise to a WasabeeTeam
+export const teamPromise = async function (teamid) {
+  // does this ever get triggered?
+  if (teamid == "owned") {
+    console.log("owned team queried");
+    const owned = new WasabeeTeam();
+    owned.id = "owned";
+    owned.name = "Owned Ops";
+    return owned;
+  }
+
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function (resolve, reject) {
-    if (teamid == "owned") {
-      const owned = new WasabeeTeam();
-      owned.id = "owned";
-      owned.name = "Owned Ops";
-      resolve(owned);
-    }
-
-    const url = `${SERVER_BASE}/api/v1/team/${teamid}`;
-    const req = new XMLHttpRequest();
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    let newteam = null;
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          // add this team to the cache
-          newteam = WasabeeTeam.create(req.response);
-          Wasabee.teams.set(teamid, newteam);
-          resolve(newteam);
-          break;
-        case 401:
-          reject(wX("TEAM PERM DENIED", teamid));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+  const response = await _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
+  const newteam = WasabeeTeam.create(response);
+  Wasabee.teams.set(teamid, newteam);
+  return newteam;
 };
 
-// not generic since 304 and special headers
+// returns a promise to fetch a WasabeeOp
+// not generic since 304 result processing and If-Modified-Since header
 export const opPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
+  const localop = getOperationByID(opID);
+  const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
+
   return new Promise(function (resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
     const req = new XMLHttpRequest();
-    const localop = getOperationByID(opID);
 
     req.open("GET", url);
 
@@ -149,7 +88,7 @@ export const opPromise = function (opID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    let newop = null;
+    let newop = null; // I hate javascript
     req.onload = function () {
       switch (req.status) {
         case 200:
@@ -163,6 +102,10 @@ export const opPromise = function (opID) {
           resolve(localop);
           break;
         case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
+          break;
+        case 403:
           reject(wX("OP PERM DENIED", opID));
           break;
         default:
@@ -179,55 +122,20 @@ export const opPromise = function (opID) {
   });
 };
 
-// not generic, too many exceptions
-export const mePromise = function () {
+// returns a resolved promise to WasabeeMe
+export const mePromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise(function (resolve, reject) {
-    const url = `${SERVER_BASE}/me`;
-    const req = new XMLHttpRequest();
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    let me = null;
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          me = WasabeeMe.create(req.response);
-          if (!me) {
-            reject(wX("NOT LOGGED IN", "200, invalid"));
-          } else {
-            resolve(me);
-          }
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", "401"));
-          break;
-        case 403:
-          // 403 is a detected RES agent
-          alert(`${req.responseText}`);
-          WasabeeMe.purge();
-          resetOps();
-          reject(wX("NOT LOGGED IN", "blacklist"));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+  try {
+    const response = await _genericGet(`${SERVER_BASE}/me`);
+    const me = WasabeeMe.create(response);
+    return me;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 };
 
 // returns (a resolved promise of) the actual WasabeeAgent
-// this is inconsistent with the rest of the framework but done so because of the agent cache
-// async functions return promises
 export const agentPromise = async function (GID, force) {
   if (!force && window.plugin.wasabee._agentCache.has(GID)) {
     return window.plugin.wasabee._agentCache.get(GID);
@@ -284,7 +192,7 @@ export const SendAccessTokenAsync = function (accessToken) {
   return _genericPost(
     `${SERVER_BASE}/aptok`,
     JSON.stringify({ accessToken: accessToken }),
-    "application/json"
+    "application/json;charset=UTF-8"
   );
 };
 
@@ -465,6 +373,7 @@ const _genericPut = function (url, formData, contentType) {
           resolve(req.response);
           break;
         case 401:
+          WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
@@ -501,6 +410,7 @@ const _genericPost = function (url, formData, contentType) {
           resolve(req.response);
           break;
         case 401:
+          WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
@@ -531,6 +441,7 @@ const _genericDelete = function (url, formData) {
           resolve(req.response);
           break;
         case 401:
+          WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
@@ -560,7 +471,20 @@ const _genericGet = function (url) {
           resolve(req.response);
           break;
         case 401:
+          WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
+          break;
+        case 403:
+          // if the agent has been blacklisted at v/rocks...
+          if (req.response.includes("Smurf go away")) {
+            alert(`${req.responseText}`);
+            WasabeeMe.purge();
+            resetOps();
+            // why not at least try?
+            delete localStorage["reswue-environment-data"];
+            delete localStorage["reswue-operation-data"];
+          }
+          reject(req.response);
           break;
         default:
           reject(req.response);
