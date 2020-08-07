@@ -174,19 +174,19 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_OTHER,
     {
-      markerIcon: require("./images/wasabee_markers_other_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_other_done.png"),
+      markerIcon: require("./images/wasabee_markers_other_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_other_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_other_done.svg"),
     },
   ],
   [
     W.static.constants.MARKER_TYPE_RECHARGE,
     {
-      markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_recharge_done.png"),
+      markerIcon: require("./images/wasabee_markers_recharge_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_recharge_done.svg"),
     },
   ],
   [
@@ -201,10 +201,10 @@ W.static.markerTypes = new Map([
   [
     W.static.constants.MARKER_TYPE_VIRUS,
     {
-      markerIcon: require("./images/wasabee_markers_virus_pending.png"),
-      markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
-      markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
-      markerIconDone: require("./images/wasabee_markers_virus_done.png"),
+      markerIcon: require("./images/wasabee_markers_virus_pending.svg"),
+      markerIconAssigned: require("./images/wasabee_markers_virus_assigned.svg"),
+      markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.svg"),
+      markerIconDone: require("./images/wasabee_markers_virus_done.svg"),
     },
   ],
   [
