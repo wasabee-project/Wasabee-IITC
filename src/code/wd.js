@@ -159,6 +159,7 @@ const dLoadDetails = (e) => {
           marker._popup._wrapper.classList.add("wasabee-popup");
         marker.update();
       } catch (e) {
+        console.log("getting wd marker popup: ", e);
         marker.setPopupContent(e);
         marker.update();
       }
@@ -187,12 +188,7 @@ const getMarkerPopup = async (PortalID) => {
     const l = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of l) {
       if (k != "details") {
-        let a;
-        if (window.plugin.wasabee._agentCache.has(v.GID)) {
-          a = window.plugin.wasabee._agentCache.get(v.GID);
-        } else {
-          a = await agentPromise(v.GID, false);
-        }
+        const a = await agentPromise(v.GID, false);
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());
