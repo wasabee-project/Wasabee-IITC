@@ -46,7 +46,7 @@ const HomogeneousDialog = WDialog.extend({
     anchorLabelOne.textContent = wX("ANCHOR_PORTAL");
     const anchorButtonOne = L.DomUtil.create("button", null, container);
     anchorButtonOne.textContent = wX("SET");
-    this._anchorDisplayOne = L.DomUtil.create("span", null, container);
+    this._anchorDisplayOne = L.DomUtil.create("span", "portal", container);
     if (this._anchorOne) {
       this._anchorDisplayOne.appendChild(
         this._anchorOne.displayFormat(this._smallScreen)
@@ -74,7 +74,7 @@ const HomogeneousDialog = WDialog.extend({
     anchorLabelTwo.textContent = wX("ANCHOR_PORTAL2");
     const anchorButtonTwo = L.DomUtil.create("button", null, container);
     anchorButtonTwo.textContent = wX("SET");
-    this._anchorDisplayTwo = L.DomUtil.create("span", null, container);
+    this._anchorDisplayTwo = L.DomUtil.create("span", "portal", container);
     if (this._anchorTwo) {
       this._anchorDisplayTwo.appendChild(
         this._anchorTwo.displayFormat(this._smallScreen)
@@ -102,7 +102,7 @@ const HomogeneousDialog = WDialog.extend({
     anchorLabelThree.textContent = wX("ANCHOR_PORTAL3");
     const anchorButtonThree = L.DomUtil.create("button", null, container);
     anchorButtonThree.textContent = wX("SET");
-    this._anchorDisplayThree = L.DomUtil.create("span", null, container);
+    this._anchorDisplayThree = L.DomUtil.create("span", "portal", container);
     if (this._anchorThree) {
       this._anchorDisplayThree.appendChild(
         this._anchorThree.displayFormat(this._smallScreen)
@@ -137,8 +137,6 @@ const HomogeneousDialog = WDialog.extend({
       dc++;
     } // no need for an event, we will read the value directly below
 
-    L.DomUtil.create("span", "null", container);
-
     const orderLabel = L.DomUtil.create("label", null, container);
     orderLabel.textContent = "Order";
     this.orderMenu = L.DomUtil.create("select", null, container);
@@ -154,24 +152,27 @@ const HomogeneousDialog = WDialog.extend({
     }
     L.DomUtil.create("span", "null", container);
 
-    const placeholder = L.DomUtil.create("div", "null", container);
-    placeholder.textContent = "\u2063";
+    const fullSearchLabel = L.DomUtil.create("label", null, container);
+    fullSearchLabel.textContent = wX("HF_DEEP_SEARCH");
+    this._fullSearchCheck = L.DomUtil.create("input", null, container);
+    this._fullSearchCheck.type = "checkbox";
 
-    // Go button
-    const drawButton = L.DomUtil.create("button", "drawb", container);
-    drawButton.textContent = wX("ONION");
-    L.DomEvent.on(drawButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this.hfield.call(this);
-    });
-
-    const spanRedraw = L.DomUtil.create("span", "null", container);
+    const spanRedraw = L.DomUtil.create("div", null, container);
     this._redrawButton = L.DomUtil.create("button", null, spanRedraw);
-    this._redrawButton.textContent = "Redraw"; // need wX
+    this._redrawButton.textContent = wX("HF_REDRAW_BUTTON");
     this._redrawButton.style.display = "none";
     L.DomEvent.on(this._redrawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._tree) this._draw.call(this);
+    });
+
+    // Go button
+    const drawButton = L.DomUtil.create("button", "drawb", container);
+    drawButton.textContent = wX("HF_DRAW_BUTTON");
+    L.DomEvent.on(drawButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      if (this._fullSearchCheck.checked) this.hdeepfield.call(this);
+      else this.hfield.call(this);
     });
 
     const buttons = {};
@@ -255,6 +256,57 @@ const HomogeneousDialog = WDialog.extend({
       alert(
         `Unable to find ${this._failed} splits, try less depth or a different region`
       );
+    }
+  },
+
+  hdeepfield: function () {
+    this._failed = 0;
+    this._layerGroup.clearLayers();
+
+    if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
+      alert("please select three anchors");
+      return;
+    }
+
+    const portals = new Array();
+    for (const p of getAllPortalsOnScreen(this._operation)) {
+      if (
+        this._fieldCovers(
+          this._anchorOne,
+          this._anchorTwo,
+          this._anchorThree,
+          p
+        )
+      )
+        portals.push(p);
+    }
+
+    console.time("HF deep recurser");
+    const tree = this._fullRecurser(
+      portals,
+      this._anchorOne,
+      this._anchorTwo,
+      this._anchorThree
+    );
+    console.timeEnd("HF deep recurser");
+
+    this._tree = tree;
+    this._failed = (3 ** (+this.depthMenu.value - 1) - 1) / 2 - tree.split;
+
+    this._draw();
+
+    if (this._failed > 0) {
+      alert(
+        `Unable to find ${this._failed} splits, try less depth or a different region`
+      );
+    }
+
+    this._failed = 0;
+    this._layerGroup.clearLayers();
+
+    if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
+      alert("please select three anchors");
+      return;
     }
   },
 
@@ -372,6 +424,134 @@ const HomogeneousDialog = WDialog.extend({
       bestResult.children[1].split +
       bestResult.children[2].split;
     return bestResult;
+  },
+
+  _fullRecurser: function (portalsCovered, one, two, three) {
+    const alreadyCalculatedCover = new Map();
+    const getNbSplitPerDepth = (depth) => (3 ** (depth - 1) - 1) / 2;
+
+    console.log(
+      "Expect at least",
+      Math.max(
+        0,
+        getNbSplitPerDepth(this.depthMenu.value) - portalsCovered.length
+      ),
+      "missing splits"
+    );
+
+    const homogeneousFrom = (depth, portalsCovered, one, two, three) => {
+      if (depth <= 1)
+        return { success: true, anchors: [one, two, three], split: 0 };
+
+      const key = [depth, one.id, two.id, three.id].sort().toString();
+      if (alreadyCalculatedCover.get(key) === undefined) {
+        // sort portals according to the balance between the regions
+        const m = new Map();
+        // for each of the portals in play
+        for (const wp of portalsCovered) {
+          const subregions = this._getSubregions(
+            wp,
+            new Array(...portalsCovered),
+            one,
+            two,
+            three
+          );
+          // one of the regions didn't have enough
+          if (!subregions) continue;
+          // is this one better than the previous?
+          // smallest difference in the number of portals between the greatest and least, 0 being ideal
+          const differential =
+            Math.max(
+              subregions[0].length,
+              subregions[1].length,
+              subregions[2].length
+            ) -
+            Math.min(
+              subregions[0].length,
+              subregions[1].length,
+              subregions[2].length
+            );
+          m.set(wp.id, differential);
+        }
+
+        const sorted = new Map([...m.entries()].sort((a, b) => a[1] - b[1]));
+
+        const maxNbSplit = Math.min(
+          getNbSplitPerDepth(depth),
+          portalsCovered.length
+        );
+        let bestResult = {
+          success: false,
+          anchors: [one, two, three],
+          split: 0,
+          portal: null,
+          children: null,
+        };
+        for (const k of sorted.keys()) {
+          const wp = WasabeePortal.get(k);
+          const subregions = this._getSubregions(
+            wp,
+            new Array(...portalsCovered),
+            one,
+            two,
+            three
+          );
+          const maxNbSplitSubregions =
+            Math.min(getNbSplitPerDepth(depth - 1), subregions[0].length) +
+            Math.min(getNbSplitPerDepth(depth - 1), subregions[1].length) +
+            Math.min(getNbSplitPerDepth(depth - 1), subregions[2].length);
+          if (maxNbSplitSubregions + 1 <= bestResult.split) {
+            // Skip the portal since it will induce less splits than the current best choice
+            continue;
+          }
+
+          let ret1 = homogeneousFrom(
+            depth - 1,
+            new Array(...subregions[0]),
+            one,
+            two,
+            wp
+          );
+          let ret2 = homogeneousFrom(
+            depth - 1,
+            new Array(...subregions[1]),
+            two,
+            three,
+            wp
+          );
+          let ret3 = homogeneousFrom(
+            depth - 1,
+            new Array(...subregions[2]),
+            one,
+            three,
+            wp
+          );
+
+          const nbSplit = ret1.split + ret2.split + ret3.split + 1;
+
+          if (nbSplit > bestResult.split) {
+            bestResult.success = ret1.success && ret2.success && ret3.success;
+            bestResult.split = nbSplit;
+            bestResult.portal = wp;
+            bestResult.children = [ret1, ret2, ret3];
+          }
+
+          if (nbSplit == maxNbSplit) {
+            // we cannot do more split so it is one of the best choice
+            break;
+          }
+        }
+        alreadyCalculatedCover.set(key, bestResult);
+      }
+      return alreadyCalculatedCover.get(key);
+    };
+    return homogeneousFrom(
+      this.depthMenu.value,
+      portalsCovered,
+      one,
+      two,
+      three
+    );
   },
 
   _drawTreeCore: function (tree) {
