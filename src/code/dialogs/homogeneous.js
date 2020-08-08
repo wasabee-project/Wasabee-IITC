@@ -765,8 +765,6 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _getSubregions: function (centerPoint, possibles, one, two, three) {
-    this._operation.addPortal(centerPoint);
-
     const possibleExceptAnchors = new Array();
     for (const p of possibles) {
       const guid = p.id || p.options.guid;
