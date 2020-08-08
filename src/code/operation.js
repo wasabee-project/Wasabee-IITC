@@ -198,6 +198,18 @@ export default class WasabeeOp {
     return markers;
   }
 
+  getLink(portal1, portal2) {
+    for (const l of this.links) {
+      if (
+        (l.fromPortalId == portal1.id && l.toPortalId == portal2.id) ||
+        (l.fromPortalId == portal2.id && l.toPortalId == portal1.id)
+      ) {
+        return l;
+      }
+    }
+    return null;
+  }
+
   getLinkListFromPortal(portal) {
     const links = this.links.filter(function (listLink) {
       return (
