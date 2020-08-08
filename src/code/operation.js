@@ -250,19 +250,19 @@ export default class WasabeeOp {
     this.update(true);
   }
 
-  setLinkComment(link, comment) {
-    for (const v of this.links) {
-      if (v.ID == link.ID) {
-        v.description = comment;
+  setMarkerState(markerID, state) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.state = state;
       }
     }
     this.update(true);
   }
 
-  setMarkerState(markerID, state) {
-    for (const v of this.markers) {
-      if (v.ID == markerID) {
-        v.state = state;
+  setLinkComment(link, comment) {
+    for (const v of this.links) {
+      if (v.ID == link.ID) {
+        v.description = comment;
       }
     }
     this.update(true);
@@ -281,6 +281,15 @@ export default class WasabeeOp {
     for (const v of this.links) {
       if (v.ID == linkID) {
         v.color = color;
+      }
+    }
+    this.update(true);
+  }
+
+  setLinkOrder(linkID, order) {
+    for (const v of this.links) {
+      if (v.ID == linkID) {
+        v.opOrder = order;
       }
     }
     this.update(true);
@@ -845,10 +854,10 @@ export default class WasabeeOp {
   get nextOrder() {
     let o = 0;
     for (const l of this.links) {
-      o = Math.max(o, l.throwOrderPos);
+      o = Math.max(o, l.opOrder);
     }
     for (const m of this.markers) {
-      o = Math.max(o, m.order);
+      o = Math.max(o, m.opOrder);
     }
     return ++o;
   }
