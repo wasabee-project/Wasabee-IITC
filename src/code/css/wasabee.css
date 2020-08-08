@@ -621,7 +621,7 @@
   margin: 5px;
 }*/
 
-.wasabee-dialog-link buttonall {
+.wasabee-dialog-link button.drawb {
   cursor: pointer;
   margin: 5px;
   grid-column: 3;
