@@ -601,18 +601,18 @@ const HomogeneousDialog = WDialog.extend({
         const dp = portalDepth.get(r.portal.id);
         for (const anchor of r.anchors) {
           const ap = portalDepth.get(anchor.id);
-          const linkID = this._operation.addLink(
-            anchor,
-            r.portal,
-            "intern link",
-            orderByDepth(r.portal, anchor)
-          );
+          const order = orderByDepth(r.portal, anchor);
+          let [fromPortal, toPortal] = [anchor, r.portal];
           if (ap > 0 && dp == ap + 1)
-            this._operation.reverseLink(anchor.id, r.portal.id);
-          this._operation.setLinkColor(
-            linkID,
-            this._colors[depth % this._colors.length]
+            [toPortal, fromPortal] = [anchor, r.portal];
+          const link = this._operation.addLink(
+            fromPortal,
+            toPortal,
+            "intern link",
+            order,
+            true
           );
+          link.color = this._colors[order % this._colors.length];
         }
         for (const child of r.children) draw(depth + 1, child);
       }
@@ -638,24 +638,39 @@ const HomogeneousDialog = WDialog.extend({
     this._operation.addPortal(one);
     this._operation.addPortal(two);
     this._operation.addPortal(three);
-    this._operation.addLink(
+    const outer1 = this._operation.addLink(
       two,
       one,
       "Outer 1",
-      (depthValue * (depthValue - 1)) / 2 + depthValue + 1
+      (depthValue * (depthValue - 1)) / 2 + depthValue + 1,
+      true
     );
-    this._operation.addLink(
+    outer1.color = this._colors[
+      ((depthValue * (depthValue - 1)) / 2 + depthValue + 1) %
+        this._colors.length
+    ];
+    const outer2 = this._operation.addLink(
       three,
       one,
       "Outer 2",
-      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
+      true
     );
-    this._operation.addLink(
+    outer2.color = this._colors[
+      ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+        this._colors.length
+    ];
+    const outer3 = this._operation.addLink(
       three,
       two,
       "Outer 3",
-      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2
+      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
+      true
     );
+    outer3.color = this._colors[
+      ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+        this._colors.length
+    ];
     draw(1, tree);
   },
 
@@ -690,11 +705,14 @@ const HomogeneousDialog = WDialog.extend({
     // link an anchor to inner portals in depth order
     const drawBackLink = (depth, r, anchor, order) => {
       if (r.portal) {
-        const linkID = this._operation.addLink(anchor, r.portal, "", order + 1);
-        this._operation.setLinkColor(
-          linkID,
-          this._colors[order % this._colors.length]
+        const link = this._operation.addLink(
+          anchor,
+          r.portal,
+          "intern link",
+          order + 1,
+          true
         );
+        link.color = this._colors[order % this._colors.length];
         for (const child of r.children)
           if (child.anchors.includes(anchor))
             drawBackLink(depth + 1, child, anchor, order + 1);
@@ -709,11 +727,14 @@ const HomogeneousDialog = WDialog.extend({
       const pThree = r.anchors.filter((p) => p != pOne && p != pTwo)[0];
       // draw outer link
       for (const anchor of [pOne, pTwo]) {
-        const linkID = this._operation.addLink(pThree, anchor, "", order + 1);
-        this._operation.setLinkColor(
-          linkID,
-          this._colors[order % this._colors.length]
+        const link = this._operation.addLink(
+          pThree,
+          anchor,
+          "",
+          order + 1,
+          true
         );
+        link.color = this._colors[order % this._colors.length];
       }
       if (!r.portal) return order + 1;
       // draw inner link from 3
@@ -738,7 +759,8 @@ const HomogeneousDialog = WDialog.extend({
     drawDebug(depthValue, tree);
 
     for (const p of tree.anchors) this._operation.addPortal(p);
-    this._operation.addLink(two, one, "Outer base", 1);
+    const outerBase = this._operation.addLink(two, one, "Outer base", 1, true);
+    outerBase.color = this._colors[0];
     draw(1, tree, one, two);
   },
 

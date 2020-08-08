@@ -474,7 +474,7 @@ export default class WasabeeOp {
     return false;
   }
 
-  addLink(fromPortal, toPortal, description, order) {
+  addLink(fromPortal, toPortal, description, order, replace = false) {
     if (!fromPortal || !toPortal) {
       console.log("missing portal for link");
       return null;
@@ -489,18 +489,29 @@ export default class WasabeeOp {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    const link = new WasabeeLink(this, fromPortal.id, toPortal.id, description);
+    const existingLink = this.getLink(fromPortal, toPortal);
+
+    const link =
+      existingLink && replace
+        ? existingLink
+        : new WasabeeLink(this, fromPortal.id, toPortal.id);
+    link.description = description;
     if (order) link.opOrder = order;
-    if (!this.containsLink(link)) {
+
+    if (!existingLink) {
       this.links.push(link);
+      this.update(true);
+      this.runCrosslinks();
+    } else if (replace) {
       this.update(true);
       this.runCrosslinks();
     } else {
       console.log(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
       );
+      return existingLink;
     }
-    return link.ID;
+    return link;
   }
 
   containsAnchor(portalId) {
