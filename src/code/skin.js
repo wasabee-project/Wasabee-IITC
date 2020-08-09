@@ -57,6 +57,7 @@ export const changeSkin = (name) => {
 
     // add the stock languages back
     for (const k of Object.getOwnPropertyNames(Wasabee.static.strings)) {
+      if (Wasabee.skin.strings == null) Wasabee.skin.strings = {};
       Wasabee.skin.strings[k] = Wasabee.static.strings[k];
     }
 
