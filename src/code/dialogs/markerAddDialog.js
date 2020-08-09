@@ -77,7 +77,8 @@ const MarkerAddDialog = WDialog.extend({
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._addMarker(this._type.value, this._operation, this._comment.value);
+      if (window.plugin.wasabee.skin.markerTypes.has(this._type.value))
+        this._addMarker(this._type.value, this._operation, this._comment.value);
     });
 
     const buttons = {};
