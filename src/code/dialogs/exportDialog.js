@@ -82,7 +82,7 @@ const ExportDialog = WDialog.extend({
     output.maps.idOthers = {};
     output.maps.idOthers.label = "Others";
     output.maps.idOthers.state = 1;
-    output.maps.idOthers.bkmk = {};
+    output.maps.idOthers.bkmrk = {};
 
     output.portals = {};
     output.portals.idOthers = {};
