@@ -182,6 +182,7 @@
   "MARKER ASSIGNMENT": " Marker Assignment",
   "MARKER STATE PROMPT": "Marker Status",
   "MARKER STATE": " Set marker state",
+  "MARKERS_AS_BOOKMARKS": "Markers as bookmarks",
   "MAX": "Fan Field",
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": " (${value} minutes ago)",

@@ -34,6 +34,9 @@ const ExportDialog = WDialog.extend({
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
       this._drawToolsFormat();
     };
+    buttons[wX("MARKERS_AS_BOOKMARKS")] = () => {
+      this._bookmarkFormat();
+    };
 
     this._dialog = window.dialog({
       title: wX("EXPORT") + this._operation.name,
@@ -69,6 +72,32 @@ const ExportDialog = WDialog.extend({
       output.push(l);
     }
 
+    ta.value = JSON.stringify(output);
+  },
+
+  _bookmarkFormat: function () {
+    const ta = document.getElementById("wasabee-dialog-export-textarea");
+    const output = new Object();
+    output.maps = {};
+    output.maps.idOthers = {};
+    output.maps.idOthers.label = "Others";
+    output.maps.idOthers.state = 1;
+    output.maps.idOthers.bkmk = {};
+
+    output.portals = {};
+    output.portals.idOthers = {};
+    output.portals.idOthers.label = "Others";
+    output.portals.idOthers.state = 1;
+    output.portals.idOthers.bkmrk = {};
+
+    for (const m of this._operation.markers) {
+      const id = "id" + m.ID.substring(0, 16);
+      const p = this._operation._idToOpportals.get(m.portalId);
+      output.portals.idOthers.bkmrk[id] = {};
+      output.portals.idOthers.bkmrk[id].guid = m.portalId;
+      output.portals.idOthers.bkmrk[id].latlng = `${p.lat},${p.lng}`;
+      output.portals.idOthers.bkmrk[id].label = p.name;
+    }
     ta.value = JSON.stringify(output);
   },
 });
