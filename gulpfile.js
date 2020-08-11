@@ -134,10 +134,10 @@ gulp.task("buildplugin", (cb) => {
 });
 
 gulp.task("buildmeta", (cb) => {
-  const path = cfg.releaseFolder[status.mode] + cfg.metaName;
+  const p = path.join(cfg.releaseFolder["prod"], cfg.metaName);
 
-  ensureDirectoryExistence(path);
-  fs.writeFile(path, status.headers, (err) => {
+  ensureDirectoryExistence(p);
+  fs.writeFile(p, status.headers, (err) => {
     cb(err);
   });
 });
