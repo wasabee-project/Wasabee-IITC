@@ -22,7 +22,13 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: [
+          "to-string-loader",
+          {
+            loader: "css-loader",
+            options: { esModule: false },
+          },
+        ],
       },
       {
         test: /\.html$/,
