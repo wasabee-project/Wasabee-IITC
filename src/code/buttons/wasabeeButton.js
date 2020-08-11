@@ -159,16 +159,16 @@ const WasabeeButton = WButton.extend({
     this.Wupdate(); // takes container and operation, not needed here
   },
 
-  getIcon: function () {
-    // XXX skin logic here
+  // getIcon: function () {
+  //   // XXX skin logic here
 
-    if (this._lastLoginState) {
-      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_in.default; //green bee image
-    } else {
-      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_out //yellow bee image
-        .default;
-    }
-  },
+  //   if (this._lastLoginState) {
+  //     return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_in.default; //green bee image
+  //   } else {
+  //     return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_out //yellow bee image
+  //       .default;
+  //   }
+  // },
 
   _getActions: function () {
     let tmp = [];
