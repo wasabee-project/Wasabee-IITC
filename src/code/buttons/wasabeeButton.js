@@ -31,7 +31,6 @@ const WasabeeButton = WButton.extend({
     this.button = this._createButton({
       container: container,
       className: "wasabee-toolbar-wasabee",
-      // buttonImage: this.getIcon(),
       callback: this.handler,
       context: this,
     });
@@ -140,7 +139,6 @@ const WasabeeButton = WButton.extend({
 
     this._SettingsActions = [
       {
-        //img: window.plugin.wasabee.skin.images.toolbar_settings.default,
         title: "Settings",
         text: "⚙",
         callback: () => {
@@ -158,17 +156,6 @@ const WasabeeButton = WButton.extend({
     // check login state and update if necessary
     this.Wupdate(); // takes container and operation, not needed here
   },
-
-  // getIcon: function () {
-  //   // XXX skin logic here
-
-  //   if (this._lastLoginState) {
-  //     return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_in.default; //green bee image
-  //   } else {
-  //     return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_out //yellow bee image
-  //       .default;
-  //   }
-  // },
 
   _getActions: function () {
     let tmp = [];
@@ -201,7 +188,6 @@ const WasabeeButton = WButton.extend({
       this._lastLoginState = loggedIn;
       if (loggedIn) this.button.classList.add("wasabee-logged-in");
       else this.button.classList.remove("wasabee-logged-in");
-      // this.button.children[0].src = this.getIcon();
 
       const old = this.actionsContainer;
       this.actionsContainer = this._getActions();

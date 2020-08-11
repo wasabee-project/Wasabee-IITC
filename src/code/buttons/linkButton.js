@@ -21,7 +21,6 @@ const LinkButton = WButton.extend({
     this.button = this._createButton({
       container: this._container,
       className: "wasabee-toolbar-link",
-      //buttonImage: window.plugin.wasabee.skin.images.toolbar_addlinks.default,
       callback: this._toggleActions,
       context: context,
     });
