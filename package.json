@@ -5,7 +5,7 @@
   "main": "gulpfile.js",
   "private": true,
   "devDependencies": {
-    "css-loader": "^4.1.0",
+    "css-loader": "^4.2.1",
     "del": "^5.1.0",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
