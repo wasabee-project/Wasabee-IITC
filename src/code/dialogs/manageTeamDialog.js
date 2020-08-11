@@ -103,20 +103,25 @@ const ManageTeamDialog = WDialog.extend({
         name: wX("REMOVE"),
         value: (agent) => agent.id,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => {
-          const button = L.DomUtil.create("a", null, cell);
+        format: (cell, value, obj) => {
+          const button = L.DomUtil.create("button", null, cell);
           button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            removeAgentFromTeamPromise(value, this._team.ID).then(
-              () => {
+            const con = new ConfirmDialog();
+            con.setup(
+              `${button.textContent}: ${obj.name}`,
+              `${button.textContent}: ${obj.name}?`,
+              async () => {
+                try {
+                  await removeAgentFromTeamPromise(value, this._team.ID);
+                } catch (e) {
+                  console.log(e);
+                }
                 window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-              },
-              (reject) => {
-                alert(reject);
-                console.log(reject);
               }
             );
+            con.enable();
           });
         },
       },
