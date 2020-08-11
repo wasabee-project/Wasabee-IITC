@@ -116,17 +116,15 @@ const TeamListDialog = WDialog.extend({
         sort: null,
         format: (row, value, obj) => {
           row.textContent = "";
-          for (const ot of this._me.OwnedTeams) {
-            if (obj.State == "On" && ot.ID == obj.ID) {
-              const link = L.DomUtil.create("a", "enl", row);
-              link.textContent = wX("MANAGE");
-              L.DomEvent.on(link, "click", (ev) => {
-                L.DomEvent.stop(ev);
-                const mtd = new ManageTeamDialog();
-                mtd.setup(ot);
-                mtd.enable();
-              });
-            }
+          if (obj.State == "On" && this._me.GoogleID == obj.Owner) {
+            const link = L.DomUtil.create("a", "enl", row);
+            link.textContent = wX("MANAGE");
+            L.DomEvent.on(link, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              const mtd = new ManageTeamDialog();
+              mtd.setup(obj);
+              mtd.enable();
+            });
           }
         },
       },
