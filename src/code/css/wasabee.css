@@ -495,6 +495,35 @@
   background-image: url(../images/marker_layer_groupSE.png)
 }
 
+.wasabee-toolbar-wasabee {
+  background-image: url(../images/toolbar_wasabeebutton_out.png)
+}
+.wasabee-toolbar-wasabee.wasabee-logged-in {
+  background-image: url(../images/toolbar_wasabeebutton_in.png)
+}
+.wasabee-toolbar-ops {
+  background-image: url(../images/toolbar_viewOps.png)
+}
+.wasabee-toolbar-quickdraw {
+  background-image: url(../images/toolbar_quickdraw.png)
+}
+.wasabee-toolbar-link {
+  background-image: url(../images/toolbar_addlinks.png)
+}
+.wasabee-toolbar-marker {
+  background-image: url(../images/toolbar_addMarkers.png)
+}
+.wasabee-toolbar-sync {
+  /*background-image: url(../images/toolbar_sync.png)*/
+  background-image: url(../images/toolbar_download.png)
+}
+/*.wasabee-toolbar-download {
+  background-image: url(../images/toolbar_download.png)
+}*/
+.wasabee-toolbar-upload {
+  background-image: url(../images/toolbar_upload.png)
+}
+
 /* all dialogs get this class -- do global stuff with it */
 /* .wasabee-dialog {
   background-color: rgba(250, 250, 250, 0.9);
