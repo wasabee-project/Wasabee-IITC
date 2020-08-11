@@ -31,7 +31,6 @@ const SyncButton = WButton.extend({
     this._syncbutton = this._createButton({
       container: container,
       className: "wasabee-toolbar-sync",
-      // buttonImage: window.plugin.wasabee.skin.images.toolbar_download.default,
       context: this,
       callback: async () => {
         const so = getSelectedOperation();

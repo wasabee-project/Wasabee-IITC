@@ -22,7 +22,6 @@ const MarkerButton = WButton.extend({
     this.button = this._createButton({
       container: this._container,
       className: "wasabee-toolbar-marker",
-      //buttonImage: window.plugin.wasabee.skin.images.toolbar_addMarkers.default,
       callback: this._toggleActions,
       context: context,
     });
