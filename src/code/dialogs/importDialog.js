@@ -4,19 +4,20 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
-// import { pointTileDataRequest } from "../uiCommands";
+import { postToFirebase } from "../firebaseSupport";
 
 const ImportDialog = WDialog.extend({
   statics: {
-    TYPE: "importDialog"
+    TYPE: "importDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = ImportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: ImportDialog.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     this._autoload = false;
     if (
@@ -29,11 +30,11 @@ const ImportDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", null);
@@ -74,7 +75,7 @@ const ImportDialog = WDialog.extend({
         window.runHooks("wasabeeUIUpdate", newop);
         window.runHooks("wasabeeCrosslinks", newop);
       },
-      id: window.plugin.wasabee.static.dialogNames.importDialog
+      id: window.plugin.wasabee.static.dialogNames.importDialog,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
@@ -168,7 +169,7 @@ const ImportDialog = WDialog.extend({
         // use fixed precision
         const truncPoint = {
           lat: point.lat.toFixed(6),
-          lng: point.lng.toFixed(6)
+          lng: point.lng.toFixed(6),
         };
         // check the op first
         let portal = newop.getPortalByLatLng(truncPoint.lat, truncPoint.lng);
@@ -227,7 +228,7 @@ const ImportDialog = WDialog.extend({
       return np;
     }
     return false;
-  }
+  },
 });
 
 export default ImportDialog;

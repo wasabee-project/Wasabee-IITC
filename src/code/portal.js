@@ -31,15 +31,22 @@ export default class WasabeePortal {
       lat: this.lat,
       lng: this.lng,
       comment: this.comment,
-      hardness: this.hardness
+      hardness: this.hardness,
     };
   }
 
   static create(obj) {
-    if (typeof obj == "string") obj = JSON.parse(obj);
+    if (typeof obj == "string") {
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    }
     if (!obj || !obj.id) {
       console.log("can't create WasabeePortal from this");
-      return;
+      return null;
     }
     const wp = new WasabeePortal(
       obj.id,
@@ -127,13 +134,13 @@ export default class WasabeePortal {
     // e.title = this.name;
     e.href = `/intel?ll=${v}&pll=${v}`;
 
-    L.DomEvent.on(e, "click", event => {
+    L.DomEvent.on(e, "click", (event) => {
       if (window.selectedPortal != this.id && this.id.length == 35)
         window.renderPortalDetails(this.id);
       else window.map.panTo(pt);
       event.preventDefault();
       return false;
-    }).on(e, "dblclick", event => {
+    }).on(e, "dblclick", (event) => {
       if (window.selectedPortal != this.id && this.id.length == 35)
         window.renderPortalDetails(this.id);
       if (window.map.getBounds().contains(pt))

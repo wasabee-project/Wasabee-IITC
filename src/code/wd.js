@@ -1,7 +1,7 @@
 // the counter-op / defensive tools are Wasabee-D
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
-import { getAgent } from "./server";
+import { agentPromise } from "./server";
 import wX from "./wX";
 import { getPortalDetails } from "./uiCommands";
 
@@ -14,7 +14,7 @@ export const initWasabeeD = () => {
     true
   );
 
-  window.pluginCreateHook("wasabeeDkeys");
+  // window.pluginCreateHook("wasabeeDkeys"); // not needed after IITC 0.30
   window.addHook("wasabeeDkeys", () => {
     drawWasabeeDkeys();
   });
@@ -23,13 +23,13 @@ export const initWasabeeD = () => {
     window.plugin.wasabee._Dkeys = new Map();
   }
 
-  window.map.on("layeradd", obj => {
+  window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.defensiveLayers) {
       window.runHooks("wasabeeDkeys");
     }
   });
 
-  window.map.on("layerremove", obj => {
+  window.map.on("layerremove", (obj) => {
     if (obj.layer === window.plugin.wasabee.defensiveLayers) {
       // clearLayers doesn't actually remove the data, just hides it from the map
       window.plugin.wasabee.defensiveLayers.clearLayers();
@@ -49,7 +49,7 @@ export const drawWasabeeDkeys = () => {
   window.addHook("portalDetailLoaded", dLoadDetails);
 
   dKeylistPromise().then(
-    data => {
+    (data) => {
       let list = null;
       try {
         list = JSON.parse(data);
@@ -90,13 +90,13 @@ export const drawWasabeeDkeys = () => {
         }
       }
     },
-    err => {
+    (err) => {
       console.log(err);
     }
   );
 };
 
-const dLoadDetails = e => {
+const dLoadDetails = (e) => {
   if (!e.success) return; // bad load
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return; // not enabled
   if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
@@ -112,9 +112,8 @@ const dLoadDetails = e => {
   submap.set("details", e.details);
   window.plugin.wasabee._Dkeys.set(e.guid, submap);
 
-  const icon = window.plugin.wasabee.static.markerTypes.get(
-    "GetKeyPortalMarker"
-  ).markerIconDone.default;
+  const icon = window.plugin.wasabee.skin.markerTypes.get("GetKeyPortalMarker")
+    .markerIconDone.default;
 
   const latLng = new L.LatLng(
     (e.details.latE6 / 1e6).toFixed(6),
@@ -137,8 +136,8 @@ const dLoadDetails = e => {
       shadowUrl: null,
       iconSize: L.point(24, 40),
       iconAnchor: L.point(12, 40),
-      popupAnchor: L.point(-1, -48)
-    })
+      popupAnchor: L.point(-1, -48),
+    }),
   });
   window.plugin.wasabee.defensiveLayers[e.guid] = marker;
   marker.addTo(window.plugin.wasabee.defensiveLayers);
@@ -146,17 +145,24 @@ const dLoadDetails = e => {
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
     className: "wasabee-popup",
-    closeButton: false
+    closeButton: false,
   });
   marker.on(
     "click spiderfiedclick",
-    ev => {
+    async (ev) => {
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      marker.setPopupContent(getMarkerPopup(e.guid));
-      if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup");
-      marker.update();
+      try {
+        const content = await getMarkerPopup(e.guid);
+        marker.setPopupContent(content);
+        if (marker._popup._wrapper)
+          marker._popup._wrapper.classList.add("wasabee-popup");
+        marker.update();
+      } catch (e) {
+        console.log("getting wd marker popup: ", e);
+        marker.setPopupContent(e);
+        marker.update();
+      }
       marker.openPopup();
     },
     marker
@@ -173,8 +179,8 @@ const dLoadDetails = e => {
   }
 };
 
-const getMarkerPopup = PortalID => {
-  if (!window.plugin.wasabee._Dkeys) return;
+const getMarkerPopup = async (PortalID) => {
+  if (!window.plugin.wasabee._Dkeys) return null;
 
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
   if (window.plugin.wasabee._Dkeys.has(PortalID)) {
@@ -182,7 +188,7 @@ const getMarkerPopup = PortalID => {
     const l = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of l) {
       if (k != "details") {
-        const a = getAgent(v.GID);
+        const a = await agentPromise(v.GID, false);
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());

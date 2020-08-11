@@ -37,10 +37,10 @@ export default class WasabeeMarker {
   }
 
   get icon() {
-    if (!window.plugin.wasabee.static.markerTypes.has(this.type)) {
-      this.type = window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+    if (!window.plugin.wasabee.skin.markerTypes.has(this.type)) {
+      this.type = window.plugin.wasabee.skin.constants.DEFAULT_MARKER_TYPE;
     }
-    const marker = window.plugin.wasabee.static.markerTypes.get(this.type);
+    const marker = window.plugin.wasabee.skin.markerTypes.get(this.type);
     let img = marker.markerIcon.default;
     switch (this.state) {
       case "pending":
@@ -55,6 +55,8 @@ export default class WasabeeMarker {
       case "acknowledged":
         img = marker.markerIconAcknowledged.default;
         break;
+      default:
+        img = marker.markerIcon.default;
     }
     return img;
   }
@@ -71,11 +73,11 @@ export default class WasabeeMarker {
     );
     if (this.state != "completed" && this.assignedTo) {
       agentPromise(this.assignedTo, false).then(
-        function(a) {
+        function (a) {
           assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
           assignment.appendChild(a.formatDisplay());
         },
-        function(err) {
+        function (err) {
           console.log(err);
         }
       );
@@ -91,7 +93,7 @@ export default class WasabeeMarker {
     );
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
     deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", ev => {
+    L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       deleteMarker(operation, this, portal);
       marker.closePopup();
@@ -100,7 +102,7 @@ export default class WasabeeMarker {
     if (operation.IsServerOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN");
-      L.DomEvent.on(assignButton, "click", ev => {
+      L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         const ad = new AssignDialog();
         ad.setup(this, operation);
@@ -110,7 +112,7 @@ export default class WasabeeMarker {
     }
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
-    L.DomEvent.on(gmapButton, "click", ev => {
+    L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
       window.open(
@@ -138,7 +140,7 @@ export default class WasabeeMarker {
         title
       );
       comment.textContent = this.comment;
-      L.DomEvent.on(comment, "click", ev => {
+      L.DomEvent.on(comment, "click", (ev) => {
         L.DomEvent.stop(ev);
         const com = new SetCommentDialog();
         com.setup(this, operation);
@@ -150,7 +152,7 @@ export default class WasabeeMarker {
     const cl = L.DomUtil.create("a", null, comment);
     cl.textContent = portal.comment || wX("SET_PORTAL_COMMENT");
     cl.href = "#";
-    L.DomEvent.on(cl, "click", ev => {
+    L.DomEvent.on(cl, "click", (ev) => {
       L.DomEvent.stop(ev);
       const cd = new SetCommentDialog();
       cd.setup(portal, operation);
@@ -166,7 +168,7 @@ export default class WasabeeMarker {
       const hl = L.DomUtil.create("a", null, hardness);
       hl.textContent = portal.hardness;
       hl.href = "#";
-      L.DomEvent.on(hl, "click", ev => {
+      L.DomEvent.on(hl, "click", (ev) => {
         L.DomEvent.stop(ev);
         const cd = new SetCommentDialog();
         cd.setup(portal, operation);

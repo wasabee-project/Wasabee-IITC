@@ -2,7 +2,6 @@ import WasabeePortal from "./portal";
 import WasabeeLink from "./link";
 import { getSelectedOperation } from "./selectedOp";
 
-//*** CROSSLINK THINGS */
 const Wasabee = window.plugin.wasabee;
 
 // takes WasabeeLink or L.geodesicPolyline format
@@ -180,7 +179,6 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
       return true;
     }
 
-    // XXX  my gut says there is a way to do this more quickly
     for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
@@ -201,13 +199,14 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
 };
 
 const showCrossLink = (link, operation) => {
+  // this should be in static.js or skin
   const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
     color: "#d22",
     opacity: 0.7,
     weight: 5,
     clickable: false,
     dashArray: [8, 8],
-    guid: link.options.guid
+    guid: link.options.guid,
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
@@ -250,7 +249,7 @@ const testSelfBlock = (incoming, operation) => {
   for (const against of operation.links) {
     if (incoming.ID == against.ID) continue;
     if (greatCircleArcIntersect(against, incoming)) {
-      const lt = window.plugin.wasabee.static.layerTypes.get("self-block");
+      const lt = window.plugin.wasabee.skin.layerTypes.get("self-block");
       const style = lt.link;
       style.color = lt.color;
       const blocked = L.geodesicPolyline(against.getLatLngs(operation), style);
@@ -259,9 +258,8 @@ const testSelfBlock = (incoming, operation) => {
   }
 };
 
-export const checkAllLinks = operation => {
-  console.time("checkAllLinks");
-  // console.log("checkAllLinks called: " + operation.ID);
+export const checkAllLinks = (operation) => {
+  // console.time("checkAllLinks");
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
@@ -273,24 +271,12 @@ export const checkAllLinks = operation => {
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
-  console.timeEnd("checkAllLinks");
+  // console.timeEnd("checkAllLinks");
 };
 
-const onLinkAdded = data => {
+const onLinkAdded = (data) => {
   testLink(data.link, getSelectedOperation());
 };
-
-/* probably unused now -- remove in 0.16
-const testForDeletedLinks = () => {
-  for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
-    const guid = layer.options.guid;
-    if (!window.links[guid]) {
-      console.log("testForDeletedLinks FOUND SOMETHING!!!");
-      window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
-      window.plugin.wasabee._crosslinkCache.delete(guid);
-    }
-  }
-}; */
 
 const onMapDataRefreshStart = () => {
   window.removeHook("linkAdded", onLinkAdded);
@@ -307,8 +293,7 @@ const onMapDataRefreshEnd = () => {
 };
 
 export const initCrossLinks = () => {
-  window.pluginCreateHook("wasabeeCrosslinks");
-  window.addHook("wasabeeCrosslinks", operation => {
+  window.addHook("wasabeeCrosslinks", (operation) => {
     checkAllLinks(operation);
   });
 
@@ -321,7 +306,7 @@ export const initCrossLinks = () => {
   );
 
   // rerun crosslinks on re-enable
-  window.map.on("layeradd", obj => {
+  window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee._crosslinkCache = new Map();
       const operation = getSelectedOperation();
@@ -332,7 +317,7 @@ export const initCrossLinks = () => {
   });
 
   // clear crosslinks on disable
-  window.map.on("layerremove", obj => {
+  window.map.on("layerremove", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee.crossLinkLayers.clearLayers();
       delete window.plugin.wasabee._crosslinkCache;
@@ -349,7 +334,7 @@ export class GeodesicLine {
     // let r2d = 180.0 / Math.PI; //eslint-disable-line
     // maths based on http://williams.best.vwh.net/avform.htm#Int
     if (start.lng == end.lng) {
-      throw "Error: cannot calculate latitude for meridians";
+      throw new Error("Error: cannot calculate latitude for meridians");
     }
     // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
     this.lat1 = start.lat * d2r;
@@ -399,4 +384,3 @@ export class GeodesicLine {
     return Math.atan2(y, x);
   }
 }
-//*** END CROSSLINK THINGS */'

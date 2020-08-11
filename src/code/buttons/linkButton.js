@@ -5,10 +5,10 @@ import wX from "../wX";
 
 const LinkButton = WButton.extend({
   statics: {
-    TYPE: "LinkButton"
+    TYPE: "LinkButton",
   },
 
-  initialize: function(map = window.map, container) {
+  initialize: function (map = window.map, container) {
     this._map = map;
 
     this.type = LinkButton.TYPE;
@@ -20,9 +20,9 @@ const LinkButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_addlinks.default,
+      buttonImage: window.plugin.wasabee.skin.images.toolbar_addlinks.default,
       callback: this._toggleActions,
-      context: context
+      context: context,
     });
 
     this.actionsContainer = this._createSubActions([
@@ -34,7 +34,7 @@ const LinkButton = WButton.extend({
           const ld = new LinkDialog(map);
           ld.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("AUTO_DRAWS"),
@@ -44,13 +44,13 @@ const LinkButton = WButton.extend({
           const a = new AutodrawsDialog(map);
           a.enable();
         },
-        context: context
-      }
+        context: context,
+      },
     ]);
 
     this.actionsContainer.style.top = "78px";
     this._container.appendChild(this.actionsContainer);
-  }
+  },
 
   // enable: // default is good
   // disable: // default is good

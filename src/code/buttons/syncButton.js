@@ -7,10 +7,10 @@ import wX from "../wX";
 
 const SyncButton = WButton.extend({
   statics: {
-    TYPE: "syncButton"
+    TYPE: "syncButton",
   },
 
-  Wupdate: function() {
+  Wupdate: function () {
     // takes container & operation, not needed here
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn) {
@@ -20,7 +20,7 @@ const SyncButton = WButton.extend({
     }
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -30,43 +30,46 @@ const SyncButton = WButton.extend({
 
     this._syncbutton = this._createButton({
       container: container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_download.default,
+      buttonImage: window.plugin.wasabee.skin.images.toolbar_download.default,
       context: this,
       callback: () => {
         const so = getSelectedOperation();
-        const me = WasabeeMe.get(true); // force update of ops list
-        // const me = await WasabeeMe.waitGet(true); // force update of ops list
-        if (!me) {
-          const ad = new AuthDialog();
-          ad.enable();
-          return;
-        }
-
-        const promises = new Array();
-        for (const op of me.Ops) {
-          promises.push(opPromise(op.ID));
-        }
-        Promise.all(promises).then(
-          ops => {
-            for (const newop of ops) {
-              newop.store();
-              if (newop.ID == so.ID) {
-                makeSelectedOperation(newop.ID);
-              }
-            }
-            alert(wX("SYNC DONE"));
-          },
-          function(err) {
-            console.log(err);
-            alert(err);
+        // force update of ops list
+        // const me = WasabeeMe.get(true); // force update of ops list
+        WasabeeMe.waitGet(true).then((me) => {
+          if (!me) {
+            const ad = new AuthDialog();
+            ad.enable();
+            return;
           }
-        );
-      }
+
+          const promises = new Array();
+          const opsID = new Set(me.Ops.map((o) => o.ID));
+          for (const opID of opsID) {
+            promises.push(opPromise(opID));
+          }
+          Promise.all(promises).then(
+            (ops) => {
+              for (const newop of ops) {
+                newop.store();
+                if (newop.ID == so.ID) {
+                  makeSelectedOperation(newop.ID);
+                }
+              }
+              alert(wX("SYNC DONE"));
+            },
+            function (err) {
+              console.log(err);
+              alert(err);
+            }
+          );
+        });
+      },
     });
 
     // hide or show depeneding on logged in state
     this.Wupdate(); // container & operation not needed
-  }
+  },
 });
 
 export default SyncButton;

@@ -5,7 +5,8 @@ import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import store from "../lib/store";
 import { updateOpPromise } from "./server";
-// import wX from "./wX";
+
+import wX from "./wX";
 
 // this should be in statics.js
 const DEFAULT_OPERATION_COLOR = "groupa";
@@ -60,7 +61,7 @@ export default class WasabeeOp {
       stored: this.stored,
       localchanged: this.localchanged,
       blockers: this.blockers,
-      keysonhand: this.keysonhand
+      keysonhand: this.keysonhand,
     };
   }
 
@@ -116,7 +117,7 @@ export default class WasabeeOp {
       for (const m of this.markers) {
         m.portalId = rename.get(m.portalId);
       }
-      this.anchors = this.anchors.map(a => rename.get(a));
+      this.anchors = this.anchors.map((a) => rename.get(a));
       for (const b of this.blockers) {
         b.fromPortalId = rename.get(b.fromPortalId);
         b.toPortalId = rename.get(b.toPortalId);
@@ -172,16 +173,9 @@ export default class WasabeeOp {
     return this.containsLinkFromTo(link.fromPortalId, link.toPortalId);
   }
 
-  // unused
-  /* containsMarker(portal, markerType) {
-    if (this.markers.length == 0) return false;
-    for (const m of this.markers) {
-      if (m.portalId == portal.id && m.type == markerType) {
-        return true;
-      }
-    }
-    return false;
-  } */
+  containsMarker(portal, markerType) {
+    return this.containsMarkerByID(portal.id, markerType);
+  }
 
   containsMarkerByID(portalID, markerType) {
     if (this.markers.length == 0) return false;
@@ -193,8 +187,31 @@ export default class WasabeeOp {
     return false;
   }
 
+  getPortalMarkers(portal) {
+    const markers = new Map();
+    if (!portal) return markers;
+    for (const m of this.markers) {
+      if (m.portalId == portal.id) {
+        markers.set(m.type, m);
+      }
+    }
+    return markers;
+  }
+
+  getLink(portal1, portal2) {
+    for (const l of this.links) {
+      if (
+        (l.fromPortalId == portal1.id && l.toPortalId == portal2.id) ||
+        (l.fromPortalId == portal2.id && l.toPortalId == portal1.id)
+      ) {
+        return l;
+      }
+    }
+    return null;
+  }
+
   getLinkListFromPortal(portal) {
-    const links = this.links.filter(function(listLink) {
+    const links = this.links.filter(function (listLink) {
       return (
         listLink.fromPortalId == portal.id || listLink.toPortalId == portal.id
       );
@@ -207,14 +224,20 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
-    this.anchors = this.anchors.filter(function(anchor) {
+    console.log("removing anchor");
+    console.log(this.links);
+
+    this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
-    this.links = this.links.filter(function(listLink) {
+    this.links = this.links.filter(function (listLink) {
       return (
         listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId
       );
     });
+
+    console.log(this.links);
+
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update(true);
@@ -222,7 +245,7 @@ export default class WasabeeOp {
   }
 
   removeMarker(marker) {
-    this.markers = this.markers.filter(function(listMarker) {
+    this.markers = this.markers.filter(function (listMarker) {
       return listMarker.ID !== marker.ID;
     });
     this.cleanPortalList();
@@ -239,19 +262,19 @@ export default class WasabeeOp {
     this.update(true);
   }
 
-  setLinkComment(link, comment) {
-    for (const v of this.links) {
-      if (v.ID == link.ID) {
-        v.description = comment;
+  setMarkerState(markerID, state) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.state = state;
       }
     }
     this.update(true);
   }
 
-  setMarkerState(markerID, state) {
-    for (const v of this.markers) {
-      if (v.ID == markerID) {
-        v.state = state;
+  setLinkComment(link, comment) {
+    for (const v of this.links) {
+      if (v.ID == link.ID) {
+        v.description = comment;
       }
     }
     this.update(true);
@@ -270,6 +293,15 @@ export default class WasabeeOp {
     for (const v of this.links) {
       if (v.ID == linkID) {
         v.color = color;
+      }
+    }
+    this.update(true);
+  }
+
+  setLinkOrder(linkID, order) {
+    for (const v of this.links) {
+      if (v.ID == linkID) {
+        v.opOrder = order;
       }
     }
     this.update(true);
@@ -442,7 +474,7 @@ export default class WasabeeOp {
     return false;
   }
 
-  addLink(fromPortal, toPortal, description, order) {
+  addLink(fromPortal, toPortal, description, order, replace = false) {
     if (!fromPortal || !toPortal) {
       console.log("missing portal for link");
       return null;
@@ -457,18 +489,29 @@ export default class WasabeeOp {
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
 
-    const link = new WasabeeLink(this, fromPortal.id, toPortal.id, description);
+    const existingLink = this.getLink(fromPortal, toPortal);
+
+    const link =
+      existingLink && replace
+        ? existingLink
+        : new WasabeeLink(this, fromPortal.id, toPortal.id);
+    link.description = description;
     if (order) link.opOrder = order;
-    if (!this.containsLink(link)) {
+
+    if (!existingLink) {
       this.links.push(link);
+      this.update(true);
+      this.runCrosslinks();
+    } else if (replace) {
       this.update(true);
       this.runCrosslinks();
     } else {
       console.log(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
       );
+      return existingLink;
     }
-    return link.ID;
+    return link;
   }
 
   containsAnchor(portalId) {
@@ -521,13 +564,13 @@ export default class WasabeeOp {
   }
 
   get fakedPortals() {
-    const c = Array.from(this._idToOpportals.values()).filter(p => p.faked);
+    const c = Array.from(this._idToOpportals.values()).filter((p) => p.faked);
     return c;
   }
 
   // silently swap two anchors
   _swapPortal(originalPortal, newPortal) {
-    this.anchors = this.anchors.filter(function(listAnchor) {
+    this.anchors = this.anchors.filter(function (listAnchor) {
       return listAnchor !== originalPortal.id;
     });
     if (!this.containsAnchor(newPortal.id)) this.anchors.push(newPortal.id);
@@ -570,7 +613,9 @@ export default class WasabeeOp {
       }
     }
     // Remove the invalid links from the array (after we are done iterating through it)
-    this.links = this.links.filter(element => !linksToRemove.includes(element));
+    this.links = this.links.filter(
+      (element) => !linksToRemove.includes(element)
+    );
   }
 
   swapPortal(originalPortal, newPortal) {
@@ -585,14 +630,22 @@ export default class WasabeeOp {
 
   addMarker(markerType, portal, comment) {
     if (!portal) return;
-    // if (!this.containsMarker(portal, markerType)) {
-    this.addPortal(portal);
-    const marker = new WasabeeMarker(markerType, portal.id, comment);
-    this.markers.push(marker);
-    this.update(true);
-    // only need this for virus/destroy
-    this.runCrosslinks();
-    // } else alert(wX("ALREADY_HAS_MARKER"));
+    const destructMarkerTypes = [
+      window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
+      window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
+      window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
+    ];
+    if (this.containsMarker(portal, markerType)) {
+      alert(wX("ALREADY_HAS_MARKER"));
+    } else {
+      this.addPortal(portal);
+      const marker = new WasabeeMarker(markerType, portal.id, comment);
+      this.markers.push(marker);
+      this.update(true);
+
+      // only need this for virus/destroy
+      if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
+    }
   }
 
   assignMarker(id, gid) {
@@ -680,7 +733,7 @@ export default class WasabeeOp {
       () => {
         console.log("active mode change pushed", new Date().toGMTString());
       },
-      err => {
+      (err) => {
         console.log(err);
         alert("Active Mode Update failed: " + err);
       }
@@ -703,7 +756,7 @@ export default class WasabeeOp {
   }
 
   convertLinksToObjs(links) {
-    if (!links || links.length == 0) return;
+    if (!links || links.length == 0) return null;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -716,7 +769,7 @@ export default class WasabeeOp {
   }
 
   convertBlockersToObjs(links) {
-    if (!links || links.length == 0) return;
+    if (!links || links.length == 0) return null;
     const tempLinks = new Array();
     for (const l of links) {
       if (l instanceof WasabeeLink) {
@@ -729,7 +782,7 @@ export default class WasabeeOp {
   }
 
   convertMarkersToObjs(markers) {
-    if (!markers || markers.length == 0) return;
+    if (!markers || markers.length == 0) return null;
     const tmpMarkers = new Array();
     if (markers) {
       for (const m of markers) {
@@ -744,7 +797,7 @@ export default class WasabeeOp {
   }
 
   convertPortalsToObjs(portals) {
-    if (!portals || portals.length == 0) return;
+    if (!portals || portals.length == 0) return null;
     const tmpPortals = Array();
     for (const p of portals) {
       if (p instanceof WasabeePortal) {
@@ -824,10 +877,10 @@ export default class WasabeeOp {
   get nextOrder() {
     let o = 0;
     for (const l of this.links) {
-      o = Math.max(o, l.order);
+      o = Math.max(o, l.opOrder);
     }
     for (const m of this.markers) {
-      o = Math.max(o, m.order);
+      o = Math.max(o, m.opOrder);
     }
     return ++o;
   }
@@ -836,7 +889,16 @@ export default class WasabeeOp {
   // KOH always takes place on the server because non-write-access
   // agents need to make changes & sync
   keyOnHand(portalId, gid, onhand, capsule) {
+    if (typeof onhand == "string") {
+      onhand = Number.parseInt(onhand, 10);
+    }
+
     for (const k of this.keysonhand) {
+      // fix broken ops
+      if (typeof k.onhand == "string") {
+        k.onhand = Number.parseInt(k.onhand, 10);
+      }
+
       if (k.portalId == portalId && k.gid == gid) {
         k.onhand = onhand;
         k.capsule = capsule;
@@ -845,15 +907,11 @@ export default class WasabeeOp {
       }
     }
 
-    if (typeof onhand == "string") {
-      onhand = Number.parseInt(onhand, 10);
-    }
-
     const k = {
       portalId: portalId,
       gid: gid,
       onhand: onhand,
-      capsule: capsule
+      capsule: capsule,
     };
     this.keysonhand.push(k);
     this.update(false);

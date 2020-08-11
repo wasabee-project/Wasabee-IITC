@@ -1,36 +1,41 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 // export screen
 const ExportDialog = WDialog.extend({
   statics: {
-    TYPE: "exportDialog"
+    TYPE: "exportDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = ExportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
+    postToFirebase({ id: "analytics", action: ExportDialog.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
       this._drawToolsFormat();
+    };
+    buttons[wX("MARKERS_AS_BOOKMARKS")] = () => {
+      this._bookmarkFormat();
     };
 
     this._dialog = window.dialog({
@@ -42,12 +47,12 @@ const ExportDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.exportDialog
+      id: window.plugin.wasabee.static.dialogNames.exportDialog,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const mainContent = L.DomUtil.create("div", null);
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
@@ -56,7 +61,7 @@ const ExportDialog = WDialog.extend({
     return mainContent;
   },
 
-  _drawToolsFormat: function() {
+  _drawToolsFormat: function () {
     const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Array();
     for (const link of this._operation.links) {
@@ -68,7 +73,33 @@ const ExportDialog = WDialog.extend({
     }
 
     ta.value = JSON.stringify(output);
-  }
+  },
+
+  _bookmarkFormat: function () {
+    const ta = document.getElementById("wasabee-dialog-export-textarea");
+    const output = new Object();
+    output.maps = {};
+    output.maps.idOthers = {};
+    output.maps.idOthers.label = "Others";
+    output.maps.idOthers.state = 1;
+    output.maps.idOthers.bkmrk = {};
+
+    output.portals = {};
+    output.portals.idOthers = {};
+    output.portals.idOthers.label = "Others";
+    output.portals.idOthers.state = 1;
+    output.portals.idOthers.bkmrk = {};
+
+    for (const m of this._operation.markers) {
+      const id = "id" + m.ID.substring(0, 16);
+      const p = this._operation._idToOpportals.get(m.portalId);
+      output.portals.idOthers.bkmrk[id] = {};
+      output.portals.idOthers.bkmrk[id].guid = m.portalId;
+      output.portals.idOthers.bkmrk[id].latlng = `${p.lat},${p.lng}`;
+      output.portals.idOthers.bkmrk[id].label = p.name;
+    }
+    ta.value = JSON.stringify(output);
+  },
 });
 
 export default ExportDialog;

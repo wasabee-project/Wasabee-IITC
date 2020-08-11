@@ -6,15 +6,17 @@ import StarburstDialog from "../dialogs/starburst";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
 import MadridDialog from "../dialogs/madrid";
+import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({
   // not strictly necessary, but good style
   statics: {
-    TYPE: "autodraws"
+    TYPE: "autodraws",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
+    postToFirebase({ id: "analytics", action: AutodrawsDialog.TYPE });
     this._map = map;
     this.menuItems = [
       {
@@ -23,7 +25,7 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const mm = new MultimaxButtonControl(this._map);
           mm.enable();
-        }
+        },
       },
       {
         text: wX("MAX"),
@@ -31,7 +33,7 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const ff = new FanfieldDialog(this._map);
           ff.enable();
-        }
+        },
       },
       {
         text: wX("STARBURST"),
@@ -39,7 +41,7 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const sb = new StarburstDialog(this._map);
           sb.enable();
-        }
+        },
       },
       {
         text: wX("ONION_WAS_TAKEN"),
@@ -47,7 +49,7 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const o = new OnionfieldDialog(this._map);
           o.enable();
-        }
+        },
       },
       {
         text: wX("HG"),
@@ -55,7 +57,7 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const h = new HomogeneousDialog(this._map);
           h.enable();
-        }
+        },
       },
       {
         text: wX("MADRID_WAS_TAKEN"),
@@ -63,15 +65,15 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const m = new MadridDialog(this._map);
           m.enable();
-        }
-      }
+        },
+      },
     ];
 
     this.type = AutodrawsDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 
-  addHooks: function() {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     if (this._smallScreen) {
       this._displaySmallDialog();
@@ -80,11 +82,11 @@ const AutodrawsDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const html = L.DomUtil.create("div", "container");
     for (const i of this.menuItems) {
       const link = L.DomUtil.create("a", null, html);
@@ -111,14 +113,14 @@ const AutodrawsDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.autodraws
+      id: window.plugin.wasabee.static.dialogNames.autodraws,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _displaySmallDialog: function() {
+  _displaySmallDialog: function () {
     this._displayDialog();
-  }
+  },
 });
 
 export default AutodrawsDialog;

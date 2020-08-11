@@ -3,7 +3,7 @@ import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 
-const setRestoreOpID = opID => {
+const setRestoreOpID = (opID) => {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
 };
 
@@ -49,7 +49,7 @@ const loadNewDefaultOp = () => {
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-export const makeSelectedOperation = opID => {
+export const makeSelectedOperation = (opID) => {
   // _selectedOp is null at first load (or page reload), should never be after that
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
@@ -57,6 +57,7 @@ export const makeSelectedOperation = opID => {
         "makeSelectedOperation called on the current op; replacing with version from local store. not saving live changes first"
       );
     } else {
+      // should not be necessary now, but still safe
       window.plugin.wasabee._selectedOp.store();
     }
   }
@@ -68,27 +69,20 @@ export const makeSelectedOperation = opID => {
     alert("attempted to load invalid opID");
   }
   // the only place we should change the selected op.
+  delete window.plugin.wasabee._selectedOp;
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
   // redraw the screen, old version of IITC might not have set the hooks up yet
   // so make sure the hooks are there
   // VALID_HOOKS seems to be empty now?
-  if (
-    !window.plugin.wasabee.usingOldIITC ||
-    window.VALID_HOOKS.includes("wasabeeUIUpdate")
-  )
-    window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
-  if (
-    !window.plugin.wasabee.usingOldIITC ||
-    window.VALID_HOOKS.includes("wasabeeCrosslinks")
-  )
-    window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
+  window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
 };
 
 // use this to pull an op from local store by ID
-export const getOperationByID = opID => {
+export const getOperationByID = (opID) => {
   let op = null;
   try {
     const v = store.get(opID);
@@ -127,7 +121,7 @@ export const setupLocalStorage = () => {
 };
 
 //** This function removes an operation from the main list */
-export const removeOperation = opID => {
+export const removeOperation = (opID) => {
   try {
     store.remove(opID);
   } catch (e) {
@@ -146,7 +140,7 @@ export const resetOps = () => {
 export const opsList = () => {
   var out = new Array();
 
-  store.each(function(value, key) {
+  store.each(function (value, key) {
     if (key.length == 40) {
       out.push(key);
     }
@@ -154,7 +148,7 @@ export const opsList = () => {
   return out;
 };
 
-export const duplicateOperation = opID => {
+export const duplicateOperation = (opID) => {
   let op = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;

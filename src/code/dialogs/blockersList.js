@@ -5,27 +5,29 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
-  blockerAutomark
+  blockerAutomark,
 } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
+import { postToFirebase } from "../firebaseSupport";
 
 const BlockerList = WDialog.extend({
   statics: {
-    TYPE: "blockerList"
+    TYPE: "blockerList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = BlockerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._operation = getSelectedOperation();
+    postToFirebase({ id: "analytics", action: BlockerList.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._UIUpdateHook = newOpData => {
+    this._UIUpdateHook = (newOpData) => {
       context.blockerlistUpdate(newOpData);
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
@@ -34,14 +36,14 @@ const BlockerList = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
@@ -78,12 +80,12 @@ const BlockerList = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.blockerList
+      id: window.plugin.wasabee.static.dialogNames.blockerList,
     });
   },
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
-  blockerlistUpdate: function(newOpData) {
+  blockerlistUpdate: function (newOpData) {
     this._operation = newOpData;
     if (!this._enabled) return;
     this.sortable = this._getListDialogContent(
@@ -99,58 +101,58 @@ const BlockerList = WDialog.extend({
     content.fields = [
       {
         name: wX("FROM_PORT"),
-        value: blocker => {
+        value: (blocker) => {
           return this._operation.getPortal(blocker.fromPortalId).name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.fromPortalId);
           row.appendChild(p.displayFormat(this._smallScreen));
-        }
+        },
       },
       {
         name: wX("COUNT"),
-        value: blocker => {
+        value: (blocker) => {
           const c = this._operation.blockers.filter(
-            b =>
+            (b) =>
               b.fromPortalId == blocker.fromPortalId ||
               b.toPortalID == blocker.fromPortalId
           );
           return c.length;
         },
         // sort: (a, b) => a - b,
-        format: (row, value) => (row.textContent = value)
+        format: (row, value) => (row.textContent = value),
       },
       {
         name: wX("TO_PORT"),
-        value: blocker => {
+        value: (blocker) => {
           return this._operation.getPortal(blocker.toPortalId).name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = this._operation.getPortal(blocker.toPortalId);
           row.appendChild(p.displayFormat(this._smallScreen));
-        }
+        },
       },
       {
         name: wX("COUNT"),
-        value: blocker => {
+        value: (blocker) => {
           const c = this._operation.blockers.filter(
-            b =>
+            (b) =>
               b.fromPortalId == blocker.toPortalId ||
               b.toPortalId == blocker.toPortalId
           );
           return c.length;
         },
         // sort: (a, b) => a - b,
-        format: (row, value) => (row.textContent = value)
-      }
+        format: (row, value) => (row.textContent = value),
+      },
     ];
     content.sortBy = sortBy;
     content.sortAsc = !sortAsc; // I don't know why this flips
     content.items = this._operation.blockers;
     return content;
-  }
+  },
 });
 
 export default BlockerList;

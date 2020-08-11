@@ -5,28 +5,30 @@ import WasabeeAnchor from "../anchor";
 import WasabeeTeam from "../team";
 import { assignLinkPromise, assignMarkerPromise, teamPromise } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const AssignDialog = WDialog.extend({
   statics: {
-    TYPE: "assignDialog"
+    TYPE: "assignDialog",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = AssignDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: AssignDialog.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -41,12 +43,12 @@ const AssignDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.assign
+      id: window.plugin.wasabee.static.dialogNames.assign,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function(target, operation) {
+  setup: function (target, operation) {
     this._operation = operation;
     this._dialog = null;
     this._targetID = target.ID;
@@ -87,7 +89,7 @@ const AssignDialog = WDialog.extend({
     this._html.appendChild(menu);
   },
 
-  _buildContent: function() {
+  _buildContent: function () {
     const content = L.DomUtil.create("div");
     if (typeof this._label == "string") {
       content.textContent = this._label;
@@ -98,21 +100,21 @@ const AssignDialog = WDialog.extend({
   },
 
   // TODO this should return a promise so the draw routine can .then() it...
-  _getAgentMenu: function(current) {
+  _getAgentMenu: function (current) {
     const container = L.DomUtil.create("div", "wasabee-agent-menu");
     const menu = L.DomUtil.create("select", null, container);
     let option = menu.appendChild(L.DomUtil.create("option", null));
-    option.value = null;
+    option.value = "";
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
     const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
     if (mode == "active") {
-      menu.addEventListener("change", value => {
+      menu.addEventListener("change", (value) => {
         this.activeAssign(value);
       });
     } else {
-      menu.addEventListener("change", value => {
+      menu.addEventListener("change", (value) => {
         this.designAssign(value);
       });
     }
@@ -121,10 +123,10 @@ const AssignDialog = WDialog.extend({
     for (const t of this._operation.teamlist) {
       if (!window.plugin.wasabee.teams.has(t.teamid)) {
         teamPromise(t.teamid).then(
-          function(team) {
+          function (team) {
             console.debug(team);
           },
-          function(err) {
+          function (err) {
             console.log(err);
           }
         );
@@ -145,7 +147,7 @@ const AssignDialog = WDialog.extend({
     return container;
   },
 
-  designAssign: function(value) {
+  designAssign: function (value) {
     if (this._type == "Marker") {
       this._operation.assignMarker(this._targetID, value.srcElement.value);
     }
@@ -164,17 +166,17 @@ const AssignDialog = WDialog.extend({
     }
   },
 
-  activeAssign: function(value) {
+  activeAssign: function (value) {
     if (this._type == "Marker") {
       assignMarkerPromise(
         this._operation.ID,
         this._targetID,
         value.srcElement.value
       ).then(
-        function() {
+        function () {
           console.log("assignment processed");
         },
-        function(err) {
+        function (err) {
           console.log(err);
         }
       );
@@ -186,10 +188,10 @@ const AssignDialog = WDialog.extend({
         this._targetID,
         value.srcElement.value
       ).then(
-        function() {
+        function () {
           console.log("assignment processed");
         },
-        function(err) {
+        function (err) {
           console.log(err);
         }
       );
@@ -205,17 +207,17 @@ const AssignDialog = WDialog.extend({
           l.ID,
           value.srcElement.value
         ).then(
-          function() {
+          function () {
             console.log("assignment processed");
           },
-          function(err) {
+          function (err) {
             console.log(err);
           }
         );
         this._operation.assignLink(l.ID, value.srcElement.value);
       }
     }
-  }
+  },
 });
 
 export default AssignDialog;

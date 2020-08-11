@@ -6,10 +6,10 @@ import wX from "../wX";
 
 const UploadButton = WButton.extend({
   statics: {
-    TYPE: "uploadButton"
+    TYPE: "uploadButton",
   },
 
-  initialize: function(map = window.map, container) {
+  initialize: function (map = window.map, container) {
     this._map = map;
 
     this.type = UploadButton.TYPE;
@@ -21,7 +21,7 @@ const UploadButton = WButton.extend({
     this.button = this._createButton({
       title: "Upload",
       container: this._container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_upload.default,
+      buttonImage: window.plugin.wasabee.skin.images.toolbar_upload.default,
       context: this,
       callback: () => {
         const operation = getSelectedOperation();
@@ -31,7 +31,7 @@ const UploadButton = WButton.extend({
               alert(wX("UPDATED"));
               this.Wupdate(this._container, operation);
             },
-            reject => {
+            (reject) => {
               console.log(reject);
               alert(`Update Failed: ${reject}`);
             }
@@ -39,7 +39,7 @@ const UploadButton = WButton.extend({
           return;
         }
         uploadOpPromise().then(
-          resolve => {
+          (resolve) => {
             console.log(resolve);
             // switch to the new version in local store -- uploadOpPromise stores it
             makeSelectedOperation(resolve.ID);
@@ -47,7 +47,7 @@ const UploadButton = WButton.extend({
             this.Wupdate(this._container, resolve);
             this._invisible();
           },
-          reject => {
+          (reject) => {
             // this shouldn't be necessary, but the UI is behind
             updateOpPromise(operation).then(
               () => {
@@ -55,7 +55,7 @@ const UploadButton = WButton.extend({
                 alert(wX("UPDATED"));
                 this.Wupdate(this._container, selop);
               },
-              reject => {
+              (reject) => {
                 console.log(reject);
                 alert(`Update Failed: ${reject}`);
               }
@@ -63,11 +63,11 @@ const UploadButton = WButton.extend({
             console.log(reject);
           }
         );
-      }
+      },
     });
   },
 
-  Wupdate: function(container, operation) {
+  Wupdate: function (container, operation) {
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
       this.title = wX("NOT LOGGED IN SHORT");
@@ -101,13 +101,13 @@ const UploadButton = WButton.extend({
     this._visible();
   },
 
-  _visible: function() {
+  _visible: function () {
     this.button.style.display = "block";
   },
 
-  _invisible: function() {
+  _invisible: function () {
     this.button.style.display = "none";
-  }
+  },
 });
 
 export default UploadButton;

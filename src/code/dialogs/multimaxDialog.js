@@ -5,28 +5,29 @@ import wX from "../wX";
 import {
   getAllPortalsOnScreen,
   testPortal,
-  clearAllLinks
+  clearAllLinks,
 } from "../uiCommands";
 import { greatCircleArcIntersect } from "../crosslinks";
+import { postToFirebase } from "../firebaseSupport";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
 const MultimaxDialog = WDialog.extend({
   statics: {
-    TYPE: "multimaxDialog"
+    TYPE: "multimaxDialog",
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
@@ -121,12 +122,12 @@ const MultimaxDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.multimaxButton
+      id: window.plugin.wasabee.static.dialogNames.multimaxButton,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = MultimaxDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MULTI_M");
@@ -137,12 +138,13 @@ const MultimaxDialog = WDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = WasabeePortal.create(p);
     this._urp = testPortal();
+    postToFirebase({ id: "analytics", action: MultimaxDialog.TYPE });
   },
 
   /*
   Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
   */
-  MM: function(
+  MM: function (
     pOne,
     pTwo,
     portals,
@@ -153,7 +155,7 @@ const MultimaxDialog = WDialog.extend({
     const poset = this.buildPOSet(pOne, pTwo, portals);
     const sequence = this.longestSequence(poset);
 
-    const portalsMap = new Map(portals.map(p => [p.id, p]));
+    const portalsMap = new Map(portals.map((p) => [p.id, p]));
 
     if (base)
       this._operation.addLink(pOne, pTwo, commentPrefix + "base", ++order);
@@ -182,7 +184,7 @@ const MultimaxDialog = WDialog.extend({
     return [sequence.length, order, prev];
   },
 
-  doMultimax: function() {
+  doMultimax: function () {
     const portals = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax
@@ -202,7 +204,7 @@ const MultimaxDialog = WDialog.extend({
     return length;
   },
 
-  fieldCoversPortal: function(a, b, c, p) {
+  fieldCoversPortal: function (a, b, c, p) {
     const unreachableMapPoint = this._urp;
 
     // greatCircleArcIntersect now takes either WasabeeLink or window.link format
@@ -221,16 +223,16 @@ const MultimaxDialog = WDialog.extend({
 
   // given two anchor, build a map that shows which and how many portals are covered by each possible field by guid
   // note: a portal always covers itself
-  buildPOSet: function(anchor1, anchor2, visible) {
+  buildPOSet: function (anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
       poset.set(
         i.id,
         visible
-          .filter(j => {
+          .filter((j) => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
           })
-          .map(j => j.id)
+          .map((j) => j.id)
       );
     }
     return poset;
@@ -238,23 +240,23 @@ const MultimaxDialog = WDialog.extend({
 
   // build a map that shows which and how many portals are covering each possible field by guid
   // note: a portal is always covered by itself
-  buildRevPOSet: function(anchor1, anchor2, visible) {
+  buildRevPOSet: function (anchor1, anchor2, visible) {
     const poset = new Map();
     for (const i of visible) {
       poset.set(
         i.id,
         visible
-          .filter(j => {
+          .filter((j) => {
             return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
           })
-          .map(j => j.id)
+          .map((j) => j.id)
       );
     }
     return poset;
   },
 
   /* not working properly */
-  buildPOSetFaster: function(a, b, visible) {
+  buildPOSetFaster: function (a, b, visible) {
     const poset = new Map();
     for (const i of visible) {
       const iCovers = new Array();
@@ -291,14 +293,14 @@ const MultimaxDialog = WDialog.extend({
   // - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
   //   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
   //   (inner to outer)
-  longestSequence: function(poset, start) {
+  longestSequence: function (poset, start) {
     const alreadyCalculatedSequences = new Map();
-    const sequence_from = c => {
+    const sequence_from = (c) => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
         let sequence = Array.from(
           poset
             .get(c)
-            .filter(i => i !== c)
+            .filter((i) => i !== c)
             .map(sequence_from)
             .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), [])
         );
@@ -313,7 +315,7 @@ const MultimaxDialog = WDialog.extend({
     return Array.from(poset.keys())
       .map(sequence_from)
       .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
-  }
+  },
 });
 
 export default MultimaxDialog;

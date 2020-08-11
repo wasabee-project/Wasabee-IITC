@@ -7,189 +7,77 @@ import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
-export default function() {
+export default function () {
   return GetWasabeeServer();
 }
 
-export const uploadOpPromise = function() {
+export const uploadOpPromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
 
   const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
-  // console.log(json);
 
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw`;
-    const req = new XMLHttpRequest();
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          WasabeeMe.create(req.response); // free update
-          opPromise(operation.ID).then(
-            function(newop) {
-              newop.localchanged = false;
-              newop.store();
-              console.log(newop);
-              resolve(newop);
-            },
-            function(err) {
-              console.log("failure to fetch newly uploaded op: " + err);
-              reject(err);
-            }
-          );
-          break;
-        case 401:
-          reject(wX("UPLOAD PERM DENIED"));
-          break;
-        case 500:
-          console.log(
-            "probably trying to upload an op with an ID already taken... use update"
-          );
-          operation.fetched = null; // make it look like it came from the server
-          reject(req.response);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send(json);
-  });
+  const response = await _genericPost(
+    `${SERVER_BASE}/api/v1/draw`,
+    json,
+    "application/json;charset=UTF-8"
+  );
+  WasabeeMe.create(response); // free update to the cache
+  const newop = await opPromise(operation.ID);
+  newop.localchanged = false;
+  newop.store();
+  return newop;
 };
 
-export const updateOpPromise = operation => {
+export const updateOpPromise = (operation) => {
   const SERVER_BASE = GetWasabeeServer();
 
   // let the server know how to process assignments etc
   operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
-
-  // const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
-  // console.log(json);
   delete operation.mode;
 
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${operation.ID}`;
-    const req = new XMLHttpRequest();
-    req.open("PUT", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          operation.localchanged = false;
-          resolve(wX("UPDATED"));
-          break;
-        case 401:
-          reject(wX("UPDATE PERM DENIED"));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send(json);
-  });
+  return _genericPut(
+    `${SERVER_BASE}/api/v1/draw/${operation.ID}`,
+    json,
+    "application/json;charset=UTF-8"
+  );
 };
 
-export const deleteOpPromise = function(opID) {
+export const deleteOpPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
-    const req = new XMLHttpRequest();
-    req.open("DELETE", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(wX("DELETED"));
-          break;
-        case 401:
-          reject(wX("DELETE PERM DENIED"));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+  return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}`, new FormData());
 };
 
-export const teamPromise = function(teamid) {
+// returns a resolved promise to a WasabeeTeam
+export const teamPromise = async function (teamid) {
+  // does this ever get triggered?
+  if (teamid == "owned") {
+    console.log("owned team queried");
+    const owned = new WasabeeTeam();
+    owned.id = "owned";
+    owned.name = "Owned Ops";
+    return owned;
+  }
+
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    if (teamid == "owned") {
-      const owned = new WasabeeTeam();
-      owned.id = "owned";
-      owned.name = "Owned Ops";
-      resolve(owned);
-    }
-
-    const url = `${SERVER_BASE}/api/v1/team/${teamid}`;
-    const req = new XMLHttpRequest();
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    let newteam = null;
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          // add this team to the cache
-          newteam = WasabeeTeam.create(req.response);
-          Wasabee.teams.set(teamid, newteam);
-          resolve(newteam);
-          break;
-        case 401:
-          reject(wX("TEAM PERM DENIED", teamid));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+  const response = await _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
+  const newteam = WasabeeTeam.create(response);
+  Wasabee.teams.set(teamid, newteam);
+  return newteam;
 };
 
-export const opPromise = function(opID) {
+// returns a promise to fetch a WasabeeOp
+// not generic since 304 result processing and If-Modified-Since header
+export const opPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
+  const localop = getOperationByID(opID);
+  const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
+
+  return new Promise(function (resolve, reject) {
     const req = new XMLHttpRequest();
-    const localop = getOperationByID(opID);
 
     req.open("GET", url);
 
@@ -200,8 +88,8 @@ export const opPromise = function(opID) {
     req.withCredentials = true;
     req.crossDomain = true;
 
-    let newop = null;
-    req.onload = function() {
+    let newop = null; // I hate javascript
+    req.onload = function () {
       switch (req.status) {
         case 200:
           newop = WasabeeOp.create(req.response);
@@ -214,6 +102,10 @@ export const opPromise = function(opID) {
           resolve(localop);
           break;
         case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
+          break;
+        case 403:
           reject(wX("OP PERM DENIED", opID));
           break;
         default:
@@ -222,7 +114,7 @@ export const opPromise = function(opID) {
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
 
@@ -230,732 +122,377 @@ export const opPromise = function(opID) {
   });
 };
 
-export const mePromise = function() {
+// returns a resolved promise to WasabeeMe
+export const mePromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/me`;
-    const req = new XMLHttpRequest();
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    let me = null;
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          me = WasabeeMe.create(req.response);
-          if (!me) {
-            reject(wX("NOT LOGGED IN", "200, invalid"));
-          } else {
-            resolve(me);
-          }
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", "401"));
-          break;
-        case 403:
-          // 403 is a detected RES agent
-          alert(`${req.responseText}`);
-          WasabeeMe.purge();
-          resetOps();
-          reject(wX("NOT LOGGED IN", "blacklist"));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+  try {
+    const response = await _genericGet(`${SERVER_BASE}/me`);
+    const me = WasabeeMe.create(response);
+    return me;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 };
 
-export const agentPromise = function(GID, force) {
+// returns (a resolved promise of) the actual WasabeeAgent
+export const agentPromise = async function (GID, force) {
+  if (!force && window.plugin.wasabee._agentCache.has(GID)) {
+    return window.plugin.wasabee._agentCache.get(GID);
+  }
+
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    if (GID == null) {
-      reject("null gid");
-    }
-
-    if (!force && window.plugin.wasabee._agentCache.has(GID)) {
-      resolve(window.plugin.wasabee._agentCache.get(GID));
-    } else {
-      const url = `${SERVER_BASE}/api/v1/agent/${GID}`;
-      const req = new XMLHttpRequest();
-      req.open("GET", url);
-      req.withCredentials = true;
-      req.crossDomain = true;
-
-      req.onload = function() {
-        switch (req.status) {
-          case 200:
-            resolve(WasabeeAgent.create(req.response));
-            break;
-          case 401:
-            reject(wX("NOT LOGGED IN", req.responseText));
-            break;
-          default:
-            reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-            break;
-        }
-      };
-
-      req.onerror = function() {
-        reject(`Network Error: ${req.responseText}`);
-      };
-
-      req.send();
-    }
-  });
+  const response = await _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
+  const wa = WasabeeAgent.create(response);
+  return wa;
 };
 
-export const assignMarkerPromise = function(opID, markerID, agentID) {
+export const assignMarkerPromise = function (opID, markerID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/assign`;
-    const req = new XMLHttpRequest();
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("agent", agentID);
-    req.send(fd);
-  });
+  const fd = new FormData();
+  fd.append("agent", agentID);
+  return _genericPost(
+    `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/assign`,
+    fd
+  );
 };
 
-export const assignLinkPromise = function(opID, linkID, agentID) {
+export const assignLinkPromise = function (opID, linkID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/assign`;
-    const req = new XMLHttpRequest();
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("agent", agentID);
-    req.send(fd);
-  });
+  const fd = new FormData();
+  fd.append("agent", agentID);
+  return _genericPost(
+    `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/assign`,
+    fd
+  );
 };
 
-export const targetPromise = function(agent, portal) {
+export const targetPromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
-  const id = agent.id;
-
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/api/v1/agent/${id}/target`;
-    const req = new XMLHttpRequest();
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("id", id);
-    fd.append("portal", portal.name);
-    fd.append("ll", ll);
-    req.send(fd);
-  });
+  const fd = new FormData();
+  fd.append("id", agentID);
+  fd.append("portal", portal.name);
+  fd.append("ll", ll);
+  return _genericPost(`${SERVER_BASE}/api/v1/agent/${agentID}/target`, fd);
 };
 
-export const SendAccessTokenAsync = function(accessToken) {
+export const routePromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise(function(resolve, reject) {
-    const url = `${SERVER_BASE}/aptok`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      // console.log(req.getAllResponseHeaders());
-      switch (req.status) {
-        case 200:
-          WasabeeMe.create(req.response); // free update
-          resolve(true);
-          break;
-        default:
-          alert(wX("AUTH TOKEN REJECTED", req.statusText));
-          reject(`${req.status}: ${req.statusText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      console.log(req.getAllResponseHeaders());
-      reject(`Network Error: ${req.statusText}`);
-    };
-
-    req.setRequestHeader("Content-Type", "application/json");
-    req.send(JSON.stringify({ accessToken: accessToken }));
-  });
+  const ll = portal.lat + "," + portal.lng;
+  const fd = new FormData();
+  fd.append("id", agentID);
+  fd.append("portal", portal.name);
+  fd.append("ll", ll);
+  return _genericPost(`${SERVER_BASE}/api/v1/agent/${agentID}/route`, fd);
 };
 
-export const SetTeamState = function(teamID, state) {
+export const SendAccessTokenAsync = function (accessToken) {
   const SERVER_BASE = GetWasabeeServer();
+  return _genericPost(
+    `${SERVER_BASE}/aptok`,
+    JSON.stringify({ accessToken: accessToken }),
+    "application/json;charset=UTF-8"
+  );
+};
 
+export const SetTeamState = function (teamID, state) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(`${SERVER_BASE}/api/v1/me/${teamID}?state=${state}`);
+};
+
+export const SetMarkerState = function (opID, markerID, state) {
+  let action = "incomplete";
+  switch (state) {
+    case "acknowledged":
+      action = "acknowledge";
+      break;
+    case "pending":
+      action = "incomplete";
+      break;
+    case "completed":
+      action = "complete";
+      break;
+    default:
+      action = "incomplete";
+  }
+
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(
+    `${SERVER_BASE}/api/v1/draw/${opID}/marker/${markerID}/${action}`
+  );
+};
+
+export const SetLinkState = function (opID, linkID, state) {
+  let action = "incomplete";
+  switch (state) {
+    // no acknowledge for links -- use incomplete
+    case "pending":
+      action = "incomplete";
+      break;
+    case "completed":
+      action = "complete";
+      break;
+    default:
+      action = "incomplete";
+  }
+
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(
+    `${SERVER_BASE}/api/v1/draw/${opID}/link/${linkID}/${action}`
+  );
+};
+
+export const opKeyPromise = function (opID, portalID, onhand, capsule) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("onhand", onhand ? onhand : "0");
+  fd.append("capsule", capsule ? capsule : "");
+  return _genericPost(
+    `${SERVER_BASE}/api/v1/draw/${opID}/portal/${portalID}/keyonhand`,
+    fd
+  );
+};
+
+export const dKeyPromise = function (portalID, onhand, capsule) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("portalID", portalID ? portalID : "");
+  fd.append("count", onhand ? onhand : "0");
+  fd.append("capID", capsule ? capsule : "");
+  return _genericPost(`${SERVER_BASE}/api/v1/d`, fd);
+};
+
+export const dKeylistPromise = function () {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(`${SERVER_BASE}/api/v1/d`);
+};
+
+export const locationPromise = function (lat, lng) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(`${SERVER_BASE}/api/v1/me?lat=${lat}&lon=${lng}`);
+};
+
+export const logoutPromise = function () {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(`${SERVER_BASE}/api/v1/me/logout`);
+};
+
+export const addPermPromise = function (opID, teamID, role) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("team", teamID);
+  fd.append("role", role);
+  return _genericPost(`${SERVER_BASE}/api/v1/draw/${opID}/perms`, fd);
+};
+
+export const delPermPromise = function (opID, teamID, role) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("team", teamID);
+  fd.append("role", role);
+  return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}/perms`, fd);
+};
+
+export const leaveTeamPromise = function (teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericDelete(`${SERVER_BASE}/api/v1/me/${teamID}`, new FormData());
+};
+
+export const removeAgentFromTeamPromise = function (agentID, teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericDelete(
+    `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`,
+    new FormData()
+  );
+};
+
+export const setAgentTeamSquadPromise = function (agentID, teamID, squad) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("squad", squad);
+  return _genericPost(
+    `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}/squad`,
+    fd
+  );
+};
+
+export const addAgentToTeamPromise = function (agentID, teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericPost(
+    `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`,
+    new FormData()
+  );
+};
+
+export const renameTeamPromise = function (teamID, name) {
+  const SERVER_BASE = GetWasabeeServer();
+  const fd = new FormData();
+  fd.append("teamname", name);
+  return _genericPut(`${SERVER_BASE}/api/v1/team/${teamID}/rename`, fd);
+};
+
+export const rocksPromise = function (teamID, community, apikey) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(
+    `${SERVER_BASE}/api/v1/team/${teamID}/rockscfg?rockscomm=${community}&rockskey=${apikey}`
+  );
+};
+
+export const newTeamPromise = function (name) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericGet(`${SERVER_BASE}/api/v1/team/new?name=${name}`);
+};
+
+export const deleteTeamPromise = function (teamID) {
+  const SERVER_BASE = GetWasabeeServer();
+  return _genericDelete(`${SERVER_BASE}/api/v1/team/${teamID}`, new FormData());
+};
+
+export const oneTimeToken = function (token) {
+  const SERVER_BASE = GetWasabeeServer();
+  const url = `${SERVER_BASE}/oneTimeToken`;
+  const fd = new FormData();
+  fd.append("token", token);
+  return _genericPost(url, fd);
+};
+
+const _genericPut = function (url, formData, contentType) {
   return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/me/${teamID}?state=${state}`;
-    const req = new XMLHttpRequest();
-
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve();
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
-};
-
-export const opKeyPromise = function(opID, portalID, onhand, capsule) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}/portal/${portalID}/keyonhand`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve();
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("onhand", onhand ? onhand : "0");
-    fd.append("capsule", capsule ? capsule : "");
-    req.send(fd);
-  });
-};
-
-export const dKeyPromise = function(portalID, onhand, capsule) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/d`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve();
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("portalID", portalID ? portalID : "");
-    fd.append("count", onhand ? onhand : "0");
-    fd.append("capID", capsule ? capsule : "");
-    req.send(fd);
-  });
-};
-
-export const dKeylistPromise = function() {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/d`;
-    const req = new XMLHttpRequest();
-
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
-};
-
-export const locationPromise = function(lat, lng) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/me?lat=${lat}&lon=${lng}`;
-    const req = new XMLHttpRequest();
-
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
-};
-
-export const logoutPromise = function() {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/me/logout`;
-    const req = new XMLHttpRequest();
-
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          WasabeeMe.purge();
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
-};
-
-export const addPermPromise = function(opID, teamID, role) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}/perms`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        case 401:
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("team", teamID);
-    fd.append("role", role);
-    req.send(fd);
-  });
-};
-
-export const delPermPromise = function(opID, teamID, role) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/draw/${opID}/perms`;
-    const req = new XMLHttpRequest();
-
-    req.open("DELETE", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    const fd = new FormData();
-    fd.append("team", teamID);
-    fd.append("role", role);
-    req.send(fd);
-  });
-};
-
-export const leaveTeamPromise = function(teamID) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/me/${teamID}`;
-    const req = new XMLHttpRequest();
-
-    req.open("DELETE", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send();
-  });
-};
-
-export const removeAgentFromTeamPromise = function(agentID, teamID) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`;
-    const req = new XMLHttpRequest();
-
-    req.open("DELETE", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send();
-  });
-};
-
-export const setAgentTeamSquadPromise = function(agentID, teamID, squad) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}/squad`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    const fd = new FormData();
-    fd.append("squad", squad);
-    req.send(fd);
-  });
-};
-
-export const addAgentToTeamPromise = function(agentID, teamID) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}/${agentID}`;
-    const req = new XMLHttpRequest();
-
-    req.open("POST", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        case 302:
-          console.log(req);
-          resolve(true);
-          break;
-        default:
-          reject(`${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send();
-  });
-};
-
-export const renameTeamPromise = function(teamID, name) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}/rename`;
     const req = new XMLHttpRequest();
 
     req.open("PUT", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    if (contentType != null) req.setRequestHeader("Content-Type", contentType);
+
+    req.onload = function () {
       switch (req.status) {
         case 200:
-          resolve(true);
+          resolve(req.response);
+          break;
+        case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.responseText}`);
+          reject(req.response);
           break;
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
-    const fd = new FormData();
-    fd.append("teamname", name);
-    req.send(fd);
+
+    req.send(formData);
   });
 };
 
-export const rocksPromise = function(teamID, community, apikey) {
-  const SERVER_BASE = GetWasabeeServer();
-
+const _genericPost = function (url, formData, contentType) {
   return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}/rockscfg?rockscomm=${community}&rockskey=${apikey}`;
     const req = new XMLHttpRequest();
 
-    req.open("GET", url);
+    req.open("POST", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    if (contentType != null) req.setRequestHeader("Content-Type", contentType);
+
+    req.onload = function () {
       switch (req.status) {
         case 200:
-          resolve(true);
+          resolve(req.response);
+          break;
+        case 302: // probably unused now
+          console.log("POST returnd 302: ", req);
+          resolve(req.response);
+          break;
+        case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.responseText}`);
+          reject(req.response);
           break;
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
-    req.send();
+
+    req.send(formData);
   });
 };
 
-export const newTeamPromise = function(name) {
-  const SERVER_BASE = GetWasabeeServer();
-
+const _genericDelete = function (url, formData) {
   return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/new?name=${name}`;
-    const req = new XMLHttpRequest();
-
-    req.open("GET", url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function() {
-      switch (req.status) {
-        case 200:
-          resolve(true);
-          break;
-        default:
-          reject(`${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function() {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send();
-  });
-};
-
-export const deleteTeamPromise = function(teamID) {
-  const SERVER_BASE = GetWasabeeServer();
-
-  return new Promise((resolve, reject) => {
-    const url = `${SERVER_BASE}/api/v1/team/${teamID}`;
     const req = new XMLHttpRequest();
 
     req.open("DELETE", url);
     req.withCredentials = true;
     req.crossDomain = true;
 
-    req.onload = function() {
+    req.onload = function () {
       switch (req.status) {
         case 200:
-          resolve(true);
+          resolve(req.response);
+          break;
+        case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
           break;
         default:
-          reject(`${req.responseText}`);
+          reject(req.response);
           break;
       }
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
+      reject(`Network Error: ${req.responseText}`);
+    };
+    req.send(formData);
+  });
+};
+
+const _genericGet = function (url) {
+  return new Promise((resolve, reject) => {
+    const req = new XMLHttpRequest();
+
+    req.open("GET", url);
+    req.withCredentials = true;
+    req.crossDomain = true;
+
+    req.onload = function () {
+      switch (req.status) {
+        case 200:
+          resolve(req.response);
+          break;
+        case 401:
+          WasabeeMe.purge();
+          reject(wX("NOT LOGGED IN", req.statusText));
+          break;
+        case 403:
+          // if the agent has been blacklisted at v/rocks...
+          if (req.response.includes("Smurf go away")) {
+            alert(`${req.responseText}`);
+            WasabeeMe.purge();
+            resetOps();
+            // why not at least try?
+            delete localStorage["reswue-environment-data"];
+            delete localStorage["reswue-operation-data"];
+          }
+          reject(req.response);
+          break;
+        default:
+          reject(req.response);
+          break;
+      }
+    };
+
+    req.onerror = function () {
       reject(`Network Error: ${req.responseText}`);
     };
     req.send();
@@ -971,29 +508,9 @@ export const GetWasabeeServer = () => {
   return server;
 };
 
-export const SetWasabeeServer = server => {
-  // sanity checking here please:
+export const SetWasabeeServer = (server) => {
+  // XXX sanity checking here please:
   // starts w/ https://
   // does not end with /
   localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
-};
-
-// don't use this unless you just can't use the promise directly
-export const getAgent = gid => {
-  // when a team is loaded from the server, all agents are pushed into the cache
-  if (window.plugin.wasabee._agentCache.has(gid)) {
-    return window.plugin.wasabee._agentCache.get(gid);
-  }
-
-  let agent = null;
-  agentPromise(gid, false).then(
-    function(resolve) {
-      agent = resolve;
-      window.plugin.wasabee._agentCache.set(gid, agent);
-    },
-    function(reject) {
-      console.log(reject);
-    }
-  );
-  return agent;
 };

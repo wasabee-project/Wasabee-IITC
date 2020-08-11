@@ -5,13 +5,14 @@ import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const OnionfieldDialog = WDialog.extend({
   statics: {
-    TYPE: "OnionDialog"
+    TYPE: "OnionDialog",
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     // requires newer leaflet, poke user to upgrade their IITC
     if (!this._map.distance) {
@@ -22,11 +23,11 @@ const OnionfieldDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     if (!this._map) return;
 
     const container = L.DomUtil.create("div", "container");
@@ -50,7 +51,7 @@ const OnionfieldDialog = WDialog.extend({
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
-    L.DomEvent.on(anchorButton, "click", ev => {
+    L.DomEvent.on(anchorButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
@@ -75,7 +76,7 @@ const OnionfieldDialog = WDialog.extend({
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("ONION");
-    L.DomEvent.on(button, "click", ev => {
+    L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.onion.call(this);
     });
@@ -95,12 +96,12 @@ const OnionfieldDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-      }
+      },
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = OnionfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = "Onion/Rose";
@@ -109,15 +110,16 @@ const OnionfieldDialog = WDialog.extend({
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = WasabeePortal.create(p);
+    postToFirebase({ id: "analytics", action: OnionfieldDialog.TYPE });
   },
 
-  onion: function() {
+  onion: function () {
     if (!this._anchor) {
       alert("no anchor selected");
       return;
     }
     this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
       this._colors.push(k);
       this._trash = c;
     }
@@ -144,7 +146,7 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   // no longer operates on a a class var, different paths (if not using the fast route) have different lists
-  _removeFromList: function(portalsRemaining, guid) {
+  _removeFromList: function (portalsRemaining, guid) {
     const x = new Array();
     for (const p of portalsRemaining) {
       if (p.id != guid) x.push(p);
@@ -156,7 +158,7 @@ const OnionfieldDialog = WDialog.extend({
   // is designed to allow for determining optimum path, the fast route is quick
   // and gets a reasonable set, optimum path determination is VERY slow and nets
   // only a few extra layers
-  _recurser: function(portalsRemaining, thisPath, one, two, three) {
+  _recurser: function (portalsRemaining, thisPath, one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
     if (this._color.name == "self-block") {
@@ -181,7 +183,7 @@ const OnionfieldDialog = WDialog.extend({
     }
     // sort by distance
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
-    if (sorted.length == 0) return;
+    if (sorted.length == 0) return null;
 
     // for each of the portals in play
     for (const [k, wp] of sorted) {
@@ -299,7 +301,7 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   // looks only at links in current (not op or live data)
-  _testBlock: function(current, testing) {
+  _testBlock: function (current, testing) {
     for (const against of current) {
       if (greatCircleArcIntersect(against, testing)) return true;
     }
@@ -307,7 +309,7 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   // angle a<bc in radians
-  _angle: function(a, b, c) {
+  _angle: function (a, b, c) {
     // this formua finds b, swap a&b for our purposes
     const A = this._map.project(b.latLng);
     const B = this._map.project(a.latLng);
@@ -318,7 +320,7 @@ const OnionfieldDialog = WDialog.extend({
     const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
     const Z = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
     return Z;
-  }
+  },
 });
 
 export default OnionfieldDialog;

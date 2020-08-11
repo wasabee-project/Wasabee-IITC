@@ -28,7 +28,7 @@ export default class WasabeeLink {
       assignedTo: this.assignedTo,
       throwOrderPos: this.throwOrderPos,
       color: this.color,
-      completed: this.completed
+      completed: this.completed,
     };
   }
 
@@ -130,8 +130,8 @@ export default class WasabeeLink {
   }
 
   getColor() {
-    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
-      const c = window.plugin.wasabee.static.layerTypes.get(this.color);
+    if (window.plugin.wasabee.skin.layerTypes.has(this.color)) {
+      const c = window.plugin.wasabee.skin.layerTypes.get(this.color);
       return c.color;
     }
     return "#333333";

@@ -4,9 +4,11 @@
  * This way we can setup a service worker under a domain we control and
  * simply pass the messages along using window.parent.postMessage.
  */
-import { drawAgents } from "./mapDrawing";
+import { drawSingleTeam } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
+
+const frameID = "wasabeeFirebaseFrame";
 
 export const initFirebase = () => {
   const server = GetWasabeeServer();
@@ -15,10 +17,11 @@ export const initFirebase = () => {
   iframe.width = 0;
   iframe.height = 0;
   iframe.src = server + "/static/firebase/index.html";
+  iframe.id = frameID;
 
   $(document.body).append(iframe);
 
-  window.addEventListener("message", event => {
+  window.addEventListener("message", (event) => {
     // ignore anything not from our server
     if (event.origin.indexOf(server) === -1) return;
 
@@ -29,11 +32,12 @@ export const initFirebase = () => {
         break;
       case "Agent Location Change":
         console.log("firebase update of agent location: ", event.data.data);
-        drawAgents();
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        drawSingleTeam(event.data.data.msg);
         break;
       case "Map Change":
         opPromise(event.data.data.opID).then(
-          function(refreshed) {
+          function (refreshed) {
             refreshed.store();
             if (refreshed.ID == operation.ID) {
               console.log(
@@ -41,9 +45,14 @@ export const initFirebase = () => {
                 event.data.data
               );
               makeSelectedOperation(refreshed.ID);
+            } else {
+              console.log(
+                "firebase trigger update of op",
+                event.data.data.opID
+              );
             }
           },
-          function(err) {
+          function (err) {
             console.log(err);
           }
         );
@@ -51,9 +60,22 @@ export const initFirebase = () => {
       case "Login":
         // display to console somehow?
         console.log("server reported teammate login: ", event.data.data.gid);
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       default:
         console.log("unknown firebase command: ", event.data.data);
     }
   });
+};
+
+export const postToFirebase = (message) => {
+  // prevent analytics data from being sent if not enabled by the user: GPDR
+  if (
+    message.id == "analytics" &&
+    localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
+      "true"
+  )
+    return;
+
+  window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 };

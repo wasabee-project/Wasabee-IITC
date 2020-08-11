@@ -5,10 +5,10 @@ import wX from "../wX";
 
 const MarkerButton = WButton.extend({
   statics: {
-    TYPE: "MarkerButton"
+    TYPE: "MarkerButton",
   },
 
-  initialize: function(map, container) {
+  initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
@@ -21,10 +21,9 @@ const MarkerButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage:
-        window.plugin.wasabee.static.images.toolbar_addMarkers.default,
+      buttonImage: window.plugin.wasabee.skin.images.toolbar_addMarkers.default,
       callback: this._toggleActions,
-      context: context
+      context: context,
     });
 
     this.actionsContainer = this._createSubActions([
@@ -36,7 +35,7 @@ const MarkerButton = WButton.extend({
           const md = new MarkerAddDialog(map);
           md.enable();
         },
-        context: context
+        context: context,
       },
       {
         title: wX("MARKER LIST TITLE"),
@@ -46,13 +45,13 @@ const MarkerButton = WButton.extend({
           const ml = new MarkerList(map);
           ml.enable();
         },
-        context: context
-      }
+        context: context,
+      },
     ]);
 
     this.actionsContainer.style.top = "106px";
     this._container.appendChild(this.actionsContainer);
-  }
+  },
 
   // enable: // default is good
   // disable: // default is good

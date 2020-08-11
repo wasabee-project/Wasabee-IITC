@@ -4,19 +4,21 @@ import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
 import { getPortalDetails } from "../uiCommands";
+import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeDList = WDialog.extend({
   statics: {
-    TYPE: "wasabeeDList"
+    TYPE: "wasabeeDList",
   },
 
-  initialize: function(map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = WasabeeDList.TYPE;
     this._me = WasabeeMe.get();
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },
 
-  addHooks: function() {
+  addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
@@ -27,17 +29,17 @@ const WasabeeDList = WDialog.extend({
     window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },
 
-  removeHooks: function() {
+  removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("portalDetailLoaded", this._UIUpdateHook);
   },
 
-  update: function() {
+  update: function () {
     const table = this.getListDialogContent().table;
     this._dialog.html(table);
   },
 
-  _displayDialog: function() {
+  _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -52,17 +54,17 @@ const WasabeeDList = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.wasabeeDList
+      id: window.plugin.wasabee.static.dialogNames.wasabeeDList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  getListDialogContent: function() {
+  getListDialogContent: function () {
     const content = new Sortable();
     content.fields = [
       {
         name: wX("PORTAL"),
-        value: n => {
+        value: (n) => {
           if (
             window.portals[n.PortalID] &&
             window.portals[n.PortalID].options.data.title
@@ -82,24 +84,24 @@ const WasabeeDList = WDialog.extend({
             getPortalDetails(n.PortalID);
             cell.textContent = value;
           }
-        }
+        },
       },
       {
         name: wX("COUNT"),
-        value: key => key.Count,
+        value: (key) => key.Count,
         sort: (a, b) => a - b,
         format: (cell, value) => {
           cell.textContent = value;
-        }
+        },
       },
       {
         name: wX("CAPSULE"),
-        value: key => key.CapID,
+        value: (key) => key.CapID,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           cell.textContent = value;
-        }
-      }
+        },
+      },
     ];
     content.sortBy = 0;
 
@@ -114,7 +116,7 @@ const WasabeeDList = WDialog.extend({
 
     content.items = mylist;
     return content;
-  }
+  },
 });
 
 export default WasabeeDList;

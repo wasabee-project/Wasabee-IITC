@@ -8,7 +8,6 @@ export default class WasabeeMe {
     this.GoogleID = null;
     this.IngressName = null;
     this.Level = 0;
-    this.OwnedTeams = Array();
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
@@ -26,6 +25,7 @@ export default class WasabeeMe {
     );
   }
 
+  // eslint-diable-next-line
   remove() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
   }
@@ -66,12 +66,12 @@ export default class WasabeeMe {
       force
     ) {
       mePromise().then(
-        function(nme) {
+        function (nme) {
           me = nme;
           // mePromise calls WasabeeMe.create, which calls me.store()
           window.runHooks("wasabeeUIUpdate", getSelectedOperation());
         },
-        function(err) {
+        function (err) {
           console.log(err);
           delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
           me = null;
@@ -128,11 +128,6 @@ export default class WasabeeMe {
     if (data.Teams !== null) {
       for (const team of data.Teams) {
         wme.Teams.push(team);
-      }
-    }
-    if (data.OwnedTeams && data.OwnedTeams.length > 0) {
-      for (const team of data.OwnedTeams) {
-        wme.OwnedTeams.push(team);
       }
     }
     if (data.Ops && data.Ops.length > 0) {
