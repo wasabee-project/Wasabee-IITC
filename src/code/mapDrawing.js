@@ -36,8 +36,8 @@ const updateMarkers = (op) => {
       if (m.state != ll.options.state) {
         // state changed, update icon
         Wasabee.markerLayerGroup.removeLayer(ll);
-        const newicon = L.icon({
-          iconUrl: m.icon,
+        const newicon = L.divIcon({
+          className: `wasabee-marker-icon ${m.type} wasabee-status-${m.state}`,
           shadowUrl: null,
           iconSize: L.point(24, 40),
           iconAnchor: L.point(12, 40),
@@ -66,8 +66,8 @@ const addMarker = (target, operation) => {
     title: targetPortal.name,
     id: target.ID,
     state: target.state,
-    icon: L.icon({
-      iconUrl: target.icon,
+    icon: L.divIcon({
+      className: `wasabee-marker-icon ${target.type} wasabee-status-${target.state}`,
       shadowUrl: null,
       iconSize: L.point(24, 40),
       iconAnchor: L.point(12, 40),
