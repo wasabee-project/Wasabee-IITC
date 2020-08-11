@@ -39,8 +39,9 @@ const resetCSS = () => {
 };
 
 const addFallback = () => {
-  if (Object.getOwnPropertyNames(Wasabee.skin.CSS).length == 0)
-    Wasabee.skin.CSS = Wasabee.static.CSS;
+  for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
+    addCSS(k, Wasabee.static.CSS[k]);
+  }
   for (const k of Object.getOwnPropertyNames(Wasabee.static.images))
     if (Wasabee.skin.images[k] === undefined)
       Wasabee.skin.images[k] = Wasabee.static.images[k];
