@@ -7,9 +7,7 @@ const Wasabee = window.plugin.wasabee;
 export const initSkin = () => {
   Wasabee.skin = {};
   Wasabee.skin.CSS = Wasabee.static.CSS;
-  Wasabee.skin.images = Wasabee.static.images;
   Wasabee.skin.layerTypes = Wasabee.static.layerTypes;
-  Wasabee.skin.markerTypes = Wasabee.static.markerTypes;
   Wasabee.skin.strings = Wasabee.static.strings;
 
   for (const k of Object.getOwnPropertyNames(Wasabee.skin.CSS)) {
@@ -42,13 +40,8 @@ const addFallback = () => {
   for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
     addCSS(k, Wasabee.static.CSS[k]);
   }
-  for (const k of Object.getOwnPropertyNames(Wasabee.static.images))
-    if (Wasabee.skin.images[k] === undefined)
-      Wasabee.skin.images[k] = Wasabee.static.images[k];
   for (const [k, d] of Wasabee.static.layerTypes)
     if (!Wasabee.skin.layerTypes.has(k)) Wasabee.skin.layerTypes.set(k, d);
-  for (const [k, d] of Wasabee.static.markerTypes)
-    if (!Wasabee.skin.markerTypes.has(k)) Wasabee.skin.markerTypes.set(k, d);
 };
 
 export const changeSkin = (name) => {
