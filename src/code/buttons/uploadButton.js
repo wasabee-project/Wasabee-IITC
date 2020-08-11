@@ -21,7 +21,8 @@ const UploadButton = WButton.extend({
     this.button = this._createButton({
       title: "Upload",
       container: this._container,
-      buttonImage: window.plugin.wasabee.skin.images.toolbar_upload.default,
+      className: "wasabee-toolbar-upload",
+      // buttonImage: window.plugin.wasabee.skin.images.toolbar_upload.default,
       context: this,
       callback: () => {
         const operation = getSelectedOperation();

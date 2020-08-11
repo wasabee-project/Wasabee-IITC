@@ -21,7 +21,8 @@ const QuickdrawButton = WButton.extend({
     this.button = this._createButton({
       title: this.title,
       container: container,
-      buttonImage: window.plugin.wasabee.skin.images.toolbar_quickdraw.default,
+      className: "wasabee-toolbar-quickdraw",
+      // buttonImage: window.plugin.wasabee.skin.images.toolbar_quickdraw.default,
       callback: this.handler.enable,
       context: this.handler,
     });
