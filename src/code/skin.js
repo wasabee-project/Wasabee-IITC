@@ -39,6 +39,8 @@ const resetCSS = () => {
 };
 
 const addFallback = () => {
+  if (Object.getOwnPropertyNames(Wasabee.skin.CSS).length == 0)
+    Wasabee.skin.CSS = Wasabee.static.CSS;
   for (const k of Object.getOwnPropertyNames(Wasabee.static.images))
     if (Wasabee.skin.images[k] === undefined)
       Wasabee.skin.images[k] = Wasabee.static.images[k];
@@ -81,10 +83,11 @@ export const changeSkin = (name) => {
     localStorage[Wasabee.static.constants.SKIN_KEY] = name;
 
     resetCSS();
+    addFallback();
+
     for (const k of Object.getOwnPropertyNames(Wasabee.skin.CSS)) {
       addCSS(k, Wasabee.skin.CSS[k]);
     }
-    addFallback();
     makeSelectedOperation(op.ID);
     addButtons(op);
     window.runHooks("wasabeeUIUpdate", op);
