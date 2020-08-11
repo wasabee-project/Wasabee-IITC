@@ -12,34 +12,46 @@ export const initSkin = () => {
   Wasabee.skin.markerTypes = Wasabee.static.markerTypes;
   Wasabee.skin.strings = Wasabee.static.strings;
 
-  for (const k of Object.getOwnPropertyNames(window.plugin.wasabee.skin.CSS)) {
-    addCSS(k, window.plugin.wasabee.skin.CSS[k]);
+  for (const k of Object.getOwnPropertyNames(Wasabee.skin.CSS)) {
+    addCSS(k, Wasabee.skin.CSS[k]);
   }
 };
 
 const addCSS = (name, content) => {
-  if (!window.plugin.wasabee._css) window.plugin.wasabee._css = new Array();
-  if (window.plugin.wasabee._css.includes(name)) {
+  if (!Wasabee._css) Wasabee._css = new Array();
+  if (Wasabee._css.includes(name)) {
     document.getElementById("wasabee-css-" + name).remove();
-    window.plugin.wasabee._css.splice(window.plugin.wasabee._css.indexOf(name));
+    Wasabee._css.splice(Wasabee._css.indexOf(name));
   }
 
   const c = L.DomUtil.create("style", null, document.head);
   c.textContent = content;
   c.id = "wasabee-css-" + name;
+
+  Wasabee._css.push(name);
 };
 
 const resetCSS = () => {
-  for (const name of window.plugin.wasabee._css) {
+  for (const name of Wasabee._css) {
     document.getElementById("wasabee-css-" + name).remove();
   }
-  window.plugin.wasabee._css = new Array();
+  Wasabee._css = new Array();
+};
+
+const addFallback = () => {
+  for (const k of Object.getOwnPropertyNames(Wasabee.static.images))
+    if (Wasabee.skin.images[k] === undefined)
+      Wasabee.skin.images[k] = Wasabee.static.images[k];
+  for (const [k, d] of Wasabee.static.layerTypes)
+    if (!Wasabee.skin.layerTypes.has(k)) Wasabee.skin.layerTypes.set(k, d);
+  for (const [k, d] of Wasabee.static.markerTypes)
+    if (!Wasabee.skin.markerTypes.has(k)) Wasabee.skin.markerTypes.set(k, d);
 };
 
 export const changeSkin = (name) => {
   const op = getSelectedOperation();
   if (name == "main") {
-    delete localStorage[window.plugin.wasabee.static.constants.SKIN_KEY];
+    delete localStorage[Wasabee.static.constants.SKIN_KEY];
     resetCSS();
     initSkin();
     addButtons(op);
@@ -63,17 +75,16 @@ export const changeSkin = (name) => {
 
     // if the skin has a language, switch to it
     if (Wasabee.skin.strings[name]) {
-      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] = name;
+      localStorage[Wasabee.static.constants.LANGUAGE_KEY] = name;
     }
 
     localStorage[Wasabee.static.constants.SKIN_KEY] = name;
 
     resetCSS();
-    for (const k of Object.getOwnPropertyNames(
-      window.plugin.wasabee.skin.CSS
-    )) {
-      addCSS(k, window.plugin.wasabee.skin.CSS[k]);
+    for (const k of Object.getOwnPropertyNames(Wasabee.skin.CSS)) {
+      addCSS(k, Wasabee.skin.CSS[k]);
     }
+    addFallback();
     makeSelectedOperation(op.ID);
     addButtons(op);
     window.runHooks("wasabeeUIUpdate", op);
