@@ -286,6 +286,7 @@
   "SET_LINK_COMMENT": "Set comment for link: ",
   "SET_LCOMMENT": "Set Link Comment",
   "SET_MARKER_COMMENT": "Set comment for marker on: ",
+  "SET_MARKER_TYPE_TITLE": "Change marker type",
   "SET_MCOMMENT": "Set Marker Comment: ${value}",
   "SET_NEW_OP": "Please Set the New Operation Name",
   "SET_PORT_COMMENT": "Set comment for portal: ",

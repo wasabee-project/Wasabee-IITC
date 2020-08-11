@@ -253,6 +253,14 @@
   font-weight: initial;
 }
 
+.wasabee-marker-popup-kind {
+  cursor: pointer;
+}
+
+.wasabee-marker-popup-kind:hover {
+  text-decoration: underline;
+}
+
 .wasabee-marker-buttonset {
 }
 .wasabee-marker-buttonset button {
