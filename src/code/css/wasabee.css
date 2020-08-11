@@ -461,6 +461,11 @@
   background-image: url(../images/wasabee_markers_exclude_done.png)
 }
 
+.wasabee-defense-icon {
+  background-size: cover;
+  background-image: url(../images/wasabee_markers_key_done.png)
+}
+
 .wasabee-anchor-icon {
   background-size: cover;
   background-image: url(../images/marker_layer_main.png)

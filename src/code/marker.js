@@ -40,30 +40,30 @@ export default class WasabeeMarker {
     this.order = Number.parseInt(o, 10);
   }
 
-  get icon() {
-    if (!window.plugin.wasabee.skin.markerTypes.has(this.type)) {
-      this.type = window.plugin.wasabee.skin.constants.DEFAULT_MARKER_TYPE;
-    }
-    const marker = window.plugin.wasabee.skin.markerTypes.get(this.type);
-    let img = marker.markerIcon.default;
-    switch (this.state) {
-      case "pending":
-        img = marker.markerIcon.default;
-        break;
-      case "assigned":
-        img = marker.markerIconAssigned.default;
-        break;
-      case "completed":
-        img = marker.markerIconDone.default;
-        break;
-      case "acknowledged":
-        img = marker.markerIconAcknowledged.default;
-        break;
-      default:
-        img = marker.markerIcon.default;
-    }
-    return img;
-  }
+  // get icon() {
+  //   if (!window.plugin.wasabee.skin.markerTypes.has(this.type)) {
+  //     this.type = window.plugin.wasabee.skin.constants.DEFAULT_MARKER_TYPE;
+  //   }
+  //   const marker = window.plugin.wasabee.skin.markerTypes.get(this.type);
+  //   let img = marker.markerIcon.default;
+  //   switch (this.state) {
+  //     case "pending":
+  //       img = marker.markerIcon.default;
+  //       break;
+  //     case "assigned":
+  //       img = marker.markerIconAssigned.default;
+  //       break;
+  //     case "completed":
+  //       img = marker.markerIconDone.default;
+  //       break;
+  //     case "acknowledged":
+  //       img = marker.markerIconAcknowledged.default;
+  //       break;
+  //     default:
+  //       img = marker.markerIcon.default;
+  //   }
+  //   return img;
+  // }
 
   async getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
