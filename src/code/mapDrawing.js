@@ -372,8 +372,8 @@ const addAnchorToMap = (portalId, operation) => {
     alt: anchor.name,
     id: portalId,
     color: anchor.color,
-    icon: L.icon({
-      iconUrl: anchor.icon,
+    icon: L.divIcon({
+      className: `wasabee-anchor-icon wasabee-layer-${anchor.color}`,
       shadowUrl: null,
       iconAnchor: [12, 41],
       iconSize: [25, 41],
