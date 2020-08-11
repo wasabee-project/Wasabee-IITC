@@ -1,9 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
+import WasabeeMarker from "../marker";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
+import MarkerChangeDialog from "./markerChangeDialog";
 import { agentPromise } from "../server";
 import {
   listenForAddedPortals,
@@ -143,6 +145,15 @@ const OperationChecklistDialog = WDialog.extend({
           const span = L.DomUtil.create("span", null, cell);
           if (thing.type) L.DomUtil.addClass(span, thing.type);
           span.textContent = value;
+
+          if (thing instanceof WasabeeMarker) {
+            L.DomEvent.on(cell, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              const ch = new MarkerChangeDialog();
+              ch.setup(thing, operation);
+              ch.enable();
+            });
+          }
         },
       },
       {

@@ -4,6 +4,7 @@ import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
+import MarkerChangeDialog from "./dialogs/markerChangeDialog";
 
 export default class WasabeeMarker {
   constructor(type, portalId, comment) {
@@ -132,6 +133,15 @@ export default class WasabeeMarker {
     L.DomUtil.addClass(kind, this.type);
     kind.textContent = wX(this.type);
     title.appendChild(portal.displayFormat());
+
+    kind.href = "#";
+    L.DomEvent.on(kind, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const ch = new MarkerChangeDialog();
+      ch.setup(this, operation);
+      ch.enable();
+      marker.closePopup();
+    });
 
     if (this.comment) {
       const comment = L.DomUtil.create(

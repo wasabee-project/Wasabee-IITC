@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
+import MarkerChangeDialog from "./markerChangeDialog";
 import { agentPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 // import WasabeeMe from "../me";
@@ -101,6 +102,12 @@ const MarkerList = WDialog.extend({
         format: (cell, value, marker) => {
           const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
+          L.DomEvent.on(cell, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            const ch = new MarkerChangeDialog();
+            ch.setup(marker, operation);
+            ch.enable();
+          });
         },
       },
       {
