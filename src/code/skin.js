@@ -1,5 +1,5 @@
 import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
-import addButtons from "./addButtons";
+// import addButtons from "./addButtons";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -50,7 +50,7 @@ export const changeSkin = (name) => {
     delete localStorage[Wasabee.static.constants.SKIN_KEY];
     resetCSS();
     initSkin();
-    addButtons(op);
+    // addButtons(op);
     window.runHooks("wasabeeUIUpdate", op);
     return true;
   }
@@ -83,7 +83,7 @@ export const changeSkin = (name) => {
       addCSS(k, Wasabee.skin.CSS[k]);
     }
     makeSelectedOperation(op.ID);
-    addButtons(op);
+    // addButtons(op);
     window.runHooks("wasabeeUIUpdate", op);
     return true;
   }
