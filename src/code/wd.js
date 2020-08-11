@@ -112,8 +112,8 @@ const dLoadDetails = (e) => {
   submap.set("details", e.details);
   window.plugin.wasabee._Dkeys.set(e.guid, submap);
 
-  const icon = window.plugin.wasabee.skin.markerTypes.get("GetKeyPortalMarker")
-    .markerIconDone.default;
+  // const icon = window.plugin.wasabee.skin.markerTypes.get("GetKeyPortalMarker")
+  //   .markerIconDone.default;
 
   const latLng = new L.LatLng(
     (e.details.latE6 / 1e6).toFixed(6),
@@ -131,8 +131,8 @@ const dLoadDetails = (e) => {
   const marker = L.marker(latLng, {
     title: e.details.title,
     opacity: opacity,
-    icon: L.icon({
-      iconUrl: icon,
+    icon: L.divIcon({
+      className: "wasabee-defense-icon",
       shadowUrl: null,
       iconSize: L.point(24, 40),
       iconAnchor: L.point(12, 40),
