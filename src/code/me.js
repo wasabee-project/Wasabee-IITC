@@ -12,6 +12,7 @@ export default class WasabeeMe {
     this.Ops = Array();
     this.fetched = Date.now();
     this.Assignments = Array();
+    this._teamMap = null;
   }
 
   static maxCacheAge() {
@@ -147,5 +148,27 @@ export default class WasabeeMe {
       window.runHooks("wasabeeDkeys");
     }
     window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+  }
+
+  teamJoined(teamID) {
+    if (this._teamMap == null) this.makeTeamMap();
+    if (this._teamMap.has(teamID)) return true;
+    return false;
+  }
+
+  teamEnabled(teamID) {
+    if (this._teamMap == null) this.makeTeamMap();
+    if (this._teamMap.has(teamID)) {
+      const m = this._teamMap.get(teamID);
+      if (m == "On") return true;
+    }
+    return false;
+  }
+
+  makeTeamMap() {
+    this._teamMap = new Map();
+    for (const t of this.Teams) {
+      this._teamMap.set(t.ID, t.State);
+    }
   }
 }
