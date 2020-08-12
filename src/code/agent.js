@@ -91,15 +91,13 @@ export default class WasabeeAgent {
       d.setup(
         wX("SEND TARGET"),
         wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
-        () => {
-          targetPromise(this.id, selectedPortal).then(
-            () => {
-              alert(wX("TARGET SENT"));
-            },
-            (reject) => {
-              console.log(reject);
-            }
-          );
+        async () => {
+          try {
+            await targetPromise(this.id, selectedPortal);
+            alert(wX("TARGET SENT"));
+          } catch (e) {
+            console.log(e);
+          }
         }
       );
       d.enable();
@@ -120,15 +118,13 @@ export default class WasabeeAgent {
       d.setup(
         "Send Route to Target",
         "Do you really want to request the route to be sent?",
-        () => {
-          routePromise(this.id, selectedPortal).then(
-            () => {
-              alert("Route Sent");
-            },
-            (reject) => {
-              console.log(reject);
-            }
-          );
+        async () => {
+          try {
+            await routePromise(this.id, selectedPortal);
+            alert("Route Sent");
+          } catch (e) {
+            console.log(e);
+          }
         }
       );
       d.enable();

@@ -175,15 +175,16 @@ export const sendLocation = () => {
   if (sl !== "true") return;
 
   navigator.geolocation.getCurrentPosition(
-    (position) => {
-      locationPromise(position.coords.latitude, position.coords.longitude).then(
-        () => {
-          console.log(wX("LOCATION SUB"));
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
+    async (position) => {
+      try {
+        await locationPromise(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+        console.log(wX("LOCATION SUB"));
+      } catch (e) {
+        console.log(e);
+      }
     },
     (err) => {
       console.log(err);

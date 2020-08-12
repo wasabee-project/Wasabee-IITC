@@ -2,7 +2,7 @@ import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import WasabeeTeam from "./team";
-import { getSelectedOperation, getOperationByID, resetOps } from "./selectedOp";
+import { getSelectedOperation, getOperationByID } from "./selectedOp";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -11,6 +11,9 @@ export default function () {
   return GetWasabeeServer();
 }
 
+// uploads an op to the server
+// local change: updates "me" and stores the result after the server has done its work
+// cache: op stored to localStorage; "me" upated
 export const uploadOpPromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
 
@@ -23,13 +26,15 @@ export const uploadOpPromise = async function () {
     json,
     "application/json;charset=UTF-8"
   );
-  WasabeeMe.create(response); // free update to the cache
+  WasabeeMe.create(response).store(); // free update to the cache
   const newop = await opPromise(operation.ID);
   newop.localchanged = false;
   newop.store();
   return newop;
 };
 
+// sends a changed op to the server
+// no local change // cache: no change to localStorage
 export const updateOpPromise = (operation) => {
   const SERVER_BASE = GetWasabeeServer();
 
@@ -46,30 +51,36 @@ export const updateOpPromise = (operation) => {
   );
 };
 
+// removes an op from the server
+// no local change // cache: none
 export const deleteOpPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}`, new FormData());
 };
 
 // returns a resolved promise to a WasabeeTeam
-export const teamPromise = async function (teamid) {
-  // does this ever get triggered?
-  if (teamid == "owned") {
-    console.log("owned team queried");
-    const owned = new WasabeeTeam();
-    owned.id = "owned";
-    owned.name = "Owned Ops";
-    return owned;
+// local change: cache
+// cache: caching both team and agents
+export const teamPromise = async function (teamid, maxAgeSeconds = 0) {
+  // XXX check cache first
+  if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamid)) {
+    const t = window.plugin.wasabee.teams.get(teamid);
+    if (t.fetch > Date.now() - 1000 * maxAgeSeconds) {
+      console.log("returning team from cache");
+      return t;
+    }
+    console.log("ignoring team in cache, fetching anew");
   }
 
   const SERVER_BASE = GetWasabeeServer();
   const response = await _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
+  // team and agent caching takes place in WasabeeTeam.create
   const newteam = WasabeeTeam.create(response);
-  Wasabee.teams.set(teamid, newteam);
   return newteam;
 };
 
 // returns a promise to fetch a WasabeeOp
+// local change: If the server's copy is newer than the local copy, otherwise none
 // not generic since 304 result processing and If-Modified-Since header
 export const opPromise = function (opID) {
   const SERVER_BASE = GetWasabeeServer();
@@ -123,11 +134,14 @@ export const opPromise = function (opID) {
 };
 
 // returns a resolved promise to WasabeeMe
+// local change: updates me in localStorage
+// cache: localStorage
 export const mePromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
   try {
     const response = await _genericGet(`${SERVER_BASE}/me`);
     const me = WasabeeMe.create(response);
+    me.store();
     return me;
   } catch (e) {
     console.log(e);
@@ -136,17 +150,21 @@ export const mePromise = async function () {
 };
 
 // returns (a resolved promise of) the actual WasabeeAgent
-export const agentPromise = async function (GID, force) {
+// local change: agent saved to cache
+// cache: local first unless forced
+export const agentPromise = async function (GID, force = false) {
   if (!force && window.plugin.wasabee._agentCache.has(GID)) {
     return window.plugin.wasabee._agentCache.get(GID);
   }
 
   const SERVER_BASE = GetWasabeeServer();
   const response = await _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
+  // caching takes place in WasabeeAgent.create
   const wa = WasabeeAgent.create(response);
   return wa;
 };
 
+// local change: none // cache: none
 export const assignMarkerPromise = function (opID, markerID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -157,6 +175,7 @@ export const assignMarkerPromise = function (opID, markerID, agentID) {
   );
 };
 
+// local change: none // cache: none
 export const assignLinkPromise = function (opID, linkID, agentID) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -167,6 +186,7 @@ export const assignLinkPromise = function (opID, linkID, agentID) {
   );
 };
 
+// local change: none // cache: none
 export const targetPromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
@@ -177,6 +197,7 @@ export const targetPromise = function (agentID, portal) {
   return _genericPost(`${SERVER_BASE}/api/v1/agent/${agentID}/target`, fd);
 };
 
+// local change: none // cache: none
 export const routePromise = function (agentID, portal) {
   const SERVER_BASE = GetWasabeeServer();
   const ll = portal.lat + "," + portal.lng;
@@ -187,6 +208,7 @@ export const routePromise = function (agentID, portal) {
   return _genericPost(`${SERVER_BASE}/api/v1/agent/${agentID}/route`, fd);
 };
 
+// local change: none // cache: none
 export const SendAccessTokenAsync = function (accessToken) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericPost(
@@ -196,11 +218,13 @@ export const SendAccessTokenAsync = function (accessToken) {
   );
 };
 
+// local change: none // cache: none
 export const SetTeamState = function (teamID, state) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(`${SERVER_BASE}/api/v1/me/${teamID}?state=${state}`);
 };
 
+// local change: none // cache: none
 export const SetMarkerState = function (opID, markerID, state) {
   let action = "incomplete";
   switch (state) {
@@ -223,6 +247,7 @@ export const SetMarkerState = function (opID, markerID, state) {
   );
 };
 
+// local change: none // cache: none
 export const SetLinkState = function (opID, linkID, state) {
   let action = "incomplete";
   switch (state) {
@@ -243,6 +268,7 @@ export const SetLinkState = function (opID, linkID, state) {
   );
 };
 
+// local change: none // cache: none
 export const opKeyPromise = function (opID, portalID, onhand, capsule) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -254,6 +280,7 @@ export const opKeyPromise = function (opID, portalID, onhand, capsule) {
   );
 };
 
+// local change: none // cache: none
 export const dKeyPromise = function (portalID, onhand, capsule) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -263,21 +290,25 @@ export const dKeyPromise = function (portalID, onhand, capsule) {
   return _genericPost(`${SERVER_BASE}/api/v1/d`, fd);
 };
 
+// local change: none // cache: none
 export const dKeylistPromise = function () {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(`${SERVER_BASE}/api/v1/d`);
 };
 
+// local change: none // cache: none
 export const locationPromise = function (lat, lng) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(`${SERVER_BASE}/api/v1/me?lat=${lat}&lon=${lng}`);
 };
 
+// local change: none // cache: none
 export const logoutPromise = function () {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(`${SERVER_BASE}/api/v1/me/logout`);
 };
 
+// local change: none // cache: none
 export const addPermPromise = function (opID, teamID, role) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -286,6 +317,7 @@ export const addPermPromise = function (opID, teamID, role) {
   return _genericPost(`${SERVER_BASE}/api/v1/draw/${opID}/perms`, fd);
 };
 
+// local change: none // cache: none
 export const delPermPromise = function (opID, teamID, role) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -294,11 +326,13 @@ export const delPermPromise = function (opID, teamID, role) {
   return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}/perms`, fd);
 };
 
+// local change: none // cache: none
 export const leaveTeamPromise = function (teamID) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericDelete(`${SERVER_BASE}/api/v1/me/${teamID}`, new FormData());
 };
 
+// local change: none // cache: none
 export const removeAgentFromTeamPromise = function (agentID, teamID) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericDelete(
@@ -307,6 +341,7 @@ export const removeAgentFromTeamPromise = function (agentID, teamID) {
   );
 };
 
+// local change: none // cache: none
 export const setAgentTeamSquadPromise = function (agentID, teamID, squad) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -317,6 +352,7 @@ export const setAgentTeamSquadPromise = function (agentID, teamID, squad) {
   );
 };
 
+// local change: none // cache: none
 export const addAgentToTeamPromise = function (agentID, teamID) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericPost(
@@ -325,6 +361,7 @@ export const addAgentToTeamPromise = function (agentID, teamID) {
   );
 };
 
+// local change: none // cache: none
 export const renameTeamPromise = function (teamID, name) {
   const SERVER_BASE = GetWasabeeServer();
   const fd = new FormData();
@@ -332,6 +369,7 @@ export const renameTeamPromise = function (teamID, name) {
   return _genericPut(`${SERVER_BASE}/api/v1/team/${teamID}/rename`, fd);
 };
 
+// local change: none // cache: none
 export const rocksPromise = function (teamID, community, apikey) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(
@@ -339,16 +377,19 @@ export const rocksPromise = function (teamID, community, apikey) {
   );
 };
 
+// local change: none // cache: none
 export const newTeamPromise = function (name) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericGet(`${SERVER_BASE}/api/v1/team/new?name=${name}`);
 };
 
+// local change: none // cache: none
 export const deleteTeamPromise = function (teamID) {
   const SERVER_BASE = GetWasabeeServer();
   return _genericDelete(`${SERVER_BASE}/api/v1/team/${teamID}`, new FormData());
 };
 
+// local change: none // cache: none
 export const oneTimeToken = function (token) {
   const SERVER_BASE = GetWasabeeServer();
   const url = `${SERVER_BASE}/oneTimeToken`;
@@ -475,15 +516,6 @@ const _genericGet = function (url) {
           reject(wX("NOT LOGGED IN", req.statusText));
           break;
         case 403:
-          // if the agent has been blacklisted at v/rocks...
-          if (req.response.includes("Smurf go away")) {
-            alert(`${req.responseText}`);
-            WasabeeMe.purge();
-            resetOps();
-            // why not at least try?
-            delete localStorage["reswue-environment-data"];
-            delete localStorage["reswue-operation-data"];
-          }
           reject(req.response);
           break;
         default:

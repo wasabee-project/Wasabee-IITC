@@ -14,6 +14,10 @@ export default class WasabeeMe {
     this.Assignments = Array();
   }
 
+  static maxCacheAge() {
+    return Date.now() - 1000 * 60 * 60 * 24;
+  }
+
   toJSON() {
     // default
     return this;
@@ -31,7 +35,6 @@ export default class WasabeeMe {
   }
 
   static isLoggedIn() {
-    const maxCacheAge = Date.now() - 1000 * 60 * 60 * 24;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     if (!lsme || typeof lsme !== "string") {
       return false;
@@ -43,68 +46,57 @@ export default class WasabeeMe {
       console.log(e);
       return false;
     }
-    if (me.fetched > maxCacheAge) {
+    if (me.fetched > WasabeeMe.maxCacheAge()) {
       return true;
     }
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     return false;
   }
 
-  static get(force) {
+  // this is deceptive, it only returns a cached value, any update takes place async
+  static cacheGet() {
     let me = null;
-    const maxCacheAge = Date.now() - 1000 * 60 * 60 * 24;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      // XXX this might be a problem, since create writes it back to localStore
       me = WasabeeMe.create(lsme);
     }
     if (
       me === null ||
       me.fetched == undefined ||
-      me.fetched < maxCacheAge ||
-      force
+      me.fetched < WasabeeMe.maxCacheAge()
     ) {
-      mePromise().then(
-        function (nme) {
-          me = nme;
-          // mePromise calls WasabeeMe.create, which calls me.store()
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        },
-        function (err) {
-          console.log(err);
-          delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-          me = null;
-          alert(err);
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        }
-      );
+      delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+      return null;
     }
+
     return me;
   }
 
+  // use waitGet with "force == true" if you want a fresh value now
   static async waitGet(force) {
     let me = null;
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      // XXX this might be a problem, since create writes it back to the store
       me = WasabeeMe.create(lsme);
     }
     if (
       me === null ||
       me.fetched == undefined ||
-      me.fetched < maxCacheAge ||
+      me.fetched < WasabeeMe.maxCacheAge() ||
       force
     ) {
-      const newme = await mePromise();
-      if (newme instanceof WasabeeMe) {
+      try {
+        const newme = await mePromise();
+        if (newme instanceof WasabeeMe == false) {
+          throw newme;
+        }
         me = newme;
-      } else {
+      } catch (e) {
         delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-        console.log(newme);
-        alert(newme);
+        console.log(e);
+        alert(e);
         me = null;
       }
       window.runHooks("wasabeeUIUpdate", getSelectedOperation());
@@ -141,7 +133,7 @@ export default class WasabeeMe {
       }
     }
     wme.fetched = data.fetched ? data.fetched : Date.now();
-    wme.store();
+    // wme.store();
     return wme;
   }
 

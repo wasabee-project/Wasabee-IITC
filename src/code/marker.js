@@ -62,7 +62,7 @@ export default class WasabeeMarker {
     return img;
   }
 
-  getMarkerPopup(marker, operation) {
+  async getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
     const content = L.DomUtil.create("div", "wasabee-marker-popup");
     content.appendChild(this.getPopupBodyWithType(portal, operation, marker));
@@ -73,15 +73,13 @@ export default class WasabeeMarker {
       content
     );
     if (this.state != "completed" && this.assignedTo) {
-      agentPromise(this.assignedTo, false).then(
-        function (a) {
-          assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-          assignment.appendChild(a.formatDisplay());
-        },
-        function (err) {
-          console.log(err);
-        }
-      );
+      try {
+        const a = await agentPromise(this.assignedTo, false);
+        assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
+        assignment.appendChild(a.formatDisplay());
+      } catch (err) {
+        console.log(err);
+      }
     }
     if (this.state == "completed" && this.completedBy) {
       assignment.innerHTML = wX("COMPLETED BY", this.completedBy);

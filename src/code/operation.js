@@ -841,7 +841,7 @@ export default class WasabeeOp {
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
-    const me = WasabeeMe.get();
+    const me = WasabeeMe.cacheGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
     // if the user has no teams enabled, it can't be writable
@@ -868,7 +868,7 @@ export default class WasabeeOp {
     if (!this.IsServerOp()) return true;
     if (!WasabeeMe.isLoggedIn()) return false;
 
-    const me = WasabeeMe.get();
+    const me = WasabeeMe.cacheGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
     return false;

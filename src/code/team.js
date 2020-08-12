@@ -1,5 +1,4 @@
 import WasabeeAgent from "./agent";
-import { teamPromise } from "./server";
 
 export default class WasabeeTeam {
   constructor() {
@@ -25,26 +24,18 @@ export default class WasabeeTeam {
     team.id = data.id;
     team.name = data.name;
     team.fetched = Date.now();
+    window.plugin.wasabee.teams.set(team.id, team);
     for (const agent of data.agents) {
-      team.agents.push(WasabeeAgent.create(agent));
       // WasabeeAgent.create takes care of caching it for us
+      team.agents.push(WasabeeAgent.create(agent));
     }
     return team;
   }
 
-  static get(teamID) {
+  static cacheGet(teamID) {
     if (window.plugin.wasabee.teams.has(teamID)) {
       return window.plugin.wasabee.teams.get(teamID);
     }
-    let t = null;
-    teamPromise(teamID).then(
-      (team) => {
-        t = team;
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-    return t;
+    return null;
   }
 }

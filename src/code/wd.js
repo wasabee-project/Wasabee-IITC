@@ -41,59 +41,51 @@ export const initWasabeeD = () => {
 };
 
 // This is the primary hook that is called on map refresh
-export const drawWasabeeDkeys = () => {
+export const drawWasabeeDkeys = async () => {
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
   console.log("running drawWasabeeDkeys");
   window.addHook("portalDetailLoaded", dLoadDetails);
 
-  dKeylistPromise().then(
-    (data) => {
-      let list = null;
-      try {
-        list = JSON.parse(data);
-      } catch (e) {
-        console.log(e);
-      }
-      if (!list) console.log(data); // what does the server send if recently logged out?
-      if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
-        return;
-      for (const n of list.DefensiveKeys) {
-        if (n.PortalID) {
-          let l;
-          if (window.plugin.wasabee._Dkeys.has(n.PortalID)) {
-            l = window.plugin.wasabee._Dkeys.get(n.PortalID);
-          } else {
-            l = new Map();
+  try {
+    const data = await dKeylistPromise();
+    const list = JSON.parse(data);
+    if (!list) console.log(data); // what does the server send if recently logged out?
+    if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0) return;
+    for (const n of list.DefensiveKeys) {
+      if (n.PortalID) {
+        let l;
+        if (window.plugin.wasabee._Dkeys.has(n.PortalID)) {
+          l = window.plugin.wasabee._Dkeys.get(n.PortalID);
+        } else {
+          l = new Map();
+        }
+        l.set(n.GID, n); // add user to the sub-map
+        window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+        if (
+          window.portals[n.PortalID] &&
+          window.portals[n.PortalID].options.data.title
+        ) {
+          // already fully fetched
+          const e = window.portals[n.PortalID].options;
+          e.success = true; // make this look like an event
+          e.details = e.data;
+          dLoadDetails(e);
+        } else {
+          // if we are here early (after a reload?) IITC spams the logs
+          if (!window.requests) {
+            console.log(
+              "window.requests does not exist yet... expect an error"
+            );
           }
-          l.set(n.GID, n); // add user to the sub-map
-          window.plugin.wasabee._Dkeys.set(n.PortalID, l);
-          if (
-            window.portals[n.PortalID] &&
-            window.portals[n.PortalID].options.data.title
-          ) {
-            // already fully fetched
-            const e = window.portals[n.PortalID].options;
-            e.success = true; // make this look like an event
-            e.details = e.data;
-            dLoadDetails(e);
-          } else {
-            // if we are here early (after a reload?) IITC spams the logs
-            if (!window.requests) {
-              console.log(
-                "window.requests does not exist yet... expect an error"
-              );
-            }
-            getPortalDetails(n.PortalID); // listener deals with the replies
-          }
+          getPortalDetails(n.PortalID); // listener deals with the replies
         }
       }
-    },
-    (err) => {
-      console.log(err);
     }
-  );
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const dLoadDetails = (e) => {

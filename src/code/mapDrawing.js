@@ -84,11 +84,12 @@ const addMarker = (target, operation) => {
   // marker.off("click", marker.openPopup, marker);
   marker.on(
     "click spiderfiedclick",
-    (ev) => {
+    async (ev) => {
       L.DomEvent.stop(ev);
       // IITC 0.26's leaflet doesn't have this, just deal
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      marker.setPopupContent(target.getMarkerPopup(marker, operation));
+      const c = await target.getMarkerPopup(marker, operation);
+      marker.setPopupContent(c);
       // IITC 0.26's leaflet doesn't have this, just deal
       if (marker._popup._wrapper)
         marker._popup._wrapper.classList.add("wasabee-popup");
@@ -120,7 +121,7 @@ const resetLinks = (operation) => {
 };
 
 /** reset links is consistently 1ms faster than update, and is far safer */
-// eslint-disable-next-line
+/* 
 const updateLinks = (operation) => {
   if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
   if (!operation.links || operation.links.length == 0) {
@@ -162,7 +163,7 @@ const updateLinks = (operation) => {
   for (const [k, v] of layerMap) {
     Wasabee.linkLayerGroup.removeLayer(v);
   }
-};
+}; */
 
 /** This function adds a link to the link layer group */
 const addLink = (wlink, style, operation) => {
@@ -284,7 +285,7 @@ export const drawSingleTeam = async (
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await teamPromise(t.ID);
+    const team = await teamPromise(t.ID, 15);
     for (const agent of team.agents) {
       if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
         // new, add to map

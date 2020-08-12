@@ -8,6 +8,8 @@ import { drawSingleTeam } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
 
+// TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
+
 const frameID = "wasabeeFirebaseFrame";
 
 export const initFirebase = () => {
