@@ -174,12 +174,4 @@ W.static.layerTypes = new Map([
       color: "#ff55ff",
     },
   ],
-  [
-    "self-block",
-    {
-      name: "self-block",
-      displayName: "Self Block",
-      color: "#ff1111",
-    },
-  ],
 ]);

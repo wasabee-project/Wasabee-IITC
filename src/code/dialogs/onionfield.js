@@ -161,10 +161,6 @@ const OnionfieldDialog = WDialog.extend({
   _recurser: function (portalsRemaining, thisPath, one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
-    if (this._color.name == "self-block") {
-      this._colorIterator = (this._colorIterator + 1) % this._colors.length;
-      this._color = this._colors[this._colorIterator];
-    }
 
     // build a map of all portals still in-play
     const m = new Map();

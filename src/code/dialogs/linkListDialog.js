@@ -210,7 +210,6 @@ const LinkListDialog = WDialog.extend({
     linkColor.id = link.ID;
 
     for (const style of window.plugin.wasabee.skin.layerTypes) {
-      if (style[0] == "self-block") continue;
       const a = style[1];
       const option = L.DomUtil.create("option");
       option.value = a.name;
