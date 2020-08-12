@@ -209,13 +209,12 @@ const LinkListDialog = WDialog.extend({
     const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
 
-    for (const style of window.plugin.wasabee.skin.layerTypes) {
-      const a = style[1];
+    for (const style of window.plugin.wasabee.skin.layerTypes.values()) {
       const option = L.DomUtil.create("option");
-      option.value = a.name;
-      if (a.name == "main") a.displayName = "Op Color";
-      if (a.name == data) option.selected = true;
-      option.innerHTML = a.displayName;
+      option.value = style.name;
+      if (style.name == "main") style.displayName = "Op Color";
+      if (style.name == data) option.selected = true;
+      option.innerHTML = style.displayName;
       linkColor.append(option);
     }
 
