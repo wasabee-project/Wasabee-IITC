@@ -108,15 +108,8 @@ const resetLinks = (operation) => {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  // pre-fetch the op color outside the loop -- is this actually helpful?
-  let style = Wasabee.skin.layerTypes.get("main");
-  if (Wasabee.skin.layerTypes.has(operation.color)) {
-    style = Wasabee.skin.layerTypes.get(operation.color);
-  }
-  style.link.color = style.color;
-
   for (const l of operation.links) {
-    addLink(l, style.link, operation);
+    addLink(l, operation);
   }
 };
 
@@ -134,14 +127,6 @@ const updateLinks = (operation) => {
     layerMap.set(l.options.id, l._leaflet_id);
   }
 
-  // pre-fetch the op color outside the loop
-  let style = Wasabee.skin.layerTypes.get("main");
-  if (Wasabee.skin.layerTypes.has(operation.color)) {
-    style = Wasabee.skin.layerTypes.get(operation.color);
-  }
-  // because ... reasons?
-  style.link.color = style.color;
-
   for (const l of operation.links) {
     if (layerMap.has(l.ID)) {
       const ll = Wasabee.linkLayerGroup.getLayer(layerMap.get(l.ID));
@@ -151,11 +136,11 @@ const updateLinks = (operation) => {
         l.toPortalId != ll.options.to
       ) {
         Wasabee.linkLayerGroup.removeLayer(ll);
-        addLink(l, style.link, operation);
+        addLink(l, operation);
       }
       layerMap.delete(l.ID);
     } else {
-      addLink(l, style.link, operation);
+      addLink(l, operation);
     }
   }
 
@@ -166,27 +151,33 @@ const updateLinks = (operation) => {
 }; */
 
 /** This function adds a link to the link layer group */
-const addLink = (wlink, style, operation) => {
-  // determine per-link color
-  if (wlink.color != "main" && Wasabee.skin.layerTypes.has(wlink.color)) {
-    const linkLt = Wasabee.skin.layerTypes.get(wlink.color);
-    style = linkLt.link;
-    style.color = linkLt.color;
-  }
-
-  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
-
+const addLink = (wlink, operation) => {
   const latLngs = wlink.getLatLngs(operation);
   if (!latLngs) {
     console.log("LatLngs was null: op missing portal data?");
     return;
   }
+
+  let color = wlink.color;
+  if (color == "main") color = operation.color;
+  if (Wasabee.skin.layerTypes.has(color))
+    color = Wasabee.skin.layerTypes.get(wlink.color).color;
+
+  const style = L.extend(
+    {
+      color: color,
+    },
+    Wasabee.skin.linkStyle
+  );
+
+  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
+
   const newlink = new L.GeodesicPolyline(latLngs, style);
   // these are used for updateLink and can be removed if we get rid of it
   newlink.options.id = wlink.ID;
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
-  newlink.options.Wcolor = wlink.Wcolor;
+  newlink.options.Wcolor = wlink.color;
 
   newlink.bindPopup("loading...", {
     className: "wasabee-popup",

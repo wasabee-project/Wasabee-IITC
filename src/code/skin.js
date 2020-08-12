@@ -8,6 +8,7 @@ export const initSkin = () => {
   Wasabee.skin = {};
   Wasabee.skin.CSS = Wasabee.static.CSS;
   Wasabee.skin.layerTypes = Wasabee.static.layerTypes;
+  Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
   Wasabee.skin.strings = Wasabee.static.strings;
 
   for (const k of Object.getOwnPropertyNames(Wasabee.skin.CSS)) {
@@ -42,6 +43,8 @@ const addFallback = () => {
   }
   for (const [k, d] of Wasabee.static.layerTypes)
     if (!Wasabee.skin.layerTypes.has(k)) Wasabee.skin.layerTypes.set(k, d);
+  if (!Wasabee.skin.linkStyle)
+    Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
 };
 
 export const changeSkin = (name) => {

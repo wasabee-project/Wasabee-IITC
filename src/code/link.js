@@ -116,7 +116,7 @@ export default class WasabeeLink {
       const c = window.plugin.wasabee.skin.layerTypes.get(this.color);
       return c.color;
     }
-    return "#333333";
+    return this.color;
   }
 
   length(operation) {

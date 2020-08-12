@@ -252,10 +252,10 @@ const testSelfBlock = (incoming, operation) => {
   for (const against of operation.links) {
     if (incoming.ID == against.ID) continue;
     if (greatCircleArcIntersect(against, incoming)) {
-      const lt = window.plugin.wasabee.skin.layerTypes.get("self-block");
-      const style = lt.link;
-      style.color = lt.color;
-      const blocked = L.geodesicPolyline(against.getLatLngs(operation), style);
+      const blocked = L.geodesicPolyline(
+        against.getLatLngs(operation),
+        window.plugin.wasabee.skin.selfBlockStyle
+      );
       blocked.addTo(window.plugin.wasabee.crossLinkLayers);
     }
   }

@@ -102,6 +102,20 @@ W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_EXCLUDE,
 ]);
 
+W.static.linkStyle = {
+  dashArray: [5, 5, 1, 5],
+  assignedDashArray: [4, 2, 1],
+  opacity: 1,
+  weight: 2,
+};
+
+W.static.selfBlockStyle = {
+  color: "#ff1111",
+  dashArray: [1, 5],
+  opacity: 4,
+  weight: 3,
+};
+
 // https://leafletjs.com/reference-1.0.3.html#path
 W.static.layerTypes = new Map([
   [
@@ -110,12 +124,6 @@ W.static.layerTypes = new Map([
       name: "main",
       displayName: "Red",
       color: "#ff0000",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -124,12 +132,6 @@ W.static.layerTypes = new Map([
       name: "groupa",
       displayName: "Orange",
       color: "#ff6600",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -138,12 +140,6 @@ W.static.layerTypes = new Map([
       name: "groupb",
       displayName: "Light Orange",
       color: "#ff9900",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 1, 4, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -152,12 +148,6 @@ W.static.layerTypes = new Map([
       name: "groupc",
       displayName: "Tan",
       color: "#bb9900",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -166,12 +156,6 @@ W.static.layerTypes = new Map([
       name: "groupd",
       displayName: "Purple",
       color: "#bb22cc",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -180,12 +164,6 @@ W.static.layerTypes = new Map([
       name: "groupe",
       displayName: "Teal",
       color: "#33cccc",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -194,12 +172,6 @@ W.static.layerTypes = new Map([
       name: "groupf",
       displayName: "Pink",
       color: "#ff55ff",
-      link: {
-        dashArray: [5, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 1,
-        weight: 2,
-      },
     },
   ],
   [
@@ -208,12 +180,6 @@ W.static.layerTypes = new Map([
       name: "self-block",
       displayName: "Self Block",
       color: "#ff1111",
-      link: {
-        dashArray: [1, 5, 1, 5],
-        assignedDashArray: [4, 2, 1],
-        opacity: 4,
-        weight: 3,
-      },
     },
   ],
 ]);
