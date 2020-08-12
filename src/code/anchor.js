@@ -5,10 +5,9 @@ import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import LinkListDialog from "./dialogs/linkListDialog";
 
-// this class exists to satisfy the interface for the assignment dialog
-// allows assigining all links FROM this anchor en mass
+// this class is for the popups, and for assign menu
 export default class WasabeeAnchor {
-  constructor(portalId, op) {
+  constructor(portalId, op = getSelectedOperation()) {
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -17,9 +16,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    this._operation = op ? op : getSelectedOperation();
-    this._portal = this._operation.getPortal(this.ID);
-    this.color = this._operation.color;
+    this._operation = op;
+    this._portal = op.getPortal(this.ID);
+    this.color = op.color;
   }
 
   // pointless, since these are never pushed to the server
@@ -150,7 +149,7 @@ export default class WasabeeAnchor {
       // needs wX
       const sendButton = L.DomUtil.create("button", null, buttonSet);
       sendButton.textContent = "Send as Target";
-      L.DomEvent.on(assignButton, "click", (ev) => {
+      L.DomEvent.on(sendButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         alert(
           "send as target coming soon... select agent, select portal or route..."
