@@ -34,7 +34,7 @@ const ExportDialog = WDialog.extend({
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
       this._drawToolsFormat();
     };
-    buttons[wX("MARKERS_AS_BOOKMARKS")] = () => {
+    buttons[wX("ANCHORS_AS_BOOKMARKS")] = () => {
       this._bookmarkFormat();
     };
 
@@ -90,11 +90,11 @@ const ExportDialog = WDialog.extend({
     output.portals.idOthers.state = 1;
     output.portals.idOthers.bkmrk = {};
 
-    for (const m of this._operation.markers) {
-      const id = "id" + m.ID.substring(0, 16);
-      const p = this._operation._idToOpportals.get(m.portalId);
+    for (const a of this._operation.anchors) {
+      const id = "id" + a.substring(0, 16);
+      const p = this._operation._idToOpportals.get(a);
       output.portals.idOthers.bkmrk[id] = {};
-      output.portals.idOthers.bkmrk[id].guid = m.portalId;
+      output.portals.idOthers.bkmrk[id].guid = a;
       output.portals.idOthers.bkmrk[id].latlng = `${p.lat},${p.lng}`;
       output.portals.idOthers.bkmrk[id].label = p.name;
     }
