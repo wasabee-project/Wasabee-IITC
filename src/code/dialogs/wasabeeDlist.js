@@ -11,9 +11,9 @@ const WasabeeDList = WDialog.extend({
     TYPE: "wasabeeDList",
   },
 
-  initialize: function (map = window.map, options) {
+  initialize: async function (map = window.map, options) {
     this.type = WasabeeDList.TYPE;
-    this._me = WasabeeMe.get();
+    this._me = await WasabeeMe.waitGet();
     WDialog.prototype.initialize.call(this, map, options);
     postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },

@@ -75,8 +75,6 @@ const TeamListDialog = WDialog.extend({
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
-            // WasabeeMe.get(true); // called by toggleTeam
-            // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
           };
         },
       },
@@ -93,17 +91,13 @@ const TeamListDialog = WDialog.extend({
             cd.setup(
               `Leave ${obj.Name}?`,
               `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
-              () => {
-                leaveTeamPromise(obj.ID).then(
-                  () => {
-                    WasabeeMe.get(true);
-                    // window.runHooks("wasabeeUIUpdate", getSelectedOperation()); // called by WasabeeMe.get(true)
-                  },
-                  (err) => {
-                    console.log(err);
-                    alert(err);
-                  }
-                );
+              async () => {
+                try {
+                  await leaveTeamPromise(obj.ID);
+                  await WasabeeMe.waitGet(true);
+                } catch (e) {
+                  console.log(e);
+                }
               }
             );
             cd.enable();
@@ -151,22 +145,20 @@ const TeamListDialog = WDialog.extend({
     };
     buttons[wX("NEW_TEAM")] = () => {
       const p = new PromptDialog(window.map);
-      p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), () => {
+      p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), async () => {
         const newname = p.inputField.value;
         if (!newname) {
           alert(wX("NAME_REQ"));
           return;
         }
-        newTeamPromise(newname).then(
-          () => {
-            alert(wX("TEAM_CREATED", newname));
-            WasabeeMe.get(true); // triggers UIUpdate
-          },
-          (reject) => {
-            console.log(reject);
-            alert(reject);
-          }
-        );
+        try {
+          await newTeamPromise(newname);
+          alert(wX("TEAM_CREATED", newname));
+          await WasabeeMe.waitGet(true); // triggers UIUpdate
+        } catch (e) {
+          console.log(e);
+          alert(e);
+        }
       });
       p.current = wX("NEW_TEAM_NAME");
       p.placeholder = wX("AMAZ_TEAM_NAME");
@@ -190,9 +182,13 @@ const TeamListDialog = WDialog.extend({
   toggleTeam: async function (teamID, currentState) {
     let newState = "Off";
     if (currentState == "Off") newState = "On";
-
-    await SetTeamState(teamID, newState);
-    await WasabeeMe.get(true);
+    try {
+      await SetTeamState(teamID, newState);
+      await WasabeeMe.waitGet(true);
+    } catch (e) {
+      console.log(e);
+      alert(e);
+    }
     return newState;
   },
 

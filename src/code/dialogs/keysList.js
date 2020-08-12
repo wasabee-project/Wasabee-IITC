@@ -18,7 +18,7 @@ const KeysList = WDialog.extend({
     postToFirebase({ id: "analytics", action: KeysList.TYPE });
   },
 
-  addHooks: function () {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._operation = getSelectedOperation();
@@ -28,7 +28,7 @@ const KeysList = WDialog.extend({
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     if (WasabeeMe.isLoggedIn()) {
-      this._me = WasabeeMe.get();
+      this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }

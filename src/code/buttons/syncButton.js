@@ -32,38 +32,28 @@ const SyncButton = WButton.extend({
       container: container,
       buttonImage: window.plugin.wasabee.skin.images.toolbar_download.default,
       context: this,
-      callback: () => {
+      callback: async () => {
         const so = getSelectedOperation();
-        // force update of ops list
-        // const me = WasabeeMe.get(true); // force update of ops list
-        WasabeeMe.waitGet(true).then((me) => {
-          if (!me) {
-            const ad = new AuthDialog();
-            ad.enable();
-            return;
-          }
 
+        try {
+          const me = await WasabeeMe.waitGet(true);
           const promises = new Array();
           const opsID = new Set(me.Ops.map((o) => o.ID));
           for (const opID of opsID) {
             promises.push(opPromise(opID));
           }
-          Promise.all(promises).then(
-            (ops) => {
-              for (const newop of ops) {
-                newop.store();
-                if (newop.ID == so.ID) {
-                  makeSelectedOperation(newop.ID);
-                }
-              }
-              alert(wX("SYNC DONE"));
-            },
-            function (err) {
-              console.log(err);
-              alert(err);
+          const ops = await Promise.all(promises);
+          for (const newop of ops) {
+            newop.store();
+            if (newop.ID == so.ID) {
+              makeSelectedOperation(newop.ID);
             }
-          );
-        });
+          }
+          alert(wX("SYNC DONE"));
+        } catch (e) {
+          console.log(e);
+          new AuthDialog().enable();
+        }
       },
     });
 

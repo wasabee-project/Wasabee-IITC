@@ -238,19 +238,16 @@ const ManageTeamDialog = WDialog.extend({
       cd.setup(
         wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
         wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
-        () => {
-          deleteTeamPromise(this._team.ID).then(
-            () => {
-              alert(`${this._team.Name} removed`);
-              this._dialog.dialog("close");
-              WasabeeMe.get(true);
-              //window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            },
-            (reject) => {
-              console.log(reject);
-              alert(reject);
-            }
-          );
+        async () => {
+          try {
+            await deleteTeamPromise(this._team.ID);
+            alert(`${this._team.Name} removed`);
+            this._dialog.dialog("close");
+            await WasabeeMe.waitGet(true);
+          } catch (e) {
+            alert(e);
+            console.log(e);
+          }
         }
       );
       cd.enable();

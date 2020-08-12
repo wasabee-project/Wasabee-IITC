@@ -129,7 +129,8 @@ window.plugin.wasabee.init = function () {
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
     // this updates the UI
-    WasabeeMe.get(true);
+    // since we don't need the result, we can use the properly async version w/o awaiting it
+    WasabeeMe.waitGet(true);
   }
 
   window.runHooks("wasabeeDkeys");

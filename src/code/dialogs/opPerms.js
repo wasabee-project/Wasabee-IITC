@@ -41,10 +41,10 @@ const OpPermList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  update: function (op) {
+  update: async function (op) {
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
-      this._me = WasabeeMe.get();
+      this._me = await WasabeeMe.waitGet();
     }
 
     this._operation = op;
