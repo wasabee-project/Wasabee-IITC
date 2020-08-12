@@ -48,15 +48,11 @@ const TeamMembershipList = WDialog.extend({
   setup: async function (teamID) {
     this._teamID = teamID;
 
-    if (window.plugin.wasabee.teams.has(teamID)) {
-      this._team = window.plugin.wasabee.teams.get(teamID);
-    } else {
-      try {
-        this._team = await teamPromise(teamID);
-      } catch (e) {
-        alert(e);
-        return;
-      }
+    try {
+      this._team = await teamPromise(teamID, 2);
+    } catch (e) {
+      alert(e);
+      return;
     }
     if (!this._team.name) {
       alert(wX("NOT_LOADED"));

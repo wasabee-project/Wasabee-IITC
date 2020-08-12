@@ -26,7 +26,7 @@ export const uploadOpPromise = async function () {
     json,
     "application/json;charset=UTF-8"
   );
-  WasabeeMe.create(response).store(); // free update to the cache
+  WasabeeMe.create(response, true); // free update to the cache
   const newop = await opPromise(operation.ID);
   newop.localchanged = false;
   newop.store();
@@ -140,8 +140,7 @@ export const mePromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
   try {
     const response = await _genericGet(`${SERVER_BASE}/me`);
-    const me = WasabeeMe.create(response);
-    me.store();
+    const me = WasabeeMe.create(response, true);
     return me;
   } catch (e) {
     console.log(e);

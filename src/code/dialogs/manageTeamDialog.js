@@ -45,7 +45,7 @@ const ManageTeamDialog = WDialog.extend({
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  setup: function (team) {
+  setup: async function (team) {
     this._team = team;
     this._table = new Sortable();
     this._table.fields = [
@@ -128,17 +128,15 @@ const ManageTeamDialog = WDialog.extend({
     ];
     this._table.sortBy = 0;
 
-    teamPromise(team.ID).then(
-      (teamdata) => {
-        if (teamdata.agents && teamdata.agents.length > 0) {
-          this._table.items = teamdata.agents;
-        }
-      },
-      (reject) => {
-        console.log(reject);
-        alert(reject);
+    try {
+      // max 2 seconds cache for this screen
+      const teamdata = await teamPromise(team.ID, 2);
+      if (teamdata.agents && teamdata.agents.length > 0) {
+        this._table.items = teamdata.agents;
       }
-    );
+    } catch (e) {
+      console.log(e);
+    }
   },
 
   update: function () {

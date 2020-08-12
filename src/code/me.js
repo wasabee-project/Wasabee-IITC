@@ -49,24 +49,24 @@ export default class WasabeeMe {
     if (me.fetched > WasabeeMe.maxCacheAge()) {
       return true;
     }
-    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    WasabeeMe.purge();
     return false;
   }
 
-  // this is deceptive, it only returns a cached value, any update takes place async
+  // for when you need a cached value or nothing -- in critical code paths
   static cacheGet() {
     let me = null;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      me = WasabeeMe.create(lsme);
+      me = WasabeeMe.create(lsme, false);
     }
     if (
       me === null ||
       me.fetched == undefined ||
       me.fetched < WasabeeMe.maxCacheAge()
     ) {
-      delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+      WasabeeMe.purge();
       return null;
     }
 
@@ -79,7 +79,7 @@ export default class WasabeeMe {
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      me = WasabeeMe.create(lsme);
+      me = WasabeeMe.create(lsme, false);
     }
     if (
       me === null ||
@@ -94,7 +94,7 @@ export default class WasabeeMe {
         }
         me = newme;
       } catch (e) {
-        delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+        WasabeeMe.purge();
         console.log(e);
         alert(e);
         me = null;
@@ -104,7 +104,7 @@ export default class WasabeeMe {
     return me;
   }
 
-  static create(data) {
+  static create(data, write = true) {
     if (!data) return null;
     if (typeof data == "string") {
       try {
@@ -133,7 +133,7 @@ export default class WasabeeMe {
       }
     }
     wme.fetched = data.fetched ? data.fetched : Date.now();
-    // wme.store();
+    if (write) wme.store();
     return wme;
   }
 

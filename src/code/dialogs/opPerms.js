@@ -118,7 +118,7 @@ const OpPermList = WDialog.extend({
       {
         name: wX("TEAM"),
         value: (perm) => {
-          const t = WasabeeTeam.get(perm.teamid);
+          const t = WasabeeTeam.cacheGet(perm.teamid);
           if (t) return t.name;
           if (this._me) {
             for (const mt of this._me.Teams) {

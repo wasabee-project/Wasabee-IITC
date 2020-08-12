@@ -37,8 +37,8 @@ const TeamListDialog = WDialog.extend({
   update: function () {
     // async
     if (!this._enabled) return;
-    this._me = WasabeeMe.get();
-    // this._me = await WasabeeMe.waitGet(); // breaks logout
+    this._me = WasabeeMe.cacheGet();
+    // this._me = await WasabeeMe.waitGet(); // breaks logout ; Still? try again now
     this._dialog.html(this._buildContent());
   },
 
