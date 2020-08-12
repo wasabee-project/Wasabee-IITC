@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
-import WasabeeTeam from "../team";
+import WasabeeMe from "../me";
 import { assignLinkPromise, assignMarkerPromise, teamPromise } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
@@ -118,18 +118,24 @@ const AssignDialog = WDialog.extend({
       });
     }
 
+    const me = await WasabeeMe.waitGet();
     for (const t of this._operation.teamlist) {
-      // allow teams to be 5 minutes cached
-      const tt = (await teamPromise(t.teamid, 300)) || new WasabeeTeam();
-      for (const a of tt.agents) {
-        if (!alreadyAdded.includes(a.id) && a.state === true) {
-          alreadyAdded.push(a.id);
-          option = L.DomUtil.create("option");
-          option.value = a.id;
-          option.textContent = a.name;
-          if (a.id == current) option.selected = true;
-          menu.appendChild(option);
+      if (me.teamEnabled(t.teamid) == false) continue;
+      try {
+        // allow teams to be 5 minutes cached
+        const tt = await teamPromise(t.teamid, 300);
+        for (const a of tt.agents) {
+          if (!alreadyAdded.includes(a.id) && a.state === true) {
+            alreadyAdded.push(a.id);
+            option = L.DomUtil.create("option");
+            option.value = a.id;
+            option.textContent = a.name;
+            if (a.id == current) option.selected = true;
+            menu.appendChild(option);
+          }
         }
+      } catch (e) {
+        console.log(e);
       }
     }
 
