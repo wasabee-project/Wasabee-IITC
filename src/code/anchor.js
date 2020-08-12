@@ -56,14 +56,6 @@ export default class WasabeeAnchor {
     return this._portal.latLng;
   }
 
-  // get icon() {
-  //   let lt = window.plugin.wasabee.skin.layerTypes.get("main");
-  //   if (window.plugin.wasabee.skin.layerTypes.has(this.color)) {
-  //     lt = window.plugin.wasabee.skin.layerTypes.get(this.color);
-  //   }
-  //   return lt.portal.iconUrl.default;
-  // }
-
   popupContent(marker, operation) {
     marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
