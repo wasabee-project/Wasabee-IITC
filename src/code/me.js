@@ -31,7 +31,7 @@ export default class WasabeeMe {
   }
 
   static isLoggedIn() {
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
+    const maxCacheAge = Date.now() - 1000 * 60 * 60 * 24;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     if (!lsme || typeof lsme !== "string") {
       return false;
@@ -52,7 +52,7 @@ export default class WasabeeMe {
 
   static get(force) {
     let me = null;
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
+    const maxCacheAge = Date.now() - 1000 * 60 * 60 * 24;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
