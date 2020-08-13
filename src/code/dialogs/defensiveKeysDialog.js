@@ -71,7 +71,7 @@ const DefensiveKeysDialog = WDialog.extend({
     addDKeyButton.textContent = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._addDKey();
+      this._addDKey(); // async, but no need to await it
     });
 
     const showDKeyButton = L.DomUtil.create("button", null, this._content);
@@ -106,22 +106,19 @@ const DefensiveKeysDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _addDKey: function () {
-    // send it to the server
-    dKeyPromise(
-      this._selectedPortal.id,
-      this._count.value,
-      this._capID.value
-    ).then(
-      function () {
-        alert("Registered with server");
-        window.runHooks("wasabeeDkeys");
-      },
-      function (reject) {
-        console.log(reject);
-        alert(reject);
-      }
-    );
+  _addDKey: async function () {
+    try {
+      await dKeyPromise(
+        this._selectedPortal.id,
+        this._count.value,
+        this._capID.value
+      );
+      alert("Registered with server");
+      window.runHooks("wasabeeDkeys");
+    } catch (e) {
+      console.log(e);
+      alert(e);
+    }
   },
 
   _getMyData(portalID) {

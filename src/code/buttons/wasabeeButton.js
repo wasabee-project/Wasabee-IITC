@@ -5,11 +5,7 @@ import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-import {
-  getSelectedOperation,
-  resetOps,
-  setupLocalStorage,
-} from "../selectedOp";
+import { resetOps, setupLocalStorage } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
@@ -64,23 +60,14 @@ const WasabeeButton = WButton.extend({
     this._logoutAction = {
       title: wX("LOG_OUT"),
       text: wX("LOG_OUT"),
-      callback: () => {
-        localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
-          "design";
-        delete localStorage["sentToServer"]; // resend firebase token on login
-
-        logoutPromise().then(
-          () => {
-            WasabeeMe.purge();
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            window.runHooks("wasabeeDkeys");
-          },
-          (err) => {
-            alert(err);
-            WasabeeMe.purge();
-            console.log(err);
-          }
-        );
+      callback: async () => {
+        try {
+          await logoutPromise();
+        } catch (e) {
+          console.log(e);
+          alert(e);
+        }
+        WasabeeMe.purge(); // runs UI updates for us
       },
       context: this,
     };

@@ -110,7 +110,7 @@ const AssignDialog = WDialog.extend({
     const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
     if (mode == "active") {
       menu.addEventListener("change", (value) => {
-        this.activeAssign(value);
+        this.activeAssign(value); // async, but no need to await
       });
     } else {
       menu.addEventListener("change", (value) => {
@@ -161,55 +161,49 @@ const AssignDialog = WDialog.extend({
     }
   },
 
-  activeAssign: function (value) {
+  activeAssign: async function (value) {
     if (this._type == "Marker") {
-      assignMarkerPromise(
-        this._operation.ID,
-        this._targetID,
-        value.srcElement.value
-      ).then(
-        function () {
-          console.log("assignment processed");
-        },
-        function (err) {
-          console.log(err);
-        }
-      );
-      this._operation.assignMarker(this._targetID, value.srcElement.value);
+      try {
+        await assignMarkerPromise(
+          this._operation.ID,
+          this._targetID,
+          value.srcElement.value
+        );
+        console.log("assignment processed");
+        this._operation.assignMarker(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
     }
     if (this._type == "Link") {
-      assignLinkPromise(
-        this._operation.ID,
-        this._targetID,
-        value.srcElement.value
-      ).then(
-        function () {
-          console.log("assignment processed");
-        },
-        function (err) {
-          console.log(err);
-        }
-      );
-      this._operation.assignLink(this._targetID, value.srcElement.value);
+      try {
+        await assignLinkPromise(
+          this._operation.ID,
+          this._targetID,
+          value.srcElement.value
+        );
+        console.log("assignment processed");
+        this._operation.assignLink(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
     }
     if (this._type == "Anchor") {
       const links = this._operation.getLinkListFromPortal(
         this._operation.getPortal(this._targetID)
       );
       for (const l of links) {
-        assignLinkPromise(
-          this._operation.ID,
-          l.ID,
-          value.srcElement.value
-        ).then(
-          function () {
-            console.log("assignment processed");
-          },
-          function (err) {
-            console.log(err);
-          }
-        );
-        this._operation.assignLink(l.ID, value.srcElement.value);
+        try {
+          await assignLinkPromise(
+            this._operation.ID,
+            l.ID,
+            value.srcElement.value
+          );
+          console.log("assignment processed");
+          this._operation.assignLink(l.ID, value.srcElement.value);
+        } catch (e) {
+          console.log(e);
+        }
       }
     }
   },

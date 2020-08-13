@@ -704,7 +704,7 @@ export default class WasabeeOp {
             localStorage[modeKey] = "design";
             this.localchanged = true;
           } else {
-            // active mode
+            // active mode -- this happens async, but no need to await here
             this._updateOnServer();
           }
         } else {
@@ -720,24 +720,23 @@ export default class WasabeeOp {
   }
 
   // only for use by "active" mode
-  _updateOnServer() {
+  async _updateOnServer() {
     const now = Date.now();
+    /* 
     if (this._AMpushed && now - this._AMpushed < 1000) {
       this._AMpushed = now;
       console.log("skipping active mode push");
       return;
-    }
+    } */
 
     this._AMpushed = now;
-    updateOpPromise(this).then(
-      () => {
-        console.log("active mode change pushed", new Date().toGMTString());
-      },
-      (err) => {
-        console.log(err);
-        alert("Active Mode Update failed: " + err);
-      }
-    );
+    try {
+      await updateOpPromise(this);
+      console.log("active mode change pushed", new Date().toGMTString());
+    } catch (e) {
+      console.log(e);
+      alert("Active Mode Update failed: " + e);
+    }
   }
 
   runCrosslinks() {

@@ -87,7 +87,7 @@ const OpPermList = WDialog.extend({
 
       L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
-        this.addPerm(teamMenu.value, permMenu.value);
+        this.addPerm(teamMenu.value, permMenu.value); // async, but no need to await
         // addPerm calls wasabeeUIUpdate, which redraws the screen
       });
     }
@@ -149,7 +149,7 @@ const OpPermList = WDialog.extend({
           link.textContent = value;
           L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
-            this.delPerm(obj); // calls wasabeeUIUpdate
+            this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
           });
         },
       });
@@ -158,7 +158,7 @@ const OpPermList = WDialog.extend({
     this._table.items = this._operation.teamlist;
   },
 
-  addPerm: function (teamID, role) {
+  addPerm: async function (teamID, role) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
@@ -170,46 +170,36 @@ const OpPermList = WDialog.extend({
         return;
       }
     }
-    // send to server
-    addPermPromise(this._operation.ID, teamID, role).then(
-      () => {
-        // then add locally for display
-        this._operation.teamlist.push({
-          teamid: teamID,
-          role: role,
-        });
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
-      }
-    );
+    try {
+      await addPermPromise(this._operation.ID, teamID, role);
+      // add locally for display
+      this._operation.teamlist.push({ teamid: teamID, role: role });
+      this._operation.store();
+      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    } catch (e) {
+      console.log(e);
+      alert(e);
+    }
   },
 
-  delPerm: function (obj) {
+  delPerm: async function (obj) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
-    // send change to server
-    delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
-      () => {
-        // then remove locally for display
-        const n = new Array();
-        for (const p of this._operation.teamlist) {
-          if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
-        }
-        this._operation.teamlist = n;
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
+    try {
+      await delPermPromise(this._operation.ID, obj.teamid, obj.role);
+      const n = new Array();
+      for (const p of this._operation.teamlist) {
+        if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
       }
-    );
+      this._operation.teamlist = n;
+      this._operation.store();
+      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    } catch (e) {
+      console.log(e);
+      alert(e);
+    }
   },
 });
 

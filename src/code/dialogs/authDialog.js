@@ -126,18 +126,15 @@ const AuthDialog = WDialog.extend({
       const postwebviewButton = L.DomUtil.create("button", "webview", content);
       postwebviewButton.textContent = wX("WEBVIEW VERIFY");
       postwebviewButton.style.display = "none";
-      L.DomEvent.on(postwebviewButton, "click", (ev) => {
-        // async
+      L.DomEvent.on(postwebviewButton, "click", async (ev) => {
         L.DomEvent.stop(ev);
-        mePromise().then(
-          () => {
-            this._dialog.dialog("close");
-            postToFirebase({ id: "wasabeeLogin", method: "iOS" });
-          },
-          (err) => {
-            alert(err);
-          }
-        );
+        try {
+          await mePromise();
+          this._dialog.dialog("close");
+          postToFirebase({ id: "wasabeeLogin", method: "iOS" });
+        } catch (e) {
+          alert(e);
+        }
       });
     }
 
@@ -166,19 +163,17 @@ const AuthDialog = WDialog.extend({
     L.DomEvent.on(oneTimeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const ottDialog = new PromptDialog();
-      ottDialog.setup("One Time Token", "One Time Token", () => {
+      ottDialog.setup("One Time Token", "One Time Token", async () => {
         if (ottDialog.inputField.value) {
-          oneTimeToken(ottDialog.inputField.value).then(
-            async () => {
-              await mePromise();
-              this._dialog.dialog("close");
-              postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
-            },
-            (reject) => {
-              console.log(reject);
-              alert(reject);
-            }
-          );
+          try {
+            await oneTimeToken(ottDialog.inputField.value);
+            await mePromise();
+            this._dialog.dialog("close");
+            postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
+          } catch (e) {
+            console.log(e);
+            alert(e);
+          }
         }
       });
       // ott.current= "";
@@ -215,8 +210,6 @@ const AuthDialog = WDialog.extend({
   // this is probably the most correct, but doesn't seem to work properly
   // does making it async change anything?
   gapiAuth: function () {
-    // async
-    // console.log("calling main log in method");
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
@@ -227,36 +220,30 @@ const AuthDialog = WDialog.extend({
       options.immediate = immediate.value;
     const gPrompt = document.getElementById("auth-prompt");
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
-    window.gapi.auth2.authorize(options, (response) => {
+    window.gapi.auth2.authorize(options, async (response) => {
       if (response.error) {
         if (response.error == "immediate_failed") {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
-          window.gapi.auth2.authorize(options, (responseSelect) => {
+          window.gapi.auth2.authorize(options, async (responseSelect) => {
             if (responseSelect.error) {
               const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
               alert(err);
               console.log(err);
               return;
             }
-            // console.log("sending to Wasabee (immediate_failed)");
-            SendAccessTokenAsync(responseSelect.access_token).then(
-              (response) => {
-                WasabeeMe.create(response, true);
-                if (this._ios) {
-                  window.setTimeout(() => {
-                    this._dialog.dialog("close");
-                  }, 1500); // give time for the cookie to settle
-                } else {
-                  this._dialog.dialog("close");
-                }
-                postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
-              },
-              (tokErr) => {
-                alert(wX("AUTH TOKEN REJECTED", tokErr));
-                console.log(tokErr);
-                this._dialog.dialog("close");
-              }
-            );
+            try {
+              const r = await SendAccessTokenAsync(responseSelect.access_token);
+              WasabeeMe.create(r, true);
+              this._dialog.dialog("close");
+              postToFirebase({
+                id: "wasabeeLogin",
+                method: "gsapiAuth (immediate_failed)",
+              });
+            } catch (e) {
+              alert(wX("AUTH TOKEN REJECTED", e));
+              console.log(e);
+              this._dialog.dialog("close");
+            }
           });
         } else {
           this._dialog.dialog("close");
@@ -266,25 +253,16 @@ const AuthDialog = WDialog.extend({
         }
         return;
       }
-      // console.log("sending to Wasabee");
-      SendAccessTokenAsync(response.access_token).then(
-        (response) => {
-          WasabeeMe.create(response, true);
-          if (this._ios) {
-            window.setTimeout(() => {
-              this._dialog.dialog("close");
-            }, 1500); // give time for the cookie to settle
-          } else {
-            this._dialog.dialog("close");
-          }
-          postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
-        },
-        (tokErr) => {
-          console.log(tokErr);
-          alert(tokErr);
-          this._dialog.dialog("close");
-        }
-      );
+      try {
+        const r = await SendAccessTokenAsync(response.access_token);
+        WasabeeMe.create(r, true);
+        this._dialog.dialog("close");
+        postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
+      } catch (e) {
+        console.log(e);
+        alert(e);
+        this._dialog.dialog("close");
+      }
     });
   },
 
@@ -297,25 +275,22 @@ const AuthDialog = WDialog.extend({
         response_type: "id_token permission",
         // immediate: false // this seems to break everything
       },
-      (response) => {
+      async (response) => {
         if (response.error) {
           this._dialog.dialog("close");
           const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
           return;
         }
-        SendAccessTokenAsync(response.access_token).then(
-          (response) => {
-            WasabeeMe.create(response, true);
-            mePromise(); // needs .then...
-            this._dialog.dialog("close");
-            postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
-          },
-          (reject) => {
-            console.log(reject);
-            alert(`send access token failed (gsapiAuthChoose): $(reject)`);
-          }
-        );
+        try {
+          const r = await SendAccessTokenAsync(response.access_token);
+          WasabeeMe.create(r, true);
+          this._dialog.dialog("close");
+          postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
+        } catch (e) {
+          console.log(e);
+          alert(`send access token failed (gsapiAuthChoose): $(e)`);
+        }
       }
     );
   },

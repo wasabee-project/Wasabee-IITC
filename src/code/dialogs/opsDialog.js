@@ -186,17 +186,15 @@ const OpsDialog = WDialog.extend({
         con.setup(
           wX("CON_DEL", selectedOp.name),
           wX("YESNO_DEL", selectedOp.name),
-          () => {
+          async () => {
             if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
-              deleteOpPromise(selectedOp.ID).then(
-                function () {
-                  console.log("delete from server successful");
-                },
-                function (err) {
-                  console.log(err);
-                  alert(err);
-                }
-              );
+              try {
+                await deleteOpPromise(selectedOp.ID);
+                console.log("delete from server successful");
+              } catch (e) {
+                console.log(e);
+                alert(e);
+              }
             }
             const ol = opsList();
             let newopID = ol[0];

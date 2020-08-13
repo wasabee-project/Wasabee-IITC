@@ -58,7 +58,7 @@ const AgentDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
-      id: window.plugin.wasabee.static.dialogNames.linkList,
+      // id: window.plugin.wasabee.static.dialogNames.linkList,
     });
     this._dialog.dialog("option", "buttons", buttons);
   },

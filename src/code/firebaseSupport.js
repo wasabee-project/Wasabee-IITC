@@ -23,7 +23,7 @@ export const initFirebase = () => {
 
   $(document.body).append(iframe);
 
-  window.addEventListener("message", (event) => {
+  window.addEventListener("message", async (event) => {
     // ignore anything not from our server
     if (event.origin.indexOf(server) === -1) return;
 
@@ -38,26 +38,21 @@ export const initFirebase = () => {
         drawSingleTeam(event.data.data.msg);
         break;
       case "Map Change":
-        opPromise(event.data.data.opID).then(
-          function (refreshed) {
-            refreshed.store();
-            if (refreshed.ID == operation.ID) {
-              console.log(
-                "firebase trigger reload of current op: ",
-                event.data.data
-              );
-              makeSelectedOperation(refreshed.ID);
-            } else {
-              console.log(
-                "firebase trigger update of op",
-                event.data.data.opID
-              );
-            }
-          },
-          function (err) {
-            console.log(err);
+        try {
+          const refreshed = await opPromise(event.data.data.opID);
+          refreshed.store();
+          if (refreshed.ID == operation.ID) {
+            console.log(
+              "firebase trigger reload of current op: ",
+              event.data.data
+            );
+            makeSelectedOperation(refreshed.ID);
+          } else {
+            console.log("firebase trigger update of op", event.data.data.opID);
           }
-        );
+        } catch (e) {
+          console.log(e);
+        }
         break;
       case "Login":
         // display to console somehow?
