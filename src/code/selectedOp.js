@@ -83,17 +83,27 @@ export const makeSelectedOperation = (opID) => {
 
 // use this to pull an op from local store by ID
 export const getOperationByID = (opID) => {
-  let op = null;
   try {
-    const v = store.get(opID);
-    // parse the JSON here so we can alert based on it
-    // .create can parse for us, but this gives better alerting
-    if (v) op = WasabeeOp.create(JSON.parse(v));
+    const newfmt = localStorage[opID];
+    if (newfmt) {
+      const op = WasabeeOp.create(JSON.parse(newfmt));
+      if (op.ID) return op;
+    }
   } catch (e) {
     console.log(e);
-    alert(JSON.stringify(e));
+    try {
+      console.log("trying old format");
+      const v = store.get(opID);
+      if (v) {
+        const op = WasabeeOp.create(JSON.parse(v));
+        if (op.ID) return op;
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
-  return op;
+  console.log("unable to load op");
+  return null;
 };
 
 // called when loaded for the first time or when all ops are purged

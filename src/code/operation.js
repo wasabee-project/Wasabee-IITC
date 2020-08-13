@@ -3,7 +3,6 @@ import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
-import store from "../lib/store";
 import { updateOpPromise } from "./server";
 
 import wX from "./wX";
@@ -41,7 +40,7 @@ export default class WasabeeOp {
 
   store() {
     this.stored = Date.now();
-    store.set(this.ID, JSON.stringify(this));
+    localStorage[this.ID] = JSON.stringify(this);
   }
 
   // build object to serialize
