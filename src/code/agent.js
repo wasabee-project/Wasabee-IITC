@@ -1,6 +1,7 @@
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import { targetPromise, routePromise, GetWasabeeServer } from "./server";
+import AgentDialog from "./dialogs/agentDialog";
+import { targetPromise, routePromise } from "./server";
 import wX from "./wX";
 
 export default class WasabeeAgent {
@@ -53,7 +54,6 @@ export default class WasabeeAgent {
   }
 
   formatDisplay() {
-    const server = GetWasabeeServer();
     const display = L.DomUtil.create("a", "wasabee-agent-label");
     if (this.Vverified || this.rocks) {
       L.DomUtil.addClass(display, "enl");
@@ -61,11 +61,10 @@ export default class WasabeeAgent {
     if (this.blacklisted) {
       L.DomUtil.addClass(display, "res");
     }
-    display.href = `${server}/api/v1/agent/${this.id}?json=n`;
-    display.target = "_new";
     L.DomEvent.on(display, "click", (ev) => {
-      window.open(display.href, this.id);
       L.DomEvent.stop(ev);
+      const ad = new AgentDialog(window.map, { gid: this.id });
+      ad.enable();
     });
     display.textContent = this.name;
     return display;
