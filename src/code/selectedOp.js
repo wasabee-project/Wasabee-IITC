@@ -63,6 +63,7 @@ export const makeSelectedOperation = (opID) => {
   }
 
   // get the op from localStorage
+  // in 0.19 this becomes WasabeeOp.load(opID);
   const op = getOperationByID(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
@@ -82,6 +83,7 @@ export const makeSelectedOperation = (opID) => {
 };
 
 // use this to pull an op from local store by ID
+// in 0.19 this entire function goes away;
 export const getOperationByID = (opID) => {
   try {
     const newfmt = localStorage[opID];
@@ -133,7 +135,7 @@ export const setupLocalStorage = () => {
 //** This function removes an operation from the main list */
 export const removeOperation = (opID) => {
   try {
-    store.remove(opID);
+    delete localStorage[opID];
   } catch (e) {
     console.log(e);
   }
@@ -148,13 +150,12 @@ export const resetOps = () => {
 };
 
 export const opsList = () => {
-  var out = new Array();
+  const out = new Array();
 
-  store.each(function (value, key) {
-    if (key.length == 40) {
-      out.push(key);
-    }
-  });
+  for (const key in localStorage) {
+    if (key.length == 40 && localStorage[key].includes(`"ID":`)) out.push(key);
+  }
+
   return out;
 };
 
