@@ -38,6 +38,18 @@ export default class WasabeeOp {
     this.buildCoordsLookupTable();
   }
 
+  static load(opID) {
+    try {
+      const raw = localStorage[opID];
+      const parsed = JSON.parse(raw);
+      const op = WasabeeMe.create(parsed);
+      return op;
+    } catch (e) {
+      console.log(e);
+    }
+    return null;
+  }
+
   store() {
     this.stored = Date.now();
     localStorage[this.ID] = JSON.stringify(this);
@@ -939,12 +951,9 @@ export default class WasabeeOp {
     operation.blockers = operation.convertBlockersToObjs(obj.blockers);
     operation.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
 
-    //if (!operation.opportals) operation.opportals = new Array();
     if (!operation.links) operation.links = new Array();
     if (!operation.markers) operation.markers = new Array();
     if (!operation.blockers) operation.blockers = new Array();
-    // if (!operation.teamlist) operation.teamlist = new Array();
-    // if (!operation.keysonhand) operation.keysonhand = new Array()
 
     if (opportals)
       for (const p of opportals) operation._idToOpportals.set(p.id, p);
@@ -952,19 +961,6 @@ export default class WasabeeOp {
 
     operation.cleanAnchorList();
     operation.cleanPortalList();
-
-    // this should not be needed past 0.16
-    if (operation.keysonhand.length > 0) {
-      for (const k in operation.keysonhand) {
-        if (typeof operation.keysonhand[k].onhand == "string") {
-          console.log("in migration path for keys at op load");
-          operation.keysonhand[k].onhand = Number.parseInt(
-            operation.keysonhand[k].onhand,
-            10
-          );
-        }
-      }
-    }
 
     return operation;
   }
