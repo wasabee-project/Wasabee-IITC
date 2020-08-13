@@ -608,7 +608,7 @@ const HomogeneousDialog = WDialog.extend({
           const link = this._operation.addLink(
             fromPortal,
             toPortal,
-            "intern link",
+            dp > 0 && ap == 0 ? "intern link" : "",
             order,
             true
           );
