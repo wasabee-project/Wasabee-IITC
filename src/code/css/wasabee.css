@@ -1218,6 +1218,10 @@
   grid-column-start: 1;
 }
 
+.wasabee-link-seperator:before {
+    content: " ➾ ";
+}
+
 .wasabee-portal-comment {
   font-size: smaller;
   font-weight: lighter;
