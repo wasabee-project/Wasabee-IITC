@@ -267,6 +267,7 @@
   "SELECT PORTAL": "Select a portal to send",
   "SECONDS": " (${value} seconds ago)",
   "SEND TARGET": "Send Target",
+  "SEND TARGET AGENT": "Select target recipient",
   "SEL_SRC_ANC2": "Select both Source and Anchor 2",
   "SEL_SRC_PORT": "Select a source portal",
   "SELECT_FAN_PORTALS": "Select an anchor portal, a start portal, and an end portal, then position the view over the field area.",

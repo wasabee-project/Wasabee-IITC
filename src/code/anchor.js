@@ -1,5 +1,6 @@
 import { swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
+import SendTargetDialog from "./dialogs/sendTargetDialog";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
@@ -148,12 +149,12 @@ export default class WasabeeAnchor {
 
       // needs wX
       const sendButton = L.DomUtil.create("button", null, buttonSet);
-      sendButton.textContent = "Send as Target";
+      sendButton.textContent = wX("SEND TARGET");
       L.DomEvent.on(sendButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        alert(
-          "send as target coming soon... select agent, select portal or route..."
-        );
+        const std = new SendTargetDialog();
+        std.setup(this, operation);
+        std.enable();
         marker.closePopup();
       });
     }

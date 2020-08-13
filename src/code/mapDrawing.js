@@ -268,18 +268,6 @@ export const drawSingleTeam = async (
 ) => {
   const done = new Array();
 
-  // must be older than 5 seconds
-  const now = Date.now();
-  if (t.fetched && now - t.fetched < 5000) {
-    console.log("skipping team: recently fetched");
-    return done;
-  }
-
-  // remove whatever data we have for this team, start fresh
-  if (Wasabee.teams.size != 0 && Wasabee.teams.has(t.ID)) {
-    Wasabee.teams.delete(t.ID);
-  }
-
   // only display enabled teams
   if (t.State != "On") return done;
 

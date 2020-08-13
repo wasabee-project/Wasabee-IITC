@@ -2,6 +2,7 @@ import { generateId } from "./auxiliar";
 import { deleteMarker } from "./uiCommands.js";
 import { agentPromise } from "./server";
 import AssignDialog from "./dialogs/assignDialog";
+import SendTargetDialog from "./dialogs/sendTargetDialog";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
@@ -106,6 +107,16 @@ export default class WasabeeMarker {
         const ad = new AssignDialog();
         ad.setup(this, operation);
         ad.enable();
+        marker.closePopup();
+      });
+
+      const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
+      sendTargetButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendTargetButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog();
+        std.setup(this, operation);
+        std.enable();
         marker.closePopup();
       });
     }
