@@ -207,8 +207,8 @@ const AuthDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  // this is probably the most correct, but doesn't seem to work properly
-  // does making it async change anything?
+  // this works in most cases
+  // but fails on android if the account logged into intel is different than the one used for Wasabee
   gapiAuth: function () {
     const options = {
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
