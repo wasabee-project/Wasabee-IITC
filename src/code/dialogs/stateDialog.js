@@ -87,12 +87,10 @@ const StateDialog = WDialog.extend({
     return content;
   },
 
-  // TODO this should return a promise so the draw routine can .then() it...
   _getStateMenu: function (current) {
     const container = L.DomUtil.create("div", "wasabee-state-menu");
     const menu = L.DomUtil.create("select", null, container);
 
-    // const states = ['pending','assigned','acknowledged','completed'];
     const states = ["pending", "acknowledged", "completed"];
     for (const s of states) {
       const option = menu.appendChild(L.DomUtil.create("option", null));
@@ -104,6 +102,7 @@ const StateDialog = WDialog.extend({
     const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
     if (mode == "active") {
       menu.addEventListener("change", (value) => {
+        // async/await not necessary since this doesn't return a value
         this.activeSetState(value);
       });
     } else {
@@ -125,42 +124,33 @@ const StateDialog = WDialog.extend({
     }
   },
 
-  activeSetState: function (value) {
+  activeSetState: async function (value) {
     if (this._type == "Marker") {
-      SetMarkerState(
-        this._operation.ID,
-        this._targetID,
-        value.srcElement.value
-      ).then(
-        (resolve) => {
-          console.log(resolve);
-          // changing it locally in battle mode will push the entire draw...
-          this._operation.setMarkerState(
-            this._targetID,
-            value.srcElement.value
-          );
-        },
-        (reject) => {
-          console.log(reject);
-        }
-      );
+      try {
+        await SetMarkerState(
+          this._operation.ID,
+          this._targetID,
+          value.srcElement.value
+        );
+        // changing it locally in battle mode will push the entire draw...
+        this._operation.setMarkerState(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
     }
 
     if (this._type == "Link") {
-      SetLinkState(
-        this._operation.ID,
-        this._targetID,
-        value.srcElement.value
-      ).then(
-        (resolve) => {
-          console.log(resolve);
-          // changing it locally in battle mode will push the entire draw...
-          this._operation.setLinkState(this._targetID, value.srcElement.value);
-        },
-        (reject) => {
-          console.log(reject);
-        }
-      );
+      try {
+        await SetLinkState(
+          this._operation.ID,
+          this._targetID,
+          value.srcElement.value
+        );
+        // changing it locally in battle mode will push the entire draw...
+        this._operation.setLinkState(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
     }
   },
 });
