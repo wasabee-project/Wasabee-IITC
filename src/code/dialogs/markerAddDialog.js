@@ -49,10 +49,10 @@ const MarkerAddDialog = WDialog.extend({
 
       for (const k of window.plugin.wasabee.static.markerTypes) {
         const o = L.DomUtil.create("option", null, this._type);
-        o.value = k[0];
-        o.textContent = wX(k[0]);
-        if (markers.has(k[0])) o.disabled = true;
-        else if (!defaultType) defaultType = k[0];
+        o.value = k;
+        o.textContent = wX(k);
+        if (markers.has(k)) o.disabled = true;
+        else if (!defaultType) defaultType = k;
       }
       this._type.value = defaultType;
     } else {
