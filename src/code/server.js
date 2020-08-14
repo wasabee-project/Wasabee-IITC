@@ -75,8 +75,8 @@ export const teamPromise = async function (teamid, maxAgeSeconds = 0) {
 
   const SERVER_BASE = GetWasabeeServer();
   const response = await _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
-  // team and agent caching takes place in WasabeeTeam.create
-  const newteam = WasabeeTeam.create(response);
+  // team and agent caching takes place in new WasabeeTeam
+  const newteam = new WasabeeTeam(response);
   return newteam;
 };
 

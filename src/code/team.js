@@ -1,16 +1,7 @@
 import WasabeeAgent from "./agent";
 
 export default class WasabeeTeam {
-  constructor() {
-    this.name = null;
-    this.id = null;
-    this.agents = [];
-    this.fetched = null;
-  }
-
-  static create(data) {
-    // all consumers curently send JSON, but for API consistency
-    // support both obj and JSON
+  constructor(data) {
     if (typeof data == "string") {
       try {
         data = JSON.parse(data);
@@ -20,16 +11,19 @@ export default class WasabeeTeam {
       }
     }
 
-    const team = new WasabeeTeam();
-    team.id = data.id;
-    team.name = data.name;
-    team.fetched = Date.now();
-    window.plugin.wasabee.teams.set(team.id, team);
+    this.agents = [];
+
+    this.id = data.id;
+    this.name = data.name;
+    this.fetched = Date.now();
+
+    // push into team cache
+    window.plugin.wasabee.teams.set(this.id, this);
+
+    // push agents into agent cache
     for (const agent of data.agents) {
-      // new WasabeeAgent takes care of caching it for us
-      team.agents.push(new WasabeeAgent(agent));
+      this.agents.push(new WasabeeAgent(agent));
     }
-    return team;
   }
 
   static cacheGet(teamID) {
