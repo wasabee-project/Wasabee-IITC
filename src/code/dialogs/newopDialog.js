@@ -44,11 +44,10 @@ const NewopDialog = WDialog.extend({
       const addDialog = new PromptDialog(this._map);
       addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {
         if (addDialog.inputField.value) {
-          const newop = new WasabeeOp(
-            PLAYER.nickname,
-            addDialog.inputField.value,
-            true
-          );
+          const newop = new WasabeeOp({
+            creator: PLAYER.nickname,
+            name: addDialog.inputField.value,
+          });
           newop.store();
           makeSelectedOperation(newop.ID);
           window.runHooks("wasabeeUIUpdate", newop);

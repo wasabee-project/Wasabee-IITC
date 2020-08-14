@@ -85,7 +85,7 @@ export const opPromise = function (opID) {
     req.onload = function () {
       switch (req.status) {
         case 200:
-          newop = WasabeeOp.create(req.response);
+          newop = new WasabeeOp(req.response);
           newop.localchanged = false;
           resolve(newop);
           break;

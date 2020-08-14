@@ -11,38 +11,51 @@ import wX from "./wX";
 const DEFAULT_OPERATION_COLOR = "groupa";
 
 export default class WasabeeOp {
-  //ID <- randomly generated alpha-numeric ID for the operation
-  //name <- name of operation
-  //creator <- agent who created it
-  //portals <- List of Portals
-  //links <- List of Links
-  constructor(creator, name) {
-    this.ID = generateId();
-    this.name = name;
-    this.creator = creator;
-    //this.opportals = Array();
-    this.anchors = Array();
-    this.links = Array();
-    this.markers = Array();
-    this.color = DEFAULT_OPERATION_COLOR;
-    this.comment = null;
-    this.teamlist = Array();
-    this.fetched = null;
-    this.stored = null;
-    this.localchanged = true;
-    this.blockers = Array();
-    this.keysonhand = Array();
+  constructor(obj) {
+    if (typeof obj == "string") {
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log("corrupted operation", e);
+        return null;
+      }
+    }
 
+    this.ID = obj.ID ? obj.ID : generateId();
+    this.name = obj.name ? obj.name : "unnamed op";
+    this.creator = obj.creator ? obj.creator : "unset";
+    this.anchors = obj.anchors ? obj.anchors : Array();
+    this.links = this.convertLinksToObjs(obj.links);
+    this.markers = this.convertMarkersToObjs(obj.markers);
+    this.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
+    this.comment = obj.comment ? obj.comment : null;
+    this.teamlist = obj.teamlist ? obj.teamlist : Array();
+    this.fetched = obj.fetched ? obj.fetched : null;
+    this.stored = obj.stored ? obj.stored : null;
+    this.localchanged = obj.localchanged ? obj.localchanged : true;
+    this.blockers = this.convertBlockersToObjs(obj.blockers);
+    this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
+
+    if (!this.links) this.links = new Array();
+    if (!this.markers) this.markers = new Array();
+    if (!this.blockers) this.blockers = new Array();
+
+    const opportals = this.convertPortalsToObjs(obj.opportals);
     this._idToOpportals = new Map();
     this._coordsToOpportals = new Map();
+    if (opportals) for (const p of opportals) this._idToOpportals.set(p.id, p);
     this.buildCoordsLookupTable();
+
+    this.cleanAnchorList();
+    this.cleanPortalList();
   }
 
   static load(opID) {
     try {
       const raw = localStorage[opID];
-      const parsed = JSON.parse(raw);
-      const op = WasabeeOp.create(parsed);
+      if (raw == null) throw new Error("invalid operation ID");
+      const op = new WasabeeOp(raw);
+      if (op == null) throw new Error("corrupted operation");
       return op;
     } catch (e) {
       console.log(e);
@@ -930,43 +943,5 @@ export default class WasabeeOp {
     };
     this.keysonhand.push(k);
     this.update(false);
-  }
-
-  static create(obj) {
-    if (typeof obj == "string") {
-      try {
-        obj = JSON.parse(obj);
-      } catch (e) {
-        console.log("corrupted operation");
-        return null;
-      }
-    }
-    const operation = new WasabeeOp(obj.creator, obj.name);
-    if (obj.ID) operation.ID = obj.ID;
-    const opportals = operation.convertPortalsToObjs(obj.opportals);
-    operation.anchors = obj.anchors ? obj.anchors : Array();
-    operation.links = operation.convertLinksToObjs(obj.links);
-    operation.markers = operation.convertMarkersToObjs(obj.markers);
-    operation.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
-    operation.comment = obj.comment ? obj.comment : null;
-    operation.teamlist = obj.teamlist ? obj.teamlist : Array();
-    operation.fetched = obj.fetched ? obj.fetched : null;
-    operation.stored = obj.stored ? obj.stored : null;
-    operation.localchanged = obj.localchanged ? obj.localchanged : true;
-    operation.blockers = operation.convertBlockersToObjs(obj.blockers);
-    operation.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
-
-    if (!operation.links) operation.links = new Array();
-    if (!operation.markers) operation.markers = new Array();
-    if (!operation.blockers) operation.blockers = new Array();
-
-    if (opportals)
-      for (const p of opportals) operation._idToOpportals.set(p.id, p);
-    operation.buildCoordsLookupTable();
-
-    operation.cleanAnchorList();
-    operation.cleanPortalList();
-
-    return operation;
   }
 }

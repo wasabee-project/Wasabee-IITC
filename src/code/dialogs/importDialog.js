@@ -130,7 +130,7 @@ const ImportDialog = WDialog.extend({
     // assume a Wasabee op
     try {
       const data = JSON.parse(string);
-      const importedOp = WasabeeOp.create(data);
+      const importedOp = new WasabeeOp(data);
       importedOp.store();
       makeSelectedOperation(importedOp.ID);
       alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
@@ -141,7 +141,11 @@ const ImportDialog = WDialog.extend({
   },
 
   parseDrawTools(string) {
-    const newop = new WasabeeOp();
+    // name is overwritten above
+    const newop = new WasabeeOp({
+      creator: PLAYER.nickname,
+      name: "draw tools imported",
+    });
     // Don't check crosslink or save on each portal/link add
     newop.startBatchMode();
 

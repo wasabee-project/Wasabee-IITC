@@ -37,11 +37,10 @@ export const initSelectedOperation = () => {
 };
 
 const loadNewDefaultOp = () => {
-  const newOp = new WasabeeOp(
-    PLAYER.nickname,
-    wX("DEFAULT OP NAME", new Date().toGMTString()),
-    true
-  );
+  const newOp = new WasabeeOp({
+    creator: PLAYER.nickname,
+    name: wX("DEFAULT OP NAME", new Date().toGMTString()),
+  });
   newOp.store();
   const op = makeSelectedOperation(newOp.ID);
   return op;
@@ -88,7 +87,7 @@ export const getOperationByID = (opID) => {
   try {
     const newfmt = localStorage[opID];
     if (newfmt) {
-      const op = WasabeeOp.create(JSON.parse(newfmt));
+      const op = new WasabeeOp(newfmt);
       if (op.ID) return op;
     }
   } catch (e) {
@@ -97,7 +96,7 @@ export const getOperationByID = (opID) => {
       console.log("trying old format");
       const v = store.get(opID);
       if (v) {
-        const op = WasabeeOp.create(JSON.parse(v));
+        const op = new WasabeeOp(v);
         if (op.ID) return op;
       }
     } catch (e) {
