@@ -12,18 +12,18 @@ export default class WasabeeTeam {
       }
     }
 
-    this.agents = [];
+    this.agents = new Array();
     this.id = data.id;
     this.name = data.name;
     this.fetched = Date.now();
 
-    // push into team cache
-    window.plugin.wasabee.teams.set(this.id, this);
-
-    // push agents into agent cache
+    // convert to WasabeeAgents and push them into the agent cache
     for (const agent of data.agents) {
       this.agents.push(new WasabeeAgent(agent));
     }
+
+    // push into team cache
+    window.plugin.wasabee.teams.set(this.id, this);
   }
 
   static cacheGet(teamID) {
@@ -40,13 +40,11 @@ export default class WasabeeTeam {
         console.log("returning team from cache");
         return t;
       }
-      console.log("ignoring team in cache, fetching anew");
     }
 
     try {
-      const result = await teamPromise(teamID);
-      const t = new WasabeeTeam(result);
-      return t;
+      const t = await teamPromise(teamID);
+      return new WasabeeTeam(t);
     } catch (e) {
       console.log(e);
     }
