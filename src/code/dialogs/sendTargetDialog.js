@@ -2,7 +2,8 @@ import { WDialog } from "../leafletClasses";
 import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
 import WasabeeMe from "../me";
-import { teamPromise, targetPromise } from "../server";
+import WasabeeTeam from "../team";
+import { targetPromise } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
@@ -112,7 +113,7 @@ const SendTargetDialog = WDialog.extend({
       if (me.teamEnabled(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await teamPromise(t.teamid, 300);
+        const tt = await WasabeeTeam.waitGet(t.teamid, 5 * 60);
         for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id) && a.state === true) {
             alreadyAdded.push(a.id);

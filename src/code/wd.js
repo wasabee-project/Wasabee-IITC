@@ -1,7 +1,7 @@
 // the counter-op / defensive tools are Wasabee-D
 import WasabeeMe from "./me";
 import { dKeylistPromise } from "./server";
-import { agentPromise } from "./server";
+import WasabeeAgent from "./agent";
 import wX from "./wX";
 import { getPortalDetails } from "./uiCommands";
 
@@ -180,7 +180,7 @@ const getMarkerPopup = async (PortalID) => {
     const l = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of l) {
       if (k != "details") {
-        const a = await agentPromise(v.GID, false);
+        const a = await WasabeeAgent.waitGet(v.GID);
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());

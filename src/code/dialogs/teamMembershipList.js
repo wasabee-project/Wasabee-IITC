@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
-import { teamPromise } from "../server";
+import WasabeeTeam from "../team";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
@@ -49,7 +49,7 @@ const TeamMembershipList = WDialog.extend({
     this._teamID = teamID;
 
     try {
-      this._team = await teamPromise(teamID, 2);
+      this._team = await WasabeeTeam.waitGet(teamID, 2);
     } catch (e) {
       alert(e);
       return;

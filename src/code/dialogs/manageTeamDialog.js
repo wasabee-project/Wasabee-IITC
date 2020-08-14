@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import {
-  teamPromise,
   removeAgentFromTeamPromise,
   setAgentTeamSquadPromise,
   addAgentToTeamPromise,
@@ -10,6 +9,7 @@ import {
   GetWasabeeServer,
 } from "../server";
 import WasabeeMe from "../me";
+import WasabeeTeam from "../team";
 import Sortable from "../../lib/sortable";
 import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
@@ -131,8 +131,8 @@ const ManageTeamDialog = WDialog.extend({
     this._table.sortBy = 0;
 
     try {
-      // max 2 seconds cache for this screen
-      const teamdata = await teamPromise(team.ID, 2);
+      // max 5 seconds cache for this screen
+      const teamdata = await WasabeeTeam.waitGet(team.ID, 5);
       if (teamdata.agents && teamdata.agents.length > 0) {
         this._table.items = teamdata.agents;
       }

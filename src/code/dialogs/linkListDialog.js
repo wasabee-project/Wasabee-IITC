@@ -3,7 +3,7 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
-import { agentPromise } from "../server";
+import WasabeeAgent from "../agent";
 import wX from "../wX";
 // import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
@@ -128,14 +128,10 @@ const LinkListDialog = WDialog.extend({
         name: "Assigned To",
         value: (link) => {
           if (link.assignedTo != null && link.assignedTo != "") {
-            if (window.plugin.wasabee._agentCache.has(link.assignedTo)) {
-              const agent = window.plugin.wasabee._agentCache.get(
-                link.assignedTo
-              );
-              return agent.name;
-            }
-            // we can't use async or then here, so just request it now and it should be in cache next time
-            agentPromise(link.assignedTo);
+            const agent = WasabeeAgent.cacheGet(link.assignedTo);
+            if (agent != null) return agent.name;
+            // we can't use async here, so just request it now and it should be in cache next time
+            WasabeeAgent.waitGet(link.assignedTo);
             return "looking up: [" + link.assignedTo + "]";
           }
 

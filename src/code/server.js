@@ -1,7 +1,5 @@
-import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
-import WasabeeTeam from "./team";
 import { getSelectedOperation, getOperationByID } from "./selectedOp";
 import wX from "./wX";
 
@@ -59,25 +57,12 @@ export const deleteOpPromise = function (opID) {
   return _genericDelete(`${SERVER_BASE}/api/v1/draw/${opID}`, new FormData());
 };
 
-// returns a resolved promise to a WasabeeTeam
-// local change: cache
-// cache: caching both team and agents
-export const teamPromise = async function (teamid, maxAgeSeconds = 0) {
-  // XXX check cache first
-  if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamid)) {
-    const t = window.plugin.wasabee.teams.get(teamid);
-    if (t.fetch > Date.now() - 1000 * maxAgeSeconds) {
-      console.log("returning team from cache");
-      return t;
-    }
-    console.log("ignoring team in cache, fetching anew");
-  }
-
+// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
+// local change: none
+// cache: use WasabeeTeam.waitGet and WasabeeTeam.cacheGet for caching
+export const teamPromise = function (teamid) {
   const SERVER_BASE = GetWasabeeServer();
-  const response = await _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
-  // team and agent caching takes place in new WasabeeTeam
-  const newteam = new WasabeeTeam(response);
-  return newteam;
+  return _genericGet(`${SERVER_BASE}/api/v1/team/${teamid}`);
 };
 
 // returns a promise to fetch a WasabeeOp
@@ -148,18 +133,12 @@ export const mePromise = async function () {
   }
 };
 
-// returns (a resolved promise of) the actual WasabeeAgent
-// local change: agent saved to cache
-// cache: local first unless forced
-export const agentPromise = async function (GID, force = false) {
-  if (!force && window.plugin.wasabee._agentCache.has(GID)) {
-    return window.plugin.wasabee._agentCache.get(GID);
-  }
-
+// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.waitGet()
+// local change: none
+// cache: use WasabeeAgent.waitGet and WasabeeAgent.cacheGet for caching
+export const agentPromise = function (GID) {
   const SERVER_BASE = GetWasabeeServer();
-  const response = await _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
-  const wa = new WasabeeAgent(response);
-  return wa;
+  return _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
 };
 
 // local change: none // cache: none

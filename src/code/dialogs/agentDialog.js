@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
-import { agentPromise } from "../server";
+import WasabeeAgent from "../agent";
 
 const AgentDialog = WDialog.extend({
   statics: {
@@ -29,7 +29,7 @@ const AgentDialog = WDialog.extend({
     const agent = L.DomUtil.create("div", null, html);
 
     try {
-      const data = await agentPromise(this._gid, false);
+      const data = await WasabeeAgent.waitGet(this._gid);
       const name = L.DomUtil.create("h2", "enl, wasabee-agent-label", agent);
       name.textContent = data.name;
       const vLabel = L.DomUtil.create("label", null, agent);

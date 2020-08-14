@@ -1,6 +1,6 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
-import { teamPromise } from "./server";
+import WasabeeTeam from "./team";
 import { wX } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -273,7 +273,7 @@ export const drawSingleTeam = async (
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await teamPromise(t.ID, 15);
+    const team = await WasabeeTeam.waitGet(t.ID, 15);
     for (const agent of team.agents) {
       if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
         // new, add to map

@@ -1,7 +1,7 @@
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import AgentDialog from "./dialogs/agentDialog";
-import { targetPromise, routePromise } from "./server";
+import { agentPromise, targetPromise, routePromise } from "./server";
 import wX from "./wX";
 
 export default class WasabeeAgent {
@@ -15,8 +15,8 @@ export default class WasabeeAgent {
       }
     }
 
-    this.id = obj.id ? obj.id : null;
-    this.name = obj.name ? obj.name : null;
+    this.id = obj.id;
+    this.name = obj.name; // XXX gets messy in the cache if team display name is set
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
     this.date = obj.date ? obj.date : null;
@@ -25,8 +25,10 @@ export default class WasabeeAgent {
     this.Vverified = obj.Vverified ? obj.Vverified : false;
     this.blacklisted = obj.blacklisted ? obj.blacklisted : false;
     this.rocks = obj.rocks ? obj.rocks : false;
+
+    // squad and state are meaningless in the cache since you can never know which team set them
     this.squad = obj.squad ? obj.squad : null;
-    this.state = obj.state && obj.state == "On" ? "On" : "Off";
+    this.state = obj.state;
 
     // push the new data into the agent cache
     window.plugin.wasabee._agentCache.set(this.id, this);
@@ -34,6 +36,28 @@ export default class WasabeeAgent {
 
   get latLng() {
     if (this.lat && this.lng) return new L.LatLng(this.lat, this.lng);
+    return null;
+  }
+
+  static cacheGet(gid) {
+    if (window.plugin.wasabee._agentCache.has(gid)) {
+      return window.plugin.wasabee._agentCache.get(gid);
+    }
+    return null;
+  }
+
+  static async waitGet(gid) {
+    if (window.plugin.wasabee._agentCache.has(gid)) {
+      return window.plugin.wasabee._agentCache.get(gid);
+    }
+
+    try {
+      const result = await agentPromise(gid);
+      const newagent = new WasabeeAgent(result);
+      return newagent;
+    } catch (e) {
+      console.log(e);
+    }
     return null;
   }
 

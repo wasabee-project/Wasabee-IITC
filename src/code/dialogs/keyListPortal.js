@@ -1,9 +1,8 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
-import { agentPromise } from "../server";
+import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-// import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
 
 const KeyListPortal = WDialog.extend({
@@ -81,7 +80,7 @@ const KeyListPortal = WDialog.extend({
         value: (key) => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
-          const agent = await agentPromise(key.gid);
+          const agent = await WasabeeAgent.waitGet(key.gid);
           cell.textContent = agent.name;
         },
       },

@@ -3,9 +3,8 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import MarkerChangeDialog from "./markerChangeDialog";
-import { agentPromise } from "../server";
+import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
-// import WasabeeMe from "../me";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
@@ -129,14 +128,10 @@ const MarkerList = WDialog.extend({
         name: wX("ASS_TO"),
         value: (marker) => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
-            if (window.plugin.wasabee._agentCache.has(marker.assignedTo)) {
-              const agent = window.plugin.wasabee._agentCache.get(
-                marker.assignedTo
-              );
-              return agent.name;
-            }
-            // we can't use async or then here, so just request it now and it should be in cache next time
-            agentPromise(marker.assignedTo);
+            const agent = WasabeeAgent.cacheGet(marker.assignedTo);
+            if (agent != null) return agent.name;
+            // we can't use async here, so just request it now and it should be in cache next time
+            WasabeeAgent.waitGet(marker.assignedTo);
             return "looking up: [" + marker.assignedTo + "]";
           }
           return "";

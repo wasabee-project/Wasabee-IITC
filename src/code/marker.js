@@ -1,6 +1,6 @@
 import { generateId } from "./auxiliar";
 import { deleteMarker } from "./uiCommands.js";
-import { agentPromise } from "./server";
+import WasabeeAgent from "./agent";
 import AssignDialog from "./dialogs/assignDialog";
 import SendTargetDialog from "./dialogs/sendTargetDialog";
 import wX from "./wX";
@@ -77,7 +77,7 @@ export default class WasabeeMarker {
     );
     if (this.state != "completed" && this.assignedTo) {
       try {
-        const a = await agentPromise(this.assignedTo, false);
+        const a = await WasabeeAgent.waitGet(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
         assignment.appendChild(a.formatDisplay());
       } catch (err) {

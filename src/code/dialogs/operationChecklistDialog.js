@@ -1,4 +1,5 @@
 import { WDialog } from "../leafletClasses";
+import WasabeeAgent from "../agent";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import Sortable from "../../lib/sortable";
@@ -6,7 +7,6 @@ import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
 import MarkerChangeDialog from "./markerChangeDialog";
-import { agentPromise } from "../server";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
@@ -176,14 +176,10 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("ASS_TO"),
         value: (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            if (window.plugin.wasabee._agentCache.has(thing.assignedTo)) {
-              const agent = window.plugin.wasabee._agentCache.get(
-                thing.assignedTo
-              );
-              return agent.name;
-            }
-            // we can't use async or then here, so just request it now and it should be in cache next time
-            agentPromise(thing.assignedTo);
+            const agent = WasabeeAgent.cacheGet(thing.assignedTo);
+            if (agent != null) return agent.name;
+            // we can't use async here, so just request it now and it should be in cache next time
+            WasabeeAgent.waitGet(thing.assignedTo);
             return "looking up: [" + thing.assignedTo + "]";
           }
           return "";
