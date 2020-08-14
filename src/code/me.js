@@ -4,15 +4,40 @@ import { getSelectedOperation } from "./selectedOp";
 const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeMe {
-  constructor() {
-    this.GoogleID = null;
-    this.IngressName = null;
-    this.Level = 0;
+  constructor(data) {
+    if (typeof data == "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    }
+    this.GoogleID = data.GoogleID;
+    this.IngressName = data.IngressName;
+    this.Level = data.level ? data.level : 0;
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
     this.Assignments = Array();
     this._teamMap = null;
+
+    if (data.Teams !== null) {
+      for (const team of data.Teams) {
+        this.Teams.push(team);
+      }
+    }
+    if (data.Ops && data.Ops.length > 0) {
+      for (const op of data.Ops) {
+        this.Ops.push(op);
+      }
+    }
+    if (data.Assignments && data.Assignments.length > 0) {
+      for (const assignment of data.Assignments) {
+        this.Assignments.push(assignment);
+      }
+    }
+    this.fetched = data.fetched ? data.fetched : Date.now();
   }
 
   static maxCacheAge() {
@@ -60,7 +85,7 @@ export default class WasabeeMe {
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      me = WasabeeMe.create(lsme, false);
+      me = new WasabeeMe(lsme); // do not store
     }
     if (
       me === null ||
@@ -80,7 +105,7 @@ export default class WasabeeMe {
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      me = WasabeeMe.create(lsme, false);
+      me = new WasabeeMe(lsme); // do not store
     }
     if (
       me === null ||
@@ -89,10 +114,9 @@ export default class WasabeeMe {
       force
     ) {
       try {
-        const newme = await mePromise();
-        if (newme instanceof WasabeeMe == false) {
-          throw newme;
-        }
+        const response = await mePromise();
+        const newme = new WasabeeMe(response);
+        newme.store();
         me = newme;
       } catch (e) {
         WasabeeMe.purge();
@@ -103,39 +127,6 @@ export default class WasabeeMe {
       window.runHooks("wasabeeUIUpdate", getSelectedOperation());
     }
     return me;
-  }
-
-  static create(data, write = true) {
-    if (!data) return null;
-    if (typeof data == "string") {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.log(e);
-        return null;
-      }
-    }
-    const wme = new WasabeeMe();
-    wme.GoogleID = data.GoogleID;
-    wme.IngressName = data.IngressName;
-    if (data.Teams !== null) {
-      for (const team of data.Teams) {
-        wme.Teams.push(team);
-      }
-    }
-    if (data.Ops && data.Ops.length > 0) {
-      for (const op of data.Ops) {
-        wme.Ops.push(op);
-      }
-    }
-    if (data.Assignments && data.Assignments.length > 0) {
-      for (const assignment of data.Assignments) {
-        wme.Assignments.push(assignment);
-      }
-    }
-    wme.fetched = data.fetched ? data.fetched : Date.now();
-    if (write) wme.store();
-    return wme;
   }
 
   static purge() {

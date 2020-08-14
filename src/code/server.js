@@ -26,7 +26,8 @@ export const uploadOpPromise = async function () {
     json,
     "application/json;charset=UTF-8"
   );
-  WasabeeMe.create(response, true); // free update to the cache
+  const newme = new WasabeeMe(response);
+  newme.store();
   const newop = await opPromise(operation.ID);
   newop.localchanged = false;
   newop.store();
@@ -133,15 +134,14 @@ export const opPromise = function (opID) {
   });
 };
 
-// returns a resolved promise to WasabeeMe
-// local change: updates me in localStorage
-// cache: localStorage
+// returns a resolved promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
+// local change: none - caller must call me.store()
+// cache: use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
 export const mePromise = async function () {
   const SERVER_BASE = GetWasabeeServer();
   try {
     const response = await _genericGet(`${SERVER_BASE}/me`);
-    const me = WasabeeMe.create(response, true);
-    return me;
+    return response;
   } catch (e) {
     console.log(e);
     return e;

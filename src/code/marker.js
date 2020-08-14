@@ -8,15 +8,28 @@ import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
 
 export default class WasabeeMarker {
-  constructor(type, portalId, comment) {
+  constructor(obj) {
     this.ID = generateId();
-    this.portalId = portalId;
-    this.type = type;
-    this.comment = comment;
-    this.state = "pending";
-    this.completedBy = ""; // should be GID, requires change on the server
-    this.assignedTo = "";
-    this.order = 0;
+    this.portalId = obj.portalId;
+    this.type = obj.type;
+    this.comment = obj.comment ? obj.comment : "";
+    this.state = obj.state ? obj.state : "pending";
+    this.completedBy = obj.completedBy ? obj.completedBy : "";
+    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    this.order = obj.order ? obj.order : 0;
+  }
+
+  toJSON() {
+    return {
+      ID: this.ID,
+      portalId: this.portalId,
+      type: this.type,
+      comment: this.comment,
+      state: this.state,
+      completedBy: this.completedBy,
+      assignedTo: this.assignedTo,
+      order: this.order,
+    };
   }
 
   get opOrder() {
@@ -25,17 +38,6 @@ export default class WasabeeMarker {
 
   set opOrder(o) {
     this.order = Number.parseInt(o, 10);
-  }
-
-  static create(obj) {
-    if (obj instanceof WasabeeMarker) return obj; // unnecessary now
-
-    const marker = new WasabeeMarker(obj.type, obj.portalId, obj.comment);
-    marker.state = obj.state ? obj.state : "pending";
-    marker.completedBy = obj.completedBy ? obj.completedBy : "";
-    marker.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    marker.order = obj.order ? obj.order : 0;
-    return marker;
   }
 
   get icon() {

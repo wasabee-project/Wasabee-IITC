@@ -1,14 +1,13 @@
 import { swapPortal, deletePortal } from "./uiCommands.js";
 import AssignDialog from "./dialogs/assignDialog";
 import SendTargetDialog from "./dialogs/sendTargetDialog";
-import { getSelectedOperation } from "./selectedOp";
-import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import LinkListDialog from "./dialogs/linkListDialog";
+import wX from "./wX";
 
 // this class is for the popups, and for assign menu
 export default class WasabeeAnchor {
-  constructor(portalId, op = getSelectedOperation()) {
+  constructor(portalId, op) {
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -20,6 +19,20 @@ export default class WasabeeAnchor {
     this._operation = op;
     this._portal = op.getPortal(this.ID);
     this.color = op.color;
+  }
+
+  // currently unused
+  toJSON() {
+    return {
+      ID: this.ID,
+      portalId: this.portalId,
+      type: this.type,
+      comment: this.coment,
+      state: this.state,
+      assignedTo: this.assignedTo,
+      order: this.order,
+      color: this.color,
+    };
   }
 
   // pointless, since these are never pushed to the server

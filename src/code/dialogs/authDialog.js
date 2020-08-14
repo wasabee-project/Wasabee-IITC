@@ -2,7 +2,6 @@ import { WDialog } from "../leafletClasses";
 import {
   SendAccessTokenAsync,
   GetWasabeeServer,
-  mePromise,
   SetWasabeeServer,
   oneTimeToken,
 } from "../server";
@@ -129,7 +128,8 @@ const AuthDialog = WDialog.extend({
       L.DomEvent.on(postwebviewButton, "click", async (ev) => {
         L.DomEvent.stop(ev);
         try {
-          await mePromise();
+          const newme = await WasabeeMe.waitGet(true);
+          newme.store();
           this._dialog.dialog("close");
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
@@ -167,7 +167,8 @@ const AuthDialog = WDialog.extend({
         if (ottDialog.inputField.value) {
           try {
             await oneTimeToken(ottDialog.inputField.value);
-            await mePromise();
+            const newme = await WasabeeMe.waitGet(true);
+            newme.store();
             this._dialog.dialog("close");
             postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
           } catch (e) {
@@ -233,7 +234,8 @@ const AuthDialog = WDialog.extend({
             }
             try {
               const r = await SendAccessTokenAsync(responseSelect.access_token);
-              WasabeeMe.create(r, true);
+              const newme = new WasabeeMe(r);
+              newme.store();
               this._dialog.dialog("close");
               postToFirebase({
                 id: "wasabeeLogin",
@@ -255,7 +257,8 @@ const AuthDialog = WDialog.extend({
       }
       try {
         const r = await SendAccessTokenAsync(response.access_token);
-        WasabeeMe.create(r, true);
+        const newme = new WasabeeMe(r);
+        newme.store();
         this._dialog.dialog("close");
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
       } catch (e) {
@@ -284,7 +287,8 @@ const AuthDialog = WDialog.extend({
         }
         try {
           const r = await SendAccessTokenAsync(response.access_token);
-          WasabeeMe.create(r, true);
+          const newme = new WasabeeMe(r);
+          newme.store();
           this._dialog.dialog("close");
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {

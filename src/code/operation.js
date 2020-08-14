@@ -42,7 +42,7 @@ export default class WasabeeOp {
     try {
       const raw = localStorage[opID];
       const parsed = JSON.parse(raw);
-      const op = WasabeeMe.create(parsed);
+      const op = WasabeeOp.create(parsed);
       return op;
     } catch (e) {
       console.log(e);
@@ -658,7 +658,11 @@ export default class WasabeeOp {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
       this.addPortal(portal);
-      const marker = new WasabeeMarker(markerType, portal.id, comment);
+      const marker = new WasabeeMarker({
+        type: markerType,
+        portalId: portal.id,
+        comment: comment,
+      });
       this.markers.push(marker);
       this.update(true);
 
@@ -807,7 +811,7 @@ export default class WasabeeOp {
         if (m instanceof WasabeeMarker) {
           tmpMarkers.push(m);
         } else {
-          tmpMarkers.push(WasabeeMarker.create(m));
+          tmpMarkers.push(new WasabeeMarker(m));
         }
       }
     }

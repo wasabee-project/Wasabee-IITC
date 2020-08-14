@@ -3,7 +3,7 @@ import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
 export default class WasabeeLink {
-  constructor(obj, op = getSelectedOperation()) {
+  constructor(obj, op) {
     this.ID = generateId();
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
