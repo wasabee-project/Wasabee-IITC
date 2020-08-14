@@ -35,10 +35,6 @@ export default class WasabeeAnchor {
     return this._portal.name;
   }
 
-  static create(portalId) {
-    return new WasabeeAnchor(portalId);
-  }
-
   displayFormat(smallScreen = false) {
     return this._portal.displayFormat(smallScreen);
   }

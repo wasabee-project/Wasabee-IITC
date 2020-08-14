@@ -26,8 +26,8 @@ export default class WasabeeTeam {
     team.fetched = Date.now();
     window.plugin.wasabee.teams.set(team.id, team);
     for (const agent of data.agents) {
-      // WasabeeAgent.create takes care of caching it for us
-      team.agents.push(WasabeeAgent.create(agent));
+      // new WasabeeAgent takes care of caching it for us
+      team.agents.push(new WasabeeAgent(agent));
     }
     return team;
   }

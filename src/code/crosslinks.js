@@ -238,7 +238,10 @@ const testLink = (link, operation) => {
           link.options.data.dGuid
         );
       operation._addPortal(toPortal);
-      const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
+      const blocker = new WasabeeLink(
+        { fromPortalId: fromPortal.id, toPortalId: toPortal.id },
+        operation
+      );
       operation.addBlocker(blocker); // op.update() is called here
       break;
     }

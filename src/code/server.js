@@ -158,8 +158,7 @@ export const agentPromise = async function (GID, force = false) {
 
   const SERVER_BASE = GetWasabeeServer();
   const response = await _genericGet(`${SERVER_BASE}/api/v1/agent/${GID}`);
-  // caching takes place in WasabeeAgent.create
-  const wa = WasabeeAgent.create(response);
+  const wa = new WasabeeAgent(response);
   return wa;
 };
 

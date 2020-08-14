@@ -197,7 +197,10 @@ const OnionfieldDialog = WDialog.extend({
       // do the intial field
       if (!two) {
         portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
-        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        const a = new WasabeeLink(
+          { fromPortalId: one.id, toPortalId: wp.id },
+          this._operation
+        );
         a.color = this._color;
         a.throwOrderPos = 1;
         thisPath.push(a);
@@ -205,11 +208,17 @@ const OnionfieldDialog = WDialog.extend({
       }
       if (!three) {
         portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
-        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        const a = new WasabeeLink(
+          { fromPortalId: one.id, toPortalId: wp.id },
+          this._operation
+        );
         a.color = this._color;
         a.throwOrderPos = 2;
         thisPath.push(a);
-        const b = new WasabeeLink(this._operation, two.id, wp.id);
+        const b = new WasabeeLink(
+          { fromPortalId: two.id, toPortalId: wp.id },
+          this._operation
+        );
         b.color = this._color;
         b.throwOrderPos = 3;
         thisPath.push(b);
@@ -219,9 +228,18 @@ const OnionfieldDialog = WDialog.extend({
       // initial field done
 
       // create the three links, this does not add them to the operation
-      const a = new WasabeeLink(this._operation, one.id, wp.id);
-      const b = new WasabeeLink(this._operation, two.id, wp.id);
-      const c = new WasabeeLink(this._operation, three.id, wp.id);
+      const a = new WasabeeLink(
+        { fromPortalId: one.id, toPortalId: wp.id },
+        this._operation
+      );
+      const b = new WasabeeLink(
+        { fromPortalId: two.id, toPortalId: wp.id },
+        this._operation
+      );
+      const c = new WasabeeLink(
+        { fromPortalId: three.id, toPortalId: wp.id },
+        this._operation
+      );
       a.color = this._color;
       b.color = this._color;
       c.color = this._color;

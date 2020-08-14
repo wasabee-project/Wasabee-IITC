@@ -3,19 +3,15 @@ import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
 export default class WasabeeLink {
-  //ID <- randomly generated alpha-numeric ID for the link
-  //fromPortal <- portal the link is from
-  //toPortal <- portal the link is to
-  //description <- user entered description of link
-  constructor(operation, fromPortalId, toPortalId, description) {
+  constructor(obj, op = getSelectedOperation()) {
     this.ID = generateId();
-    this.fromPortalId = fromPortalId;
-    this.toPortalId = toPortalId;
-    this.description = description;
-    this.assignedTo = null;
-    this.throwOrderPos = 0;
-    this.color = "main";
-    this.completed = false;
+    this.fromPortalId = obj.fromPortalId;
+    this.toPortalId = obj.toPortalId;
+    this.description = obj.description ? obj.description : null;
+    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    this.color = obj.color ? obj.color : op.color;
+    this.completed = obj.completed ? obj.completed : false;
   }
 
   // build object to serialize
@@ -30,20 +26,6 @@ export default class WasabeeLink {
       color: this.color,
       completed: this.completed,
     };
-  }
-
-  static create(obj, operation) {
-    const link = new WasabeeLink(
-      operation,
-      obj.fromPortalId,
-      obj.toPortalId,
-      obj.description
-    );
-    link.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    link.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
-    link.color = obj.color ? obj.color : operation.color;
-    link.completed = obj.completed ? obj.completed : false;
-    return link;
   }
 
   // for interface consistency, the other types use comment

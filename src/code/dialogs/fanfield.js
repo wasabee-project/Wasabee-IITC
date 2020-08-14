@@ -225,9 +225,8 @@ const FanfieldDialog = WDialog.extend({
       let j = i + 1;
       for (; j < available.length; j++) {
         const testlink = new WasabeeLink(
-          this._operation,
-          wp.id,
-          available[j].id
+          { fromPortalId: wp.id, toPortalId: available[j].id },
+          this._operation
         );
         let crossed = false;
         for (const real of this._operation.links) {

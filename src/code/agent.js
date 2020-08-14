@@ -5,47 +5,31 @@ import { targetPromise, routePromise } from "./server";
 import wX from "./wX";
 
 export default class WasabeeAgent {
-  constructor() {
-    this.id = null;
-    this.name = null;
-    this.lat = 0;
-    this.lng = 0;
-    this.date = null;
-    this.pic = null;
-    this.cansendto = false;
-    this.Vverified = false;
-    this.blacklisted = false;
-    this.rocks = false;
-    this.squad = null;
-    this.state = null;
-  }
-
-  static create(obj) {
+  constructor(obj) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
       } catch (e) {
         console.log(e);
-        return null;
+        obj = {};
       }
     }
-    const a = new WasabeeAgent();
-    a.id = obj.id;
-    a.name = obj.name;
-    a.lat = obj.lat;
-    a.lng = obj.lng;
-    a.date = obj.date;
-    a.pic = obj.pic;
-    a.cansendto = obj.cansendto;
-    a.Vverified = obj.Vverified;
-    a.blacklisted = obj.blacklisted;
-    a.rocks = obj.rocks;
-    a.squad = obj.squad;
-    a.state = obj.state;
+
+    this.id = obj.id ? obj.id : null;
+    this.name = obj.name ? obj.name : null;
+    this.lat = obj.lat ? obj.lat : 0;
+    this.lng = obj.lng ? obj.lng : 0;
+    this.date = obj.date ? obj.date : null;
+    this.pic = obj.pic ? obj.pic : null;
+    this.cansendto = obj.cansendto ? obj.cansendto : false;
+    this.Vverified = obj.Vverified ? obj.Vverified : false;
+    this.blacklisted = obj.blacklisted ? obj.blacklisted : false;
+    this.rocks = obj.rocks ? obj.rocks : false;
+    this.squad = obj.squad ? obj.squad : null;
+    this.state = obj.state && obj.state == "On" ? "On" : "Off";
 
     // push the new data into the agent cache
-    window.plugin.wasabee._agentCache.set(a.id, a);
-    return a;
+    window.plugin.wasabee._agentCache.set(this.id, this);
   }
 
   get latLng() {

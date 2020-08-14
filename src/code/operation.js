@@ -505,7 +505,15 @@ export default class WasabeeOp {
     const link =
       existingLink && replace
         ? existingLink
-        : new WasabeeLink(this, fromPortal.id, toPortal.id);
+        : new WasabeeLink(
+            {
+              fromPortalId: fromPortal.id,
+              toPortalId: toPortal.id,
+              description: description,
+              throwOrderPos: order,
+            },
+            this
+          );
     link.description = description;
     if (order) link.opOrder = order;
 
@@ -772,7 +780,7 @@ export default class WasabeeOp {
       if (l instanceof WasabeeLink) {
         tempLinks.push(l);
       } else {
-        tempLinks.push(WasabeeLink.create(l, this));
+        tempLinks.push(new WasabeeLink(l, this));
       }
     }
     return tempLinks;
@@ -785,7 +793,7 @@ export default class WasabeeOp {
       if (l instanceof WasabeeLink) {
         tempLinks.push(l);
       } else {
-        tempLinks.push(WasabeeLink.create(l, this));
+        tempLinks.push(new WasabeeLink(l, this));
       }
     }
     return tempLinks;
