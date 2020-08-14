@@ -204,11 +204,11 @@ const HomogeneousDialog = WDialog.extend({
     this.label = "Homogeneous";
     this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchorOne = WasabeePortal.create(p);
+    if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchorTwo = WasabeePortal.create(p);
+    if (p) this._anchorTwo = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY];
-    if (p) this._anchorThree = WasabeePortal.create(p);
+    if (p) this._anchorThree = new WasabeePortal(p);
 
     this._urp = testPortal();
     this._failed = 0;

@@ -109,7 +109,7 @@ const StarburstDialog = WDialog.extend({
     this._operation = getSelectedOperation();
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor = WasabeePortal.create(p);
+    if (p) this._anchor = new WasabeePortal(p);
     postToFirebase({ id: "analytics", action: StarburstDialog.TYPE });
   },
 

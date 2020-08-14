@@ -134,9 +134,9 @@ const MultimaxDialog = WDialog.extend({
     this.label = wX("MULTI_M");
     this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchorOne = WasabeePortal.create(p);
+    if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchorTwo = WasabeePortal.create(p);
+    if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = testPortal();
     postToFirebase({ id: "analytics", action: MultimaxDialog.TYPE });
   },

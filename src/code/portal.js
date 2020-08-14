@@ -2,25 +2,35 @@ import { generateId } from "./auxiliar";
 import wX from "./wX";
 
 export default class WasabeePortal {
-  constructor(id, name, lat, lng, comment, hardness) {
-    this.id = id;
-    // migration: don't use a locale dependent name
-    if (name.includes(id)) name = id;
-    this.name = name;
+  constructor(obj) {
+    if (typeof obj == "string") {
+      try {
+        obj = JSON.parse(obj);
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    }
 
+    this.id = obj.id;
+
+    // migration: don't use a locale dependent name -- remove for 0.19
+    if (obj.name.includes(obj.id)) obj.name = obj.id;
     // check window.portals[id].options.data for updated name ?
-    if (typeof lat == "number") {
-      this.lat = lat.toFixed(6);
+    this.name = obj.name;
+
+    if (typeof obj.lat == "number") {
+      this.lat = obj.lat.toFixed(6);
     } else {
-      this.lat = lat;
+      this.lat = obj.lat;
     }
-    if (typeof lng == "number") {
-      this.lng = lng.toFixed(6);
+    if (typeof obj.lng == "number") {
+      this.lng = obj.lng.toFixed(6);
     } else {
-      this.lng = lng;
+      this.lng = obj.lng;
     }
-    this.comment = comment;
-    this.hardness = hardness;
+    this.comment = obj.comment;
+    this.hardness = obj.hardness;
   }
 
   // build object to serialize
@@ -35,31 +45,6 @@ export default class WasabeePortal {
     };
   }
 
-  static create(obj) {
-    if (typeof obj == "string") {
-      try {
-        obj = JSON.parse(obj);
-      } catch (e) {
-        console.log(e);
-        return null;
-      }
-    }
-    if (!obj || !obj.id) {
-      console.log("can't create WasabeePortal from this");
-      return null;
-    }
-    const wp = new WasabeePortal(
-      obj.id,
-      obj.name,
-      obj.lat,
-      obj.lng,
-      obj.comment,
-      obj.hardness
-    );
-
-    return wp;
-  }
-
   // create a wasabee portal from a IITC portal (leaflet marker)
   static fromIITC(p) {
     // we have all the details
@@ -67,12 +52,12 @@ export default class WasabeePortal {
       const data = p.options.data;
       const id = p.options.guid;
       if (data.title) {
-        return new WasabeePortal(
-          id,
-          data.title,
-          (data.latE6 / 1e6).toFixed(6),
-          (data.lngE6 / 1e6).toFixed(6)
-        );
+        return new WasabeePortal({
+          id: id,
+          name: data.title,
+          lat: (data.latE6 / 1e6).toFixed(6),
+          lng: (data.lngE6 / 1e6).toFixed(6),
+        });
       }
       // do we have enough to fake it?
       if (data.latE6) {
@@ -164,7 +149,7 @@ export default class WasabeePortal {
 
     if (!id) id = generateId();
     if (!name) name = id;
-    const n = new WasabeePortal(id, name, lat, lng);
+    const n = new WasabeePortal({ id: id, name: name, lat: lat, lng: lng });
     return n;
   }
 

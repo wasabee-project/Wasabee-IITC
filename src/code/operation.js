@@ -825,14 +825,7 @@ export default class WasabeeOp {
       if (p instanceof WasabeePortal) {
         tmpPortals.push(p);
       } else {
-        const np = new WasabeePortal(
-          p.id,
-          p.name,
-          p.lat,
-          p.lng,
-          p.comment,
-          p.hardness
-        );
+        const np = new WasabeePortal(p);
         tmpPortals.push(np);
       }
     }

@@ -15,11 +15,11 @@ const LinkDialog = WDialog.extend({
 
     let p =
       localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
-    if (p) this._source = WasabeePortal.create(p);
+    if (p) this._source = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor1 = WasabeePortal.create(p);
+    if (p) this._anchor1 = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchor2 = WasabeePortal.create(p);
+    if (p) this._anchor2 = new WasabeePortal(p);
     postToFirebase({ id: "analytics", action: LinkDialog.TYPE });
   },
 
