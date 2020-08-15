@@ -1218,6 +1218,24 @@
   grid-column-start: 1;
 }
 
+.wasabee-dialog-skin div.content {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.wasabee-dialog-skin ul {
+  clear:both;
+  list-style-type:none;
+    border: 1px solid white;
+    padding: 0;
+}
+
+.wasabee-dialog-skin li {
+    border: 1px solid #888;
+    border-collapse: collapse;
+}
+
+
 .wasabee-link-seperator:before {
     content: " ➾ ";
 }
