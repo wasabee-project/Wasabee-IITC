@@ -34,6 +34,9 @@ const SkinDialog = WDialog.extend({
   _buildContent() {
     const container = L.DomUtil.create("div", "content");
 
+    const desc = L.DomUtil.create("div", "desc", container);
+    desc.textContent = wX("SKINS_DESCRIPTION");
+
     const leftList = L.DomUtil.create("ul", "left skin-list", container);
     const rightList = L.DomUtil.create("ul", "right skin-list", container);
 
@@ -80,7 +83,7 @@ const SkinDialog = WDialog.extend({
     const content = this._buildContent();
 
     this._dialog = window.dialog({
-      title: wX("MANAGE_SKIN"),
+      title: wX("SKINS_MANAGE_TITLE"),
       html: content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-skin",

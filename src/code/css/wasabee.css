@@ -1223,6 +1223,10 @@
     grid-template-columns: auto auto;
 }
 
+.wasabee-dialog-skin div.desc {
+  grid-column: 1 / span 2;
+}
+
 .wasabee-dialog-skin ul {
   clear:both;
   list-style-type:none;
