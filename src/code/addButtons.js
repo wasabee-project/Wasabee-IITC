@@ -58,6 +58,7 @@ export const addButtons = (selectedOp) => {
     window.map.addControl(window.plugin.wasabee.buttons);
   }
 
+  // this should not be run multiple times...
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
   window.plugin.wasabee.buttons.update(selectedOp);
