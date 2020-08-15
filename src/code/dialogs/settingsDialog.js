@@ -231,6 +231,14 @@ const SettingsDialog = WDialog.extend({
         trawlSelect.value;
     });
 
+    const skinsButton = L.DomUtil.create("button", null, container);
+    skinsButton.textContent = wX("SKINS_BUTTON");
+    L.DomEvent.on(skinsButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const skinDialog = new SkinDialog(window.map);
+      skinDialog.enable();
+    });
+
     return container;
   },
 
@@ -255,11 +263,6 @@ const SettingsDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
-    };
-
-    buttons[wX(["SKINS_BUTTON"])] = () => {
-      const skinDialog = new SkinDialog(window.map);
-      skinDialog.enable();
     };
 
     this._dialog = window.dialog({
