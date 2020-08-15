@@ -26,7 +26,7 @@ const WasabeeButton = WButton.extend({
 
     this.button = this._createButton({
       container: container,
-      buttonImage: this.getIcon(),
+      className: "wasabee-toolbar-wasabee",
       callback: this.handler,
       context: this,
     });
@@ -126,9 +126,8 @@ const WasabeeButton = WButton.extend({
 
     this._SettingsActions = [
       {
-        img: window.plugin.wasabee.skin.images.toolbar_settings.default,
         title: "Settings",
-        text: "",
+        text: "⚙",
         callback: () => {
           this.disable();
           const sd = new SettingsDialog();
@@ -143,17 +142,6 @@ const WasabeeButton = WButton.extend({
     this._container.appendChild(this.actionsContainer);
     // check login state and update if necessary
     this.Wupdate(); // takes container and operation, not needed here
-  },
-
-  getIcon: function () {
-    // XXX skin logic here
-
-    if (this._lastLoginState) {
-      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_in.default; //green bee image
-    } else {
-      return window.plugin.wasabee.skin.images.toolbar_wasabeebutton_out //yellow bee image
-        .default;
-    }
   },
 
   _getActions: function () {
@@ -185,7 +173,8 @@ const WasabeeButton = WButton.extend({
     // only change the icon if the state changes -- may be overkill trying to save a few cycles
     if (loggedIn != this._lastLoginState) {
       this._lastLoginState = loggedIn;
-      this.button.children[0].src = this.getIcon();
+      if (loggedIn) this.button.classList.add("wasabee-logged-in");
+      else this.button.classList.remove("wasabee-logged-in");
 
       const old = this.actionsContainer;
       this.actionsContainer = this._getActions();

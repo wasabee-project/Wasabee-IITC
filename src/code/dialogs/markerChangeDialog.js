@@ -39,7 +39,7 @@ const MarkerChangeDialog = WDialog.extend({
     this._type = L.DomUtil.create("select", null, content);
 
     const markers = this._operation.getPortalMarkers(portal);
-    for (const k of window.plugin.wasabee.skin.markerTypes.keys()) {
+    for (const k of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);

@@ -6,7 +6,7 @@ import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import { postToFirebase } from "../firebaseSupport";
-import { changeSkin } from "../skin";
+import SkinDialog from "./skinDialog";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -231,25 +231,12 @@ const SettingsDialog = WDialog.extend({
         trawlSelect.value;
     });
 
-    const skinTitle = L.DomUtil.create("label", null, container);
-    skinTitle.textContent = "Skin";
-    const skinSelect = L.DomUtil.create("select", null, container);
-    const ss = localStorage[window.plugin.wasabee.static.constants.SKIN_KEY];
-    const ssMain = L.DomUtil.create("option", null, skinSelect);
-    ssMain.textContent = "main";
-    ssMain.value = "main";
-    if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
-    for (const k of Object.getOwnPropertyNames(window.plugin.wasabeeSkins)) {
-      const option = L.DomUtil.create("option", null, skinSelect);
-      option.textContent = k;
-      option.value = k;
-      if (ss == k) option.selected = true;
-    }
-    L.DomEvent.on(skinSelect, "change", (ev) => {
+    const skinsButton = L.DomUtil.create("button", null, container);
+    skinsButton.textContent = wX("SKINS_BUTTON");
+    L.DomEvent.on(skinsButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      localStorage[window.plugin.wasabee.static.constants.SKIN_KEY] =
-        skinSelect.value;
-      changeSkin(skinSelect.value);
+      const skinDialog = new SkinDialog(window.map);
+      skinDialog.enable();
     });
 
     return container;

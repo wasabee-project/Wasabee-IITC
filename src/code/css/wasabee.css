@@ -300,6 +300,227 @@
   width: 100%;
 }
 
+.wasabee-marker-icon {
+  background-size: cover;
+}
+
+.wasabee-marker-icon.CapturePortalMarker {
+  background-image: url(../images/wasabee_markers_capture_pending.svg)
+}
+.wasabee-marker-icon.CapturePortalMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_capture_assigned.svg)
+}
+.wasabee-marker-icon.CapturePortalMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_capture_assigned.svg)
+}
+.wasabee-marker-icon.CapturePortalMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_capture_done.svg)
+}
+.wasabee-marker-icon.LetDecayPortalAlert {
+  background-image: url(../images/wasabee_markers_decay_pending.png)
+}
+.wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_decay_assigned.png)
+}
+.wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_decay_assigned.png)
+}
+.wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_decay_done.png)
+}
+.wasabee-marker-icon.DestroyPortalAlert {
+  background-image: url(../images/wasabee_markers_destroy_pending.png)
+}
+.wasabee-marker-icon.DestroyPortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_destroy_assigned.png)
+}
+.wasabee-marker-icon.DestroyPortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_destroy_assigned.png)
+}
+.wasabee-marker-icon.DestroyPortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_destroy_done.png)
+}
+.wasabee-marker-icon.FarmPortalMarker {
+  background-image: url(../images/wasabee_markers_farm_pending.svg)
+}
+.wasabee-marker-icon.FarmPortalMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_farm_assigned.svg)
+}
+.wasabee-marker-icon.FarmPortalMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_farm_assigned.svg)
+}
+.wasabee-marker-icon.FarmPortalMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_farm_done.svg)
+}
+.wasabee-marker-icon.GotoPortalMarker {
+  background-image: url(../images/wasabee_markers_goto_pending.png)
+}
+.wasabee-marker-icon.GotoPortalMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_goto_assigned.png)
+}
+.wasabee-marker-icon.GotoPortalMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_goto_assigned.png)
+}
+.wasabee-marker-icon.GotoPortalMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_goto_done.png)
+}
+.wasabee-marker-icon.GetKeyPortalMarker {
+  background-image: url(../images/wasabee_markers_key_pending.png)
+}
+.wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_key_assigned.png)
+}
+.wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_key_assigned.png)
+}
+.wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_key_done.png)
+}
+.wasabee-marker-icon.CreateLinkAlert {
+  background-image: url(../images/wasabee_markers_link_pending.png)
+}
+.wasabee-marker-icon.CreateLinkAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_link_assigned.png)
+}
+.wasabee-marker-icon.CreateLinkAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_link_assigned.png)
+}
+.wasabee-marker-icon.CreateLinkAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_link_done.png)
+}
+.wasabee-marker-icon.MeetAgentPortalMarker {
+  background-image: url(../images/wasabee_markers_meetagent_pending.svg)
+}
+.wasabee-marker-icon.MeetAgentPortalMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_meetagent_assigned.svg)
+}
+.wasabee-marker-icon.MeetAgentPortalMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_meetagent_assigned.svg)
+}
+.wasabee-marker-icon.MeetAgentPortalMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_meetagent_done.svg)
+}
+.wasabee-marker-icon.OtherPortalAlert {
+  background-image: url(../images/wasabee_markers_other_pending.svg)
+}
+.wasabee-marker-icon.OtherPortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_other_assigned.svg)
+}
+.wasabee-marker-icon.OtherPortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_other_assigned.svg)
+}
+.wasabee-marker-icon.OtherPortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_other_done.svg)
+}
+.wasabee-marker-icon.RechargePortalAlert {
+  background-image: url(../images/wasabee_markers_recharge_pending.svg)
+}
+.wasabee-marker-icon.RechargePortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_recharge_assigned.svg)
+}
+.wasabee-marker-icon.RechargePortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_recharge_assigned.svg)
+}
+.wasabee-marker-icon.RechargePortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_recharge_done.svg)
+}
+.wasabee-marker-icon.UpgradePortalAlert {
+  background-image: url(../images/wasabee_markers_upgrade_pending.svg)
+}
+.wasabee-marker-icon.UpgradePortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_upgrade_assigned.svg)
+}
+.wasabee-marker-icon.UpgradePortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_upgrade_assigned.svg)
+}
+.wasabee-marker-icon.UpgradePortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_upgrade_done.svg)
+}
+.wasabee-marker-icon.UseVirusPortalAlert {
+  background-image: url(../images/wasabee_markers_virus_pending.svg)
+}
+.wasabee-marker-icon.UseVirusPortalAlert.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_virus_assigned.svg)
+}
+.wasabee-marker-icon.UseVirusPortalAlert.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_virus_assigned.svg)
+}
+.wasabee-marker-icon.UseVirusPortalAlert.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_virus_done.svg)
+}
+.wasabee-marker-icon.ExcludeMarker {
+  background-image: url(../images/wasabee_markers_exclude_pending.png)
+}
+.wasabee-marker-icon.ExcludeMarker.wasabee-status-assigned  {
+  background-image: url(../images/wasabee_markers_exclude_assigned.png)
+}
+.wasabee-marker-icon.ExcludeMarker.wasabee-status-acknowledged {
+  background-image: url(../images/wasabee_markers_exclude_assigned.png)
+}
+.wasabee-marker-icon.ExcludeMarker.wasabee-status-completed {
+  background-image: url(../images/wasabee_markers_exclude_done.png)
+}
+
+.wasabee-defense-icon {
+  background-size: cover;
+  background-image: url(../images/wasabee_markers_key_done.png)
+}
+
+.wasabee-anchor-icon {
+  background-size: cover;
+  background-image: url(../images/marker_layer_main.png)
+}
+.wasabee-anchor-icon.wasabee-layer-main {
+  background-image: url(../images/marker_layer_main.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupa {
+  background-image: url(../images/marker_layer_groupa.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupb {
+  background-image: url(../images/marker_layer_groupb.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupc {
+  background-image: url(../images/marker_layer_groupc.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupd {
+  background-image: url(../images/marker_layer_groupd.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupe {
+  background-image: url(../images/marker_layer_groupe.png)
+}
+.wasabee-anchor-icon.wasabee-layer-groupf {
+  background-image: url(../images/marker_layer_groupf.png)
+}
+
+.wasabee-toolbar-wasabee {
+  background-image: url(../images/toolbar_wasabeebutton_out.png)
+}
+.wasabee-toolbar-wasabee.wasabee-logged-in {
+  background-image: url(../images/toolbar_wasabeebutton_in.png)
+}
+.wasabee-toolbar-ops {
+  background-image: url(../images/toolbar_viewOps.png)
+}
+.wasabee-toolbar-quickdraw {
+  background-image: url(../images/toolbar_quickdraw.png)
+}
+.wasabee-toolbar-link {
+  background-image: url(../images/toolbar_addlinks.png)
+}
+.wasabee-toolbar-marker {
+  background-image: url(../images/toolbar_addMarkers.png)
+}
+.wasabee-toolbar-sync {
+  /*background-image: url(../images/toolbar_sync.png)*/
+  background-image: url(../images/toolbar_download.png)
+}
+/*.wasabee-toolbar-download {
+  background-image: url(../images/toolbar_download.png)
+}*/
+.wasabee-toolbar-upload {
+  background-image: url(../images/toolbar_upload.png)
+}
+
 /* all dialogs get this class -- do global stuff with it */
 /* .wasabee-dialog {
   background-color: rgba(250, 250, 250, 0.9);
@@ -995,6 +1216,43 @@
 }
 .wasabee-dialog-wasabee button.sendloc {
   grid-column-start: 1;
+}
+
+.wasabee-dialog-skin div.content {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.wasabee-dialog-skin div.desc {
+  grid-column: 1 / span 2;
+}
+
+.wasabee-dialog-skin ol.left {
+  clear:both;
+  border: 1px solid white;
+  padding-left: 0;
+  margin-right: 1em;
+}
+
+.wasabee-dialog-skin ul.right {
+  clear:both;
+  border: 1px solid white;
+  padding-left: 0;
+}
+
+.wasabee-dialog-skin ul.right {
+  list-style-type:none;
+}
+
+.wasabee-dialog-skin li {
+    padding: 3px;
+    border: 1px solid #888;
+    height: 1.5em;
+    list-style-position:inside;
+}
+
+.wasabee-link-seperator:before {
+    content: " ➾ ";
 }
 
 .wasabee-portal-comment {

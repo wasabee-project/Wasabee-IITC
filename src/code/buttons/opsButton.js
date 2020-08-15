@@ -24,7 +24,7 @@ const OpsButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      buttonImage: window.plugin.wasabee.skin.images.toolbar_viewOps.default,
+      className: "wasabee-toolbar-ops",
       callback: this._toggleActions,
       context: context,
     });

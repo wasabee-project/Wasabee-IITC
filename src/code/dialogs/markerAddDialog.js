@@ -47,12 +47,12 @@ const MarkerAddDialog = WDialog.extend({
         window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
       defaultType = markers.has(defaultType) ? null : defaultType;
 
-      for (const k of window.plugin.wasabee.skin.markerTypes) {
+      for (const k of window.plugin.wasabee.static.markerTypes) {
         const o = L.DomUtil.create("option", null, this._type);
-        o.value = k[0];
-        o.textContent = wX(k[0]);
-        if (markers.has(k[0])) o.disabled = true;
-        else if (!defaultType) defaultType = k[0];
+        o.value = k;
+        o.textContent = wX(k);
+        if (markers.has(k)) o.disabled = true;
+        else if (!defaultType) defaultType = k;
       }
       this._type.value = defaultType;
     } else {
@@ -77,7 +77,7 @@ const MarkerAddDialog = WDialog.extend({
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      if (window.plugin.wasabee.skin.markerTypes.has(this._type.value))
+      if (window.plugin.wasabee.static.markerTypes.has(this._type.value))
         this._addMarker(this._type.value, this._operation, this._comment.value);
     });
 

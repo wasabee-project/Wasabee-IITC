@@ -312,9 +312,8 @@ const HomogeneousDialog = WDialog.extend({
 
   _draw: function () {
     this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
-      if (k != "self-block") this._colors.push(k);
-      this._trash = c;
+    for (const c of window.plugin.wasabee.skin.layerTypes.values()) {
+      this._colors.push(c.color);
     }
 
     this._operation.startBatchMode();
