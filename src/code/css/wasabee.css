@@ -1227,18 +1227,29 @@
   grid-column: 1 / span 2;
 }
 
-.wasabee-dialog-skin ul {
+.wasabee-dialog-skin ol.left {
   clear:both;
+  border: 1px solid white;
+  padding-left: 0;
+  margin-right: 1em;
+}
+
+.wasabee-dialog-skin ul.right {
+  clear:both;
+  border: 1px solid white;
+  padding-left: 0;
+}
+
+.wasabee-dialog-skin ul.right {
   list-style-type:none;
-    border: 1px solid white;
-    padding: 0;
 }
 
 .wasabee-dialog-skin li {
+    padding: 3px;
     border: 1px solid #888;
-    border-collapse: collapse;
+    height: 1.5em;
+    list-style-position:inside;
 }
-
 
 .wasabee-link-seperator:before {
     content: " ➾ ";

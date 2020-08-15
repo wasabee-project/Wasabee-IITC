@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import { changeSkin } from "../skin";
+import Sortable from "sortablejs";
 
 const SkinDialog = WDialog.extend({
   statics: {
@@ -40,7 +41,7 @@ const SkinDialog = WDialog.extend({
     const skinsAvailable = L.DomUtil.create("div", "desc", container);
     skinsAvailable.textContent = wX("SKINS_AVAILABLE", this._skinSet.size);
 
-    const leftList = L.DomUtil.create("ul", "left skin-list", container);
+    const leftList = L.DomUtil.create("ol", "left skin-list", container);
     const rightList = L.DomUtil.create("ul", "right skin-list", container);
 
     const enabledSkins = [];
@@ -63,21 +64,20 @@ const SkinDialog = WDialog.extend({
       item.textContent = s;
     }
 
-    $(rightList)
-      .sortable({
-        connectWith: ".skin-list",
-      })
-      .disableSelection();
-    $(leftList)
-      .sortable({
-        connectWith: ".skin-list",
-      })
-      .disableSelection()
-      .on("sortupdate", () => {
+    /* eslint-disable no-new */
+    new Sortable(rightList, {
+      group: "shared",
+    });
+
+    /* eslint-disable no-new */
+    new Sortable(leftList, {
+      group: "shared",
+      onSort: () => {
         enabledSkins.splice(0);
         for (const elm of leftList.children) enabledSkins.push(elm.textContent);
         changeSkin(enabledSkins);
-      });
+      },
+    });
 
     return container;
   },
