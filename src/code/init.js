@@ -40,10 +40,17 @@ window.plugin.wasabee.init = function () {
   initServer();
   initSkin();
 
-  const skin = localStorage[Wasabee.static.constants.SKIN_KEY];
-  if (skin && skin != "main") {
+  const skins = [];
+  const ss = localStorage[Wasabee.static.constants.SKIN_KEY];
+  try {
+    const l = JSON.parse(ss);
+    for (const s of l) skins.push(s);
+  } catch {
+    skins.push(ss);
+  }
+  if (skins.length > 0) {
     window.addHook("iitcLoaded", () => {
-      changeSkin(skin);
+      changeSkin(skins);
     });
   }
 
