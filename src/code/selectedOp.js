@@ -86,24 +86,25 @@ export const makeSelectedOperation = (opID) => {
 export const getOperationByID = (opID) => {
   try {
     const newfmt = localStorage[opID];
-    if (newfmt) {
-      const op = new WasabeeOp(newfmt);
-      if (op.ID) return op;
-    }
+    const raw = JSON.parse(newfmt);
+    const op = new WasabeeOp(raw);
+    if (op.ID) return op;
   } catch (e) {
     console.log(e);
-    try {
-      console.log("trying old format");
-      const v = store.get(opID);
-      if (v) {
-        const op = new WasabeeOp(v);
-        if (op.ID) return op;
-      }
-    } catch (e) {
-      console.log(e);
-    }
   }
-  console.log("unable to load op");
+  return oldOpFormat(opID);
+};
+
+const oldOpFormat = (opID) => {
+  console.log("trying old format");
+  try {
+    const oldfmt = store.get(opID);
+    const raw = JSON.parse(oldfmt);
+    const op = new WasabeeOp(raw);
+    if (op.ID) return op;
+  } catch (e) {
+    console.log(e);
+  }
   return null;
 };
 
