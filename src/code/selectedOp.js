@@ -152,7 +152,9 @@ export const opsList = () => {
   const out = new Array();
 
   for (const key in localStorage) {
-    if (key.length == 40 && localStorage[key].includes(`"ID":`)) out.push(key);
+    if (key.length == 40) out.push(key);
+    // after 0.18
+    // if (key.length) == 40 && localStorage[key].includes(`"ID":`)) out.push(key);
   }
 
   return out;
