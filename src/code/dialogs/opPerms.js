@@ -61,9 +61,13 @@ const OpPermList = WDialog.extend({
 
     this._html.appendChild(this._table.table);
     if (this._me && this._operation.IsOwnedOp()) {
+      const already = new Set();
+      for (const a of this._operation.teamlist) already.add(a.teamid);
+
       const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
+        if (already.has(t.ID)) continue;
         if (t.State != "On") continue;
         const o = L.DomUtil.create("option", null, teamMenu);
         o.value = t.ID;
