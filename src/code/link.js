@@ -3,14 +3,14 @@ import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
 export default class WasabeeLink {
-  constructor(obj, op) {
+  constructor(obj) {
     this.ID = generateId();
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
     this.description = obj.description ? obj.description : null;
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
-    this.color = obj.color ? obj.color : op.color;
+    this.color = obj.color ? obj.color : "main";
     this.completed = obj.completed ? obj.completed : false;
   }
 
@@ -103,19 +103,19 @@ export default class WasabeeLink {
       operation.getPortal(this.fromPortalId).displayFormat(smallScreen)
     );
     const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
-    arrow.style.color = this.getColor();
+    arrow.style.color = this.getColor(operation);
     d.appendChild(
       operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
     return d;
   }
 
-  getColor() {
-    if (window.plugin.wasabee.skin.layerTypes.has(this.color)) {
-      const c = window.plugin.wasabee.skin.layerTypes.get(this.color);
-      return c.color;
-    }
-    return this.color;
+  getColor(operation) {
+    let color = this.color;
+    if (color == "main") color = operation.color;
+    if (window.plugin.wasabee.skin.layerTypes.has(color))
+      color = window.plugin.wasabee.skin.layerTypes.get(color).color;
+    return color;
   }
 
   length(operation) {

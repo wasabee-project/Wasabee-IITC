@@ -158,10 +158,7 @@ const addLink = (wlink, operation) => {
     return;
   }
 
-  let color = wlink.color;
-  if (color == "main") color = operation.color;
-  if (Wasabee.skin.layerTypes.has(color))
-    color = Wasabee.skin.layerTypes.get(wlink.color).color;
+  const color = wlink.getColor(operation);
 
   const style = L.extend(
     {
