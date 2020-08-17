@@ -317,28 +317,28 @@
   background-image: url(../images/wasabee_markers_capture_done.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert {
-  background-image: url(../images/wasabee_markers_decay_pending.png)
+  background-image: url(../images/wasabee_markers_decay_pending.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_decay_assigned.png)
+  background-image: url(../images/wasabee_markers_decay_assigned.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_decay_assigned.png)
+  background-image: url(../images/wasabee_markers_decay_assigned.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_decay_done.png)
+  background-image: url(../images/wasabee_markers_decay_done.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert {
-  background-image: url(../images/wasabee_markers_destroy_pending.png)
+  background-image: url(../images/wasabee_markers_destroy_pending.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_destroy_assigned.png)
+  background-image: url(../images/wasabee_markers_destroy_assigned.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_destroy_assigned.png)
+  background-image: url(../images/wasabee_markers_destroy_assigned.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_destroy_done.png)
+  background-image: url(../images/wasabee_markers_destroy_done.svg)
 }
 .wasabee-marker-icon.FarmPortalMarker {
   background-image: url(../images/wasabee_markers_farm_pending.svg)
