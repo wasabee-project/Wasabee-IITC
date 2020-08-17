@@ -1,6 +1,10 @@
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
-import { getSelectedOperation, getOperationByID } from "./selectedOp";
+import {
+  getSelectedOperation,
+  getOperationByID,
+  removeOperation,
+} from "./selectedOp";
 import wX from "./wX";
 
 const Wasabee = window.plugin.wasabee;
@@ -88,12 +92,18 @@ export const opPromise = function (opID) {
           localop.localchanged = true;
           resolve(localop);
           break;
-        case 401:
+        /* server should not return this now
+	  case 401:
           WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
-          break;
+          break; */
         case 403:
+          removeOperation(opID);
           reject(wX("OP PERM DENIED", opID));
+          break;
+        case 410:
+          removeOperation(opID);
+          reject(wX("OP DELETED", opID));
           break;
         default:
           reject(`${req.status}: ${req.statusText} ${req.responseText}`);
