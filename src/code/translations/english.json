@@ -216,6 +216,7 @@
   "OK": "OK",
   "ON_HAND": "On Hand",
   "ONLY_DT_IMP": " (only for DrawTools imports)",
+  "OP DELETED": "Operation removed from server: ${value}",
   "OP PERM DENIED": "Permission denied to operation: ${value}",
   "OP_CHECKLIST": "Operation Checklist: ${value}",
   "OP_NAME_UNSET": "Operation Name was Unset",
