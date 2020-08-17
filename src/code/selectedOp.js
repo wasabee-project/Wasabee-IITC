@@ -101,7 +101,10 @@ const oldOpFormat = (opID) => {
     const oldfmt = store.get(opID);
     const raw = JSON.parse(oldfmt);
     const op = new WasabeeOp(raw);
-    if (op.ID) return op;
+    if (op != null && op.ID) {
+      op.store();
+      return op;
+    }
   } catch (e) {
     console.log(e);
   }
