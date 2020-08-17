@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 316 540" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="BASE">
+    </g>
+    <path d="M0,323L158,415L316,323L158,540L0,323Z" style="fill:rgb(183,34,42);"/>
+    <path d="M160,0L1,92L1,275L159,367L316,275L316,91L160,0Z" style="fill:rgb(202,139,40);"/>
+    <path d="M40.242,115.042L158.827,45.659L277.834,113.031L277.547,251.632L159.352,321.048L40.874,251.337L40.242,115.042Z" style="fill:rgb(183,34,42);"/>
+    <g>
+        <g transform="matrix(0.762887,0,0,0.762887,34.8351,45.3918)">
+            <circle cx="162.5" cy="183.5" r="65.5" style="fill:none;stroke:white;stroke-width:16.28px;"/>
+        </g>
+        <g transform="matrix(0.762887,0,0,0.762887,37.1237,45.3918)">
+            <path d="M159.5,136L159.5,86L159.5,136Z" style="fill:none;stroke:white;stroke-width:16.28px;"/>
+        </g>
+        <g transform="matrix(0.762887,0,0,0.762887,37.1237,45.3918)">
+            <path d="M159,230L159,280L159,230Z" style="fill:none;stroke:white;stroke-width:16.28px;"/>
+        </g>
+        <g transform="matrix(1.52577,0,0,1.52577,-84.1753,-94.9794)">
+            <circle cx="159.5" cy="184.5" r="5.5" style="fill:white;"/>
+        </g>
+        <g transform="matrix(0.762887,0,0,0.762887,37.1237,44.3918)">
+            <path d="M209,184L251,184L209,184Z" style="fill:none;stroke:white;stroke-width:16.28px;"/>
+        </g>
+        <g transform="matrix(0.762887,0,0,0.762887,37.1237,45.3918)">
+            <path d="M113,174.862L68,174.862C63.509,174.862 59.862,178.509 59.862,183C59.862,187.491 63.509,191.138 68,191.138L113,191.138C117.491,191.138 121.138,187.491 121.138,183C121.138,178.509 117.491,174.862 113,174.862Z" style="fill:white;"/>
+        </g>
+    </g>
+</svg>
