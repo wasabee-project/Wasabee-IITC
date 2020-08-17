@@ -5,7 +5,7 @@ import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-import { resetOps, setupLocalStorage } from "../selectedOp";
+import { resetOps, setupLocalStorage, removeNonOwnedOps } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
@@ -62,6 +62,9 @@ const WasabeeButton = WButton.extend({
       text: wX("LOG_OUT"),
       callback: async () => {
         try {
+          // if not actually logged in, this removes ALL server ops
+          // but this button _should_ not be visible in that case
+          removeNonOwnedOps();
           await logoutPromise();
         } catch (e) {
           console.log(e);
@@ -89,7 +92,6 @@ const WasabeeButton = WButton.extend({
         text: wX("NEWOP BUTTON"),
         callback: () => {
           this.disable();
-          // closeAllDialogs();
           const nb = new NewopDialog(this._map);
           nb.enable();
         },

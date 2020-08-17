@@ -134,11 +134,7 @@ export const setupLocalStorage = () => {
 
 //** This function removes an operation from the main list */
 export const removeOperation = (opID) => {
-  try {
-    delete localStorage[opID];
-  } catch (e) {
-    console.log(e);
-  }
+  delete localStorage[opID];
 };
 
 //*** This function resets the local op list
@@ -178,4 +174,12 @@ export const duplicateOperation = (opID) => {
   op.cleanAll();
   op.store();
   makeSelectedOperation(op.ID);
+};
+
+// this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
+export const removeNonOwnedOps = () => {
+  for (const opID of opsList()) {
+    const op = getOperationByID(opID);
+    if (!op.IsOwnedOp()) removeOperation(opID);
+  }
 };
