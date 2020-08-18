@@ -9,6 +9,7 @@ import { resetOps, setupLocalStorage, removeNonOwnedOps } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
+import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -71,7 +72,7 @@ const WasabeeButton = WButton.extend({
           alert(e);
         }
         WasabeeMe.purge(); // runs UI updates for us
-	postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
+        postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
       },
       context: this,
     };
