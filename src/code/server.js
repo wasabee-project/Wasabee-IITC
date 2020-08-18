@@ -6,8 +6,7 @@ import {
   removeOperation,
 } from "./selectedOp";
 import wX from "./wX";
-
-const Wasabee = window.plugin.wasabee;
+import WasabeeMarker from "./marker";
 
 export default function () {
   return GetWasabeeServer();
@@ -15,12 +14,12 @@ export default function () {
 
 // uploads an op to the server
 // refreshed op stored to localStorage; "me" upated to reflect new op in list
-export const uploadOpPromise = async function () {
+export async function uploadOpPromise() {
   const operation = getSelectedOperation();
   operation.cleanAll();
   const json = JSON.stringify(operation);
 
-  const response = await _genericPost(
+  const response = await genericPost(
     "/api/v1/draw",
     json,
     "application/json;charset=UTF-8"
@@ -31,38 +30,38 @@ export const uploadOpPromise = async function () {
   newop.localchanged = false;
   newop.store();
   return newop;
-};
+}
 
 // sends a changed op to the server
-export const updateOpPromise = (operation) => {
+export function updateOpPromise(operation) {
   // let the server know how to process assignments etc
   operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
   operation.cleanAll();
   const json = JSON.stringify(operation);
   delete operation.mode;
 
-  return _genericPut(
+  return genericPut(
     `/api/v1/draw/${operation.ID}`,
     json,
     "application/json;charset=UTF-8"
   );
-};
+}
 
 // removes an op from the server
-export const deleteOpPromise = function (opID) {
-  return _genericDelete(`/api/v1/draw/${opID}`, new FormData());
-};
+export function deleteOpPromise(opID) {
+  return genericDelete(`/api/v1/draw/${opID}`, new FormData());
+}
 
 // returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
 // use WasabeeTeam.waitGet and WasabeeTeam.cacheGet
-export const teamPromise = function (teamid) {
-  return _genericGet(`/api/v1/team/${teamid}`);
-};
+export function teamPromise(teamid) {
+  return genericGet(`/api/v1/team/${teamid}`);
+}
 
 // returns a promise to fetch a WasabeeOp
 // local change: If the server's copy is newer than the local copy, otherwise none
 // not generic since 304 result processing and If-Modified-Since header
-export const opPromise = function (opID) {
+export function opPromise(opID) {
   const SERVER_BASE = GetWasabeeServer();
   const localop = getOperationByID(opID);
   const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
@@ -92,11 +91,10 @@ export const opPromise = function (opID) {
           localop.localchanged = true;
           resolve(localop);
           break;
-        /* server should not return this now
-	  case 401:
+        case 401:
           WasabeeMe.purge();
           reject(wX("NOT LOGGED IN", req.statusText));
-          break; */
+          break;
         case 403:
           removeOperation(opID);
           reject(wX("OP PERM DENIED", opID));
@@ -117,76 +115,76 @@ export const opPromise = function (opID) {
 
     req.send();
   });
-};
+}
 
 // returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
 // use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
-export const mePromise = async function () {
+export async function mePromise() {
   try {
-    const response = await _genericGet("/me");
+    const response = await genericGet("/me?json=y");
     return response;
   } catch (e) {
     console.log(e);
     return e;
   }
-};
+}
 
 // returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.waitGet()
 // use WasabeeAgent.waitGet and WasabeeAgent.cacheGet for caching
-export const agentPromise = function (GID) {
-  return _genericGet(`/api/v1/agent/${GID}`);
-};
+export function agentPromise(GID) {
+  return genericGet(`/api/v1/agent/${GID}`);
+}
 
 // local change: none // cache: none
-export const assignMarkerPromise = function (opID, markerID, agentID) {
+export function assignMarkerPromise(opID, markerID, agentID) {
   const fd = new FormData();
   fd.append("agent", agentID);
-  return _genericPost(`/api/v1/draw/${opID}/marker/${markerID}/assign`, fd);
-};
+  return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/assign`, fd);
+}
 
 // performs a link assignment on the server, sending notifications
-export const assignLinkPromise = function (opID, linkID, agentID) {
+export function assignLinkPromise(opID, linkID, agentID) {
   const fd = new FormData();
   fd.append("agent", agentID);
-  return _genericPost(`/api/v1/draw/${opID}/link/${linkID}/assign`, fd);
-};
+  return genericPost(`/api/v1/draw/${opID}/link/${linkID}/assign`, fd);
+}
 
 // sends a target (portal) to the server to notify the agent
-export const targetPromise = function (agentID, portal) {
+export function targetPromise(agentID, portal) {
   const ll = portal.lat + "," + portal.lng;
   const fd = new FormData();
   fd.append("id", agentID);
   fd.append("portal", portal.name);
   fd.append("ll", ll);
-  return _genericPost(`/api/v1/agent/${agentID}/target`, fd);
-};
+  return genericPost(`/api/v1/agent/${agentID}/target`, fd);
+}
 
 // work in progress -- server support not finished
-export const routePromise = function (agentID, portal) {
+export function routePromise(agentID, portal) {
   const ll = portal.lat + "," + portal.lng;
   const fd = new FormData();
   fd.append("id", agentID);
   fd.append("portal", portal.name);
   fd.append("ll", ll);
-  return _genericPost(`/api/v1/agent/${agentID}/route`, fd);
-};
+  return genericPost(`/api/v1/agent/${agentID}/route`, fd);
+}
 
 // returns a promise to /me if the access token is valid
-export const SendAccessTokenAsync = function (accessToken) {
-  return _genericPost(
+export function SendAccessTokenAsync(accessToken) {
+  return genericPost(
     "/aptok",
     JSON.stringify({ accessToken: accessToken }),
     "application/json;charset=UTF-8"
   );
-};
+}
 
 // changes agent's team state on the server; return value is status message
-export const SetTeamState = function (teamID, state) {
-  return _genericGet(`/api/v1/me/${teamID}?state=${state}`);
-};
+export function SetTeamState(teamID, state) {
+  return genericGet(`/api/v1/me/${teamID}?state=${state}`);
+}
 
 // changes a markers status on the server, sending relevant notifications
-export const SetMarkerState = function (opID, markerID, state) {
+export function SetMarkerState(opID, markerID, state) {
   let action = "incomplete";
   switch (state) {
     case "acknowledged":
@@ -202,11 +200,11 @@ export const SetMarkerState = function (opID, markerID, state) {
       action = "incomplete";
   }
 
-  return _genericGet(`/api/v1/draw/${opID}/marker/${markerID}/${action}`);
-};
+  return genericGet(`/api/v1/draw/${opID}/marker/${markerID}/${action}`);
+}
 
 // changes a link's status on the server, sending relevant notifications
-export const SetLinkState = function (opID, linkID, state) {
+export function SetLinkState(opID, linkID, state) {
   let action = "incomplete";
   switch (state) {
     // no acknowledge for links -- use incomplete
@@ -220,112 +218,112 @@ export const SetLinkState = function (opID, linkID, state) {
       action = "incomplete";
   }
 
-  return _genericGet(`/api/v1/draw/${opID}/link/${linkID}/${action}`);
-};
+  return genericGet(`/api/v1/draw/${opID}/link/${linkID}/${action}`);
+}
 
 // updates an agent's key count, return value is status code
-export const opKeyPromise = function (opID, portalID, onhand, capsule) {
+export function opKeyPromise(opID, portalID, onhand, capsule) {
   const fd = new FormData();
   fd.append("onhand", onhand ? onhand : "0");
   fd.append("capsule", capsule ? capsule : "");
-  return _genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
-};
+  return genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
+}
 
 // updates an agent's defensive key count, return value is status code
-export const dKeyPromise = function (portalID, onhand, capsule) {
+export function dKeyPromise(portalID, onhand, capsule) {
   const fd = new FormData();
   fd.append("portalID", portalID ? portalID : "");
   fd.append("count", onhand ? onhand : "0");
   fd.append("capID", capsule ? capsule : "");
-  return _genericPost("/api/v1/d", fd);
-};
+  return genericPost("/api/v1/d", fd);
+}
 
 // returns a promise to a list of defensive keys for all enabled teams
-export const dKeylistPromise = function () {
-  return _genericGet("/api/v1/d");
-};
+export function dKeylistPromise() {
+  return genericGet("/api/v1/d");
+}
 
 // updates an agent's location ; return value is status code
-export const locationPromise = function (lat, lng) {
-  return _genericGet(`/api/v1/me?lat=${lat}&lon=${lng}`);
-};
+export function locationPromise(lat, lng) {
+  return genericGet(`/api/v1/me?lat=${lat}&lon=${lng}`);
+}
 
 // sets logout status on the server; return value is status code
-export const logoutPromise = function () {
-  return _genericGet("/api/v1/me/logout");
-};
+export function logoutPromise() {
+  return genericGet("/api/v1/me/logout");
+}
 
 // adds a permission to an op; return value is status code
-export const addPermPromise = function (opID, teamID, role) {
+export function addPermPromise(opID, teamID, role) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
-  return _genericPost(`/api/v1/draw/${opID}/perms`, fd);
-};
+  return genericPost(`/api/v1/draw/${opID}/perms`, fd);
+}
 
 // removes a permission from an op; return value is status code
-export const delPermPromise = function (opID, teamID, role) {
+export function delPermPromise(opID, teamID, role) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
-  return _genericDelete(`/api/v1/draw/${opID}/perms`, fd);
-};
+  return genericDelete(`/api/v1/draw/${opID}/perms`, fd);
+}
 
 // removes the agent from the team; return value is status code
-export const leaveTeamPromise = function (teamID) {
-  return _genericDelete(`/api/v1/me/${teamID}`, new FormData());
-};
+export function leaveTeamPromise(teamID) {
+  return genericDelete(`/api/v1/me/${teamID}`, new FormData());
+}
 
 // removes another agent from an owned team ; return value is status code
-export const removeAgentFromTeamPromise = function (agentID, teamID) {
-  return _genericDelete(`/api/v1/team/${teamID}/${agentID}`, new FormData());
-};
+export function removeAgentFromTeamPromise(agentID, teamID) {
+  return genericDelete(`/api/v1/team/${teamID}/${agentID}`, new FormData());
+}
 
 // local change: none // cache: none
-export const setAgentTeamSquadPromise = function (agentID, teamID, squad) {
+export function setAgentTeamSquadPromise(agentID, teamID, squad) {
   const fd = new FormData();
   fd.append("squad", squad);
-  return _genericPost(`/api/v1/team/${teamID}/${agentID}/squad`, fd);
-};
+  return genericPost(`/api/v1/team/${teamID}/${agentID}/squad`, fd);
+}
 
 // local change: none // cache: none
-export const addAgentToTeamPromise = function (agentID, teamID) {
-  return _genericPost(`/api/v1/team/${teamID}/${agentID}`, new FormData());
-};
+export function addAgentToTeamPromise(agentID, teamID) {
+  return genericPost(`/api/v1/team/${teamID}/${agentID}`, new FormData());
+}
 
 // local change: none // cache: none
-export const renameTeamPromise = function (teamID, name) {
+export function renameTeamPromise(teamID, name) {
   const fd = new FormData();
   fd.append("teamname", name);
-  return _genericPut(`/api/v1/team/${teamID}/rename`, fd);
-};
+  return genericPut(`/api/v1/team/${teamID}/rename`, fd);
+}
 
 // local change: none // cache: none
-export const rocksPromise = function (teamID, community, apikey) {
-  return _genericGet(
+export function rocksPromise(teamID, community, apikey) {
+  return genericGet(
     `/api/v1/team/${teamID}/rockscfg?rockscomm=${community}&rockskey=${apikey}`
   );
-};
+}
 
 // local change: none // cache: none
-export const newTeamPromise = function (name) {
-  return _genericGet(`/api/v1/team/new?name=${name}`);
-};
+export function newTeamPromise(name) {
+  return genericGet(`/api/v1/team/new?name=${name}`);
+}
 
 // local change: none // cache: none
-export const deleteTeamPromise = function (teamID) {
-  return _genericDelete(`/api/v1/team/${teamID}`, new FormData());
-};
+export function deleteTeamPromise(teamID) {
+  return genericDelete(`/api/v1/team/${teamID}`, new FormData());
+}
 
 // local change: none // cache: none
-export const oneTimeToken = function (token) {
+export function oneTimeToken(token) {
   const url = "/oneTimeToken";
   const fd = new FormData();
   fd.append("token", token);
-  return _genericPost(url, fd);
-};
+  return genericPost(url, fd);
+}
 
-const _genericPut = function (url, formData, contentType) {
+function genericPut(url, formData, contentType) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
@@ -357,9 +355,9 @@ const _genericPut = function (url, formData, contentType) {
 
     req.send(formData);
   });
-};
+}
 
-const _genericPost = function (url, formData, contentType) {
+function genericPost(url, formData, contentType) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
@@ -395,9 +393,9 @@ const _genericPost = function (url, formData, contentType) {
 
     req.send(formData);
   });
-};
+}
 
-const _genericDelete = function (url, formData) {
+function genericDelete(url, formData) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
@@ -426,9 +424,9 @@ const _genericDelete = function (url, formData) {
     };
     req.send(formData);
   });
-};
+}
 
-const _genericGet = function (url) {
+function genericGet(url) {
   const SERVER_BASE = GetWasabeeServer();
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
@@ -460,20 +458,93 @@ const _genericGet = function (url) {
     };
     req.send();
   });
-};
+}
 
-export const GetWasabeeServer = () => {
-  let server = localStorage[Wasabee.static.constants.SERVER_BASE_KEY];
-  if (server == null) {
-    server = Wasabee.static.constants.SERVER_BASE_DEFAULT;
-    localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
+export function GetWasabeeServer() {
+  // Wasabee-IITC, use the configured server
+  if (window.plugin.wasabee) {
+    let server =
+      localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY];
+    if (server == null) {
+      server = window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
+      localStorage[
+        window.plugin.wasabee.static.constants.SERVER_BASE_KEY
+      ] = server;
+    }
+    return server;
   }
-  return server;
-};
+  // Wasabee-WebUI doesn't need to specify the server
+  return "";
+}
 
-export const SetWasabeeServer = (server) => {
+export function SetWasabeeServer(server) {
   // XXX sanity checking here please:
   // starts w/ https://
   // does not end with /
-  localStorage[Wasabee.static.constants.SERVER_BASE_KEY] = server;
-};
+  localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY] = server;
+}
+
+/* The following are for Wasabee-WebUI and not used in Wasabee-IITC */
+
+// in the service-worker for IITC
+export function sendTokenToWasabee(token) {
+  // no need for a form-data, just send the raw token
+  return genericPost(`/api/v1/me/firebase`, token);
+}
+
+export function loadConfig() {
+  return genericGet(`/static/wasabee-webui-config.json`);
+}
+
+export function setDisplayName(teamID, googleID, displayname) {
+  const fd = new FormData();
+  fd.append("displayname", displayname);
+  return genericPost(`/api/v1/team/${teamID}/${googleID}/displayname`, fd);
+}
+
+export function changeTeamOwnerPromise(teamID, newOwner) {
+  return genericGet(`/api/v1/team/${teamID}/chown?to=${newOwner}`);
+}
+
+export function createJoinLinkPromise(teamID) {
+  return genericGet(`/api/v1/team/${teamID}/genJoinKey`);
+}
+
+export function deleteJoinLinkPromise(teamID) {
+  return genericGet(`/api/v1/team/${teamID}/delJoinKey`);
+}
+
+export function setAssignmentStatus(op, object, completed) {
+  let type = "link";
+  if (object instanceof WasabeeMarker) type = "marker";
+  let c = "incomplete";
+  if (completed) c = "complete";
+
+  return genericGet(`/api/v1/draw/${op.ID}/${type}/${object.ID}/${c}`);
+}
+
+export function sendAnnounce(teamID, message) {
+  const fd = new FormData();
+  fd.append("m", message);
+  return genericPost(`/api/v1/team/${teamID}/announce`, fd);
+}
+
+export function pullRocks(teamID) {
+  return genericGet(`/api/v1/team/${teamID}/rocks`);
+}
+
+export function reverseLinkDirection(opID, linkID) {
+  return genericGet(`/api/v1/draw/${opID}/link/${linkID}/swap`);
+}
+
+export function setMarkerComment(opID, markerID, comment) {
+  const fd = new FormData();
+  fd.append("comment", comment);
+  return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/comment`, fd);
+}
+
+export function setLinkComment(opID, linkID, desc) {
+  const fd = new FormData();
+  fd.append("desc", desc);
+  return genericPost(`/api/v1/draw/${opID}/link/${linkID}/desc`);
+}
