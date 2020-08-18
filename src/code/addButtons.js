@@ -8,7 +8,7 @@ import UploadButton from "./buttons/uploadButton";
 import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
-export const addButtons = (selectedOp) => {
+export function addButtons(selectedOp) {
   selectedOp = selectedOp || getSelectedOperation();
 
   if (window.plugin.wasabee.buttons) {
@@ -62,6 +62,6 @@ export const addButtons = (selectedOp) => {
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
   window.plugin.wasabee.buttons.update(selectedOp);
-};
+}
 
 export default addButtons;

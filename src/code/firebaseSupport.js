@@ -17,7 +17,7 @@ import {
 
 const frameID = "wasabeeFirebaseFrame";
 
-export const initFirebase = () => {
+export function initFirebase() {
   const server = GetWasabeeServer();
 
   const iframe = L.DomUtil.create("iframe");
@@ -73,9 +73,9 @@ export const initFirebase = () => {
         console.log("unknown firebase command: ", event.data.data);
     }
   });
-};
+}
 
-export const postToFirebase = (message) => {
+export function postToFirebase(message) {
   // prevent analytics data from being sent if not enabled by the user: GPDR
   if (
     message.id == "analytics" &&
@@ -85,4 +85,4 @@ export const postToFirebase = (message) => {
     return;
 
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
-};
+}

@@ -3,19 +3,19 @@ import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 
-const setRestoreOpID = (opID) => {
+function setRestoreOpID(opID) {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
-};
+}
 
-const getRestoreOpID = () => {
+function getRestoreOpID() {
   return localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY];
-};
+}
 
-export const getSelectedOperation = () => {
+export function getSelectedOperation() {
   return window.plugin.wasabee._selectedOp;
-};
+}
 
-export const initSelectedOperation = () => {
+export function initSelectedOperation() {
   if (window.plugin.wasabee._selectedOp == null) {
     const toLoad = getRestoreOpID();
     if (toLoad == null) {
@@ -34,10 +34,10 @@ export const initSelectedOperation = () => {
     }
   }
   return window.plugin.wasabee._selectedOp;
-};
+}
 
 // create a new op and set it as selected
-export const loadNewDefaultOp = () => {
+export function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
     creator: PLAYER.nickname,
     name: wX("DEFAULT OP NAME", new Date().toGMTString()),
@@ -45,11 +45,11 @@ export const loadNewDefaultOp = () => {
   newOp.store();
   const op = makeSelectedOperation(newOp.ID);
   return op;
-};
+}
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-export const makeSelectedOperation = (opID) => {
+export function makeSelectedOperation(opID) {
   // _selectedOp is null at first load (or page reload), should never be after that
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
@@ -80,11 +80,11 @@ export const makeSelectedOperation = (opID) => {
   window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
   window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
-};
+}
 
 // use this to pull an op from local store by ID
 // in 0.19 this entire function goes away;
-export const getOperationByID = (opID) => {
+export function getOperationByID(opID) {
   try {
     const newfmt = localStorage[opID];
     const raw = JSON.parse(newfmt);
@@ -94,9 +94,9 @@ export const getOperationByID = (opID) => {
     console.log(e);
   }
   return oldOpFormat(opID);
-};
+}
 
-const oldOpFormat = (opID) => {
+function oldOpFormat(opID) {
   console.log("trying old format");
   try {
     const oldfmt = store.get(opID);
@@ -110,17 +110,17 @@ const oldOpFormat = (opID) => {
     console.log(e);
   }
   return null;
-};
+}
 
 // called when loaded for the first time or when all ops are purged
-const initOps = () => {
+function initOps() {
   const newop = loadNewDefaultOp();
   resetOps(); // deletes everything including newop
   newop.update(); // re-saves newop
-};
+}
 
 //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
-export const setupLocalStorage = () => {
+export function setupLocalStorage() {
   // make sure we have at least one op
   let ops = opsList();
   if (ops == undefined || ops.length == 0) {
@@ -134,22 +134,22 @@ export const setupLocalStorage = () => {
     rID = ops[0]; // ops cannot be empty due to previous block
     setRestoreOpID(rID);
   }
-};
+}
 
 //** This function removes an operation from the main list */
-export const removeOperation = (opID) => {
+export function removeOperation(opID) {
   delete localStorage[opID];
-};
+}
 
 //*** This function resets the local op list
-export const resetOps = () => {
+export function resetOps() {
   const ops = opsList();
   for (const opID of ops) {
     removeOperation(opID);
   }
-};
+}
 
-export const opsList = () => {
+export function opsList() {
   const out = new Array();
 
   for (const key in localStorage) {
@@ -159,9 +159,9 @@ export const opsList = () => {
   }
 
   return out;
-};
+}
 
-export const duplicateOperation = (opID) => {
+export function duplicateOperation(opID) {
   let op = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;
@@ -178,12 +178,12 @@ export const duplicateOperation = (opID) => {
   op.cleanAll();
   op.store();
   makeSelectedOperation(op.ID);
-};
+}
 
 // this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
-export const removeNonOwnedOps = () => {
+export function removeNonOwnedOps() {
   for (const opID of opsList()) {
     const op = getOperationByID(opID);
     if (!op.IsOwnedOp()) removeOperation(opID);
   }
-};
+}

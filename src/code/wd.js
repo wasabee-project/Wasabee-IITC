@@ -6,7 +6,7 @@ import wX from "./wX";
 import { getPortalDetails } from "./uiCommands";
 
 // setup function
-export const initWasabeeD = () => {
+export function initWasabeeD() {
   window.plugin.wasabee.defensiveLayers = new L.LayerGroup();
   window.addLayerGroup(
     "Wasabee-D Keys",
@@ -38,10 +38,10 @@ export const initWasabeeD = () => {
   });
 
   window.runHooks("wasabeeDkeys");
-};
+}
 
 // This is the primary hook that is called on map refresh
-export const drawWasabeeDkeys = async () => {
+export async function drawWasabeeDkeys() {
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
@@ -86,9 +86,9 @@ export const drawWasabeeDkeys = async () => {
   } catch (err) {
     console.log(err);
   }
-};
+}
 
-const dLoadDetails = (e) => {
+function dLoadDetails(e) {
   if (!e.success) return; // bad load
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return; // not enabled
   if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
@@ -169,9 +169,9 @@ const dLoadDetails = (e) => {
     console.log("disabling portalDetailLoaded listener for WD");
     window.removeHook("portalDetailLoaded", dLoadDetails);
   }
-};
+}
 
-const getMarkerPopup = async (PortalID) => {
+async function getMarkerPopup(PortalID) {
   if (!window.plugin.wasabee._Dkeys) return null;
 
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
@@ -196,4 +196,4 @@ const getMarkerPopup = async (PortalID) => {
     container.textContent = wX("NO_DATA");
   }
   return container;
-};
+}

@@ -4,7 +4,7 @@ import wX from "./wX";
 import { locationPromise } from "./server";
 
 /* This function adds the Wasabee options to the IITC toolbox */
-export const setupToolbox = () => {
+export function setupToolbox() {
   const toolbox = document.getElementById("toolbox");
 
   const aboutLink = L.DomUtil.create("a", null, toolbox);
@@ -47,4 +47,4 @@ export const setupToolbox = () => {
       }
     );
   });
-};
+}

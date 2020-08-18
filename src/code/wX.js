@@ -3,7 +3,7 @@ let strings = window.plugin.wasabee.static.strings;
 const defaultLang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 const localStoreKey = window.plugin.wasabee.static.constants.LANGUAGE_KEY;
 
-export const wX = (key, value, option) => {
+export function wX(key, value, option) {
   const lang = getLanguage();
 
   // if the skin system is initialized, switch to it
@@ -34,9 +34,9 @@ export const wX = (key, value, option) => {
   // eslint-disable-next-line
   if (value !== undefined) s = s.replace("${value}", value);
   return s;
-};
+}
 
-export const getLanguage = () => {
+export function getLanguage() {
   // if the skin system is initialized, switch to it
   if (window.plugin.wasabee.skin && window.plugin.wasabee.skin.strings)
     strings = window.plugin.wasabee.skin.strings;
@@ -57,6 +57,6 @@ export const getLanguage = () => {
   }
 
   return lang;
-};
+}
 
 export default wX;

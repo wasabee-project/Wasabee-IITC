@@ -4,7 +4,7 @@ import addButtons from "./addButtons";
 const Wasabee = window.plugin.wasabee;
 
 // the skins probably aren't loaded by the time W's init is called
-export const initSkin = () => {
+export function initSkin() {
   Wasabee.skin = {};
   Wasabee.skin.layerTypes = new Map(Wasabee.static.layerTypes);
   Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
@@ -14,9 +14,9 @@ export const initSkin = () => {
   for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
     addCSS(k, Wasabee.static.CSS[k]);
   }
-};
+}
 
-const addCSS = (name, content) => {
+function addCSS(name, content) {
   if (!Wasabee._css) Wasabee._css = new Array();
   if (Wasabee._css.includes(name)) {
     document.getElementById("wasabee-css-" + name).remove();
@@ -28,14 +28,14 @@ const addCSS = (name, content) => {
   c.id = "wasabee-css-" + name;
 
   Wasabee._css.push(name);
-};
+}
 
-const resetCSS = () => {
+function resetCSS() {
   for (const name of Wasabee._css) {
     document.getElementById("wasabee-css-" + name).remove();
   }
   Wasabee._css = new Array();
-};
+}
 
 // const addFallback = () => {
 //   for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
@@ -49,7 +49,7 @@ const resetCSS = () => {
 //     Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
 // };
 
-export const changeSkin = (names) => {
+export function changeSkin(names) {
   if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
 
   const op = getSelectedOperation();
@@ -102,4 +102,4 @@ export const changeSkin = (names) => {
   addButtons(op);
   window.runHooks("wasabeeUIUpdate", op);
   return true;
-};
+}

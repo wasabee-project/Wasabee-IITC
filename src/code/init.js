@@ -12,7 +12,7 @@ import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
 
-window.plugin.wasabee.init = function () {
+window.plugin.wasabee.init = () => {
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -145,7 +145,7 @@ window.plugin.wasabee.init = function () {
 
 // this can be moved to auth dialog, no need to init it for people who never log in
 // and use webpack, rather than importing it ourself
-const initGoogleAPI = () => {
+function initGoogleAPI() {
   if (typeof window.gapi !== "undefined") {
     alert(
       "Wasabee detected another GAPI instance; there may be authentication issues"
@@ -169,4 +169,4 @@ const initGoogleAPI = () => {
   (document.body || document.head || document.documentElement).appendChild(
     script
   );
-};
+}

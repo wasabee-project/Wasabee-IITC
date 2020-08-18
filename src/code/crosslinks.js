@@ -5,7 +5,7 @@ import { getSelectedOperation } from "./selectedOp";
 const Wasabee = window.plugin.wasabee;
 
 // takes WasabeeLink or L.geodesicPolyline format
-export const greatCircleArcIntersect = (existing, drawn) => {
+export function greatCircleArcIntersect(existing, drawn) {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
   // method:
@@ -171,9 +171,9 @@ export const greatCircleArcIntersect = (existing, drawn) => {
   // latitudes cross between left and right - so geodesic lines cross
   //console.log('Xlink!');
   return true;
-};
+}
 
-const testPolyLine = (wasabeeLink, realLink, operation) => {
+function testPolyLine(wasabeeLink, realLink, operation) {
   if (greatCircleArcIntersect(realLink, wasabeeLink)) {
     if (!operation.markers || operation.markers.length == 0) {
       return true;
@@ -196,9 +196,9 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
     return true;
   }
   return false;
-};
+}
 
-const showCrossLink = (link, operation) => {
+function showCrossLink(link, operation) {
   // this should be in static.js or skin
   const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
     color: "#d22",
@@ -211,9 +211,9 @@ const showCrossLink = (link, operation) => {
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
   window.plugin.wasabee._crosslinkCache.set(link.options.guid, blocked);
-};
+}
 
-const testLink = (link, operation) => {
+function testLink(link, operation) {
   // if the crosslink already exists, do not recheck
   if (window.plugin.wasabee._crosslinkCache.has(link.options.guid)) {
     return;
@@ -246,9 +246,9 @@ const testLink = (link, operation) => {
       break;
     }
   }
-};
+}
 
-const testSelfBlock = (incoming, operation) => {
+function testSelfBlock(incoming, operation) {
   for (const against of operation.links) {
     if (incoming.ID == against.ID) continue;
     if (greatCircleArcIntersect(against, incoming)) {
@@ -259,9 +259,9 @@ const testSelfBlock = (incoming, operation) => {
       blocked.addTo(window.plugin.wasabee.crossLinkLayers);
     }
   }
-};
+}
 
-export const checkAllLinks = (operation) => {
+export function checkAllLinks(operation) {
   // console.time("checkAllLinks");
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
@@ -275,17 +275,17 @@ export const checkAllLinks = (operation) => {
     testSelfBlock(l, operation);
   }
   // console.timeEnd("checkAllLinks");
-};
+}
 
-const onLinkAdded = (data) => {
+function onLinkAdded(data) {
   testLink(data.link, getSelectedOperation());
-};
+}
 
-const onMapDataRefreshStart = () => {
+function onMapDataRefreshStart() {
   window.removeHook("linkAdded", onLinkAdded);
-};
+}
 
-const onMapDataRefreshEnd = () => {
+function onMapDataRefreshEnd() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
   const operation = getSelectedOperation();
@@ -293,9 +293,9 @@ const onMapDataRefreshEnd = () => {
   checkAllLinks(operation);
   // testForDeletedLinks();
   window.addHook("linkAdded", onLinkAdded);
-};
+}
 
-export const initCrossLinks = () => {
+export function initCrossLinks() {
   window.addHook("wasabeeCrosslinks", (operation) => {
     checkAllLinks(operation);
   });
@@ -329,7 +329,7 @@ export const initCrossLinks = () => {
 
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
-};
+}
 
 export class GeodesicLine {
   constructor(start, end) {

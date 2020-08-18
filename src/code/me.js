@@ -141,6 +141,7 @@ export default class WasabeeMe {
       window.plugin.wasabee._Dkeys.clear();
       window.runHooks("wasabeeDkeys");
     }
+
     window.runHooks("wasabeeUIUpdate", getSelectedOperation());
   }
 

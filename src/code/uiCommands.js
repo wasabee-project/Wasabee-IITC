@@ -6,15 +6,15 @@ import { locationPromise } from "./server";
 import WasabeeMe from "./me";
 import wX from "./wX";
 
-export const addPortal = (operation, portal) => {
+export function addPortal(operation, portal) {
   if (!portal) {
     alert(wX("SELECT PORTAL"));
     return;
   }
   operation.addPortal(portal);
-};
+}
 
-export const swapPortal = (operation, portal) => {
+export function swapPortal(operation, portal) {
   const selectedPortal = WasabeePortal.getSelected();
   if (!selectedPortal) {
     alert(wX("SELECT PORTAL"));
@@ -35,9 +35,9 @@ export const swapPortal = (operation, portal) => {
     operation.swapPortal(portal, selectedPortal);
   });
   con.enable();
-};
+}
 
-export const deletePortal = (operation, portal) => {
+export function deletePortal(operation, portal) {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
@@ -46,9 +46,9 @@ export const deletePortal = (operation, portal) => {
     operation.removeAnchor(portal.id);
   });
   con.enable();
-};
+}
 
-export const deleteMarker = (operation, marker, portal) => {
+export function deleteMarker(operation, marker, portal) {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
@@ -57,9 +57,9 @@ export const deleteMarker = (operation, marker, portal) => {
     operation.removeMarker(marker);
   });
   con.enable();
-};
+}
 
-export const clearAllItems = (operation) => {
+export function clearAllItems(operation) {
   const con = new ConfirmDialog();
   con.setup(
     `Clear: ${operation.name}`,
@@ -70,9 +70,9 @@ export const clearAllItems = (operation) => {
     }
   );
   con.enable();
-};
+}
 
-export const clearAllLinks = (operation) => {
+export function clearAllLinks(operation) {
   const con = new ConfirmDialog();
   con.setup(
     `Clear Links: ${operation.name}`,
@@ -83,16 +83,16 @@ export const clearAllLinks = (operation) => {
     }
   );
   con.enable();
-};
+}
 
-export const listenForAddedPortals = (newPortal) => {
+export function listenForAddedPortals(newPortal) {
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
   op.updatePortal(WasabeePortal.fromIITC(newPortal.portal));
-};
+}
 
-export const listenForPortalDetails = (e) => {
+export function listenForPortalDetails(e) {
   if (!e.success) return;
   const op = getSelectedOperation();
   op.updatePortal(
@@ -103,13 +103,13 @@ export const listenForPortalDetails = (e) => {
       lng: (e.details.lngE6 / 1e6).toFixed(6),
     })
   );
-};
+}
 
 // This is what should be called to add to the queue
 // can take either an entire array of portal GUID or a single GUID
 // this depends on something listening for the IITC PortalDetailsLoaded hook to process the result
 // see listenForPortalDetails above
-export const getPortalDetails = function (guid) {
+export function getPortalDetails(guid) {
   if (Array.isArray(guid)) {
     window.plugin.wasabee.portalDetailQueue = window.plugin.wasabee.portalDetailQueue.concat(
       guid
@@ -134,9 +134,10 @@ export const getPortalDetails = function (guid) {
         window.plugin.wasabee.portalDetailIntervalID
     );
   }
-};
+}
 
-const pdqDoNext = function () {
+//const pdqDoNext = function () {
+function pdqDoNext() {
   const p = window.plugin.wasabee.portalDetailQueue.shift();
 
   // are we done?
@@ -153,9 +154,9 @@ const pdqDoNext = function () {
   if (p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
   // this is the bit everyone is so worried about
   window.portalDetail.request(p);
-};
+}
 
-export const loadFaked = function (operation, force = false) {
+export function loadFaked(operation, force = false) {
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
     false;
@@ -166,9 +167,9 @@ export const loadFaked = function (operation, force = false) {
   const f = new Array();
   for (const x of operation.fakedPortals) f.push(x.id);
   if (f.length > 0) getPortalDetails(f);
-};
+}
 
-export const sendLocation = () => {
+export function sendLocation() {
   if (!WasabeeMe.isLoggedIn()) return;
   const sl =
     localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
@@ -190,9 +191,9 @@ export const sendLocation = () => {
       console.log(err);
     }
   );
-};
+}
 
-export const getAllPortalsOnScreen = function (operation) {
+export function getAllPortalsOnScreen(operation) {
   const bounds = window.clampLatLngBounds(window.map.getBounds());
   const x = [];
   for (const portal in window.portals) {
@@ -210,18 +211,20 @@ export const getAllPortalsOnScreen = function (operation) {
     }
   }
   return x;
-};
+}
 
-const _isOnScreen = function (ll, bounds) {
+// const _isOnScreen = function (ll, bounds) {
+function _isOnScreen(ll, bounds) {
   return (
     ll.lat < bounds._northEast.lat &&
     ll.lng < bounds._northEast.lng &&
     ll.lat > bounds._southWest.lat &&
     ll.lng > bounds._southWest.lng
   );
-};
+}
 
-const _hasMarker = function (portalid, markerType, operation) {
+// const _hasMarker = function (portalid, markerType, operation) {
+function _hasMarker(portalid, markerType, operation) {
   if (operation.markers.length == 0) return false;
   for (const m of operation.markers) {
     if (m.portalId == portalid && m.type == markerType) {
@@ -229,12 +232,12 @@ const _hasMarker = function (portalid, markerType, operation) {
     }
   }
   return false;
-};
+}
 
 // this is the test point used in several auto-draws
 // settings allow there to be several different due to
 // rouding errors resulting from long distances
-export const testPortal = function (recursed = false) {
+export function testPortal(recursed = false) {
   let urp =
     localStorage[
       window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
@@ -260,10 +263,10 @@ export const testPortal = function (recursed = false) {
 
   // if recrused and still getting garbage, we have a problem
   return parsed;
-};
+}
 
 // recursive function to auto-mark blockers
-export const blockerAutomark = function (operation, first = true) {
+export function blockerAutomark(operation, first = true) {
   if (first) operation.startBatchMode();
   // build count list
   const portals = new Array();
@@ -327,4 +330,4 @@ export const blockerAutomark = function (operation, first = true) {
   blockerAutomark(operation, false);
 
   if (first) operation.endBatchMode();
-};
+}
