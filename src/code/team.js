@@ -16,6 +16,9 @@ export default class WasabeeTeam {
     this.id = data.id;
     this.name = data.name;
     this.fetched = Date.now();
+    this.rc = data.rc;
+    this.rk = data.rk;
+    this.jlt = data.jlt;
 
     // convert to WasabeeAgents and push them into the agent cache
     for (const agent of data.agents) {
@@ -36,7 +39,7 @@ export default class WasabeeTeam {
   static async waitGet(teamID, maxAgeSeconds = 60) {
     if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamID)) {
       const t = window.plugin.wasabee.teams.get(teamID);
-      if (t.fetch > Date.now() - 1000 * maxAgeSeconds) {
+      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
         console.log("returning team from cache");
         return t;
       }
