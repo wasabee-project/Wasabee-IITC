@@ -6,7 +6,12 @@
  */
 import { drawSingleTeam } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
-import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
+import {
+  makeSelectedOperation,
+  getSelectedOperation,
+  removeOperation,
+  loadNewDefaultOp,
+} from "./selectedOp";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -58,6 +63,11 @@ export const initFirebase = () => {
         // display to console somehow?
         console.log("server reported teammate login: ", event.data.data.gid);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        break;
+      case "Delete":
+        console.log("server requested op delete: ", event.data.data.opID);
+        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
+        removeOperation(event.data.data.opID);
         break;
       default:
         console.log("unknown firebase command: ", event.data.data);

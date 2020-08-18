@@ -36,7 +36,8 @@ export const initSelectedOperation = () => {
   return window.plugin.wasabee._selectedOp;
 };
 
-const loadNewDefaultOp = () => {
+// create a new op and set it as selected
+export const loadNewDefaultOp = () => {
   const newOp = new WasabeeOp({
     creator: PLAYER.nickname,
     name: wX("DEFAULT OP NAME", new Date().toGMTString()),
