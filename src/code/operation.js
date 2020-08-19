@@ -638,7 +638,7 @@ export default class WasabeeOp {
           l.toPortalId = newPortal.id;
         } else {
           console.log(
-            `Operation: Removing link '{$l.ID}' while swapping because it would duplicate an existing link in the operation.`
+            `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
         }
