@@ -145,12 +145,16 @@ export function assignLinkPromise(opID, linkID, agentID) {
 
 // sends a target (portal) to the server to notify the agent
 export function targetPromise(agentID, portal) {
-  const ll = portal.lat + "," + portal.lng;
-  const fd = new FormData();
-  fd.append("id", agentID);
-  fd.append("portal", portal.name);
-  fd.append("ll", ll);
-  return genericPost(`/api/v1/agent/${agentID}/target`, fd);
+  return genericPost(
+    `/api/v1/agent/${agentID}/target`,
+    JSON.stringify({
+      Name: portal.name,
+      Lat: portal.lat,
+      Lng: portal.lng,
+      ID: portal.id,
+    }),
+    "application/json;charset=UTF-8"
+  );
 }
 
 // work in progress -- server support not finished
