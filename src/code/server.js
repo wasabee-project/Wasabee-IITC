@@ -222,8 +222,8 @@ export function SetLinkState(opID, linkID, state) {
 // updates an agent's key count, return value is status code
 export function opKeyPromise(opID, portalID, onhand, capsule) {
   const fd = new FormData();
-  fd.append("onhand", onhand ? onhand : "0");
-  fd.append("capsule", capsule ? capsule : "");
+  fd.append("onhand", onhand);
+  fd.append("capsule", capsule);
   return genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
 }
 
@@ -357,18 +357,21 @@ async function genericPut(url, formData, contentType = "multipart/form-data") {
   }
 }
 
-async function genericPost(url, formData, contentType = "multipart/form-data") {
+async function genericPost(url, formData, contentType) {
   try {
-    const response = await fetch(GetWasabeeServer() + url, {
+    const construct = {
       method: "POST",
       mode: "cors",
       cache: "default",
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      headers: { "Content-Type": contentType },
       body: formData,
-    });
+    };
+    if (contentType != null) {
+      construct.headers = { "Content-Type": contentType };
+    }
+    const response = await fetch(GetWasabeeServer() + url, construct);
 
     let err = null;
     switch (response.status) {
