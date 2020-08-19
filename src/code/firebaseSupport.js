@@ -12,6 +12,7 @@ import {
   removeOperation,
   loadNewDefaultOp,
 } from "./selectedOp";
+import WasabeePortal from "./portal";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -34,13 +35,23 @@ export function initFirebase() {
 
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
-      case "Generic Message":
-        alert(JSON.stringify(event.data.data));
-        break;
       case "Agent Location Change":
         console.log("firebase update of agent location: ", event.data.data);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         drawSingleTeam(event.data.data.msg);
+        break;
+      case "Delete":
+        console.log("server requested op delete: ", event.data.data.opID);
+        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
+        removeOperation(event.data.data.opID);
+        break;
+      case "Generic Message":
+        alert(JSON.stringify(event.data.data));
+        break;
+      case "Login":
+        // display to console somehow?
+        console.log("server reported teammate login: ", event.data.data.gid);
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       case "Map Change":
         try {
@@ -59,15 +70,21 @@ export function initFirebase() {
           console.log(e);
         }
         break;
-      case "Login":
-        // display to console somehow?
-        console.log("server reported teammate login: ", event.data.data.gid);
-        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
-        break;
-      case "Delete":
-        console.log("server requested op delete: ", event.data.data.opID);
-        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
-        removeOperation(event.data.data.opID);
+      case "Target":
+        try {
+          const target = JSON.parse(event.data.data.msg);
+          const raw = {
+            id: target.ID,
+            name: target.Name,
+            lat: target.Lat,
+            lng: target.Lon,
+          };
+          const portal = new WasabeePortal(raw);
+          const f = portal.displayFormat();
+          alert(f.outerHTML + "<br>Sent by: " + target.Sender, true);
+        } catch (e) {
+          console.log(e);
+        }
         break;
       default:
         console.log("unknown firebase command: ", event.data.data);
