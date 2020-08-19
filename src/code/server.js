@@ -61,60 +61,54 @@ export function teamPromise(teamid) {
 // returns a promise to fetch a WasabeeOp
 // local change: If the server's copy is newer than the local copy, otherwise none
 // not generic since 304 result processing and If-Modified-Since header
-export function opPromise(opID) {
-  const SERVER_BASE = GetWasabeeServer();
+export async function opPromise(opID) {
+  let ims = "Sat, 29 Oct 1994 19:43:31 GMT"; // the dawn of time...
   const localop = getOperationByID(opID);
-  const url = `${SERVER_BASE}/api/v1/draw/${opID}`;
+  if (localop != null && localop.fetched) ims = localop.fetched;
 
-  return new Promise(function (resolve, reject) {
-    const req = new XMLHttpRequest();
+  try {
+    const response = await fetch(GetWasabeeServer() + `/api/v1/draw/${opID}`, {
+      method: "GET",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      header: { "If-Modified-Since": ims },
+    });
 
-    req.open("GET", url);
-
-    if (localop != null && localop.fetched) {
-      req.setRequestHeader("If-Modified-Since", localop.fetched);
-    }
-
-    req.withCredentials = true;
-    req.crossDomain = true;
-
+    let raw = null;
     let newop = null; // I hate javascript
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          newop = new WasabeeOp(req.response);
-          newop.localchanged = false;
-          resolve(newop);
-          break;
-        case 304: // If-Modified-Since replied NotModified
-          console.log("server copy is older/unmodified, keeping local copy");
-          localop.localchanged = true;
-          resolve(localop);
-          break;
-        case 401:
-          WasabeeMe.purge();
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        case 403:
-          removeOperation(opID);
-          reject(wX("OP PERM DENIED", opID));
-          break;
-        case 410:
-          removeOperation(opID);
-          reject(wX("OP DELETED", opID));
-          break;
-        default:
-          reject(`${req.status}: ${req.statusText} ${req.responseText}`);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send();
-  });
+    switch (response.status) {
+      case 200:
+        raw = await response.json();
+        newop = new WasabeeOp(raw);
+        newop.localchanged = false;
+        return Promise.resolve(newop);
+      case 304: // If-Modified-Since replied NotModified
+        console.log("server copy is older/unmodified, keeping local copy");
+        localop.localchanged = true;
+        return Promise.resolve(localop);
+      case 401:
+        WasabeeMe.purge();
+        raw = await response.json();
+        return Promise.reject(wX("NOT LOGGED IN", raw.error));
+      case 403:
+        removeOperation(opID);
+        raw = await response.json();
+        return Promise.reject(wX("OP PERM DENIED", opID) + ": " + raw.error);
+      case 410:
+        removeOperation(opID);
+        raw = await response.json();
+        return Promise.reject(wX("OP DELETED", opID) + ": " + raw.error);
+      default:
+        raw = await response.text();
+        return Promise.reject(response.statusText, raw);
+    }
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
 }
 
 // returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
@@ -323,146 +317,152 @@ export function oneTimeToken(token) {
   return genericPost(url, fd);
 }
 
-function genericPut(url, formData, contentType) {
-  const SERVER_BASE = GetWasabeeServer();
-  return new Promise((resolve, reject) => {
-    const req = new XMLHttpRequest();
+async function genericPut(url, formData, contentType = "multipart/form-data") {
+  try {
+    const response = await fetch(GetWasabeeServer() + url, {
+      method: "PUT",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      headers: { "Content-Type": contentType },
+      body: formData,
+    });
 
-    req.open("PUT", SERVER_BASE + url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    if (contentType != null) req.setRequestHeader("Content-Type", contentType);
-
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 401:
-          WasabeeMe.purge();
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(req.response);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send(formData);
-  });
+    let err = null;
+    switch (response.status) {
+      case 200:
+        // returns a promise to the content
+        // I think all the PUTS return a JSON "OK"
+        return response.text();
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        err = await response.json();
+        return Promise.reject(wX("NOT LOGGED IN", err.error));
+      // break;
+      default:
+        err = await response.text();
+        return Promise.reject(response.statusText, err);
+      // break;
+    }
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
 }
 
-function genericPost(url, formData, contentType) {
-  const SERVER_BASE = GetWasabeeServer();
-  return new Promise((resolve, reject) => {
-    const req = new XMLHttpRequest();
+async function genericPost(url, formData, contentType = "multipart/form-data") {
+  try {
+    const response = await fetch(GetWasabeeServer() + url, {
+      method: "POST",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      headers: { "Content-Type": contentType },
+      body: formData,
+    });
 
-    req.open("POST", SERVER_BASE + url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    if (contentType != null) req.setRequestHeader("Content-Type", contentType);
-
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 302: // probably unused now
-          console.log("POST returnd 302: ", req);
-          resolve(req.response);
-          break;
-        case 401:
-          WasabeeMe.purge();
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(req.response);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-
-    req.send(formData);
-  });
+    let err = null;
+    switch (response.status) {
+      case 200:
+        // returns a promise to the content
+        return response.text();
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        err = await response.json();
+        return Promise.reject(wX("NOT LOGGED IN", err.error));
+      // break;
+      default:
+        err = await response.text();
+        return Promise.reject(response.statusText, err);
+      // break;
+    }
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
 }
 
-function genericDelete(url, formData) {
-  const SERVER_BASE = GetWasabeeServer();
-  return new Promise((resolve, reject) => {
-    const req = new XMLHttpRequest();
+async function genericDelete(url, formData) {
+  try {
+    const response = await fetch(GetWasabeeServer() + url, {
+      method: "DELETE",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      headers: { "Content-Type": "multipart/form-data" },
+      body: formData,
+    });
 
-    req.open("DELETE", SERVER_BASE + url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 401:
-          WasabeeMe.purge();
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        default:
-          reject(req.response);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send(formData);
-  });
+    let err = null;
+    switch (response.status) {
+      case 200:
+        // returns a promise to the content
+        return response.text();
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        err = await response.json();
+        return Promise.reject(wX("NOT LOGGED IN", err.error));
+      // break;
+      default:
+        err = await response.text();
+        return Promise.reject(response.statusText, err);
+      // break;
+    }
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
 }
 
-function genericGet(url) {
-  const SERVER_BASE = GetWasabeeServer();
-  return new Promise((resolve, reject) => {
-    const req = new XMLHttpRequest();
+async function genericGet(url) {
+  try {
+    const response = await fetch(GetWasabeeServer() + url, {
+      method: "GET",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+    });
 
-    req.open("GET", SERVER_BASE + url);
-    req.withCredentials = true;
-    req.crossDomain = true;
-
-    req.onload = function () {
-      switch (req.status) {
-        case 200:
-          resolve(req.response);
-          break;
-        case 401:
-          WasabeeMe.purge();
-          reject(wX("NOT LOGGED IN", req.statusText));
-          break;
-        case 403:
-          reject(req.response);
-          break;
-        default:
-          reject(req.response);
-          break;
-      }
-    };
-
-    req.onerror = function () {
-      reject(`Network Error: ${req.responseText}`);
-    };
-    req.send();
-  });
+    let err = null;
+    switch (response.status) {
+      case 200:
+        // returns a promise to the content
+        return response.text();
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        err = await response.json();
+        return Promise.reject(wX("NOT LOGGED IN", err.error));
+      // break;
+      case 403:
+        err = await response.json();
+        return Promise.reject(err.error);
+      // break;
+      default:
+        err = await response.text();
+        return Promise.reject(response.statusText, err);
+      // break;
+    }
+  } catch (e) {
+    console.log(e);
+    return Promise.reject(e);
+  }
 }
 
 export function GetWasabeeServer() {
   // Wasabee-IITC, use the configured server
-  if (window.plugin.wasabee) {
+  if (window.plugin && window.plugin.wasabee) {
     let server =
       localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY];
     if (server == null) {
