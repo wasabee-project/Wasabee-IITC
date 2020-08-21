@@ -11,20 +11,20 @@ const WasabeeDList = WDialog.extend({
     TYPE: "wasabeeDList",
   },
 
-  initialize: async function (map = window.map, options) {
+  initialize: function (map = window.map, options) {
     this.type = WasabeeDList.TYPE;
-    this._me = await WasabeeMe.waitGet();
     WDialog.prototype.initialize.call(this, map, options);
     postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },
 
-  addHooks: function () {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
     this._UIUpdateHook = () => {
       context.update();
     };
+    this._me = await WasabeeMe.waitGet();
     this._displayDialog();
     window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },
