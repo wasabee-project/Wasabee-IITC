@@ -100,7 +100,8 @@ const AuthDialog = WDialog.extend({
     const menus = L.DomUtil.create("div", "options", content);
     menus.innerHTML =
       "<span>Login Settings: <label>Prompt:</label><select id='auth-prompt'><option value='unset'>Auto</option><option value='none' selected='selected'>none (quick)</option><option value='select_account'>select_account</option></select></span> &nbsp; " +
-      "<span><label>Immediate</label>: <select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select></span>";
+      "<span><label>Immediate</label>: <select id='auth-immediate'><option value='unset'>Auto (quick)</option><option value='true'>true</option><option value='false'>false</option></select>" +
+      "</span><span><label>ux_mode</label>: <select id='ux-mode'><option value='unset'>Unset</option><option value='popup'>Popup</option><option value='redirect'>Redirect</option></select>";
     if (!this._android) menus.style.display = "none";
 
     if (!this._android && !this._ios) {
@@ -219,6 +220,8 @@ const AuthDialog = WDialog.extend({
     const immediate = document.getElementById("auth-immediate");
     if (immediate && immediate.value != "unset")
       options.immediate = immediate.value;
+    const uxmode = document.getElementById("ux-mode");
+    if (uxmode && uxmode.value != "unset") options.ux_mode = uxmode.value;
     const gPrompt = document.getElementById("auth-prompt");
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
     window.gapi.auth2.authorize(options, async (response) => {
