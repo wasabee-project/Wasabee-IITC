@@ -280,7 +280,6 @@ export function checkAllLinks(operation) {
 
   const linkGenerator = realLinks();
   for (const link of linkGenerator) {
-    console.log(link);
     testLink(link, operation);
   }
 
