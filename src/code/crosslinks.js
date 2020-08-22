@@ -261,14 +261,27 @@ function testSelfBlock(incoming, operation) {
   }
 }
 
+// lets see if using a generator makes the GUI more responsive on large ops
+function* realLinks() {
+  const guids = Object.getOwnPropertyNames(window.links);
+  // it is possible that the link was purged while we were yielded
+  // checking here should reduce the workload while scrolling/zooming
+  for (const g of guids) {
+    if (window.links[g] != null) yield window.links[g];
+  }
+}
+
 export function checkAllLinks(operation) {
   // console.time("checkAllLinks");
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
   if (!operation.links || operation.links.length == 0) return;
-  for (const guid in window.links) {
-    testLink(window.links[guid], operation);
+
+  const linkGenerator = realLinks();
+  for (const link of linkGenerator) {
+    console.log(link);
+    testLink(link, operation);
   }
 
   for (const l of operation.links) {
