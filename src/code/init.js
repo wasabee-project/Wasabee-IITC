@@ -163,7 +163,7 @@ function initGoogleAPI() {
   script.src = "https://apis.google.com/js/platform.js";
   script.onload = () => {
     window.gapi.load("auth2", () => {
-      window.gapi.auth2.enableDebugLogs(true);
+      window.gapi.auth2.enableDebugLogs(false);
     });
   };
   (document.body || document.head || document.documentElement).appendChild(
