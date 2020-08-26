@@ -493,10 +493,10 @@
 }
 
 .wasabee-toolbar-wasabee {
-  background-image: url(../images/toolbar_wasabeebutton_out.png)
+  background-image: url(../images/toolbar_wasabeebutton_out.svg)
 }
 .wasabee-toolbar-wasabee.wasabee-logged-in {
-  background-image: url(../images/toolbar_wasabeebutton_in.png)
+  background-image: url(../images/toolbar_wasabeebutton_in.svg)
 }
 .wasabee-toolbar-ops {
   background-image: url(../images/toolbar_viewOps.png)
