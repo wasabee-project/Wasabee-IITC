@@ -302,7 +302,7 @@ const AuthDialog = WDialog.extend({
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {
           console.log(e);
-          alert(`send access token failed (gsapiAuthChoose): $(e)`);
+          alert(`send access token failed (gsapiAuthChoose): ${e}`);
         }
       }
     );
