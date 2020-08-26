@@ -262,6 +262,8 @@ function testSelfBlock(incoming, operation) {
 }
 
 // lets see if using a generator makes the GUI more responsive on large ops
+// -- yeild doesn't seem to release the main thread, maybe we need to yeild a
+// Promise.resolve(window.links[g]) and await it in the for loop?
 function* realLinks() {
   const guids = Object.getOwnPropertyNames(window.links);
   // it is possible that the link was purged while we were yielded
@@ -303,7 +305,6 @@ function onMapDataRefreshEnd() {
   const operation = getSelectedOperation();
 
   checkAllLinks(operation);
-  // testForDeletedLinks();
   window.addHook("linkAdded", onLinkAdded);
 }
 
