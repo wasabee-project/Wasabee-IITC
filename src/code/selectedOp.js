@@ -74,9 +74,6 @@ export function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  // redraw the screen, old version of IITC might not have set the hooks up yet
-  // so make sure the hooks are there
-  // VALID_HOOKS seems to be empty now?
   window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
   window.runHooks("wasabeeCrosslinks", window.plugin.wasabee._selectedOp);
   return window.plugin.wasabee._selectedOp;
