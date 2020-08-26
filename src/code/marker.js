@@ -17,15 +17,21 @@ export default class WasabeeMarker {
     this.completedBy = obj.completedBy ? obj.completedBy : "";
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.order = obj.order ? obj.order : 0;
+
+    if (this.state == "pending" && this.assignedTo != "")
+      this.state = "assigned";
   }
 
   toJSON() {
+    let state = this.state;
+    if (this.state == "assigned") state = "pending";
+
     return {
       ID: this.ID,
       portalId: this.portalId,
       type: this.type,
       comment: this.comment,
-      state: this.state,
+      state: state,
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
       order: this.order,
@@ -39,31 +45,6 @@ export default class WasabeeMarker {
   set opOrder(o) {
     this.order = Number.parseInt(o, 10);
   }
-
-  // get icon() {
-  //   if (!window.plugin.wasabee.skin.markerTypes.has(this.type)) {
-  //     this.type = window.plugin.wasabee.skin.constants.DEFAULT_MARKER_TYPE;
-  //   }
-  //   const marker = window.plugin.wasabee.skin.markerTypes.get(this.type);
-  //   let img = marker.markerIcon.default;
-  //   switch (this.state) {
-  //     case "pending":
-  //       img = marker.markerIcon.default;
-  //       break;
-  //     case "assigned":
-  //       img = marker.markerIconAssigned.default;
-  //       break;
-  //     case "completed":
-  //       img = marker.markerIconDone.default;
-  //       break;
-  //     case "acknowledged":
-  //       img = marker.markerIconAcknowledged.default;
-  //       break;
-  //     default:
-  //       img = marker.markerIcon.default;
-  //   }
-  //   return img;
-  // }
 
   async getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
