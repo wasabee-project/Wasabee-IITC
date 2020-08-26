@@ -311,7 +311,7 @@
   background-image: url(../images/wasabee_markers_capture_assigned.svg)
 }
 .wasabee-marker-icon.CapturePortalMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_capture_assigned.svg)
+  background-image: url(../images/wasabee_markers_capture_acknowledge.svg)
 }
 .wasabee-marker-icon.CapturePortalMarker.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_capture_done.svg)
@@ -323,7 +323,7 @@
   background-image: url(../images/wasabee_markers_decay_assigned.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_decay_assigned.svg)
+  background-image: url(../images/wasabee_markers_decay_acknowledge.svg)
 }
 .wasabee-marker-icon.LetDecayPortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_decay_done.svg)
@@ -335,7 +335,7 @@
   background-image: url(../images/wasabee_markers_destroy_assigned.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_destroy_assigned.svg)
+  background-image: url(../images/wasabee_markers_destroy_acknowledge.svg)
 }
 .wasabee-marker-icon.DestroyPortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_destroy_done.svg)
@@ -347,7 +347,7 @@
   background-image: url(../images/wasabee_markers_farm_assigned.svg)
 }
 .wasabee-marker-icon.FarmPortalMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_farm_assigned.svg)
+  background-image: url(../images/wasabee_markers_farm_acknowledge.svg)
 }
 .wasabee-marker-icon.FarmPortalMarker.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_farm_done.svg)
@@ -395,7 +395,7 @@
   background-image: url(../images/wasabee_markers_meetagent_assigned.svg)
 }
 .wasabee-marker-icon.MeetAgentPortalMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_meetagent_assigned.svg)
+  background-image: url(../images/wasabee_markers_meetagent_acknowledge.svg)
 }
 .wasabee-marker-icon.MeetAgentPortalMarker.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_meetagent_done.svg)
@@ -407,7 +407,7 @@
   background-image: url(../images/wasabee_markers_other_assigned.svg)
 }
 .wasabee-marker-icon.OtherPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_other_assigned.svg)
+  background-image: url(../images/wasabee_markers_other_acknowledge.svg)
 }
 .wasabee-marker-icon.OtherPortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_other_done.svg)
@@ -419,7 +419,7 @@
   background-image: url(../images/wasabee_markers_recharge_assigned.svg)
 }
 .wasabee-marker-icon.RechargePortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_recharge_assigned.svg)
+  background-image: url(../images/wasabee_markers_recharge_acknowledge.svg)
 }
 .wasabee-marker-icon.RechargePortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_recharge_done.svg)
@@ -431,7 +431,7 @@
   background-image: url(../images/wasabee_markers_upgrade_assigned.svg)
 }
 .wasabee-marker-icon.UpgradePortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_upgrade_assigned.svg)
+  background-image: url(../images/wasabee_markers_upgrade_acknowledge.svg)
 }
 .wasabee-marker-icon.UpgradePortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_upgrade_done.svg)
@@ -443,7 +443,7 @@
   background-image: url(../images/wasabee_markers_virus_assigned.svg)
 }
 .wasabee-marker-icon.UseVirusPortalAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_virus_assigned.svg)
+  background-image: url(../images/wasabee_markers_virus_acknowledge.svg)
 }
 .wasabee-marker-icon.UseVirusPortalAlert.wasabee-status-completed {
   background-image: url(../images/wasabee_markers_virus_done.svg)
