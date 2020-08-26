@@ -703,7 +703,6 @@ export default class WasabeeOp {
   }
 
   clearAllItems() {
-    //this.opportals = Array();
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
@@ -719,6 +718,12 @@ export default class WasabeeOp {
     this.links = Array();
     this.blockers = Array();
     this.cleanAnchorList();
+    this.cleanPortalList();
+    this.update(true);
+  }
+
+  clearAllMarkers() {
+    this.markers = Array();
     this.cleanPortalList();
     this.update(true);
   }

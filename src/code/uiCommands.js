@@ -85,6 +85,19 @@ export function clearAllLinks(operation) {
   con.enable();
 }
 
+export function clearAllMarkers(operation) {
+  const con = new ConfirmDialog();
+  con.setup(
+    `Clear Markers: ${operation.name}`,
+    `Do you want to remove all markers from ${operation.name}?`,
+    () => {
+      operation.clearAllMarkers();
+      window.runHooks("wasabeeCrosslinks", operation);
+    }
+  );
+  con.enable();
+}
+
 export function listenForAddedPortals(newPortal) {
   if (!newPortal.portal.options.data.title) return;
 

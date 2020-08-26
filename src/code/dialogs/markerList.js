@@ -9,6 +9,7 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
+  clearAllMarkers,
 } from "../uiCommands";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
@@ -49,6 +50,10 @@ const MarkerList = WDialog.extend({
     loadFaked(this._operation);
 
     const buttons = {};
+    buttons[wX("CLEAR MARKERS")] = () => {
+      clearAllMarkers(getSelectedOperation());
+    };
+
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
