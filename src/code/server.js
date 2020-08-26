@@ -321,18 +321,21 @@ export function oneTimeToken(token) {
   return genericPost(url, fd);
 }
 
-async function genericPut(url, formData, contentType = "multipart/form-data") {
+async function genericPut(url, formData, contentType) {
   try {
-    const response = await fetch(GetWasabeeServer() + url, {
+    const construct = {
       method: "PUT",
       mode: "cors",
       cache: "default",
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      headers: { "Content-Type": contentType },
       body: formData,
-    });
+    };
+    if (contentType != null) {
+      construct.headers = { "Content-Type": contentType };
+    }
+    const response = await fetch(GetWasabeeServer() + url, construct);
 
     let err = null;
     switch (response.status) {
@@ -497,6 +500,10 @@ export function SetWasabeeServer(server) {
 export function sendTokenToWasabee(token) {
   // no need for a form-data, just send the raw token
   return genericPost(`/api/v1/me/firebase`, token);
+}
+
+export function getCustomTokenFromServer() {
+  return genericGet(`/api/v1/me/firebase`);
 }
 
 export function loadConfig() {
