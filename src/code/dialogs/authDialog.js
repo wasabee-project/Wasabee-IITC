@@ -226,7 +226,13 @@ const AuthDialog = WDialog.extend({
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
     window.gapi.auth2.authorize(options, async (response) => {
       if (response.error) {
-        if (response.error == "immediate_failed") {
+        if (response.error === "idpiframe_initialization_failed") {
+          alert("You need enable cookies or allow [*.]google.com");
+        }
+        if (
+          response.error == "user_logged_out" ||
+          response.error == "immediate_failed"
+        ) {
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
           window.gapi.auth2.authorize(options, async (responseSelect) => {
             if (responseSelect.error) {
