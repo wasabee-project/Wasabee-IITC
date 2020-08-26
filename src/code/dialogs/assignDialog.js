@@ -4,9 +4,15 @@ import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
-import { assignLinkPromise, assignMarkerPromise } from "../server";
+import {
+  assignLinkPromise,
+  assignMarkerPromise,
+  updateOpPromise,
+  opPromise,
+} from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
+import { makeSelectedOperation } from "../selectedOp";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -163,6 +169,15 @@ const AssignDialog = WDialog.extend({
   },
 
   activeAssign: async function (value) {
+    // if this._operation.localchanged...
+    try {
+      await updateOpPromise(this._operation);
+      console.log("update pushed");
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+
     if (this._type == "Marker") {
       try {
         await assignMarkerPromise(
@@ -174,6 +189,7 @@ const AssignDialog = WDialog.extend({
         this._operation.assignMarker(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
+        throw e;
       }
     }
     if (this._type == "Link") {
@@ -187,6 +203,7 @@ const AssignDialog = WDialog.extend({
         this._operation.assignLink(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
+        throw e;
       }
     }
     if (this._type == "Anchor") {
@@ -204,8 +221,18 @@ const AssignDialog = WDialog.extend({
           this._operation.assignLink(l.ID, value.srcElement.value);
         } catch (e) {
           console.log(e);
+          throw e;
         }
       }
+    }
+
+    try {
+      const updated = await opPromise(this._operation.ID);
+      updated.store();
+      makeSelectedOperation(updated.ID);
+    } catch (e) {
+      console.log(e);
+      throw e;
     }
   },
 });
