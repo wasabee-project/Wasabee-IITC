@@ -554,6 +554,12 @@ export function reverseLinkDirection(opID, linkID) {
   return genericGet(`/api/v1/draw/${opID}/link/${linkID}/swap`);
 }
 
+export function setOpInfo(opID, info) {
+  const fd = new FormData();
+  fd.append("info", info);
+  return genericPost(`/api/v1/draw/${opID}/info`, fd);
+}
+
 export function setMarkerComment(opID, markerID, comment) {
   const fd = new FormData();
   fd.append("comment", comment);
