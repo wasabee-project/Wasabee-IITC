@@ -398,18 +398,21 @@ async function genericPost(url, formData, contentType) {
   }
 }
 
-async function genericDelete(url, formData) {
+async function genericDelete(url, formData, contentType) {
   try {
-    const response = await fetch(GetWasabeeServer() + url, {
+    const construct = {
       method: "DELETE",
       mode: "cors",
       cache: "default",
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      headers: { "Content-Type": "multipart/form-data" },
       body: formData,
-    });
+    };
+    if (contentType != null) {
+      construct.headers = { "Content-Type": contentType };
+    }
+    const response = await fetch(GetWasabeeServer() + url, construct);
 
     let err = null;
     switch (response.status) {
