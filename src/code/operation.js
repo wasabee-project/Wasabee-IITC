@@ -37,6 +37,8 @@ export default class WasabeeOp {
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
 
+    this.server = this.fetched ? obj.server : null;
+
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
     if (!this.blockers) this.blockers = new Array();
@@ -88,6 +90,8 @@ export default class WasabeeOp {
       localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
+      // ignored by the server but useful for localStorage
+      server: this.server,
     };
   }
 

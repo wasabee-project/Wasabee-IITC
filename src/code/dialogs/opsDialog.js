@@ -79,12 +79,31 @@ const OpsDialog = WDialog.extend({
     const operationSelect = L.DomUtil.create("select", null, topSet);
 
     const ol = opsList();
+    const data = new Map();
     for (const opID of ol) {
       const tmpOp = getOperationByID(opID);
-      const option = L.DomUtil.create("option", null, operationSelect);
-      option.value = opID;
-      option.text = tmpOp.name;
-      if (opID == selectedOp.ID) option.selected = true;
+      const server = tmpOp.server || "";
+      if (!data.has(server)) data.set(server, []);
+      data.get(server).push({
+        id: opID,
+        name: tmpOp.name,
+      });
+    }
+
+    for (const server of [...data.keys()].sort()) {
+      const ops = data.get(server);
+      ops.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+      if (server != "") {
+        const option = L.DomUtil.create("option", null, operationSelect);
+        option.text = "-- " + server + " --";
+        option.disabled = true;
+      }
+      for (const d of ops) {
+        const option = L.DomUtil.create("option", null, operationSelect);
+        option.value = d.id;
+        option.text = d.name;
+        if (d.id == selectedOp.ID) option.selected = true;
+      }
     }
 
     L.DomEvent.on(operationSelect, "change", (ev) => {
