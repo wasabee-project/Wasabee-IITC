@@ -84,6 +84,7 @@ export function makeSelectedOperation(opID) {
 export function getOperationByID(opID) {
   try {
     const newfmt = localStorage[opID];
+    if (!newfmt) return null;
     const raw = JSON.parse(newfmt);
     const op = new WasabeeOp(raw);
     if (op.ID) return op;
