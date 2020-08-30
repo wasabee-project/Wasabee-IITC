@@ -36,6 +36,16 @@ export function initSelectedOperation() {
   return window.plugin.wasabee._selectedOp;
 }
 
+export function changeOpIfNeeded() {
+  const selectedOp = getSelectedOperation();
+  const ops = opsList();
+  if (!ops.includes(selectedOp.ID)) {
+    if (ops.length == 0) loadNewDefaultOp();
+    else makeSelectedOperation(ops[ops.length - 1]);
+  }
+  return window.plugin.wasabee._selectedOp;
+}
+
 // create a new op and set it as selected
 export function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
@@ -58,7 +68,8 @@ export function makeSelectedOperation(opID) {
       );
     } else {
       // should not be necessary now, but still safe
-      window.plugin.wasabee._selectedOp.store();
+      if (opsList().includes(window.plugin.wasabee._selectedOp.ID))
+        window.plugin.wasabee._selectedOp.store();
     }
   }
 
@@ -179,6 +190,7 @@ export function opsList() {
   return list;
 }
 
+// to remove on 0.19
 function oldOpsList() {
   const out = new Array();
 
@@ -216,4 +228,5 @@ export function removeNonOwnedOps() {
     const op = getOperationByID(opID);
     if (!op.IsOwnedOp()) removeOperation(opID);
   }
+  changeOpIfNeeded();
 }
