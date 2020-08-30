@@ -134,9 +134,24 @@ export function setupLocalStorage() {
   }
 }
 
+function storeOpsList(ops) {
+  localStorage[
+    window.plugin.wasabee.static.constants.OPS_LIST_KEY
+  ] = JSON.stringify(ops);
+}
+
 //** This function removes an operation from the main list */
 export function removeOperation(opID) {
+  const ops = opsList().filter((ID) => ID != opID);
+  storeOpsList(ops);
   delete localStorage[opID];
+}
+
+//** This function adds an operation to the main list */
+export function addOperation(opID) {
+  const ops = opsList();
+  if (!ops.includes(opID)) ops.push(opID);
+  storeOpsList(ops);
 }
 
 //*** This function resets the local op list
@@ -148,6 +163,23 @@ export function resetOps() {
 }
 
 export function opsList() {
+  const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      console.log(e);
+      //falback to old listing
+    }
+  }
+
+  // <0.18 migration
+  const list = oldOpsList();
+  storeOpsList(list);
+  return list;
+}
+
+function oldOpsList() {
   const out = new Array();
 
   for (const key in localStorage) {
