@@ -12,6 +12,7 @@ export default class WasabeeLink {
     this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
     this.color = obj.color ? obj.color : "main";
     this.completed = obj.completed ? obj.completed : false;
+    this.zone = obj.zone ? obj.zone : 0;
   }
 
   // build object to serialize
@@ -25,6 +26,7 @@ export default class WasabeeLink {
       throwOrderPos: this.throwOrderPos,
       color: this.color,
       completed: this.completed,
+      zone: this.zone,
     };
   }
 
