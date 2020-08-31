@@ -2,6 +2,7 @@ import WasabeeLink from "./link";
 import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
+import WasabeeZone from "./zone";
 import { generateId } from "./auxiliar";
 import { updateOpPromise } from "./server";
 
@@ -35,6 +36,7 @@ export default class WasabeeOp {
     this.localchanged = obj.localchanged ? obj.localchanged : true;
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
+    this.zones = this.convertZonesToObjs(obj.zones);
 
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
@@ -796,34 +798,34 @@ export default class WasabeeOp {
   }
 
   convertLinksToObjs(links) {
-    if (!links || links.length == 0) return null;
-    const tempLinks = new Array();
+    const tmpLinks = new Array();
+    if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
       if (l instanceof WasabeeLink) {
-        tempLinks.push(l);
+        tmpLinks.push(l);
       } else {
-        tempLinks.push(new WasabeeLink(l, this));
+        tmpLinks.push(new WasabeeLink(l, this));
       }
     }
-    return tempLinks;
+    return tmpLinks;
   }
 
   convertBlockersToObjs(links) {
-    if (!links || links.length == 0) return null;
-    const tempLinks = new Array();
+    const tmpLinks = new Array();
+    if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
       if (l instanceof WasabeeLink) {
-        tempLinks.push(l);
+        tmpLinks.push(l);
       } else {
-        tempLinks.push(new WasabeeLink(l, this));
+        tmpLinks.push(new WasabeeLink(l, this));
       }
     }
-    return tempLinks;
+    return tmpLinks;
   }
 
   convertMarkersToObjs(markers) {
-    if (!markers || markers.length == 0) return null;
     const tmpMarkers = new Array();
+    if (!markers || markers.length == 0) return tmpMarkers;
     if (markers) {
       for (const m of markers) {
         if (m instanceof WasabeeMarker) {
@@ -837,8 +839,8 @@ export default class WasabeeOp {
   }
 
   convertPortalsToObjs(portals) {
-    if (!portals || portals.length == 0) return null;
     const tmpPortals = Array();
+    if (!portals || portals.length == 0) return tmpPortals;
     for (const p of portals) {
       if (p instanceof WasabeePortal) {
         tmpPortals.push(p);
@@ -848,6 +850,23 @@ export default class WasabeeOp {
       }
     }
     return tmpPortals;
+  }
+
+  convertZonesToObjs(zones) {
+    if (!zones || zones.length == 0) {
+      const primary = new WasabeeZone({ id: 1, name: "Primary" });
+      return new Array(primary);
+    }
+    const tmpZones = Array();
+    for (const z of zones) {
+      if (z instanceof WasabeeZone) {
+        tmpZones.push(z);
+      } else {
+        const nz = new WasabeeZone(z);
+        tmpZones.push(nz);
+      }
+    }
+    return tmpZones;
   }
 
   // minimum bounds rectangle
