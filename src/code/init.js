@@ -8,7 +8,6 @@ import { initFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
-import wX from "./wX";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
 
@@ -17,14 +16,10 @@ window.plugin.wasabee.init = () => {
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 
-  if (window.plugin.sync) alert(wX("DISABLE_SYNC"));
-
-  // check if using 'old' iitc
-  const hookLength = window.VALID_HOOKS.hookLength;
-  // no longer necessary on IITC-CE, but still needed on 0.26
-  window.pluginCreateHook("wasabeeUIUpdate");
-  if (window.VALID_HOOKS.hookLength > hookLength) {
-    alert("Wasabee probably won't work on this old version of IITC");
+  if (window.iitcBuildDate == undefined || window.iitcBuildDate < "2020-01-18-170317") {
+    alert(
+      "Wasabee won't work on this version of IITC; please update to 0.30.1 or newer from iitc.app"
+    );
   }
 
   Wasabee._selectedOp = null; // the in-memory working op;
