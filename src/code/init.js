@@ -16,7 +16,10 @@ window.plugin.wasabee.init = () => {
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
 
-  if (window.iitcBuildDate == undefined || window.iitcBuildDate < "2020-01-18-170317") {
+  if (
+    window.iitcBuildDate == undefined ||
+    window.iitcBuildDate < "2020-01-18-170317"
+  ) {
     alert(
       "Wasabee won't work on this version of IITC; please update to 0.30.1 or newer from iitc.app"
     );
