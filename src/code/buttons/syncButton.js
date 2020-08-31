@@ -1,8 +1,15 @@
 import { WButton } from "../leafletClasses";
-import { opPromise } from "../server";
+import { opPromise, GetWasabeeServer } from "../server";
 import WasabeeMe from "../me";
 import AuthDialog from "../dialogs/authDialog";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import {
+  getSelectedOperation,
+  makeSelectedOperation,
+  opsList,
+  getOperationByID,
+  removeOperation,
+  changeOpIfNeeded,
+} from "../selectedOp";
 import wX from "../wX";
 
 const SyncButton = WButton.extend({
@@ -34,11 +41,26 @@ const SyncButton = WButton.extend({
       context: this,
       callback: async () => {
         const so = getSelectedOperation();
+        const server = GetWasabeeServer();
 
         try {
           const me = await WasabeeMe.waitGet(true);
           const promises = new Array();
           const opsID = new Set(me.Ops.map((o) => o.ID));
+
+          // delete operations absent from server
+          const serverOps = new Set(
+            opsList()
+              .map(getOperationByID)
+              .filter((op) => op.server == server && !opsID.has(op.ID))
+          );
+          for (const op of serverOps) removeOperation(op.ID);
+          if (serverOps.size > 0)
+            console.log(
+              "remove",
+              Array.from(serverOps).map((op) => op.ID)
+            );
+
           for (const opID of opsID) {
             promises.push(opPromise(opID));
           }
@@ -47,6 +69,8 @@ const SyncButton = WButton.extend({
 
           // replace current op by the server version if any
           if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
+          // change op if the current does not exist anymore
+          else if (!opsList().includes(so.ID)) changeOpIfNeeded();
           // update UI to reflect new ops list
           else window.runHooks("wasabeeUIUpdate", so);
 
