@@ -17,6 +17,7 @@ export default class WasabeeMarker {
     this.completedBy = obj.completedBy ? obj.completedBy : "";
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.order = obj.order ? obj.order : 0;
+    this.zone = obj.zone ? obj.zone : 1;
 
     if (this.state == "pending" && this.assignedTo != "")
       this.state = "assigned";
@@ -35,6 +36,7 @@ export default class WasabeeMarker {
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
       order: this.order,
+      zone: this.zone,
     };
   }
 
