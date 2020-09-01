@@ -208,7 +208,11 @@ const OpsDialog = WDialog.extend({
           wX("CON_DEL", selectedOp.name),
           wX("YESNO_DEL", selectedOp.name),
           async () => {
-            if (selectedOp.IsServerOp() && selectedOp.IsOwnedOp()) {
+            if (
+              selectedOp.IsServerOp() &&
+              selectedOp.IsOwnedOp() &&
+              selectedOp.IsOnCurrentServer()
+            ) {
               try {
                 await deleteOpPromise(selectedOp.ID);
                 console.log("delete from server successful");
