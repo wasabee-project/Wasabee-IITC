@@ -4,7 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId } from "./auxiliar";
-import { updateOpPromise } from "./server";
+import { updateOpPromise, GetWasabeeServer } from "./server";
 import { addOperation } from "./selectedOp";
 
 import wX from "./wX";
@@ -902,6 +902,8 @@ export default class WasabeeOp {
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
+    // if logged on a different server from the one used for the op, not writable
+    if (!this.IsOnCurrentServer()) return false;
     // if the user has no teams enabled, it can't be writable
     if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
@@ -915,6 +917,11 @@ export default class WasabeeOp {
 
     // not on a write-access team, must not be
     return false;
+  }
+
+  IsOnCurrentServer() {
+    // assume yes if .server is not defined yet (<0.19)
+    return !this.server || this.server == GetWasabeeServer();
   }
 
   IsServerOp() {

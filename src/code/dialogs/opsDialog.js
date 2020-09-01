@@ -192,8 +192,11 @@ const OpsDialog = WDialog.extend({
       const deleteButton = L.DomUtil.create("button", null, deleteDiv);
       if (selectedOp.IsOwnedOp()) {
         deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
-        if (selectedOp.IsServerOp())
-          deleteButton.textContent += wX("LOCFRMSER");
+        if (selectedOp.IsServerOp()) {
+          if (selectedOp.IsOnCurrentServer())
+            deleteButton.textContent += wX("LOCFRMSER");
+          else deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
+        }
       } else {
         deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
       }
