@@ -96,15 +96,19 @@ const TrawlDialog = WDialog.extend({
     const options = L.DomUtil.create("div", null, container);
     const clearLabel = L.DomUtil.create("label", null, options);
     clearLabel.textContent = wX("TRAWL_CLEAR_MARKERS");
-    const clearMarkers = L.DomUtil.create("input", null, clearLabel);
+    clearLabel.htmlFor = "wasabee-trawl-clear";
+    const clearMarkers = L.DomUtil.create("input", null, options);
     clearMarkers.type = "checkbox";
     clearMarkers.checked = false;
+    clearMarkers.id = "wasabee-trawl-clear";
 
     const amLabel = L.DomUtil.create("label", null, options);
     amLabel.textContent = wX("TRAWL_AUTOMARK");
-    this.automark = L.DomUtil.create("input", null, amLabel);
+    amLabel.htmlFor = "wasabee-trawl-automark";
+    this.automark = L.DomUtil.create("input", null, options);
     this.automark.type = "checkbox";
     this.automark.checked = false;
+    this.automark.id = "wasabee-trawl-automark";
 
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");

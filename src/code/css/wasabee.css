@@ -1104,6 +1104,11 @@
   grid-template-columns: 1fr;
 }
 
+.wasabee-dialog-trawl div.container div {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
 .wasabee-dialog-onion {
 }
 .wasabee-dialog-onion div.container {

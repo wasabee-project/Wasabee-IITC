@@ -154,8 +154,10 @@ const MadridDialog = MultimaxDialog.extend({
     //Add backlinks after all the rest is set up
     const fllabel = L.DomUtil.create("label", null, container);
     fllabel.textContent = wX("ADD_BL");
+    fllabel.htmlFor = "wasabee-madrid-backlink";
     this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
+    this._flcheck.id = "wasabee-madrid-backlink";
 
     const newLine = L.DomUtil.create("label", "newline", container);
     const dividerBeforeDraw = L.DomUtil.create("span", null, container);

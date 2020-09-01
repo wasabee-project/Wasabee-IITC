@@ -93,8 +93,10 @@ const MultimaxDialog = WDialog.extend({
 
     const fllabel = L.DomUtil.create("label", null, container);
     fllabel.textContent = wX("ADD_BL");
+    fllabel.htmlFor = "wasabee-multimax-backlink";
     this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
+    this._flcheck.id = "wasabee-multimax-backlink";
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);

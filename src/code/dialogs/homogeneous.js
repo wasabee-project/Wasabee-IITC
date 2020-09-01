@@ -154,8 +154,10 @@ const HomogeneousDialog = WDialog.extend({
 
     const fullSearchLabel = L.DomUtil.create("label", null, container);
     fullSearchLabel.textContent = wX("HF_DEEP_SEARCH");
+    fullSearchLabel.htmlFor = "wasabee-homogeneous-deep";
     this._fullSearchCheck = L.DomUtil.create("input", null, container);
     this._fullSearchCheck.type = "checkbox";
+    this._fullSearchCheck.id = "wasabee-homogeneous-deep";
 
     const spanRedraw = L.DomUtil.create("div", null, container);
     this._redrawButton = L.DomUtil.create("button", null, spanRedraw);
