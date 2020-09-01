@@ -36,6 +36,16 @@ export function initSelectedOperation() {
   return window.plugin.wasabee._selectedOp;
 }
 
+export function changeOpIfNeeded() {
+  const selectedOp = getSelectedOperation();
+  const ops = opsList();
+  if (!ops.includes(selectedOp.ID)) {
+    if (ops.length == 0) loadNewDefaultOp();
+    else makeSelectedOperation(ops[ops.length - 1]);
+  }
+  return window.plugin.wasabee._selectedOp;
+}
+
 // create a new op and set it as selected
 export function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
@@ -58,7 +68,8 @@ export function makeSelectedOperation(opID) {
       );
     } else {
       // should not be necessary now, but still safe
-      window.plugin.wasabee._selectedOp.store();
+      if (opsList().includes(window.plugin.wasabee._selectedOp.ID))
+        window.plugin.wasabee._selectedOp.store();
     }
   }
 
@@ -84,6 +95,7 @@ export function makeSelectedOperation(opID) {
 export function getOperationByID(opID) {
   try {
     const newfmt = localStorage[opID];
+    if (!newfmt) return null;
     const raw = JSON.parse(newfmt);
     const op = new WasabeeOp(raw);
     if (op.ID) return op;
@@ -133,9 +145,24 @@ export function setupLocalStorage() {
   }
 }
 
+function storeOpsList(ops) {
+  localStorage[
+    window.plugin.wasabee.static.constants.OPS_LIST_KEY
+  ] = JSON.stringify(ops);
+}
+
 //** This function removes an operation from the main list */
 export function removeOperation(opID) {
+  const ops = opsList().filter((ID) => ID != opID);
+  storeOpsList(ops);
   delete localStorage[opID];
+}
+
+//** This function adds an operation to the main list */
+export function addOperation(opID) {
+  const ops = opsList();
+  if (!ops.includes(opID)) ops.push(opID);
+  storeOpsList(ops);
 }
 
 //*** This function resets the local op list
@@ -147,6 +174,24 @@ export function resetOps() {
 }
 
 export function opsList() {
+  const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      console.log(e);
+      //falback to old listing
+    }
+  }
+
+  // <0.18 migration
+  const list = oldOpsList();
+  storeOpsList(list);
+  return list;
+}
+
+// to remove on 0.19
+function oldOpsList() {
   const out = new Array();
 
   for (const key in localStorage) {
@@ -183,4 +228,5 @@ export function removeNonOwnedOps() {
     const op = getOperationByID(opID);
     if (!op.IsOwnedOp()) removeOperation(opID);
   }
+  changeOpIfNeeded();
 }

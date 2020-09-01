@@ -4,6 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import { generateId } from "./auxiliar";
 import { updateOpPromise } from "./server";
+import { addOperation } from "./selectedOp";
 
 import wX from "./wX";
 
@@ -36,6 +37,8 @@ export default class WasabeeOp {
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
 
+    this.server = this.fetched ? obj.server : null;
+
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
     if (!this.blockers) this.blockers = new Array();
@@ -66,6 +69,7 @@ export default class WasabeeOp {
   store() {
     this.stored = Date.now();
     localStorage[this.ID] = JSON.stringify(this);
+    addOperation(this.ID);
   }
 
   // build object to serialize
@@ -86,6 +90,8 @@ export default class WasabeeOp {
       localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
+      // ignored by the server but useful for localStorage
+      server: this.server,
     };
   }
 

@@ -9,6 +9,7 @@ import {
   opsList,
   removeOperation,
   duplicateOperation,
+  changeOpIfNeeded,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
@@ -78,12 +79,31 @@ const OpsDialog = WDialog.extend({
     const operationSelect = L.DomUtil.create("select", null, topSet);
 
     const ol = opsList();
+    const data = new Map();
     for (const opID of ol) {
       const tmpOp = getOperationByID(opID);
-      const option = L.DomUtil.create("option", null, operationSelect);
-      option.value = opID;
-      option.text = tmpOp.name;
-      if (opID == selectedOp.ID) option.selected = true;
+      const server = tmpOp.server || "";
+      if (!data.has(server)) data.set(server, []);
+      data.get(server).push({
+        id: opID,
+        name: tmpOp.name,
+      });
+    }
+
+    for (const server of [...data.keys()].sort()) {
+      const ops = data.get(server);
+      ops.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+      if (server != "") {
+        const option = L.DomUtil.create("option", null, operationSelect);
+        option.text = "-- " + server + " --";
+        option.disabled = true;
+      }
+      for (const d of ops) {
+        const option = L.DomUtil.create("option", null, operationSelect);
+        option.value = d.id;
+        option.text = d.name;
+        if (d.id == selectedOp.ID) option.selected = true;
+      }
     }
 
     L.DomEvent.on(operationSelect, "change", (ev) => {
@@ -194,20 +214,8 @@ const OpsDialog = WDialog.extend({
                 alert(e);
               }
             }
-            const ol = opsList();
-            let newopID = ol[0];
-            if (newopID == null || newopID == selectedOp.ID) {
-              console.log(
-                "removing first op in list? I was going to use that...."
-              );
-              newopID = ol[1];
-              if (newopID == null) {
-                console.log("not removing last op... fix this");
-                // create a new default op and use that -- just call the init/reset functions?
-              }
-            }
-            const removeid = selectedOp.ID;
-            const newop = makeSelectedOperation(newopID);
+            removeOperation(selectedOp.ID);
+            const newop = changeOpIfNeeded();
             const mbr = newop.mbr;
             if (
               mbr &&
@@ -216,9 +224,6 @@ const OpsDialog = WDialog.extend({
             ) {
               this._map.fitBounds(mbr);
             }
-            removeOperation(removeid);
-            window.runHooks("wasabeeUIUpdate", newop);
-            window.runHooks("wasabeeCrosslinks", newop);
           }
         );
         con.enable();

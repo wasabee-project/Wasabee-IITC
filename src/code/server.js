@@ -67,7 +67,8 @@ export async function opPromise(opID) {
   if (localop != null && localop.fetched) ims = localop.fetched;
 
   try {
-    const response = await fetch(GetWasabeeServer() + `/api/v1/draw/${opID}`, {
+    const server = GetWasabeeServer();
+    const response = await fetch(server + `/api/v1/draw/${opID}`, {
       method: "GET",
       mode: "cors",
       cache: "default",
@@ -84,10 +85,12 @@ export async function opPromise(opID) {
         raw = await response.json();
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
+        newop.server = server;
         return Promise.resolve(newop);
       case 304: // If-Modified-Since replied NotModified
         console.log("server copy is older/unmodified, keeping local copy");
         localop.localchanged = true;
+        localop.server = server;
         return Promise.resolve(localop);
       case 401:
         WasabeeMe.purge();
