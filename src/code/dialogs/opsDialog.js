@@ -246,8 +246,8 @@ const OpsDialog = WDialog.extend({
     dupeButton.textContent = wX("DUPE_OP");
     L.DomEvent.on(dupeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      duplicateOperation(selectedOp.ID);
-      window.runHooks("wasabeeUIUpdate", window.plugin.wasabee._selectedOp);
+      const newop = duplicateOperation(selectedOp.ID);
+      makeSelectedOperation(newop.ID);
     });
 
     this._content = content;

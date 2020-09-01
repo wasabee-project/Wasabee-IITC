@@ -219,7 +219,7 @@ export function duplicateOperation(opID) {
   op.keysonhand = new Array();
   op.cleanAll();
   op.store();
-  makeSelectedOperation(op.ID);
+  return op;
 }
 
 // this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users

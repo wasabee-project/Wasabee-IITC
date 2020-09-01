@@ -9,6 +9,7 @@ import {
   getOperationByID,
   removeOperation,
   changeOpIfNeeded,
+  duplicateOperation,
 } from "../selectedOp";
 import wX from "../wX";
 
@@ -48,13 +49,21 @@ const SyncButton = WButton.extend({
           const promises = new Array();
           const opsID = new Set(me.Ops.map((o) => o.ID));
 
-          // delete operations absent from server
+          // delete operations absent from server unless the owner
           const serverOps = new Set(
             opsList()
               .map(getOperationByID)
               .filter((op) => op.server == server && !opsID.has(op.ID))
           );
-          for (const op of serverOps) removeOperation(op.ID);
+          for (const op of serverOps) {
+            // if owned, duplicate the OP
+            if (op.IsOwnedOp()) {
+              const newop = duplicateOperation(op.ID);
+              newop.name = op.name;
+              newop.store();
+            }
+            removeOperation(op.ID);
+          }
           if (serverOps.size > 0)
             console.log(
               "remove",
