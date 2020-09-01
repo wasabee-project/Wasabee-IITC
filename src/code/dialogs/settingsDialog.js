@@ -83,8 +83,10 @@ const SettingsDialog = WDialog.extend({
 
     const sendLocTitle = L.DomUtil.create("label", null, container);
     sendLocTitle.textContent = wX("SEND LOCATION");
+    sendLocTitle.htmlFor = "wasabee-setting-sendloc";
     const sendLocCheck = L.DomUtil.create("input", null, container);
     sendLocCheck.type = "checkbox";
+    sendLocCheck.id = "wasabee-setting-sendloc";
     const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
     const sl = localStorage[c];
     if (sl === "true") sendLocCheck.checked = true;
@@ -95,8 +97,10 @@ const SettingsDialog = WDialog.extend({
 
     const expertTitle = L.DomUtil.create("label", null, container);
     expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
+    expertTitle.htmlFor = "wasabee-setting-expert";
     const expertCheck = L.DomUtil.create("input", null, container);
     expertCheck.type = "checkbox";
+    expertCheck.id = "wasabee-setting-expert";
     const exm = window.plugin.wasabee.static.constants.EXPERT_MODE_KEY;
     const ex = localStorage[exm];
     if (ex === "true") expertCheck.checked = true;
@@ -107,8 +111,10 @@ const SettingsDialog = WDialog.extend({
 
     const analyticsTitle = L.DomUtil.create("label", null, container);
     analyticsTitle.textContent = wX("SEND ANALYTICS");
+    analyticsTitle.htmlFor = "wasabee-setting-analytics";
     const analyticsCheck = L.DomUtil.create("input", null, container);
     analyticsCheck.type = "checkbox";
+    analyticsCheck.id = "wasabee-setting-analytics";
     if (
       localStorage[
         window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
@@ -175,8 +181,10 @@ const SettingsDialog = WDialog.extend({
 
     const autoLoadTitle = L.DomUtil.create("label", null, container);
     autoLoadTitle.textContent = wX("AUTOLOAD");
+    autoLoadTitle.htmlFor = "wasabee-setting-autoload";
     const autoLoadCheck = L.DomUtil.create("input", null, container);
     autoLoadCheck.type = "checkbox";
+    autoLoadCheck.id = "wasabee-setting-autoload";
     const alc = window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED;
     const al = localStorage[alc];
     if (al === "true") autoLoadCheck.checked = true;
