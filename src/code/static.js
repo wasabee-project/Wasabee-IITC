@@ -31,6 +31,7 @@ W.static = {
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
+    OPS_LIST_KEY: "wasabee-ops",
     SEND_LOCATION_KEY: "wasabee-send-location",
     SEND_ANALYTICS_KEY: "wasabee-analytics",
     EXPERT_MODE_KEY: "wasabee-expert-mode",

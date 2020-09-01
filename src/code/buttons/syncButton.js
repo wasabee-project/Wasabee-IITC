@@ -43,12 +43,13 @@ const SyncButton = WButton.extend({
             promises.push(opPromise(opID));
           }
           const ops = await Promise.all(promises);
-          for (const newop of ops) {
-            newop.store();
-            if (newop.ID == so.ID) {
-              makeSelectedOperation(newop.ID);
-            }
-          }
+          for (const newop of ops) newop.store();
+
+          // replace current op by the server version if any
+          if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
+          // update UI to reflect new ops list
+          else window.runHooks("wasabeeUIUpdate", so);
+
           alert(wX("SYNC DONE"));
         } catch (e) {
           console.log(e);

@@ -1,5 +1,5 @@
 import { WButton } from "../leafletClasses";
-import { uploadOpPromise, updateOpPromise } from "../server";
+import { uploadOpPromise, updateOpPromise, GetWasabeeServer } from "../server";
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -85,6 +85,13 @@ const UploadButton = WButton.extend({
     if (!operation.localchanged) {
       this._invisible();
       this.title = wX("UPDATE HOVER NOT CHANGED", operation.name);
+      this.button.title = this.title;
+      return;
+    }
+
+    if (operation.server && operation.server != GetWasabeeServer()) {
+      this._invisible();
+      this.title = wX("UPDATE HOVER WRONG SERVER", operation.name);
       this.button.title = this.title;
       return;
     }
