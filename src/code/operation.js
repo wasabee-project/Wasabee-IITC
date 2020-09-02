@@ -467,10 +467,12 @@ export default class WasabeeOp {
   }
 
   // update portal silently if one with mathching ID or with matching position
+  // return true if this update a portal data
   _updatePortal(portal) {
     const old = this.getPortal(portal.id);
     if (old) {
       if (!portal.faked) {
+        if (old.name == portal.name) return false;
         old.name = portal.name;
         return true;
       }
