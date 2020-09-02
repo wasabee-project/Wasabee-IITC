@@ -353,40 +353,40 @@
   background-image: url(../images/wasabee_markers_farm_done.svg)
 }
 .wasabee-marker-icon.GotoPortalMarker {
-  background-image: url(../images/wasabee_markers_goto_pending.png)
+  background-image: url(../images/wasabee_markers_goto_pending.svg)
 }
 .wasabee-marker-icon.GotoPortalMarker.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_goto_assigned.png)
+  background-image: url(../images/wasabee_markers_goto_assigned.svg)
 }
 .wasabee-marker-icon.GotoPortalMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_goto_assigned.png)
+  background-image: url(../images/wasabee_markers_goto_acknowledged.svg)
 }
 .wasabee-marker-icon.GotoPortalMarker.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_goto_done.png)
+  background-image: url(../images/wasabee_markers_goto_done.svg)
 }
 .wasabee-marker-icon.GetKeyPortalMarker {
-  background-image: url(../images/wasabee_markers_key_pending.png)
+  background-image: url(../images/wasabee_markers_key_pending.svg)
 }
 .wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_key_assigned.png)
+  background-image: url(../images/wasabee_markers_key_assigned.svg)
 }
 .wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_key_assigned.png)
+  background-image: url(../images/wasabee_markers_key_acknowledged.svg)
 }
 .wasabee-marker-icon.GetKeyPortalMarker.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_key_done.png)
+  background-image: url(../images/wasabee_markers_key_done.svg)
 }
 .wasabee-marker-icon.CreateLinkAlert {
-  background-image: url(../images/wasabee_markers_link_pending.png)
+  background-image: url(../images/wasabee_markers_link_pending.svg)
 }
 .wasabee-marker-icon.CreateLinkAlert.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_link_assigned.png)
+  background-image: url(../images/wasabee_markers_link_assigned.svg)
 }
 .wasabee-marker-icon.CreateLinkAlert.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_link_assigned.png)
+  background-image: url(../images/wasabee_markers_link_acknowledged.svg)
 }
 .wasabee-marker-icon.CreateLinkAlert.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_link_done.png)
+  background-image: url(../images/wasabee_markers_link_done.svg)
 }
 .wasabee-marker-icon.MeetAgentPortalMarker {
   background-image: url(../images/wasabee_markers_meetagent_pending.svg)
@@ -449,21 +449,21 @@
   background-image: url(../images/wasabee_markers_virus_done.svg)
 }
 .wasabee-marker-icon.ExcludeMarker {
-  background-image: url(../images/wasabee_markers_exclude_pending.png)
+  background-image: url(../images/wasabee_markers_exclude_pending.svg)
 }
 .wasabee-marker-icon.ExcludeMarker.wasabee-status-assigned  {
-  background-image: url(../images/wasabee_markers_exclude_assigned.png)
+  background-image: url(../images/wasabee_markers_exclude_assigned.svg)
 }
 .wasabee-marker-icon.ExcludeMarker.wasabee-status-acknowledged {
-  background-image: url(../images/wasabee_markers_exclude_assigned.png)
+  background-image: url(../images/wasabee_markers_exclude_assigned.svg)
 }
 .wasabee-marker-icon.ExcludeMarker.wasabee-status-completed {
-  background-image: url(../images/wasabee_markers_exclude_done.png)
+  background-image: url(../images/wasabee_markers_exclude_done.svg)
 }
 
 .wasabee-defense-icon {
   background-size: cover;
-  background-image: url(../images/wasabee_markers_key_done.png)
+  background-image: url(../images/wasabee_markers_key_done.svg)
 }
 
 .wasabee-anchor-icon {
