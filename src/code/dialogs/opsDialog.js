@@ -82,6 +82,7 @@ const OpsDialog = WDialog.extend({
     const data = new Map();
     for (const opID of ol) {
       const tmpOp = getOperationByID(opID);
+      if (!tmpOp) continue;
       const server = tmpOp.server || "";
       if (!data.has(server)) data.set(server, []);
       data.get(server).push({
