@@ -486,7 +486,8 @@ export default class WasabeeOp {
     this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-      this.update(true);
+      // don't update, anchors are bound to links
+      //this.update(true);
     }
   }
 
