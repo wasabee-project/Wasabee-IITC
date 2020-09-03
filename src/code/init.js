@@ -29,6 +29,7 @@ window.plugin.wasabee.init = () => {
   Wasabee.teams = new Map();
   Wasabee._agentCache = new Map();
   Wasabee.onlineAgents = new Map();
+  Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
 
   // can this be moved to the auth dialog?
