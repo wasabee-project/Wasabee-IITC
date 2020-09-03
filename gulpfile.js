@@ -134,7 +134,7 @@ gulp.task("buildplugin", (cb) => {
 });
 
 gulp.task("buildmeta", (cb) => {
-  const p = path.join(cfg.releaseFolder["prod"], cfg.metaName);
+  const p = path.join(cfg.releaseFolder[status.mode], cfg.metaName);
 
   ensureDirectoryExistence(p);
   fs.writeFile(p, status.headers, (err) => {
