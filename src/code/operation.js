@@ -92,6 +92,7 @@ export default class WasabeeOp {
       localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
+      mode: this.mode,
       // ignored by the server but useful for localStorage
       server: this.server,
     };
