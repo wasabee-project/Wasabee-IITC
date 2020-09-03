@@ -35,7 +35,8 @@ export async function uploadOpPromise() {
 // sends a changed op to the server
 export function updateOpPromise(operation) {
   // let the server know how to process assignments etc
-  operation.mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
+  operation.mode =
+    localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
   operation.cleanAll();
   const json = JSON.stringify(operation);
   delete operation.mode;

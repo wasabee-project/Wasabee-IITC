@@ -365,8 +365,8 @@ export default class WasabeeOp {
       }
     }
     this.links = newLinks;
-    this.cleanPortalList();
     this.cleanAnchorList();
+    this.cleanPortalList();
     this.update(true);
     this.runCrosslinks();
   }
