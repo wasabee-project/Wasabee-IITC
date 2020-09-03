@@ -92,6 +92,7 @@ export default class WasabeeOp {
       localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
+      mode: this.mode,
       // ignored by the server but useful for localStorage
       server: this.server,
     };
@@ -467,10 +468,12 @@ export default class WasabeeOp {
   }
 
   // update portal silently if one with mathching ID or with matching position
+  // return true if this update a portal data
   _updatePortal(portal) {
     const old = this.getPortal(portal.id);
     if (old) {
       if (!portal.faked) {
+        if (old.name == portal.name) return false;
         old.name = portal.name;
         return true;
       }
@@ -569,7 +572,8 @@ export default class WasabeeOp {
     this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-      this.update(true);
+      // don't update, anchors are bound to links
+      //this.update(true);
     }
   }
 

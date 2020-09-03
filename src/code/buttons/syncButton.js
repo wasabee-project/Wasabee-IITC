@@ -53,6 +53,7 @@ const SyncButton = WButton.extend({
           const serverOps = new Set(
             opsList()
               .map(getOperationByID)
+              .filter((op) => op)
               .filter((op) => op.server == server && !opsID.has(op.ID))
           );
           for (const op of serverOps) {
