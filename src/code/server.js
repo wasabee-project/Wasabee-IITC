@@ -343,9 +343,17 @@ async function genericPut(url, formData, contentType) {
     let err = null;
     switch (response.status) {
       case 200:
-        // returns a promise to the content
-        // I think all the PUTS return a JSON "OK"
-        return response.text();
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          console.log(obj);
+          if (obj.updateID)
+            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          // returns a promise to the content
+          return Promise.resolve(text);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       // break;
       case 401:
         WasabeeMe.purge();
@@ -382,8 +390,17 @@ async function genericPost(url, formData, contentType) {
     let err = null;
     switch (response.status) {
       case 200:
-        // returns a promise to the content
-        return response.text();
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          console.log(obj);
+          if (obj.updateID)
+            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          // returns a promise to the content
+          return Promise.resolve(text);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       // break;
       case 401:
         WasabeeMe.purge();
@@ -420,8 +437,17 @@ async function genericDelete(url, formData, contentType) {
     let err = null;
     switch (response.status) {
       case 200:
-        // returns a promise to the content
-        return response.text();
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          console.log(obj);
+          if (obj.updateID)
+            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          // returns a promise to the content
+          return Promise.resolve(text);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       // break;
       case 401:
         WasabeeMe.purge();
@@ -453,9 +479,17 @@ async function genericGet(url) {
     let err = null;
     switch (response.status) {
       case 200:
-        // returns a promise to the content
-        return response.text();
-      // break;
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          console.log(obj);
+          if (obj.updateID)
+            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          // returns a promise to the content
+          return Promise.resolve(text);
+        } catch (e) {
+          return Promise.reject(e);
+        }
       case 401:
         WasabeeMe.purge();
         err = await response.json();
