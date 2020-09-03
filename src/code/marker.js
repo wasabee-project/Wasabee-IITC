@@ -48,6 +48,14 @@ export default class WasabeeMarker {
     this.order = Number.parseInt(o, 10);
   }
 
+  assign(gid) {
+    if (this.state == "pending" || this.state == "assigned") {
+      if (!gid || gid == "") this.state = "pending";
+      else this.state = "assigned";
+      this.assignedTo = gid;
+    }
+  }
+
   async getMarkerPopup(marker, operation) {
     const portal = operation.getPortal(this.portalId);
     const content = L.DomUtil.create("div", "wasabee-marker-popup");

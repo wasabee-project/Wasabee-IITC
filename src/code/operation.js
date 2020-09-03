@@ -699,7 +699,7 @@ export default class WasabeeOp {
   assignMarker(id, gid) {
     for (const v of this.markers) {
       if (v.ID == id) {
-        v.assignedTo = gid;
+        v.assign(gid);
       }
     }
     this.update(true);
