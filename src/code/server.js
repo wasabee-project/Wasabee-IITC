@@ -72,7 +72,8 @@ export const updateOpPromise = (operation) => {
   const SERVER_BASE = GetWasabeeServer();
 
   // let the server know how to process assignments etc
-  operation.mode = window.plugin.wasabee.static.constants.MODE_KEY;
+  const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
+  operation.mode = localStorage[modeKey];
 
   // const operation = getSelectedOperation();
   operation.cleanAll();
