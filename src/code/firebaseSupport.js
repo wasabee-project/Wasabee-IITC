@@ -54,20 +54,30 @@ export function initFirebase() {
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       case "Map Change":
-        try {
-          const refreshed = await opPromise(event.data.data.opID);
-          refreshed.store();
-          if (refreshed.ID == operation.ID) {
-            console.log(
-              "firebase trigger reload of current op: ",
-              event.data.data
-            );
-            makeSelectedOperation(refreshed.ID);
-          } else {
-            console.log("firebase trigger update of op", event.data.data.opID);
+        if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
+          try {
+            const refreshed = await opPromise(event.data.data.opID);
+            refreshed.store();
+            if (refreshed.ID == operation.ID) {
+              console.log(
+                "firebase trigger reload of current op: ",
+                event.data.data
+              );
+              makeSelectedOperation(refreshed.ID);
+            } else {
+              console.log(
+                "firebase trigger update of op",
+                event.data.data.opID
+              );
+            }
+          } catch (e) {
+            console.log(e);
           }
-        } catch (e) {
-          console.log(e);
+        } else {
+          console.log(
+            "skipping firebase requested update of op since it was our change",
+            event.data.data.updateID
+          );
         }
         break;
       case "Target":
