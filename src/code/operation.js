@@ -860,7 +860,18 @@ export default class WasabeeOp {
 
   convertZonesToObjs(zones) {
     if (!zones || zones.length == 0) {
-      const primary = new WasabeeZone({ id: 1, name: "Primary" });
+      // if not set, use the defaults
+      const primary = new WasabeeZone(
+        { id: 1, name: "Primary" },
+        { id: 2, name: "Alpha" },
+        { id: 3, name: "Beta" },
+        { id: 4, name: "Gamma" },
+        { id: 5, name: "Delta" },
+        { id: 6, name: "Epsilon" },
+        { id: 7, name: "Zeta" },
+        { id: 8, name: "Eta" },
+        { id: 9, name: "Theta" }
+      );
       return new Array(primary);
     }
     const tmpZones = Array();
