@@ -226,7 +226,7 @@ export function duplicateOperation(opID) {
 export function removeNonOwnedOps() {
   for (const opID of opsList()) {
     const op = getOperationByID(opID);
-    if (!op.IsOwnedOp()) removeOperation(opID);
+    if (!op || !op.IsOwnedOp()) removeOperation(opID);
   }
   changeOpIfNeeded();
 }
