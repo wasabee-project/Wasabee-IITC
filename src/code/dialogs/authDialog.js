@@ -226,6 +226,7 @@ const AuthDialog = WDialog.extend({
     if (gPrompt && gPrompt.value != "unset") options.prompt = gPrompt.value;
     window.gapi.auth2.authorize(options, async (response) => {
       if (response.error) {
+        postToFirebase({ id: "exception", error: response.error });
         if (response.error === "idpiframe_initialization_failed") {
           alert("You need enable cookies or allow [*.]google.com");
         }
@@ -236,6 +237,7 @@ const AuthDialog = WDialog.extend({
           options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
           window.gapi.auth2.authorize(options, async (responseSelect) => {
             if (responseSelect.error) {
+              postToFirebase({ id: "exception", error: response.error });
               const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
               alert(err);
               console.log(err);
@@ -259,6 +261,7 @@ const AuthDialog = WDialog.extend({
         } else {
           this._dialog.dialog("close");
           const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
+          postToFirebase({ id: "exception", error: err });
           console.log(err);
           alert(err);
         }
@@ -271,6 +274,7 @@ const AuthDialog = WDialog.extend({
         this._dialog.dialog("close");
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
       } catch (e) {
+        postToFirebase({ id: "exception", error: e });
         console.log(e);
         alert(e);
         this._dialog.dialog("close");
@@ -292,6 +296,7 @@ const AuthDialog = WDialog.extend({
           this._dialog.dialog("close");
           const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
+          postToFirebase({ id: "exception", error: err });
           return;
         }
         try {
@@ -303,6 +308,7 @@ const AuthDialog = WDialog.extend({
         } catch (e) {
           console.log(e);
           alert(`send access token failed (gsapiAuthChoose): ${e}`);
+          postToFirebase({ id: "exception", error: e });
         }
       }
     );
