@@ -15,11 +15,11 @@ const UploadButton = WButton.extend({
     this.type = UploadButton.TYPE;
     // this.handler = null;
     const operation = getSelectedOperation();
-    this.title = `Upload ${operation.name}`;
+    this.title = wX("UPLOAD BUTTON HOVER", operation.name);
     this._container = container;
 
     this.button = this._createButton({
-      title: "Upload",
+      title: this.title,
       container: this._container,
       className: "wasabee-toolbar-upload",
       context: this,

@@ -30,6 +30,7 @@ const WasabeeButton = WButton.extend({
       className: "wasabee-toolbar-wasabee",
       callback: this.handler,
       context: this,
+      title: this.title,
     });
 
     this._lastLoginState = false;

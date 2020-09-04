@@ -40,6 +40,7 @@ const SyncButton = WButton.extend({
       container: container,
       className: "wasabee-toolbar-sync",
       context: this,
+      title: this.title,
       callback: async () => {
         const so = getSelectedOperation();
         const server = GetWasabeeServer();

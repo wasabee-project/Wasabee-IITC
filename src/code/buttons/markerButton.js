@@ -24,6 +24,7 @@ const MarkerButton = WButton.extend({
       className: "wasabee-toolbar-marker",
       callback: this._toggleActions,
       context: context,
+      title: this.title,
     });
 
     this.actionsContainer = this._createSubActions([
