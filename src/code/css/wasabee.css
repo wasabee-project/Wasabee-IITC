@@ -468,28 +468,28 @@
 
 .wasabee-anchor-icon {
   background-size: cover;
-  background-image: url(../images/marker_layer_main.png)
+  background-image: url(../images/marker_layer_main.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-main {
-  background-image: url(../images/marker_layer_main.png)
+  background-image: url(../images/marker_layer_main.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupa {
-  background-image: url(../images/marker_layer_groupa.png)
+  background-image: url(../images/marker_layer_groupa.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupb {
-  background-image: url(../images/marker_layer_groupb.png)
+  background-image: url(../images/marker_layer_groupb.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupc {
-  background-image: url(../images/marker_layer_groupc.png)
+  background-image: url(../images/marker_layer_groupc.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupd {
-  background-image: url(../images/marker_layer_groupd.png)
+  background-image: url(../images/marker_layer_groupd.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupe {
-  background-image: url(../images/marker_layer_groupe.png)
+  background-image: url(../images/marker_layer_groupe.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupf {
-  background-image: url(../images/marker_layer_groupf.png)
+  background-image: url(../images/marker_layer_groupf.svg)
 }
 
 .wasabee-toolbar-wasabee {
