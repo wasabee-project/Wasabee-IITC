@@ -34,17 +34,9 @@ function updateMarkers(op) {
     if (layerMap.has(m.ID)) {
       const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
       if (m.state != ll.options.state) {
-        // state changed, update icon
-        Wasabee.markerLayerGroup.removeLayer(ll);
-        const newicon = L.divIcon({
-          className: `wasabee-marker-icon ${m.type} wasabee-status-${m.state}`,
-          shadowUrl: null,
-          iconSize: L.point(24, 40),
-          iconAnchor: L.point(12, 40),
-          popupAnchor: L.point(-1, -48),
-        });
-        ll.setIcon(newicon);
-        ll.addTo(Wasabee.markerLayerGroup);
+        L.DomUtil.removeClass(ll._icon, `wasabee-status-${ll.options.state}`);
+        L.DomUtil.addClass(ll._icon, `wasabee-status-${m.state}`);
+        ll.options.state = m.state;
       }
       layerMap.delete(m.ID);
     } else {

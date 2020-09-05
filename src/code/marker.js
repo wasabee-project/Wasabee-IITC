@@ -13,26 +13,28 @@ export default class WasabeeMarker {
     this.portalId = obj.portalId;
     this.type = obj.type;
     this.comment = obj.comment ? obj.comment : "";
-    this.state = obj.state ? obj.state : "pending";
     this.completedBy = obj.completedBy ? obj.completedBy : "";
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.order = obj.order ? obj.order : 0;
     this.zone = obj.zone ? obj.zone : 1;
 
-    if (this.state == "pending" && this.assignedTo != "")
-      this.state = "assigned";
+    // some constants
+    this.STATE_UNASSIGNED = "pending";
+    this.STATE_ASSIGNED = "assigned";
+    this.STATE_ACKNOWLEDGED = "acknowledged";
+    this.STATE_COMPLETED = "completed";
+
+    // validation happens in the setter, setting up this._state
+    this.state = obj.state;
   }
 
   toJSON() {
-    // let state = this.state;
-    // if (this.state == "assigned") state = "pending";
-
     return {
       ID: this.ID,
       portalId: this.portalId,
       type: this.type,
       comment: this.comment,
-      state: this.state,
+      state: this._state, // no need to validate here
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
       order: this.order,
@@ -49,23 +51,32 @@ export default class WasabeeMarker {
   }
 
   assign(gid) {
-    if (this.state == "pending" || this.state == "assigned") {
-      if (!gid || gid == "") this.state = "pending";
-      else this.state = "assigned";
-      this.assignedTo = gid;
+    if (!gid || gid == "") {
+      this._state = this.STATE_UNASSIGNED;
+      this.assignedTo = "";
+      return;
     }
+
+    this.assignedTo = gid;
+    this._state = this.STATE_ASSIGNED;
+    return;
   }
 
-  setState(state) {
+  set state(state) {
     // if setting to "pending", clear assignments
-    if (state == "pending") this.assignedTo = null;
-    // if setting to assigned or acknowledged and there is no assignment, set to "pending", a task can be completed w/o being assigned
+    if (state == this.STATE_UNASSIGNED) this.assignedTo = null;
+    // if setting to assigned or acknowledged and there is no assignment, set to "pending". A task _can_ be completed w/o being assigned
     if (
-      (state == "assigned" || state == "acknowledged") &&
+      (state == this.STATE_ASSIGNED || state == this.STATE_ACKNOWLEDGED) &&
       (!this.assignedTo || this.assignedTo == "")
-    )
-      state = "pending";
-    this.state = state;
+    ) {
+      state = this.STATE_UNASSIGNED;
+    }
+    this._state = state;
+  }
+
+  get state() {
+    return this._state;
   }
 
   async getMarkerPopup(marker, operation) {

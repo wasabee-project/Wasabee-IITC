@@ -171,6 +171,7 @@ const AssignDialog = WDialog.extend({
   activeAssign: async function (value) {
     // if this._operation.localchanged...
     try {
+      console.log("pushing op to server");
       await updateOpPromise(this._operation);
       console.log("update pushed");
     } catch (e) {
@@ -185,10 +186,11 @@ const AssignDialog = WDialog.extend({
           this._targetID,
           value.srcElement.value
         );
-        console.log("assignment processed");
-        this._operation.assignMarker(this._targetID, value.srcElement.value);
+        console.log("assignment processed by server");
+        // this._operation.assignMarker(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
+        this._operation.assignMarker(this._targetID, value.srcElement.value);
         throw e;
       }
     }
@@ -199,10 +201,11 @@ const AssignDialog = WDialog.extend({
           this._targetID,
           value.srcElement.value
         );
-        console.log("assignment processed");
-        this._operation.assignLink(this._targetID, value.srcElement.value);
+        console.log("assignment processed by server");
+        // this._operation.assignLink(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
+        this._operation.assignLink(this._targetID, value.srcElement.value);
         throw e;
       }
     }
@@ -217,18 +220,21 @@ const AssignDialog = WDialog.extend({
             l.ID,
             value.srcElement.value
           );
-          console.log("assignment processed");
-          this._operation.assignLink(l.ID, value.srcElement.value);
+          console.log("assignment processed by server");
+          // this._operation.assignLink(l.ID, value.srcElement.value);
         } catch (e) {
           console.log(e);
+          this._operation.assignLink(l.ID, value.srcElement.value);
           throw e;
         }
       }
     }
 
     try {
+      console.log("refreshing local copy of op from server");
       const updated = await opPromise(this._operation.ID);
       updated.store();
+      this._operation = updated();
       makeSelectedOperation(updated.ID);
     } catch (e) {
       console.log(e);

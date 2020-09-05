@@ -299,8 +299,8 @@ export default class WasabeeOp {
   setMarkerState(markerID, state) {
     for (const v of this.markers) {
       if (v.ID == markerID) {
-        if (state == "pending") this.assignedTo = null;
-        v.setState(state);
+        // validation happens in the marker class
+        v.state = state;
       }
     }
     this.update(true);
@@ -702,18 +702,18 @@ export default class WasabeeOp {
     for (const v of this.markers) {
       if (v.ID == id) {
         v.assign(gid);
+        this.update(true);
       }
     }
-    this.update(true);
   }
 
   assignLink(id, gid) {
     for (const v of this.links) {
       if (v.ID == id) {
         v.assignedTo = gid;
+        this.update(true);
       }
     }
-    this.update(true);
   }
 
   clearAllItems() {
