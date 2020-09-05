@@ -799,11 +799,11 @@
 .wasabee-dialog-keyslist {
 }
 .wasabee-dialog-keyslist .enough {
-  color: #fff;
+  color: #03fe03;
   font-weight: bold;
 }
 .wasabee-dialog-keyslist .notenough {
-  color: #900;
+  color: #ffce00;
   font-weight: bold;
 }
 
