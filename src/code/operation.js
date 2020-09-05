@@ -30,6 +30,7 @@ export default class WasabeeOp {
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
+    this.color = this.oldColors(this.color); // for 0.17, use old colors
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
@@ -995,5 +996,54 @@ export default class WasabeeOp {
     };
     this.keysonhand.push(k);
     this.update(false);
+  }
+
+  // for 0.17, if we see the new, we change to the old
+  // for 0.18 we will change from old-to-new...
+  oldColors(incoming) {
+    switch (incoming) {
+      case "orange":
+        return "groupa";
+      case "yellow":
+        return "groupb";
+      case "lime":
+        return "groupc";
+      case "purple":
+        return "groupd";
+      case "teal":
+        return "groupe";
+      case "fuscia":
+        return "groupf";
+      case "red":
+        return "main";
+      case "blue":
+        return "main";
+      case "green":
+        return "groupc";
+      default:
+        return incoming;
+    }
+  }
+
+  // not used in 0.17...
+  newColors(incoming) {
+    switch (incoming) {
+      case "groupa":
+        return "orange";
+      case "groupb":
+        return "yellow";
+      case "groupc":
+        return "lime";
+      case "groupd":
+        return "purple";
+      case "groupe":
+        return "teal";
+      case "groupf":
+        return "fuscia";
+      case "main":
+        return "red";
+      default:
+        return incoming;
+    }
   }
 }
