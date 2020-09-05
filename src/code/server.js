@@ -347,7 +347,6 @@ async function genericPut(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          console.log(obj);
           if (obj.updateID)
             window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
           // returns a promise to the content
@@ -394,7 +393,6 @@ async function genericPost(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          console.log(obj);
           if (obj.updateID)
             window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
           // returns a promise to the content
@@ -441,7 +439,6 @@ async function genericDelete(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          console.log(obj);
           if (obj.updateID)
             window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
           // returns a promise to the content
@@ -483,7 +480,6 @@ async function genericGet(url) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          console.log(obj);
           if (obj.updateID)
             window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
           // returns a promise to the content
