@@ -299,7 +299,8 @@ export default class WasabeeOp {
   setMarkerState(markerID, state) {
     for (const v of this.markers) {
       if (v.ID == markerID) {
-        v.state = state;
+        if (state == "pending") this.assignedTo = null;
+        v.setState(state);
       }
     }
     this.update(true);

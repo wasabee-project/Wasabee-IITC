@@ -24,15 +24,15 @@ export default class WasabeeMarker {
   }
 
   toJSON() {
-    let state = this.state;
-    if (this.state == "assigned") state = "pending";
+    // let state = this.state;
+    // if (this.state == "assigned") state = "pending";
 
     return {
       ID: this.ID,
       portalId: this.portalId,
       type: this.type,
       comment: this.comment,
-      state: state,
+      state: this.state,
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
       order: this.order,
@@ -54,6 +54,18 @@ export default class WasabeeMarker {
       else this.state = "assigned";
       this.assignedTo = gid;
     }
+  }
+
+  setState(state) {
+    // if setting to "pending", clear assignments
+    if (state == "pending") this.assignedTo = null;
+    // if setting to assigned or acknowledged and there is no assignment, set to "pending", a task can be completed w/o being assigned
+    if (
+      (state == "assigned" || state == "acknowledged") &&
+      (!this.assignedTo || this.assignedTo == "")
+    )
+      state = "pending";
+    this.state = state;
   }
 
   async getMarkerPopup(marker, operation) {
