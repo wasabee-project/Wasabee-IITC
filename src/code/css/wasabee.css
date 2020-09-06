@@ -499,10 +499,12 @@
   background-image: url(../images/toolbar_wasabeebutton_in.svg)
 }
 .wasabee-toolbar-ops {
-  background-image: url(../images/toolbar_viewOps.png)
+  background-image: url(../images/toolbar_viewOps.svg);
+  background-size: 60%;
 }
 .wasabee-toolbar-quickdraw {
-  background-image: url(../images/toolbar_quickdraw.png)
+  background-image: url(../images/toolbar_quickdraw.svg);
+  background-size: 60%;
 }
 .wasabee-toolbar-link {
   background-image: url(../images/toolbar_addlinks.png)
