@@ -63,6 +63,14 @@ export default class WasabeeMarker {
   }
 
   set state(state) {
+    // sanitize state
+    if (
+      state != this.STATE_UNASSIGNED &&
+      state != this.STATE_ASSIGNED &&
+      state != this.STATE_ACKNOWLEDGED &&
+      state != this.STATE_COMPLETED
+    )
+      state = this.STATE_UNASSIGNED;
     // if setting to "pending", clear assignments
     if (state == this.STATE_UNASSIGNED) this.assignedTo = null;
     // if setting to assigned or acknowledged and there is no assignment, set to "pending". A task _can_ be completed w/o being assigned
