@@ -51,6 +51,7 @@ const AuthDialog = WDialog.extend({
     }
 
     const content = L.DomUtil.create("div", "content");
+    L.DomUtil.create("div", null, content).textContent = GetWasabeeServer();
 
     const ua = L.DomUtil.create("div", "useragent", content);
     this._android = false;
