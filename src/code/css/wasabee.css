@@ -468,28 +468,28 @@
 
 .wasabee-anchor-icon {
   background-size: cover;
-  background-image: url(../images/marker_layer_main.svg)
+  background-image: url(../images/pin_red.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-main {
-  background-image: url(../images/marker_layer_main.svg)
+  background-image: url(../images/pin_red.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupa {
-  background-image: url(../images/marker_layer_groupa.svg)
+  background-image: url(../images/pin_orange.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupb {
-  background-image: url(../images/marker_layer_groupb.svg)
+  background-image: url(../images/pin_yellow.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupc {
-  background-image: url(../images/marker_layer_groupc.svg)
+  background-image: url(../images/pin_tan.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupd {
-  background-image: url(../images/marker_layer_groupd.svg)
+  background-image: url(../images/pin_purple.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupe {
-  background-image: url(../images/marker_layer_groupe.svg)
+  background-image: url(../images/pin_teal.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-groupf {
-  background-image: url(../images/marker_layer_groupf.svg)
+  background-image: url(../images/pin_magenta.svg)
 }
 
 .wasabee-toolbar-wasabee {
