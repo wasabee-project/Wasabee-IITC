@@ -51,7 +51,8 @@ const AuthDialog = WDialog.extend({
     }
 
     const content = L.DomUtil.create("div", "content");
-    L.DomUtil.create("div", null, content).textContent = GetWasabeeServer();
+    this._server = L.DomUtil.create("div", null, content);
+    this._server.textContent = GetWasabeeServer();
 
     const ua = L.DomUtil.create("div", "useragent", content);
     this._android = false;
@@ -151,6 +152,7 @@ const AuthDialog = WDialog.extend({
         () => {
           if (serverDialog.inputField.value) {
             SetWasabeeServer(serverDialog.inputField.value);
+            this._server.textContent = GetWasabeeServer();
             WasabeeMe.purge();
           }
         }
