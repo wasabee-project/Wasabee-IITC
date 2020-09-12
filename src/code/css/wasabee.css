@@ -492,6 +492,16 @@
   background-image: url(../images/pin_magenta.svg)
 }
 
+/* use a specific class for custom layer to not break skins and pre-defined layers */
+.wasabee-anchor-icon.wasabee-layer-custom {
+  background-size: cover;
+  background-image: url(../images/pin_red.svg);
+  mask-image: url(../images/pin_red.svg);
+  mask-size: cover;
+  mask-type: alpha;
+  background-blend-mode: luminosity;
+}
+
 .wasabee-toolbar-wasabee {
   background-image: url(../images/toolbar_wasabeebutton_out.svg)
 }
