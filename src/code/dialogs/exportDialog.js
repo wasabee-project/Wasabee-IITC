@@ -12,7 +12,6 @@ const ExportDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = ExportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._operation = getSelectedOperation();
     postToFirebase({ id: "analytics", action: ExportDialog.TYPE });
   },
 
@@ -27,20 +26,21 @@ const ExportDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
-      this._drawToolsFormat();
+      this._drawToolsFormat(operation);
     };
     buttons[wX("ANCHORS_AS_BOOKMARKS")] = () => {
-      this._bookmarkFormat();
+      this._bookmarkFormat(operation);
     };
 
     this._dialog = window.dialog({
-      title: wX("EXPORT") + this._operation.name,
-      html: this._buildContent(),
+      title: wX("EXPORT") + operation.name,
+      html: this._buildContent(operation),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-export",
       closeCallback: () => {
@@ -52,30 +52,30 @@ const ExportDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _buildContent: function () {
+  _buildContent: function (operation) {
     const mainContent = L.DomUtil.create("div", null);
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
-    this._operation.cleanAll();
-    textArea.value = JSON.stringify(this._operation);
+    operation.cleanAll();
+    textArea.value = JSON.stringify(operation);
     return mainContent;
   },
 
-  _drawToolsFormat: function () {
+  _drawToolsFormat: function (operation) {
     const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Array();
-    for (const link of this._operation.links) {
+    for (const link of operation.links) {
       const l = {};
       l.type = "polyline";
-      l.color = link.getColor(this._operation);
-      l.latLngs = link.getLatLngs(this._operation);
+      l.color = link.getColor(operation);
+      l.latLngs = link.getLatLngs(operation);
       output.push(l);
     }
 
     ta.value = JSON.stringify(output);
   },
 
-  _bookmarkFormat: function () {
+  _bookmarkFormat: function (operation) {
     const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Object();
     output.maps = {};
@@ -90,9 +90,9 @@ const ExportDialog = WDialog.extend({
     output.portals.idOthers.state = 1;
     output.portals.idOthers.bkmrk = {};
 
-    for (const a of this._operation.anchors) {
+    for (const a of operation.anchors) {
       const id = "id" + a.substring(0, 16);
-      const p = this._operation._idToOpportals.get(a);
+      const p = operation._idToOpportals.get(a);
       output.portals.idOthers.bkmrk[id] = {};
       output.portals.idOthers.bkmrk[id].guid = a;
       output.portals.idOthers.bkmrk[id].latlng = `${p.lat},${p.lng}`;
