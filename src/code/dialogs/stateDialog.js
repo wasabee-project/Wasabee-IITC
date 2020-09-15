@@ -4,6 +4,7 @@ import WasabeeMarker from "../marker";
 import { SetMarkerState, SetLinkState } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -53,6 +54,11 @@ const StateDialog = WDialog.extend({
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = this._getStateMenu(target);
+
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("operation changed");
+    }
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);

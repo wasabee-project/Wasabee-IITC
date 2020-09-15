@@ -1,5 +1,4 @@
 import { mePromise } from "./server";
-import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 

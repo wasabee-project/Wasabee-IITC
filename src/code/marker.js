@@ -100,7 +100,8 @@ export default class WasabeeMarker {
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {
       console.log("null portal getting marker popup");
-      return L.DomUtil.create("div", "wasabee-marker-popup").textContent = "invalid portal";
+      return (L.DomUtil.create("div", "wasabee-marker-popup").textContent =
+        "invalid portal");
     }
 
     const content = L.DomUtil.create("div", "wasabee-marker-popup");

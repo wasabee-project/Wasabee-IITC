@@ -57,6 +57,8 @@ const SendTargetDialog = WDialog.extend({
     const menu = await this._getAgentMenu(target.assignedTo);
     this._name = wX("SEND TARGET AGENT");
 
+    const operation = getSelectedOperation();
+
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
