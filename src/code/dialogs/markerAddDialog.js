@@ -18,7 +18,6 @@ const MarkerAddDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
     const context = this;
     this._pch = (portal) => {
       context.update(portal);
@@ -42,9 +41,19 @@ const MarkerAddDialog = WDialog.extend({
       this._portal.appendChild(
         this._selectedPortal.displayFormat(this._smallScreen)
       );
-      const markers = this._operation.getPortalMarkers(this._selectedPortal);
+
+      const markers = getSelectedOperation().getPortalMarkers(
+        this._selectedPortal
+      );
       let defaultType =
         window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
+      if (
+        localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] !=
+        null
+      ) {
+        defaultType =
+          localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY];
+      }
       defaultType = markers.has(defaultType) ? null : defaultType;
 
       for (const k of window.plugin.wasabee.static.markerTypes) {
@@ -78,7 +87,7 @@ const MarkerAddDialog = WDialog.extend({
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (window.plugin.wasabee.static.markerTypes.has(this._type.value))
-        this._addMarker(this._type.value, this._operation, this._comment.value);
+        this._addMarker(this._type.value, this._comment.value);
     });
 
     const buttons = {};
@@ -100,9 +109,13 @@ const MarkerAddDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _addMarker: function (selectedType, operation, comment) {
+  _addMarker: function (selectedType, comment) {
+    const operation = getSelectedOperation();
     operation.addMarker(selectedType, WasabeePortal.getSelected(), comment);
     this.update();
+    localStorage[
+      window.plugin.wasabee.static.constants.LAST_MARKER_KEY
+    ] = selectedType;
   },
 });
 
