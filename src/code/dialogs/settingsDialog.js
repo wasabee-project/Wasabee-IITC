@@ -31,7 +31,6 @@ const SettingsDialog = WDialog.extend({
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._operation = getSelectedOperation();
     // magic context incantation to make "this" work...
     this._UIUpdateHook = () => {
       context.update();

@@ -152,7 +152,7 @@ export default class WasabeeMarker {
       L.DomEvent.on(sendTargetButton, "click", (ev) => {
         L.DomEvent.stop(ev);
         const std = new SendTargetDialog();
-        std.setup(this, operation);
+        std.setup(this);
         std.enable();
         marker.closePopup();
       });

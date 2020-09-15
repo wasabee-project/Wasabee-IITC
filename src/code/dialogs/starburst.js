@@ -1,7 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-// import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
@@ -106,7 +105,6 @@ const StarburstDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("STARBURST");
     this.label = wX("STARBURST TITLE");
-    this._operation = getSelectedOperation();
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
@@ -119,12 +117,14 @@ const StarburstDialog = WDialog.extend({
       return;
     }
 
-    this._operation.startBatchMode();
-    for (const p of getAllPortalsOnScreen(this._operation)) {
+    const operation = getSelectedOperation();
+
+    operation.startBatchMode();
+    for (const p of getAllPortalsOnScreen(operation)) {
       if (p.id == this._anchor.id) continue;
-      this._operation.addLink(p, this._anchor, "auto starburst");
+      operation.addLink(p, this._anchor, "auto starburst");
     }
-    this._operation.endBatchMode();
+    operation.endBatchMode();
   },
 });
 

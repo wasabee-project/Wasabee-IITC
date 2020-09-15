@@ -6,6 +6,7 @@ import WasabeeTeam from "../team";
 import { targetPromise } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
 
 const SendTargetDialog = WDialog.extend({
   statics: {
@@ -48,8 +49,7 @@ const SendTargetDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target, operation) {
-    this._operation = operation;
+  setup: async function (target) {
     this._dialog = null;
     this._target = target;
     this._html = L.DomUtil.create("div", null);
@@ -96,9 +96,11 @@ const SendTargetDialog = WDialog.extend({
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
+    const operation = getSelectedOperation();
+
     menu.addEventListener("change", async (ev) => {
       L.DomEvent.stop(ev);
-      const portal = this._operation.getPortal(this._target.portalId);
+      const portal = operation.getPortal(this._target.portalId);
       try {
         await targetPromise(menu.value, portal);
         this._dialog.dialog("close");
@@ -109,7 +111,7 @@ const SendTargetDialog = WDialog.extend({
     });
 
     const me = await WasabeeMe.waitGet();
-    for (const t of this._operation.teamlist) {
+    for (const t of operation.teamlist) {
       if (me.teamEnabled(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
