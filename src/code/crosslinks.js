@@ -302,12 +302,10 @@ function onLinkAdded(data) {
 }
 
 function onMapDataRefreshStart() {
-  console.log("map data refresh start");
   window.removeHook("linkAdded", onLinkAdded);
 }
 
 function onMapDataRefreshEnd() {
-  console.log("map data refresh end");
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
 
@@ -317,7 +315,6 @@ function onMapDataRefreshEnd() {
 
 export function initCrossLinks() {
   window.addHook("wasabeeCrosslinks", () => {
-    console.log("running crosslinks");
     checkAllLinks();
   });
 

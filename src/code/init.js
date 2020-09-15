@@ -1,10 +1,6 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
-import {
-  setupLocalStorage,
-  initSelectedOperation,
-  getSelectedOperation,
-} from "./selectedOp";
+import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawMap, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
@@ -81,9 +77,7 @@ window.plugin.wasabee.init = () => {
 
   // custom hook for updating our UI
   window.addHook("wasabeeUIUpdate", () => {
-    console.log("ui update", getSelectedOperation().ID);
     drawMap();
-    console.log("ui update done");
   });
 
   // IITC-CE, not 0.26

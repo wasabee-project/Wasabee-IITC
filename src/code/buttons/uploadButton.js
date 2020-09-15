@@ -60,7 +60,7 @@ const UploadButton = WButton.extend({
     });
   },
 
-  Wupdate: function (container, operation) {
+  Wupdate: function () {
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
       this.title = wX("NOT LOGGED IN SHORT");
@@ -68,6 +68,7 @@ const UploadButton = WButton.extend({
       return;
     }
 
+    const operation = getSelectedOperation();
     if (!operation.IsServerOp()) {
       this._visible();
       this.title = wX("UPLOAD BUTTON HOVER", operation.name);
