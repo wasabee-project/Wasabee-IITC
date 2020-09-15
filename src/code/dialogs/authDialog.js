@@ -6,7 +6,6 @@ import {
   oneTimeToken,
 } from "../server";
 import PromptDialog from "./promptDialog";
-import { getSelectedOperation } from "../selectedOp";
 import { sendLocation } from "../uiCommands";
 import { wX, getLanguage } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
@@ -26,7 +25,6 @@ const AuthDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
     this._displayDialog();
   },
 

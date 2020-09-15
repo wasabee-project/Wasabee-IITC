@@ -1,7 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import WasabeeMe from "../me";
-import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
@@ -22,7 +21,6 @@ const DefensiveKeysDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet();
-    this._operation = getSelectedOperation();
     this._pch = (portal) => {
       this._portalClickedHook(portal);
     };
