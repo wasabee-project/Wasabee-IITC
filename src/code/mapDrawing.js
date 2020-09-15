@@ -81,13 +81,10 @@ function addMarker(target) {
     "click spiderfiedclick",
     async (ev) => {
       L.DomEvent.stop(ev);
-      // IITC 0.26's leaflet doesn't have this, just deal
-      if (marker.isPopupOpen && marker.isPopupOpen()) return;
+      if (marker.isPopupOpen()) return;
       const c = await target.popupContent(marker);
       marker.setPopupContent(c);
-      // IITC 0.26's leaflet doesn't have this, just deal
-      if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup");
+      marker._popup._wrapper.classList.add("wasabee-popup");
       marker.update();
       marker.openPopup();
     },

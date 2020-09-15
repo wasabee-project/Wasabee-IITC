@@ -115,7 +115,7 @@ const OpsDialog = WDialog.extend({
         this._map.fitBounds(mbr);
       }
       window.runHooks("wasabeeUIUpdate");
-      window.runHooks("wasabeeCrosslinks", newop);
+      window.runHooks("wasabeeCrosslinks");
     });
 
     const writable = selectedOp.IsWritableOp();

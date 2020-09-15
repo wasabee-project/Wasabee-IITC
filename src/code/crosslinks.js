@@ -273,7 +273,13 @@ function* realLinks() {
   }
 }
 
-export function checkAllLinks(operation) {
+export function checkAllLinks() {
+  const operation = getSelectedOperation();
+  if (operation == null) {
+    console.log("crosslinks run, no op loaded?");
+    return;
+  }
+
   // console.time("checkAllLinks");
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
@@ -296,21 +302,23 @@ function onLinkAdded(data) {
 }
 
 function onMapDataRefreshStart() {
+  console.log("map data refresh start");
   window.removeHook("linkAdded", onLinkAdded);
 }
 
 function onMapDataRefreshEnd() {
+  console.log("map data refresh end");
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
-  const operation = getSelectedOperation();
 
-  checkAllLinks(operation);
+  checkAllLinks();
   window.addHook("linkAdded", onLinkAdded);
 }
 
 export function initCrossLinks() {
-  window.addHook("wasabeeCrosslinks", (operation) => {
-    checkAllLinks(operation);
+  window.addHook("wasabeeCrosslinks", () => {
+    console.log("running crosslinks");
+    checkAllLinks();
   });
 
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
@@ -325,10 +333,7 @@ export function initCrossLinks() {
   window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee._crosslinkCache = new Map();
-      const operation = getSelectedOperation();
-      if (operation) {
-        checkAllLinks(operation);
-      }
+      checkAllLinks();
     }
   });
 

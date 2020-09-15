@@ -61,6 +61,9 @@ export default class WasabeeAnchor {
   popupContent(marker) {
     // just log for now, if we see it, then we can figure out what is really going on
     const operation = getSelectedOperation();
+    if (operation == null) {
+      console.log("null op for anchor?");
+    }
     if (this._opID != operation.ID) {
       console.log("anchor opID != selected opID");
     }

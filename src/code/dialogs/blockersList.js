@@ -64,7 +64,7 @@ const BlockerList = WDialog.extend({
       operation.blockers = new Array();
       this.blockerlistUpdate();
       operation.update(false); // blockers do not need to be sent to server
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     };
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(operation, true); // force

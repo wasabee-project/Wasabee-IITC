@@ -10,8 +10,6 @@ import { getSelectedOperation } from "./selectedOp";
 
 export default class WasabeeMarker {
   constructor(obj) {
-    const operation = getSelectedOperation();
-    this._opID = operation.ID;
     this.ID = generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
@@ -92,9 +90,8 @@ export default class WasabeeMarker {
 
   async popupContent(marker) {
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
-      // just log for now
-      console.log("this._opID != operation.ID");
+    if (operation == null) {
+      console.log("null op in marker?");
     }
 
     const portal = operation.getPortal(this.portalId);

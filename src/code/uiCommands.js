@@ -66,7 +66,7 @@ export function clearAllItems(operation) {
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     }
   );
   con.enable();
@@ -79,7 +79,7 @@ export function clearAllLinks(operation) {
     `Do you want to remove all links from ${operation.name}?`,
     () => {
       operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     }
   );
   con.enable();
@@ -92,7 +92,7 @@ export function clearAllMarkers(operation) {
     `Do you want to remove all markers from ${operation.name}?`,
     () => {
       operation.clearAllMarkers();
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     }
   );
   con.enable();

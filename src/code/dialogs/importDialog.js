@@ -1,10 +1,10 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { WDialog } from "../leafletClasses";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import OperationChecklistDialog from "./operationChecklistDialog";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
+import { makeSelectedOperation } from "../selectedOp";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -70,10 +70,8 @@ const ImportDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-        // XXX is this still necessary?
-        const newop = getSelectedOperation();
         window.runHooks("wasabeeUIUpdate");
-        window.runHooks("wasabeeCrosslinks", newop);
+        window.runHooks("wasabeeCrosslinks");
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });

@@ -796,7 +796,7 @@ export default class WasabeeOp {
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.runHooks("wasabeeCrosslinks", this);
+    window.runHooks("wasabeeCrosslinks");
   }
 
   startBatchMode() {
