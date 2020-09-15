@@ -134,7 +134,6 @@ const MultimaxDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
-    this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
@@ -187,6 +186,8 @@ const MultimaxDialog = WDialog.extend({
   },
 
   doMultimax: function () {
+    // this._operation is OK here
+    this._operation = getSelectedOperation();
     const portals = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax

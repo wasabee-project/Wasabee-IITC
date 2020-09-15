@@ -112,7 +112,7 @@ const MarkerList = WDialog.extend({
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
             const ch = new MarkerChangeDialog();
-            ch.setup(marker, operation);
+            ch.setup(marker);
             ch.enable();
           });
         },

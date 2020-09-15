@@ -23,22 +23,22 @@ const MarkerChangeDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  setup: function (target, operation) {
+  setup: function (target) {
     this._marker = target;
-    this._operation = operation;
   },
 
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const content = L.DomUtil.create("div", "content");
 
-    const portal = this._operation.getPortal(this._marker.portalId);
+    const portal = operation.getPortal(this._marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
     portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
 
     this._type = L.DomUtil.create("select", null, content);
 
-    const markers = this._operation.getPortalMarkers(portal);
+    const markers = operation.getPortalMarkers(portal);
     for (const k of window.plugin.wasabee.static.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
@@ -53,8 +53,8 @@ const MarkerChangeDialog = WDialog.extend({
         window.plugin.wasabee.static.markerTypes.has(this._type.value) &&
         !markers.has(this._type.value)
       ) {
-        this._operation.removeMarker(this._marker);
-        this._operation.addMarker(
+        operation.removeMarker(this._marker);
+        operation.addMarker(
           this._type.value,
           portal,
           this._marker.comment

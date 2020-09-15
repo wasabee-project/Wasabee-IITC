@@ -106,7 +106,6 @@ const OnionfieldDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
-    this._operation = getSelectedOperation();
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
@@ -114,6 +113,8 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   onion: function () {
+    // this._operation is OK here
+    this._operation = getSelectedOperation();
     if (!this._anchor) {
       alert("no anchor selected");
       return;

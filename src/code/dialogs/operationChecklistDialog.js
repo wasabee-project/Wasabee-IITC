@@ -152,7 +152,7 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ch = new MarkerChangeDialog();
-              ch.setup(thing, operation);
+              ch.setup(thing);
               ch.enable();
             });
           }
