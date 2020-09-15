@@ -130,11 +130,11 @@ const StateDialog = WDialog.extend({
   },
 
   activeSetState: async function (value) {
-	const operation = getSelectedOperation();
-	if (operation.ID != this._opID) {
-          console.log("operation changed, bailing");
-	  return;
-	}
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) {
+      console.log("operation changed, bailing");
+      return;
+    }
 
     if (this._type == "Marker") {
       try {
@@ -152,11 +152,7 @@ const StateDialog = WDialog.extend({
 
     if (this._type == "Link") {
       try {
-        await SetLinkState(
-          this._opID,
-          this._targetID,
-          value.srcElement.value
-        );
+        await SetLinkState(this._opID, this._targetID, value.srcElement.value);
         // changing it locally in battle mode will push the entire draw...
         operation.setLinkState(this._targetID, value.srcElement.value);
       } catch (e) {

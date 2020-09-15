@@ -64,7 +64,7 @@ const BlockerList = WDialog.extend({
       operation.blockers = new Array();
       this.blockerlistUpdate();
       operation.update(false); // blockers do not need to be sent to server
-      window.runHooks("wasabeeCrosslinks", operation); 
+      window.runHooks("wasabeeCrosslinks", operation);
     };
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(operation, true); // force
@@ -90,7 +90,7 @@ const BlockerList = WDialog.extend({
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function () {
-    operation = getSelectedOperation();
+    const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       console.log("op changed");
     }

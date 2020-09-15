@@ -11,7 +11,6 @@ import {
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
 import Sortable from "../../lib/sortable";
-import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";

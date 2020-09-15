@@ -7,6 +7,7 @@ import WasabeeAgent from "../agent";
 import wX from "../wX";
 // import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -76,16 +77,14 @@ const LinkListDialog = WDialog.extend({
         value: (link) => operation.getPortal(link.fromPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(operation)),
+        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "To",
         value: (link) => operation.getPortal(link.toPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(operation)),
+        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "Length",

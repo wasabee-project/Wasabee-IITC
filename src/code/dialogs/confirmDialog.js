@@ -1,5 +1,4 @@
 import { WDialog } from "../leafletClasses";
-import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 

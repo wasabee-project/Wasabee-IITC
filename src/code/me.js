@@ -124,7 +124,7 @@ export default class WasabeeMe {
         alert(e);
         me = null;
       }
-      window.runHooks("wasabeeUIUpdate"); 
+      window.runHooks("wasabeeUIUpdate");
     }
     return me;
   }
