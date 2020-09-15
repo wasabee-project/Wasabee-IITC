@@ -12,7 +12,7 @@ import {
 } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
-import { makeSelectedOperation } from "../selectedOp";
+import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -233,7 +233,6 @@ const AssignDialog = WDialog.extend({
       console.log("refreshing local copy of op from server");
       const updated = await opPromise(operation.ID);
       updated.store();
-      operation = updated();
       makeSelectedOperation(updated.ID);
     } catch (e) {
       console.log(e);
