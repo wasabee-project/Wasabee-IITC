@@ -1,15 +1,17 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
+import { getSelectedOperation } from "./selectedOp";
 import { wX } from "./wX";
 
 const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
-export function drawThings(op) {
-  updateAnchors(op);
-  updateMarkers(op);
-  resetLinks(op);
+export function drawMap() {
+  const operation = getSelectedOperation();
+  updateAnchors(operation);
+  updateMarkers(operation);
+  resetLinks(operation);
 }
 
 function updateMarkers(op) {
@@ -40,7 +42,7 @@ function updateMarkers(op) {
       }
       layerMap.delete(m.ID);
     } else {
-      addMarker(m, op);
+      addMarker(m);
     }
   }
 
@@ -52,7 +54,8 @@ function updateMarkers(op) {
 }
 
 /** This function adds a Markers to the target layer group */
-function addMarker(target, operation) {
+function addMarker(target) {
+  const operation = getSelectedOperation();
   const targetPortal = operation.getPortal(target.portalId);
   const marker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
@@ -80,7 +83,7 @@ function addMarker(target, operation) {
       L.DomEvent.stop(ev);
       // IITC 0.26's leaflet doesn't have this, just deal
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      const c = await target.getMarkerPopup(marker, operation);
+      const c = await target.popupContent(marker);
       marker.setPopupContent(c);
       // IITC 0.26's leaflet doesn't have this, just deal
       if (marker._popup._wrapper)
@@ -335,7 +338,7 @@ function updateAnchors(op) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      addAnchorToMap(a, op);
+      addAnchorToMap(a);
     }
   }
 
@@ -347,7 +350,8 @@ function updateAnchors(op) {
 }
 
 /** This function adds a portal to the portal layer group */
-function addAnchorToMap(portalId, operation) {
+function addAnchorToMap(portalId) {
+  const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
   const marker = L.marker(anchor.latLng, {
     title: anchor.name,
@@ -374,7 +378,7 @@ function addAnchorToMap(portalId, operation) {
     (ev) => {
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      const content = anchor.popupContent(marker, operation);
+      const content = anchor.popupContent(marker);
       marker.setPopupContent(content);
       if (marker._popup._wrapper)
         marker._popup._wrapper.classList.add("wasabee-popup");

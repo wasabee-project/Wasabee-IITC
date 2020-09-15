@@ -21,15 +21,16 @@ const OpPermList = WDialog.extend({
   addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
 
@@ -41,28 +42,34 @@ const OpPermList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  update: async function (op) {
+  update: async function () {
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      this._opID = operation.ID;
+      console.log("operation changed");
+    }
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     }
 
-    this._operation = op;
-    this.buildTable();
+    this.buildTable(operation);
     this._html.firstChild.replaceWith(this._table.table);
   },
 
   _displayDialog: function () {
     if (!this._map) return;
 
-    this.buildTable();
+    const operation = getSelectedOperation();
+
+    this.buildTable(operation);
 
     this._html = L.DomUtil.create("div", null);
 
     this._html.appendChild(this._table.table);
-    if (this._me && this._operation.IsOwnedOp()) {
+    if (this._me && operation.IsOwnedOp()) {
       const already = new Set();
-      for (const a of this._operation.teamlist) already.add(a.teamid);
+      for (const a of operation.teamlist) already.add(a.teamid);
 
       const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
@@ -102,7 +109,7 @@ const OpPermList = WDialog.extend({
     };
 
     this._dialog = window.dialog({
-      title: wX("PERMS", this._operation.name),
+      title: wX("PERMS", operation.name),
       html: this._html,
       height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-perms",
@@ -115,8 +122,7 @@ const OpPermList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  // needs this._operation.teamlist;
-  buildTable: function () {
+  buildTable: function (operation) {
     this._table = new Sortable();
     this._table.fields = [
       {
@@ -159,7 +165,7 @@ const OpPermList = WDialog.extend({
       });
     }
     this._table.sortBy = 0;
-    this._table.items = this._operation.teamlist;
+    this._table.items = operation.teamlist;
   },
 
   addPerm: async function (teamID, role) {
@@ -167,19 +173,20 @@ const OpPermList = WDialog.extend({
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
-    for (const p of this._operation.teamlist) {
+    const operation = getSelectedOperation();
+    for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role) {
         console.log("not adding duplicate");
-        window.runHooks("wasabeeUIUpdate", this._operation);
+        window.runHooks("wasabeeUIUpdate");
         return;
       }
     }
     try {
-      await addPermPromise(this._operation.ID, teamID, role);
+      await addPermPromise(operation.ID, teamID, role);
       // add locally for display
-      this._operation.teamlist.push({ teamid: teamID, role: role });
-      this._operation.store();
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      operation.teamlist.push({ teamid: teamID, role: role });
+      operation.store();
+      window.runHooks("wasabeeUIUpdate");
     } catch (e) {
       console.log(e);
       alert(e);
@@ -191,15 +198,16 @@ const OpPermList = WDialog.extend({
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
+    const operation = getSelectedOperation();
     try {
-      await delPermPromise(this._operation.ID, obj.teamid, obj.role);
+      await delPermPromise(operation.ID, obj.teamid, obj.role);
       const n = new Array();
-      for (const p of this._operation.teamlist) {
+      for (const p of operation.teamlist) {
         if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
       }
-      this._operation.teamlist = n;
-      this._operation.store();
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      operation.teamlist = n;
+      operation.store();
+      window.runHooks("wasabeeUIUpdate");
     } catch (e) {
       console.log(e);
       alert(e);

@@ -33,8 +33,8 @@ const SettingsDialog = WDialog.extend({
     const context = this;
     this._operation = getSelectedOperation();
     // magic context incantation to make "this" work...
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     // put any per-open setup here
@@ -53,8 +53,7 @@ const SettingsDialog = WDialog.extend({
   },
 
   update: function () {
-    const container = this._getContent();
-    this._dialog.html(container);
+    this._dialog.html(this._getContent());
     // TODO also update the title
   },
 
@@ -78,7 +77,7 @@ const SettingsDialog = WDialog.extend({
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
         langMenu.value;
       addButtons(getSelectedOperation());
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      window.runHooks("wasabeeUIUpdate");
     });
 
     const sendLocTitle = L.DomUtil.create("label", null, container);

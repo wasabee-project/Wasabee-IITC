@@ -771,7 +771,7 @@ export default class WasabeeOp {
 
     // even if not server
     this.store();
-    window.runHooks("wasabeeUIUpdate", this);
+    window.runHooks("wasabeeUIUpdate");
   }
 
   // only for use by "active" mode

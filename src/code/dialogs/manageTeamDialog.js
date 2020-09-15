@@ -33,8 +33,8 @@ const ManageTeamDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const context = this;
     // magic context incantation to make "this" work...
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -82,7 +82,7 @@ const ManageTeamDialog = WDialog.extend({
                       this._team.ID,
                       squadDialog.inputField.value
                     );
-                    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                    window.runHooks("wasabeeUIUpdate");
                     alert(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
@@ -120,7 +120,7 @@ const ManageTeamDialog = WDialog.extend({
                 } catch (e) {
                   console.log(e);
                 }
-                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+                window.runHooks("wasabeeUIUpdate");
               }
             );
             con.enable();
@@ -165,7 +165,7 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await addAgentToTeamPromise(addField.value, this._team.ID);
         alert(wX("ADD_SUCC_INSTR"));
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        window.runHooks("wasabeeUIUpdate");
       } catch (e) {
         console.log(e);
         alert(e);
@@ -185,7 +185,7 @@ const ManageTeamDialog = WDialog.extend({
         await renameTeamPromise(this._team.ID, renameField.value);
         alert(`renamed to ${renameField.value}`);
         this._team.Name = renameField.value; // for display
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        window.runHooks("wasabeeUIUpdate");
       } catch (e) {
         console.log(e);
         alert(e);
@@ -215,7 +215,7 @@ const ManageTeamDialog = WDialog.extend({
         alert("updated rocks info");
         this._team.RocksComm = rockscommField.value; // for display
         this._team.RocksKey = rocksapiField.value; // for display
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        window.runHooks("wasabeeUIUpdate");
       } catch (e) {
         console.log(e);
         alert(e);

@@ -32,8 +32,8 @@ const OpsDialog = WDialog.extend({
     this._displayDialog();
 
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
@@ -66,9 +66,9 @@ const OpsDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function (selectedOp) {
+  update: function () {
     if (this._enabled && this._dialog && this._dialog.html) {
-      this.makeContent(selectedOp);
+      this.makeContent(getSelectedOperation());
       this._dialog.html(this._content);
     }
   },
@@ -114,7 +114,7 @@ const OpsDialog = WDialog.extend({
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         this._map.fitBounds(mbr);
       }
-      window.runHooks("wasabeeUIUpdate", newop);
+      window.runHooks("wasabeeUIUpdate");
       window.runHooks("wasabeeCrosslinks", newop);
     });
 
@@ -133,7 +133,7 @@ const OpsDialog = WDialog.extend({
         } else {
           selectedOp.name = input.value;
           selectedOp.store();
-          window.runHooks("wasabeeUIUpdate", selectedOp);
+          window.runHooks("wasabeeUIUpdate");
         }
       });
     } else {
@@ -158,7 +158,7 @@ const OpsDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         selectedOp.color = opColor.value;
         selectedOp.store();
-        window.runHooks("wasabeeUIUpdate", selectedOp);
+        window.runHooks("wasabeeUIUpdate");
       });
     }
 

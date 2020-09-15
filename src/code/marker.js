@@ -1,14 +1,17 @@
 import { generateId } from "./auxiliar";
-import { deleteMarker } from "./uiCommands.js";
+import { deleteMarker } from "./uiCommands";
 import WasabeeAgent from "./agent";
 import AssignDialog from "./dialogs/assignDialog";
 import SendTargetDialog from "./dialogs/sendTargetDialog";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
+import { getSelectedOperation } from "./selectedOp";
 
 export default class WasabeeMarker {
   constructor(obj) {
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     this.ID = generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
@@ -87,10 +90,20 @@ export default class WasabeeMarker {
     return this._state;
   }
 
-  async getMarkerPopup(marker, operation) {
+  async popupContent(marker) {
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      // just log for now
+      console.log("this._opID != operation.ID");
+    }
+
     const portal = operation.getPortal(this.portalId);
+    if (portal == null) {
+      console.log("null portal getting marker popup");
+      return;
+    }
     const content = L.DomUtil.create("div", "wasabee-marker-popup");
-    content.appendChild(this.getPopupBodyWithType(portal, operation, marker));
+    content.appendChild(this._getPopupBodyWithType(portal, operation, marker));
 
     const assignment = L.DomUtil.create(
       "div",
@@ -160,7 +173,7 @@ export default class WasabeeMarker {
     return content;
   }
 
-  getPopupBodyWithType(portal, operation, marker) {
+  _getPopupBodyWithType(portal, operation, marker) {
     const title = L.DomUtil.create("div", "desc");
     const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
     L.DomUtil.addClass(kind, this.type);

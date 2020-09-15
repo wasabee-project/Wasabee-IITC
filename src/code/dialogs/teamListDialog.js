@@ -28,8 +28,8 @@ const TeamListDialog = WDialog.extend({
     this._displayDialog();
     // magic context incantation to make "this" work...
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },

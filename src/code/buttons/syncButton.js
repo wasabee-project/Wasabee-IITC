@@ -83,7 +83,7 @@ const SyncButton = WButton.extend({
           // change op if the current does not exist anymore
           else if (!opsList().includes(so.ID)) changeOpIfNeeded();
           // update UI to reflect new ops list
-          else window.runHooks("wasabeeUIUpdate", so);
+          else window.runHooks("wasabeeUIUpdate");
 
           alert(wX("SYNC DONE"));
         } catch (e) {

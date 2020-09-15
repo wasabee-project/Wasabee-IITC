@@ -85,12 +85,12 @@ const QuickDrawControl = L.Handler.extend({
 
     this._tooltip = new WTooltip(this._map);
 
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
     this._tooltip.updateContent(this._getTooltipText());
-    this._throwOrder = this._operation.nextOrder;
+    this._throwOrder = operation.nextOrder;
 
     // IITC hook format for IITC event
     this._portalClickedHook = (data) => {
@@ -115,7 +115,6 @@ const QuickDrawControl = L.Handler.extend({
       window.removeLayerGroup(this._guideLayerGroup);
       delete this._guideLayerGroup;
     }
-    if (this._operation) delete this._operation;
     if (this._anchor1) delete this._anchor1;
     if (this._anchor2) delete this._anchor2;
     if (this._previous) delete this._previous;
@@ -149,8 +148,9 @@ const QuickDrawControl = L.Handler.extend({
     }
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
-      this._operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks", this._operation);
+      const operation = getSelectedOperation();
+      operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", operation);
     }
   },
 

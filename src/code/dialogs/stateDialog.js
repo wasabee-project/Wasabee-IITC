@@ -46,8 +46,8 @@ const StateDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (target, operation) {
-    this._operation = operation;
+  setup: function (target, opID) {
+    this._opID = opID;
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
@@ -115,25 +115,36 @@ const StateDialog = WDialog.extend({
   },
 
   designSetState: function (value) {
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("operation changed -- bailing");
+      return;
+    }
     if (this._type == "Marker") {
-      this._operation.setMarkerState(this._targetID, value.srcElement.value);
+      operation.setMarkerState(this._targetID, value.srcElement.value);
     }
     // link states are different, but the WasabeeLink object knows what to do...
     if (this._type == "Link") {
-      this._operation.setLinkState(this._targetID, value.srcElement.value);
+      operation.setLinkState(this._targetID, value.srcElement.value);
     }
   },
 
   activeSetState: async function (value) {
+	const operation = getSelectedOperation();
+	if (operation.ID != this._opID) {
+          console.log("operation changed, bailing");
+	  return;
+	}
+
     if (this._type == "Marker") {
       try {
         await SetMarkerState(
-          this._operation.ID,
+          this._opID,
           this._targetID,
           value.srcElement.value
         );
         // changing it locally in battle mode will push the entire draw...
-        this._operation.setMarkerState(this._targetID, value.srcElement.value);
+        operation.setMarkerState(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
       }
@@ -142,12 +153,12 @@ const StateDialog = WDialog.extend({
     if (this._type == "Link") {
       try {
         await SetLinkState(
-          this._operation.ID,
+          this._opID,
           this._targetID,
           value.srcElement.value
         );
         // changing it locally in battle mode will push the entire draw...
-        this._operation.setLinkState(this._targetID, value.srcElement.value);
+        operation.setLinkState(this._targetID, value.srcElement.value);
       } catch (e) {
         console.log(e);
       }

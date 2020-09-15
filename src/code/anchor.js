@@ -1,4 +1,5 @@
-import { swapPortal, deletePortal } from "./uiCommands.js";
+import { swapPortal, deletePortal } from "./uiCommands";
+import { getSelectedOperation } from "./selectedOp";
 import AssignDialog from "./dialogs/assignDialog";
 import SendTargetDialog from "./dialogs/sendTargetDialog";
 import SetCommentDialog from "./dialogs/setCommentDialog";
@@ -7,7 +8,8 @@ import wX from "./wX";
 
 // this class is for the popups, and for assign menu
 export default class WasabeeAnchor {
-  constructor(portalId, op) {
+  constructor(portalId) {
+    const op = getSelectedOperation();
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -16,9 +18,9 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    this._operation = op;
     this._portal = op.getPortal(this.ID);
     this.color = op.color;
+    this._opID = op.ID;
   }
 
   // currently unused
@@ -56,7 +58,13 @@ export default class WasabeeAnchor {
     return this._portal.latLng;
   }
 
-  popupContent(marker, operation) {
+  popupContent(marker) {
+    // just log for now, if we see it, then we can figure out what is really going on
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("anchor opID != selected opID");
+    }
+
     marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
@@ -72,7 +80,7 @@ export default class WasabeeAnchor {
     L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
       const cd = new SetCommentDialog();
-      cd.setup(this._portal, this._operation);
+      cd.setup(this._portal, operation);
       cd.enable();
       marker.closePopup();
     });
@@ -88,7 +96,7 @@ export default class WasabeeAnchor {
       L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
         const cd = new SetCommentDialog();
-        cd.setup(this._portal, this._operation);
+        cd.setup(this._portal, operation);
         cd.enable();
         marker.closePopup();
       });

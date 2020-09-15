@@ -28,10 +28,11 @@ const MarkerList = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.markerListUpdate(newOpData);
+    this._UIUpdateHook = () => {
+      context.markerListUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
@@ -47,7 +48,8 @@ const MarkerList = WDialog.extend({
   },
 
   _displayDialog: function () {
-    loadFaked(this._operation);
+    const operation = getSelectedOperation();
+    loadFaked(operation);
 
     const buttons = {};
     buttons[wX("CLEAR MARKERS")] = () => {
@@ -59,8 +61,8 @@ const MarkerList = WDialog.extend({
     };
 
     this._dialog = window.dialog({
-      title: wX("MARKER_LIST", this._operation.name),
-      html: this.getListDialogContent(this._operation).table,
+      title: wX("MARKER_LIST", operation.name),
+      html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
@@ -72,8 +74,9 @@ const MarkerList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  markerListUpdate: function (operation) {
-    if (operation.ID != this._operation.ID) this._operation = operation;
+  markerListUpdate: function () {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) console.log("op changed");
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
     this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));

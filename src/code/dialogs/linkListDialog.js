@@ -27,8 +27,8 @@ const LinkListDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.updateLinkList(newOpData);
+    this._UIUpdateHook = () => {
+      context.updateLinkList();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -59,9 +59,10 @@ const LinkListDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (operation, portal) {
+  setup: function (UNUSED, portal) {
     this._portal = portal;
-    this._operation = operation;
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     this._table = new Sortable();
     this._table.fields = [
       {
@@ -72,23 +73,23 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "From",
-        value: (link) => this._operation.getPortal(link.fromPortalId),
+        value: (link) => operation.getPortal(link.fromPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
+          cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "To",
-        value: (link) => this._operation.getPortal(link.toPortalId),
+        value: (link) => operation.getPortal(link.toPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
+          cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "Length",
-        value: (link) => link.length(this._operation),
+        value: (link) => link.length(operation),
         format: (cell, data) => {
           cell.classList.add("length");
           cell.textContent =
@@ -99,9 +100,9 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Min Lvl",
         title: wX("MIN_SRC_PORT_LVL"),
-        value: (link) => link.length(this._operation),
+        value: (link) => link.length(operation),
         format: (cell, data, link) => {
-          cell.appendChild(link.minLevel(this._operation));
+          cell.appendChild(link.minLevel(operation));
         },
         smallScreenHide: true,
       },
@@ -141,11 +142,11 @@ const LinkListDialog = WDialog.extend({
         format: (a, m, link) => {
           const assignee = L.DomUtil.create("a", null, a);
           assignee.textContent = m;
-          if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
+          if (operation.IsServerOp() && operation.IsWritableOp()) {
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ad = new AssignDialog();
-              ad.setup(link, this._operation);
+              ad.setup(link, operation);
               ad.enable();
             });
           }
@@ -190,21 +191,23 @@ const LinkListDialog = WDialog.extend({
       },
     ];
     this._table.sortBy = 0;
-    this._table.items = this._operation.getLinkListFromPortal(this._portal);
+    this._table.items = operation.getLinkListFromPortal(this._portal);
   },
 
   deleteLink: function (link) {
     const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
     prompt.textContent = wX("CONFIRM_DELETE");
-    prompt.appendChild(link.displayFormat(this._operation));
+    const operation = getSelectedOperation();
+    prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
-      this._operation.removeLink(link.fromPortalId, link.toPortalId);
+      operation.removeLink(link.fromPortalId, link.toPortalId);
     });
     con.enable();
   },
 
   makeColorMenu: function (list, data, link) {
+    const operation = getSelectedOperation();
     const colorSection = L.DomUtil.create("div", null, list);
     const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
@@ -222,15 +225,16 @@ const LinkListDialog = WDialog.extend({
       "change",
       () => {
         link.color = linkColor.value;
-        this._operation.update();
+        operation.update();
       },
       false
     );
   },
 
-  updateLinkList: function (operation) {
+  updateLinkList: function () {
+    const operation = getSelectedOperation();
     if (!this._enabled) return;
-    if (this._operation.ID == operation.ID) {
+    if (this._opID == operation.ID) {
       this._table.items = operation.getLinkListFromPortal(this._portal);
     } else {
       // the selected operation changed, just bail

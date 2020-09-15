@@ -32,15 +32,16 @@ const OperationChecklistDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    // this._opID = operation.ID;
     // magic context incantation to make "this" work...
-    this._UIUpdateHook = (newOpData) => {
-      context.checklistUpdate(newOpData);
+    this._UIUpdateHook = () => {
+      context.checklistUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
-    loadFaked(this._operation);
+    loadFaked(operation);
 
     this._displayDialog();
   },
@@ -53,18 +54,19 @@ const OperationChecklistDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+    const operation = getSelectedOperation();
+    this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
 
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
     buttons[wX("LOAD PORTALS")] = () => {
-      loadFaked(this._operation, true); // force
+      loadFaked(operation, true); // force
     };
 
     this._dialog = window.dialog({
-      title: wX("OP_CHECKLIST", this._operation.name),
+      title: wX("OP_CHECKLIST", operation.name),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
@@ -77,8 +79,8 @@ const OperationChecklistDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  checklistUpdate: function (newOpData) {
-    this._operation = newOpData;
+  checklistUpdate: function () {
+    const operation = getSelectedOperation();
     this._dialog.dialog("option", "title", wX("OP_CHECKLIST", newOpData.name));
     this.sortable = this.getListDialogContent(
       newOpData,
@@ -212,7 +214,7 @@ const OperationChecklistDialog = WDialog.extend({
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
             const sd = new StateDialog();
-            sd.setup(thing, operation);
+            sd.setup(thing, operation.ID);
             sd.enable();
           });
         },

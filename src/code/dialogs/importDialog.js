@@ -72,7 +72,7 @@ const ImportDialog = WDialog.extend({
         delete this._dialog;
         // XXX is this still necessary?
         const newop = getSelectedOperation();
-        window.runHooks("wasabeeUIUpdate", newop);
+        window.runHooks("wasabeeUIUpdate");
         window.runHooks("wasabeeCrosslinks", newop);
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog,

@@ -1,7 +1,7 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import { drawThings, drawAgents } from "./mapDrawing";
+import { drawMap, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
 import { initFirebase } from "./firebaseSupport";
@@ -76,14 +76,14 @@ window.plugin.wasabee.init = () => {
   });
 
   // custom hook for updating our UI
-  window.addHook("wasabeeUIUpdate", (operation) => {
-    drawThings(operation);
+  window.addHook("wasabeeUIUpdate", () => {
+    drawMap();
   });
 
   // IITC-CE, not 0.26
   if (window.addResumeFunction) {
     window.addResumeFunction(() => {
-      window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+      window.runHooks("wasabeeUIUpdate");
       sendLocation();
     });
   }
@@ -95,7 +95,7 @@ window.plugin.wasabee.init = () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+      window.runHooks("wasabeeUIUpdate");
     }
   });
 
@@ -125,7 +125,7 @@ window.plugin.wasabee.init = () => {
   setupToolbox();
 
   // draw the UI with the op data for the first time
-  window.runHooks("wasabeeUIUpdate", Wasabee._selectedOp);
+  window.runHooks("wasabeeUIUpdate");
 
   // run crosslinks
   window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);

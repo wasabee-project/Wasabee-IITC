@@ -21,10 +21,11 @@ const KeysList = WDialog.extend({
   addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     if (WasabeeMe.isLoggedIn()) {
@@ -41,14 +42,15 @@ const KeysList = WDialog.extend({
   },
 
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
 
     this._dialog = window.dialog({
-      title: wX("KEY_LIST2", this._operation.name),
-      html: this.getListDialogContent(this._operation).table,
+      title: wX("KEY_LIST2", operation.name),
+      html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
@@ -60,8 +62,10 @@ const KeysList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function (operation) {
-    if (operation.ID != this._operation.ID) this._operation = operation;
+  update: function () {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) console.log("operation changed");
+
     this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);

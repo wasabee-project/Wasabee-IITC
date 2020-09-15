@@ -19,16 +19,19 @@ const BlockerList = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = BlockerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._operation = getSelectedOperation();
     postToFirebase({ id: "analytics", action: BlockerList.TYPE });
   },
 
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
+
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.blockerlistUpdate(newOpData);
+    this._UIUpdateHook = () => {
+      context.blockerlistUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
@@ -44,26 +47,27 @@ const BlockerList = WDialog.extend({
   },
 
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     if (!this._map) return;
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
-    loadFaked(this._operation);
+    loadFaked(operation);
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
-      window.runHooks("wasabeeUIUpdate", this._operation);
+      window.runHooks("wasabeeUIUpdate");
     };
     buttons[wX("AUTOMARK")] = () => {
-      blockerAutomark(this._operation);
+      blockerAutomark(operation);
     };
     buttons[wX("RESET")] = () => {
-      this._operation.blockers = new Array();
-      this.blockerlistUpdate(this._operation);
-      this._operation.update(false); // blockers do not need to be sent to server
-      window.runHooks("wasabeeCrosslinks", this._operation);
+      operation.blockers = new Array();
+      this.blockerlistUpdate();
+      operation.update(false); // blockers do not need to be sent to server
+      window.runHooks("wasabeeCrosslinks", operation); 
     };
     buttons[wX("LOAD PORTALS")] = () => {
-      loadFaked(this._operation, true); // force
+      loadFaked(operation, true); // force
     };
     buttons[wX("TRAWL TITLE")] = () => {
       const td = new TrawlDialog();
@@ -71,7 +75,7 @@ const BlockerList = WDialog.extend({
     };
 
     this._dialog = window.dialog({
-      title: wX("KNOWN_BLOCK", this._operation.name),
+      title: wX("KNOWN_BLOCK", operation.name),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-blockerlist",
@@ -85,35 +89,39 @@ const BlockerList = WDialog.extend({
   },
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
-  blockerlistUpdate: function (newOpData) {
-    this._operation = newOpData;
+  blockerlistUpdate: function () {
+    operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("op changed");
+    }
     if (!this._enabled) return;
     this.sortable = this._getListDialogContent(
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
     this._dialog.html(this.sortable.table);
-    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", newOpData.name));
+    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", operation.name));
   },
 
   _getListDialogContent(sortBy, sortAsc) {
+    const operation = getSelectedOperation();
     const content = new Sortable();
     content.fields = [
       {
         name: wX("FROM_PORT"),
         value: (blocker) => {
-          return this._operation.getPortal(blocker.fromPortalId).name;
+          return operation.getPortal(blocker.fromPortalId).name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          const p = this._operation.getPortal(blocker.fromPortalId);
+          const p = operation.getPortal(blocker.fromPortalId);
           row.appendChild(p.displayFormat(this._smallScreen));
         },
       },
       {
         name: wX("COUNT"),
         value: (blocker) => {
-          const c = this._operation.blockers.filter(
+          const c = operation.blockers.filter(
             (b) =>
               b.fromPortalId == blocker.fromPortalId ||
               b.toPortalID == blocker.fromPortalId
@@ -126,18 +134,18 @@ const BlockerList = WDialog.extend({
       {
         name: wX("TO_PORT"),
         value: (blocker) => {
-          return this._operation.getPortal(blocker.toPortalId).name;
+          return operation.getPortal(blocker.toPortalId).name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          const p = this._operation.getPortal(blocker.toPortalId);
+          const p = operation.getPortal(blocker.toPortalId);
           row.appendChild(p.displayFormat(this._smallScreen));
         },
       },
       {
         name: wX("COUNT"),
         value: (blocker) => {
-          const c = this._operation.blockers.filter(
+          const c = operation.blockers.filter(
             (b) =>
               b.fromPortalId == blocker.toPortalId ||
               b.toPortalId == blocker.toPortalId
@@ -150,7 +158,7 @@ const BlockerList = WDialog.extend({
     ];
     content.sortBy = sortBy;
     content.sortAsc = !sortAsc; // I don't know why this flips
-    content.items = this._operation.blockers;
+    content.items = operation.blockers;
     return content;
   },
 });

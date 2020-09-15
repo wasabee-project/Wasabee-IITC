@@ -309,7 +309,7 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.runHooks("wasabeeUIUpdate", operation);
+    window.runHooks("wasabeeUIUpdate");
     return;
   }
 

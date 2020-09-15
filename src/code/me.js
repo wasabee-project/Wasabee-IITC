@@ -124,7 +124,7 @@ export default class WasabeeMe {
         alert(e);
         me = null;
       }
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      window.runHooks("wasabeeUIUpdate"); 
     }
     return me;
   }
@@ -142,7 +142,7 @@ export default class WasabeeMe {
       window.runHooks("wasabeeDkeys");
     }
 
-    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    window.runHooks("wasabeeUIUpdate");
   }
 
   teamJoined(teamID) {
