@@ -145,7 +145,7 @@ const LinkListDialog = WDialog.extend({
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ad = new AssignDialog();
-              ad.setup(link, operation);
+              ad.setup(link);
               ad.enable();
             });
           }

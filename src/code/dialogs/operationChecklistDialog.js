@@ -196,7 +196,7 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ad = new AssignDialog();
-              ad.setup(thing, operation);
+              ad.setup(thing);
               ad.enable();
             });
           }

@@ -55,8 +55,8 @@ const AssignDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target, operation) {
-    const operation = getSelectedOperation;
+  setup: async function (target) {
+    const operation = getSelectedOperation();
     this._opID = operation.ID;
     this._dialog = null;
     this._targetID = target.ID;
@@ -218,11 +218,7 @@ const AssignDialog = WDialog.extend({
       );
       for (const l of links) {
         try {
-          await assignLinkPromise(
-            operation.ID,
-            l.ID,
-            value.srcElement.value
-          );
+          await assignLinkPromise(operation.ID, l.ID, value.srcElement.value);
           console.log("assignment processed by server");
           // operation.assignLink(l.ID, value.srcElement.value);
         } catch (e) {

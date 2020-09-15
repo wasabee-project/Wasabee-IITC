@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
@@ -54,11 +55,7 @@ const MarkerChangeDialog = WDialog.extend({
         !markers.has(this._type.value)
       ) {
         operation.removeMarker(this._marker);
-        operation.addMarker(
-          this._type.value,
-          portal,
-          this._marker.comment
-        );
+        operation.addMarker(this._type.value, portal, this._marker.comment);
       }
       this._dialog.dialog("close");
     };

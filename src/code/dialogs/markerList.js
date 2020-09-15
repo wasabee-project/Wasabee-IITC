@@ -150,7 +150,7 @@ const MarkerList = WDialog.extend({
           assigned.textContent = value;
           L.DomEvent.on(cell, "click", () => {
             const ad = new AssignDialog();
-            ad.setup(agent, operation);
+            ad.setup(agent);
             ad.enable();
           });
         },
