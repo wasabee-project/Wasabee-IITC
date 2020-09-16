@@ -44,6 +44,7 @@
   "homepage": "https://github.com/wasabee-project/Wasabee-IITC/blob/master/README.md",
   "dependencies": {
     "arc": "^0.1.1",
+    "color-string": "^1.5.3",
     "sortablejs": "^1.10.2"
   }
 }

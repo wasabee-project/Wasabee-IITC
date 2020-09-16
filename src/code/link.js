@@ -2,6 +2,9 @@ import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
+// for named color
+import colorString from "color-string";
+
 export default class WasabeeLink {
   constructor(obj) {
     this.ID = generateId();
@@ -106,6 +109,22 @@ export default class WasabeeLink {
     );
     const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
     arrow.style.color = this.getColor(operation);
+    const picker = L.DomUtil.create("input", "", arrow);
+    picker.type = "color";
+    picker.value = colorString.to.hex(
+      colorString.get.rgb(this.getColor(operation))
+    );
+    picker.style.display = "none";
+
+    L.DomEvent.on(arrow, "click", () => {
+      picker.click();
+    });
+
+    L.DomEvent.on(picker, "change", (ev) => {
+      this.color = ev.target.value;
+      operation.update();
+    });
+
     d.appendChild(
       operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
