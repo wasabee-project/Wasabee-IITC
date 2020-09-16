@@ -220,6 +220,16 @@ const LinkListDialog = WDialog.extend({
       linkColor.append(option);
     }
 
+    // TODO: picker here
+    // custom color
+    if (operation.newColors(data) == data) {
+      const option = L.DomUtil.create("option");
+      option.value = data;
+      option.selected = true;
+      option.textContent = `Custom ${data}`;
+      linkColor.append(option);
+    }
+
     linkColor.addEventListener(
       "change",
       () => {
