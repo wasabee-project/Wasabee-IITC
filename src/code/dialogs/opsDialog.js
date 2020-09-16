@@ -165,8 +165,10 @@ const OpsDialog = WDialog.extend({
       customOption.value = "custom";
       customOption.textContent = "Custom";
 
-      if (WasabeeOp.newColors(selectedOp.color) == selectedOp.color)
+      if (WasabeeOp.newColors(selectedOp.color) == selectedOp.color) {
         customOption.selected = true;
+        customOption.textContent = `Custom ${selectedOp.color}`;
+      }
 
       const picker = L.DomUtil.create("input", "", customOption);
       picker.type = "color";
