@@ -36,12 +36,12 @@ export function initFirebase() {
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
       case "Agent Location Change":
-        console.log("firebase update of agent location: ", event.data.data);
+        console.debug("firebase update of agent location: ", event.data.data);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         drawSingleTeam(event.data.data.msg);
         break;
       case "Delete":
-        console.log("server requested op delete: ", event.data.data.opID);
+        console.warn("server requested op delete: ", event.data.data.opID);
         if (event.data.data.opID == operation.ID) loadNewDefaultOp();
         removeOperation(event.data.data.opID);
         break;
@@ -50,7 +50,7 @@ export function initFirebase() {
         break;
       case "Login":
         // display to console somehow?
-        console.log("server reported teammate login: ", event.data.data.gid);
+        console.debug("server reported teammate login: ", event.data.data.gid);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       case "Map Change":
@@ -65,16 +65,16 @@ export function initFirebase() {
               );
               makeSelectedOperation(refreshed.ID);
             } else {
-              console.log(
+              console.debug(
                 "firebase trigger update of op",
                 event.data.data.opID
               );
             }
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         } else {
-          console.log(
+          console.debug(
             "skipping firebase requested update of op since it was our change",
             event.data.data.updateID
           );
@@ -93,11 +93,11 @@ export function initFirebase() {
           const f = portal.displayFormat();
           alert(f.outerHTML + "<br>Sent by: " + target.Sender, true);
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
         break;
       default:
-        console.log("unknown firebase command: ", event.data.data);
+        console.warn("unknown firebase command: ", event.data.data);
     }
   });
 }

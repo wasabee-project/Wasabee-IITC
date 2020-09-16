@@ -133,7 +133,7 @@ const ImportDialog = WDialog.extend({
       makeSelectedOperation(importedOp.ID);
       alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
     } catch (e) {
-      console.warn("WasabeeTools: failed to import data: " + e);
+      console.error("WasabeeTools: failed to import data", e);
       alert(wX("IMP_NOPE"));
     }
   },
@@ -151,8 +151,8 @@ const ImportDialog = WDialog.extend({
     try {
       data = JSON.parse(string);
     } catch (e) {
-      console.warn("Failed parseDrawTools: " + e);
-      alert(e);
+      console.error("Failed parseDrawTools", e);
+      alert(e.toString());
       return null;
     }
 

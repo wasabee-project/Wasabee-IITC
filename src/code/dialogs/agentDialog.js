@@ -41,7 +41,8 @@ const AgentDialog = WDialog.extend({
       const img = L.DomUtil.create("img", null, agent);
       img.src = data.pic;
     } catch (e) {
-      agent.innerHTML = e;
+      console.error(e);
+      agent.innerHTML = e.toString();
     }
 
     const buttons = {};

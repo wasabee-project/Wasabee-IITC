@@ -31,8 +31,8 @@ const UploadButton = WButton.extend({
             alert(wX("UPDATED"));
             this.Wupdate(this._container, operation);
           } catch (e) {
-            console.log(e);
-            alert(`Update Failed: ${e}`);
+            console.error(e);
+            alert(`Update Failed: ${e.toString()}`);
           }
           return;
         }
@@ -46,14 +46,14 @@ const UploadButton = WButton.extend({
           // this._invisible();
         } catch (e) {
           // not triggered this in a while...
-          console.log(e + ": trying as update");
+          console.warn(e.toString() + ": trying as update");
           try {
             await updateOpPromise(operation);
             alert(wX("UPDATED"));
             this.Wupdate(this._container, operation);
           } catch (e) {
-            console.log(e);
-            alert(`Upload + Update Failed: ${e}`);
+            console.error(e);
+            alert(`Upload + Update Failed: ${e.toString()}`);
           }
         }
       },

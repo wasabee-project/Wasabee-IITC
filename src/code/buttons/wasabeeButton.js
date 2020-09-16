@@ -69,8 +69,8 @@ const WasabeeButton = WButton.extend({
           removeNonOwnedOps();
           await logoutPromise();
         } catch (e) {
-          console.log(e);
-          alert(e);
+          console.error(e);
+          alert(e.toString());
         }
         WasabeeMe.purge(); // runs UI updates for us
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login

@@ -96,7 +96,7 @@ const TeamListDialog = WDialog.extend({
                   await leaveTeamPromise(obj.ID);
                   await WasabeeMe.waitGet(true);
                 } catch (e) {
-                  console.log(e);
+                  console.error(e);
                 }
               }
             );
@@ -156,8 +156,8 @@ const TeamListDialog = WDialog.extend({
           alert(wX("TEAM_CREATED", newname));
           await WasabeeMe.waitGet(true); // triggers UIUpdate
         } catch (e) {
-          console.log(e);
-          alert(e);
+          console.error(e);
+          alert(e.toString());
         }
       });
       p.current = wX("NEW_TEAM_NAME");
@@ -186,8 +186,8 @@ const TeamListDialog = WDialog.extend({
       await SetTeamState(teamID, newState);
       await WasabeeMe.waitGet(true);
     } catch (e) {
-      console.log(e);
-      alert(e);
+      console.error(e);
+      alert(e.toString());
     }
     return newState;
   },

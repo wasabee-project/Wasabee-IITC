@@ -108,7 +108,7 @@ const SendTargetDialog = WDialog.extend({
         this._dialog.dialog("close");
         alert(wX("TARGET SENT"));
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     });
 
@@ -129,7 +129,7 @@ const SendTargetDialog = WDialog.extend({
           }
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
 

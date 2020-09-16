@@ -87,7 +87,7 @@ const SyncButton = WButton.extend({
 
           alert(wX("SYNC DONE"));
         } catch (e) {
-          console.log(e);
+          console.error(e);
           new AuthDialog().enable();
         }
       },

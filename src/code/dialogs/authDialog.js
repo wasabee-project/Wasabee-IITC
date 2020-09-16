@@ -133,7 +133,8 @@ const AuthDialog = WDialog.extend({
           this._dialog.dialog("close");
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
-          alert(e);
+          console.error(e);
+          alert(e.toString());
         }
       });
     }
@@ -172,8 +173,8 @@ const AuthDialog = WDialog.extend({
             this._dialog.dialog("close");
             postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
           } catch (e) {
-            console.log(e);
-            alert(e);
+            console.error(e);
+            alert(e.toString());
           }
         }
       });
@@ -252,8 +253,8 @@ const AuthDialog = WDialog.extend({
                 method: "gsapiAuth (immediate_failed)",
               });
             } catch (e) {
-              alert(wX("AUTH TOKEN REJECTED", e));
-              console.log(e);
+              alert(wX("AUTH TOKEN REJECTED", e.toString()));
+              console.error(e);
               this._dialog.dialog("close");
             }
           });
@@ -273,9 +274,9 @@ const AuthDialog = WDialog.extend({
         this._dialog.dialog("close");
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
       } catch (e) {
-        postToFirebase({ id: "exception", error: e });
-        console.log(e);
-        alert(e);
+        postToFirebase({ id: "exception", error: e.toString() });
+        console.error(e);
+        alert(e.toString());
         this._dialog.dialog("close");
       }
     });
@@ -305,9 +306,9 @@ const AuthDialog = WDialog.extend({
           this._dialog.dialog("close");
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {
-          console.log(e);
-          alert(`send access token failed (gsapiAuthChoose): ${e}`);
-          postToFirebase({ id: "exception", error: e });
+          console.error(e);
+          alert(`send access token failed (gsapiAuthChoose): ${e.toString()}`);
+          postToFirebase({ id: "exception", error: e.toString() });
         }
       }
     );

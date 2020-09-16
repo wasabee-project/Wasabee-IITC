@@ -86,8 +86,8 @@ const ManageTeamDialog = WDialog.extend({
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
                   } catch (e) {
-                    console.log(e);
-                    alert(e);
+                    console.error(e);
+                    alert(e.toString());
                   }
                 } else {
                   alert(wX("INPUT_SQUAD_NAME"));
@@ -117,7 +117,7 @@ const ManageTeamDialog = WDialog.extend({
                 try {
                   await removeAgentFromTeamPromise(value, this._team.ID);
                 } catch (e) {
-                  console.log(e);
+                  console.error(e);
                 }
                 window.runHooks("wasabeeUIUpdate");
               }
@@ -136,7 +136,7 @@ const ManageTeamDialog = WDialog.extend({
         this._table.items = teamdata.agents;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   },
 
@@ -166,8 +166,8 @@ const ManageTeamDialog = WDialog.extend({
         alert(wX("ADD_SUCC_INSTR"));
         window.runHooks("wasabeeUIUpdate");
       } catch (e) {
-        console.log(e);
-        alert(e);
+        console.error(e);
+        alert(e.toString());
       }
     });
 
@@ -186,8 +186,8 @@ const ManageTeamDialog = WDialog.extend({
         this._team.Name = renameField.value; // for display
         window.runHooks("wasabeeUIUpdate");
       } catch (e) {
-        console.log(e);
-        alert(e);
+        console.error(e);
+        alert(e.toString());
       }
     });
 
@@ -216,8 +216,8 @@ const ManageTeamDialog = WDialog.extend({
         this._team.RocksKey = rocksapiField.value; // for display
         window.runHooks("wasabeeUIUpdate");
       } catch (e) {
-        console.log(e);
-        alert(e);
+        console.error(e);
+        alert(e.toString());
       }
     });
 
@@ -238,8 +238,8 @@ const ManageTeamDialog = WDialog.extend({
             this._dialog.dialog("close");
             await WasabeeMe.waitGet(true);
           } catch (e) {
-            alert(e);
-            console.log(e);
+            console.error(e);
+            alert(e.toString());
           }
         }
       );

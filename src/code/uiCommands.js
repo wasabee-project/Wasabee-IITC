@@ -155,7 +155,7 @@ function pdqDoNext() {
 
   // are we done?
   if (p === undefined) {
-    console.log(
+    console.debug(
       "closing portal details request queue: " +
         window.plugin.wasabee.portalDetailIntervalID
     );
@@ -195,7 +195,7 @@ export function sendLocation() {
           position.coords.latitude,
           position.coords.longitude
         );
-        console.log(wX("LOCATION SUB"));
+        console.debug(wX("LOCATION SUB"));
       } catch (e) {
         console.error(e);
       }

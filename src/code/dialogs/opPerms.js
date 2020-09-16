@@ -188,8 +188,8 @@ const OpPermList = WDialog.extend({
       operation.store();
       window.runHooks("wasabeeUIUpdate");
     } catch (e) {
-      console.log(e);
-      alert(e);
+      console.error(e);
+      alert(e.toString());
     }
   },
 
@@ -209,8 +209,8 @@ const OpPermList = WDialog.extend({
       operation.store();
       window.runHooks("wasabeeUIUpdate");
     } catch (e) {
-      console.log(e);
-      alert(e);
+      console.error(e);
+      alert(e.toString());
     }
   },
 });

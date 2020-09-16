@@ -45,7 +45,7 @@ export async function drawWasabeeDkeys() {
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
-  console.trace("running drawWasabeeDkeys");
+  console.debug("running drawWasabeeDkeys");
   window.addHook("portalDetailLoaded", dLoadDetails);
 
   try {
@@ -166,7 +166,7 @@ function dLoadDetails(e) {
     if (!v.has("details")) disable = false; // still some waiting to be fetched
   }
   if (disable) {
-    console.trace("disabling portalDetailLoaded listener for WD");
+    console.debug("disabling portalDetailLoaded listener for WD");
     window.removeHook("portalDetailLoaded", dLoadDetails);
   }
 }

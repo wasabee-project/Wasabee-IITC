@@ -114,8 +114,8 @@ const DefensiveKeysDialog = WDialog.extend({
       alert("Registered with server");
       window.runHooks("wasabeeDkeys");
     } catch (e) {
-      console.log(e);
-      alert(e);
+      console.error(e);
+      alert(e.toString());
     }
   },
 

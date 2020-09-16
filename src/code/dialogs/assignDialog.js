@@ -143,7 +143,7 @@ const AssignDialog = WDialog.extend({
           }
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
 
@@ -174,11 +174,11 @@ const AssignDialog = WDialog.extend({
     const operation = getSelectedOperation();
     // if operation.localchanged...
     try {
-      console.log("pushing op to server");
+      console.debug("pushing op to server");
       await updateOpPromise(operation);
-      console.log("update pushed");
+      console.debug("update pushed");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw e;
     }
 
@@ -189,10 +189,10 @@ const AssignDialog = WDialog.extend({
           this._targetID,
           value.srcElement.value
         );
-        console.log("assignment processed by server");
+        console.debug("assignment processed by server");
         // operation.assignMarker(this._targetID, value.srcElement.value);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         operation.assignMarker(this._targetID, value.srcElement.value);
         throw e;
       }
@@ -204,10 +204,10 @@ const AssignDialog = WDialog.extend({
           this._targetID,
           value.srcElement.value
         );
-        console.log("assignment processed by server");
+        console.debug("assignment processed by server");
         // operation.assignLink(this._targetID, value.srcElement.value);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         operation.assignLink(this._targetID, value.srcElement.value);
         throw e;
       }
@@ -219,10 +219,10 @@ const AssignDialog = WDialog.extend({
       for (const l of links) {
         try {
           await assignLinkPromise(operation.ID, l.ID, value.srcElement.value);
-          console.log("assignment processed by server");
+          console.debug("assignment processed by server");
           // operation.assignLink(l.ID, value.srcElement.value);
         } catch (e) {
-          console.log(e);
+          console.error(e);
           operation.assignLink(l.ID, value.srcElement.value);
           throw e;
         }
@@ -230,12 +230,12 @@ const AssignDialog = WDialog.extend({
     }
 
     try {
-      console.log("refreshing local copy of op from server");
+      console.debug("refreshing local copy of op from server");
       const updated = await opPromise(operation.ID);
       updated.store();
       makeSelectedOperation(updated.ID);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw e;
     }
   },

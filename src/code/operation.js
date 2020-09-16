@@ -129,7 +129,7 @@ export default class WasabeeOp {
     }
 
     if (this._dirtyCoordsTable) {
-      console.trace("operation: removing duplicates");
+      console.debug("operation: removing duplicates");
       const toRemove = new Array();
       const rename = new Map();
 
@@ -255,7 +255,7 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
-    console.trace("removing anchor");
+    console.debug("removing anchor");
     console.debug(this.links);
 
     this.anchors = this.anchors.filter(function (anchor) {
@@ -511,7 +511,7 @@ export default class WasabeeOp {
   addLink(fromPortal, toPortal, description, order, replace = false) {
     console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
-      console.trace(
+      console.debug(
         "Operation: Ignoring link where source and target are the same portal."
       );
       return null;
@@ -545,7 +545,7 @@ export default class WasabeeOp {
       this.update(true);
       this.runCrosslinks();
     } else {
-      console.trace(
+      console.debug(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
       );
       return existingLink;
@@ -617,28 +617,28 @@ export default class WasabeeOp {
 
       if (l.fromPortalId == originalPortal.id) {
         if (l.toPortalId === newPortal.id) {
-          console.trace(
+          console.debug(
             `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(newPortal.id, l.toPortalId)) {
           l.fromPortalId = newPortal.id;
         } else {
-          console.trace(
+          console.debug(
             `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
         }
       } else if (l.toPortalId == originalPortal.id) {
         if (l.fromPortalId === newPortal.id) {
-          console.trace(
+          console.debug(
             `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(l.fromPortalId, newPortal.id)) {
           l.toPortalId = newPortal.id;
         } else {
-          console.trace(
+          console.debug(
             `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
@@ -768,14 +768,14 @@ export default class WasabeeOp {
     /* 
     if (this._AMpushed && now - this._AMpushed < 1000) {
       this._AMpushed = now;
-      console.trace("skipping active mode push");
+      console.debug("skipping active mode push");
       return;
     } */
 
     this._AMpushed = now;
     try {
       await updateOpPromise(this);
-      console.trace("active mode change pushed", new Date().toGMTString());
+      console.debug("active mode change pushed", new Date().toGMTString());
     } catch (e) {
       console.error(e);
       alert("Active Mode Update failed: " + e);

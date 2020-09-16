@@ -218,8 +218,8 @@ const OpsDialog = WDialog.extend({
                 await deleteOpPromise(selectedOp.ID);
                 console.log("delete from server successful");
               } catch (e) {
-                console.log(e);
-                alert(e);
+                console.error(e);
+                alert(e.toString());
               }
             }
             removeOperation(selectedOp.ID);

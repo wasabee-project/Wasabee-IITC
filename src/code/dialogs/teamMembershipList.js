@@ -51,7 +51,8 @@ const TeamMembershipList = WDialog.extend({
     try {
       this._team = await WasabeeTeam.waitGet(teamID, 2);
     } catch (e) {
-      alert(e);
+      console.error(e);
+      alert(e.toString());
       return;
     }
     if (!this._team.name) {
