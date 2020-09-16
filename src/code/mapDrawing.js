@@ -3,6 +3,7 @@ import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import { getSelectedOperation } from "./selectedOp";
 import { wX } from "./wX";
+import AssignDialog from "./dialogs/assignDialog";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -163,10 +164,10 @@ function addLink(wlink, operation) {
 
   const newlink = new L.GeodesicPolyline(latLngs, style);
   // these are used for updateLink and can be removed if we get rid of it
-  newlink.options.id = wlink.ID;
+  /* newlink.options.id = wlink.ID;
   newlink.options.fm = wlink.fromPortalId;
   newlink.options.to = wlink.toPortalId;
-  newlink.options.Wcolor = wlink.color;
+  newlink.options.Wcolor = wlink.color; */
 
   newlink.bindPopup("loading...", {
     className: "wasabee-popup",
@@ -176,21 +177,42 @@ function addLink(wlink, operation) {
   newlink.on(
     "click",
     (ev) => {
+      // XXX move this to link.getPopup()
       if (ev.target._popup._wrapper)
         ev.target._popup._wrapper.classList.add("wasabee-popup");
       const div = L.DomUtil.create("div", null);
+      L.DomUtil.create("div", null, div).appendChild(
+        wlink.displayFormat(operation, true)
+      );
+      if (wlink.description)
+        L.DomUtil.create("div", null, div).textContent = wlink.description;
+      L.DomUtil.create("div", null, div).textContent =
+        "# " + wlink.throwOrderPos;
       const del = L.DomUtil.create("button", null, div);
       del.textContent = wX("DELETE_LINK");
-      L.DomEvent.on(del, "click", () => {
+      L.DomEvent.on(del, "click", (ev) => {
+        L.DomEvent.stop(ev);
         operation.removeLink(wlink.fromPortalId, wlink.toPortalId);
       });
       const rev = L.DomUtil.create("button", null, div);
       rev.textContent = wX("REVERSE");
-      L.DomEvent.on(rev, "click", () => {
+      L.DomEvent.on(rev, "click", (ev) => {
+        L.DomEvent.stop(ev);
         operation.reverseLink(wlink.fromPortalId, wlink.toPortalId);
       });
+      if (operation.IsServerOp() && WasabeeMe.isLoggedIn()) {
+        const assignButton = L.DomUtil.create("button", null, div);
+        assignButton.textContent = wX("ASSIGN");
+        L.DomEvent.on(assignButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const ad = new AssignDialog();
+          ad.setup(wlink, operation);
+          ad.enable();
+        });
+      }
+
       ev.target.setPopupContent(div);
-      ev.target.openPopup();
+      ev.target.openPopup(ev.latlng);
       L.DomEvent.stop(ev);
       return true;
     },
