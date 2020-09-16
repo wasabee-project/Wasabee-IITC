@@ -8,6 +8,7 @@ import wX from "../wX";
 // import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
+import WasabeeOp from "../operation";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -222,7 +223,7 @@ const LinkListDialog = WDialog.extend({
 
     // TODO: picker here
     // custom color
-    if (operation.newColors(data) == data) {
+    if (WasabeeOp.newColors(data) == data) {
       const option = L.DomUtil.create("option");
       option.value = data;
       option.selected = true;

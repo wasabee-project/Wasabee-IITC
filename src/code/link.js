@@ -1,9 +1,10 @@
 import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
+import WasabeeOp from "./operation";
 
 // for named color
-import colorString from "color-string";
+import { convertColorToHex } from "./auxiliar";
 
 export default class WasabeeLink {
   constructor(obj) {
@@ -111,9 +112,7 @@ export default class WasabeeLink {
     arrow.style.color = this.getColor(operation);
     const picker = L.DomUtil.create("input", "", arrow);
     picker.type = "color";
-    picker.value = colorString.to.hex(
-      colorString.get.rgb(this.getColor(operation))
-    );
+    picker.value = convertColorToHex(this.getColor(operation));
     picker.style.display = "none";
 
     L.DomEvent.on(arrow, "click", () => {
@@ -133,7 +132,7 @@ export default class WasabeeLink {
 
   getColor(operation) {
     // 0.17 -- use the old names internally no matter what we are sent
-    let color = operation.oldColors(this.color);
+    let color = WasabeeOp.oldColors(this.color);
     if (color == "main") color = operation.color;
     if (window.plugin.wasabee.skin.layerTypes.has(color))
       color = window.plugin.wasabee.skin.layerTypes.get(color).color;

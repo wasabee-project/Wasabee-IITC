@@ -1,6 +1,7 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
+import WasabeeOp from "./operation";
 import { getSelectedOperation } from "./selectedOp";
 import { wX } from "./wX";
 import AssignDialog from "./dialogs/assignDialog";
@@ -373,7 +374,7 @@ function addAnchorToMap(portalId) {
   const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
   let layer = anchor.color;
-  if (operation.newColors(layer) == layer) layer = "custom";
+  if (WasabeeOp.newColors(layer) == layer) layer = "custom";
   const marker = L.marker(anchor.latLng, {
     title: anchor.name,
     alt: anchor.name,

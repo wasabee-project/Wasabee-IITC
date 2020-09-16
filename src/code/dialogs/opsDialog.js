@@ -15,6 +15,9 @@ import OpPermList from "./opPerms";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
+import WasabeeOp from "../operation";
+import { convertColorToHex } from "../auxiliar";
+
 const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog",
@@ -157,9 +160,32 @@ const OpsDialog = WDialog.extend({
         option.value = c.name;
         option.textContent = c.displayName;
       }
+
+      const customOption = L.DomUtil.create("option", null, opColor);
+      customOption.value = "custom";
+      customOption.textContent = "Custom";
+
+      if (WasabeeOp.newColors(selectedOp.color) == selectedOp.color)
+        customOption.selected = true;
+
+      const picker = L.DomUtil.create("input", "", customOption);
+      picker.type = "color";
+      picker.value = convertColorToHex(selectedOp.color);
+      picker.style.display = "none";
+
       L.DomEvent.on(opColor, "change", (ev) => {
         L.DomEvent.stop(ev);
-        selectedOp.color = opColor.value;
+        if (opColor.value == "custom") picker.click();
+        else {
+          selectedOp.color = opColor.value;
+          selectedOp.store();
+          window.runHooks("wasabeeUIUpdate");
+        }
+      });
+
+      L.DomEvent.on(picker, "change", (ev) => {
+        L.DomEvent.stop(ev);
+        selectedOp.color = picker.value;
         selectedOp.store();
         window.runHooks("wasabeeUIUpdate");
       });
