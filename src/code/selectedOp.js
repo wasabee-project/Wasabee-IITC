@@ -85,7 +85,7 @@ export function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  window.runHooks("wasabeeUIUpdate");
+  window.runHooks("wasabeeUIUpdate", "makeSelectedOperation");
   window.runHooks("wasabeeCrosslinks");
   return window.plugin.wasabee._selectedOp;
 }
@@ -100,7 +100,7 @@ export function getOperationByID(opID) {
     const op = new WasabeeOp(raw);
     if (op.ID) return op;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
   return oldOpFormat(opID);
 }
@@ -116,7 +116,7 @@ function oldOpFormat(opID) {
       return op;
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
   return null;
 }
@@ -179,7 +179,7 @@ export function opsList() {
     try {
       return JSON.parse(raw);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       //falback to old listing
     }
   }

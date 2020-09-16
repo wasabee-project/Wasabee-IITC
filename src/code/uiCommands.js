@@ -197,11 +197,11 @@ export function sendLocation() {
         );
         console.log(wX("LOCATION SUB"));
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     },
     (err) => {
-      console.log(err);
+      console.error(err);
     }
   );
 }
@@ -309,7 +309,7 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.runHooks("wasabeeUIUpdate");
+    window.runHooks("wasabeeUIUpdate", "blockerAutomark");
     return;
   }
 

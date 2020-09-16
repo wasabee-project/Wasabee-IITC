@@ -10,7 +10,7 @@ export default class WasabeeAgent {
       try {
         obj = JSON.parse(obj);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         obj = {};
       }
     }
@@ -56,7 +56,7 @@ export default class WasabeeAgent {
       const newagent = new WasabeeAgent(result);
       return newagent;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     return null;
   }
@@ -103,7 +103,7 @@ export default class WasabeeAgent {
             await targetPromise(this.id, selectedPortal);
             alert(wX("TARGET SENT"));
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
       );
@@ -130,7 +130,7 @@ export default class WasabeeAgent {
             await routePromise(this.id, selectedPortal);
             alert("Route Sent");
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
       );

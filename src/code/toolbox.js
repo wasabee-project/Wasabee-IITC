@@ -39,11 +39,11 @@ export function setupToolbox() {
           );
           alert(wX("LOC_PROC"));
         } catch (e) {
-          console.log(e);
+          console.error(e.toString());
         }
       },
       (err) => {
-        console.log(err);
+        console.error(err);
       }
     );
   });

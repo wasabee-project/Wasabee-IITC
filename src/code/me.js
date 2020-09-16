@@ -8,7 +8,7 @@ export default class WasabeeMe {
       try {
         data = JSON.parse(data);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         return null;
       }
     }
@@ -68,7 +68,7 @@ export default class WasabeeMe {
     try {
       me = JSON.parse(lsme);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return false;
     }
     if (me.fetched > WasabeeMe.maxCacheAge()) {
@@ -119,11 +119,11 @@ export default class WasabeeMe {
         me = newme;
       } catch (e) {
         WasabeeMe.purge();
-        console.log(e);
-        alert(e);
+        console.error(e);
+        alert(e.toString());
         me = null;
       }
-      window.runHooks("wasabeeUIUpdate");
+      window.runHooks("wasabeeUIUpdate", "me waitGet");
     }
     return me;
   }
@@ -141,7 +141,7 @@ export default class WasabeeMe {
       window.runHooks("wasabeeDkeys");
     }
 
-    window.runHooks("wasabeeUIUpdate");
+    window.runHooks("wasabeeUIUpdate", "me purge");
   }
 
   teamJoined(teamID) {

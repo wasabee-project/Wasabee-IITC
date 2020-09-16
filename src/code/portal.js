@@ -7,7 +7,7 @@ export default class WasabeePortal {
       try {
         obj = JSON.parse(obj);
       } catch (e) {
-        console.log(e);
+        console.error(e);
         return null;
       }
     }
@@ -78,7 +78,7 @@ export default class WasabeePortal {
 
   // easy compat with IITC's format -- just here for safety as we use more WP
   get _latlng() {
-    console.log("calling WasabeePortal._latlng() compat");
+    console.trace("calling WasabeePortal._latlng() compat");
     return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
@@ -142,10 +142,7 @@ export default class WasabeePortal {
   }
 
   static fake(lat, lng, id, name) {
-    if (!lat && !lng) {
-      console.log("WasabeePortal.fake called w/o lat/lng");
-      return null;
-    }
+    console.assert(lat && lng, "WasabeePortal.fake called w/o lat/lng");
 
     if (!id) id = generateId();
     if (!name) name = id;

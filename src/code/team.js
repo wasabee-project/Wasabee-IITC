@@ -7,7 +7,7 @@ export default class WasabeeTeam {
       try {
         data = JSON.parse(data);
       } catch (e) {
-        console.log("corrupted team");
+        console.error("corrupted team");
         return null;
       }
     }
@@ -49,7 +49,7 @@ export default class WasabeeTeam {
       const t = await teamPromise(teamID);
       return new WasabeeTeam(t);
     } catch (e) {
-      console.log(e);
+      console.error(e.toString());
     }
     return null;
   }

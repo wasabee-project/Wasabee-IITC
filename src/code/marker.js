@@ -115,7 +115,7 @@ export default class WasabeeMarker {
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
         assignment.appendChild(a.formatDisplay());
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
     if (this.state == "completed" && this.completedBy) {

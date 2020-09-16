@@ -45,13 +45,13 @@ export async function drawWasabeeDkeys() {
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   if (!WasabeeMe.isLoggedIn()) return;
 
-  console.log("running drawWasabeeDkeys");
+  console.trace("running drawWasabeeDkeys");
   window.addHook("portalDetailLoaded", dLoadDetails);
 
   try {
     const data = await dKeylistPromise();
     const list = JSON.parse(data);
-    if (!list) console.log(data); // what does the server send if recently logged out?
+    if (!list) console.debug(data); // what does the server send if recently logged out?
     if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0) return;
     for (const n of list.DefensiveKeys) {
       if (n.PortalID) {
@@ -75,7 +75,7 @@ export async function drawWasabeeDkeys() {
         } else {
           // if we are here early (after a reload?) IITC spams the logs
           if (!window.requests) {
-            console.log(
+            console.warn(
               "window.requests does not exist yet... expect an error"
             );
           }
@@ -84,7 +84,7 @@ export async function drawWasabeeDkeys() {
       }
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -151,7 +151,7 @@ function dLoadDetails(e) {
           marker._popup._wrapper.classList.add("wasabee-popup");
         marker.update();
       } catch (e) {
-        console.log("getting wd marker popup: ", e);
+        console.error("getting wd marker popup: ", e);
         marker.setPopupContent(e);
         marker.update();
       }
@@ -166,7 +166,7 @@ function dLoadDetails(e) {
     if (!v.has("details")) disable = false; // still some waiting to be fetched
   }
   if (disable) {
-    console.log("disabling portalDetailLoaded listener for WD");
+    console.trace("disabling portalDetailLoaded listener for WD");
     window.removeHook("portalDetailLoaded", dLoadDetails);
   }
 }

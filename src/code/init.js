@@ -76,14 +76,15 @@ window.plugin.wasabee.init = () => {
   });
 
   // custom hook for updating our UI
-  window.addHook("wasabeeUIUpdate", () => {
+  window.addHook("wasabeeUIUpdate", (caller) => {
+    if (caller != null) console.debug("ui update", caller);
     drawMap();
   });
 
   // IITC-CE, not 0.26
   if (window.addResumeFunction) {
     window.addResumeFunction(() => {
-      window.runHooks("wasabeeUIUpdate");
+      window.runHooks("wasabeeUIUpdate", "resume");
       sendLocation();
     });
   }
@@ -95,7 +96,7 @@ window.plugin.wasabee.init = () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.runHooks("wasabeeUIUpdate");
+      window.runHooks("wasabeeUIUpdate", "layeradd");
     }
   });
 
@@ -125,10 +126,10 @@ window.plugin.wasabee.init = () => {
   setupToolbox();
 
   // draw the UI with the op data for the first time
-  window.runHooks("wasabeeUIUpdate");
+  window.runHooks("wasabeeUIUpdate", "startup");
 
   // run crosslinks
-  window.runHooks("wasabeeCrosslinks", Wasabee._selectedOp);
+  window.runHooks("wasabeeCrosslinks");
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not

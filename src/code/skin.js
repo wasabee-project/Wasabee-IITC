@@ -98,8 +98,7 @@ export function changeSkin(names) {
     window.plugin.wasabee.static.constants.SKIN_KEY
   ] = JSON.stringify(validNames);
 
-  // makeSelectedOperation(op.ID);
   addButtons(op);
-  window.runHooks("wasabeeUIUpdate", op);
+  window.runHooks("wasabeeUIUpdate", "skin change");
   return true;
 }

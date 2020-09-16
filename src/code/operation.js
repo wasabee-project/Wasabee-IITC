@@ -18,7 +18,7 @@ export default class WasabeeOp {
       try {
         obj = JSON.parse(obj);
       } catch (e) {
-        console.log("corrupted operation", e);
+        console.error("corrupted operation", e);
         return null;
       }
     }
@@ -64,7 +64,7 @@ export default class WasabeeOp {
       if (op == null) throw new Error("corrupted operation");
       return op;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     return null;
   }
@@ -129,7 +129,7 @@ export default class WasabeeOp {
     }
 
     if (this._dirtyCoordsTable) {
-      console.log("operation: removing duplicates");
+      console.trace("operation: removing duplicates");
       const toRemove = new Array();
       const rename = new Map();
 
@@ -174,10 +174,7 @@ export default class WasabeeOp {
   }
 
   containsPortal(portal) {
-    if (!portal && !portal.id) {
-      console.log("containsPortal w/o args");
-      return false;
-    }
+    console.assert(portal && portal.id, "containsPortal w/o args");
     return this._idToOpportals.has(portal.id);
   }
 
@@ -258,8 +255,8 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
-    console.log("removing anchor");
-    console.log(this.links);
+    console.trace("removing anchor");
+    console.debug(this.links);
 
     this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
@@ -270,7 +267,7 @@ export default class WasabeeOp {
       );
     });
 
-    console.log(this.links);
+    console.debug(this.links);
 
     this.cleanAnchorList();
     this.cleanPortalList();
@@ -445,7 +442,7 @@ export default class WasabeeOp {
         // the portal is likely to be a real portal while old is a faked one
         // this is addressed later when rebuilding coords lookup table.
         // use _updatePortal to replace old one by the new one
-        console.log(
+        console.debug(
           "add portal %s on portal %s location %s",
           this._coordsToOpportals.get(key).id,
           portal.id,
@@ -512,12 +509,9 @@ export default class WasabeeOp {
   }
 
   addLink(fromPortal, toPortal, description, order, replace = false) {
-    if (!fromPortal || !toPortal) {
-      console.log("missing portal for link");
-      return null;
-    }
+    console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
-      console.log(
+      console.trace(
         "Operation: Ignoring link where source and target are the same portal."
       );
       return null;
@@ -551,7 +545,7 @@ export default class WasabeeOp {
       this.update(true);
       this.runCrosslinks();
     } else {
-      console.log(
+      console.trace(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
       );
       return existingLink;
@@ -594,19 +588,12 @@ export default class WasabeeOp {
   }
 
   addBlocker(link) {
-    if (!link.fromPortalId || !link.toPortalId) {
-      console.log("not fully formed");
-      console.log(link);
-      return;
-    }
+    if (!link.fromPortalId || !link.toPortalId) return;
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
-      this.update(false); // can trigger a redraw-storm, just skip
+      // this.update(false); // can trigger a redraw-storm, just skip
+      this.store();
     }
-  }
-
-  removeBlocker() {
-    // console.log("remove blocker called... write this"); // no need for now
   }
 
   get fakedPortals() {
@@ -630,28 +617,28 @@ export default class WasabeeOp {
 
       if (l.fromPortalId == originalPortal.id) {
         if (l.toPortalId === newPortal.id) {
-          console.log(
+          console.trace(
             `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(newPortal.id, l.toPortalId)) {
           l.fromPortalId = newPortal.id;
         } else {
-          console.log(
+          console.trace(
             `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
         }
       } else if (l.toPortalId == originalPortal.id) {
         if (l.fromPortalId === newPortal.id) {
-          console.log(
+          console.trace(
             `Operation: Removing link '${l.ID}' while swapping because it would create a link with the same source and target.`
           );
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(l.fromPortalId, newPortal.id)) {
           l.toPortalId = newPortal.id;
         } else {
-          console.log(
+          console.trace(
             `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
           );
           linksToRemove.push(l);
@@ -751,12 +738,13 @@ export default class WasabeeOp {
       // server op
       if (updateLocalchanged) {
         // caller requested store (default)
-        const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
-        const mode = localStorage[modeKey];
+        const mode =
+          localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
         if (mode == "active") {
           if (!WasabeeMe.isLoggedIn()) {
             alert("Not Logged in, disabling active mode");
-            localStorage[modeKey] = "design";
+            localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
+              "design";
             this.localchanged = true;
           } else {
             // active mode -- this happens async, but no need to await here
@@ -771,7 +759,7 @@ export default class WasabeeOp {
 
     // even if not server
     this.store();
-    window.runHooks("wasabeeUIUpdate");
+    window.runHooks("wasabeeUIUpdate", "op update");
   }
 
   // only for use by "active" mode
@@ -780,16 +768,16 @@ export default class WasabeeOp {
     /* 
     if (this._AMpushed && now - this._AMpushed < 1000) {
       this._AMpushed = now;
-      console.log("skipping active mode push");
+      console.trace("skipping active mode push");
       return;
     } */
 
     this._AMpushed = now;
     try {
       await updateOpPromise(this);
-      console.log("active mode change pushed", new Date().toGMTString());
+      console.trace("active mode change pushed", new Date().toGMTString());
     } catch (e) {
-      console.log(e);
+      console.error(e);
       alert("Active Mode Update failed: " + e);
     }
   }
@@ -999,8 +987,8 @@ export default class WasabeeOp {
     this.update(false);
   }
 
-  // for 0.17, if we see the new, we change to the old
-  // for 0.18 we will change from old-to-new...
+  // for 0.18, if we see the new, we change to the old
+  // for 0.19 we will change from old-to-new...
   oldColors(incoming) {
     switch (incoming) {
       case "orange":
@@ -1026,7 +1014,7 @@ export default class WasabeeOp {
     }
   }
 
-  // not used in 0.17...
+  // not used in 0.18, will be default in 0.19
   newColors(incoming) {
     switch (incoming) {
       case "groupa":
