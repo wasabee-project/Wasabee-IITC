@@ -92,8 +92,11 @@ const OpsDialog = WDialog.extend({
     }
 
     for (const server of [...data.keys()].sort()) {
-      const ops = data.get(server);
-      ops.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+      const ops = data
+        .get(server)
+        .sort((a, b) =>
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
       if (server != "") {
         const option = L.DomUtil.create("option", null, operationSelect);
         option.text = "-- " + server + " --";

@@ -372,19 +372,28 @@ function updateAnchors(op) {
 function addAnchorToMap(portalId) {
   const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
+  let layer = anchor.color;
+  if (operation.newColors(layer) == layer) layer = "custom";
   const marker = L.marker(anchor.latLng, {
     title: anchor.name,
     alt: anchor.name,
     id: portalId,
     color: anchor.color,
     icon: L.divIcon({
-      className: `wasabee-anchor-icon wasabee-layer-${anchor.color}`,
+      className: `wasabee-anchor-icon wasabee-layer-${layer}`,
       shadowUrl: null,
       iconAnchor: [12, 41],
       iconSize: [25, 41],
       popupAnchor: [0, -35],
     }),
   });
+
+  if (layer == "custom") {
+    marker.on("add", () => {
+      const div = marker.getElement();
+      div.style.backgroundColor = anchor.color;
+    });
+  }
 
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
