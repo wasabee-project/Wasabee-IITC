@@ -256,10 +256,11 @@ export function logoutPromise() {
 }
 
 // adds a permission to an op; return value is status code
-export function addPermPromise(opID, teamID, role) {
+export function addPermPromise(opID, teamID, role, zone) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
+  fd.append("zone", zone);
   return genericPost(`/api/v1/draw/${opID}/perms`, fd);
 }
 
@@ -347,8 +348,7 @@ async function genericPut(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          if (obj.updateID)
-            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
           return Promise.resolve(text);
         } catch (e) {
@@ -394,8 +394,7 @@ async function genericPost(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          if (obj.updateID)
-            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
           return Promise.resolve(text);
         } catch (e) {
@@ -441,8 +440,7 @@ async function genericDelete(url, formData, contentType) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          if (obj.updateID)
-            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
           return Promise.resolve(text);
         } catch (e) {
@@ -483,8 +481,7 @@ async function genericGet(url) {
         try {
           const text = await response.text();
           const obj = JSON.parse(text);
-          if (obj.updateID)
-            window.plugin.wasabee._updateList.set(obj.updateID, Date.now());
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
           return Promise.resolve(text);
         } catch (e) {
@@ -526,6 +523,13 @@ export function GetWasabeeServer() {
   }
   // Wasabee-WebUI doesn't need to specify the server
   return "";
+}
+
+export function GetUpdateList() {
+  if (window.plugin && window.plugin.wasabee) {
+    return window.plugin.wasabee._updateList;
+  }
+  return window.wasabeewebui._updateList;
 }
 
 export function SetWasabeeServer(server) {
@@ -607,5 +611,19 @@ export function setMarkerComment(opID, markerID, comment) {
 export function setLinkComment(opID, linkID, desc) {
   const fd = new FormData();
   fd.append("desc", desc);
-  return genericPost(`/api/v1/draw/${opID}/link/${linkID}/desc`);
+  return genericPost(`/api/v1/draw/${opID}/link/${linkID}/desc`, fd);
+}
+
+export function setLinkZone(opID, linkID, zone) {
+  console.log(opID, linkID, zone);
+  const fd = new FormData();
+  fd.append("zone", zone);
+  return genericPost(`/api/v1/draw/${opID}/link/${linkID}/zone`, fd);
+}
+
+export function setMarkerZone(opID, markerID, zone) {
+  console.log(opID, markerID, zone);
+  const fd = new FormData();
+  fd.append("zone", zone);
+  return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/zone`, fd);
 }
