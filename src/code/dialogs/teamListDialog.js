@@ -65,7 +65,7 @@ const TeamListDialog = WDialog.extend({
         },
       },
       {
-        name: wX("STATE"),
+        name: wX("TEAM STATE"),
         value: (team) => team.State,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
@@ -79,38 +79,32 @@ const TeamListDialog = WDialog.extend({
         },
       },
       {
-        name: wX("LEAVE"),
+        name: "",
         value: (team) => team.State,
         sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.textContent = wX("LEAVE");
-          L.DomEvent.on(link, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            const cd = new ConfirmDialog();
-            cd.setup(
-              `Leave ${obj.Name}?`,
-              `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
-              async () => {
-                try {
-                  await leaveTeamPromise(obj.ID);
-                  await WasabeeMe.waitGet(true);
-                } catch (e) {
-                  console.error(e);
+          link.textContent = "";
+          if (this._me.GoogleID != obj.Owner) {
+            link.textContent = wX("LEAVE");
+            L.DomEvent.on(link, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              const cd = new ConfirmDialog();
+              cd.setup(
+                `Leave ${obj.Name}?`,
+                `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
+                async () => {
+                  try {
+                    await leaveTeamPromise(obj.ID);
+                    await WasabeeMe.waitGet(true);
+                  } catch (e) {
+                    console.error(e);
+                  }
                 }
-              }
-            );
-            cd.enable();
-          });
-        },
-      },
-      {
-        name: wX("MANAGE"),
-        value: (team) => team.ID,
-        sort: null,
-        format: (row, value, obj) => {
-          row.textContent = "";
-          if (obj.State == "On" && this._me.GoogleID == obj.Owner) {
+              );
+              cd.enable();
+            });
+          } else {
             const link = L.DomUtil.create("a", "enl", row);
             link.textContent = wX("MANAGE");
             L.DomEvent.on(link, "click", (ev) => {
