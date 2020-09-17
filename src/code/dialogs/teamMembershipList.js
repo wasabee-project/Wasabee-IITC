@@ -81,9 +81,7 @@ const TeamMembershipList = WDialog.extend({
       },
     ];
     this._table.sortBy = 0;
-    // if team owner, don't show non-enabled agents
-    const a = this._team.agents.filter((agent) => agent.state);
-    this._table.items = a;
+    this._table.items = this._team.agents;
   },
 });
 

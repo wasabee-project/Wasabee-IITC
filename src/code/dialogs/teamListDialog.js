@@ -50,18 +50,15 @@ const TeamListDialog = WDialog.extend({
         value: (team) => team.Name,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, team) => {
-          const link = L.DomUtil.create("a", null, row);
+          const link = L.DomUtil.create("a", "enl", row);
           link.href = "#";
           link.textContent = value;
-          if (team.State == "On") {
-            L.DomUtil.addClass(link, "enl");
-            L.DomEvent.on(link, "click", async (ev) => {
-              L.DomEvent.stop(ev);
-              const td = new TeamMembershipList();
-              await td.setup(team.ID);
-              td.enable();
-            });
-          }
+          L.DomEvent.on(link, "click", async (ev) => {
+            L.DomEvent.stop(ev);
+            const td = new TeamMembershipList();
+            await td.setup(team.ID);
+            td.enable();
+          });
         },
       },
       {
