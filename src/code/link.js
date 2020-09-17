@@ -2,7 +2,8 @@ import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeOp from "./operation";
-
+import WasabeeMe from "./me";
+import AssignDialog from "./dialogs/assignDialog";
 // for named color
 import { convertColorToHex } from "./auxiliar";
 
@@ -183,5 +184,38 @@ export default class WasabeeLink {
     }
     a.textContent = s;
     return a;
+  }
+
+  getPopup(operation) {
+    const div = L.DomUtil.create("div", null);
+    L.DomUtil.create("div", null, div).appendChild(
+      this.displayFormat(operation, true)
+    );
+    if (this.description)
+      L.DomUtil.create("div", "enl", div).textContent = this.description;
+    L.DomUtil.create("div", "enl", div).textContent = "# " + this.throwOrderPos;
+    const del = L.DomUtil.create("button", null, div);
+    del.textContent = wX("DELETE_LINK");
+    L.DomEvent.on(del, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      operation.removeLink(this.fromPortalId, this.toPortalId);
+    });
+    const rev = L.DomUtil.create("button", null, div);
+    rev.textContent = wX("REVERSE");
+    L.DomEvent.on(rev, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      operation.reverseLink(this.fromPortalId, this.toPortalId);
+    });
+    if (operation.IsServerOp() && WasabeeMe.isLoggedIn()) {
+      const assignButton = L.DomUtil.create("button", null, div);
+      assignButton.textContent = wX("ASSIGN");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog();
+        ad.setup(this, operation);
+        ad.enable();
+      });
+    }
+    return div;
   }
 }
