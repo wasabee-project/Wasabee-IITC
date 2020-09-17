@@ -114,7 +114,7 @@ const SendTargetDialog = WDialog.extend({
 
     const me = await WasabeeMe.waitGet();
     for (const t of operation.teamlist) {
-      if (me.teamEnabled(t.teamid) == false) continue;
+      if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.waitGet(t.teamid, 5 * 60);

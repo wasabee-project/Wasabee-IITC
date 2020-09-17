@@ -987,6 +987,13 @@ export default class WasabeeOp {
     this.update(false);
   }
 
+  zoneName(zoneID) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) return z.name;
+    }
+    return zoneID;
+  }
+
   // for 0.18, if we see the new, we change to the old
   // for 0.19 we will change from old-to-new...
   static oldColors(incoming) {

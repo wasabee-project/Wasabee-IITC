@@ -46,7 +46,7 @@ const OpPermList = WDialog.extend({
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       this._opID = operation.ID;
-      console.log("operation changed");
+      console.warn("operation changed while perm dialog open");
     }
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
@@ -74,8 +74,7 @@ const OpPermList = WDialog.extend({
       const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
-        if (already.has(t.ID)) continue;
-        if (t.State != "On") continue;
+        // if (already.has(t.ID)) continue;
         const o = L.DomUtil.create("option", null, teamMenu);
         o.value = t.ID;
         o.textContent = t.Name;
@@ -90,6 +89,17 @@ const OpPermList = WDialog.extend({
       const ao = L.DomUtil.create("option", null, permMenu);
       ao.value = "assignedonly";
       ao.textContent = wX("ASSIGNED_ONLY");
+
+      const zoneMenu = L.DomUtil.create("select", null, addArea);
+      const zoneAll = L.DomUtil.create("option", null, zoneMenu);
+      zoneAll.value = "0";
+      zoneAll.textContent = "All";
+      for (const oz of operation.zones) {
+        const z = L.DomUtil.create("option", null, zoneMenu);
+        z.value = oz.id;
+        z.textContent = oz.name;
+      }
+
       const ab = L.DomUtil.create("button", null, addArea);
       ab.type = "button";
       ab.name = "Add";
@@ -128,13 +138,16 @@ const OpPermList = WDialog.extend({
       {
         name: wX("TEAM"),
         value: (perm) => {
+          // try the team cache first
           const t = WasabeeTeam.cacheGet(perm.teamid);
           if (t) return t.name;
+          // check the "me" list
           if (this._me) {
             for (const mt of this._me.Teams) {
-              if (mt.ID == perm.teamid) return mt.Name + " (off)";
+              if (mt.ID == perm.teamid) return mt.Name;
             }
           }
+          // default to the id
           return "[" + perm.teamid + "]";
         },
         sort: (a, b) => a.localeCompare(b),
@@ -143,6 +156,12 @@ const OpPermList = WDialog.extend({
       {
         name: wX("ROLE"),
         value: (perm) => perm.role,
+        sort: (a, b) => a.localeCompare(b),
+        // , format: (cell, value) => (cell.textContent = value)
+      },
+      {
+        name: "Zone",
+        value: (perm) => operation.zoneName(perm.zone),
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
@@ -168,23 +187,23 @@ const OpPermList = WDialog.extend({
     this._table.items = operation.teamlist;
   },
 
-  addPerm: async function (teamID, role) {
+  addPerm: async function (teamID, role, zone) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
     const operation = getSelectedOperation();
     for (const p of operation.teamlist) {
-      if (p.teamid == teamID && p.role == role) {
-        console.log("not adding duplicate");
+      if (p.teamid == teamID && p.role == role && p.zone == zone) {
+        console.warn("not adding duplicate permission");
         window.runHooks("wasabeeUIUpdate");
         return;
       }
     }
     try {
-      await addPermPromise(operation.ID, teamID, role);
+      await addPermPromise(operation.ID, teamID, role, zone);
       // add locally for display
-      operation.teamlist.push({ teamid: teamID, role: role });
+      operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
       operation.store();
       window.runHooks("wasabeeUIUpdate");
     } catch (e) {
