@@ -3,6 +3,7 @@ import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import WasabeeOp from "./operation";
 import { getSelectedOperation } from "./selectedOp";
+import { convertColorToHue } from "./auxiliar";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -359,7 +360,8 @@ function addAnchorToMap(portalId) {
   if (layer == "custom") {
     marker.on("add", () => {
       const div = marker.getElement();
-      div.style.backgroundColor = anchor.color;
+      const hue = convertColorToHue(anchor.color);
+      div.style.filter = `hue-rotate(${hue}deg)`;
     });
   }
 

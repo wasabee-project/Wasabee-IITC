@@ -17,3 +17,30 @@ export function convertColorToHex(color, on_error = "#000000") {
     return on_error;
   }
 }
+
+function rgbToHue(color) {
+  const [r, g, b] = color;
+  const min = Math.min(Math.min(r, g), b);
+  const max = Math.max(Math.max(r, g), b);
+
+  if (min == max) return 0;
+
+  let hue = 0;
+  if (max == r) hue = (g - b) / (max - min);
+  else if (max == g) hue = 2 + (b - r) / (max - min);
+  else hue = 4 + (r - g) / (max - min);
+
+  hue = hue * 60;
+  if (hue < 0) hue = hue + 360;
+
+  return Math.round(hue);
+}
+
+export function convertColorToHue(color, on_error = 0) {
+  try {
+    return rgbToHue(colorString.get.rgb(WasabeeOp.newColors(color)));
+  } catch (e) {
+    console.log(e);
+    return on_error;
+  }
+}
