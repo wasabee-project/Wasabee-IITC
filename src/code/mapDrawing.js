@@ -3,7 +3,6 @@ import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import WasabeeOp from "./operation";
 import { getSelectedOperation } from "./selectedOp";
-import { convertColorToHSL } from "./auxiliar";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -343,27 +342,39 @@ function addAnchorToMap(portalId) {
   const anchor = new WasabeeAnchor(portalId, operation);
   let layer = anchor.color;
   if (WasabeeOp.newColors(layer) == layer) layer = "custom";
-  const marker = L.marker(anchor.latLng, {
-    title: anchor.name,
-    alt: anchor.name,
-    id: portalId,
-    color: anchor.color,
-    icon: L.divIcon({
-      className: `wasabee-anchor-icon wasabee-layer-${layer}`,
-      shadowUrl: null,
-      iconAnchor: [12, 41],
-      iconSize: [25, 41],
-      popupAnchor: [0, -35],
-    }),
-  });
-
-  if (layer == "custom") {
-    marker.on("add", () => {
-      const div = marker.getElement();
-      const [h, s, l] = convertColorToHSL(anchor.color);
-      div.style.filter = `hue-rotate(${h}deg) saturate(${s}) brightness(${
-        l + 0.5
-      })`;
+  let marker;
+  if (layer != "custom") {
+    marker = L.marker(anchor.latLng, {
+      title: anchor.name,
+      alt: anchor.name,
+      id: portalId,
+      color: anchor.color,
+      icon: L.divIcon({
+        className: `wasabee-anchor-icon wasabee-layer-${layer}`,
+        shadowUrl: null,
+        iconAnchor: [12, 41],
+        iconSize: [25, 41],
+        popupAnchor: [0, -35],
+      }),
+    });
+  } else {
+    const svg = L.Util.template(
+      '<svg class="wasabee-anchor-icon wasabee-layer-custom" style="background-color: {color}""></svg>',
+      { color: anchor.color }
+    );
+    marker = L.marker(anchor.latLng, {
+      title: anchor.name,
+      alt: anchor.name,
+      id: portalId,
+      color: anchor.color,
+      icon: L.divIcon({
+        className: "",
+        shadowUrl: null,
+        iconAnchor: [12, 41],
+        iconSize: [25, 41],
+        popupAnchor: [0, -35],
+        html: svg,
+      }),
     });
   }
 

@@ -497,6 +497,12 @@
 .wasabee-anchor-icon.wasabee-layer-custom {
   background-size: cover;
   background-image: url(../images/pin_red.svg);
+  background-blend-mode: luminosity;
+  mask-image: url(../images/pin_red.svg);
+  mask-size: cover;
+  -webkit-mask-image: url(../images/pin_red.svg);
+  -webkit-mask-size: cover;
+
 }
 
 .wasabee-toolbar-wasabee {
