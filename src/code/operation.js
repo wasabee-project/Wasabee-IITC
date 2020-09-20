@@ -5,7 +5,7 @@ import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId } from "./auxiliar";
 import { updateOpPromise, GetWasabeeServer } from "./server";
-import { addOperation } from "./selectedOp";
+import { addOperation, getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
@@ -35,7 +35,7 @@ export default class WasabeeOp {
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
-    this.localchanged = obj.localchanged ? obj.localchanged : true;
+    this.localchanged = obj.localchanged === false ? obj.localchanged : true;
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
@@ -73,6 +73,10 @@ export default class WasabeeOp {
     this.stored = Date.now();
     localStorage[this.ID] = JSON.stringify(this);
     addOperation(this.ID);
+
+    const s = getSelectedOperation();
+    if (s.ID == this.ID && s != this)
+      console.trace("store current OP from a different obj");
   }
 
   // build object to serialize
@@ -901,27 +905,58 @@ export default class WasabeeOp {
   IsWritableOp() {
     // not from the server, must be writable
     if (!this.IsServerOp()) return true;
+    // if logged on a different server from the one used for the op, not writable
+    if (!this.IsOnCurrentServer()) return false;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
     if (me.GoogleID == this.creator) return true;
-    // if logged on a different server from the one used for the op, not writable
-    if (!this.IsOnCurrentServer()) return false;
     // if the user has no teams enabled, it can't be writable
     if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
     for (const t of this.teamlist) {
       if (t.role == "write") {
         for (const m of me.Teams) {
-          if (t.teamid == m.ID && m.State == "On") return true;
+          if (t.teamid == m.ID) return true;
         }
       }
     }
 
     // not on a write-access team, must not be
     return false;
+  }
+
+  getPermission() {
+    // not from the server, must be writable
+    if (!this.IsServerOp()) return "write";
+    // if it is a server op and not logged in, the user is the owner
+    if (!WasabeeMe.isLoggedIn()) return "write";
+    // if logged on a different server from the one used for the op, the user is the owner
+    if (!this.IsOnCurrentServer()) return "write";
+    // if current user is op creator, it is always writable
+    const me = WasabeeMe.cacheGet();
+    if (!me) return "read"; // fail safe
+    if (me.GoogleID == this.creator) return "write";
+
+    // look for team permission
+    for (const t of this.teamlist) {
+      if (t.role == "write") {
+        for (const m of me.Teams) {
+          if (t.teamid == m.ID) return "write";
+        }
+      }
+    }
+    for (const t of this.teamlist) {
+      if (t.role == "read") {
+        for (const m of me.Teams) {
+          if (t.teamid == m.ID) return "read";
+        }
+      }
+    }
+
+    return "assignonly";
   }
 
   IsOnCurrentServer() {

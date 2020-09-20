@@ -28,6 +28,8 @@ const UploadButton = WButton.extend({
         if (operation.IsServerOp()) {
           try {
             await updateOpPromise(operation);
+            operation.localchanged = false;
+            operation.store();
             alert(wX("UPDATED"));
             this.Wupdate(this._container, operation);
           } catch (e) {
