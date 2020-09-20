@@ -1043,7 +1043,7 @@ export default class WasabeeOp {
         return "groupd";
       case "teal":
         return "groupe";
-      case "fuscia":
+      case "fuchsia":
         return "groupf";
       case "red":
         return "main";
@@ -1070,7 +1070,7 @@ export default class WasabeeOp {
       case "groupe":
         return "teal";
       case "groupf":
-        return "fuscia";
+        return "fuchsia";
       case "main":
         return "red";
       default:
