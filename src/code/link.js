@@ -6,7 +6,7 @@ import WasabeeMe from "./me";
 import AssignDialog from "./dialogs/assignDialog";
 // for named color
 import { convertColorToHex } from "./auxiliar";
-import { addColor } from "./skin";
+import { addToColorList } from "./skin";
 
 export default class WasabeeLink {
   constructor(obj) {
@@ -136,7 +136,7 @@ export default class WasabeeLink {
     this.color = color;
     if (this.color == operation.color) this.color = "main";
     operation.update();
-    addColor(color);
+    addToColorList(color);
   }
 
   getColor(operation) {

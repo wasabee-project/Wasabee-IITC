@@ -118,7 +118,7 @@ function initOpsColor() {
   }
 }
 
-export function addColor(color) {
+export function addToColorList(color) {
   const datalist = document.getElementById("wasabee-colors-datalist");
   // fail safe
   if (!datalist) return;
