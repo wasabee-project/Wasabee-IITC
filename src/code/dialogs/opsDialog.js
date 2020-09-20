@@ -181,6 +181,7 @@ const OpsDialog = WDialog.extend({
           const opOwner = L.DomUtil.create("td", "opstatus", opRow);
           const agent = WasabeeAgent.cacheGet(op.owner);
           if (agent != null) opOwner.appendChild(agent.formatDisplay());
+          else if (server == "") opOwner.append(window.PLAYER.nickname);
           else {
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {

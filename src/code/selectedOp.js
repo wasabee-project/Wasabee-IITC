@@ -251,6 +251,7 @@ export function duplicateOperation(opID) {
 
   op.ID = generateId();
   op.name = op.name + " " + new Date().toGMTString();
+  op.creator = window.PLAYER.nickname;
   op.teamlist = null;
   op.fetched = null;
   op.keysonhand = new Array();
