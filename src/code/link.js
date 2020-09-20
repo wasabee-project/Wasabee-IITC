@@ -115,6 +115,7 @@ export default class WasabeeLink {
     picker.type = "color";
     picker.value = convertColorToHex(this.getColor(operation));
     picker.style.display = "none";
+    picker.setAttribute("list", "wasabee-op-colors-datalist");
 
     L.DomEvent.on(arrow, "click", () => {
       picker.click();
@@ -122,6 +123,7 @@ export default class WasabeeLink {
 
     L.DomEvent.on(picker, "change", (ev) => {
       this.color = ev.target.value;
+      if (this.color == operation.color) this.color = "main";
       operation.update();
     });
 

@@ -14,6 +14,7 @@ export function initSkin() {
   for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
     addCSS(k, Wasabee.static.CSS[k]);
   }
+  initOpsColor();
 }
 
 function addCSS(name, content) {
@@ -94,6 +95,8 @@ export function changeSkin(names) {
     if (skin.selfBlockStyle) Wasabee.skin.selfBlockStyle = skin.selfBlockStyle;
   }
 
+  initOpsColor();
+
   localStorage[
     window.plugin.wasabee.static.constants.SKIN_KEY
   ] = JSON.stringify(validNames);
@@ -101,4 +104,16 @@ export function changeSkin(names) {
   addButtons(op);
   window.runHooks("wasabeeUIUpdate", "skin change");
   return true;
+}
+
+function initOpsColor() {
+  const el = document.getElementById("wasabee-op-colors-datalist");
+  if (el) el.remove();
+
+  const datalist = L.DomUtil.create("datalist", null, document.body);
+  datalist.id = "wasabee-op-colors-datalist";
+
+  for (const c of window.plugin.wasabee.static.layerTypes.values()) {
+    L.DomUtil.create("option", null, datalist).value = c.color;
+  }
 }
