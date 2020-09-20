@@ -107,13 +107,30 @@ export function changeSkin(names) {
 }
 
 function initOpsColor() {
-  const el = document.getElementById("wasabee-op-colors-datalist");
+  const el = document.getElementById("wasabee-colors-datalist");
   if (el) el.remove();
 
   const datalist = L.DomUtil.create("datalist", null, document.body);
-  datalist.id = "wasabee-op-colors-datalist";
+  datalist.id = "wasabee-colors-datalist";
 
   for (const c of window.plugin.wasabee.static.layerTypes.values()) {
     L.DomUtil.create("option", null, datalist).value = c.color;
   }
+}
+
+export function addColor(color) {
+  const datalist = document.getElementById("wasabee-colors-datalist");
+  // fail safe
+  if (!datalist) return;
+
+  for (const c of datalist.children) {
+    if (c.value == color) {
+      datalist.insertBefore(c, datalist.firstChild);
+      return;
+    }
+  }
+
+  const c = L.DomUtil.create("option");
+  c.value = color;
+  datalist.insertBefore(c, datalist.firstChild);
 }

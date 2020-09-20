@@ -234,8 +234,7 @@ const LinkListDialog = WDialog.extend({
     linkColor.addEventListener(
       "change",
       () => {
-        link.color = linkColor.value;
-        operation.update();
+        link.setColor(linkColor.value, operation);
       },
       false
     );

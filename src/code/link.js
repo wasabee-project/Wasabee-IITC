@@ -6,6 +6,7 @@ import WasabeeMe from "./me";
 import AssignDialog from "./dialogs/assignDialog";
 // for named color
 import { convertColorToHex } from "./auxiliar";
+import { addColor } from "./skin";
 
 export default class WasabeeLink {
   constructor(obj) {
@@ -115,22 +116,27 @@ export default class WasabeeLink {
     picker.type = "color";
     picker.value = convertColorToHex(this.getColor(operation));
     picker.style.display = "none";
-    picker.setAttribute("list", "wasabee-op-colors-datalist");
+    picker.setAttribute("list", "wasabee-colors-datalist");
 
     L.DomEvent.on(arrow, "click", () => {
       picker.click();
     });
 
     L.DomEvent.on(picker, "change", (ev) => {
-      this.color = ev.target.value;
-      if (this.color == operation.color) this.color = "main";
-      operation.update();
+      this.setColor(ev.target.value, operation);
     });
 
     d.appendChild(
       operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
     return d;
+  }
+
+  setColor(color, operation) {
+    this.color = color;
+    if (this.color == operation.color) this.color = "main";
+    operation.update();
+    addColor(color);
   }
 
   getColor(operation) {

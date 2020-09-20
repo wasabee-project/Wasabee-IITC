@@ -107,7 +107,7 @@ const OpSettingDialog = WDialog.extend({
       const picker = L.DomUtil.create("input", "picker", topSet);
       picker.type = "color";
       picker.value = convertColorToHex(selectedOp.color);
-      picker.setAttribute("list", "wasabee-op-colors-datalist");
+      picker.setAttribute("list", "wasabee-colors-datalist");
 
       L.DomEvent.on(picker, "change", (ev) => {
         L.DomEvent.stop(ev);
