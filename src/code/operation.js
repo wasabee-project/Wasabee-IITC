@@ -74,8 +74,9 @@ export default class WasabeeOp {
     localStorage[this.ID] = JSON.stringify(this);
     addOperation(this.ID);
 
+    // some debug info to trace race condition
     const s = getSelectedOperation();
-    if (s.ID == this.ID && s != this)
+    if (s && s.ID == this.ID && s != this)
       console.trace("store current OP from a different obj");
   }
 
