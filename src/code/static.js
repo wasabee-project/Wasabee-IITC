@@ -10,7 +10,8 @@ W.static = {
     markerButton: "wasabee-marker",
     mustauth: "wasabee-mustauth",
     newopButton: "wasabee-newop",
-    opsButton: "wasabee-operations",
+    opsList: "wasabee-operations",
+    opSettings: "wasabee-operation-settings",
     wasabeeButton: "wasabee-userinfo",
     linkList: "wasabee-linklist",
     markerList: "wasabee-markerlist",
@@ -32,6 +33,8 @@ W.static = {
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
     OPS_LIST_KEY: "wasabee-ops",
+    OPS_LIST_HIDDEN_KEY: "wasabee-hidden-ops",
+    OPS_SHOW_HIDDEN_OPS: "wasabee-show-hidden-ops",
     SEND_LOCATION_KEY: "wasabee-send-location",
     SEND_ANALYTICS_KEY: "wasabee-analytics",
     EXPERT_MODE_KEY: "wasabee-expert-mode",

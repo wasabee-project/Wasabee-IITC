@@ -505,7 +505,7 @@
 .wasabee-toolbar-wasabee.wasabee-logged-in {
   background-image: url(../images/toolbar_wasabeebutton_in.svg)
 }
-.wasabee-toolbar-ops {
+.wasabee-toolbar-op {
   background-image: url(../images/toolbar_viewOps.svg);
   background-size: 60%;
 }
@@ -1017,40 +1017,56 @@
   display: grid;
   grid-template-columns: 1fr;
 }
-.wasabee-dialog-ops {
-}
-.wasabee-dialog-ops div.topset {
+
+.wasabee-dialog-op-settings div.topset {
   display: grid;
   grid-template-columns: 1fr 1fr;
   row-gap: 4px;
 }
-.wasabee-dialog-ops select {
-  width: auto;
-  grid-column-start: 1;
-  grid-column-end: 3;
-}
-.wasabee-dialog-ops textarea {
+.wasabee-dialog-op-settings textarea {
   grid-column-start: 1;
   grid-column-end: 3;
   width: auto;
   height: 50px;
   resize: vertical;
 }
-.wasabee-dialog-ops p.comment {
+.wasabee-dialog-op-settings p.comment {
   grid-column-start: 1;
   grid-column-end: 3;
 }
-.wasabee-dialog-ops input {
+.wasabee-dialog-op-settings input {
   width: auto;
   -moz-transform: scale(1);
 }
-.wasabee-dialog-ops div.buttonset {
+.wasabee-dialog-op-settings div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
 }
-.wasabee-dialog-ops div.buttonset button {
+.wasabee-dialog-op-settings div.buttonset button {
   margin: 4px;
   width: 100%;
+}
+.wasabee-dialog-ops div.container {
+    overflow: auto;
+}
+.wasabee-dialog-ops .wasabee-table .servername th {
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-left: none;
+    border-right: none;
+    background-color: rgba(0,0,0,.4)
+}
+.wasabee-dialog-ops .wasabee-table th.show-hidden-ops {
+    text-align: right
+}
+.wasabee-dialog-ops .wasabee-table th.show-hidden-ops label {
+    padding-right: 1em
+}
+.wasabee-dialog-ops .wasabee-table .actions {
+    white-space: nowrap;
+}
+.wasabee-dialog-ops .wasabee-table .actions a {
+    padding: .25em
 }
 .wasabee-dialog-checklist {
 }

@@ -1,22 +1,22 @@
 import { WButton } from "../leafletClasses";
-import OpsDialog from "../dialogs/opsDialog";
+import OpSettings from "../dialogs/opSettings";
 import BlockersList from "../dialogs/blockersList";
 import OperationChecklistDialog from "../dialogs/operationChecklistDialog";
 import ExportDialog from "../dialogs/exportDialog";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
 
-const OpsButton = WButton.extend({
+const OpButton = WButton.extend({
   statics: {
-    TYPE: "opsButton",
+    TYPE: "opButton",
   },
 
   initialize: function (map, container) {
     if (!map) map = window.map;
     this._map = map;
 
-    this.type = OpsButton.TYPE;
-    this.title = wX("OPS BUTTON TITLE");
+    this.type = OpButton.TYPE;
+    this.title = wX("OP_BUTTON");
     this.handler = this._toggleActions;
     this._container = container;
 
@@ -24,7 +24,7 @@ const OpsButton = WButton.extend({
 
     this.button = this._createButton({
       container: this._container,
-      className: "wasabee-toolbar-ops",
+      className: "wasabee-toolbar-op",
       callback: this._toggleActions,
       context: context,
       title: this.title,
@@ -32,11 +32,11 @@ const OpsButton = WButton.extend({
 
     this.actionsContainer = this._createSubActions([
       {
-        title: wX("OPS BUTTON TITLE"),
-        text: wX("OPS BUTTON"),
+        title: wX("OP_SETTINGS_TITLE"),
+        text: wX("OP_SETTINGS_BUTTON"),
         callback: () => {
           this.disable();
-          const od = new OpsDialog(map);
+          const od = new OpSettings(map);
           od.enable();
         },
         context: context,
@@ -92,4 +92,4 @@ const OpsButton = WButton.extend({
   // Wupdate: function() { // nothing to do }
 });
 
-export default OpsButton;
+export default OpButton;

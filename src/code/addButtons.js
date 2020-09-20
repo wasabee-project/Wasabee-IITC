@@ -1,7 +1,7 @@
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
-import OpsButton from "./buttons/opsButton";
+import OpButton from "./buttons/opButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
@@ -28,7 +28,7 @@ export function addButtons(selectedOp) {
 
       const wb = new WasabeeButton(map, this._container);
       this._modes[wb.type] = wb;
-      const ob = new OpsButton(map, this._container);
+      const ob = new OpButton(map, this._container);
       this._modes[ob.type] = ob;
       const qb = new QuickdrawButton(map, this._container);
       this._modes[qb.type] = qb;
