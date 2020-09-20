@@ -165,6 +165,28 @@ export function addOperation(opID) {
   storeOpsList(ops);
 }
 
+//** This function shows an operation to the main list */
+export function showOperation(opID) {
+  const hiddenOps = hiddenOpsList().filter((ID) => ID != opID);
+  localStorage[
+    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+  ] = JSON.stringify(hiddenOps);
+}
+
+//** This function hides an operation to the main list */
+export function hideOperation(opID) {
+  const hiddenOps = hiddenOpsList();
+  if (!hiddenOps.includes(opID)) hiddenOps.push(opID);
+  localStorage[
+    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+  ] = JSON.stringify(hiddenOps);
+}
+
+export function resetHiddenOps() {
+  localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY] =
+    "[]";
+}
+
 //*** This function resets the local op list
 export function resetOps() {
   const ops = opsList();
@@ -173,11 +195,26 @@ export function resetOps() {
   }
 }
 
-export function opsList() {
+export function hiddenOpsList() {
+  try {
+    const raw =
+      localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function opsList(hidden = true) {
   const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
   if (raw) {
     try {
-      return JSON.parse(raw);
+      const ops = JSON.parse(raw);
+      if (!hidden) {
+        const hiddenOps = hiddenOpsList();
+        return ops.filter((o) => !hiddenOps.includes(o));
+      }
+      return ops;
     } catch (e) {
       console.error(e);
       //falback to old listing
