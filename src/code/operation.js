@@ -1030,6 +1030,82 @@ export default class WasabeeOp {
     return zoneID;
   }
 
+  mergeOp(operation, options) {
+    this.startBatchMode();
+
+    // update fakes whatever the options
+    for (const p of operation.fakedPortals) {
+      const lp = this.getPortalByLatLng(p.lat, p.lng);
+      if (lp) operation.addPortal(lp);
+    }
+
+    for (const p of this.fakedPortals) {
+      const lp = operation.getPortalByLatLng(p.lat, p.lng);
+      if (lp) this.addPortal(lp);
+    }
+
+    // the server has the right count of key
+    if (options.server) this.keysonhand = operation.keysonhand;
+    // ignore otherwise
+    // todo merge to max ?
+
+    // server is right about teams
+    if (options.server) this.teamlist = operation.teamlist;
+
+    // merge portals
+    for (const p of operation.opportals) {
+      const lp = this.getPortal(p.id);
+      if (!lp) this.addPortal(p);
+      else {
+        if (options.portal.comment) lp.comment = p.comment;
+        if (options.portal.hardness) lp.hardness = p.hardness;
+      }
+    }
+
+    // markers
+    const portalMarkers = new Map();
+    for (const m of this.markers) {
+      const s = portalMarkers.get(m.portalId) || new Map();
+      s.set(m.type, m);
+      portalMarkers.set(m.portalId, s);
+    }
+    for (const m of operation.markers) {
+      let pm = portalMarkers.get(m.portalId);
+      if (!pm) {
+        pm = new Map();
+        portalMarkers.set(m.portalId, pm);
+      }
+      const lm = pm.get(m.type);
+      if (!lm) {
+        this.markers.push(m);
+        pm.set(m.type, m);
+      } else {
+        if (options.marker.comment) lm.comment = m.comment;
+        if (options.marker.order) lm.order = m.order;
+        if (options.marker.zone) lm.zone = m.zone;
+        if (options.marker.assign) lm.assignedTo = m.assignedTo;
+      }
+    }
+
+    // links
+    for (const l of operation.links) {
+      const fromPortal = this.getPortal(l.fromPortal);
+      const toPortal = this.getPortal(l.toPortal);
+      const ll = this.getLink(fromPortal, toPortal);
+      if (!ll) this.links.push(l);
+      else {
+        if (options.link.order) ll.throwOrderPos = l.throwOrderPos;
+        if (options.link.zone) ll.zone = l.zone;
+        if (options.link.assign) ll.assignedTo = l.assignedTo;
+        if (options.link.direction) {
+          ll.fromPortalId = l.fromPortalId;
+          ll.toPortalId = l.toPortalId;
+        }
+      }
+    }
+    this.endBatchMode();
+  }
+
   // for 0.18, if we see the new, we change to the old
   // for 0.19 we will change from old-to-new...
   static oldColors(incoming) {
