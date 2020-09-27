@@ -72,6 +72,7 @@ const TeamListDialog = WDialog.extend({
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
+            window.runHooks("wasabeeDkeys");
           };
         },
       },
@@ -94,6 +95,7 @@ const TeamListDialog = WDialog.extend({
                   try {
                     await leaveTeamPromise(obj.ID);
                     await WasabeeMe.waitGet(true);
+                    window.runHooks("wasabeeDkeys");
                   } catch (e) {
                     console.error(e);
                   }

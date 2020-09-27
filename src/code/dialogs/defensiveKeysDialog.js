@@ -105,12 +105,18 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _addDKey: async function () {
+    const dk = {
+      PortalID: this._selectedPortal.id,
+      Count: Number(this._count.value),
+      CapID: this._capID.value,
+      Name: this._selectedPortal.name,
+      Lat: this._selectedPortal.lat,
+      Lng: this._selectedPortal.lat,
+    };
     try {
-      await dKeyPromise(
-        this._selectedPortal.id,
-        this._count.value,
-        this._capID.value
-      );
+      const j = JSON.stringify(dk);
+      console.log(j);
+      await dKeyPromise(j);
       alert("Registered with server");
       window.runHooks("wasabeeDkeys");
     } catch (e) {
