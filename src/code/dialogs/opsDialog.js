@@ -107,6 +107,7 @@ const OpsDialog = WDialog.extend({
         id: opID,
         name: tmpOp.name,
         localchanged: tmpOp.localchanged,
+        local: tmpOp.fetched === null,
         owner: tmpOp.creator,
         perm: tmpOp.getPermission(),
       });
@@ -123,7 +124,9 @@ const OpsDialog = WDialog.extend({
       const serverTh = L.DomUtil.create("th", "", serverRow);
       serverTh.colSpan = 5;
       serverTh.textContent = server;
-      if (server == "") {
+
+      const isLocal = server == "";
+      if (isLocal) {
         serverTh.textContent = "Local";
         serverTh.colSpan = 1;
         const hideOps = L.DomUtil.create("th", "show-hidden-ops", serverRow);
@@ -169,7 +172,7 @@ const OpsDialog = WDialog.extend({
           const opStatus = L.DomUtil.create("td", "opstatus", opRow);
           const status = L.DomUtil.create("span", "", opStatus);
           status.textContent = "";
-          if (server != "") {
+          if (!op.local) {
             status.textContent = "Sync";
             if (op.localchanged) {
               status.textContent = "Modified";
@@ -181,7 +184,7 @@ const OpsDialog = WDialog.extend({
           const opOwner = L.DomUtil.create("td", "opstatus", opRow);
           const agent = WasabeeAgent.cacheGet(op.owner);
           if (agent != null) opOwner.appendChild(agent.formatDisplay());
-          else if (server == "") opOwner.append(window.PLAYER.nickname);
+          else if (isLocal) opOwner.append(window.PLAYER.nickname);
           else {
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {

@@ -1,8 +1,14 @@
 import { WButton } from "../leafletClasses";
-import { uploadOpPromise, updateOpPromise, GetWasabeeServer } from "../server";
+import {
+  uploadOpPromise,
+  updateOpPromise,
+  GetWasabeeServer,
+  opPromise,
+} from "../server";
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import MergeDialog from "../dialogs/mergeDialog";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -26,16 +32,7 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
-          try {
-            await updateOpPromise(operation);
-            operation.localchanged = false;
-            operation.store();
-            alert(wX("UPDATED"));
-            this.Wupdate(this._container, operation);
-          } catch (e) {
-            console.error(e);
-            alert(`Update Failed: ${e.toString()}`);
-          }
+          await this.doPullAndUpdate();
           return;
         }
 
@@ -110,6 +107,37 @@ const UploadButton = WButton.extend({
 
   _invisible: function () {
     this.button.style.display = "none";
+  },
+
+  doUpdate: async function (op) {
+    await updateOpPromise(op);
+    op.localchanged = false;
+    op.fetched = new Date().toUTCString();
+    op.store();
+    alert(wX("UPDATED"));
+    this.Wupdate(this._container, op);
+  },
+
+  doPullAndUpdate: async function () {
+    const operation = getSelectedOperation();
+    if (operation.IsServerOp()) {
+      try {
+        const lastOp = await opPromise(operation.ID);
+        // conflict
+        if (!lastOp.localchanged) {
+          const md = new MergeDialog();
+          md.setup(operation, lastOp, (op) => this.doUpdate(op));
+          md.enable();
+        } else {
+          // no conflict
+          this.doUpdate(operation);
+        }
+      } catch (e) {
+        console.error(e);
+        alert(`Update Failed: ${e.toString()}`);
+      }
+      return;
+    }
   },
 });
 
