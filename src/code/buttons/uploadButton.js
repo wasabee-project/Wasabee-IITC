@@ -32,7 +32,7 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
-          await this.doUpdate();
+          await this.doPullAndUpdate();
           return;
         }
 
@@ -109,7 +109,16 @@ const UploadButton = WButton.extend({
     this.button.style.display = "none";
   },
 
-  doUpdate: async function () {
+  doUpdate: async function (op) {
+    await updateOpPromise(op);
+    op.localchanged = false;
+    op.fetched = new Date().toUTCString();
+    op.store();
+    alert(wX("UPDATED"));
+    this.Wupdate(this._container, op);
+  },
+
+  doPullAndUpdate: async function () {
     const operation = getSelectedOperation();
     if (operation.IsServerOp()) {
       try {
@@ -117,21 +126,11 @@ const UploadButton = WButton.extend({
         // conflict
         if (!lastOp.localchanged) {
           const md = new MergeDialog();
-          md.setup(operation, lastOp, async (op) => {
-            await updateOpPromise(op);
-            op.localchanged = false;
-            op.store();
-            alert(wX("UPDATED"));
-            this.Wupdate(this._container, op);
-          });
+          md.setup(operation, lastOp, (op) => this.doUpdate(op));
           md.enable();
         } else {
           // no conflict
-          await updateOpPromise(operation);
-          operation.localchanged = false;
-          operation.store();
-          alert(wX("UPDATED"));
-          this.Wupdate(this._container, operation);
+          this.doUpdate(operation);
         }
       } catch (e) {
         console.error(e);

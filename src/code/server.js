@@ -76,7 +76,7 @@ export async function opPromise(opID) {
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      header: { "If-Modified-Since": ims },
+      headers: { "If-Modified-Since": ims },
     });
 
     let raw = null;
@@ -86,6 +86,7 @@ export async function opPromise(opID) {
         raw = await response.json();
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
+        newop.fetched = new Date().toUTCString();
         newop.server = server;
         return Promise.resolve(newop);
       case 304: // If-Modified-Since replied NotModified
