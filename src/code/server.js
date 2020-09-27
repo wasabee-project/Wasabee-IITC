@@ -231,13 +231,14 @@ export function opKeyPromise(opID, portalID, onhand, capsule) {
   return genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
 }
 
-// updates an agent's defensive key count, return value is status code
-export function dKeyPromise(portalID, onhand, capsule) {
-  const fd = new FormData();
-  fd.append("portalID", portalID ? portalID : "");
-  fd.append("count", onhand ? onhand : "0");
-  fd.append("capID", capsule ? capsule : "");
-  return genericPost("/api/v1/d", fd);
+// updates an agent's single defensive key
+export function dKeyPromise(json) {
+  return genericPost("/api/v1/d", json, "application/json;charset=UTF-8");
+}
+
+// many d-keys at once
+export function dKeyBulkPromise(json) {
+  return genericPost("/api/v1/d/bulk", json, "application/json;charset=UTF-8");
 }
 
 // returns a promise to a list of defensive keys for all enabled teams
