@@ -1,6 +1,7 @@
 // the counter-op / defensive tools are Wasabee-D
 import WasabeeMe from "./me";
-import { dKeylistPromise } from "./server";
+import WasabeePortal from "./portal";
+import { dKeylistPromise, dKeyPromise } from "./server";
 import WasabeeAgent from "./agent";
 import wX from "./wX";
 import { getPortalDetails } from "./uiCommands";
@@ -11,10 +12,10 @@ export function initWasabeeD() {
   window.addLayerGroup(
     "Wasabee-D Keys",
     window.plugin.wasabee.defensiveLayers,
-    true
+    false
   );
 
-  // window.pluginCreateHook("wasabeeDkeys"); // not needed after IITC 0.30
+  // hook called in init.js after load
   window.addHook("wasabeeDkeys", () => {
     drawWasabeeDkeys();
   });
@@ -36,8 +37,6 @@ export function initWasabeeD() {
       window.plugin.wasabee._Dkeys.clear();
     }
   });
-
-  window.runHooks("wasabeeDkeys");
 }
 
 // This is the primary hook that is called on map refresh
@@ -51,18 +50,31 @@ export async function drawWasabeeDkeys() {
   try {
     const data = await dKeylistPromise();
     const list = JSON.parse(data);
+
+    window.plugin.wasabee.defensiveLayers.clearLayers();
+    window.plugin.wasabee._Dkeys.clear();
+
     if (!list) console.debug(data); // what does the server send if recently logged out?
     if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0) return;
     for (const n of list.DefensiveKeys) {
       if (n.PortalID) {
-        let l;
+        let submap;
         if (window.plugin.wasabee._Dkeys.has(n.PortalID)) {
-          l = window.plugin.wasabee._Dkeys.get(n.PortalID);
+          submap = window.plugin.wasabee._Dkeys.get(n.PortalID);
         } else {
-          l = new Map();
+          submap = new Map();
         }
-        l.set(n.GID, n); // add user to the sub-map
-        window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+        submap.set(n.GID, n); // add user to the sub-map
+        window.plugin.wasabee._Dkeys.set(n.PortalID, submap);
+
+        // new format, no more work to be done
+        if (n.Name) {
+          submap.set("loaded", true);
+          window.plugin.wasabee._Dkeys.set(n.PortalID, submap);
+          continue;
+        }
+
+        // old format, look it up and upgrade
         if (
           window.portals[n.PortalID] &&
           window.portals[n.PortalID].options.data.title
@@ -73,12 +85,6 @@ export async function drawWasabeeDkeys() {
           e.details = e.data;
           dLoadDetails(e);
         } else {
-          // if we are here early (after a reload?) IITC spams the logs
-          if (!window.requests) {
-            console.warn(
-              "window.requests does not exist yet... expect an error"
-            );
-          }
           getPortalDetails(n.PortalID); // listener deals with the replies
         }
       }
@@ -86,43 +92,75 @@ export async function drawWasabeeDkeys() {
   } catch (err) {
     console.error(err);
   }
+  drawMarkers();
 }
 
 function dLoadDetails(e) {
   if (!e.success) return; // bad load
-  if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return; // not enabled
-  if (!window.plugin.wasabee._Dkeys.has(e.guid)) return; // not one we are concerned with
-  if (
-    window.plugin.wasabee.defensiveLayers[e.guid] &&
-    window.plugin.wasabee.defensiveLayers[e.guid]._leaflet_id
-  )
-    window.plugin.wasabee.defensiveLayers.removeLayer(
-      window.plugin.wasabee.defensiveLayers[e.guid]
-    );
+  if (window.plugin.wasabee._Dkeys.has(e.guid)) {
+    const submap = window.plugin.wasabee._Dkeys.get(e.guid);
+    if (!submap.has("loaded")) {
+      const me = WasabeeMe.cacheGet(86400);
+      submap.set("loaded", true);
 
-  const submap = window.plugin.wasabee._Dkeys.get(e.guid);
-  submap.set("details", e.details);
-  window.plugin.wasabee._Dkeys.set(e.guid, submap);
-
-  // const icon = window.plugin.wasabee.skin.markerTypes.get("GetKeyPortalMarker")
-  //   .markerIconDone.default;
-
-  const latLng = new L.LatLng(
-    (e.details.latE6 / 1e6).toFixed(6),
-    (e.details.lngE6 / 1e6).toFixed(6)
-  );
-
-  let opacity = 0.3;
-  if (e.details && e.details.team == "E") {
-    if (e.details.resonators && e.details.resonators.length == 8) {
-      opacity = 1.0;
-    } else {
-      opacity = 0.6;
+      // TODO: don't overwrite those that are already set...
+      for (const [id, data] of submap.entries()) {
+        if (id == "loaded") continue;
+        data.Lat = (e.details.latE6 / 1e6).toFixed(6);
+        data.Lng = (e.details.lngE6 / 1e6).toFixed(6);
+        data.Name = e.details.title;
+        submap.set(id, data);
+        if (id == me.GoogleID) upgradeOnServer(data); // async, no need to await here
+      }
+      window.plugin.wasabee._Dkeys.set(e.guid, submap);
     }
   }
-  const marker = L.marker(latLng, {
-    title: e.details.title,
-    opacity: opacity,
+
+  let disable = true;
+  for (const v of window.plugin.wasabee._Dkeys.values()) {
+    if (!v.has("loaded")) disable = false; // still some waiting to be fetched
+  }
+  if (disable) {
+    console.debug("disabling portalDetailLoaded listener for WD");
+    window.removeHook("portalDetailLoaded", dLoadDetails);
+    drawMarkers();
+  }
+}
+
+function drawMarkers() {
+  for (const [portalID, submap] of window.plugin.wasabee._Dkeys.entries()) {
+    drawMarker(portalID, submap);
+  }
+}
+
+function drawMarker(portalID, submap) {
+  if (
+    window.plugin.wasabee.defensiveLayers[portalID] &&
+    window.plugin.wasabee.defensiveLayers[portalID]._leaflet_id
+  )
+    window.plugin.wasabee.defensiveLayers.removeLayer(
+      window.plugin.wasabee.defensiveLayers[portalID]
+    );
+
+  let portal = null;
+  for (const [id, p] of submap) {
+    if (id == "loaded") continue;
+    if (p.Name == null || p.Name == "") continue;
+    portal = new WasabeePortal({
+      ID: portalID,
+      name: p.Name,
+      lat: p.Lat,
+      lng: p.Lng,
+    });
+    break; // first one is fine
+  }
+  if (portal == null) {
+    console.debug("awaiting data for old format", portalID);
+    return;
+  }
+
+  const marker = L.marker(portal.latLng, {
+    title: portal.name,
     icon: L.divIcon({
       className: "wasabee-defense-icon",
       shadowUrl: null,
@@ -131,7 +169,7 @@ function dLoadDetails(e) {
       popupAnchor: L.point(-1, -48),
     }),
   });
-  window.plugin.wasabee.defensiveLayers[e.guid] = marker;
+  window.plugin.wasabee.defensiveLayers[portalID] = marker;
   marker.addTo(window.plugin.wasabee.defensiveLayers);
 
   window.registerMarkerForOMS(marker);
@@ -145,7 +183,7 @@ function dLoadDetails(e) {
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
       try {
-        const content = await getMarkerPopup(e.guid);
+        const content = await getMarkerPopup(portalID);
         marker.setPopupContent(content);
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");
@@ -159,27 +197,16 @@ function dLoadDetails(e) {
     },
     marker
   );
-
-  let disable = true;
-  for (const [k, v] of window.plugin.wasabee._Dkeys) {
-    if (!k) disable = false; // silence es-lint
-    if (!v.has("details")) disable = false; // still some waiting to be fetched
-  }
-  if (disable) {
-    console.debug("disabling portalDetailLoaded listener for WD");
-    window.removeHook("portalDetailLoaded", dLoadDetails);
-  }
 }
 
 async function getMarkerPopup(PortalID) {
   if (!window.plugin.wasabee._Dkeys) return null;
-
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
   if (window.plugin.wasabee._Dkeys.has(PortalID)) {
     const ul = L.DomUtil.create("ul", null, container);
-    const l = window.plugin.wasabee._Dkeys.get(PortalID);
-    for (const [k, v] of l) {
-      if (k != "details") {
+    const submap = window.plugin.wasabee._Dkeys.get(PortalID);
+    for (const [k, v] of submap) {
+      if (k != "loaded") {
         const a = await WasabeeAgent.waitGet(v.GID);
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
@@ -196,4 +223,26 @@ async function getMarkerPopup(PortalID) {
     container.textContent = wX("NO_DATA");
   }
   return container;
+}
+
+async function upgradeOnServer(data) {
+  console.log("wd key upgradeOnServer", data);
+
+  const restoreCount = data.Count;
+  // remove old
+  try {
+    data.Count = 0;
+    await dKeyPromise(JSON.stringify(data));
+  } catch (e) {
+    console.log(e);
+    return;
+  }
+
+  // restore as new
+  try {
+    data.Count = restoreCount;
+    await dKeyPromise(JSON.stringify(data));
+  } catch (e) {
+    console.log(e);
+  }
 }
