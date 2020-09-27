@@ -34,7 +34,7 @@ const MergeDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("MERGE_UPDATE")] = () => {
       this.doMerge();
-      if (this._callback) this._callback();
+      if (this._callback) this._callback(this._opDest);
       this._dialog.dialog("close");
     };
     buttons[wX("MERGE_ONLY")] = () => {
@@ -97,7 +97,7 @@ const MergeDialog = WDialog.extend({
       "Link Order",
       "Link Zone",
     ]) {
-      const path = name.split(" ").map(String.toLowerCase);
+      const path = name.split(" ").map((s) => s.toLowerCase());
       options[path[0]][path[1]] = this[name].checked;
     }
 
@@ -105,7 +105,9 @@ const MergeDialog = WDialog.extend({
   },
 
   _buildContent: function () {
-    const content = L.DomUtil.create("div", "title");
+    const content = L.DomUtil.create("div", "container");
+    const desc = L.DomUtil.create("div", "description", content);
+    desc.textContent = "Use server data for:";
     for (const name of [
       "Portal Comment",
       "Portal Hardness",

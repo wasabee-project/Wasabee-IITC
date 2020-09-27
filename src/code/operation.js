@@ -1089,8 +1089,8 @@ export default class WasabeeOp {
 
     // links
     for (const l of operation.links) {
-      const fromPortal = this.getPortal(l.fromPortal);
-      const toPortal = this.getPortal(l.toPortal);
+      const fromPortal = this.getPortal(l.fromPortalId);
+      const toPortal = this.getPortal(l.toPortalId);
       const ll = this.getLink(fromPortal, toPortal);
       if (!ll) this.links.push(l);
       else {

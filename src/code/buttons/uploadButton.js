@@ -8,7 +8,7 @@ import {
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import MergeDialog from "../dialog/mergeDialog";
+import MergeDialog from "../dialogs/mergeDialog";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -32,16 +32,7 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
-          try {
-            await updateOpPromise(operation);
-            operation.localchanged = false;
-            operation.store();
-            alert(wX("UPDATED"));
-            this.Wupdate(this._container, operation);
-          } catch (e) {
-            console.error(e);
-            alert(`Update Failed: ${e.toString()}`);
-          }
+          await this.doUpdate();
           return;
         }
 
@@ -124,7 +115,7 @@ const UploadButton = WButton.extend({
       try {
         const lastOp = await opPromise(operation.ID);
         // conflict
-        if (lastOp.localchanged) {
+        if (!lastOp.localchanged) {
           const md = new MergeDialog();
           md.setup(operation, lastOp, async (op) => {
             await updateOpPromise(op);
