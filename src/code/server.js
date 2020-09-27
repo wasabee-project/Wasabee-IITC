@@ -91,7 +91,6 @@ export async function opPromise(opID) {
         return Promise.resolve(newop);
       case 304: // If-Modified-Since replied NotModified
         console.warn("server copy is older/unmodified, keeping local copy");
-        localop.localchanged = true;
         localop.server = server;
         return Promise.resolve(localop);
       case 401:
