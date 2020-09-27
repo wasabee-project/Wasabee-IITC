@@ -1030,7 +1030,18 @@ export default class WasabeeOp {
     return zoneID;
   }
 
-  mergeOp(operation, options) {
+  mergeOp(operation, opt) {
+    // prevent malformed options
+    const options = Object.assign(
+      {
+        server: false,
+        portal: false,
+        marker: false,
+        link: false,
+      },
+      opt
+    );
+
     this.startBatchMode();
 
     // update fakes whatever the options

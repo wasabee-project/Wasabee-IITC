@@ -12,8 +12,6 @@ const MergeDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = MergeDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("MERGE_TITLE");
-    this._label = wX("MERGE_DESC");
     postToFirebase({ id: "analytics", action: MergeDialog.TYPE });
   },
 
@@ -54,7 +52,7 @@ const MergeDialog = WDialog.extend({
       },
     });
     this._dialog = window.dialog({
-      title: this._title,
+      title: wX("MERGE_TITLE"),
       html: this._buildContent(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-merge",
@@ -109,13 +107,15 @@ const MergeDialog = WDialog.extend({
       options[path[0]][path[1]] = this[name].checked;
     }
 
+    // note: getOperationByID(this._opDest.ID) could be use here
+    // note2: opSrc may note be stored yet (cause sharing the same op ID)
     this._opDest.mergeOp(this._opSrc, options);
   },
 
   _buildContent: function () {
     const content = L.DomUtil.create("div", "container");
-    const desc = L.DomUtil.create("div", "description", content);
-    desc.textContent = "Use server data for:";
+    const desc = L.DomUtil.create("div", "desc", content);
+    desc.textContent = wX("MERGE_DESC");
     for (const name of [
       "Portal Comment",
       "Portal Hardness",
