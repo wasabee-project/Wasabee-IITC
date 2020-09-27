@@ -941,21 +941,13 @@ export default class WasabeeOp {
     if (!me) return "read"; // fail safe
     if (me.GoogleID == this.creator) return "write";
 
+    const teamsID = new Set(me.Teams.map((t) => t.ID));
     // look for team permission
-    for (const t of this.teamlist) {
-      if (t.role == "write") {
-        for (const m of me.Teams) {
-          if (t.teamid == m.ID) return "write";
-        }
-      }
-    }
-    for (const t of this.teamlist) {
-      if (t.role == "read") {
-        for (const m of me.Teams) {
-          if (t.teamid == m.ID) return "read";
-        }
-      }
-    }
+    for (const t of this.teamlist)
+      if (t.role == "write" && teamsID.has(t.teamid)) return "write";
+
+    for (const t of this.teamlist)
+      if (t.role == "read" && teamsID.has(t.teamid)) return "read";
 
     return "assignonly";
   }
