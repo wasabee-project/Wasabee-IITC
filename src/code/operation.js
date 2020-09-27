@@ -1086,7 +1086,14 @@ export default class WasabeeOp {
         if (options.marker.comment) lm.comment = m.comment;
         if (options.marker.order) lm.order = m.order;
         if (options.marker.zone) lm.zone = m.zone;
-        if (options.marker.assign) lm.assignedTo = m.assignedTo;
+        if (lm.assignedTo == m.assignedTo) lm.state = m.state;
+        else if (options.marker.assign) lm.assign(m.assignedTo);
+
+        // completed is completed whatever the assignment
+        if (m.state == m.STATE_COMPLETED) {
+          lm.state = m.state;
+          lm.completedBy = m.completedBy;
+        }
       }
     }
 
@@ -1099,11 +1106,12 @@ export default class WasabeeOp {
       else {
         if (options.link.order) ll.throwOrderPos = l.throwOrderPos;
         if (options.link.zone) ll.zone = l.zone;
-        if (options.link.assign) ll.assignedTo = l.assignedTo;
         if (options.link.direction) {
           ll.fromPortalId = l.fromPortalId;
           ll.toPortalId = l.toPortalId;
         }
+        if (options.link.assign) ll.assignedTo = l.assignedTo;
+        if (l.state == "completed") ll.state = "completed";
       }
     }
     this.endBatchMode();
