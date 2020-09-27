@@ -31,20 +31,28 @@ const MergeDialog = WDialog.extend({
   _displayDialog: function () {
     if (!this._map) return;
 
-    const buttons = {};
-    buttons[wX("MERGE_UPDATE")] = () => {
-      this.doMerge();
-      if (this._callback) this._callback(this._opDest);
-      this._dialog.dialog("close");
-    };
-    buttons[wX("MERGE_ONLY")] = () => {
-      this.doMerge();
-      this._dialog.dialog("close");
-    };
-    buttons[wX("CANCEL")] = () => {
-      this._dialog.dialog("close");
-    };
-
+    const buttons = [];
+    buttons.push({
+      text: wX("MERGE_UPDATE"),
+      click: () => {
+        this.doMerge();
+        if (this._callback) this._callback(this._opDest);
+        this._dialog.dialog("close");
+      },
+    });
+    buttons.push({
+      text: wX("MERGE_ONLY"),
+      click: () => {
+        this.doMerge();
+        this._dialog.dialog("close");
+      },
+    });
+    buttons.push({
+      text: wX("CANCEL"),
+      click: () => {
+        this._dialog.dialog("close");
+      },
+    });
     this._dialog = window.dialog({
       title: this._title,
       html: this._buildContent(),
