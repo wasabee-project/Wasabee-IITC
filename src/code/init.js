@@ -136,11 +136,11 @@ window.plugin.wasabee.init = () => {
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
     // this updates the UI
-    // since we don't need the result, we can use the properly async version w/o awaiting it
     WasabeeMe.waitGet(true);
-  }
 
-  window.runHooks("wasabeeDkeys");
+    // load Wasabee-Defense keys if logged in
+    window.runHooks("wasabeeDkeys");
+  }
 };
 
 // this can be moved to auth dialog, no need to init it for people who never log in
