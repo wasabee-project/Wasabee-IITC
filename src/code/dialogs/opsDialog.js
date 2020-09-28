@@ -174,7 +174,8 @@ const OpsDialog = WDialog.extend({
           status.textContent = "";
           if (!op.local) {
             status.textContent = "Sync";
-            if (op.localchanged) {
+            if (isLocal) status.textContent = "Orphan";
+            else if (op.localchanged) {
               status.textContent = "Modified";
               status.style.color = "red";
             }
