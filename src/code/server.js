@@ -123,7 +123,7 @@ export async function mePromise() {
     return response;
   } catch (e) {
     console.error(e);
-    return e.toString();
+    return e;
   }
 }
 
@@ -183,6 +183,14 @@ export function SendAccessTokenAsync(accessToken) {
 // changes agent's team state on the server; return value is status message
 export function SetTeamState(teamID, state) {
   return genericGet(`/api/v1/me/${teamID}?state=${state}`);
+}
+
+export function SetTeamShareWD(teamID, state) {
+  return genericGet(`/api/v1/me/${teamID}/wdshare?state=${state}`);
+}
+
+export function SetTeamLoadWD(teamID, state) {
+  return genericGet(`/api/v1/me/${teamID}/wdload?state=${state}`);
 }
 
 // changes a markers status on the server, sending relevant notifications
@@ -343,7 +351,6 @@ async function genericPut(url, formData, contentType) {
     }
     const response = await fetch(GetWasabeeServer() + url, construct);
 
-    let err = null;
     switch (response.status) {
       case 200:
         try {
@@ -354,22 +361,32 @@ async function genericPut(url, formData, contentType) {
           return Promise.resolve(text);
         } catch (e) {
           console.error(e);
-          return Promise.reject(e.toString());
+          return Promise.reject(e);
         }
       // break;
       case 401:
         WasabeeMe.purge();
-        err = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", err.error));
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", err.error));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
       default:
-        err = await response.text();
-        return Promise.reject(response.statusText, err);
+        try {
+          const err = await response.text();
+          return Promise.reject(response.statusText, err);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
     }
   } catch (e) {
     console.error(e);
-    return Promise.reject(e.toString());
+    return Promise.reject(e);
   }
 }
 
@@ -389,7 +406,6 @@ async function genericPost(url, formData, contentType) {
     }
     const response = await fetch(GetWasabeeServer() + url, construct);
 
-    let err = null;
     switch (response.status) {
       case 200:
         try {
@@ -400,22 +416,32 @@ async function genericPost(url, formData, contentType) {
           return Promise.resolve(text);
         } catch (e) {
           console.error(e);
-          return Promise.reject(e.toString());
+          return Promise.reject(e);
         }
       // break;
       case 401:
         WasabeeMe.purge();
-        err = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", err.error));
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", err.error));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
       default:
-        err = await response.text();
-        return Promise.reject(response.statusText, err);
+        try {
+          const err = await response.text();
+          return Promise.reject(response.statusText, err);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
     }
   } catch (e) {
     console.error(e);
-    return Promise.reject(e.toString());
+    return Promise.reject(e);
   }
 }
 
@@ -435,7 +461,6 @@ async function genericDelete(url, formData, contentType) {
     }
     const response = await fetch(GetWasabeeServer() + url, construct);
 
-    let err = null;
     switch (response.status) {
       case 200:
         try {
@@ -446,22 +471,32 @@ async function genericDelete(url, formData, contentType) {
           return Promise.resolve(text);
         } catch (e) {
           console.error(e);
-          return Promise.reject(e.toString());
+          return Promise.reject(e);
         }
       // break;
       case 401:
         WasabeeMe.purge();
-        err = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", err.error));
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", err.error));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
       default:
-        err = await response.text();
-        return Promise.reject(response.statusText, err);
+        try {
+          const err = await response.text();
+          return Promise.reject(response.statusText, err);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
     }
   } catch (e) {
     console.error(e);
-    return Promise.reject(e.toString());
+    return Promise.reject(e);
   }
 }
 
@@ -476,7 +511,6 @@ async function genericGet(url) {
       referrerPolicy: "origin",
     });
 
-    let err = null;
     switch (response.status) {
       case 200:
         try {
@@ -487,25 +521,41 @@ async function genericGet(url) {
           return Promise.resolve(text);
         } catch (e) {
           console.error(e);
-          return Promise.reject(e.toString());
+          return Promise.reject(e);
         }
       case 401:
         WasabeeMe.purge();
-        err = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", err.error));
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", err.error));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
       case 403:
-        err = await response.json();
-        return Promise.reject(err.error);
+        try {
+          const err = await response.json();
+          return Promise.reject("forbidden: " + err.error);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
       default:
-        err = await response.text();
-        return Promise.reject(response.statusText, err);
+        console.log(response);
+        try {
+          const err = await response.json();
+          return Promise.reject(err.error);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
       // break;
     }
   } catch (e) {
     console.error(e);
-    return Promise.reject(e.toString());
+    return Promise.reject(e);
   }
 }
 
