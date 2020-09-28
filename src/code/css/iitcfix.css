@@ -15,12 +15,6 @@
   max-width: calc(100vw - 2px);
 }
 
-@media (min-width: 700px) {
-  .ui-dialog {
-    max-width: 600px;
-  }
-}
-
 .ui-dialog-aboutIITC {
   width: unset !important;
   min-width: unset !important;

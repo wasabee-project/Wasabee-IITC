@@ -97,7 +97,7 @@ const OperationChecklistDialog = WDialog.extend({
     const content = new Sortable();
     content.fields = [
       {
-        name: wX("ORDER"),
+        name: this._smallScreen ? "#" : wX("ORDER"),
         value: (thing) => thing.opOrder,
         // sort: (a, b) => a - b,
         format: (cell, value, thing) => {

@@ -172,6 +172,7 @@
   padding: 3px 4px;
   text-align: left;
   /* color: rgba(0, 0, 0, 1); */
+  vertical-align: baseline;
 }
 .wasabee-table td:first-child,
 .wasabee-table th:first-child {
