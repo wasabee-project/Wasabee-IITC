@@ -195,6 +195,7 @@ const WasabeeButton = WButton.extend({
       const old = this.actionsContainer;
       this.actionsContainer = this._getActions();
       old.parentNode.replaceChild(this.actionsContainer, old);
+      this.disable();
     }
   },
 });
