@@ -515,8 +515,12 @@ async function genericGet(url) {
       case 200:
         try {
           const text = await response.text();
-          const obj = JSON.parse(text);
-          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
+          if (
+            response.headers.get("Content-Type").includes("application/json")
+          ) {
+            const obj = JSON.parse(text);
+            if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
+          }
           // returns a promise to the content
           return Promise.resolve(text);
         } catch (e) {
