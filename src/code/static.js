@@ -4,6 +4,9 @@ const W = window.plugin.wasabee || {};
 W.static = {
   CSS: {
     main: require("./css/wasabee.css"),
+    // fix for dialogs on mobile from iitc dev version
+    // to remove on >IITC-0.30.1
+    iitcfix: require("./css/iitcfix.css"),
   },
   dialogNames: {
     linkDialogButton: "wasabee-addlinks",
