@@ -1053,7 +1053,7 @@
   width: 100%;
 }
 .wasabee-dialog-ops div.container {
-    overflow: auto;
+    overflow: hidden;
 }
 .wasabee-dialog-ops .wasabee-table .servername th {
     border-top: 1px solid;
