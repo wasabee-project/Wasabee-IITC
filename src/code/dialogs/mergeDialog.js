@@ -31,6 +31,13 @@ const MergeDialog = WDialog.extend({
 
     const buttons = [];
     buttons.push({
+      text: wX("FORCE_UPDATE"),
+      click: () => {
+        if (this._callback) this._callback(this._opDest);
+        this._dialog.dialog("close");
+      },
+    });
+    buttons.push({
       text: wX("MERGE_UPDATE"),
       click: () => {
         this.doMerge();
@@ -130,8 +137,15 @@ const MergeDialog = WDialog.extend({
     ]) {
       const label = L.DomUtil.create("label", null, content);
       label.textContent = name;
+      label.htmlFor =
+        "wasabee-merge-" +
+        name
+          .split(" ")
+          .map((s) => s.toLowerCase())
+          .join("-");
       this[name] = L.DomUtil.create("input", null, content);
       this[name].type = "checkbox";
+      this[name].id = label.htmlFor;
     }
     return content;
   },
