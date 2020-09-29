@@ -44,7 +44,7 @@ const OpSettingDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    this.makeContent(getSelectedOperation());
+    this.makeContent();
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -69,12 +69,13 @@ const OpSettingDialog = WDialog.extend({
 
   update: function () {
     if (this._enabled && this._dialog && this._dialog.html) {
-      this.makeContent(getSelectedOperation());
+      this.makeContent();
       this._dialog.html(this._content);
     }
   },
 
-  makeContent: function (selectedOp) {
+  makeContent: function () {
+    const selectedOp = getSelectedOperation();
     const content = L.DomUtil.create("div");
     const topSet = L.DomUtil.create("div", "topset", content);
 
@@ -91,8 +92,10 @@ const OpSettingDialog = WDialog.extend({
         if (!input.value || input.value == "") {
           alert(wX("USE_VALID_NAME"));
         } else {
-          selectedOp.name = input.value;
-          selectedOp.store();
+          const so = getSelectedOperation();
+          so.name = input.value;
+          so.localchanged = true;
+          so.store();
           window.runHooks("wasabeeUIUpdate");
         }
       });
@@ -111,9 +114,10 @@ const OpSettingDialog = WDialog.extend({
 
       L.DomEvent.on(picker, "change", (ev) => {
         L.DomEvent.stop(ev);
-        const selectedOp = getSelectedOperation();
-        selectedOp.color = picker.value;
-        selectedOp.store();
+        const so = getSelectedOperation();
+        so.color = picker.value;
+        so.localchanged = true;
+        so.store();
         window.runHooks("wasabeeUIUpdate");
       });
     }
@@ -124,8 +128,10 @@ const OpSettingDialog = WDialog.extend({
       commentInput.value = selectedOp.comment;
       L.DomEvent.on(commentInput, "change", (ev) => {
         L.DomEvent.stop(ev);
-        selectedOp.comment = commentInput.value;
-        selectedOp.store();
+        const so = getSelectedOperation();
+        so.comment = commentInput.value;
+        so.localchanged = true;
+        so.store();
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
@@ -140,7 +146,8 @@ const OpSettingDialog = WDialog.extend({
       clearOpButton.textContent = wX("CLEAR_EVERYTHING");
       L.DomEvent.on(clearOpButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        clearAllItems(selectedOp);
+        const so = getSelectedOperation();
+        clearAllItems(so);
       });
     }
 
@@ -160,35 +167,28 @@ const OpSettingDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       // this should be moved to uiCommands
       const con = new ConfirmDialog(window.map);
-      con.setup(
-        wX("CON_DEL", selectedOp.name),
-        wX("YESNO_DEL", selectedOp.name),
-        async () => {
-          if (
-            selectedOp.IsServerOp() &&
-            selectedOp.IsOwnedOp() &&
-            selectedOp.IsOnCurrentServer()
-          ) {
-            try {
-              await deleteOpPromise(selectedOp.ID);
-              console.log("delete from server successful");
-            } catch (e) {
-              console.error(e);
-              alert(e.toString());
-            }
-          }
-          removeOperation(selectedOp.ID);
-          const newop = changeOpIfNeeded();
-          const mbr = newop.mbr;
-          if (
-            mbr &&
-            isFinite(mbr._southWest.lat) &&
-            isFinite(mbr._northEast.lat)
-          ) {
-            this._map.fitBounds(mbr);
+      const so = getSelectedOperation();
+      con.setup(wX("CON_DEL", so.name), wX("YESNO_DEL", so.name), async () => {
+        if (so.IsServerOp() && so.IsOwnedOp() && so.IsOnCurrentServer()) {
+          try {
+            await deleteOpPromise(so.ID);
+            console.log("delete from server successful");
+          } catch (e) {
+            console.error(e);
+            alert(e.toString());
           }
         }
-      );
+        removeOperation(so.ID);
+        const newop = changeOpIfNeeded();
+        const mbr = newop.mbr;
+        if (
+          mbr &&
+          isFinite(mbr._southWest.lat) &&
+          isFinite(mbr._northEast.lat)
+        ) {
+          this._map.fitBounds(mbr);
+        }
+      });
       con.enable();
     });
 
@@ -208,7 +208,8 @@ const OpSettingDialog = WDialog.extend({
     dupeButton.textContent = wX("DUPE_OP");
     L.DomEvent.on(dupeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const newop = duplicateOperation(selectedOp.ID);
+      const so = getSelectedOperation();
+      const newop = duplicateOperation(so.ID);
       makeSelectedOperation(newop.ID);
     });
 
