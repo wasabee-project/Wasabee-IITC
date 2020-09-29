@@ -159,6 +159,25 @@ const OperationChecklistDialog = WDialog.extend({
         },
       },
       {
+        name: "Zone",
+        value: (thing) => thing.zone,
+        sort: (a, b) => a.localCompare(b),
+        format: (cell, value, thing) => {
+          const z = L.DomUtil.create("select", null, cell);
+          for (const zone of operation.zones) {
+            const o = L.DomUtil.create("option", null, z);
+            o.textContent = zone.name;
+            o.value = zone.id;
+            if (zone.id == thing.zone) o.selected = true;
+            L.DomEvent.on(z, "change", (ev) => {
+              L.DomEvent.stop(ev);
+              operation.setZone(thing, o.value);
+            });
+          }
+        },
+        smallScreenHide: true,
+      },
+      {
         name: wX("COMMENT"),
         value: (thing) => thing.comment,
         sort: (a, b) => a.localeCompare(b),
@@ -227,13 +246,27 @@ const OperationChecklistDialog = WDialog.extend({
           if (obj instanceof WasabeeLink) {
             const rev = L.DomUtil.create("a", null, cell);
             rev.href = "#";
-            rev.textContent = "Reverse";
+            rev.textContent = "🔄";
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);
             });
+
+            const del = L.DomUtil.create("a", null, cell);
+            del.href = "#";
+            del.textContent = "🗑";
+            L.DomEvent.on(del, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              operation.removeLink(obj.fromPortalId, obj.toPortalId);
+            });
           } else {
-            cell.textContent = "";
+            const del = L.DomUtil.create("a", null, cell);
+            del.href = "#";
+            del.textContent = "🗑";
+            L.DomEvent.on(del, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              operation.removeMarker(obj);
+            });
           }
         },
       },
