@@ -173,19 +173,20 @@ const OpsDialog = WDialog.extend({
           const status = L.DomUtil.create("span", "", opStatus);
           status.textContent = "";
           if (!op.local) {
-            status.textContent = "Sync";
-            if (isLocal) status.textContent = "Orphan";
-            else if (op.localchanged) {
-              status.textContent = "Modified";
+            if (isLocal) {
+              status.textContent = "!";
+              status.style.color = "red";
+            } else if (op.localchanged) {
+              status.textContent = "*";
               status.style.color = "red";
             }
           }
         }
         {
-          const opOwner = L.DomUtil.create("td", "opstatus", opRow);
+          const opOwner = L.DomUtil.create("td", "opowner", opRow);
           const agent = WasabeeAgent.cacheGet(op.owner);
           if (agent != null) opOwner.appendChild(agent.formatDisplay());
-          else if (isLocal) opOwner.append(window.PLAYER.nickname);
+          else if (op.local) opOwner.append(window.PLAYER.nickname);
           else {
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {
@@ -202,9 +203,9 @@ const OpsDialog = WDialog.extend({
         }
         {
           const opPerm = L.DomUtil.create("td", "opperm", opRow);
-          let text = wX("ASSIGNED_ONLY");
-          if (op.perm == "read") text = wX("READ");
-          else if (op.perm == "write") text = wX("WRITE");
+          let text = wX("ASSIGNED_ONLY_SHORT");
+          if (op.perm == "read") text = wX("READ_SHORT");
+          else if (op.perm == "write") text = wX("WRITE_SHORT");
           if (op.id == selectedOp.ID) {
             const perm = L.DomUtil.create("a", "", opPerm);
             perm.textContent = text;
