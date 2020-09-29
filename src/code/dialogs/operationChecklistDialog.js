@@ -161,7 +161,7 @@ const OperationChecklistDialog = WDialog.extend({
       {
         name: "Zone",
         value: (thing) => thing.zone,
-        sort: (a, b) => a.localCompare(b),
+        sort: (a, b) => a.localeCompare(b),
         format: (cell, value, thing) => {
           const z = L.DomUtil.create("select", null, cell);
           for (const zone of operation.zones) {
@@ -171,7 +171,7 @@ const OperationChecklistDialog = WDialog.extend({
             if (zone.id == thing.zone) o.selected = true;
             L.DomEvent.on(z, "change", (ev) => {
               L.DomEvent.stop(ev);
-              operation.setZone(thing, o.value);
+              operation.setZone(thing, z.value);
             });
           }
         },

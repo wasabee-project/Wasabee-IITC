@@ -32,7 +32,7 @@ export default class WasabeeLink {
       throwOrderPos: this.throwOrderPos,
       color: this.color,
       completed: this.completed,
-      zone: this.zone,
+      zone: Number(this.zone),
     };
   }
 

@@ -99,6 +99,7 @@ export default class WasabeeOp {
       blockers: this.blockers,
       keysonhand: this.keysonhand,
       mode: this.mode,
+      zones: this.zones,
       // ignored by the server but useful for localStorage
       server: this.server,
     };
@@ -1168,7 +1169,7 @@ export default class WasabeeOp {
 
   // a wrapper to set WasabeePortal or WasabeeLink zone and update
   setZone(thing, zoneID) {
-    thing.zone = zoneID;
+    thing.zone = Number(zoneID);
     this.update(true);
   }
 }

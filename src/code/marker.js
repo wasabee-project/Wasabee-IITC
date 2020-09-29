@@ -39,7 +39,7 @@ export default class WasabeeMarker {
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
       order: this.order,
-      zone: this.zone,
+      zone: Number(this.zone),
     };
   }
 
