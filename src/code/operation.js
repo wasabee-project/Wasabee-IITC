@@ -1165,4 +1165,10 @@ export default class WasabeeOp {
         return incoming;
     }
   }
+
+  // a wrapper to set WasabeePortal or WasabeeLink zone and update
+  setZone(thing, zoneID) {
+    thing.zone = zoneID;
+    this.update(true);
+  }
 }
