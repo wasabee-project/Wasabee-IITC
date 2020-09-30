@@ -1172,4 +1172,41 @@ export default class WasabeeOp {
     thing.zone = Number(zoneID);
     this.update(true);
   }
+
+  removeZone(zoneID) {
+    if (zoneID == 1) {
+      console.log("cannot remove zone 1");
+      return;
+    }
+    for (const m of this.markers) {
+      if (m.zone == zoneID) m.zone = 1;
+    }
+    for (const l of this.links) {
+      if (l.zone == zoneID) l.zone = 1;
+    }
+    this.zones = this.zones.filter((z) => {
+      return z.id != zoneID;
+    });
+    this.update(true);
+  }
+
+  renameZone(zoneID, name) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.name = name;
+        break;
+      }
+    }
+    this.update(true);
+  }
+
+  addZone() {
+    const ids = new Set();
+    for (const z of this.zones) {
+      ids.add(z.id);
+    }
+    const newid = Math.max(...ids) + 1;
+    this.zones.push({ id: newid, name: newid });
+    this.update(true);
+  }
 }
