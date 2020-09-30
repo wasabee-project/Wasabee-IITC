@@ -1,7 +1,7 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { WDialog } from "../leafletClasses";
-import OperationChecklistDialog from "./operationChecklistDialog";
+import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import { makeSelectedOperation } from "../selectedOp";

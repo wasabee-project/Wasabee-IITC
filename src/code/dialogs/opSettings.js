@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
 import { clearAllItems } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
+import ZoneDialog from "./zoneDialog";
 import {
   getSelectedOperation,
   makeSelectedOperation,
@@ -202,6 +203,15 @@ const OpSettingDialog = WDialog.extend({
         opl.enable();
       });
     }
+
+    const zoneDiv = L.DomUtil.create("div", null, buttonSection);
+    const zoneButton = L.DomUtil.create("button", null, zoneDiv);
+    zoneButton.textContent = "Zones";
+    L.DomEvent.on(zoneButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const z = new ZoneDialog();
+      z.enable();
+    });
 
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
