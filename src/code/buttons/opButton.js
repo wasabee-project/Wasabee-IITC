@@ -1,7 +1,7 @@
 import { WButton } from "../leafletClasses";
 import OpSettings from "../dialogs/opSettings";
 import BlockersList from "../dialogs/blockersList";
-import OperationChecklistDialog from "../dialogs/operationChecklistDialog";
+import OperationChecklistDialog from "../dialogs/checklist";
 import ExportDialog from "../dialogs/exportDialog";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
