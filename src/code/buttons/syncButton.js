@@ -31,7 +31,7 @@ const SyncButton = WButton.extend({
       className: "wasabee-toolbar-sync",
       context: this,
       title: this.title,
-      callback: fullSync(),
+      callback: fullSync,
     });
 
     // hide or show depeneding on logged in state
