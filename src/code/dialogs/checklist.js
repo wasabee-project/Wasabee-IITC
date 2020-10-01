@@ -183,6 +183,7 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, thing) => {
           const comment = L.DomUtil.create("a", null, cell);
+          if (!value) value = ". . .";
           comment.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
@@ -203,7 +204,7 @@ const OperationChecklistDialog = WDialog.extend({
             WasabeeAgent.waitGet(thing.assignedTo);
             return "looking up: [" + thing.assignedTo + "]";
           }
-          return "";
+          return ". . .";
         },
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, thing) => {
