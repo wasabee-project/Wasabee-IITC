@@ -5,8 +5,8 @@
             "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js"
         },
         "dev": {
-            "downloadURL": "https://server.wasabee.rocks/static/dev/wasabee.user.js",
-            "updateURL": "https://server.wasabee.rocks/static/dev/wasabee.meta.js"
+            "downloadURL": "https://am.wasabee.rocks/static/dev/wasabee.user.js",
+            "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js"
         },
         "common": {
             "id": "Wasabee.user.js",
