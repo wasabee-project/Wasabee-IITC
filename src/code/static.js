@@ -43,7 +43,6 @@ W.static = {
     EXPERT_MODE_KEY: "wasabee-expert-mode",
     LANGUAGE_KEY: "wasabee-language",
     DEFAULT_LANGUAGE: "English",
-    MODE_KEY: "wasabee-mode",
     AGENT_INFO_KEY: "wasabee-me",
     MULTIMAX_UNREACHABLE_KEY: "wasabee-mm-unreachable",
     LINK_SOURCE_KEY: "wasabee-link-source",

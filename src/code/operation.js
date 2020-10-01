@@ -4,7 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId } from "./auxiliar";
-import { updateOpPromise, GetWasabeeServer } from "./server";
+import { GetWasabeeServer } from "./server";
 import { addOperation, getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
@@ -740,36 +740,11 @@ export default class WasabeeOp {
     if (this._batchmode === true) return;
 
     if (this.fetched && updateLocalchanged) {
-      if (
-        localStorage[window.plugin.wasabee.static.constants.MODE_KEY] ==
-        "active"
-      ) {
-        this._updateOnServer(); // async, no need to await
-      } else {
-        this.localchanged = true;
-      }
+      this.localchanged = true;
     }
 
     this.store();
     window.runHooks("wasabeeUIUpdate", "op update");
-  }
-
-  // only for use by "active" mode
-  async _updateOnServer() {
-    if (!WasabeeMe.isLoggedIn()) {
-      alert("Not Logged in, disabling active mode");
-      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
-      this.localchanged = true;
-    }
-
-    try {
-      await updateOpPromise(this);
-      console.debug("active mode change pushed", new Date().toGMTString());
-    } catch (e) {
-      console.error(e);
-      alert("Active Mode Update failed: " + e);
-      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
-    }
   }
 
   runCrosslinks() {

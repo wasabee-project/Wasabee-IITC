@@ -125,30 +125,6 @@ const SettingsDialog = WDialog.extend({
         analyticsCheck.checked;
     });
 
-    const modeTitle = L.DomUtil.create("label", null, container);
-    modeTitle.textContent = wX("WASABEE_MODE_LABEL");
-    const modeSelect = L.DomUtil.create("select", null, container);
-    const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
-    const mode = localStorage[modeKey];
-    const designMode = L.DomUtil.create("option", null, modeSelect);
-    designMode.value = "design";
-    designMode.textContent = wX("WASABEE_MODE_DESIGN");
-    if (mode == "design") designMode.selected = true;
-    const operationMode = L.DomUtil.create("option", null, modeSelect);
-    operationMode.value = "active";
-    operationMode.textContent = wX("WASABEE_MODE_BATTLE");
-    if (!WasabeeMe.isLoggedIn()) {
-      operationMode.disabled = true;
-      operationMode.textContent += " (not logged in)";
-    }
-    if (mode == "active") operationMode.selected = true;
-    L.DomEvent.on(modeSelect, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[modeKey] = modeSelect.value;
-    });
-    /* const modeDesc = L.DomUtil.create("div", "desc", container);
-    modeDesc.textContent = wX("WASABEE_MODE_DESC"); */
-
     const urpTitle = L.DomUtil.create("label", null, container);
     urpTitle.textContent = "Multimax test point";
     const urpSelect = L.DomUtil.create("select", null, container);
