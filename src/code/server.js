@@ -86,7 +86,6 @@ export async function opPromise(opID) {
         raw = await response.json();
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
-        newop.fetched = new Date().toUTCString();
         newop.server = server;
         return Promise.resolve(newop);
       case 304: // If-Modified-Since replied NotModified
