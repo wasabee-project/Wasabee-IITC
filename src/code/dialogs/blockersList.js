@@ -34,6 +34,7 @@ const BlockerList = WDialog.extend({
       context.blockerlistUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.addHook("wasabeeCrosslinksDone", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
@@ -42,6 +43,7 @@ const BlockerList = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.removeHook("wasabeeCrosslinksDone", this._UIUpdateHook);
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },

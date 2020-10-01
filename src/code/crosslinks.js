@@ -294,6 +294,7 @@ export function checkAllLinks() {
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
+  window.runHooks("wasabeeCrosslinksDone");
   // console.timeEnd("checkAllLinks");
 }
 

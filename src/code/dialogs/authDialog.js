@@ -157,7 +157,7 @@ const AuthDialog = WDialog.extend({
         }
       );
       serverDialog.current = GetWasabeeServer();
-      serverDialog.placeholder = "https://server.wasabee.rocks";
+      serverDialog.placeholder = "https://am.wasabee.rocks";
       serverDialog.enable();
     });
 
