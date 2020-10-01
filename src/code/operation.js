@@ -717,7 +717,6 @@ export default class WasabeeOp {
 
     this._idToOpportals.clear();
     this._coordsToOpportals.clear();
-
     this.update(true);
   }
 
@@ -735,56 +734,41 @@ export default class WasabeeOp {
     this.update(true);
   }
 
-  // call update to save the op and redraw everything on the map
+  // save the op and redraw everything on the map
   update(updateLocalchanged = true) {
     // batchmode skips all this, for bulk adding links/etc
     if (this._batchmode === true) return;
 
-    if (this.fetched) {
-      // server op
-      if (updateLocalchanged) {
-        // caller requested store (default)
-        const mode =
-          localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-        if (mode == "active") {
-          if (!WasabeeMe.isLoggedIn()) {
-            alert("Not Logged in, disabling active mode");
-            localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
-              "design";
-            this.localchanged = true;
-          } else {
-            // active mode -- this happens async, but no need to await here
-            this._updateOnServer();
-          }
-        } else {
-          // design mode
-          this.localchanged = true;
-        }
+    if (this.fetched && updateLocalchanged) {
+      if (
+        localStorage[window.plugin.wasabee.static.constants.MODE_KEY] ==
+        "active"
+      ) {
+        this._updateOnServer(); // async, no need to await
+      } else {
+        this.localchanged = true;
       }
     }
 
-    // even if not server
     this.store();
     window.runHooks("wasabeeUIUpdate", "op update");
   }
 
   // only for use by "active" mode
   async _updateOnServer() {
-    const now = Date.now();
-    /* 
-    if (this._AMpushed && now - this._AMpushed < 1000) {
-      this._AMpushed = now;
-      console.debug("skipping active mode push");
-      return;
-    } */
+    if (!WasabeeMe.isLoggedIn()) {
+      alert("Not Logged in, disabling active mode");
+      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
+      this.localchanged = true;
+    }
 
-    this._AMpushed = now;
     try {
       await updateOpPromise(this);
       console.debug("active mode change pushed", new Date().toGMTString());
     } catch (e) {
       console.error(e);
       alert("Active Mode Update failed: " + e);
+      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
     }
   }
 

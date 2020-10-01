@@ -21,7 +21,7 @@ export default class WasabeeMe {
     this.Assignments = Array();
     this._teamMap = null;
 
-    if (data.Teams !== null) {
+    if (data.Teams && data.Teams.length > 0) {
       for (const team of data.Teams) {
         this.Teams.push(team);
       }

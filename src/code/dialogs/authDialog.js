@@ -6,7 +6,7 @@ import {
   oneTimeToken,
 } from "../server";
 import PromptDialog from "./promptDialog";
-import { sendLocation } from "../uiCommands";
+import { sendLocation, fullSync } from "../uiCommands";
 import { wX, getLanguage } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
@@ -132,6 +132,7 @@ const AuthDialog = WDialog.extend({
           const newme = await WasabeeMe.waitGet(true);
           newme.store();
           this._dialog.dialog("close");
+          fullSync();
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
           console.error(e);
@@ -173,6 +174,7 @@ const AuthDialog = WDialog.extend({
             const newme = await WasabeeMe.waitGet(true);
             newme.store();
             this._dialog.dialog("close");
+            fullSync();
             postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
           } catch (e) {
             console.error(e);
@@ -250,6 +252,7 @@ const AuthDialog = WDialog.extend({
               const newme = new WasabeeMe(r);
               newme.store();
               this._dialog.dialog("close");
+              fullSync();
               postToFirebase({
                 id: "wasabeeLogin",
                 method: "gsapiAuth (immediate_failed)",
@@ -274,6 +277,7 @@ const AuthDialog = WDialog.extend({
         const newme = new WasabeeMe(r);
         newme.store();
         this._dialog.dialog("close");
+        fullSync();
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
       } catch (e) {
         postToFirebase({ id: "exception", error: e.toString() });
@@ -306,6 +310,7 @@ const AuthDialog = WDialog.extend({
           const newme = new WasabeeMe(r);
           newme.store();
           this._dialog.dialog("close");
+          fullSync();
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {
           console.error(e);
