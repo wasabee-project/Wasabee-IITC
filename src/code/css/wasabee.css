@@ -1288,15 +1288,6 @@
     list-style-position:inside;
 }
 
-.wasabee-dialog-merge div.container {
-    display: grid;
-    grid-template-columns: auto auto;
-}
-
-.wasabee-dialog-merge div.desc {
-    grid-column: 1 / 3;
-}
-
 .wasabee-link-seperator:before {
     content: " ➾ ";
 }

@@ -7,8 +7,8 @@ import {
 } from "../server";
 import WasabeeMe from "../me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import ConfirmDialog from "../dialogs/confirmDialog";
 import wX from "../wX";
-import MergeDialog from "../dialogs/mergeDialog";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -125,8 +125,12 @@ const UploadButton = WButton.extend({
         const lastOp = await opPromise(operation.ID);
         // conflict
         if (!lastOp.localchanged) {
-          const md = new MergeDialog();
-          md.setup(operation, lastOp, (op) => this.doUpdate(op));
+          const md = new ConfirmDialog();
+          md.setup(
+            wX("UPDATE_CONFLICT_TITLE"),
+            wX("UPDATE_CONFLICT_DESC"),
+            () => this.doUpdate(operation)
+          );
           md.enable();
         } else {
           // no conflict
