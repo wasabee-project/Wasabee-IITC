@@ -1,7 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../me";
 import Sortable from "../../lib/sortable";
-import { SetTeamState, leaveTeamPromise, newTeamPromise } from "../server";
+import {
+  SetTeamState,
+  leaveTeamPromise,
+  newTeamPromise,
+  SetTeamShareWD,
+  SetTeamLoadWD,
+} from "../server";
 import PromptDialog from "./promptDialog";
 import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
@@ -28,17 +34,17 @@ const TeamListDialog = WDialog.extend({
     this._displayDialog();
     // magic context incantation to make "this" work...
     const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
+    this._UIUpdateHook = async () => {
+      await context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  update: function () {
+  update: async function () {
     // async
     if (!this._enabled) return;
-    this._me = WasabeeMe.cacheGet();
-    // this._me = await WasabeeMe.waitGet(); // breaks logout ; Still? try again now
+    // this._me = WasabeeMe.cacheGet();
+    this._me = await WasabeeMe.waitGet(); // breaks logout ; Still? try again now
     this._dialog.html(this._buildContent());
   },
 
@@ -72,6 +78,36 @@ const TeamListDialog = WDialog.extend({
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
+            window.runHooks("wasabeeDkeys");
+          };
+        },
+      },
+      {
+        name: "Share W-D Keys",
+        value: (team) => team.ShareWD,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, obj) => {
+          const link = L.DomUtil.create("a", null, row);
+          let curshare = obj.ShareWD;
+          link.textContent = curshare;
+          if (curshare == "On") L.DomUtil.addClass(link, "enl");
+          link.onclick = () => {
+            this.toggleShareWD(obj.ID, curshare);
+            window.runHooks("wasabeeDkeys");
+          };
+        },
+      },
+      {
+        name: "Load W-D Keys",
+        value: (team) => team.LoadWD,
+        sort: (a, b) => a.localeCompare(b),
+        format: (row, value, obj) => {
+          const link = L.DomUtil.create("a", null, row);
+          let curload = obj.LoadWD;
+          link.textContent = curload;
+          if (curload == "On") L.DomUtil.addClass(link, "enl");
+          link.onclick = () => {
+            this.toggleLoadWD(obj.ID, curload);
             window.runHooks("wasabeeDkeys");
           };
         },
@@ -177,6 +213,32 @@ const TeamListDialog = WDialog.extend({
     if (currentState == "Off") newState = "On";
     try {
       await SetTeamState(teamID, newState);
+      await WasabeeMe.waitGet(true);
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+    }
+    return newState;
+  },
+
+  toggleShareWD: async function (teamID, currentState) {
+    let newState = "Off";
+    if (currentState == "Off") newState = "On";
+    try {
+      await SetTeamShareWD(teamID, newState);
+      await WasabeeMe.waitGet(true);
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+    }
+    return newState;
+  },
+
+  toggleLoadWD: async function (teamID, currentState) {
+    let newState = "Off";
+    if (currentState == "Off") newState = "On";
+    try {
+      await SetTeamLoadWD(teamID, newState);
       await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);

@@ -113,6 +113,7 @@ export default class WasabeeAgent {
     // this needs wX
     const requestRoute = L.DomUtil.create("button", null, content);
     requestRoute.textContent = "Send Route to Target";
+    requestRoute.style.display = "none"; // hide this until the server-side is ready
     L.DomEvent.on(requestRoute, "click", (ev) => {
       L.DomEvent.stop(ev);
       const selectedPortal = WasabeePortal.getSelected();
