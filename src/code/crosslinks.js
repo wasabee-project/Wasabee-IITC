@@ -207,6 +207,7 @@ function showCrossLink(link, operation) {
     clickable: false,
     dashArray: [8, 8],
     guid: link.options.guid,
+    interactive: false,
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
@@ -256,6 +257,7 @@ function testSelfBlock(incoming, operation) {
         against.getLatLngs(operation),
         window.plugin.wasabee.skin.selfBlockStyle
       );
+      blocked.options.interactive = false;
       blocked.addTo(window.plugin.wasabee.crossLinkLayers);
     }
   }
