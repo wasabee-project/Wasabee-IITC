@@ -78,8 +78,7 @@ W.static = {
       opacity: 0.7,
       weight: 5,
       smoothFactor: 1,
-      clickable: false,
-      interactive: true,
+      interactive: false,
     },
   },
 };

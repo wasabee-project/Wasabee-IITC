@@ -204,10 +204,9 @@ function showCrossLink(link, operation) {
     color: "#d22",
     opacity: 0.7,
     weight: 5,
-    clickable: false,
+    interactive: false,
     dashArray: [8, 8],
     guid: link.options.guid,
-    interactive: false,
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
