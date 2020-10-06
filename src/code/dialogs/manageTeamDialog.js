@@ -48,7 +48,6 @@ const ManageTeamDialog = WDialog.extend({
 
   setup: async function (team) {
     this._team = team;
-    console.log(team);
     this._table = new Sortable();
     this._table.fields = [
       {
