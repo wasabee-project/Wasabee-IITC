@@ -7,6 +7,8 @@ import {
   rocksPromise,
   deleteTeamPromise,
   GetWasabeeServer,
+  deleteJoinLinkPromise,
+  createJoinLinkPromise,
 } from "../server";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
@@ -46,6 +48,7 @@ const ManageTeamDialog = WDialog.extend({
 
   setup: async function (team) {
     this._team = team;
+    console.log(team);
     this._table = new Sortable();
     this._table.fields = [
       {
@@ -220,6 +223,34 @@ const ManageTeamDialog = WDialog.extend({
         alert(e.toString());
       }
     });
+
+    const joinlinklabel = L.DomUtil.create("label", null, container);
+    joinlinklabel.textContent = "Join Link";
+    if (this._team.JoinLinkToken != "") {
+      const joinlink = L.DomUtil.create("a", null, container);
+      const server = GetWasabeeServer();
+      joinlink.href = `${server}/api/v1/team/${this._team.ID}/join/${this._team.JoinLinkToken}`;
+      joinlink.textContent = joinlink.href;
+      const joinlinkdel = L.DomUtil.create("button", null, container);
+      joinlinkdel.textContent = "Revoke";
+      L.DomEvent.on(joinlinkdel, "click", async (ev) => {
+        L.DomEvent.stop(ev);
+        await deleteJoinLinkPromise(this._team.ID);
+        this._team.JoinLinkToken = "";
+        window.runHooks("wasabeeUIUpdate");
+      });
+    } else {
+      L.DomUtil.create("span", null, container).textContent = "not set";
+      const joinlinkadd = L.DomUtil.create("button", null, container);
+      joinlinkadd.textContent = "Create";
+      L.DomEvent.on(joinlinkadd, "click", async (ev) => {
+        L.DomEvent.stop(ev);
+        const response = await createJoinLinkPromise(this._team.ID);
+        const j = JSON.parse(response);
+        this._team.JoinLinkToken = j.Key;
+        window.runHooks("wasabeeUIUpdate");
+      });
+    }
 
     const removeLabel = L.DomUtil.create("label", null, container);
     removeLabel.textContent = wX("REMOVE_TEAM");
