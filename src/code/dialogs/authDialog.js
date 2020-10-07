@@ -93,6 +93,8 @@ const AuthDialog = WDialog.extend({
 
     L.DomEvent.on(gapiButton, "click", (ev) => {
       L.DomEvent.stop(ev);
+      gapiButton.disabled = true;
+      gapiButton.textContent = "... loading ...";
       this.gapiAuth.call(this);
     });
 
@@ -109,6 +111,8 @@ const AuthDialog = WDialog.extend({
       gapiSelectButton.textContent = wX("AUTH_SELECT_ACCOUNT");
       L.DomEvent.on(gapiSelectButton, "click", (ev) => {
         L.DomEvent.stop(ev);
+        gapiSelectButton.disabled = true;
+        gapiSelectButton.textContent = "... loading ...";
         this.gsapiAuthChoose.call(this);
       });
     }

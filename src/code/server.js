@@ -147,7 +147,7 @@ export function assignLinkPromise(opID, linkID, agentID) {
 }
 
 // sends a target (portal) to the server to notify the agent
-export function targetPromise(agentID, portal) {
+export function targetPromise(agentID, portal, type = "ad hoc") {
   return genericPost(
     `/api/v1/agent/${agentID}/target`,
     JSON.stringify({
@@ -155,6 +155,7 @@ export function targetPromise(agentID, portal) {
       Lat: portal.lat,
       Lng: portal.lng,
       ID: portal.id,
+      Type: type,
     }),
     "application/json;charset=UTF-8"
   );

@@ -56,12 +56,13 @@ const SendTargetDialog = WDialog.extend({
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = await this._getAgentMenu(target.assignedTo);
     this._name = wX("SEND TARGET AGENT");
+    this._targettype = "ad hoc target";
 
     const operation = getSelectedOperation();
 
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
-      this._type = "Marker";
+      this._targettype = target.type;
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
@@ -70,7 +71,7 @@ const SendTargetDialog = WDialog.extend({
 
     if (target instanceof WasabeeAnchor) {
       const portal = operation.getPortal(target.portalId);
-      this._type = "Anchor";
+      this._targettype = "anchor";
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
@@ -104,7 +105,7 @@ const SendTargetDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       const portal = operation.getPortal(this._target.portalId);
       try {
-        await targetPromise(menu.value, portal);
+        await targetPromise(menu.value, portal, this._targettype);
         this._dialog.dialog("close");
         alert(wX("TARGET SENT"));
       } catch (e) {

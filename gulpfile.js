@@ -92,9 +92,14 @@ gulp.task("buildheaders", (cb) => {
 
 gulp.task("webpack", (callback) => {
   const webpackConfig = require("./webpack.config.js");
+  if (status.mode === "prod") {
+    webpackConfig.mode = "production";
+    webpackConfig.devtool = "nosources-source-map";
+  }
   if (status.mode === "dev") {
     webpackConfig.mode = "development";
     webpackConfig.devtool = "eval-source-map";
+    // webpackConfig.optimization.minimize = true;
   }
   webpack(webpackConfig, function (err, stats) {
     log(
