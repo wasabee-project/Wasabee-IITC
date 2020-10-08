@@ -5,6 +5,7 @@ import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const FanfieldDialog = WDialog.extend({
   statics: {
@@ -15,6 +16,7 @@ const FanfieldDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
+    postToFirebase({ id: "analytics", action: FanfieldDialog.TYPE });
   },
 
   removeHooks: function () {
@@ -144,11 +146,11 @@ const FanfieldDialog = WDialog.extend({
     this.label = wX("FAN_FIELD3");
     this._operation = getSelectedOperation();
     let p = localStorage["wasabee-anchor-1"];
-    if (p) this._anchor = WasabeePortal.create(p);
+    if (p) this._anchor = new WasabeePortal(p);
     p = localStorage["wasabee-fanfield-start"];
-    if (p) this._start = WasabeePortal.create(p);
+    if (p) this._start = new WasabeePortal(p);
     p = localStorage["wasabee-fanfield-end"];
-    if (p) this._end = WasabeePortal.create(p);
+    if (p) this._end = new WasabeePortal(p);
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)
@@ -223,9 +225,8 @@ const FanfieldDialog = WDialog.extend({
       let j = i + 1;
       for (; j < available.length; j++) {
         const testlink = new WasabeeLink(
-          this._operation,
-          wp.id,
-          available[j].id
+          { fromPortalId: wp.id, toPortalId: available[j].id },
+          this._operation
         );
         let crossed = false;
         for (const real of this._operation.links) {

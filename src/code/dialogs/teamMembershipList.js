@@ -1,7 +1,8 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
-import { teamPromise } from "../server";
+import WasabeeTeam from "../team";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -11,6 +12,7 @@ const TeamMembershipList = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = TeamMembershipList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: TeamMembershipList.TYPE });
   },
 
   addHooks: function () {
@@ -49,15 +51,12 @@ const TeamMembershipList = WDialog.extend({
   setup: async function (teamID) {
     this._teamID = teamID;
 
-    if (window.plugin.wasabee.teams.has(teamID)) {
-      this._team = window.plugin.wasabee.teams.get(teamID);
-    } else {
-      try {
-        this._team = await teamPromise(teamID);
-      } catch (e) {
-        alert(e);
-        return;
-      }
+    try {
+      this._team = await WasabeeTeam.waitGet(teamID, 2);
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+      return;
     }
     if (!this._team.name) {
       alert(wX("NOT_LOADED"));
@@ -78,16 +77,24 @@ const TeamMembershipList = WDialog.extend({
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: wX("LOC_UPDATE"),
-        value: (agent) => agent.date + " GMT",
+        name: "Sharing Location",
+        value: (agent) => agent.state,
         sort: (a, b) => a.localeCompare(b),
-        // , format: (cell, value) => (cell.textContent = value)
+        format: (cell, value) => {
+          if (value) cell.textContent = "✅";
+        },
+      },
+      {
+        name: "Sharing W-D Keys",
+        value: (agent) => agent.ShareWD,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value) => {
+          if (value) cell.textContent = "✅";
+        },
       },
     ];
     this._table.sortBy = 0;
-    // if team owner, don't show non-enabled agents
-    const a = this._team.agents.filter((agent) => agent.state);
-    this._table.items = a;
+    this._table.items = this._team.agents;
   },
 });
 

@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
-import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 // generic confirmation screen w/ ok and cancel buttons
 
@@ -14,17 +14,26 @@ const ConfirmDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE");
     this._label = wX("NO_LABEL");
+    postToFirebase({ id: "analytics", action: ConfirmDialog.TYPE });
   },
 
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._displayDialog();
+    if (
+      localStorage[window.plugin.wasabee.static.constants.EXPERT_MODE_KEY] ==
+      "true"
+    ) {
+      console.log("expert mode: skipping dialog display");
+      if (this._callback) this._callback();
+    } else {
+      this._displayDialog();
+    }
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+    window.runHooks("wasabeeUIUpdate");
   },
 
   _displayDialog: function () {

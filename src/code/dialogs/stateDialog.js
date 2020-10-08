@@ -1,8 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
-// import { stateLinkPromise, stateMarkerPromise } from "../server";
+import { SetMarkerState, SetLinkState } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -12,6 +14,7 @@ const StateDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = StateDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: StateDialog.TYPE });
   },
 
   addHooks: function () {
@@ -44,13 +47,18 @@ const StateDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (target, operation) {
-    this._operation = operation;
+  setup: function (target, opID) {
+    this._opID = opID;
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = this._getStateMenu(target);
+
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("operation changed");
+    }
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
@@ -85,12 +93,10 @@ const StateDialog = WDialog.extend({
     return content;
   },
 
-  // TODO this should return a promise so the draw routine can .then() it...
   _getStateMenu: function (current) {
     const container = L.DomUtil.create("div", "wasabee-state-menu");
     const menu = L.DomUtil.create("select", null, container);
 
-    // const states = ['pending','assigned','acknowledged','completed'];
     const states = ["pending", "acknowledged", "completed"];
     for (const s of states) {
       const option = menu.appendChild(L.DomUtil.create("option", null));
@@ -114,18 +120,50 @@ const StateDialog = WDialog.extend({
   },
 
   designSetState: function (value) {
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      console.log("operation changed -- bailing");
+      return;
+    }
     if (this._type == "Marker") {
-      this._operation.setMarkerState(this._targetID, value.srcElement.value);
+      operation.setMarkerState(this._targetID, value.srcElement.value);
     }
     // link states are different, but the WasabeeLink object knows what to do...
     if (this._type == "Link") {
-      this._operation.setLinkState(this._targetID, value.srcElement.value);
+      operation.setLinkState(this._targetID, value.srcElement.value);
     }
   },
 
-  activeSetState: function (value) {
-    alert("Active mode set state not written yet");
-    console.log("not written yet", value);
+  activeSetState: async function (value) {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) {
+      console.log("operation changed, bailing");
+      return;
+    }
+
+    if (this._type == "Marker") {
+      try {
+        await SetMarkerState(
+          this._opID,
+          this._targetID,
+          value.srcElement.value
+        );
+        // changing it locally in battle mode will push the entire draw...
+        operation.setMarkerState(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    if (this._type == "Link") {
+      try {
+        await SetLinkState(this._opID, this._targetID, value.srcElement.value);
+        // changing it locally in battle mode will push the entire draw...
+        operation.setLinkState(this._targetID, value.srcElement.value);
+      } catch (e) {
+        console.log(e);
+      }
+    }
   },
 });
 

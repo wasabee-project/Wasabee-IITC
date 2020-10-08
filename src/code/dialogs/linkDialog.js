@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const LinkDialog = WDialog.extend({
   statics: {
@@ -14,11 +15,12 @@ const LinkDialog = WDialog.extend({
 
     let p =
       localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
-    if (p) this._source = WasabeePortal.create(p);
+    if (p) this._source = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor1 = WasabeePortal.create(p);
+    if (p) this._anchor1 = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchor2 = WasabeePortal.create(p);
+    if (p) this._anchor2 = new WasabeePortal(p);
+    postToFirebase({ id: "analytics", action: LinkDialog.TYPE });
   },
 
   addHooks: function () {
@@ -63,15 +65,6 @@ const LinkDialog = WDialog.extend({
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
-    const clearSourceButton = L.DomUtil.create("button", "clear", container);
-    clearSourceButton.textContent = wX("CLEAR");
-    L.DomEvent.on(clearSourceButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      delete localStorage[
-        window.plugin.wasabee.static.constants.LINK_SOURCE_KEY
-      ];
-      this._sourceDisplay.textContent = wX("NOT_SET");
-    });
 
     const anchor1Label = L.DomUtil.create("label", null, container);
     anchor1Label.textContent = wX("ANCHOR1");
@@ -114,15 +107,6 @@ const LinkDialog = WDialog.extend({
       } else {
         alert("Select both Source and Anchor 1");
       }
-    });
-    const clearAnchor1Button = L.DomUtil.create("button", "clear", container);
-    clearAnchor1Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor1Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      delete localStorage[
-        window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-      ];
-      this._anchor1Display.textContent = wX("NOT_SET");
     });
 
     const anchor2Label = L.DomUtil.create("label", null, container);
@@ -167,24 +151,10 @@ const LinkDialog = WDialog.extend({
         alert(wX("SEL_SRC_ANC2"));
       }
     });
-    const clearAnchor2Button = L.DomUtil.create("button", "clear", container);
-    clearAnchor2Button.textContent = wX("CLEAR");
-    L.DomEvent.on(clearAnchor2Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      delete localStorage[
-        window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
-      ];
-      this._anchor2Display.textContent = wX("NOT_SET");
-    });
-
-    // Bottom buttons bar
-    // Enter arrow
-    //const opt = L.DomUtil.create("label", "arrow", container);
-    //opt.textContent = "\uD83E\uDCA7";
 
     // Go button
-    const button = L.DomUtil.create("buttonall", null, container);
-    button.textContent = "\uD83D\uDC1D" + wX("ADD_BUTTON_LINKS");
+    const button = L.DomUtil.create("button", "drawb", container);
+    button.textContent = wX("ADD_BUTTON_LINKS");
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));

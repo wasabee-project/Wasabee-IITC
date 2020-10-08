@@ -2,6 +2,7 @@ import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
+import { postToFirebase } from "../firebaseSupport";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -20,8 +21,7 @@ const QuickdrawButton = WButton.extend({
     this.button = this._createButton({
       title: this.title,
       container: container,
-      buttonImage:
-        window.plugin.wasabee.static.images.toolbar_quickdraw.default,
+      className: "wasabee-toolbar-quickdraw",
       callback: this.handler.enable,
       context: this.handler,
     });
@@ -55,9 +55,16 @@ const QuickDrawControl = L.Handler.extend({
 
   enable: function () {
     console.log("qd enable called");
-    if (this._enabled) return;
+    if (this._enabled) {
+      this.disable();
+      return;
+    }
     L.Handler.prototype.enable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].enable();
+    window.plugin.wasabee.buttons._modes[this.buttonName].button.classList.add(
+      "active"
+    );
+    postToFirebase({ id: "analytics", action: "quickdrawStart" });
   },
 
   disable: function () {
@@ -65,6 +72,10 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
     window.plugin.wasabee.buttons._modes[this.buttonName].disable();
+    window.plugin.wasabee.buttons._modes[
+      this.buttonName
+    ].button.classList.remove("active");
+    postToFirebase({ id: "analytics", action: "quickdrawEnd" });
   },
 
   addHooks: function () {
@@ -129,13 +140,17 @@ const QuickDrawControl = L.Handler.extend({
       this.disable();
     }
     if (e.originalEvent.key === "/" || e.originalEvent.key === "g") {
+      postToFirebase({ id: "analytics", action: "quickdrawGuides" });
       this._guideLayerToggle();
     }
     if (e.originalEvent.key === "t" || e.originalEvent.key === "m") {
+      postToFirebase({ id: "analytics", action: "quickdrawMode" });
       this._toggleMode();
     }
     if (e.originalEvent.key === "X") {
+      postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
+      window.runHooks("wasabeeCrosslinks", this._operation);
     }
   },
 
@@ -234,7 +249,7 @@ const QuickDrawControl = L.Handler.extend({
         this._anchor1,
         this._anchor2,
         wX("QDBASE"),
-        this._throwOrder++
+        this._operation.nextOrder
       );
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
@@ -252,13 +267,13 @@ const QuickDrawControl = L.Handler.extend({
       selectedPortal,
       this._anchor1,
       null,
-      this._throwOrder++
+      this._operation.nextOrder
     );
     this._operation.addLink(
       selectedPortal,
       this._anchor2,
       null,
-      this._throwOrder++
+      this._operation.nextOrder
     );
     this._tooltip.updateContent(this._getTooltipText());
   },

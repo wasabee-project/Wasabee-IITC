@@ -3,9 +3,12 @@ import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
-import { getAgent } from "../server";
+import WasabeeAgent from "../agent";
 import wX from "../wX";
-import WasabeeMe from "../me";
+// import WasabeeMe from "../me";
+import { postToFirebase } from "../firebaseSupport";
+import { getSelectedOperation } from "../selectedOp";
+import WasabeeOp from "../operation";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -19,14 +22,15 @@ const LinkListDialog = WDialog.extend({
     this._label = wX("NO_LABEL");
     this.placeholder = "";
     this.current = "";
+    postToFirebase({ id: "analytics", action: LinkListDialog.TYPE });
   },
 
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.updateLinkList(newOpData);
+    this._UIUpdateHook = () => {
+      context.updateLinkList();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -57,9 +61,10 @@ const LinkListDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (operation, portal) {
+  setup: function (UNUSED, portal) {
     this._portal = portal;
-    this._operation = operation;
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     this._table = new Sortable();
     this._table.fields = [
       {
@@ -70,23 +75,21 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "From",
-        value: (link) => this._operation.getPortal(link.fromPortalId),
+        value: (link) => operation.getPortal(link.fromPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
+        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "To",
-        value: (link) => this._operation.getPortal(link.toPortalId),
+        value: (link) => operation.getPortal(link.toPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
+        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
       },
       {
         name: "Length",
-        value: (link) => link.length(this._operation),
+        value: (link) => link.length(operation),
         format: (cell, data) => {
           cell.classList.add("length");
           cell.textContent =
@@ -97,9 +100,9 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Min Lvl",
         title: wX("MIN_SRC_PORT_LVL"),
-        value: (link) => link.length(this._operation),
+        value: (link) => link.length(operation),
         format: (cell, data, link) => {
-          cell.appendChild(link.minLevel(this._operation));
+          cell.appendChild(link.minLevel(operation));
         },
         smallScreenHide: true,
       },
@@ -126,25 +129,24 @@ const LinkListDialog = WDialog.extend({
         name: "Assigned To",
         value: (link) => {
           if (link.assignedTo != null && link.assignedTo != "") {
-            if (!WasabeeMe.isLoggedIn()) return "not logged in";
-            const agent = getAgent(link.assignedTo);
-            if (agent != null) {
-              return agent.name;
-            } else {
-              return "looking up: [" + link.assignedTo + "]";
-            }
+            const agent = WasabeeAgent.cacheGet(link.assignedTo);
+            if (agent != null) return agent.name;
+            // we can't use async here, so just request it now and it should be in cache next time
+            WasabeeAgent.waitGet(link.assignedTo);
+            return "looking up: [" + link.assignedTo + "]";
           }
+
           return "";
         },
         sort: (a, b) => a.localeCompare(b),
         format: (a, m, link) => {
           const assignee = L.DomUtil.create("a", null, a);
           assignee.textContent = m;
-          if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
+          if (operation.IsServerOp() && operation.IsWritableOp()) {
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ad = new AssignDialog();
-              ad.setup(link, this._operation);
+              ad.setup(link);
               ad.enable();
             });
           }
@@ -189,49 +191,59 @@ const LinkListDialog = WDialog.extend({
       },
     ];
     this._table.sortBy = 0;
-    this._table.items = this._operation.getLinkListFromPortal(this._portal);
+    this._table.items = operation.getLinkListFromPortal(this._portal);
   },
 
   deleteLink: function (link) {
     const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
     prompt.textContent = wX("CONFIRM_DELETE");
-    prompt.appendChild(link.displayFormat(this._operation));
+    const operation = getSelectedOperation();
+    prompt.appendChild(link.displayFormat(operation));
     con.setup("Delete Link", prompt, () => {
-      this._operation.removeLink(link.fromPortalId, link.toPortalId);
+      operation.removeLink(link.fromPortalId, link.toPortalId);
     });
     con.enable();
   },
 
   makeColorMenu: function (list, data, link) {
+    const operation = getSelectedOperation();
     const colorSection = L.DomUtil.create("div", null, list);
     const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
 
-    for (const style of window.plugin.wasabee.static.layerTypes) {
-      if (style[0] == "SE" || style[0] == "self-block") continue;
-      const a = style[1];
+    for (const style of window.plugin.wasabee.skin.layerTypes.values()) {
       const option = L.DomUtil.create("option");
-      option.value = a.name;
-      if (a.name == "main") a.displayName = "Op Color";
-      if (a.name == data) option.selected = true;
-      option.innerHTML = a.displayName;
+      option.value = style.name;
+      if (style.name == "main") style.displayName = "Op Color";
+      if (style.name == data) option.selected = true;
+      option.innerHTML = style.displayName;
+      linkColor.append(option);
+    }
+
+    // TODO: picker here
+    // custom color
+    if (WasabeeOp.newColors(data) == data) {
+      const option = L.DomUtil.create("option");
+      option.value = data;
+      option.selected = true;
+      option.textContent = `Custom ${data}`;
       linkColor.append(option);
     }
 
     linkColor.addEventListener(
       "change",
       () => {
-        link.color = linkColor.value;
-        this._operation.update();
+        link.setColor(linkColor.value, operation);
       },
       false
     );
   },
 
-  updateLinkList: function (operation) {
+  updateLinkList: function () {
+    const operation = getSelectedOperation();
     if (!this._enabled) return;
-    if (this._operation.ID == operation.ID) {
+    if (this._opID == operation.ID) {
       this._table.items = operation.getLinkListFromPortal(this._portal);
     } else {
       // the selected operation changed, just bail

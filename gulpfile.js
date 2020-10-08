@@ -92,9 +92,17 @@ gulp.task("buildheaders", (cb) => {
 
 gulp.task("webpack", (callback) => {
   const webpackConfig = require("./webpack.config.js");
+  if (status.mode === "prod") {
+    webpackConfig.mode = "production";
+    webpackConfig.devtool = "nosources-source-map";
+  }
   if (status.mode === "dev") {
     webpackConfig.mode = "development";
     webpackConfig.devtool = "eval-source-map";
+<<<<<<< HEAD
+    // webpackConfig.optimization.minimize = true;
+=======
+>>>>>>> master
   }
   webpack(webpackConfig, function (err, stats) {
     log(
@@ -134,10 +142,17 @@ gulp.task("buildplugin", (cb) => {
 });
 
 gulp.task("buildmeta", (cb) => {
+<<<<<<< HEAD
+  const p = path.join(cfg.releaseFolder[status.mode], cfg.metaName);
+
+  ensureDirectoryExistence(p);
+  fs.writeFile(p, status.headers, (err) => {
+=======
   const path = cfg.releaseFolder[status.mode] + cfg.metaName;
 
   ensureDirectoryExistence(path);
   fs.writeFile(path, status.headers, (err) => {
+>>>>>>> master
     cb(err);
   });
 });

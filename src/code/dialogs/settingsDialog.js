@@ -5,6 +5,8 @@ import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
+import { postToFirebase } from "../firebaseSupport";
+import SkinDialog from "./skinDialog";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
@@ -21,6 +23,7 @@ const SettingsDialog = WDialog.extend({
     this.type = SettingsDialog.TYPE;
     // call the parent classes initialize as well
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: SettingsDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -28,10 +31,9 @@ const SettingsDialog = WDialog.extend({
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._operation = getSelectedOperation();
     // magic context incantation to make "this" work...
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     // put any per-open setup here
@@ -50,8 +52,7 @@ const SettingsDialog = WDialog.extend({
   },
 
   update: function () {
-    const container = this._getContent();
-    this._dialog.html(container);
+    this._dialog.html(this._getContent());
     // TODO also update the title
   },
 
@@ -64,13 +65,7 @@ const SettingsDialog = WDialog.extend({
 
     const current =
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
-    for (const l in window.plugin.wasabee.static.strings) {
-      const option = L.DomUtil.create("option", null, langMenu);
-      option.value = l;
-      option.textContent = l;
-      if (l == current) option.selected = true;
-    }
-    for (const l in window.plugin.wasabee.static.stringsSilly) {
+    for (const l in window.plugin.wasabee.skin.strings) {
       const option = L.DomUtil.create("option", null, langMenu);
       option.value = l;
       option.textContent = l;
@@ -81,13 +76,15 @@ const SettingsDialog = WDialog.extend({
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
         langMenu.value;
       addButtons(getSelectedOperation());
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      window.runHooks("wasabeeUIUpdate");
     });
 
     const sendLocTitle = L.DomUtil.create("label", null, container);
     sendLocTitle.textContent = wX("SEND LOCATION");
+    sendLocTitle.htmlFor = "wasabee-setting-sendloc";
     const sendLocCheck = L.DomUtil.create("input", null, container);
     sendLocCheck.type = "checkbox";
+    sendLocCheck.id = "wasabee-setting-sendloc";
     const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
     const sl = localStorage[c];
     if (sl === "true") sendLocCheck.checked = true;
@@ -96,29 +93,37 @@ const SettingsDialog = WDialog.extend({
       localStorage[c] = sendLocCheck.checked;
     });
 
-    const modeTitle = L.DomUtil.create("label", null, container);
-    modeTitle.textContent = wX("WASABEE_MODE_LABEL");
-    const modeSelect = L.DomUtil.create("select", null, container);
-    const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
-    const mode = localStorage[modeKey];
-    const designMode = L.DomUtil.create("option", null, modeSelect);
-    designMode.value = "design";
-    designMode.textContent = wX("WASABEE_MODE_DESIGN");
-    if (mode == "design") designMode.selected = true;
-    const operationMode = L.DomUtil.create("option", null, modeSelect);
-    operationMode.value = "active";
-    operationMode.textContent = wX("WASABEE_MODE_BATTLE");
-    if (!WasabeeMe.isLoggedIn()) {
-      operationMode.disabled = true;
-      operationMode.textContent += " (not logged in)";
-    }
-    if (mode == "active") operationMode.selected = true;
-    L.DomEvent.on(modeSelect, "change", (ev) => {
+    const expertTitle = L.DomUtil.create("label", null, container);
+    expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
+    expertTitle.htmlFor = "wasabee-setting-expert";
+    const expertCheck = L.DomUtil.create("input", null, container);
+    expertCheck.type = "checkbox";
+    expertCheck.id = "wasabee-setting-expert";
+    const exm = window.plugin.wasabee.static.constants.EXPERT_MODE_KEY;
+    const ex = localStorage[exm];
+    if (ex === "true") expertCheck.checked = true;
+    L.DomEvent.on(expertCheck, "change", (ev) => {
       L.DomEvent.stop(ev);
-      localStorage[modeKey] = modeSelect.value;
+      localStorage[exm] = expertCheck.checked;
     });
-    /* const modeDesc = L.DomUtil.create("div", "desc", container);
-    modeDesc.textContent = wX("WASABEE_MODE_DESC"); */
+
+    const analyticsTitle = L.DomUtil.create("label", null, container);
+    analyticsTitle.textContent = wX("SEND ANALYTICS");
+    analyticsTitle.htmlFor = "wasabee-setting-analytics";
+    const analyticsCheck = L.DomUtil.create("input", null, container);
+    analyticsCheck.type = "checkbox";
+    analyticsCheck.id = "wasabee-setting-analytics";
+    if (
+      localStorage[
+        window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
+      ] === "true"
+    )
+      analyticsCheck.checked = true;
+    L.DomEvent.on(analyticsCheck, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] =
+        analyticsCheck.checked;
+    });
 
     const urpTitle = L.DomUtil.create("label", null, container);
     urpTitle.textContent = "Multimax test point";
@@ -150,8 +155,10 @@ const SettingsDialog = WDialog.extend({
 
     const autoLoadTitle = L.DomUtil.create("label", null, container);
     autoLoadTitle.textContent = wX("AUTOLOAD");
+    autoLoadTitle.htmlFor = "wasabee-setting-autoload";
     const autoLoadCheck = L.DomUtil.create("input", null, container);
     autoLoadCheck.type = "checkbox";
+    autoLoadCheck.id = "wasabee-setting-autoload";
     const alc = window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED;
     const al = localStorage[alc];
     if (al === "true") autoLoadCheck.checked = true;
@@ -204,6 +211,14 @@ const SettingsDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] =
         trawlSelect.value;
+    });
+
+    const skinsButton = L.DomUtil.create("button", null, container);
+    skinsButton.textContent = wX("SKINS_BUTTON");
+    L.DomEvent.on(skinsButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const skinDialog = new SkinDialog(window.map);
+      skinDialog.enable();
     });
 
     return container;

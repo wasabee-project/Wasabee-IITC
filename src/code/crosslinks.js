@@ -2,11 +2,10 @@ import WasabeePortal from "./portal";
 import WasabeeLink from "./link";
 import { getSelectedOperation } from "./selectedOp";
 
-//*** CROSSLINK THINGS */
 const Wasabee = window.plugin.wasabee;
 
 // takes WasabeeLink or L.geodesicPolyline format
-export const greatCircleArcIntersect = (existing, drawn) => {
+export function greatCircleArcIntersect(existing, drawn) {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
 
   // method:
@@ -172,15 +171,14 @@ export const greatCircleArcIntersect = (existing, drawn) => {
   // latitudes cross between left and right - so geodesic lines cross
   //console.log('Xlink!');
   return true;
-};
+}
 
-const testPolyLine = (wasabeeLink, realLink, operation) => {
+function testPolyLine(wasabeeLink, realLink, operation) {
   if (greatCircleArcIntersect(realLink, wasabeeLink)) {
     if (!operation.markers || operation.markers.length == 0) {
       return true;
     }
 
-    // XXX  my gut says there is a way to do this more quickly
     for (const marker of operation.markers) {
       if (
         marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
@@ -198,23 +196,24 @@ const testPolyLine = (wasabeeLink, realLink, operation) => {
     return true;
   }
   return false;
-};
+}
 
-const showCrossLink = (link, operation) => {
+function showCrossLink(link, operation) {
+  // this should be in static.js or skin
   const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
     color: "#d22",
     opacity: 0.7,
     weight: 5,
-    clickable: false,
+    interactive: false,
     dashArray: [8, 8],
     guid: link.options.guid,
   });
 
   blocked.addTo(window.plugin.wasabee.crossLinkLayers);
   window.plugin.wasabee._crosslinkCache.set(link.options.guid, blocked);
-};
+}
 
-const testLink = (link, operation) => {
+function testLink(link, operation) {
   // if the crosslink already exists, do not recheck
   if (window.plugin.wasabee._crosslinkCache.has(link.options.guid)) {
     return;
@@ -239,77 +238,84 @@ const testLink = (link, operation) => {
           link.options.data.dGuid
         );
       operation._addPortal(toPortal);
-      const blocker = new WasabeeLink(operation, fromPortal.id, toPortal.id);
+      const blocker = new WasabeeLink(
+        { fromPortalId: fromPortal.id, toPortalId: toPortal.id },
+        operation
+      );
       operation.addBlocker(blocker); // op.update() is called here
       break;
     }
   }
-};
+}
 
-const testSelfBlock = (incoming, operation) => {
+function testSelfBlock(incoming, operation) {
   for (const against of operation.links) {
     if (incoming.ID == against.ID) continue;
     if (greatCircleArcIntersect(against, incoming)) {
-      const lt = window.plugin.wasabee.static.layerTypes.get("self-block");
-      const style = lt.link;
-      style.color = lt.color;
-      const blocked = L.geodesicPolyline(against.getLatLngs(operation), style);
+      const blocked = L.geodesicPolyline(
+        against.getLatLngs(operation),
+        window.plugin.wasabee.skin.selfBlockStyle
+      );
+      blocked.options.interactive = false;
       blocked.addTo(window.plugin.wasabee.crossLinkLayers);
     }
   }
-};
+}
 
-export const checkAllLinks = (operation) => {
-  console.time("checkAllLinks");
-  // console.log("checkAllLinks called: " + operation.ID);
+// lets see if using a generator makes the GUI more responsive on large ops
+// -- yeild doesn't seem to release the main thread, maybe we need to yeild a
+// Promise.resolve(window.links[g]) and await it in the for loop?
+function* realLinks() {
+  const guids = Object.getOwnPropertyNames(window.links);
+  // it is possible that the link was purged while we were yielded
+  // checking here should reduce the workload while scrolling/zooming
+  for (const g of guids) {
+    if (window.links[g] != null) yield window.links[g];
+  }
+}
+
+export function checkAllLinks() {
+  const operation = getSelectedOperation();
+  if (operation == null) {
+    console.log("crosslinks run, no op loaded?");
+    return;
+  }
+
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
   if (!operation.links || operation.links.length == 0) return;
-  for (const guid in window.links) {
-    testLink(window.links[guid], operation);
+
+  const linkGenerator = realLinks();
+  for (const link of linkGenerator) {
+    testLink(link, operation);
   }
 
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
-  console.timeEnd("checkAllLinks");
-};
+  window.runHooks("wasabeeCrosslinksDone");
+}
 
-const onLinkAdded = (data) => {
+function onLinkAdded(data) {
   testLink(data.link, getSelectedOperation());
-};
+}
 
-/* probably unused now -- remove in 0.16
-const testForDeletedLinks = () => {
-  for (const layer of window.plugin.wasabee.crossLinkLayers.getLayers()) {
-    const guid = layer.options.guid;
-    if (!window.links[guid]) {
-      console.log("testForDeletedLinks FOUND SOMETHING!!!");
-      window.plugin.wasabee.crossLinkLayers.removeLayer(layer);
-      window.plugin.wasabee._crosslinkCache.delete(guid);
-    }
-  }
-}; */
-
-const onMapDataRefreshStart = () => {
+function onMapDataRefreshStart() {
   window.removeHook("linkAdded", onLinkAdded);
-};
+}
 
-const onMapDataRefreshEnd = () => {
+function onMapDataRefreshEnd() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
-  const operation = getSelectedOperation();
 
-  checkAllLinks(operation);
-  // testForDeletedLinks();
+  checkAllLinks();
   window.addHook("linkAdded", onLinkAdded);
-};
+}
 
-export const initCrossLinks = () => {
-  window.pluginCreateHook("wasabeeCrosslinks");
-  window.addHook("wasabeeCrosslinks", (operation) => {
-    checkAllLinks(operation);
+export function initCrossLinks() {
+  window.addHook("wasabeeCrosslinks", () => {
+    checkAllLinks();
   });
 
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
@@ -324,10 +330,7 @@ export const initCrossLinks = () => {
   window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
       window.plugin.wasabee._crosslinkCache = new Map();
-      const operation = getSelectedOperation();
-      if (operation) {
-        checkAllLinks(operation);
-      }
+      checkAllLinks();
     }
   });
 
@@ -341,7 +344,7 @@ export const initCrossLinks = () => {
 
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
-};
+}
 
 export class GeodesicLine {
   constructor(start, end) {
@@ -349,7 +352,7 @@ export class GeodesicLine {
     // let r2d = 180.0 / Math.PI; //eslint-disable-line
     // maths based on http://williams.best.vwh.net/avform.htm#Int
     if (start.lng == end.lng) {
-      throw "Error: cannot calculate latitude for meridians";
+      throw new Error("Error: cannot calculate latitude for meridians");
     }
     // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
     this.lat1 = start.lat * d2r;
@@ -399,4 +402,3 @@ export class GeodesicLine {
     return Math.atan2(y, x);
   }
 }
-//*** END CROSSLINK THINGS */'

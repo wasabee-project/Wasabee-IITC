@@ -4,6 +4,7 @@ import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
 import { getPortalDetails } from "../uiCommands";
+import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -12,17 +13,18 @@ const WasabeeDList = WDialog.extend({
 
   initialize: function (map = window.map, options) {
     this.type = WasabeeDList.TYPE;
-    this._me = WasabeeMe.get();
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },
 
-  addHooks: function () {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
     this._UIUpdateHook = () => {
       context.update();
     };
+    this._me = await WasabeeMe.waitGet();
     this._displayDialog();
     window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },

@@ -1,19 +1,29 @@
 // import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import { getSelectedOperation } from "./selectedOp";
-import { locationPromise } from "./server";
 import WasabeeMe from "./me";
 import wX from "./wX";
+import { opPromise, GetWasabeeServer, locationPromise } from "./server";
+import AuthDialog from "./dialogs/authDialog";
+import {
+  getSelectedOperation,
+  makeSelectedOperation,
+  opsList,
+  getOperationByID,
+  removeOperation,
+  changeOpIfNeeded,
+  duplicateOperation,
+} from "./selectedOp";
 
-export const addPortal = (operation, portal) => {
+export function addPortal(operation, portal) {
   if (!portal) {
-    return void alert(wX("SELECT PORTAL"));
+    alert(wX("SELECT PORTAL"));
+    return;
   }
   operation.addPortal(portal);
-};
+}
 
-export const swapPortal = (operation, portal) => {
+export function swapPortal(operation, portal) {
   const selectedPortal = WasabeePortal.getSelected();
   if (!selectedPortal) {
     alert(wX("SELECT PORTAL"));
@@ -30,13 +40,14 @@ export const swapPortal = (operation, portal) => {
   pr.appendChild(portal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat());
+  L.DomUtil.create("span", null, pr).textContent = "?";
   con.setup(wX("SWAP TITLE"), pr, () => {
     operation.swapPortal(portal, selectedPortal);
   });
   con.enable();
-};
+}
 
-export const deletePortal = (operation, portal) => {
+export function deletePortal(operation, portal) {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
@@ -45,9 +56,9 @@ export const deletePortal = (operation, portal) => {
     operation.removeAnchor(portal.id);
   });
   con.enable();
-};
+}
 
-export const deleteMarker = (operation, marker, portal) => {
+export function deleteMarker(operation, marker, portal) {
   const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
@@ -56,59 +67,72 @@ export const deleteMarker = (operation, marker, portal) => {
     operation.removeMarker(marker);
   });
   con.enable();
-};
+}
 
-export const clearAllItems = (operation) => {
+export function clearAllItems(operation) {
   const con = new ConfirmDialog();
   con.setup(
     `Clear: ${operation.name}`,
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     }
   );
   con.enable();
-};
+}
 
-export const clearAllLinks = (operation) => {
+export function clearAllLinks(operation) {
   const con = new ConfirmDialog();
   con.setup(
     `Clear Links: ${operation.name}`,
     `Do you want to remove all links from ${operation.name}?`,
     () => {
       operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks", operation);
+      window.runHooks("wasabeeCrosslinks");
     }
   );
   con.enable();
-};
+}
 
-export const listenForAddedPortals = (newPortal) => {
+export function clearAllMarkers(operation) {
+  const con = new ConfirmDialog();
+  con.setup(
+    `Clear Markers: ${operation.name}`,
+    `Do you want to remove all markers from ${operation.name}?`,
+    () => {
+      operation.clearAllMarkers();
+      window.runHooks("wasabeeCrosslinks");
+    }
+  );
+  con.enable();
+}
+
+export function listenForAddedPortals(newPortal) {
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
   op.updatePortal(WasabeePortal.fromIITC(newPortal.portal));
-};
+}
 
-export const listenForPortalDetails = (e) => {
+export function listenForPortalDetails(e) {
   if (!e.success) return;
   const op = getSelectedOperation();
   op.updatePortal(
-    new WasabeePortal(
-      e.guid,
-      e.details.title,
-      (e.details.latE6 / 1e6).toFixed(6),
-      (e.details.lngE6 / 1e6).toFixed(6)
-    )
+    new WasabeePortal({
+      id: e.guid,
+      name: e.details.title,
+      lat: (e.details.latE6 / 1e6).toFixed(6),
+      lng: (e.details.lngE6 / 1e6).toFixed(6),
+    })
   );
-};
+}
 
 // This is what should be called to add to the queue
 // can take either an entire array of portal GUID or a single GUID
 // this depends on something listening for the IITC PortalDetailsLoaded hook to process the result
 // see listenForPortalDetails above
-export const getPortalDetails = function (guid) {
+export function getPortalDetails(guid) {
   if (Array.isArray(guid)) {
     window.plugin.wasabee.portalDetailQueue = window.plugin.wasabee.portalDetailQueue.concat(
       guid
@@ -133,14 +157,14 @@ export const getPortalDetails = function (guid) {
         window.plugin.wasabee.portalDetailIntervalID
     );
   }
-};
+}
 
-const pdqDoNext = function () {
+function pdqDoNext() {
   const p = window.plugin.wasabee.portalDetailQueue.shift();
 
   // are we done?
   if (p === undefined) {
-    console.log(
+    console.debug(
       "closing portal details request queue: " +
         window.plugin.wasabee.portalDetailIntervalID
     );
@@ -152,9 +176,9 @@ const pdqDoNext = function () {
   if (p.length != 35) return; // ignore faked ones from DrawTools imports and other garbage
   // this is the bit everyone is so worried about
   window.portalDetail.request(p);
-};
+}
 
-export const loadFaked = function (operation, force = false) {
+export function loadFaked(operation, force = false) {
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
     false;
@@ -165,32 +189,33 @@ export const loadFaked = function (operation, force = false) {
   const f = new Array();
   for (const x of operation.fakedPortals) f.push(x.id);
   if (f.length > 0) getPortalDetails(f);
-};
+}
 
-export const sendLocation = () => {
+export function sendLocation() {
   if (!WasabeeMe.isLoggedIn()) return;
   const sl =
     localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY];
   if (sl !== "true") return;
 
   navigator.geolocation.getCurrentPosition(
-    (position) => {
-      locationPromise(position.coords.latitude, position.coords.longitude).then(
-        () => {
-          console.log(wX("LOCATION SUB"));
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
+    async (position) => {
+      try {
+        await locationPromise(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+        console.debug(wX("LOCATION SUB"));
+      } catch (e) {
+        console.error(e);
+      }
     },
     (err) => {
-      console.log(err);
+      console.error(err);
     }
   );
-};
+}
 
-export const getAllPortalsOnScreen = function (operation) {
+export function getAllPortalsOnScreen(operation) {
   const bounds = window.clampLatLngBounds(window.map.getBounds());
   const x = [];
   for (const portal in window.portals) {
@@ -208,18 +233,19 @@ export const getAllPortalsOnScreen = function (operation) {
     }
   }
   return x;
-};
+}
 
-const _isOnScreen = function (ll, bounds) {
+// const _isOnScreen = function (ll, bounds) {
+function _isOnScreen(ll, bounds) {
   return (
     ll.lat < bounds._northEast.lat &&
     ll.lng < bounds._northEast.lng &&
     ll.lat > bounds._southWest.lat &&
     ll.lng > bounds._southWest.lng
   );
-};
+}
 
-const _hasMarker = function (portalid, markerType, operation) {
+function _hasMarker(portalid, markerType, operation) {
   if (operation.markers.length == 0) return false;
   for (const m of operation.markers) {
     if (m.portalId == portalid && m.type == markerType) {
@@ -227,12 +253,12 @@ const _hasMarker = function (portalid, markerType, operation) {
     }
   }
   return false;
-};
+}
 
 // this is the test point used in several auto-draws
 // settings allow there to be several different due to
 // rouding errors resulting from long distances
-export const testPortal = function (recursed = false) {
+export function testPortal(recursed = false) {
   let urp =
     localStorage[
       window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
@@ -258,10 +284,10 @@ export const testPortal = function (recursed = false) {
 
   // if recrused and still getting garbage, we have a problem
   return parsed;
-};
+}
 
 // recursive function to auto-mark blockers
-export const blockerAutomark = function (operation, first = true) {
+export function blockerAutomark(operation, first = true) {
   if (first) operation.startBatchMode();
   // build count list
   const portals = new Array();
@@ -291,7 +317,7 @@ export const blockerAutomark = function (operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.runHooks("wasabeeUIUpdate", operation);
+    window.runHooks("wasabeeUIUpdate", "blockerAutomark");
     return;
   }
 
@@ -325,4 +351,55 @@ export const blockerAutomark = function (operation, first = true) {
   blockerAutomark(operation, false);
 
   if (first) operation.endBatchMode();
-};
+}
+
+export async function fullSync() {
+  const so = getSelectedOperation();
+  const server = GetWasabeeServer();
+
+  try {
+    const me = await WasabeeMe.waitGet(true);
+    const promises = new Array();
+    const opsID = new Set(me.Ops.map((o) => o.ID));
+
+    // delete operations absent from server unless the owner
+    const serverOps = new Set(
+      opsList()
+        .map(getOperationByID)
+        .filter((op) => op)
+        .filter((op) => op.server == server && !opsID.has(op.ID))
+    );
+    for (const op of serverOps) {
+      // if owned, duplicate the OP
+      if (op.IsOwnedOp()) {
+        const newop = duplicateOperation(op.ID);
+        newop.name = op.name;
+        newop.store();
+      }
+      removeOperation(op.ID);
+    }
+    if (serverOps.size > 0)
+      console.log(
+        "remove",
+        Array.from(serverOps).map((op) => op.ID)
+      );
+
+    for (const opID of opsID) {
+      promises.push(opPromise(opID));
+    }
+    const ops = await Promise.all(promises);
+    for (const newop of ops) newop.store();
+
+    // replace current op by the server version if any
+    if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
+    // change op if the current does not exist anymore
+    else if (!opsList().includes(so.ID)) changeOpIfNeeded();
+    // update UI to reflect new ops list
+    else window.runHooks("wasabeeUIUpdate");
+
+    alert(wX("SYNC DONE"));
+  } catch (e) {
+    console.error(e);
+    new AuthDialog().enable();
+  }
+}

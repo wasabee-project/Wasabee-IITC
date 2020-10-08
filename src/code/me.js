@@ -1,18 +1,46 @@
 import { mePromise } from "./server";
-import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeMe {
-  constructor() {
-    this.GoogleID = null;
-    this.IngressName = null;
-    this.Level = 0;
-    this.OwnedTeams = Array();
+  constructor(data) {
+    if (typeof data == "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+    this.GoogleID = data.GoogleID;
+    this.IngressName = data.IngressName;
+    this.Level = data.level ? data.level : 0;
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
     this.Assignments = Array();
+    this._teamMap = null;
+
+    if (data.Teams && data.Teams.length > 0) {
+      for (const team of data.Teams) {
+        this.Teams.push(team);
+      }
+    }
+    if (data.Ops && data.Ops.length > 0) {
+      for (const op of data.Ops) {
+        this.Ops.push(op);
+      }
+    }
+    if (data.Assignments && data.Assignments.length > 0) {
+      for (const assignment of data.Assignments) {
+        this.Assignments.push(assignment);
+      }
+    }
+    this.fetched = data.fetched ? data.fetched : Date.now();
+  }
+
+  static maxCacheAge() {
+    return Date.now() - 1000 * 60 * 60 * 24;
   }
 
   toJSON() {
@@ -26,12 +54,12 @@ export default class WasabeeMe {
     );
   }
 
+  // eslint-diable-next-line
   remove() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
   }
 
   static isLoggedIn() {
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     if (!lsme || typeof lsme !== "string") {
       return false;
@@ -40,118 +68,71 @@ export default class WasabeeMe {
     try {
       me = JSON.parse(lsme);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return false;
     }
-    if (me.fetched > maxCacheAge) {
+    if (me.fetched > WasabeeMe.maxCacheAge()) {
       return true;
     }
-    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    WasabeeMe.purge();
     return false;
   }
 
-  static get(force) {
+  // for when you need a cached value or nothing -- in critical code paths
+  static cacheGet() {
     let me = null;
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      // XXX this might be a problem, since create writes it back to localStore
-      me = WasabeeMe.create(lsme);
+      me = new WasabeeMe(lsme); // do not store
     }
     if (
       me === null ||
       me.fetched == undefined ||
-      me.fetched < maxCacheAge ||
-      force
+      me.fetched < WasabeeMe.maxCacheAge()
     ) {
-      mePromise().then(
-        function (nme) {
-          me = nme;
-          // mePromise calls WasabeeMe.create, which calls me.store()
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        },
-        function (err) {
-          console.log(err);
-          delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-          me = null;
-          alert(err);
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        }
-      );
+      WasabeeMe.purge();
+      return null;
     }
+
     return me;
   }
 
+  // use waitGet with "force == true" if you want a fresh value now
   static async waitGet(force) {
     let me = null;
-    const maxCacheAge = Date.now() - 1000 * 60 * 59;
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
 
     if (typeof lsme == "string") {
-      // XXX this might be a problem, since create writes it back to the store
-      me = WasabeeMe.create(lsme);
+      me = new WasabeeMe(lsme); // do not store
     }
     if (
       me === null ||
       me.fetched == undefined ||
-      me.fetched < maxCacheAge ||
+      me.fetched < WasabeeMe.maxCacheAge() ||
       force
     ) {
-      const newme = await mePromise();
-      if (newme instanceof WasabeeMe) {
+      try {
+        const response = await mePromise();
+        const newme = new WasabeeMe(response);
+        newme.store();
         me = newme;
-      } else {
-        delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-        console.log(newme);
-        alert(newme);
+      } catch (e) {
+        WasabeeMe.purge();
+        console.error(e);
+        alert(e.toString());
         me = null;
       }
-      window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+      window.runHooks("wasabeeUIUpdate", "me waitGet");
     }
     return me;
-  }
-
-  static create(data) {
-    if (!data) return null;
-    if (typeof data == "string") {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.log(e);
-        return null;
-      }
-    }
-    const wme = new WasabeeMe();
-    wme.GoogleID = data.GoogleID;
-    wme.IngressName = data.IngressName;
-    if (data.Teams !== null) {
-      for (const team of data.Teams) {
-        wme.Teams.push(team);
-      }
-    }
-    if (data.OwnedTeams && data.OwnedTeams.length > 0) {
-      for (const team of data.OwnedTeams) {
-        wme.OwnedTeams.push(team);
-      }
-    }
-    if (data.Ops && data.Ops.length > 0) {
-      for (const op of data.Ops) {
-        wme.Ops.push(op);
-      }
-    }
-    if (data.Assignments && data.Assignments.length > 0) {
-      for (const assignment of data.Assignments) {
-        wme.Assignments.push(assignment);
-      }
-    }
-    wme.fetched = data.fetched ? data.fetched : Date.now();
-    wme.store();
-    return wme;
   }
 
   static purge() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
+    delete localStorage["sentToServer"]; // resend firebase token on login
+
     if (window.plugin.wasabee._agentCache)
       window.plugin.wasabee._agentCache.clear();
     if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();
@@ -159,6 +140,29 @@ export default class WasabeeMe {
       window.plugin.wasabee._Dkeys.clear();
       window.runHooks("wasabeeDkeys");
     }
-    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+
+    window.runHooks("wasabeeUIUpdate", "me purge");
+  }
+
+  teamJoined(teamID) {
+    if (this._teamMap == null) this.makeTeamMap();
+    if (this._teamMap.has(teamID)) return true;
+    return false;
+  }
+
+  teamEnabled(teamID) {
+    if (this._teamMap == null) this.makeTeamMap();
+    if (this._teamMap.has(teamID)) {
+      const m = this._teamMap.get(teamID);
+      if (m == "On") return true;
+    }
+    return false;
+  }
+
+  makeTeamMap() {
+    this._teamMap = new Map();
+    for (const t of this.Teams) {
+      this._teamMap.set(t.ID, t.State);
+    }
   }
 }

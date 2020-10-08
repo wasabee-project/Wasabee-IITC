@@ -4,6 +4,7 @@ import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const NewopDialog = WDialog.extend({
   statics: {
@@ -13,6 +14,7 @@ const NewopDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = NewopDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: NewopDialog.TYPE });
   },
 
   addHooks: function () {
@@ -42,15 +44,14 @@ const NewopDialog = WDialog.extend({
       const addDialog = new PromptDialog(this._map);
       addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {
         if (addDialog.inputField.value) {
-          const newop = new WasabeeOp(
-            PLAYER.nickname,
-            addDialog.inputField.value,
-            true
-          );
+          const newop = new WasabeeOp({
+            creator: PLAYER.nickname,
+            name: addDialog.inputField.value,
+          });
           newop.store();
           makeSelectedOperation(newop.ID);
-          window.runHooks("wasabeeUIUpdate", newop);
-          window.runHooks("wasabeeCrosslinks", newop);
+          window.runHooks("wasabeeUIUpdate");
+          window.runHooks("wasabeeCrosslinks");
         } else {
           alert(wX("OP_NAME_UNSET"));
         }

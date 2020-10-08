@@ -5,6 +5,7 @@ import WasabeeTeam from "../team";
 import WasabeeMe from "../me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const OpPermList = WDialog.extend({
   statics: {
@@ -14,20 +15,22 @@ const OpPermList = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = OpPermList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: OpPermList.TYPE });
   },
 
   addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
 
@@ -39,30 +42,39 @@ const OpPermList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  update: function (op) {
+  update: async function () {
+    const operation = getSelectedOperation();
+    if (this._opID != operation.ID) {
+      this._opID = operation.ID;
+      console.warn("operation changed while perm dialog open");
+    }
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
-      this._me = WasabeeMe.get();
+      this._me = await WasabeeMe.waitGet();
     }
 
-    this._operation = op;
-    this.buildTable();
+    this.buildTable(operation);
     this._html.firstChild.replaceWith(this._table.table);
   },
 
   _displayDialog: function () {
     if (!this._map) return;
 
-    this.buildTable();
+    const operation = getSelectedOperation();
+
+    this.buildTable(operation);
 
     this._html = L.DomUtil.create("div", null);
 
     this._html.appendChild(this._table.table);
-    if (this._me && this._operation.IsOwnedOp()) {
+    if (this._me && operation.IsOwnedOp()) {
+      const already = new Set();
+      for (const a of operation.teamlist) already.add(a.teamid);
+
       const addArea = L.DomUtil.create("div", null, this._html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
-        if (t.State != "On") continue;
+        // if (already.has(t.ID)) continue;
         const o = L.DomUtil.create("option", null, teamMenu);
         o.value = t.ID;
         o.textContent = t.Name;
@@ -77,6 +89,17 @@ const OpPermList = WDialog.extend({
       const ao = L.DomUtil.create("option", null, permMenu);
       ao.value = "assignedonly";
       ao.textContent = wX("ASSIGNED_ONLY");
+
+      const zoneMenu = L.DomUtil.create("select", null, addArea);
+      const zoneAll = L.DomUtil.create("option", null, zoneMenu);
+      zoneAll.value = "0";
+      zoneAll.textContent = "All";
+      for (const oz of operation.zones) {
+        const z = L.DomUtil.create("option", null, zoneMenu);
+        z.value = oz.id;
+        z.textContent = oz.name;
+      }
+
       const ab = L.DomUtil.create("button", null, addArea);
       ab.type = "button";
       ab.name = "Add";
@@ -85,7 +108,7 @@ const OpPermList = WDialog.extend({
 
       L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
-        this.addPerm(teamMenu.value, permMenu.value);
+        this.addPerm(teamMenu.value, permMenu.value); // async, but no need to await
         // addPerm calls wasabeeUIUpdate, which redraws the screen
       });
     }
@@ -96,7 +119,7 @@ const OpPermList = WDialog.extend({
     };
 
     this._dialog = window.dialog({
-      title: wX("PERMS", this._operation.name),
+      title: wX("PERMS", operation.name),
       html: this._html,
       height: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-perms",
@@ -109,20 +132,22 @@ const OpPermList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  // needs this._operation.teamlist;
-  buildTable: function () {
+  buildTable: function (operation) {
     this._table = new Sortable();
     this._table.fields = [
       {
         name: wX("TEAM"),
         value: (perm) => {
-          const t = WasabeeTeam.get(perm.teamid);
+          // try the team cache first
+          const t = WasabeeTeam.cacheGet(perm.teamid);
           if (t) return t.name;
+          // check the "me" list
           if (this._me) {
             for (const mt of this._me.Teams) {
-              if (mt.ID == perm.teamid) return mt.Name + " (off)";
+              if (mt.ID == perm.teamid) return mt.Name;
             }
           }
+          // default to the id
           return "[" + perm.teamid + "]";
         },
         sort: (a, b) => a.localeCompare(b),
@@ -131,6 +156,12 @@ const OpPermList = WDialog.extend({
       {
         name: wX("ROLE"),
         value: (perm) => perm.role,
+        sort: (a, b) => a.localeCompare(b),
+        // , format: (cell, value) => (cell.textContent = value)
+      },
+      {
+        name: "Zone",
+        value: (perm) => operation.zoneName(perm.zone),
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
@@ -147,67 +178,59 @@ const OpPermList = WDialog.extend({
           link.textContent = value;
           L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
-            this.delPerm(obj); // calls wasabeeUIUpdate
+            this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
           });
         },
       });
     }
     this._table.sortBy = 0;
-    this._table.items = this._operation.teamlist;
+    this._table.items = operation.teamlist;
   },
 
-  addPerm: function (teamID, role) {
+  addPerm: async function (teamID, role, zone) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
-    for (const p of this._operation.teamlist) {
-      if (p.teamid == teamID && p.role == role) {
-        console.log("not adding duplicate");
-        window.runHooks("wasabeeUIUpdate", this._operation);
+    const operation = getSelectedOperation();
+    for (const p of operation.teamlist) {
+      if (p.teamid == teamID && p.role == role && p.zone == zone) {
+        console.warn("not adding duplicate permission");
+        window.runHooks("wasabeeUIUpdate");
         return;
       }
     }
-    // send to server
-    addPermPromise(this._operation.ID, teamID, role).then(
-      () => {
-        // then add locally for display
-        this._operation.teamlist.push({
-          teamid: teamID,
-          role: role,
-        });
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
-      }
-    );
+    try {
+      await addPermPromise(operation.ID, teamID, role, zone);
+      // add locally for display
+      operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
+      operation.store();
+      window.runHooks("wasabeeUIUpdate");
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+    }
   },
 
-  delPerm: function (obj) {
+  delPerm: async function (obj) {
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
-    // send change to server
-    delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
-      () => {
-        // then remove locally for display
-        const n = new Array();
-        for (const p of this._operation.teamlist) {
-          if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
-        }
-        this._operation.teamlist = n;
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
+    const operation = getSelectedOperation();
+    try {
+      await delPermPromise(operation.ID, obj.teamid, obj.role);
+      const n = new Array();
+      for (const p of operation.teamlist) {
+        if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
       }
-    );
+      operation.teamlist = n;
+      operation.store();
+      window.runHooks("wasabeeUIUpdate");
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+    }
   },
 });
 

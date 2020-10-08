@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import {
-  teamPromise,
   removeAgentFromTeamPromise,
   setAgentTeamSquadPromise,
   addAgentToTeamPromise,
@@ -8,12 +7,16 @@ import {
   rocksPromise,
   deleteTeamPromise,
   GetWasabeeServer,
+  deleteJoinLinkPromise,
+  createJoinLinkPromise,
 } from "../server";
+import WasabeeMe from "../me";
+import WasabeeTeam from "../team";
 import Sortable from "../../lib/sortable";
-import { getSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
+import { postToFirebase } from "../firebaseSupport";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = WDialog.extend({
@@ -24,14 +27,15 @@ const ManageTeamDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = ManageTeamDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: ManageTeamDialog.TYPE });
   },
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const context = this;
     // magic context incantation to make "this" work...
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -42,7 +46,7 @@ const ManageTeamDialog = WDialog.extend({
     window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  setup: function (team) {
+  setup: async function (team) {
     this._team = team;
     this._table = new Sortable();
     this._table.fields = [
@@ -53,7 +57,7 @@ const ManageTeamDialog = WDialog.extend({
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay()),
       },
       {
-        name: "Enabled",
+        name: wX("TEAM STATE"),
         value: (agent) => agent.state,
         sort: (a, b) => a && !b,
         // , format: (cell, value) => (cell.textContent = value)
@@ -68,28 +72,30 @@ const ManageTeamDialog = WDialog.extend({
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
             const squadDialog = new PromptDialog(window.map);
-            squadDialog.setup(`Set Squad for ${obj.name}`, "Squad", () => {
-              if (squadDialog.inputField.value) {
-                setAgentTeamSquadPromise(
-                  obj.id,
-                  this._team.ID,
-                  squadDialog.inputField.value
-                ).then(
-                  () => {
-                    window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+            squadDialog.setup(
+              `Set Squad for ${obj.name}`,
+              "Squad",
+              async () => {
+                if (squadDialog.inputField.value) {
+                  try {
+                    await setAgentTeamSquadPromise(
+                      obj.id,
+                      this._team.ID,
+                      squadDialog.inputField.value
+                    );
+                    window.runHooks("wasabeeUIUpdate");
                     alert(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
-                  },
-                  (reject) => {
-                    console.log(reject);
-                    alert(reject);
+                  } catch (e) {
+                    console.error(e);
+                    alert(e.toString());
                   }
-                );
-              } else {
-                alert(wX("INPUT_SQUAD_NAME"));
+                } else {
+                  alert(wX("INPUT_SQUAD_NAME"));
+                }
               }
-            });
+            );
             squadDialog.current = value;
             squadDialog.placeholder = "boots";
             squadDialog.enable();
@@ -100,37 +106,40 @@ const ManageTeamDialog = WDialog.extend({
         name: wX("REMOVE"),
         value: (agent) => agent.id,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value) => {
-          const button = L.DomUtil.create("a", null, cell);
+        format: (cell, value, obj) => {
+          const button = L.DomUtil.create("button", null, cell);
           button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            removeAgentFromTeamPromise(value, this._team.ID).then(
-              () => {
-                window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-              },
-              (reject) => {
-                alert(reject);
-                console.log(reject);
+            const con = new ConfirmDialog();
+            con.setup(
+              `${button.textContent}: ${obj.name}`,
+              `${button.textContent}: ${obj.name}?`,
+              async () => {
+                try {
+                  await removeAgentFromTeamPromise(value, this._team.ID);
+                } catch (e) {
+                  console.error(e);
+                }
+                window.runHooks("wasabeeUIUpdate");
               }
             );
+            con.enable();
           });
         },
       },
     ];
     this._table.sortBy = 0;
 
-    teamPromise(team.ID).then(
-      (teamdata) => {
-        if (teamdata.agents && teamdata.agents.length > 0) {
-          this._table.items = teamdata.agents;
-        }
-      },
-      (reject) => {
-        console.log(reject);
-        alert(reject);
+    try {
+      // max 5 seconds cache for this screen
+      const teamdata = await WasabeeTeam.waitGet(team.ID, 5);
+      if (teamdata.agents && teamdata.agents.length > 0) {
+        this._table.items = teamdata.agents;
       }
-    );
+    } catch (e) {
+      console.error(e);
+    }
   },
 
   update: function () {
@@ -152,18 +161,16 @@ const ManageTeamDialog = WDialog.extend({
     addField.placeholder = wX("INGNAME_GID");
     const addButton = L.DomUtil.create("button", null, container);
     addButton.textContent = wX("ADD");
-    L.DomEvent.on(addButton, "click", (ev) => {
+    L.DomEvent.on(addButton, "click", async (ev) => {
       L.DomEvent.stop(ev);
-      addAgentToTeamPromise(addField.value, this._team.ID).then(
-        () => {
-          alert(wX("ADD_SUCC_INSTR"));
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        },
-        (reject) => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+      try {
+        await addAgentToTeamPromise(addField.value, this._team.ID);
+        alert(wX("ADD_SUCC_INSTR"));
+        window.runHooks("wasabeeUIUpdate");
+      } catch (e) {
+        console.error(e);
+        alert(e.toString());
+      }
     });
 
     const renamelabel = L.DomUtil.create("label", null, container);
@@ -173,19 +180,17 @@ const ManageTeamDialog = WDialog.extend({
     renameField.value = this._team.Name;
     const renameButton = L.DomUtil.create("button", null, container);
     renameButton.textContent = wX("RENAME");
-    L.DomEvent.on(renameButton, "click", (ev) => {
+    L.DomEvent.on(renameButton, "click", async (ev) => {
       L.DomEvent.stop(ev);
-      renameTeamPromise(this._team.ID, renameField.value).then(
-        () => {
-          alert(`renamed to ${renameField.value}`);
-          this._team.Name = renameField.value; // for display
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        },
-        (reject) => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+      try {
+        await renameTeamPromise(this._team.ID, renameField.value);
+        alert(`renamed to ${renameField.value}`);
+        this._team.Name = renameField.value; // for display
+        window.runHooks("wasabeeUIUpdate");
+      } catch (e) {
+        console.error(e);
+        alert(e.toString());
+      }
     });
 
     const rockslabel = L.DomUtil.create("label", null, container);
@@ -200,25 +205,51 @@ const ManageTeamDialog = WDialog.extend({
     if (this._team.RocksKey) rocksapiField.value = this._team.RocksKey;
     const rocksButton = L.DomUtil.create("button", null, container);
     rocksButton.textContent = wX("SET");
-    L.DomEvent.on(rocksButton, "click", (ev) => {
+    L.DomEvent.on(rocksButton, "click", async (ev) => {
       L.DomEvent.stop(ev);
-      rocksPromise(
-        this._team.ID,
-        rockscommField.value,
-        rocksapiField.value
-      ).then(
-        () => {
-          alert(`updated rocks info`);
-          this._team.RocksComm = rockscommField.value; // for display
-          this._team.RocksKey = rocksapiField.value; // for display
-          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-        },
-        (reject) => {
-          console.log(reject);
-          alert(reject);
-        }
-      );
+      try {
+        await rocksPromise(
+          this._team.ID,
+          rockscommField.value,
+          rocksapiField.value
+        );
+        alert("updated rocks info");
+        this._team.RocksComm = rockscommField.value; // for display
+        this._team.RocksKey = rocksapiField.value; // for display
+        window.runHooks("wasabeeUIUpdate");
+      } catch (e) {
+        console.error(e);
+        alert(e.toString());
+      }
     });
+
+    const joinlinklabel = L.DomUtil.create("label", null, container);
+    joinlinklabel.textContent = "Join Link";
+    if (this._team.JoinLinkToken != "") {
+      const joinlink = L.DomUtil.create("a", null, container);
+      const server = GetWasabeeServer();
+      joinlink.href = `${server}/api/v1/team/${this._team.ID}/join/${this._team.JoinLinkToken}`;
+      joinlink.textContent = joinlink.href;
+      const joinlinkdel = L.DomUtil.create("button", null, container);
+      joinlinkdel.textContent = "Revoke";
+      L.DomEvent.on(joinlinkdel, "click", async (ev) => {
+        L.DomEvent.stop(ev);
+        await deleteJoinLinkPromise(this._team.ID);
+        this._team.JoinLinkToken = "";
+        window.runHooks("wasabeeUIUpdate");
+      });
+    } else {
+      L.DomUtil.create("span", null, container).textContent = "not set";
+      const joinlinkadd = L.DomUtil.create("button", null, container);
+      joinlinkadd.textContent = "Create";
+      L.DomEvent.on(joinlinkadd, "click", async (ev) => {
+        L.DomEvent.stop(ev);
+        const response = await createJoinLinkPromise(this._team.ID);
+        const j = JSON.parse(response);
+        this._team.JoinLinkToken = j.Key;
+        window.runHooks("wasabeeUIUpdate");
+      });
+    }
 
     const removeLabel = L.DomUtil.create("label", null, container);
     removeLabel.textContent = wX("REMOVE_TEAM");
@@ -230,17 +261,16 @@ const ManageTeamDialog = WDialog.extend({
       cd.setup(
         wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
         wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
-        () => {
-          deleteTeamPromise(this._team.ID).then(
-            () => {
-              alert(`${this._team.Name} removed`);
-              window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            },
-            (reject) => {
-              console.log(reject);
-              alert(reject);
-            }
-          );
+        async () => {
+          try {
+            await deleteTeamPromise(this._team.ID);
+            alert(`${this._team.Name} removed`);
+            this._dialog.dialog("close");
+            await WasabeeMe.waitGet(true);
+          } catch (e) {
+            console.error(e);
+            alert(e.toString());
+          }
         }
       );
       cd.enable();

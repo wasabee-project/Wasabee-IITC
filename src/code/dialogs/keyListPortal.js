@@ -1,9 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
-import { agentPromise } from "../server";
+import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import WasabeeMe from "../me";
+import { postToFirebase } from "../firebaseSupport";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -13,14 +13,15 @@ const KeyListPortal = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = KeyListPortal.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: KeyListPortal.TYPE });
   },
 
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.keyListUpdate(newOpData);
+    this._UIUpdateHook = () => {
+      context.keyListUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -33,8 +34,9 @@ const KeyListPortal = WDialog.extend({
 
   setup: function (portalID) {
     this._portalID = portalID;
-    this._operation = getSelectedOperation();
-    this._portal = this._operation.getPortal(portalID);
+    const op = getSelectedOperation();
+    this._opID = op.ID;
+    this._portal = op.getPortal(portalID);
     this._sortable = this.getSortable();
   },
 
@@ -44,10 +46,9 @@ const KeyListPortal = WDialog.extend({
       return;
     }
 
-    if (!WasabeeMe.isLoggedIn()) {
-      this.disable();
-      alert("log in to see key detail");
-      return;
+    const op = getSelectedOperation();
+    if (this._opID != op.ID) {
+      console.log("this._opID != op.ID");
     }
 
     const buttons = {};
@@ -57,7 +58,7 @@ const KeyListPortal = WDialog.extend({
 
     this._dialog = window.dialog({
       title: wX("PORTAL KEY LIST", this._portal.displayName),
-      html: this.getListDialogContent(this._operation, this._portalID),
+      html: this.getListDialogContent(op, this._portalID),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
@@ -69,8 +70,9 @@ const KeyListPortal = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  keyListUpdate: function (operation) {
-    if (operation.ID != this._operation.ID) {
+  keyListUpdate: function () {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) {
       this._dialog.dialog("close"); // op changed, bail
     }
     const table = this.getListDialogContent(operation, this._portalID);
@@ -85,7 +87,7 @@ const KeyListPortal = WDialog.extend({
         value: (key) => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
-          const agent = await agentPromise(key.gid);
+          const agent = await WasabeeAgent.waitGet(key.gid);
           cell.textContent = agent.name;
         },
       },

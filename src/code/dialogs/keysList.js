@@ -5,6 +5,7 @@ import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const KeysList = WDialog.extend({
   statics: {
@@ -14,19 +15,21 @@ const KeysList = WDialog.extend({
   initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
     this.type = KeysList.TYPE;
+    postToFirebase({ id: "analytics", action: KeysList.TYPE });
   },
 
-  addHooks: function () {
+  addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
+    this._UIUpdateHook = () => {
+      context.update();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     if (WasabeeMe.isLoggedIn()) {
-      this._me = WasabeeMe.get();
+      this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }
@@ -39,14 +42,15 @@ const KeysList = WDialog.extend({
   },
 
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
 
     this._dialog = window.dialog({
-      title: wX("KEY_LIST2", this._operation.name),
-      html: this.getListDialogContent(this._operation).table,
+      title: wX("KEY_LIST2", operation.name),
+      html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
       closeCallback: () => {
@@ -58,8 +62,10 @@ const KeysList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function (operation) {
-    if (operation.ID != this._operation.ID) this._operation = operation;
+  update: function () {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) console.log("operation changed");
+
     this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
@@ -84,8 +90,8 @@ const KeysList = WDialog.extend({
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           cell.textContent = value;
-          const oh = parseInt(key.onHand);
-          const req = parseInt(key.Required);
+          const oh = parseInt(key.onHand, 10);
+          const req = parseInt(key.Required, 10);
           if (oh >= req) {
             L.DomUtil.addClass(cell, "enough");
           } else {
@@ -95,7 +101,7 @@ const KeysList = WDialog.extend({
       },
       {
         name: wX("ON_HAND"),
-        value: (key) => parseInt(key.onHand),
+        value: (key) => parseInt(key.onHand, 10),
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
@@ -118,14 +124,15 @@ const KeysList = WDialog.extend({
       sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
-          value: (key) => parseInt(key.iHave),
+          value: (key) => parseInt(key.iHave, 10),
           // sort: (a, b) => a - b,
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
+              if (operation.IsServerOp())
+                opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
             cell.appendChild(oif);
@@ -140,7 +147,8 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
+              if (operation.IsServerOp())
+                opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });
             cell.appendChild(oif);

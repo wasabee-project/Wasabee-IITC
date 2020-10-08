@@ -4,36 +4,59 @@
  * This way we can setup a service worker under a domain we control and
  * simply pass the messages along using window.parent.postMessage.
  */
-import { drawAgents } from "./mapDrawing";
+import { drawSingleTeam } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
-import { makeSelectedOperation, getSelectedOperation } from "./selectedOp";
+import {
+  makeSelectedOperation,
+  getSelectedOperation,
+  removeOperation,
+  loadNewDefaultOp,
+} from "./selectedOp";
+import WasabeePortal from "./portal";
 
-export const initFirebase = () => {
+// TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
+
+const frameID = "wasabeeFirebaseFrame";
+
+export function initFirebase() {
   const server = GetWasabeeServer();
 
   const iframe = L.DomUtil.create("iframe");
   iframe.width = 0;
   iframe.height = 0;
   iframe.src = server + "/static/firebase/index.html";
+  iframe.id = frameID;
 
   $(document.body).append(iframe);
 
-  window.addEventListener("message", (event) => {
+  window.addEventListener("message", async (event) => {
     // ignore anything not from our server
     if (event.origin.indexOf(server) === -1) return;
 
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
+      case "Agent Location Change":
+        console.debug("firebase update of agent location: ", event.data.data);
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        drawSingleTeam(event.data.data.msg);
+        break;
+      case "Delete":
+        console.warn("server requested op delete: ", event.data.data.opID);
+        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
+        removeOperation(event.data.data.opID);
+        break;
       case "Generic Message":
         alert(JSON.stringify(event.data.data));
         break;
-      case "Agent Location Change":
-        console.log("firebase update of agent location: ", event.data.data);
-        drawAgents();
+      case "Login":
+        // display to console somehow?
+        console.debug("server reported teammate login: ", event.data.data.gid);
+        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       case "Map Change":
-        opPromise(event.data.data.opID).then(
-          function (refreshed) {
+        if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
+          try {
+            const refreshed = await opPromise(event.data.data.opID);
             refreshed.store();
             if (refreshed.ID == operation.ID) {
               console.log(
@@ -41,19 +64,52 @@ export const initFirebase = () => {
                 event.data.data
               );
               makeSelectedOperation(refreshed.ID);
+            } else {
+              console.debug(
+                "firebase trigger update of op",
+                event.data.data.opID
+              );
             }
-          },
-          function (err) {
-            console.log(err);
+          } catch (e) {
+            console.error(e);
           }
-        );
+        } else {
+          console.debug(
+            "skipping firebase requested update of op since it was our change",
+            event.data.data.updateID
+          );
+        }
         break;
-      case "Login":
-        // display to console somehow?
-        console.log("server reported teammate login: ", event.data.data.gid);
+      case "Target":
+        try {
+          const target = JSON.parse(event.data.data.msg);
+          const raw = {
+            id: target.ID,
+            name: target.Name,
+            lat: target.Lat,
+            lng: target.Lon,
+          };
+          const portal = new WasabeePortal(raw);
+          const f = portal.displayFormat();
+          alert(f.outerHTML + "<br>Sent by: " + target.Sender, true);
+        } catch (e) {
+          console.error(e);
+        }
         break;
       default:
-        console.log("unknown firebase command: ", event.data.data);
+        console.warn("unknown firebase command: ", event.data.data);
     }
   });
-};
+}
+
+export function postToFirebase(message) {
+  // prevent analytics data from being sent if not enabled by the user: GPDR
+  if (
+    message.id == "analytics" &&
+    localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
+      "true"
+  )
+    return;
+
+  window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
+}

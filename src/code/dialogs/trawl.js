@@ -5,6 +5,7 @@ import { blockerAutomark } from "../uiCommands";
 // why trust my own math when someone else has done the work?
 import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
 // import { datums } from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-datum";
+import { postToFirebase } from "../firebaseSupport";
 
 const TrawlDialog = WDialog.extend({
   statics: {
@@ -14,6 +15,7 @@ const TrawlDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
     this.type = TrawlDialog.TYPE;
+    postToFirebase({ id: "analytics", action: TrawlDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -83,20 +85,30 @@ const TrawlDialog = WDialog.extend({
 
   // define our work in _displayDialog
   _displayDialog: function () {
+    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
+    if (mode != "design") {
+      console.log("switching to design mode for trawl");
+      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
+    }
+
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
     const clearLabel = L.DomUtil.create("label", null, options);
     clearLabel.textContent = wX("TRAWL_CLEAR_MARKERS");
-    const clearMarkers = L.DomUtil.create("input", null, clearLabel);
+    clearLabel.htmlFor = "wasabee-trawl-clear";
+    const clearMarkers = L.DomUtil.create("input", null, options);
     clearMarkers.type = "checkbox";
     clearMarkers.checked = false;
+    clearMarkers.id = "wasabee-trawl-clear";
 
     const amLabel = L.DomUtil.create("label", null, options);
     amLabel.textContent = wX("TRAWL_AUTOMARK");
-    this.automark = L.DomUtil.create("input", null, amLabel);
+    amLabel.htmlFor = "wasabee-trawl-automark";
+    this.automark = L.DomUtil.create("input", null, options);
     this.automark.type = "checkbox";
     this.automark.checked = false;
+    this.automark.id = "wasabee-trawl-automark";
 
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");

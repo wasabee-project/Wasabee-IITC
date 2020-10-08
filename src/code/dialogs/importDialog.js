@@ -1,10 +1,10 @@
 import WasabeeOp from "../operation";
 import WasabeePortal from "../portal";
 import { WDialog } from "../leafletClasses";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
-import OperationChecklistDialog from "./operationChecklistDialog";
+import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
-// import { pointTileDataRequest } from "../uiCommands";
+import { postToFirebase } from "../firebaseSupport";
+import { makeSelectedOperation } from "../selectedOp";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -14,6 +14,7 @@ const ImportDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = ImportDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: ImportDialog.TYPE });
   },
 
   addHooks: function () {
@@ -69,10 +70,8 @@ const ImportDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-        // XXX is this still necessary?
-        const newop = getSelectedOperation();
-        window.runHooks("wasabeeUIUpdate", newop);
-        window.runHooks("wasabeeCrosslinks", newop);
+        window.runHooks("wasabeeUIUpdate");
+        window.runHooks("wasabeeCrosslinks");
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });
@@ -129,18 +128,22 @@ const ImportDialog = WDialog.extend({
     // assume a Wasabee op
     try {
       const data = JSON.parse(string);
-      const importedOp = WasabeeOp.create(data);
+      const importedOp = new WasabeeOp(data);
       importedOp.store();
       makeSelectedOperation(importedOp.ID);
       alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
     } catch (e) {
-      console.warn("WasabeeTools: failed to import data: " + e);
+      console.error("WasabeeTools: failed to import data", e);
       alert(wX("IMP_NOPE"));
     }
   },
 
   parseDrawTools(string) {
-    const newop = new WasabeeOp();
+    // name is overwritten above
+    const newop = new WasabeeOp({
+      creator: PLAYER.nickname,
+      name: "draw tools imported",
+    });
     // Don't check crosslink or save on each portal/link add
     newop.startBatchMode();
 
@@ -148,8 +151,8 @@ const ImportDialog = WDialog.extend({
     try {
       data = JSON.parse(string);
     } catch (e) {
-      console.warn("Failed parseDrawTools: " + e);
-      alert(e);
+      console.error("Failed parseDrawTools", e);
+      alert(e.toString());
       return null;
     }
 

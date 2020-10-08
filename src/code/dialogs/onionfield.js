@@ -5,6 +5,7 @@ import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const OnionfieldDialog = WDialog.extend({
   statics: {
@@ -105,19 +106,21 @@ const OnionfieldDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
-    this._operation = getSelectedOperation();
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor = WasabeePortal.create(p);
+    if (p) this._anchor = new WasabeePortal(p);
+    postToFirebase({ id: "analytics", action: OnionfieldDialog.TYPE });
   },
 
   onion: function () {
+    // this._operation is OK here
+    this._operation = getSelectedOperation();
     if (!this._anchor) {
       alert("no anchor selected");
       return;
     }
     this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.static.layerTypes) {
+    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
       this._colors.push(k);
       this._trash = c;
     }
@@ -159,10 +162,6 @@ const OnionfieldDialog = WDialog.extend({
   _recurser: function (portalsRemaining, thisPath, one, two, three) {
     this._colorIterator = (this._colorIterator + 1) % this._colors.length;
     this._color = this._colors[this._colorIterator];
-    if (this._color.name == "self-block") {
-      this._colorIterator = (this._colorIterator + 1) % this._colors.length;
-      this._color = this._colors[this._colorIterator];
-    }
 
     // build a map of all portals still in-play
     const m = new Map();
@@ -181,7 +180,7 @@ const OnionfieldDialog = WDialog.extend({
     }
     // sort by distance
     const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
-    if (sorted.length == 0) return;
+    if (sorted.length == 0) return null;
 
     // for each of the portals in play
     for (const [k, wp] of sorted) {
@@ -195,7 +194,10 @@ const OnionfieldDialog = WDialog.extend({
       // do the intial field
       if (!two) {
         portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
-        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        const a = new WasabeeLink(
+          { fromPortalId: one.id, toPortalId: wp.id },
+          this._operation
+        );
         a.color = this._color;
         a.throwOrderPos = 1;
         thisPath.push(a);
@@ -203,11 +205,17 @@ const OnionfieldDialog = WDialog.extend({
       }
       if (!three) {
         portalsRemaining = this._removeFromList(portalsRemaining, wp.id);
-        const a = new WasabeeLink(this._operation, one.id, wp.id);
+        const a = new WasabeeLink(
+          { fromPortalId: one.id, toPortalId: wp.id },
+          this._operation
+        );
         a.color = this._color;
         a.throwOrderPos = 2;
         thisPath.push(a);
-        const b = new WasabeeLink(this._operation, two.id, wp.id);
+        const b = new WasabeeLink(
+          { fromPortalId: two.id, toPortalId: wp.id },
+          this._operation
+        );
         b.color = this._color;
         b.throwOrderPos = 3;
         thisPath.push(b);
@@ -217,9 +225,18 @@ const OnionfieldDialog = WDialog.extend({
       // initial field done
 
       // create the three links, this does not add them to the operation
-      const a = new WasabeeLink(this._operation, one.id, wp.id);
-      const b = new WasabeeLink(this._operation, two.id, wp.id);
-      const c = new WasabeeLink(this._operation, three.id, wp.id);
+      const a = new WasabeeLink(
+        { fromPortalId: one.id, toPortalId: wp.id },
+        this._operation
+      );
+      const b = new WasabeeLink(
+        { fromPortalId: two.id, toPortalId: wp.id },
+        this._operation
+      );
+      const c = new WasabeeLink(
+        { fromPortalId: three.id, toPortalId: wp.id },
+        this._operation
+      );
       a.color = this._color;
       b.color = this._color;
       c.color = this._color;

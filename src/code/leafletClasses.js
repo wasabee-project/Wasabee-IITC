@@ -41,6 +41,7 @@ export const WDialog = L.Handler.extend({
     this.type = "Unextended Wasabee Dialog";
     this._map = map;
     this._container = map._container;
+    this.options = {};
     L.Util.extend(this.options, options);
     this._enabled = false;
     this._smallScreen = this._isMobile();
@@ -142,38 +143,49 @@ export const WButton = L.Class.extend({
 
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);
+      img.id = this.type;
       img.src = options.buttonImage;
     }
 
-    if (options.title) link.title = options.title;
+    if (options.title) {
+      link.title = options.title;
+    }
 
-    L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
-      .on(link, "mousedown", L.DomEvent.stopPropagation)
-      .on(link, "dblclick", L.DomEvent.stopPropagation)
-      .on(link, "click", L.DomEvent.preventDefault)
-      .on(link, "click", options.callback, options.context);
+    if (this._isTouch()) {
+      L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
+        .on(link, "touchstart", L.DomEvent.preventDefault)
+        .on(link, "touchstart", this.touchstart, options.context)
+        .on(link, "touchend", this.touchend, options.context)
+        .on(link, "touchmove", this.touchmove, options.context);
+    } else {
+      L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
+        .on(link, "mousedown", L.DomEvent.stopPropagation)
+        .on(link, "dblclick", L.DomEvent.stopPropagation)
+        .on(link, "click", L.DomEvent.preventDefault)
+        .on(link, "click", options.callback, options.context);
+    }
 
-    /* 
-    L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
-      .on(link, "touchstart", L.DomEvent.preventDefault)
-      .on(link, "touchstart", this.touchstart, options.context)
-      .on(link, "touchend", this.touchend, options.context); */
     return link;
   },
 
-  touchstart: function () {
-    console.log("Wbutton touchstart");
-    // console.log(ev);
+  _touches: null,
+
+  touchstart: function (ev) {
+    this._touches = ev.changedTouches[0].target.id;
+    console.log("first touch", this._touches);
+    if (!this._enabled) this.enable();
   },
 
   touchend: function (ev) {
-    console.log("Wbutton touchend");
-    console.log(ev);
-    console.log(this);
-    if (this._enabled) {
-      this.disable();
-    } else {
-      this.enable();
+    this._touches = ev.changedTouches[0].target.id;
+    console.log("last touch target", this._touches);
+    if (this._enabled) this.disable();
+  },
+
+  touchmove: function (ev) {
+    if (ev.changedTouches[0].target.id != this._touches) {
+      this._touches = ev.changedTouches[0].target.id;
+      console.log("new touch target", this._touches);
     }
   },
 
@@ -183,11 +195,19 @@ export const WButton = L.Class.extend({
       .off(button, "mousedown", L.DomEvent.stopPropagation)
       .off(button, "dblclick", L.DomEvent.stopPropagation)
       .off(button, "click", L.DomEvent.preventDefault)
+      .off(button, "touchstart", L.DomEvent.preventDefault)
+      .off(button, "touchend", L.DomEvent.preventDefault)
       .off(button, "click", callback);
   },
 
   _createSubActions: function (buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
+    L.DomEvent.on(container, "touchenter", (ev) => {
+      console.log("touchenter", ev);
+    });
+    L.DomEvent.on(container, "touchleave", (ev) => {
+      console.log("touchleave", ev);
+    });
     for (const b of buttons) {
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
@@ -199,7 +219,21 @@ export const WButton = L.Class.extend({
         context: b.context,
         className: "wasabee-subactions",
       });
+      L.DomEvent.on(li, "touchenter", (ev) => {
+        console.log("touchenter", ev);
+      });
+      L.DomEvent.on(li, "touchleave", (ev) => {
+        console.log("touchleave", ev);
+      });
     }
     return container;
+  },
+
+  _isTouch: function () {
+    /* console.log("mobile", L.Browser.mobile);
+    console.log("touch", L.Browser.touch);
+    console.log("userLocation", window.plugin.userLocation); */
+    // if (L.Browser.mobile && L.Browser.touch) return true;
+    return false;
   },
 });

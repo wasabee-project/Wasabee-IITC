@@ -3,6 +3,7 @@ import WasabeePortal from "../portal";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 export const SetCommentDialog = WDialog.extend({
   setup: function (target, operation) {
@@ -40,6 +41,7 @@ export const SetCommentDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = SetCommentDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: SetCommentDialog.TYPE });
   },
 
   addHooks: function () {

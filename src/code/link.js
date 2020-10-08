@@ -1,21 +1,24 @@
 import { generateId } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
+import WasabeeOp from "./operation";
+import WasabeeMe from "./me";
+import AssignDialog from "./dialogs/assignDialog";
+// for named color
+import { convertColorToHex } from "./auxiliar";
+import { addToColorList } from "./skin";
 
 export default class WasabeeLink {
-  //ID <- randomly generated alpha-numeric ID for the link
-  //fromPortal <- portal the link is from
-  //toPortal <- portal the link is to
-  //description <- user entered description of link
-  constructor(operation, fromPortalId, toPortalId, description) {
+  constructor(obj) {
     this.ID = generateId();
-    this.fromPortalId = fromPortalId;
-    this.toPortalId = toPortalId;
-    this.description = description;
-    this.assignedTo = null;
-    this.throwOrderPos = 0;
-    this.color = "main";
-    this.completed = false;
+    this.fromPortalId = obj.fromPortalId;
+    this.toPortalId = obj.toPortalId;
+    this.description = obj.description ? obj.description : null;
+    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    this.color = obj.color ? obj.color : "main";
+    this.completed = obj.completed ? obj.completed : false;
+    this.zone = obj.zone ? obj.zone : 1;
   }
 
   // build object to serialize
@@ -29,21 +32,8 @@ export default class WasabeeLink {
       throwOrderPos: this.throwOrderPos,
       color: this.color,
       completed: this.completed,
+      zone: Number(this.zone),
     };
-  }
-
-  static create(obj, operation) {
-    const link = new WasabeeLink(
-      operation,
-      obj.fromPortalId,
-      obj.toPortalId,
-      obj.description
-    );
-    link.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    link.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
-    link.color = obj.color ? obj.color : operation.color;
-    link.completed = obj.completed ? obj.completed : false;
-    return link;
   }
 
   // for interface consistency, the other types use comment
@@ -120,21 +110,42 @@ export default class WasabeeLink {
     d.appendChild(
       operation.getPortal(this.fromPortalId).displayFormat(smallScreen)
     );
-    const arrow = L.DomUtil.create("span", null, d);
-    arrow.textContent = " ➾ ";
-    arrow.style.color = this.getColor();
+    const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
+    arrow.style.color = this.getColor(operation);
+    const picker = L.DomUtil.create("input", "", arrow);
+    picker.type = "color";
+    picker.value = convertColorToHex(this.getColor(operation));
+    picker.style.display = "none";
+    picker.setAttribute("list", "wasabee-colors-datalist");
+
+    L.DomEvent.on(arrow, "click", () => {
+      picker.click();
+    });
+
+    L.DomEvent.on(picker, "change", (ev) => {
+      this.setColor(ev.target.value, operation);
+    });
+
     d.appendChild(
       operation.getPortal(this.toPortalId).displayFormat(smallScreen)
     );
     return d;
   }
 
-  getColor() {
-    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
-      const c = window.plugin.wasabee.static.layerTypes.get(this.color);
-      return c.color;
-    }
-    return "#333333";
+  setColor(color, operation) {
+    this.color = color;
+    if (this.color == operation.color) this.color = "main";
+    operation.update();
+    addToColorList(color);
+  }
+
+  getColor(operation) {
+    // 0.17 -- use the old names internally no matter what we are sent
+    let color = WasabeeOp.oldColors(this.color);
+    if (color == "main") color = operation.color;
+    if (window.plugin.wasabee.skin.layerTypes.has(color))
+      color = window.plugin.wasabee.skin.layerTypes.get(color).color;
+    return color;
   }
 
   length(operation) {
@@ -181,5 +192,38 @@ export default class WasabeeLink {
     }
     a.textContent = s;
     return a;
+  }
+
+  getPopup(operation) {
+    const div = L.DomUtil.create("div", null);
+    L.DomUtil.create("div", null, div).appendChild(
+      this.displayFormat(operation, true)
+    );
+    if (this.description)
+      L.DomUtil.create("div", "enl", div).textContent = this.description;
+    L.DomUtil.create("div", "enl", div).textContent = "# " + this.throwOrderPos;
+    const del = L.DomUtil.create("button", null, div);
+    del.textContent = wX("DELETE_LINK");
+    L.DomEvent.on(del, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      operation.removeLink(this.fromPortalId, this.toPortalId);
+    });
+    const rev = L.DomUtil.create("button", null, div);
+    rev.textContent = wX("REVERSE");
+    L.DomEvent.on(rev, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      operation.reverseLink(this.fromPortalId, this.toPortalId);
+    });
+    if (operation.IsServerOp() && WasabeeMe.isLoggedIn()) {
+      const assignButton = L.DomUtil.create("button", null, div);
+      assignButton.textContent = wX("ASSIGN");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog();
+        ad.setup(this, operation);
+        ad.enable();
+      });
+    }
+    return div;
   }
 }

@@ -1,13 +1,16 @@
 // aliases to make review easier
-const strings = window.plugin.wasabee.static.strings;
+let strings = window.plugin.wasabee.static.strings;
 const defaultLang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 const localStoreKey = window.plugin.wasabee.static.constants.LANGUAGE_KEY;
 
-export const wX = (key, value, option) => {
+export function wX(key, value, option) {
   const lang = getLanguage();
 
-  let s = null;
+  // if the skin system is initialized, switch to it
+  if (window.plugin.wasabee.skin && window.plugin.wasabee.skin.strings)
+    strings = window.plugin.wasabee.skin.strings;
 
+  let s = null;
   if (strings[lang] && strings[lang][key]) s = strings[lang][key];
   if (!s && strings[defaultLang] && strings[defaultLang][key])
     s = strings[defaultLang][key];
@@ -26,12 +29,18 @@ export const wX = (key, value, option) => {
   if (!s) s = `${key} not in ${lang} or ${defaultLang}`;
 
   // do any necessary replacements
-  if (option) s = s.replace("${option}", option);
-  if (value) s = s.replace("${value}", value);
+  // eslint-disable-next-line
+  if (option !== undefined) s = s.replace("${option}", option);
+  // eslint-disable-next-line
+  if (value !== undefined) s = s.replace("${value}", value);
   return s;
-};
+}
 
-export const getLanguage = () => {
+export function getLanguage() {
+  // if the skin system is initialized, switch to it
+  if (window.plugin.wasabee.skin && window.plugin.wasabee.skin.strings)
+    strings = window.plugin.wasabee.skin.strings;
+
   // load the selected language, or use DEFAULT_LANGUAGE if not set
   let lang = localStorage[localStoreKey];
   if (!lang) {
@@ -48,6 +57,6 @@ export const getLanguage = () => {
   }
 
   return lang;
-};
+}
 
 export default wX;

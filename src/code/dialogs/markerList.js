@@ -2,15 +2,17 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
-import { getAgent } from "../server";
+import MarkerChangeDialog from "./markerChangeDialog";
+import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeMe from "../me";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
+  clearAllMarkers,
 } from "../uiCommands";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 const MarkerList = WDialog.extend({
   statics: {
@@ -20,15 +22,17 @@ const MarkerList = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = MarkerList.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: MarkerList.TYPE });
   },
 
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    const operation = getSelectedOperation();
+    this._opID = operation.ID;
     const context = this;
-    this._UIUpdateHook = (newOpData) => {
-      context.markerListUpdate(newOpData);
+    this._UIUpdateHook = () => {
+      context.markerListUpdate();
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
@@ -44,16 +48,21 @@ const MarkerList = WDialog.extend({
   },
 
   _displayDialog: function () {
-    loadFaked(this._operation);
+    const operation = getSelectedOperation();
+    loadFaked(operation);
 
     const buttons = {};
+    buttons[wX("CLEAR MARKERS")] = () => {
+      clearAllMarkers(getSelectedOperation());
+    };
+
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
 
     this._dialog = window.dialog({
-      title: wX("MARKER_LIST", this._operation.name),
-      html: this.getListDialogContent(this._operation).table,
+      title: wX("MARKER_LIST", operation.name),
+      html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
       closeCallback: () => {
@@ -65,8 +74,9 @@ const MarkerList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  markerListUpdate: function (operation) {
-    if (operation.ID != this._operation.ID) this._operation = operation;
+  markerListUpdate: function () {
+    const operation = getSelectedOperation();
+    if (operation.ID != this._opID) console.log("op changed");
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
     this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
@@ -99,6 +109,12 @@ const MarkerList = WDialog.extend({
         format: (cell, value, marker) => {
           const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
+          L.DomEvent.on(cell, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            const ch = new MarkerChangeDialog();
+            ch.setup(marker);
+            ch.enable();
+          });
         },
       },
       {
@@ -120,13 +136,11 @@ const MarkerList = WDialog.extend({
         name: wX("ASS_TO"),
         value: (marker) => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
-            if (!WasabeeMe.isLoggedIn()) return "not logged in";
-            const agent = getAgent(marker.assignedTo);
-            if (agent != null) {
-              return agent.name;
-            } else {
-              return "Loading: [" + marker.assignedTo + "]";
-            }
+            const agent = WasabeeAgent.cacheGet(marker.assignedTo);
+            if (agent != null) return agent.name;
+            // we can't use async here, so just request it now and it should be in cache next time
+            WasabeeAgent.waitGet(marker.assignedTo);
+            return "looking up: [" + marker.assignedTo + "]";
           }
           return "";
         },
@@ -136,7 +150,7 @@ const MarkerList = WDialog.extend({
           assigned.textContent = value;
           L.DomEvent.on(cell, "click", () => {
             const ad = new AssignDialog();
-            ad.setup(agent, operation);
+            ad.setup(agent);
             ad.enable();
           });
         },

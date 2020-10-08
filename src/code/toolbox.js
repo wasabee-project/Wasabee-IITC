@@ -4,7 +4,7 @@ import wX from "./wX";
 import { locationPromise } from "./server";
 
 /* This function adds the Wasabee options to the IITC toolbox */
-export const setupToolbox = () => {
+export function setupToolbox() {
   const toolbox = document.getElementById("toolbox");
 
   const aboutLink = L.DomUtil.create("a", null, toolbox);
@@ -31,22 +31,20 @@ export const setupToolbox = () => {
   L.DomEvent.on(locationLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        locationPromise(
-          position.coords.latitude,
-          position.coords.longitude
-        ).then(
-          () => {
-            alert(wX("LOC_PROC"));
-          },
-          (err) => {
-            console.log(err);
-          }
-        );
+      async (position) => {
+        try {
+          await locationPromise(
+            position.coords.latitude,
+            position.coords.longitude
+          );
+          alert(wX("LOC_PROC"));
+        } catch (e) {
+          console.error(e.toString());
+        }
       },
       (err) => {
-        console.log(err);
+        console.error(err);
       }
     );
   });
-};
+}

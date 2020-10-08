@@ -1,14 +1,14 @@
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
-import OpsButton from "./buttons/opsButton";
+import OpButton from "./buttons/opButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
 import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
-export default function (selectedOp) {
+export function addButtons(selectedOp) {
   selectedOp = selectedOp || getSelectedOperation();
 
   if (window.plugin.wasabee.buttons) {
@@ -28,7 +28,7 @@ export default function (selectedOp) {
 
       const wb = new WasabeeButton(map, this._container);
       this._modes[wb.type] = wb;
-      const ob = new OpsButton(map, this._container);
+      const ob = new OpButton(map, this._container);
       this._modes[ob.type] = ob;
       const qb = new QuickdrawButton(map, this._container);
       this._modes[qb.type] = qb;
@@ -58,7 +58,10 @@ export default function (selectedOp) {
     window.map.addControl(window.plugin.wasabee.buttons);
   }
 
+  // this should not be run multiple times...
   window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
   window.plugin.wasabee.buttons.update(selectedOp);
 }
+
+export default addButtons;

@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
+import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AboutDialog = WDialog.extend({
@@ -16,6 +17,7 @@ const AboutDialog = WDialog.extend({
     this.type = AboutDialog.TYPE;
     // call the parent classes initialize as well
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: AboutDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -50,7 +52,10 @@ const AboutDialog = WDialog.extend({
       "<h3>Show your love</h3><a href='https://paypal.me/pools/c/8osG170xBE' target=\"_blank\">Tip Jar@paypal</a>";
     const about = L.DomUtil.create("div", null, html);
     about.innerHTML =
-      "<h3>About Wasabee-IITC</h3><ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
+      "<h3>About Wasabee-IITC</h3>" +
+      "Current version: " +
+      window.plugin.wasabee.info.version +
+      "<ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");

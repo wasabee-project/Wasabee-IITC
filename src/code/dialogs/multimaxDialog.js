@@ -8,6 +8,7 @@ import {
   clearAllLinks,
 } from "../uiCommands";
 import { greatCircleArcIntersect } from "../crosslinks";
+import { postToFirebase } from "../firebaseSupport";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -92,8 +93,10 @@ const MultimaxDialog = WDialog.extend({
 
     const fllabel = L.DomUtil.create("label", null, container);
     fllabel.textContent = wX("ADD_BL");
+    fllabel.htmlFor = "wasabee-multimax-backlink";
     this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
+    this._flcheck.id = "wasabee-multimax-backlink";
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
@@ -131,12 +134,12 @@ const MultimaxDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
-    this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchorOne = WasabeePortal.create(p);
+    if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchorTwo = WasabeePortal.create(p);
+    if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = testPortal();
+    postToFirebase({ id: "analytics", action: MultimaxDialog.TYPE });
   },
 
   /*
@@ -183,6 +186,8 @@ const MultimaxDialog = WDialog.extend({
   },
 
   doMultimax: function () {
+    // this._operation is OK here
+    this._operation = getSelectedOperation();
     const portals = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax

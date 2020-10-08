@@ -1,10 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import WasabeeMe from "../me";
-import { getSelectedOperation } from "../selectedOp";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
+import { postToFirebase } from "../firebaseSupport";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -14,6 +14,7 @@ const DefensiveKeysDialog = WDialog.extend({
   initialize: function (map = window.map, options) {
     this.type = DefensiveKeysDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
+    postToFirebase({ id: "analytics", action: DefensiveKeysDialog.TYPE });
   },
 
   addHooks: async function () {
@@ -69,7 +70,7 @@ const DefensiveKeysDialog = WDialog.extend({
     addDKeyButton.textContent = wX("UPDATE_COUNT");
     L.DomEvent.on(addDKeyButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._addDKey();
+      this._addDKey(); // async, but no need to await it
     });
 
     const showDKeyButton = L.DomUtil.create("button", null, this._content);
@@ -104,30 +105,33 @@ const DefensiveKeysDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _addDKey: function () {
-    // send it to the server
-    dKeyPromise(
-      this._selectedPortal.id,
-      this._count.value,
-      this._capID.value
-    ).then(
-      function () {
-        alert("Registered with server");
-        window.runHooks("wasabeeDkeys");
-      },
-      function (reject) {
-        console.log(reject);
-        alert(reject);
-      }
-    );
+  _addDKey: async function () {
+    const dk = {
+      PortalID: this._selectedPortal.id,
+      Count: Number(this._count.value),
+      CapID: this._capID.value,
+      Name: this._selectedPortal.name,
+      Lat: this._selectedPortal.lat,
+      Lng: this._selectedPortal.lat,
+    };
+    try {
+      const j = JSON.stringify(dk);
+      console.log(j);
+      await dKeyPromise(j);
+      alert("Registered with server");
+      window.runHooks("wasabeeDkeys");
+    } catch (e) {
+      console.error(e);
+      alert(e.toString());
+    }
   },
 
   _getMyData(portalID) {
-    if (!window.plugin.wasabee._Dkeys) return;
-    if (!window.plugin.wasabee._Dkeys.has(portalID)) return;
+    if (!window.plugin.wasabee._Dkeys) return null;
+    if (!window.plugin.wasabee._Dkeys.has(portalID)) return null;
     const l = window.plugin.wasabee._Dkeys.get(portalID);
     if (l.has(this._me.GoogleID)) return l.get(this._me.GoogleID);
-    return;
+    return null;
   },
 });
 

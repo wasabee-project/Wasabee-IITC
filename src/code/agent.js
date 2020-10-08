@@ -1,50 +1,39 @@
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import { targetPromise, GetWasabeeServer } from "./server";
+import AgentDialog from "./dialogs/agentDialog";
+import { agentPromise, targetPromise, routePromise } from "./server";
 import wX from "./wX";
 
 export default class WasabeeAgent {
-  constructor() {
-    this.id = null;
-    this.name = null;
-    this.lat = 0;
-    this.lng = 0;
-    this.date = null;
-    this.pic = null;
-    this.cansendto = false;
-    this.Vverified = false;
-    this.blacklisted = false;
-    this.rocks = false;
-    this.squad = null;
-    this.state = null;
-  }
-
-  static create(obj) {
+  constructor(obj) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
       } catch (e) {
-        console.log(e);
-        return null;
+        console.error(e);
+        obj = {};
       }
     }
-    const a = new WasabeeAgent();
-    a.id = obj.id;
-    a.name = obj.name;
-    a.lat = obj.lat;
-    a.lng = obj.lng;
-    a.date = obj.date;
-    a.pic = obj.pic;
-    a.cansendto = obj.cansendto;
-    a.Vverified = obj.Vverified;
-    a.blacklisted = obj.blacklisted;
-    a.rocks = obj.rocks;
-    a.squad = obj.squad;
-    a.state = obj.state;
+
+    this.id = obj.id;
+    this.name = obj.name; // XXX gets messy in the cache if team display name is set
+    this.lat = obj.lat ? obj.lat : 0;
+    this.lng = obj.lng ? obj.lng : 0;
+    this.date = obj.date ? obj.date : null;
+    this.pic = obj.pic ? obj.pic : null;
+    this.cansendto = obj.cansendto ? obj.cansendto : false;
+    this.Vverified = obj.Vverified ? obj.Vverified : false;
+    this.blacklisted = obj.blacklisted ? obj.blacklisted : false;
+    this.rocks = obj.rocks ? obj.rocks : false;
+
+    // squad and state are meaningless in the cache since you can never know which team set them
+    this.squad = obj.squad ? obj.squad : null;
+    this.state = obj.state;
+    this.ShareWD = obj.ShareWD;
+    this.LoadWD = obj.LoadWD;
 
     // push the new data into the agent cache
-    window.plugin.wasabee._agentCache.set(a.id, a);
-    return a;
+    window.plugin.wasabee._agentCache.set(this.id, this);
   }
 
   get latLng() {
@@ -52,8 +41,29 @@ export default class WasabeeAgent {
     return null;
   }
 
+  static cacheGet(gid) {
+    if (window.plugin.wasabee._agentCache.has(gid)) {
+      return window.plugin.wasabee._agentCache.get(gid);
+    }
+    return null;
+  }
+
+  static async waitGet(gid) {
+    if (window.plugin.wasabee._agentCache.has(gid)) {
+      return window.plugin.wasabee._agentCache.get(gid);
+    }
+
+    try {
+      const result = await agentPromise(gid);
+      const newagent = new WasabeeAgent(result);
+      return newagent;
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
+  }
+
   formatDisplay() {
-    const server = GetWasabeeServer();
     const display = L.DomUtil.create("a", "wasabee-agent-label");
     if (this.Vverified || this.rocks) {
       L.DomUtil.addClass(display, "enl");
@@ -61,11 +71,10 @@ export default class WasabeeAgent {
     if (this.blacklisted) {
       L.DomUtil.addClass(display, "res");
     }
-    display.href = `${server}/api/v1/agent/${this.id}?json=n`;
-    display.target = "_new";
     L.DomEvent.on(display, "click", (ev) => {
-      window.open(display.href, this.id);
       L.DomEvent.stop(ev);
+      const ad = new AgentDialog(window.map, { gid: this.id });
+      ad.enable();
     });
     display.textContent = this.name;
     return display;
@@ -76,6 +85,7 @@ export default class WasabeeAgent {
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
     title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
+
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", (ev) => {
@@ -86,19 +96,47 @@ export default class WasabeeAgent {
         return;
       }
 
-      const f = selectedPortal.displayName;
-      const name = this.name;
       const d = new ConfirmDialog();
-      d.setup(wX("SEND TARGET"), wX("SEND TARGET CONFIRM", f, name), () => {
-        targetPromise(this, selectedPortal).then(
-          function () {
+      d.setup(
+        wX("SEND TARGET"),
+        wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
+        async () => {
+          try {
+            await targetPromise(this.id, selectedPortal);
             alert(wX("TARGET SENT"));
-          },
-          function (reject) {
-            console.log(reject);
+          } catch (e) {
+            console.error(e);
           }
-        );
-      });
+        }
+      );
+      d.enable();
+    });
+
+    // this needs wX
+    const requestRoute = L.DomUtil.create("button", null, content);
+    requestRoute.textContent = "Send Route to Target";
+    requestRoute.style.display = "none"; // hide this until the server-side is ready
+    L.DomEvent.on(requestRoute, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const selectedPortal = WasabeePortal.getSelected();
+      if (!selectedPortal) {
+        alert(wX("SELECT PORTAL"));
+        return;
+      }
+
+      const d = new ConfirmDialog();
+      d.setup(
+        "Send Route to Target",
+        "Do you really want to request the route to be sent?",
+        async () => {
+          try {
+            await routePromise(this.id, selectedPortal);
+            alert("Route Sent");
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      );
       d.enable();
     });
     return content;

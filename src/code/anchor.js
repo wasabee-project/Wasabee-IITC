@@ -1,14 +1,15 @@
-import { swapPortal, deletePortal } from "./uiCommands.js";
-import AssignDialog from "./dialogs/assignDialog";
+import { swapPortal, deletePortal } from "./uiCommands";
 import { getSelectedOperation } from "./selectedOp";
-import wX from "./wX";
+import AssignDialog from "./dialogs/assignDialog";
+import SendTargetDialog from "./dialogs/sendTargetDialog";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import LinkListDialog from "./dialogs/linkListDialog";
+import wX from "./wX";
 
-// this class exists to satisfy the interface for the assignment dialog
-// allows assigining all links FROM this anchor en mass
+// this class is for the popups, and for assign menu
 export default class WasabeeAnchor {
-  constructor(portalId, op) {
+  constructor(portalId) {
+    const op = getSelectedOperation();
     this.ID = portalId;
     this.portalId = portalId;
     this.type = "anchor";
@@ -17,9 +18,23 @@ export default class WasabeeAnchor {
     this.assignedTo = null;
     this.order = 0;
 
-    this._operation = op ? op : getSelectedOperation();
-    this._portal = this._operation.getPortal(this.ID);
-    this.color = this._operation.color;
+    this._portal = op.getPortal(this.ID);
+    this.color = op.color;
+    this._opID = op.ID;
+  }
+
+  // currently unused
+  toJSON() {
+    return {
+      ID: this.ID,
+      portalId: this.portalId,
+      type: this.type,
+      comment: this.coment,
+      state: this.state,
+      assignedTo: this.assignedTo,
+      order: this.order,
+      color: this.color,
+    };
   }
 
   // pointless, since these are never pushed to the server
@@ -35,10 +50,6 @@ export default class WasabeeAnchor {
     return this._portal.name;
   }
 
-  static create(portalId) {
-    return new WasabeeAnchor(portalId);
-  }
-
   displayFormat(smallScreen = false) {
     return this._portal.displayFormat(smallScreen);
   }
@@ -47,15 +58,16 @@ export default class WasabeeAnchor {
     return this._portal.latLng;
   }
 
-  get icon() {
-    let lt = window.plugin.wasabee.static.layerTypes.get("main");
-    if (window.plugin.wasabee.static.layerTypes.has(this.color)) {
-      lt = window.plugin.wasabee.static.layerTypes.get(this.color);
+  popupContent(marker) {
+    // just log for now, if we see it, then we can figure out what is really going on
+    const operation = getSelectedOperation();
+    if (operation == null) {
+      console.log("null op for anchor?");
     }
-    return lt.portal.iconUrl.default;
-  }
+    if (this._opID != operation.ID) {
+      console.log("anchor opID != selected opID");
+    }
 
-  popupContent(marker, operation) {
     marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
@@ -71,7 +83,7 @@ export default class WasabeeAnchor {
     L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
       const cd = new SetCommentDialog();
-      cd.setup(this._portal, this._operation);
+      cd.setup(this._portal, operation);
       cd.enable();
       marker.closePopup();
     });
@@ -87,7 +99,7 @@ export default class WasabeeAnchor {
       L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
         const cd = new SetCommentDialog();
-        cd.setup(this._portal, this._operation);
+        cd.setup(this._portal, operation);
         cd.enable();
         marker.closePopup();
       });
@@ -139,11 +151,20 @@ export default class WasabeeAnchor {
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        // XXX why can't I just use "this"? instead of making a new anchor?
-        const anchor = new WasabeeAnchor(this.ID);
         const ad = new AssignDialog();
-        ad.setup(anchor, operation);
+        ad.setup(this, operation);
         ad.enable();
+        marker.closePopup();
+      });
+
+      // needs wX
+      const sendButton = L.DomUtil.create("button", null, buttonSet);
+      sendButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog();
+        std.setup(this, operation);
+        std.enable();
         marker.closePopup();
       });
     }

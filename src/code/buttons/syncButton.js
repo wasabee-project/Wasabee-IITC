@@ -1,8 +1,6 @@
 import { WButton } from "../leafletClasses";
-import { opPromise } from "../server";
 import WasabeeMe from "../me";
-import AuthDialog from "../dialogs/authDialog";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import { fullSync } from "../uiCommands";
 import wX from "../wX";
 
 const SyncButton = WButton.extend({
@@ -30,38 +28,10 @@ const SyncButton = WButton.extend({
 
     this._syncbutton = this._createButton({
       container: container,
-      buttonImage: window.plugin.wasabee.static.images.toolbar_download.default,
+      className: "wasabee-toolbar-sync",
       context: this,
-      callback: () => {
-        const so = getSelectedOperation();
-        const me = WasabeeMe.get(true); // force update of ops list
-        // const me = await WasabeeMe.waitGet(true); // force update of ops list
-        if (!me) {
-          const ad = new AuthDialog();
-          ad.enable();
-          return;
-        }
-
-        const promises = new Array();
-        for (const op of me.Ops) {
-          promises.push(opPromise(op.ID));
-        }
-        Promise.all(promises).then(
-          (ops) => {
-            for (const newop of ops) {
-              newop.store();
-              if (newop.ID == so.ID) {
-                makeSelectedOperation(newop.ID);
-              }
-            }
-            alert(wX("SYNC DONE"));
-          },
-          function (err) {
-            console.log(err);
-            alert(err);
-          }
-        );
-      },
+      title: this.title,
+      callback: fullSync,
     });
 
     // hide or show depeneding on logged in state
