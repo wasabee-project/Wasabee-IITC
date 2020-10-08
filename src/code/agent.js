@@ -71,14 +71,7 @@ export default class WasabeeAgent {
     if (this.blacklisted) {
       L.DomUtil.addClass(display, "res");
     }
-<<<<<<< HEAD
     L.DomEvent.on(display, "click", (ev) => {
-=======
-    display.href = `${server}/api/v1/agent/${this.id}?json=n`;
-    display.target = "_new";
-    L.DomEvent.on(display, "click", (ev) => {
-      window.open(display.href, this.id);
->>>>>>> master
       L.DomEvent.stop(ev);
       const ad = new AgentDialog(window.map, { gid: this.id });
       ad.enable();
@@ -104,7 +97,6 @@ export default class WasabeeAgent {
       }
 
       const d = new ConfirmDialog();
-<<<<<<< HEAD
       d.setup(
         wX("SEND TARGET"),
         wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
@@ -142,15 +134,6 @@ export default class WasabeeAgent {
             alert("Route Sent");
           } catch (e) {
             console.error(e);
-=======
-      d.setup(wX("SEND TARGET"), wX("SEND TARGET CONFIRM", f, name), () => {
-        targetPromise(this, selectedPortal).then(
-          function () {
-            alert(wX("TARGET SENT"));
-          },
-          function (reject) {
-            console.log(reject);
->>>>>>> master
           }
         }
       );

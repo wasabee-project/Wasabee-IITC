@@ -33,7 +33,6 @@ export default class WasabeeTeam {
     if (window.plugin.wasabee.teams.has(teamID)) {
       return window.plugin.wasabee.teams.get(teamID);
     }
-<<<<<<< HEAD
     return null;
   }
 
@@ -43,15 +42,6 @@ export default class WasabeeTeam {
       if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
         console.debug("returning team from cache");
         return t;
-=======
-    let t = null;
-    teamPromise(teamID).then(
-      (team) => {
-        t = team;
-      },
-      (err) => {
-        console.log(err);
->>>>>>> master
       }
     }
 

@@ -32,10 +32,7 @@ export default class WasabeeLink {
       throwOrderPos: this.throwOrderPos,
       color: this.color,
       completed: this.completed,
-<<<<<<< HEAD
       zone: Number(this.zone),
-=======
->>>>>>> master
     };
   }
 

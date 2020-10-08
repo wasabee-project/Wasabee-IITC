@@ -3,11 +3,7 @@ import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 
-<<<<<<< HEAD
 function setRestoreOpID(opID) {
-=======
-const setRestoreOpID = (opID) => {
->>>>>>> master
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
 }
 
@@ -63,11 +59,7 @@ export function loadNewDefaultOp() {
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-<<<<<<< HEAD
 export function makeSelectedOperation(opID) {
-=======
-export const makeSelectedOperation = (opID) => {
->>>>>>> master
   // _selectedOp is null at first load (or page reload), should never be after that
   if (window.plugin.wasabee._selectedOp != null) {
     if (opID == window.plugin.wasabee._selectedOp.ID) {
@@ -99,13 +91,8 @@ export const makeSelectedOperation = (opID) => {
 }
 
 // use this to pull an op from local store by ID
-<<<<<<< HEAD
 // in 0.19 this entire function goes away;
 export function getOperationByID(opID) {
-=======
-export const getOperationByID = (opID) => {
-  let op = null;
->>>>>>> master
   try {
     const newfmt = localStorage[opID];
     if (newfmt == undefined) return null;
@@ -165,7 +152,6 @@ function storeOpsList(ops) {
 }
 
 //** This function removes an operation from the main list */
-<<<<<<< HEAD
 export function removeOperation(opID) {
   const ops = opsList().filter((ID) => ID != opID);
   storeOpsList(ops);
@@ -200,15 +186,6 @@ export function resetHiddenOps() {
   localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY] =
     "[]";
 }
-=======
-export const removeOperation = (opID) => {
-  try {
-    store.remove(opID);
-  } catch (e) {
-    console.log(e);
-  }
-};
->>>>>>> master
 
 //*** This function resets the local op list
 export function resetOps() {
@@ -228,7 +205,6 @@ export function hiddenOpsList() {
   }
 }
 
-<<<<<<< HEAD
 export function opsList(hidden = true) {
   const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
   if (raw) {
@@ -242,11 +218,6 @@ export function opsList(hidden = true) {
     } catch (e) {
       console.error(e);
       //falback to old listing
-=======
-  store.each(function (value, key) {
-    if (key.length == 40) {
-      out.push(key);
->>>>>>> master
     }
   }
 
@@ -269,11 +240,7 @@ function oldOpsList() {
   return out;
 }
 
-<<<<<<< HEAD
 export function duplicateOperation(opID) {
-=======
-export const duplicateOperation = (opID) => {
->>>>>>> master
   let op = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;

@@ -31,7 +31,6 @@ export function setupToolbox() {
   L.DomEvent.on(locationLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     navigator.geolocation.getCurrentPosition(
-<<<<<<< HEAD
       async (position) => {
         try {
           await locationPromise(
@@ -45,23 +44,6 @@ export function setupToolbox() {
       },
       (err) => {
         console.error(err);
-=======
-      (position) => {
-        locationPromise(
-          position.coords.latitude,
-          position.coords.longitude
-        ).then(
-          () => {
-            alert(wX("LOC_PROC"));
-          },
-          (err) => {
-            console.log(err);
-          }
-        );
-      },
-      (err) => {
-        console.log(err);
->>>>>>> master
       }
     );
   });

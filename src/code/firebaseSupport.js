@@ -29,11 +29,7 @@ export function initFirebase() {
 
   $(document.body).append(iframe);
 
-<<<<<<< HEAD
   window.addEventListener("message", async (event) => {
-=======
-  window.addEventListener("message", (event) => {
->>>>>>> master
     // ignore anything not from our server
     if (event.origin.indexOf(server) === -1) return;
 
@@ -58,14 +54,9 @@ export function initFirebase() {
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         break;
       case "Map Change":
-<<<<<<< HEAD
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
           try {
             const refreshed = await opPromise(event.data.data.opID);
-=======
-        opPromise(event.data.data.opID).then(
-          function (refreshed) {
->>>>>>> master
             refreshed.store();
             if (refreshed.ID == operation.ID) {
               console.log(
@@ -79,14 +70,8 @@ export function initFirebase() {
                 event.data.data.opID
               );
             }
-<<<<<<< HEAD
           } catch (e) {
             console.error(e);
-=======
-          },
-          function (err) {
-            console.log(err);
->>>>>>> master
           }
         } else {
           console.debug(
