@@ -29,13 +29,8 @@ const OpPermList = WDialog.extend({
       this._me = null;
     }
     const context = this;
-<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.update();
-=======
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
->>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
 
@@ -47,16 +42,12 @@ const OpPermList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-<<<<<<< HEAD
   update: async function () {
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       this._opID = operation.ID;
       console.warn("operation changed while perm dialog open");
     }
-=======
-  update: function (op) {
->>>>>>> master
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
@@ -141,23 +132,14 @@ const OpPermList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-<<<<<<< HEAD
   buildTable: function (operation) {
-=======
-  // needs this._operation.teamlist;
-  buildTable: function () {
->>>>>>> master
     this._table = new Sortable();
     this._table.fields = [
       {
         name: wX("TEAM"),
         value: (perm) => {
-<<<<<<< HEAD
           // try the team cache first
           const t = WasabeeTeam.cacheGet(perm.teamid);
-=======
-          const t = WasabeeTeam.get(perm.teamid);
->>>>>>> master
           if (t) return t.name;
           // check the "me" list
           if (this._me) {
@@ -177,15 +159,12 @@ const OpPermList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
-<<<<<<< HEAD
       {
         name: "Zone",
         value: (perm) => operation.zoneName(perm.zone),
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
-=======
->>>>>>> master
     ];
 
     if (WasabeeMe.isLoggedIn()) {
@@ -208,11 +187,7 @@ const OpPermList = WDialog.extend({
     this._table.items = operation.teamlist;
   },
 
-<<<<<<< HEAD
   addPerm: async function (teamID, role, zone) {
-=======
-  addPerm: function (teamID, role) {
->>>>>>> master
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
@@ -225,7 +200,6 @@ const OpPermList = WDialog.extend({
         return;
       }
     }
-<<<<<<< HEAD
     try {
       await addPermPromise(operation.ID, teamID, role, zone);
       // add locally for display
@@ -239,32 +213,10 @@ const OpPermList = WDialog.extend({
   },
 
   delPerm: async function (obj) {
-=======
-    // send to server
-    addPermPromise(this._operation.ID, teamID, role).then(
-      () => {
-        // then add locally for display
-        this._operation.teamlist.push({
-          teamid: teamID,
-          role: role,
-        });
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
-      }
-    );
-  },
-
-  delPerm: function (obj) {
->>>>>>> master
     if (!WasabeeMe.isLoggedIn()) {
       alert(wX("NOT LOGGED IN SHORT"));
       return;
     }
-<<<<<<< HEAD
     const operation = getSelectedOperation();
     try {
       await delPermPromise(operation.ID, obj.teamid, obj.role);
@@ -279,25 +231,6 @@ const OpPermList = WDialog.extend({
       console.error(e);
       alert(e.toString());
     }
-=======
-    // send change to server
-    delPermPromise(this._operation.ID, obj.teamid, obj.role).then(
-      () => {
-        // then remove locally for display
-        const n = new Array();
-        for (const p of this._operation.teamlist) {
-          if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);
-        }
-        this._operation.teamlist = n;
-        this._operation.store();
-        window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-      },
-      (err) => {
-        console.log(err);
-        alert(err);
-      }
-    );
->>>>>>> master
   },
 });
 

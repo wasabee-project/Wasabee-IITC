@@ -17,11 +17,7 @@ const WasabeeDList = WDialog.extend({
     postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },
 
-<<<<<<< HEAD
   addHooks: async function () {
-=======
-  addHooks: function () {
->>>>>>> master
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;

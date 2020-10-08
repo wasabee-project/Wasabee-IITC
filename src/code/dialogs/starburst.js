@@ -124,11 +124,7 @@ const StarburstDialog = WDialog.extend({
       if (p.id == this._anchor.id) continue;
       operation.addLink(p, this._anchor, "auto starburst");
     }
-<<<<<<< HEAD
     operation.endBatchMode();
-=======
-    this._operation.endBatchMode();
->>>>>>> master
   },
 });
 

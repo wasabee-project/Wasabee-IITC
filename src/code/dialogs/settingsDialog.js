@@ -32,13 +32,8 @@ const SettingsDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const context = this;
     // magic context incantation to make "this" work...
-<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.update();
-=======
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
->>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     // put any per-open setup here
@@ -57,12 +52,7 @@ const SettingsDialog = WDialog.extend({
   },
 
   update: function () {
-<<<<<<< HEAD
     this._dialog.html(this._getContent());
-=======
-    const container = this._getContent();
-    this._dialog.html(container);
->>>>>>> master
     // TODO also update the title
   },
 
@@ -81,15 +71,6 @@ const SettingsDialog = WDialog.extend({
       option.textContent = l;
       if (l == current) option.selected = true;
     }
-<<<<<<< HEAD
-=======
-    for (const l in window.plugin.wasabee.static.stringsSilly) {
-      const option = L.DomUtil.create("option", null, langMenu);
-      option.value = l;
-      option.textContent = l;
-      if (l == current) option.selected = true;
-    }
->>>>>>> master
     L.DomEvent.on(langMenu, "change", (ev) => {
       L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
@@ -112,7 +93,6 @@ const SettingsDialog = WDialog.extend({
       localStorage[c] = sendLocCheck.checked;
     });
 
-<<<<<<< HEAD
     const expertTitle = L.DomUtil.create("label", null, container);
     expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
     expertTitle.htmlFor = "wasabee-setting-expert";
@@ -123,26 +103,6 @@ const SettingsDialog = WDialog.extend({
     const ex = localStorage[exm];
     if (ex === "true") expertCheck.checked = true;
     L.DomEvent.on(expertCheck, "change", (ev) => {
-=======
-    const modeTitle = L.DomUtil.create("label", null, container);
-    modeTitle.textContent = wX("WASABEE_MODE_LABEL");
-    const modeSelect = L.DomUtil.create("select", null, container);
-    const modeKey = window.plugin.wasabee.static.constants.MODE_KEY;
-    const mode = localStorage[modeKey];
-    const designMode = L.DomUtil.create("option", null, modeSelect);
-    designMode.value = "design";
-    designMode.textContent = wX("WASABEE_MODE_DESIGN");
-    if (mode == "design") designMode.selected = true;
-    const operationMode = L.DomUtil.create("option", null, modeSelect);
-    operationMode.value = "active";
-    operationMode.textContent = wX("WASABEE_MODE_BATTLE");
-    if (!WasabeeMe.isLoggedIn()) {
-      operationMode.disabled = true;
-      operationMode.textContent += " (not logged in)";
-    }
-    if (mode == "active") operationMode.selected = true;
-    L.DomEvent.on(modeSelect, "change", (ev) => {
->>>>>>> master
       L.DomEvent.stop(ev);
       localStorage[exm] = expertCheck.checked;
     });
