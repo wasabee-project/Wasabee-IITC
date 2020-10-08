@@ -55,14 +55,9 @@ const AssignDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-<<<<<<< HEAD
   setup: async function (target) {
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-=======
-  setup: function (target, operation) {
-    this._operation = operation;
->>>>>>> master
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);

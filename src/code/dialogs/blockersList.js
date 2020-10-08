@@ -30,13 +30,8 @@ const BlockerList = WDialog.extend({
     this._opID = operation.ID;
 
     const context = this;
-<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.blockerlistUpdate();
-=======
-    this._UIUpdateHook = (newOpData) => {
-      context.blockerlistUpdate(newOpData);
->>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("wasabeeCrosslinksDone", this._UIUpdateHook);
@@ -54,10 +49,7 @@ const BlockerList = WDialog.extend({
   },
 
   _displayDialog: function () {
-<<<<<<< HEAD
     const operation = getSelectedOperation();
-=======
->>>>>>> master
     if (!this._map) return;
 
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
@@ -99,16 +91,11 @@ const BlockerList = WDialog.extend({
   },
 
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
-<<<<<<< HEAD
   blockerlistUpdate: function () {
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       console.log("op changed");
     }
-=======
-  blockerlistUpdate: function (newOpData) {
-    this._operation = newOpData;
->>>>>>> master
     if (!this._enabled) return;
     this.sortable = this._getListDialogContent(
       this.sortable.sortBy,
@@ -125,11 +112,7 @@ const BlockerList = WDialog.extend({
       {
         name: wX("FROM_PORT"),
         value: (blocker) => {
-<<<<<<< HEAD
           return operation.getPortal(blocker.fromPortalId).name;
-=======
-          return this._operation.getPortal(blocker.fromPortalId).name;
->>>>>>> master
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
@@ -140,11 +123,7 @@ const BlockerList = WDialog.extend({
       {
         name: wX("COUNT"),
         value: (blocker) => {
-<<<<<<< HEAD
           const c = operation.blockers.filter(
-=======
-          const c = this._operation.blockers.filter(
->>>>>>> master
             (b) =>
               b.fromPortalId == blocker.fromPortalId ||
               b.toPortalID == blocker.fromPortalId
@@ -157,11 +136,7 @@ const BlockerList = WDialog.extend({
       {
         name: wX("TO_PORT"),
         value: (blocker) => {
-<<<<<<< HEAD
           return operation.getPortal(blocker.toPortalId).name;
-=======
-          return this._operation.getPortal(blocker.toPortalId).name;
->>>>>>> master
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
@@ -172,11 +147,7 @@ const BlockerList = WDialog.extend({
       {
         name: wX("COUNT"),
         value: (blocker) => {
-<<<<<<< HEAD
           const c = operation.blockers.filter(
-=======
-          const c = this._operation.blockers.filter(
->>>>>>> master
             (b) =>
               b.fromPortalId == blocker.toPortalId ||
               b.toPortalId == blocker.toPortalId

@@ -113,11 +113,8 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   onion: function () {
-<<<<<<< HEAD
     // this._operation is OK here
     this._operation = getSelectedOperation();
-=======
->>>>>>> master
     if (!this._anchor) {
       alert("no anchor selected");
       return;

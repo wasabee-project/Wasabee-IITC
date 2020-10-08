@@ -65,27 +65,6 @@ const LinkDialog = WDialog.extend({
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
-<<<<<<< HEAD
-    // const clearSourceButton = L.DomUtil.create("button", "clear", container);
-    // clearSourceButton.textContent = wX("CLEAR");
-    // L.DomEvent.on(clearSourceButton, "click", (ev) => {
-    //   L.DomEvent.stop(ev);
-    //   delete localStorage[
-    //     window.plugin.wasabee.static.constants.LINK_SOURCE_KEY
-    //   ];
-    //   this._sourceDisplay.textContent = wX("NOT_SET");
-    // });
-=======
-    const clearSourceButton = L.DomUtil.create("button", "clear", container);
-    clearSourceButton.textContent = wX("CLEAR");
-    L.DomEvent.on(clearSourceButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      delete localStorage[
-        window.plugin.wasabee.static.constants.LINK_SOURCE_KEY
-      ];
-      this._sourceDisplay.textContent = wX("NOT_SET");
-    });
->>>>>>> master
 
     const anchor1Label = L.DomUtil.create("label", null, container);
     anchor1Label.textContent = wX("ANCHOR1");

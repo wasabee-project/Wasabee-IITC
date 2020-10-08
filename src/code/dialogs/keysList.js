@@ -18,23 +18,14 @@ const KeysList = WDialog.extend({
     postToFirebase({ id: "analytics", action: KeysList.TYPE });
   },
 
-<<<<<<< HEAD
   addHooks: async function () {
-=======
-  addHooks: function () {
->>>>>>> master
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     const context = this;
-<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.update();
-=======
-    this._UIUpdateHook = (newOpData) => {
-      context.update(newOpData);
->>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     if (WasabeeMe.isLoggedIn()) {
@@ -51,10 +42,7 @@ const KeysList = WDialog.extend({
   },
 
   _displayDialog: function () {
-<<<<<<< HEAD
     const operation = getSelectedOperation();
-=======
->>>>>>> master
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -74,15 +62,10 @@ const KeysList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-<<<<<<< HEAD
   update: function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("operation changed");
 
-=======
-  update: function (operation) {
-    if (operation.ID != this._operation.ID) this._operation = operation;
->>>>>>> master
     this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
@@ -118,11 +101,7 @@ const KeysList = WDialog.extend({
       },
       {
         name: wX("ON_HAND"),
-<<<<<<< HEAD
         value: (key) => parseInt(key.onHand, 10),
-=======
-        value: (key) => parseInt(key.onHand),
->>>>>>> master
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
           const a = L.DomUtil.create("a");
@@ -145,11 +124,7 @@ const KeysList = WDialog.extend({
       sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
-<<<<<<< HEAD
           value: (key) => parseInt(key.iHave, 10),
-=======
-          value: (key) => parseInt(key.iHave),
->>>>>>> master
           // sort: (a, b) => a - b,
           format: (cell, value, key) => {
             const oif = L.DomUtil.create("input");

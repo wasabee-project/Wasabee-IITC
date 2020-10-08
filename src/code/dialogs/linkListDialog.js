@@ -29,13 +29,8 @@ const LinkListDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
-<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.updateLinkList();
-=======
-    this._UIUpdateHook = (newOpData) => {
-      context.updateLinkList(newOpData);
->>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -66,11 +61,7 @@ const LinkListDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-<<<<<<< HEAD
   setup: function (UNUSED, portal) {
-=======
-  setup: function (operation, portal) {
->>>>>>> master
     this._portal = portal;
     const operation = getSelectedOperation();
     this._opID = operation.ID;
@@ -84,7 +75,6 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "From",
-<<<<<<< HEAD
         value: (link) => operation.getPortal(link.fromPortalId),
         sortValue: (b) => b.name,
         sort: (a, b) => a.localeCompare(b),
@@ -100,25 +90,6 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Length",
         value: (link) => link.length(operation),
-=======
-        value: (link) => this._operation.getPortal(link.fromPortalId),
-        sortValue: (b) => b.name,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
-      },
-      {
-        name: "To",
-        value: (link) => this._operation.getPortal(link.toPortalId),
-        sortValue: (b) => b.name,
-        sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) =>
-          cell.appendChild(data.displayFormat(this._operation)),
-      },
-      {
-        name: "Length",
-        value: (link) => link.length(this._operation),
->>>>>>> master
         format: (cell, data) => {
           cell.classList.add("length");
           cell.textContent =
@@ -129,11 +100,7 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Min Lvl",
         title: wX("MIN_SRC_PORT_LVL"),
-<<<<<<< HEAD
         value: (link) => link.length(operation),
-=======
-        value: (link) => link.length(this._operation),
->>>>>>> master
         format: (cell, data, link) => {
           cell.appendChild(link.minLevel(operation));
         },
@@ -175,11 +142,7 @@ const LinkListDialog = WDialog.extend({
         format: (a, m, link) => {
           const assignee = L.DomUtil.create("a", null, a);
           assignee.textContent = m;
-<<<<<<< HEAD
           if (operation.IsServerOp() && operation.IsWritableOp()) {
-=======
-          if (this._operation.IsServerOp() && this._operation.IsWritableOp()) {
->>>>>>> master
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ad = new AssignDialog();
@@ -244,10 +207,7 @@ const LinkListDialog = WDialog.extend({
   },
 
   makeColorMenu: function (list, data, link) {
-<<<<<<< HEAD
     const operation = getSelectedOperation();
-=======
->>>>>>> master
     const colorSection = L.DomUtil.create("div", null, list);
     const linkColor = L.DomUtil.create("select", null, colorSection);
     linkColor.id = link.ID;
@@ -280,12 +240,8 @@ const LinkListDialog = WDialog.extend({
     );
   },
 
-<<<<<<< HEAD
   updateLinkList: function () {
     const operation = getSelectedOperation();
-=======
-  updateLinkList: function (operation) {
->>>>>>> master
     if (!this._enabled) return;
     if (this._opID == operation.ID) {
       this._table.items = operation.getLinkListFromPortal(this._portal);
