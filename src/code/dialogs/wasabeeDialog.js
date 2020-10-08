@@ -33,7 +33,7 @@ const WasabeeDialog = WDialog.extend({
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
-  update: async function () {
+  update: function () {
     if (!this._enabled) return;
     // this._me = await WasabeeMe.waitGet(); // breaks logout
     this._dialog.html(this._buildContent());

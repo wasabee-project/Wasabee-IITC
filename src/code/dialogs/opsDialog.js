@@ -6,11 +6,15 @@ import {
   makeSelectedOperation,
   opsList,
   removeOperation,
+  resetHiddenOps,
+  hiddenOpsList,
+  showOperation,
+  hideOperation,
+  changeOpIfNeeded,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
-
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
 
