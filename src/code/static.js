@@ -4,9 +4,26 @@ const W = window.plugin.wasabee || {};
 W.static = {
   CSS: {
     main: require("./css/wasabee.css"),
+<<<<<<< HEAD
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
     iitcfix: require("./css/iitcfix.css"),
+=======
+  },
+  images: {
+    toolbar_addlinks: require("./images/toolbar_addlinks.png"),
+    toolbar_viewOps: require("./images/toolbar_viewOps.png"),
+    toolbar_addMarkers: require("./images/toolbar_addMarkers.png"),
+    toolbar_sync: require("./images/toolbar_sync.png"),
+    toolbar_upload: require("./images/toolbar_upload.png"),
+    toolbar_download: require("./images/toolbar_download.png"),
+    toolbar_wasabeebutton_in: require("./images/toolbar_wasabeebutton_in.png"),
+    toolbar_wasabeebutton_out: require("./images/toolbar_wasabeebutton_out.png"),
+    toolbar_wasabeebutton_se: require("./images/toolbar_wasabeebutton_se.png"),
+    toolbar_wasabeebutton_seg: require("./images/toolbar_wasabeebutton_seg.png"),
+    toolbar_quickdraw: require("./images/toolbar_quickdraw.png"),
+    toolbar_settings: require("./images/toolbar_settings.png"),
+>>>>>>> master
   },
   dialogNames: {
     linkDialogButton: "wasabee-addlinks",
@@ -78,7 +95,12 @@ W.static = {
       opacity: 0.7,
       weight: 5,
       smoothFactor: 1,
+<<<<<<< HEAD
       interactive: false,
+=======
+      clickable: false,
+      interactive: true,
+>>>>>>> master
     },
   },
 };
@@ -92,6 +114,7 @@ W.static.strings.Tagalog = require("./translations/filipino.json");
 W.static.strings.French = require("./translations/french.json");
 W.static.tips = require("./translations/tips.json");
 
+<<<<<<< HEAD
 W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_CAPTURE,
   W.static.constants.MARKER_TYPE_DECAY,
@@ -106,6 +129,126 @@ W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_UPGRADE,
   W.static.constants.MARKER_TYPE_VIRUS,
   W.static.constants.MARKER_TYPE_EXCLUDE,
+=======
+W.static.markerTypes = new Map([
+  [
+    W.static.constants.MARKER_TYPE_CAPTURE,
+    {
+      markerIcon: require("./images/wasabee_markers_capture_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_capture_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_capture_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_capture_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_DECAY,
+    {
+      markerIcon: require("./images/wasabee_markers_decay_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_decay_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_decay_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_decay_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_DESTROY,
+    {
+      markerIcon: require("./images/wasabee_markers_destroy_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_destroy_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_destroy_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_destroy_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_FARM,
+    {
+      markerIcon: require("./images/wasabee_markers_farm_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_farm_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_farm_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_farm_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_GOTO,
+    {
+      markerIcon: require("./images/wasabee_markers_goto_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_goto_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_goto_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_goto_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_KEY,
+    {
+      markerIcon: require("./images/wasabee_markers_key_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_key_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_key_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_key_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_LINK,
+    {
+      markerIcon: require("./images/wasabee_markers_link_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_link_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_link_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_link_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_MEETAGENT,
+    {
+      markerIcon: require("./images/wasabee_markers_meetagent_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_meetagent_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_meetagent_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_meetagent_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_OTHER,
+    {
+      markerIcon: require("./images/wasabee_markers_other_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_other_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_other_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_other_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_RECHARGE,
+    {
+      markerIcon: require("./images/wasabee_markers_recharge_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_recharge_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_recharge_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_recharge_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_UPGRADE,
+    {
+      markerIcon: require("./images/wasabee_markers_upgrade_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_upgrade_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_upgrade_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_upgrade_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_VIRUS,
+    {
+      markerIcon: require("./images/wasabee_markers_virus_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_virus_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_virus_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_virus_done.png"),
+    },
+  ],
+  [
+    W.static.constants.MARKER_TYPE_EXCLUDE,
+    {
+      markerIcon: require("./images/wasabee_markers_exclude_pending.png"),
+      markerIconAssigned: require("./images/wasabee_markers_exclude_assigned.png"),
+      markerIconAcknowledged: require("./images/wasabee_markers_exclude_assigned.png"),
+      markerIconDone: require("./images/wasabee_markers_exclude_done.png"),
+    },
+  ],
+>>>>>>> master
 ]);
 
 W.static.linkStyle = {
@@ -130,6 +273,18 @@ W.static.layerTypes = new Map([
       name: "main",
       displayName: "Red",
       color: "#ff0000",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_main.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -138,6 +293,18 @@ W.static.layerTypes = new Map([
       name: "groupa",
       displayName: "Orange",
       color: "#ff6600",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupa.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -146,6 +313,18 @@ W.static.layerTypes = new Map([
       name: "groupb",
       displayName: "Light Orange",
       color: "#ff9900",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 1, 4, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupb.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -154,6 +333,18 @@ W.static.layerTypes = new Map([
       name: "groupc",
       displayName: "Tan",
       color: "#bb9900",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupc.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -162,6 +353,18 @@ W.static.layerTypes = new Map([
       name: "groupd",
       displayName: "Purple",
       color: "#bb22cc",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupd.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -170,6 +373,18 @@ W.static.layerTypes = new Map([
       name: "groupe",
       displayName: "Teal",
       color: "#33cccc",
+<<<<<<< HEAD
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupe.png"),
+      },
+>>>>>>> master
     },
   ],
   [
@@ -178,6 +393,54 @@ W.static.layerTypes = new Map([
       name: "groupf",
       displayName: "Pink",
       color: "#ff55ff",
+<<<<<<< HEAD
     },
   ],
+=======
+      link: {
+        dashArray: [5, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupf.png"),
+      },
+    },
+  ],
+  [
+    "SE",
+    {
+      name: "SE",
+      displayName: "Special Edition",
+      color: "#333333",
+      link: {
+        dashArray: [5, 1, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 1,
+        weight: 2,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupSE.png"),
+      },
+    },
+  ],
+  [
+    "self-block",
+    {
+      name: "self-block",
+      displayName: "Self Block",
+      color: "#ff1111",
+      link: {
+        dashArray: [1, 5, 1, 5],
+        assignedDashArray: [4, 2, 1],
+        opacity: 4,
+        weight: 3,
+      },
+      portal: {
+        iconUrl: require("./images/marker_layer_groupa.png"),
+      },
+    },
+  ],
+>>>>>>> master
 ]);

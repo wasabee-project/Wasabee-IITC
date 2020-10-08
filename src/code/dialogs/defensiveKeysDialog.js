@@ -21,6 +21,10 @@ const DefensiveKeysDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet();
+<<<<<<< HEAD
+=======
+    this._operation = getSelectedOperation();
+>>>>>>> master
     this._pch = (portal) => {
       this._portalClickedHook(portal);
     };
@@ -104,6 +108,7 @@ const DefensiveKeysDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD
   _addDKey: async function () {
     const dk = {
       PortalID: this._selectedPortal.id,
@@ -123,6 +128,24 @@ const DefensiveKeysDialog = WDialog.extend({
       console.error(e);
       alert(e.toString());
     }
+=======
+  _addDKey: function () {
+    // send it to the server
+    dKeyPromise(
+      this._selectedPortal.id,
+      this._count.value,
+      this._capID.value
+    ).then(
+      function () {
+        alert("Registered with server");
+        window.runHooks("wasabeeDkeys");
+      },
+      function (reject) {
+        console.log(reject);
+        alert(reject);
+      }
+    );
+>>>>>>> master
   },
 
   _getMyData(portalID) {
@@ -130,7 +153,11 @@ const DefensiveKeysDialog = WDialog.extend({
     if (!window.plugin.wasabee._Dkeys.has(portalID)) return null;
     const l = window.plugin.wasabee._Dkeys.get(portalID);
     if (l.has(this._me.GoogleID)) return l.get(this._me.GoogleID);
+<<<<<<< HEAD
     return null;
+=======
+    return;
+>>>>>>> master
   },
 });
 

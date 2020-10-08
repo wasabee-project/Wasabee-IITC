@@ -32,6 +32,7 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
+<<<<<<< HEAD
           await this.doPullAndUpdate();
           return;
         }
@@ -55,11 +56,54 @@ const UploadButton = WButton.extend({
             alert(`Upload + Update Failed: ${e.toString()}`);
           }
         }
+=======
+          updateOpPromise(operation).then(
+            () => {
+              alert(wX("UPDATED"));
+              this.Wupdate(this._container, operation);
+            },
+            (reject) => {
+              console.log(reject);
+              alert(`Update Failed: ${reject}`);
+            }
+          );
+          return;
+        }
+        uploadOpPromise().then(
+          (resolve) => {
+            console.log(resolve);
+            // switch to the new version in local store -- uploadOpPromise stores it
+            makeSelectedOperation(resolve.ID);
+            alert(wX("UPLOADED"));
+            this.Wupdate(this._container, resolve);
+            this._invisible();
+          },
+          (reject) => {
+            // this shouldn't be necessary, but the UI is behind
+            updateOpPromise(operation).then(
+              () => {
+                const selop = getSelectedOperation();
+                alert(wX("UPDATED"));
+                this.Wupdate(this._container, selop);
+              },
+              (reject) => {
+                console.log(reject);
+                alert(`Update Failed: ${reject}`);
+              }
+            );
+            console.log(reject);
+          }
+        );
+>>>>>>> master
       },
     });
   },
 
+<<<<<<< HEAD
   Wupdate: function () {
+=======
+  Wupdate: function (container, operation) {
+>>>>>>> master
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
       this.title = wX("NOT LOGGED IN SHORT");
@@ -108,6 +152,7 @@ const UploadButton = WButton.extend({
   _invisible: function () {
     this.button.style.display = "none";
   },
+<<<<<<< HEAD
 
   doUpdate: async function (op) {
     await updateOpPromise(op);
@@ -143,6 +188,8 @@ const UploadButton = WButton.extend({
       return;
     }
   },
+=======
+>>>>>>> master
 });
 
 export default UploadButton;

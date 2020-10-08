@@ -16,7 +16,10 @@ const AutodrawsDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
+<<<<<<< HEAD
     postToFirebase({ id: "analytics", action: AutodrawsDialog.TYPE });
+=======
+>>>>>>> master
     this._map = map;
     this.menuItems = [
       {

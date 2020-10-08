@@ -22,6 +22,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
+<<<<<<< HEAD
         use: [
           "to-string-loader",
           {
@@ -29,6 +30,9 @@ module.exports = {
             options: { esModule: false },
           },
         ],
+=======
+        use: ["style-loader", "css-loader"],
+>>>>>>> master
       },
       {
         test: /\.html$/,

@@ -91,8 +91,25 @@ export default class WasabeeMe {
       me.fetched == undefined ||
       me.fetched < WasabeeMe.maxCacheAge()
     ) {
+<<<<<<< HEAD
       WasabeeMe.purge();
       return null;
+=======
+      mePromise().then(
+        function (nme) {
+          me = nme;
+          // mePromise calls WasabeeMe.create, which calls me.store()
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        },
+        function (err) {
+          console.log(err);
+          delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+          me = null;
+          alert(err);
+          window.runHooks("wasabeeUIUpdate", getSelectedOperation());
+        }
+      );
+>>>>>>> master
     }
 
     return me;

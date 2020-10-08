@@ -281,7 +281,13 @@ export function checkAllLinks() {
     return;
   }
 
+<<<<<<< HEAD
   // console.time("checkAllLinks");
+=======
+export const checkAllLinks = (operation) => {
+  console.time("checkAllLinks");
+  // console.log("checkAllLinks called: " + operation.ID);
+>>>>>>> master
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
 
@@ -299,7 +305,11 @@ export function checkAllLinks() {
   // console.timeEnd("checkAllLinks");
 }
 
+<<<<<<< HEAD
 function onLinkAdded(data) {
+=======
+const onLinkAdded = (data) => {
+>>>>>>> master
   testLink(data.link, getSelectedOperation());
 }
 
@@ -315,9 +325,16 @@ function onMapDataRefreshEnd() {
   window.addHook("linkAdded", onLinkAdded);
 }
 
+<<<<<<< HEAD
 export function initCrossLinks() {
   window.addHook("wasabeeCrosslinks", () => {
     checkAllLinks();
+=======
+export const initCrossLinks = () => {
+  window.pluginCreateHook("wasabeeCrosslinks");
+  window.addHook("wasabeeCrosslinks", (operation) => {
+    checkAllLinks(operation);
+>>>>>>> master
   });
 
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();

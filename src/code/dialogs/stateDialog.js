@@ -47,8 +47,13 @@ const StateDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD
   setup: function (target, opID) {
     this._opID = opID;
+=======
+  setup: function (target, operation) {
+    this._operation = operation;
+>>>>>>> master
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
@@ -93,6 +98,10 @@ const StateDialog = WDialog.extend({
     return content;
   },
 
+<<<<<<< HEAD
+=======
+  // TODO this should return a promise so the draw routine can .then() it...
+>>>>>>> master
   _getStateMenu: function (current) {
     const container = L.DomUtil.create("div", "wasabee-state-menu");
     const menu = L.DomUtil.create("select", null, container);
@@ -108,7 +117,10 @@ const StateDialog = WDialog.extend({
     const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
     if (mode == "active") {
       menu.addEventListener("change", (value) => {
+<<<<<<< HEAD
         // async/await not necessary since this doesn't return a value
+=======
+>>>>>>> master
         this.activeSetState(value);
       });
     } else {
@@ -121,11 +133,14 @@ const StateDialog = WDialog.extend({
   },
 
   designSetState: function (value) {
+<<<<<<< HEAD
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       console.log("operation changed -- bailing");
       return;
     }
+=======
+>>>>>>> master
     if (this._type == "Marker") {
       operation.setMarkerState(this._targetID, value.srcElement.value);
     }
@@ -135,6 +150,7 @@ const StateDialog = WDialog.extend({
     }
   },
 
+<<<<<<< HEAD
   activeSetState: async function (value) {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) {
@@ -165,6 +181,11 @@ const StateDialog = WDialog.extend({
         console.log(e);
       }
     }
+=======
+  activeSetState: function (value) {
+    alert("Active mode set state not written yet");
+    console.log("not written yet", value);
+>>>>>>> master
   },
 });
 

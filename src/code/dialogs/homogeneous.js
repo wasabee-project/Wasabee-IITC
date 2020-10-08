@@ -152,12 +152,25 @@ const HomogeneousDialog = WDialog.extend({
     }
     L.DomUtil.create("span", "null", container);
 
+<<<<<<< HEAD
     const fullSearchLabel = L.DomUtil.create("label", null, container);
     fullSearchLabel.textContent = wX("HF_DEEP_SEARCH");
     fullSearchLabel.htmlFor = "wasabee-homogeneous-deep";
     this._fullSearchCheck = L.DomUtil.create("input", null, container);
     this._fullSearchCheck.type = "checkbox";
     this._fullSearchCheck.id = "wasabee-homogeneous-deep";
+=======
+    const placeholder = L.DomUtil.create("div", "null", container);
+    placeholder.textContent = "\u2063";
+
+    // Go button
+    const drawButton = L.DomUtil.create("button", "drawb", container);
+    drawButton.textContent = wX("ONION");
+    L.DomEvent.on(drawButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this.hfield.call(this);
+    });
+>>>>>>> master
 
     const spanRedraw = L.DomUtil.create("div", null, container);
     this._redrawButton = L.DomUtil.create("button", null, spanRedraw);
@@ -261,6 +274,7 @@ const HomogeneousDialog = WDialog.extend({
     }
   },
 
+<<<<<<< HEAD
   hdeepfield: function () {
     this._failed = 0;
     this._layerGroup.clearLayers();
@@ -312,6 +326,8 @@ const HomogeneousDialog = WDialog.extend({
     }
   },
 
+=======
+>>>>>>> master
   _draw: function () {
     this._colors = new Array();
     for (const c of window.plugin.wasabee.skin.layerTypes.values()) {
@@ -427,6 +443,7 @@ const HomogeneousDialog = WDialog.extend({
     return bestResult;
   },
 
+<<<<<<< HEAD
   _fullRecurser: function (portalsCovered, one, two, three) {
     const alreadyCalculatedCover = new Map();
     const getNbSplitPerDepth = (depth) => (3 ** (depth - 1) - 1) / 2;
@@ -555,6 +572,8 @@ const HomogeneousDialog = WDialog.extend({
     );
   },
 
+=======
+>>>>>>> master
   _drawTreeCore: function (tree) {
     const depthValue = +this.depthMenu.value - 1;
     const [one, two, three] = tree.anchors;
@@ -766,6 +785,11 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _getSubregions: function (centerPoint, possibles, one, two, three) {
+<<<<<<< HEAD
+=======
+    this._operation.addPortal(centerPoint);
+
+>>>>>>> master
     const possibleExceptAnchors = new Array();
     for (const p of possibles) {
       const guid = p.id || p.options.guid;

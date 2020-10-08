@@ -35,8 +35,13 @@ const OperationChecklistDialog = WDialog.extend({
     const operation = getSelectedOperation();
     // this._opID = operation.ID;
     // magic context incantation to make "this" work...
+<<<<<<< HEAD:src/code/dialogs/checklist.js
     this._UIUpdateHook = () => {
       context.checklistUpdate();
+=======
+    this._UIUpdateHook = (newOpData) => {
+      context.checklistUpdate(newOpData);
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
@@ -54,8 +59,12 @@ const OperationChecklistDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
+<<<<<<< HEAD:src/code/dialogs/checklist.js
     const operation = getSelectedOperation();
     this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
+=======
+    this.sortable = this.getListDialogContent(this._operation, 0, false); // defaults to sorting by op order
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -79,9 +88,15 @@ const OperationChecklistDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD:src/code/dialogs/checklist.js
   checklistUpdate: function () {
     const operation = getSelectedOperation();
     this._dialog.dialog("option", "title", wX("OP_CHECKLIST", operation.name));
+=======
+  checklistUpdate: function (newOpData) {
+    this._operation = newOpData;
+    this._dialog.dialog("option", "title", wX("OP_CHECKLIST", newOpData.name));
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
     this.sortable = this.getListDialogContent(
       operation,
       this.sortable.sortBy,
@@ -97,7 +112,11 @@ const OperationChecklistDialog = WDialog.extend({
     const content = new Sortable();
     content.fields = [
       {
+<<<<<<< HEAD:src/code/dialogs/checklist.js
         name: this._smallScreen ? "#" : wX("ORDER"),
+=======
+        name: wX("ORDER"),
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
         value: (thing) => thing.opOrder,
         // sort: (a, b) => a - b,
         format: (cell, value, thing) => {
@@ -147,6 +166,7 @@ const OperationChecklistDialog = WDialog.extend({
           const span = L.DomUtil.create("span", null, cell);
           if (thing.type) L.DomUtil.addClass(span, thing.type);
           span.textContent = value;
+<<<<<<< HEAD:src/code/dialogs/checklist.js
 
           if (thing instanceof WasabeeMarker) {
             L.DomEvent.on(cell, "click", (ev) => {
@@ -176,6 +196,9 @@ const OperationChecklistDialog = WDialog.extend({
           }
         },
         smallScreenHide: true,
+=======
+        },
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
       },
       {
         name: wX("COMMENT"),
@@ -247,7 +270,11 @@ const OperationChecklistDialog = WDialog.extend({
           if (obj instanceof WasabeeLink) {
             const rev = L.DomUtil.create("a", null, cell);
             rev.href = "#";
+<<<<<<< HEAD:src/code/dialogs/checklist.js
             rev.textContent = "🔄";
+=======
+            rev.textContent = "Reverse";
+>>>>>>> master:src/code/dialogs/operationChecklistDialog.js
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);

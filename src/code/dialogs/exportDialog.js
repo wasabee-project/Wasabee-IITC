@@ -26,7 +26,10 @@ const ExportDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
+<<<<<<< HEAD
     const operation = getSelectedOperation();
+=======
+>>>>>>> master
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -52,7 +55,11 @@ const ExportDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD
   _buildContent: function (operation) {
+=======
+  _buildContent: function () {
+>>>>>>> master
     const mainContent = L.DomUtil.create("div", null);
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
@@ -61,7 +68,11 @@ const ExportDialog = WDialog.extend({
     return mainContent;
   },
 
+<<<<<<< HEAD
   _drawToolsFormat: function (operation) {
+=======
+  _drawToolsFormat: function () {
+>>>>>>> master
     const ta = document.getElementById("wasabee-dialog-export-textarea");
     const output = new Array();
     for (const link of operation.links) {
@@ -74,6 +85,7 @@ const ExportDialog = WDialog.extend({
 
     ta.value = JSON.stringify(output);
   },
+<<<<<<< HEAD
 
   _bookmarkFormat: function (operation) {
     const ta = document.getElementById("wasabee-dialog-export-textarea");
@@ -100,6 +112,8 @@ const ExportDialog = WDialog.extend({
     }
     ta.value = JSON.stringify(output);
   },
+=======
+>>>>>>> master
 });
 
 export default ExportDialog;

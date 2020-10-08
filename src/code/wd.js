@@ -47,6 +47,7 @@ export async function drawWasabeeDkeys() {
   console.debug("running drawWasabeeDkeys");
   window.addHook("portalDetailLoaded", dLoadDetails);
 
+<<<<<<< HEAD
   try {
     const data = await dKeylistPromise();
     const list = JSON.parse(data);
@@ -88,6 +89,52 @@ export async function drawWasabeeDkeys() {
           getPortalDetails(n.PortalID); // listener deals with the replies
         }
       }
+=======
+  dKeylistPromise().then(
+    (data) => {
+      let list = null;
+      try {
+        list = JSON.parse(data);
+      } catch (e) {
+        console.log(e);
+      }
+      if (!list) console.log(data); // what does the server send if recently logged out?
+      if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
+        return;
+      for (const n of list.DefensiveKeys) {
+        if (n.PortalID) {
+          let l;
+          if (window.plugin.wasabee._Dkeys.has(n.PortalID)) {
+            l = window.plugin.wasabee._Dkeys.get(n.PortalID);
+          } else {
+            l = new Map();
+          }
+          l.set(n.GID, n); // add user to the sub-map
+          window.plugin.wasabee._Dkeys.set(n.PortalID, l);
+          if (
+            window.portals[n.PortalID] &&
+            window.portals[n.PortalID].options.data.title
+          ) {
+            // already fully fetched
+            const e = window.portals[n.PortalID].options;
+            e.success = true; // make this look like an event
+            e.details = e.data;
+            dLoadDetails(e);
+          } else {
+            // if we are here early (after a reload?) IITC spams the logs
+            if (!window.requests) {
+              console.log(
+                "window.requests does not exist yet... expect an error"
+              );
+            }
+            getPortalDetails(n.PortalID); // listener deals with the replies
+          }
+        }
+      }
+    },
+    (err) => {
+      console.log(err);
+>>>>>>> master
     }
   } catch (err) {
     console.error(err);
@@ -95,7 +142,11 @@ export async function drawWasabeeDkeys() {
   drawMarkers();
 }
 
+<<<<<<< HEAD
 function dLoadDetails(e) {
+=======
+const dLoadDetails = (e) => {
+>>>>>>> master
   if (!e.success) return; // bad load
   if (window.plugin.wasabee._Dkeys.has(e.guid)) {
     const submap = window.plugin.wasabee._Dkeys.get(e.guid);
@@ -179,7 +230,11 @@ function drawMarker(portalID, submap) {
   });
   marker.on(
     "click spiderfiedclick",
+<<<<<<< HEAD
     async (ev) => {
+=======
+    (ev) => {
+>>>>>>> master
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
       try {
@@ -199,8 +254,25 @@ function drawMarker(portalID, submap) {
   );
 }
 
+<<<<<<< HEAD
 async function getMarkerPopup(PortalID) {
   if (!window.plugin.wasabee._Dkeys) return null;
+=======
+  let disable = true;
+  for (const [k, v] of window.plugin.wasabee._Dkeys) {
+    if (!k) disable = false; // silence es-lint
+    if (!v.has("details")) disable = false; // still some waiting to be fetched
+  }
+  if (disable) {
+    console.log("disabling portalDetailLoaded listener for WD");
+    window.removeHook("portalDetailLoaded", dLoadDetails);
+  }
+};
+
+const getMarkerPopup = (PortalID) => {
+  if (!window.plugin.wasabee._Dkeys) return;
+
+>>>>>>> master
   const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
   if (window.plugin.wasabee._Dkeys.has(PortalID)) {
     const ul = L.DomUtil.create("ul", null, container);

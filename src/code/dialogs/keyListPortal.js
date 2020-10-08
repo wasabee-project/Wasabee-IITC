@@ -20,8 +20,13 @@ const KeyListPortal = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
+<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.keyListUpdate();
+=======
+    this._UIUpdateHook = (newOpData) => {
+      context.keyListUpdate(newOpData);
+>>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
@@ -70,9 +75,14 @@ const KeyListPortal = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD
   keyListUpdate: function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) {
+=======
+  keyListUpdate: function (operation) {
+    if (operation.ID != this._operation.ID) {
+>>>>>>> master
       this._dialog.dialog("close"); // op changed, bail
     }
     const table = this.getListDialogContent(operation, this._portalID);

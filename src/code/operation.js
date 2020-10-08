@@ -98,10 +98,13 @@ export default class WasabeeOp {
       localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
+<<<<<<< HEAD
       mode: this.mode,
       zones: this.zones,
       // ignored by the server but useful for localStorage
       server: this.server,
+=======
+>>>>>>> master
     };
   }
 
@@ -261,9 +264,12 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
+<<<<<<< HEAD
     console.debug("removing anchor");
     console.debug(this.links);
 
+=======
+>>>>>>> master
     this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
@@ -744,7 +750,32 @@ export default class WasabeeOp {
     }
 
     this.store();
+<<<<<<< HEAD
     window.runHooks("wasabeeUIUpdate", "op update");
+=======
+    window.runHooks("wasabeeUIUpdate", this);
+  }
+
+  // only for use by "active" mode
+  _updateOnServer() {
+    const now = Date.now();
+    if (this._AMpushed && now - this._AMpushed < 1000) {
+      this._AMpushed = now;
+      console.log("skipping active mode push");
+      return;
+    }
+
+    this._AMpushed = now;
+    updateOpPromise(this).then(
+      () => {
+        console.log("active mode change pushed", new Date().toGMTString());
+      },
+      (err) => {
+        console.log(err);
+        alert("Active Mode Update failed: " + err);
+      }
+    );
+>>>>>>> master
   }
 
   runCrosslinks() {

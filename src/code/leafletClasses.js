@@ -168,6 +168,7 @@ export const WButton = L.Class.extend({
     return link;
   },
 
+<<<<<<< HEAD
   _touches: null,
 
   touchstart: function (ev) {
@@ -186,6 +187,21 @@ export const WButton = L.Class.extend({
     if (ev.changedTouches[0].target.id != this._touches) {
       this._touches = ev.changedTouches[0].target.id;
       console.log("new touch target", this._touches);
+=======
+  touchstart: function () {
+    console.log("Wbutton touchstart");
+    // console.log(ev);
+  },
+
+  touchend: function (ev) {
+    console.log("Wbutton touchend");
+    console.log(ev);
+    console.log(this);
+    if (this._enabled) {
+      this.disable();
+    } else {
+      this.enable();
+>>>>>>> master
     }
   },
 
@@ -218,16 +234,20 @@ export const WButton = L.Class.extend({
         callback: b.callback,
         context: b.context,
         className: "wasabee-subactions",
+<<<<<<< HEAD
       });
       L.DomEvent.on(li, "touchenter", (ev) => {
         console.log("touchenter", ev);
       });
       L.DomEvent.on(li, "touchleave", (ev) => {
         console.log("touchleave", ev);
+=======
+>>>>>>> master
       });
     }
     return container;
   },
+<<<<<<< HEAD
 
   _isTouch: function () {
     /* console.log("mobile", L.Browser.mobile);
@@ -236,4 +256,6 @@ export const WButton = L.Class.extend({
     // if (L.Browser.mobile && L.Browser.touch) return true;
     return false;
   },
+=======
+>>>>>>> master
 });

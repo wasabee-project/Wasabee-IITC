@@ -8,7 +8,11 @@ import wX from "../wX";
 
 const OpButton = WButton.extend({
   statics: {
+<<<<<<< HEAD:src/code/buttons/opButton.js
     TYPE: "opButton",
+=======
+    TYPE: "opsButton",
+>>>>>>> master:src/code/buttons/opsButton.js
   },
 
   initialize: function (map, container) {
@@ -27,7 +31,10 @@ const OpButton = WButton.extend({
       className: "wasabee-toolbar-op",
       callback: this._toggleActions,
       context: context,
+<<<<<<< HEAD:src/code/buttons/opButton.js
       title: this.title,
+=======
+>>>>>>> master:src/code/buttons/opsButton.js
     });
 
     this.actionsContainer = this._createSubActions([

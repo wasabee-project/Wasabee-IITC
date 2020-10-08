@@ -11,7 +11,11 @@ import { initSkin, changeSkin } from "./skin";
 import WasabeeMe from "./me";
 const Wasabee = window.plugin.wasabee;
 
+<<<<<<< HEAD
 window.plugin.wasabee.init = () => {
+=======
+window.plugin.wasabee.init = function () {
+>>>>>>> master
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -76,9 +80,14 @@ window.plugin.wasabee.init = () => {
   });
 
   // custom hook for updating our UI
+<<<<<<< HEAD
   window.addHook("wasabeeUIUpdate", (caller) => {
     if (caller != null) console.debug("ui update", caller);
     drawMap();
+=======
+  window.addHook("wasabeeUIUpdate", (operation) => {
+    drawThings(operation);
+>>>>>>> master
   });
 
   // IITC-CE, not 0.26

@@ -186,8 +186,11 @@ const MultimaxDialog = WDialog.extend({
   },
 
   doMultimax: function () {
+<<<<<<< HEAD
     // this._operation is OK here
     this._operation = getSelectedOperation();
+=======
+>>>>>>> master
     const portals = getAllPortalsOnScreen(this._operation);
 
     // Calculate the multimax

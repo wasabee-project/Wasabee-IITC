@@ -26,6 +26,12 @@ const TeamMembershipList = WDialog.extend({
   },
 
   _displayDialog: function () {
+<<<<<<< HEAD
+=======
+    // sometimes we are too quick, try again
+    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
+
+>>>>>>> master
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
@@ -74,6 +80,7 @@ const TeamMembershipList = WDialog.extend({
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
+<<<<<<< HEAD
         name: "Sharing Location",
         value: (agent) => agent.state,
         sort: (a, b) => a.localeCompare(b),
@@ -92,6 +99,18 @@ const TeamMembershipList = WDialog.extend({
     ];
     this._table.sortBy = 0;
     this._table.items = this._team.agents;
+=======
+        name: wX("LOC_UPDATE"),
+        value: (agent) => agent.date + " GMT",
+        sort: (a, b) => a.localeCompare(b),
+        // , format: (cell, value) => (cell.textContent = value)
+      },
+    ];
+    this._table.sortBy = 0;
+    // if team owner, don't show non-enabled agents
+    const a = this._team.agents.filter((agent) => agent.state);
+    this._table.items = a;
+>>>>>>> master
   },
 });
 

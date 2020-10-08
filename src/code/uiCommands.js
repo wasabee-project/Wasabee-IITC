@@ -69,7 +69,11 @@ export function deleteMarker(operation, marker, portal) {
   con.enable();
 }
 
+<<<<<<< HEAD
 export function clearAllItems(operation) {
+=======
+export const clearAllItems = (operation) => {
+>>>>>>> master
   const con = new ConfirmDialog();
   con.setup(
     `Clear: ${operation.name}`,
@@ -82,7 +86,11 @@ export function clearAllItems(operation) {
   con.enable();
 }
 
+<<<<<<< HEAD
 export function clearAllLinks(operation) {
+=======
+export const clearAllLinks = (operation) => {
+>>>>>>> master
   const con = new ConfirmDialog();
   con.setup(
     `Clear Links: ${operation.name}`,
@@ -108,14 +116,22 @@ export function clearAllMarkers(operation) {
   con.enable();
 }
 
+<<<<<<< HEAD
 export function listenForAddedPortals(newPortal) {
+=======
+export const listenForAddedPortals = (newPortal) => {
+>>>>>>> master
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
   op.updatePortal(WasabeePortal.fromIITC(newPortal.portal));
 }
 
+<<<<<<< HEAD
 export function listenForPortalDetails(e) {
+=======
+export const listenForPortalDetails = (e) => {
+>>>>>>> master
   if (!e.success) return;
   const op = getSelectedOperation();
   op.updatePortal(
@@ -132,7 +148,11 @@ export function listenForPortalDetails(e) {
 // can take either an entire array of portal GUID or a single GUID
 // this depends on something listening for the IITC PortalDetailsLoaded hook to process the result
 // see listenForPortalDetails above
+<<<<<<< HEAD
 export function getPortalDetails(guid) {
+=======
+export const getPortalDetails = function (guid) {
+>>>>>>> master
   if (Array.isArray(guid)) {
     window.plugin.wasabee.portalDetailQueue = window.plugin.wasabee.portalDetailQueue.concat(
       guid
@@ -159,8 +179,12 @@ export function getPortalDetails(guid) {
   }
 }
 
+<<<<<<< HEAD
 //const pdqDoNext = function () {
 function pdqDoNext() {
+=======
+const pdqDoNext = function () {
+>>>>>>> master
   const p = window.plugin.wasabee.portalDetailQueue.shift();
 
   // are we done?
@@ -179,7 +203,11 @@ function pdqDoNext() {
   window.portalDetail.request(p);
 }
 
+<<<<<<< HEAD
 export function loadFaked(operation, force = false) {
+=======
+export const loadFaked = function (operation, force = false) {
+>>>>>>> master
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
     false;
@@ -199,6 +227,7 @@ export function sendLocation() {
   if (sl !== "true") return;
 
   navigator.geolocation.getCurrentPosition(
+<<<<<<< HEAD
     async (position) => {
       try {
         await locationPromise(
@@ -212,11 +241,29 @@ export function sendLocation() {
     },
     (err) => {
       console.error(err);
+=======
+    (position) => {
+      locationPromise(position.coords.latitude, position.coords.longitude).then(
+        () => {
+          console.log(wX("LOCATION SUB"));
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    },
+    (err) => {
+      console.log(err);
+>>>>>>> master
     }
   );
 }
 
+<<<<<<< HEAD
 export function getAllPortalsOnScreen(operation) {
+=======
+export const getAllPortalsOnScreen = function (operation) {
+>>>>>>> master
   const bounds = window.clampLatLngBounds(window.map.getBounds());
   const x = [];
   for (const portal in window.portals) {
@@ -236,8 +283,12 @@ export function getAllPortalsOnScreen(operation) {
   return x;
 }
 
+<<<<<<< HEAD
 // const _isOnScreen = function (ll, bounds) {
 function _isOnScreen(ll, bounds) {
+=======
+const _isOnScreen = function (ll, bounds) {
+>>>>>>> master
   return (
     ll.lat < bounds._northEast.lat &&
     ll.lng < bounds._northEast.lng &&
@@ -246,8 +297,12 @@ function _isOnScreen(ll, bounds) {
   );
 }
 
+<<<<<<< HEAD
 // const _hasMarker = function (portalid, markerType, operation) {
 function _hasMarker(portalid, markerType, operation) {
+=======
+const _hasMarker = function (portalid, markerType, operation) {
+>>>>>>> master
   if (operation.markers.length == 0) return false;
   for (const m of operation.markers) {
     if (m.portalId == portalid && m.type == markerType) {
@@ -260,7 +315,11 @@ function _hasMarker(portalid, markerType, operation) {
 // this is the test point used in several auto-draws
 // settings allow there to be several different due to
 // rouding errors resulting from long distances
+<<<<<<< HEAD
 export function testPortal(recursed = false) {
+=======
+export const testPortal = function (recursed = false) {
+>>>>>>> master
   let urp =
     localStorage[
       window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY
@@ -289,7 +348,11 @@ export function testPortal(recursed = false) {
 }
 
 // recursive function to auto-mark blockers
+<<<<<<< HEAD
 export function blockerAutomark(operation, first = true) {
+=======
+export const blockerAutomark = function (operation, first = true) {
+>>>>>>> master
   if (first) operation.startBatchMode();
   // build count list
   const portals = new Array();
@@ -353,6 +416,7 @@ export function blockerAutomark(operation, first = true) {
   blockerAutomark(operation, false);
 
   if (first) operation.endBatchMode();
+<<<<<<< HEAD
 }
 
 export async function fullSync() {
@@ -405,3 +469,6 @@ export async function fullSync() {
     new AuthDialog().enable();
   }
 }
+=======
+};
+>>>>>>> master

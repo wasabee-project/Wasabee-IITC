@@ -9,7 +9,10 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
+<<<<<<< HEAD
   clearAllMarkers,
+=======
+>>>>>>> master
 } from "../uiCommands";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
@@ -31,8 +34,13 @@ const MarkerList = WDialog.extend({
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     const context = this;
+<<<<<<< HEAD
     this._UIUpdateHook = () => {
       context.markerListUpdate();
+=======
+    this._UIUpdateHook = (newOpData) => {
+      context.markerListUpdate(newOpData);
+>>>>>>> master
     };
     window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
@@ -48,8 +56,12 @@ const MarkerList = WDialog.extend({
   },
 
   _displayDialog: function () {
+<<<<<<< HEAD
     const operation = getSelectedOperation();
     loadFaked(operation);
+=======
+    loadFaked(this._operation);
+>>>>>>> master
 
     const buttons = {};
     buttons[wX("CLEAR MARKERS")] = () => {
@@ -74,9 +86,14 @@ const MarkerList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
+<<<<<<< HEAD
   markerListUpdate: function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("op changed");
+=======
+  markerListUpdate: function (operation) {
+    if (operation.ID != this._operation.ID) this._operation = operation;
+>>>>>>> master
     const table = this.getListDialogContent(operation).table;
     this._dialog.html(table);
     this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
@@ -109,12 +126,15 @@ const MarkerList = WDialog.extend({
         format: (cell, value, marker) => {
           const d = L.DomUtil.create("span", marker.type, cell);
           d.textContent = value;
+<<<<<<< HEAD
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
             const ch = new MarkerChangeDialog();
             ch.setup(marker);
             ch.enable();
           });
+=======
+>>>>>>> master
         },
       },
       {

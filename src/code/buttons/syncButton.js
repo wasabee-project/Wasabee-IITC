@@ -30,8 +30,41 @@ const SyncButton = WButton.extend({
       container: container,
       className: "wasabee-toolbar-sync",
       context: this,
+<<<<<<< HEAD
       title: this.title,
       callback: fullSync,
+=======
+      callback: () => {
+        const so = getSelectedOperation();
+        const me = WasabeeMe.get(true); // force update of ops list
+        // const me = await WasabeeMe.waitGet(true); // force update of ops list
+        if (!me) {
+          const ad = new AuthDialog();
+          ad.enable();
+          return;
+        }
+
+        const promises = new Array();
+        for (const op of me.Ops) {
+          promises.push(opPromise(op.ID));
+        }
+        Promise.all(promises).then(
+          (ops) => {
+            for (const newop of ops) {
+              newop.store();
+              if (newop.ID == so.ID) {
+                makeSelectedOperation(newop.ID);
+              }
+            }
+            alert(wX("SYNC DONE"));
+          },
+          function (err) {
+            console.log(err);
+            alert(err);
+          }
+        );
+      },
+>>>>>>> master
     });
 
     // hide or show depeneding on logged in state
