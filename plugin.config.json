@@ -5,13 +5,8 @@
             "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js"
         },
         "dev": {
-<<<<<<< HEAD
             "downloadURL": "https://am.wasabee.rocks/static/dev/wasabee.user.js",
             "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js"
-=======
-            "downloadURL": "https://server.wasabee.rocks/static/dev/wasabee.user.js",
-            "updateURL": "https://server.wasabee.rocks/static/dev/wasabee.meta.js"
->>>>>>> master
         },
         "common": {
             "id": "Wasabee.user.js",
@@ -22,11 +17,7 @@
             "category": "Draw",
             "include": "https://intel.ingress.com/*",
             "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-<<<<<<< HEAD
             "version": "0.18.BUILDDATE",
-=======
-            "version": "0.17.BUILDDATE",
->>>>>>> master
 	    "grant": "none"
         }
     },

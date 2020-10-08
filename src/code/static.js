@@ -178,7 +178,6 @@ W.static.layerTypes = new Map([
       name: "groupf",
       displayName: "Pink",
       color: "#ff55ff",
-      },
     },
   ],
 ]);
