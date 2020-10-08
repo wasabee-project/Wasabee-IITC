@@ -40,6 +40,7 @@ export function swapPortal(operation, portal) {
   pr.appendChild(portal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat());
+  L.DomUtil.create("span", null, pr).textContent = "?";
   con.setup(wX("SWAP TITLE"), pr, () => {
     operation.swapPortal(portal, selectedPortal);
   });
