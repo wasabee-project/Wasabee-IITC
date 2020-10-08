@@ -102,6 +102,7 @@ export default class WasabeeOp {
       zones: this.zones,
       // ignored by the server but useful for localStorage
       server: this.server,
+
     };
   }
 
