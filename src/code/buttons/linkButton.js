@@ -23,10 +23,7 @@ const LinkButton = WButton.extend({
       className: "wasabee-toolbar-link",
       callback: this._toggleActions,
       context: context,
-<<<<<<< HEAD
       title: this.title,
-=======
->>>>>>> master
     });
 
     this.actionsContainer = this._createSubActions([

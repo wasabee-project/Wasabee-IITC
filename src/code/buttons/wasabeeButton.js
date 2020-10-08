@@ -6,15 +6,7 @@ import AuthDialog from "../dialogs/authDialog";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-<<<<<<< HEAD
 import { resetOps, setupLocalStorage, removeNonOwnedOps } from "../selectedOp";
-=======
-import {
-  getSelectedOperation,
-  resetOps,
-  setupLocalStorage,
-} from "../selectedOp";
->>>>>>> master
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
@@ -39,10 +31,7 @@ const WasabeeButton = WButton.extend({
       className: "wasabee-toolbar-wasabee",
       callback: this.handler,
       context: this,
-<<<<<<< HEAD
       title: this.title,
-=======
->>>>>>> master
     });
 
     this._lastLoginState = false;
@@ -74,7 +63,6 @@ const WasabeeButton = WButton.extend({
     this._logoutAction = {
       title: wX("LOG_OUT"),
       text: wX("LOG_OUT"),
-<<<<<<< HEAD
       callback: async () => {
         try {
           // if not actually logged in, this removes ALL server ops
@@ -87,22 +75,6 @@ const WasabeeButton = WButton.extend({
         }
         WasabeeMe.purge(); // runs UI updates for us
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
-=======
-      callback: () => {
-        localStorage[window.plugin.wasabee.static.constants.MODE_KEY] =
-          "design";
-
-        logoutPromise().then(
-          () => {
-            window.runHooks("wasabeeUIUpdate", getSelectedOperation());
-            window.runHooks("wasabeeDkeys");
-          },
-          (err) => {
-            alert(err);
-            console.log(err);
-          }
-        );
->>>>>>> master
       },
       context: this,
     };
@@ -188,31 +160,6 @@ const WasabeeButton = WButton.extend({
     this.Wupdate(); // takes container and operation, not needed here
   },
 
-<<<<<<< HEAD
-=======
-  getIcon: function () {
-    const lang = getLanguage();
-    // if the seconary langauge is set, use its icon
-    if (lang == window.plugin.wasabee.static.constants.SECONDARY_LANGUAGE) {
-      if (this._lastLoginState) {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_seg //green eyed
-          .default;
-      } else {
-        return window.plugin.wasabee.static.images.toolbar_wasabeebutton_se //non-green eyed
-          .default;
-      }
-    }
-    // regular icon, two states
-    if (this._lastLoginState) {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_in //green bee image
-        .default;
-    } else {
-      return window.plugin.wasabee.static.images.toolbar_wasabeebutton_out //yellow bee image
-        .default;
-    }
-  },
-
->>>>>>> master
   _getActions: function () {
     let tmp = [];
     if (!this._lastLoginState) {
