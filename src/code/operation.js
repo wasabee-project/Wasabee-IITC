@@ -102,7 +102,6 @@ export default class WasabeeOp {
       zones: this.zones,
       // ignored by the server but useful for localStorage
       server: this.server,
-
     };
   }
 
@@ -976,6 +975,9 @@ export default class WasabeeOp {
   }
 
   zoneName(zoneID) {
+    if (zoneID == "0")
+      // All zone
+      return "All";
     for (const z of this.zones) {
       if (z.id == zoneID) return z.name;
     }
