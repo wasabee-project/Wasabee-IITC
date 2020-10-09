@@ -219,7 +219,7 @@ const OpPermList = WDialog.extend({
     }
     const operation = getSelectedOperation();
     try {
-      await delPermPromise(operation.ID, obj.teamid, obj.role);
+      await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);
       const n = new Array();
       for (const p of operation.teamlist) {
         if (p.teamid != obj.teamid || p.role != obj.role) n.push(p);

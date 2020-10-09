@@ -274,10 +274,11 @@ export function addPermPromise(opID, teamID, role, zone) {
 }
 
 // removes a permission from an op; return value is status code
-export function delPermPromise(opID, teamID, role) {
+export function delPermPromise(opID, teamID, role, zone) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
+  fd.append("zone", zone);
   return genericDelete(`/api/v1/draw/${opID}/perms`, fd);
 }
 
