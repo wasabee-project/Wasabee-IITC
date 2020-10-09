@@ -108,7 +108,7 @@ const OpPermList = WDialog.extend({
 
       L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
-        this.addPerm(teamMenu.value, permMenu.value); // async, but no need to await
+        this.addPerm(teamMenu.value, permMenu.value, zoneMenu.value); // async, but no need to await
         // addPerm calls wasabeeUIUpdate, which redraws the screen
       });
     }
