@@ -38,7 +38,7 @@ export const WTooltip = L.Class.extend({
 
 export const WDialog = L.Handler.extend({
   initialize: function (map = window.map, options) {
-    this.type = "Unextended Wasabee Dialog";
+    if (this.type === undefined) this.type = "Unextended Wasabee Dialog";
     this._map = map;
     this._container = map._container;
     this.options = {};
