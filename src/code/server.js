@@ -234,7 +234,7 @@ export function SetLinkState(opID, linkID, state) {
 // updates an agent's key count, return value is status code
 export function opKeyPromise(opID, portalID, onhand, capsule) {
   const fd = new FormData();
-  fd.append("onhand", onhand);
+  fd.append("count", onhand);
   fd.append("capsule", capsule);
   return genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
 }
