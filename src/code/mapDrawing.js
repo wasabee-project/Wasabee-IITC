@@ -106,7 +106,7 @@ function resetLinks(operation) {
 }
 
 /** reset links is consistently 1ms faster than update, and is far safer */
-/* 
+/*
 function updateLinks(operation) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
   if (!operation.links || operation.links.length == 0) {
@@ -359,7 +359,7 @@ function addAnchorToMap(portalId) {
     });
   } else {
     const svg = L.Util.template(
-      '<svg class="wasabee-anchor-icon wasabee-layer-custom" style="background-color: {color}""></svg>',
+      '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
       { color: anchor.color }
     );
     marker = L.marker(anchor.latLng, {
@@ -368,7 +368,7 @@ function addAnchorToMap(portalId) {
       id: portalId,
       color: anchor.color,
       icon: L.divIcon({
-        className: "",
+        className: "wasabee-anchor-icon",
         shadowUrl: null,
         iconAnchor: [12, 41],
         iconSize: [25, 41],

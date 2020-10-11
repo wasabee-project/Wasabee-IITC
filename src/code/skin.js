@@ -9,12 +9,14 @@ export function initSkin() {
   Wasabee.skin.layerTypes = new Map(Wasabee.static.layerTypes);
   Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
   Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
+  Wasabee.skin.anchorTemplate = Wasabee.static.anchorTemplate;
   Wasabee.skin.strings = Object.assign({}, Wasabee.static.strings);
 
   for (const k of Object.getOwnPropertyNames(Wasabee.static.CSS)) {
     addCSS(k, Wasabee.static.CSS[k]);
   }
   initOpsColor();
+  initAnchorIcon();
 }
 
 function addCSS(name, content) {
@@ -93,9 +95,12 @@ export function changeSkin(names) {
       for (const [k, v] of skin.layerTypes) Wasabee.skin.layerTypes.set(k, v);
     if (skin.linkStyle) Wasabee.skin.linkStyle = skin.linkStyle;
     if (skin.selfBlockStyle) Wasabee.skin.selfBlockStyle = skin.selfBlockStyle;
+    if (skin.anchorTemplate !== undefined)
+      Wasabee.skin.anchorTemplate = skin.anchorTemplate;
   }
 
   initOpsColor();
+  initAnchorIcon();
 
   localStorage[
     window.plugin.wasabee.static.constants.SKIN_KEY
@@ -106,6 +111,21 @@ export function changeSkin(names) {
   return true;
 }
 
+function initAnchorIcon() {
+  const el = document.getElementById("wasabee-anchor-svg");
+  if (el) el.remove();
+
+  const iconHTML = Wasabee.skin.anchorTemplate;
+  if (iconHTML) {
+    const tmp = L.DomUtil.create("div");
+    tmp.innerHTML = iconHTML;
+
+    const icon = tmp.firstChild;
+    icon.id = "wasabee-anchor-svg";
+    document.body.appendChild(icon);
+  }
+}
+
 function initOpsColor() {
   const el = document.getElementById("wasabee-colors-datalist");
   if (el) el.remove();
@@ -113,7 +133,7 @@ function initOpsColor() {
   const datalist = L.DomUtil.create("datalist", null, document.body);
   datalist.id = "wasabee-colors-datalist";
 
-  for (const c of window.plugin.wasabee.static.layerTypes.values()) {
+  for (const c of Wasabee.skin.layerTypes.values()) {
     L.DomUtil.create("option", null, datalist).value = c.color;
   }
 }

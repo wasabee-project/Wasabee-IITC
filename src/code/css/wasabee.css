@@ -469,7 +469,6 @@
 
 .wasabee-anchor-icon {
   background-size: 25px 41px;
-  background-image: url(../images/pin_red.svg)
 }
 .wasabee-anchor-icon.wasabee-layer-main {
   background-image: url(../images/pin_red.svg)
@@ -491,18 +490,6 @@
 }
 .wasabee-anchor-icon.wasabee-layer-groupf {
   background-image: url(../images/pin_magenta.svg)
-}
-
-/* use a specific class for custom layer to not break skins and pre-defined layers */
-/* in order custom color to match OP color, the anchor base color MUST be closed to red */
-.wasabee-anchor-icon.wasabee-layer-custom {
-  background-image: url(../images/pin_red.svg);
-  background-blend-mode: luminosity;
-  mask-image: url(../images/pin_red.svg);
-  mask-size: 25px 41px;
-  -webkit-mask-image: url(../images/pin_red.svg);
-  -webkit-mask-size: 25px 41px;
-
 }
 
 .wasabee-toolbar-wasabee {

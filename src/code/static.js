@@ -123,6 +123,8 @@ W.static.selfBlockStyle = {
   weight: 3,
 };
 
+W.static.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");
+
 // https://leafletjs.com/reference-1.0.3.html#path
 W.static.layerTypes = new Map([
   [

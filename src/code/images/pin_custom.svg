@@ -1,0 +1,9 @@
+<svg>
+	<symbol id="wasabee-anchor-icon" viewBox="0 0 25 41">
+		<path d="M 12,41 l -2,-3 l 0,-20 l 4,0 l 0,20 Z" style="fill: #b0b0b0;"/>
+		<path d="M 12,41 l -2,-3 l 0,-20 l 2,0 Z" style="fill: #c0c0c0;"/>
+		<circle cx="12" cy="13" r="9" />
+		<circle cx="12" cy="13" r="7" style="fill: white; fill-opacity: .1"/>
+		<path d="M 7,13 a 5,5,0,0,1,5,-5" style="stroke: white; stroke-opacity: .4;fill: none;stroke-linecap: round;stroke-width: 2;"/>
+	</symbol>
+</svg>
