@@ -39,8 +39,6 @@ const HomogeneousDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "container");
     const description2 = L.DomUtil.create("div", "desc", container);
     description2.textContent = wX("H-GEN_INST");
-    const anchorDisplay = L.DomUtil.create("span", null, container);
-    anchorDisplay.textContent = "";
 
     const anchorLabelOne = L.DomUtil.create("label", null, container);
     anchorLabelOne.textContent = wX("ANCHOR_PORTAL");
@@ -150,7 +148,6 @@ const HomogeneousDialog = WDialog.extend({
       orderOption.value = value;
       orderOption.textContent = text;
     }
-    L.DomUtil.create("span", "null", container);
 
     const fullSearchLabel = L.DomUtil.create("label", null, container);
     fullSearchLabel.textContent = wX("HF_DEEP_SEARCH");

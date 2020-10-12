@@ -1,0 +1,103 @@
+/* Autodraw dialogs */
+
+.wasabee-dialog button.drawb {
+  padding: 4px 17px;
+  cursor: pointer;
+  border-radius: 35px;
+  border: 2px solid goldenrod;
+  text-align: center;
+  width: max-content;
+  margin: auto 0 auto auto;
+}
+
+.wasabee-dialog-fanfield .container,
+.wasabee-dialog-homogeneous .container,
+.wasabee-dialog-link .container,
+.wasabee-dialog-madrid .container,
+.wasabee-dialog-multimax .container,
+.wasabee-dialog-onion .container,
+.wasabee-dialog-starburst .container {
+  display: grid;
+  grid-gap: 0.2em 0.5em;
+  align-items: center;
+  grid-template-columns: minmax(min-content, 10em) min-content auto;
+}
+
+.wasabee-dialog-fanfield label,
+.wasabee-dialog-link label,
+.wasabee-dialog-madrid label,
+.wasabee-dialog-multimax label,
+.wasabee-dialog-onion label,
+.wasabee-dialog-starburst label {
+    grid-column: 1;
+}
+
+.wasabee-dialog-fanfield button,
+.wasabee-dialog-homogeneous button,
+.wasabee-dialog-link button,
+.wasabee-dialog-madrid button,
+.wasabee-dialog-multimax button,
+.wasabee-dialog-onion button,
+.wasabee-dialog-starburst button {
+  padding: 4px;
+  grid-column: 2;
+  cursor: pointer;
+}
+
+.wasabee-dialog-homogeneous .drawb {
+  grid-column: 4;
+}
+
+.wasabee-dialog-link .drawb,
+.wasabee-dialog-fanfield .drawb,
+.wasabee-dialog-madrid .drawb,
+.wasabee-dialog-multimax .drawb,
+.wasabee-dialog-onion .drawb,
+.wasabee-dialog-starburst .drawb {
+  grid-column: 3;
+}
+
+.wasabee-dialog-link .desc,
+.wasabee-dialog-fanfield .desc,
+.wasabee-dialog-madrid .desc,
+.wasabee-dialog-multimax .desc,
+.wasabee-dialog-onion .desc {
+  grid-column: 1 / 4;
+}
+
+.wasabee-dialog-fanfield .desc2 {
+  grid-column: 1 / 3;
+}
+
+.wasabee-dialog-homogeneous .desc {
+  grid-column: 1 / 5;
+}
+
+.wasabee-dialog-homogeneous .portal {
+  grid-column: 3 / 5;
+}
+
+.wasabee-dialog-link .portal {
+  grid-column: 3;
+}
+.wasabee-dialog-link .add {
+  grid-column: 4;
+}
+.wasabee-dialog-link .desc {
+  grid-column: 4;
+}
+
+.wasabee-dialog-madrid .set_label {
+  grid-column: 1 / 4;
+}
+
+.wasabee-dialog-starburst .desc,
+.wasabee-dialog-starburst .desc2,
+.wasabee-dialog-starburst .desc3 {
+  grid-column: 1 / 3;
+}
+
+.wasabee-dialog-starburst .desc2,
+.wasabee-dialog-starburst .desc3 {
+  color: lightgrey;
+}

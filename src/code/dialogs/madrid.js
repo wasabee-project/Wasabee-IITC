@@ -53,7 +53,7 @@ const MadridDialog = MultimaxDialog.extend({
       }
     });
 
-    const setOneLabel = L.DomUtil.create("label", null, container);
+    const setOneLabel = L.DomUtil.create("div", "set_label", container);
     setOneLabel.textContent = wX("MADRID_SET_1");
     const setOneButton = L.DomUtil.create("button", null, container);
     setOneButton.textContent = wX("SET");
@@ -102,7 +102,7 @@ const MadridDialog = MultimaxDialog.extend({
       }
     });
 
-    const setTwoLabel = L.DomUtil.create("label", null, container);
+    const setTwoLabel = L.DomUtil.create("div", "set_label", container);
     setTwoLabel.textContent = wX("MADRID_SET_2");
     const setTwoButton = L.DomUtil.create("button", null, container);
     setTwoButton.textContent = wX("SET");
@@ -129,7 +129,7 @@ const MadridDialog = MultimaxDialog.extend({
     const anchorThreeDisplay = L.DomUtil.create("span", null, container);
     anchorThreeDisplay.textContent = "Auto-determined";
 
-    const setThreeLabel = L.DomUtil.create("label", null, container);
+    const setThreeLabel = L.DomUtil.create("div", "set_label", container);
     setThreeLabel.textContent = wX("MADRID_SET_3");
     const setThreeButton = L.DomUtil.create("button", null, container);
     setThreeButton.textContent = wX("SET");

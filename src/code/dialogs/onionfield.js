@@ -39,7 +39,7 @@ const OnionfieldDialog = WDialog.extend({
     const dividerBeforePortals = L.DomUtil.create("span", null, container);
     dividerBeforePortals.textContent = "";
 
-    const anchorLabel = L.DomUtil.create("div", null, container);
+    const anchorLabel = L.DomUtil.create("label", null, container);
     anchorLabel.textContent = wX("ANCHOR_PORTAL");
     const anchorButton = L.DomUtil.create("button", null, container);
     anchorButton.textContent = wX("SET");

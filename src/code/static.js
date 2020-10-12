@@ -4,6 +4,7 @@ const W = window.plugin.wasabee || {};
 W.static = {
   CSS: {
     main: require("./css/wasabee.css"),
+    autodraws: require("./css/autodraws.css"),
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
     iitcfix: require("./css/iitcfix.css"),
