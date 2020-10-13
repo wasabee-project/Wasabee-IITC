@@ -340,6 +340,7 @@ function updateAnchors(op) {
 function addAnchorToMap(portalId) {
   const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
+  // use WasabeeOp.newColors(anchor.color) for 0.19
   let layer = anchor.color;
   if (WasabeeOp.newColors(layer) == layer) layer = "custom";
   let marker;
