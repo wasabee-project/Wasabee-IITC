@@ -21,7 +21,7 @@ window.plugin.wasabee.init = () => {
     window.iitcBuildDate < "2020-01-18-170317"
   ) {
     alert(
-      "Wasabee won't work on this version of IITC; please update to 0.30.1 or newer from <a href='iitc.app'>iitc.app. On desktop, do not use the IITC button, use the TamperMonkey/GreaseMonkey method."
+      "Wasabee won't work on this version of IITC; please <a href='https://iitc.app'>update to 0.30.1 or newer from https://iitc.app</a>. On desktop, <strong>do not use the IITC button</strong>, use the TamperMonkey/GreaseMonkey method."
     );
     return;
   }
