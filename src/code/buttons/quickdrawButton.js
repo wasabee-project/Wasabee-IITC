@@ -35,7 +35,7 @@ const QuickdrawButton = WButton.extend({
 
     this.actionsContainer = this._createSubActions([this._endSubAction]);
     // this should be automaticly detected
-    this.actionsContainer.style.top = "52px";
+    // this.actionsContainer.style.top = "52px";
     this._container.appendChild(this.actionsContainer);
   },
 
