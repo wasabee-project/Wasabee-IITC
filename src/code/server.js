@@ -1,10 +1,6 @@
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
-import {
-  getSelectedOperation,
-  getOperationByID,
-  removeOperation,
-} from "./selectedOp";
+import { getSelectedOperation, removeOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeMarker from "./marker";
 
@@ -64,7 +60,7 @@ export function teamPromise(teamid) {
 // not generic since 304 result processing and If-Modified-Since header
 export async function opPromise(opID) {
   let ims = "Sat, 29 Oct 1994 19:43:31 GMT"; // the dawn of time...
-  const localop = getOperationByID(opID);
+  const localop = WasabeeOp.load(opID);
   if (localop != null && localop.fetched) ims = localop.fetched;
 
   try {

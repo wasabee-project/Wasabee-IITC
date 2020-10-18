@@ -1,4 +1,4 @@
-// import WasabeeOp from "./operation";
+import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import WasabeeMe from "./me";
@@ -9,7 +9,6 @@ import {
   getSelectedOperation,
   makeSelectedOperation,
   opsList,
-  getOperationByID,
   removeOperation,
   changeOpIfNeeded,
   duplicateOperation,
@@ -365,7 +364,7 @@ export async function fullSync() {
     // delete operations absent from server unless the owner
     const serverOps = new Set(
       opsList()
-        .map(getOperationByID)
+        .map(WasabeeOp.load)
         .filter((op) => op)
         .filter((op) => op.server == server && !opsID.has(op.ID))
     );

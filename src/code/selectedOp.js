@@ -1,4 +1,3 @@
-import store from "../lib/store";
 import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
@@ -22,7 +21,7 @@ export function initSelectedOperation() {
       loadNewDefaultOp();
     } else {
       // verify it exists before trying to load
-      let tmp = getOperationByID(toLoad);
+      let tmp = WasabeeOp.load(toLoad);
       if (tmp == null) {
         console.log(
           "most recently loaded up not present in local store, starting with new default op"
@@ -75,7 +74,7 @@ export function makeSelectedOperation(opID) {
 
   // get the op from localStorage
   // in 0.19 this becomes WasabeeOp.load(opID);
-  const op = getOperationByID(opID);
+  const op = WasabeeOp.load(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
     alert("attempted to load invalid opID");
@@ -88,37 +87,6 @@ export function makeSelectedOperation(opID) {
   window.runHooks("wasabeeUIUpdate", "makeSelectedOperation");
   window.runHooks("wasabeeCrosslinks");
   return window.plugin.wasabee._selectedOp;
-}
-
-// use this to pull an op from local store by ID
-// in 0.19 this entire function goes away;
-export function getOperationByID(opID) {
-  try {
-    const newfmt = localStorage[opID];
-    if (newfmt == undefined) return null;
-    const raw = JSON.parse(newfmt);
-    const op = new WasabeeOp(raw);
-    if (op.ID) return op;
-  } catch (e) {
-    console.error(e);
-  }
-  return oldOpFormat(opID);
-}
-
-function oldOpFormat(opID) {
-  console.log("trying old format");
-  try {
-    const oldfmt = store.get(opID);
-    const raw = JSON.parse(oldfmt);
-    const op = new WasabeeOp(raw);
-    if (op != null && op.ID) {
-      op.store();
-      return op;
-    }
-  } catch (e) {
-    console.error(e);
-  }
-  return null;
 }
 
 // called when loaded for the first time or when all ops are purged
@@ -246,7 +214,7 @@ export function duplicateOperation(opID) {
     op = window.plugin.wasabee._selectedOp;
     op.store();
   } else {
-    op = getOperationByID(opID);
+    op = WasabeeOp.load(opID);
   }
 
   op.ID = generateId();
@@ -263,7 +231,7 @@ export function duplicateOperation(opID) {
 // this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
 export function removeNonOwnedOps() {
   for (const opID of opsList()) {
-    const op = getOperationByID(opID);
+    const op = WasabeeOp.load(opID);
     if (!op || !op.IsOwnedOp()) removeOperation(opID);
   }
   changeOpIfNeeded();

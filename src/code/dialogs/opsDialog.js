@@ -1,8 +1,8 @@
+import WasabeeOp from "../operation";
 import { WDialog } from "../leafletClasses";
 import ConfirmDialog from "./confirmDialog";
 import {
   getSelectedOperation,
-  getOperationByID,
   makeSelectedOperation,
   opsList,
   removeOperation,
@@ -98,7 +98,7 @@ const OpsDialog = WDialog.extend({
     const data = new Map();
     data.set("", []);
     for (const opID of ol) {
-      const tmpOp = getOperationByID(opID);
+      const tmpOp = WasabeeOp.load(opID);
       if (!tmpOp) continue;
       const server = tmpOp.server || "";
       if (!data.has(server)) data.set(server, []);
