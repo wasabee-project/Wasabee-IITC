@@ -26,38 +26,19 @@ export function addButtons(selectedOp) {
       this._container = L.DomUtil.create("ul", "leaflet-bar", outerDiv);
       this._modes = {};
 
-      const wb = new WasabeeButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[wb.type] = wb;
-      const ob = new OpButton(map, L.DomUtil.create("li", "", this._container));
-      this._modes[ob.type] = ob;
-      const qb = new QuickdrawButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[qb.type] = qb;
-      const lb = new LinkButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[lb.type] = lb;
-      const mb = new MarkerButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[mb.type] = mb;
-      const sb = new SyncButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[sb.type] = sb;
-      const ub = new UploadButton(
-        map,
-        L.DomUtil.create("li", "", this._container)
-      );
-      this._modes[ub.type] = ub;
+      for (const Constructor of [
+        WasabeeButton,
+        OpButton,
+        QuickdrawButton,
+        LinkButton,
+        MarkerButton,
+        SyncButton,
+        UploadButton,
+      ]) {
+        const item = L.DomUtil.create("li", null, this._container);
+        const button = new Constructor(map, item);
+        this._modes[button.type] = button;
+      }
       return outerDiv;
     },
 
