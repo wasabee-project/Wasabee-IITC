@@ -50,7 +50,7 @@ const MarkerButton = WButton.extend({
       },
     ]);
 
-    this.actionsContainer.style.top = "106px";
+    // this.actionsContainer.style.top = "106px";
     this._container.appendChild(this.actionsContainer);
   },
 

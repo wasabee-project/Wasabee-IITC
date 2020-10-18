@@ -5,6 +5,7 @@ W.static = {
   CSS: {
     main: require("./css/wasabee.css"),
     autodraws: require("./css/autodraws.css"),
+    toolbar: require("./css/toolbar.css"),
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
     iitcfix: require("./css/iitcfix.css"),

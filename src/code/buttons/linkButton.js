@@ -49,7 +49,7 @@ const LinkButton = WButton.extend({
       },
     ]);
 
-    this.actionsContainer.style.top = "78px";
+    //this.actionsContainer.style.top = "78px";
     this._container.appendChild(this.actionsContainer);
   },
 
