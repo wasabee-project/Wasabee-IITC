@@ -161,7 +161,7 @@ const OperationChecklistDialog = WDialog.extend({
       {
         name: "Zone",
         value: (thing) => thing.zone,
-        sort: (a, b) => a.localeCompare(b),
+        sort: (a, b) => a - b,
         format: (cell, value, thing) => {
           const z = L.DomUtil.create("select", null, cell);
           for (const zone of operation.zones) {
@@ -202,7 +202,7 @@ const OperationChecklistDialog = WDialog.extend({
             if (agent != null) return agent.name;
             // we can't use async here, so just request it now and it should be in cache next time
             WasabeeAgent.waitGet(thing.assignedTo);
-            return "looking up: [" + thing.assignedTo + "]";
+            return "GID: [" + thing.assignedTo + "]";
           }
           return ". . .";
         },
@@ -273,7 +273,7 @@ const OperationChecklistDialog = WDialog.extend({
       },
     ];
     content.sortBy = sortBy;
-    content.sortAsc = !sortAsc; // I don't know why this flips
+    content.sortAsc = sortAsc;
     content.items = allThings;
     return content;
   },

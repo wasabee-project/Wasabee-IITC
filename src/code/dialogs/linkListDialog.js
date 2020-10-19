@@ -8,7 +8,7 @@ import wX from "../wX";
 // import WasabeeMe from "../me";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeOp from "../operation";
+// import WasabeeOp from "../operation";
 
 const LinkListDialog = WDialog.extend({
   statics: {
@@ -70,22 +70,22 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Order",
         value: (link) => link.throwOrderPos,
-        // , sort: (a, b) => { return a - b; }
-        // , format: (cell, value, obj) => { console.log(value, obj); cell.textContent = value; }
       },
       {
         name: "From",
         value: (link) => operation.getPortal(link.fromPortalId),
-        sortValue: (b) => b.name,
+        sortValue: (portal) => portal.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
+        format: (cell, portal) =>
+          cell.appendChild(portal.displayFormat(operation)),
       },
       {
         name: "To",
         value: (link) => operation.getPortal(link.toPortalId),
-        sortValue: (b) => b.name,
+        sortValue: (portal) => portal.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
+        format: (cell, portal) =>
+          cell.appendChild(portal.displayFormat(operation)),
       },
       {
         name: "Length",
@@ -133,7 +133,7 @@ const LinkListDialog = WDialog.extend({
             if (agent != null) return agent.name;
             // we can't use async here, so just request it now and it should be in cache next time
             WasabeeAgent.waitGet(link.assignedTo);
-            return "looking up: [" + link.assignedTo + "]";
+            return "GID: [" + link.assignedTo + "]";
           }
 
           return "";
@@ -153,15 +153,14 @@ const LinkListDialog = WDialog.extend({
         },
         smallScreenHide: true,
       },
-      {
+      /* {
         name: "Color",
         value: (link) => link.color,
-        // sort: null,
         format: (cell, data, link) => {
           this.makeColorMenu(cell, data, link);
         },
         smallScreenHide: true,
-      },
+      }, */
       {
         name: "Reverse",
         value: (link) => link.fromPortalId,
@@ -206,7 +205,7 @@ const LinkListDialog = WDialog.extend({
     con.enable();
   },
 
-  makeColorMenu: function (list, data, link) {
+  /* makeColorMenu: function (list, data, link) {
     const operation = getSelectedOperation();
     const colorSection = L.DomUtil.create("div", null, list);
     const linkColor = L.DomUtil.create("select", null, colorSection);
@@ -238,7 +237,7 @@ const LinkListDialog = WDialog.extend({
       },
       false
     );
-  },
+  }, */
 
   updateLinkList: function () {
     const operation = getSelectedOperation();
