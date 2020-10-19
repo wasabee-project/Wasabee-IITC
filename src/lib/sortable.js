@@ -1,33 +1,50 @@
-/* started modification to make it work with leaflet's L.DomUtil -- work is unfinished */
-
 export default class Sortable {
   constructor() {
     this._items = [];
     this._fields = [];
-    this._sortBy = 0;
-    this._sortAsc = true;
+    this._sortBy = 0; // which field/column number to sort by
+    this._sortAsc = false; // ascending or descending
     this._table = L.DomUtil.create("table", "wasabee-table");
+
+    // these really don't need to be defined here yet, since they are setup when the fields/items come in
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
+
+    // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
-    this.renderHead();
   }
+
+  /* How to use this:
+   *
+   * const s = new Sortable();
+   * s.fields = [ {...}, {...} ];
+   * s.items = [ {...}, {...} ];
+   * domobj.appendChild(s.table);
+   *
+   * field { } format:
+   * value(obj) - use the incoming object to calculate the value (displayed if no formatting is required)
+   * sort(a, b, aobj, bobj) - compare two objects for sorting ; the column is not sortable if sort() is not defined; does anything take advantage of aobj/bobj sorting?
+   * sortValue(value, obj) - determine the value to sort by, which may differ from the primary value - obj is optional and can be null if not needed ; value is used if sortValue() is not defined -- almost completely unused
+   * format(cell, value, obj) - cell is the DOM table td into which the value is written, obj is optional and can be null if not needed; value is used if format() is not defined
+   * smallScreenHide -- boolean, if true the cell is hidden on smaller screens
+   */
 
   get sortBy() {
     return this._sortBy;
   }
 
   set sortBy(property) {
-    this._sortBy = property;
+    this._sortBy = Number(property);
     this.sort();
   }
 
   get sortAsc() {
-    return this._sortBy;
+    return this._sortAsc;
   }
 
-  set sortAsc(property) {
-    this._sortAsc = property;
+  set sortAsc(b) {
+    if (b !== true) b = false;
+    this._sortAsc = b;
     this.sort();
   }
 
@@ -36,38 +53,62 @@ export default class Sortable {
   }
 
   get items() {
-    return this._items.map(function(focusTable) {
-      return focusTable.obj;
+    return this._items.map((a) =>  {
+      return a.obj;
     });
   }
 
-  set items(a) {
-    const me = this;
-    this._items = a.map(function(e) {
+  set items(incoming) {
+    let index = 0;
+    this._items = incoming.map((obj) => {
       const row = L.DomUtil.create("tr");
       const data = {
-        obj: e,
-        row: row,
-        index: 0,
-        values: [],
-        sortValues: []
+        obj: obj, // the raw value passed in
+        row: row,  // the complete DOM for the row -- drawn by sort()
+        index: index,  // the position in the list, set & used by sort()
+        values: [], // the computed values for this row
+        sortValues: [], // the computed sort values for this row
       };
-      me._fields.forEach(function(b) {
-        const a = b.value(e);
-        data.values.push(a);
-        data.sortValues.push(b.sortValue ? b.sortValue(a, e) : a);
-        const f = row.insertCell(-1);
-        if (b.format) {
-          b.format(f, a, e);
-        } else {
-          f.textContent = a;
-        }
-	if (b.smallScreenHide && me._smallScreen) {
-         f.style.display = "none";
+      index++;
+      for (const field of this._fields) {
+        // calculate the value using the field's rules
+        const value = field.value(obj);
+        // data.values.push(value);
+
+	if (value != null && typeof obj.then === 'function') {
+          console.log("testing resolving promises", obj);
+	    obj.then(
+	      (resolve) => {
+	        data.value.push(resolve);
+              },
+	      (reject) => {
+                console.log(reject);
+	        data.value.push("rejected");
+	      }
+	    );
+	} else {
+	  // not a promise, just use it directly
+          data.values.push(value);
 	}
-      });
+
+	// calculate sortValue using the field's rules if required
+	let sortValue = value;
+        if (field.sortValue) sortValue = field.sortValue(value, obj); 
+        data.sortValues.push(sortValue);
+
+        const cell = row.insertCell(-1);
+        if (field.format) {
+          field.format(cell, value, obj);
+        } else {
+          cell.textContent = value;
+        }
+        if (field.smallScreenHide && this._smallScreen) {
+          cell.style.display = "none";
+        }
+      }
       return data;
     });
+
     this.sort();
   }
 
@@ -81,89 +122,67 @@ export default class Sortable {
   }
 
   renderHead() {
-    const self = this;
-    this.empty(this._head);
+    delete this._head;
+    this._head = L.DomUtil.create("thead", null, this._table);
+
     const titleRow = this._head.insertRow(-1);
-    this._fields.forEach(function(column, currentState) {
-      const editor = L.DomUtil.create("th", null, titleRow);
-      editor.textContent = column.name;
-      if (column.title) {
-        editor.title = column.title;
-      }
-      if (column.smallScreenHide && self._smallScreen) {
-         editor.style.display = "none"
-      }
-      if (column.sort !== null) {
-        editor.classList.add("sortable");
-        editor.tabIndex = 0;
-        editor.addEventListener(
-          "keypress",
-          function(event) {
-            if (event.keyCode === 13) {
-              event.target.dispatchEvent(
-                new MouseEvent("click", {
-                  bubbles: true,
-                  cancelable: true
-                })
-              );
-            }
-          },
-          false
-        );
-        editor.addEventListener(
+    for (const [index, field] of this._fields.entries()) {
+      const cell = L.DomUtil.create("th", null, titleRow);
+      cell.textContent = field.name;
+      if (field.smallScreenHide && this._smallScreen) cell.style.display = "none";
+      if (field.sort !== null) {
+        L.DomUtil.addClass(cell, "sortable");
+        L.DomEvent.on(
+          cell,
           "click",
-          function() {
-            if (currentState === self._sortBy) {
-              self._sortAsc = !self._sortAsc;
-            } else {
-              self._sortBy = currentState;
-              self._sortAsc = column.defaultAsc;
+          (ev) => {
+	    L.DomEvent.stop(ev);
+            for (const element of titleRow.children) {
+              L.DomUtil.removeClass(element, "sorted");
+              L.DomUtil.removeClass(element, "asc");
+              L.DomUtil.removeClass(element, "desc");
             }
-            self.sort();
+            if (index == this._sortBy) {
+              this._sortAsc = !this._sortAsc;
+              L.DomUtil.addClass(cell, "sorted");
+              L.DomUtil.addClass(cell, this._sortAsc ? "asc" : "desc");
+            }
+            this._sortBy = index;
+            this.sort();
           },
           false
         );
       }
-    });
+    }
   }
 
   sort() {
-    const that = this;
-    this.empty(this._body);
-    const self = this._fields[this._sortBy];
-    this._items.forEach(function(a, b) {
-      return (a.index = b);
-    });
-    this._items.sort(function(a, b) {
-      const value = a.sortValues[that._sortBy];
-      const i = b.sortValues[that._sortBy];
-      let length = 0;
-      return (
-        (length = self.sort
-          ? self.sort(value, i, a.obj, b.obj)
-          : i > value
-          ? -1
-          : value > i
-          ? 1
-          : 0),
-        length === 0 && (length = a.index - b.index),
-        that._sortAsc ? length : -length
-      );
-    });
-    this._items.forEach(function(tabs) {
-      return that._body.appendChild(tabs.row);
-    });
-    $(this._head.getElementsByClassName("sorted")).removeClass(
-      "sorted asc desc"
-    );
-    const dayEle = this._head.rows[0].children[this._sortBy];
-    dayEle.classList.add("sorted");
-    dayEle.classList.add(this._sortAsc ? "asc" : "desc");
-  }
+    delete this._body;
+    this._body = L.DomUtil.create("tbody", null, this._table);
 
-  empty(cell) {
-    for (; cell.firstChild; ) {
-      cell.removeChild(cell.firstChild);
+    const sortfield = this._fields[this._sortBy];
+
+    this._items.sort((a, b) => {
+      const aval = a.sortValues[this._sortBy];
+      const bval = b.sortValues[this._sortBy];
+
+      let l = 0;
+      // if the field defined a sort function, use that
+      if (sortfield.sort) { 
+        l = sortfield.sort(aval, bval, a.obj, b.obj)
+      } else {
+        // otherwise use simple sort
+	if (aval > bval) l = 1;
+        if (bval > aval) l = -1;
+      }
+      // if two values are the same, preserve previous order
+      if (l == 0) l = a.index - b.index;
+      return (this._sortAsc ? -l : l);
+    });
+
+    for (const [index, item] of this._items.entries()) {
+      item.index = index;
+      this._body.appendChild(item.row);
     }
   }
 }
