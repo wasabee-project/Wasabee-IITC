@@ -165,18 +165,18 @@
   background-size: 60%;
 }
 .wasabee-toolbar-link {
-  background-image: url(../images/toolbar_addlinks.png)
+  background-image: url(../images/toolbar_addlinks.svg)
 }
 .wasabee-toolbar-marker {
-  background-image: url(../images/toolbar_addMarkers.png)
+  background-image: url(../images/toolbar_addMarkers.svg)
 }
 .wasabee-toolbar-sync {
   /*background-image: url(../images/toolbar_sync.png)*/
-  background-image: url(../images/toolbar_download.png)
+  background-image: url(../images/toolbar_download.svg)
 }
 /*.wasabee-toolbar-download {
   background-image: url(../images/toolbar_download.png)
 }*/
 .wasabee-toolbar-upload {
-  background-image: url(../images/toolbar_upload.png)
+  background-image: url(../images/toolbar_upload.svg)
 }
