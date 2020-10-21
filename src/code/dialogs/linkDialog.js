@@ -26,7 +26,7 @@ const LinkDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    // this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
@@ -98,11 +98,12 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(anchor1AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
-        this._operation.addLink(
+        const operation = getSelectedOperation();
+        operation.addLink(
           this._source,
           this._anchor1,
           this._desc.value,
-          this._operation.nextOrder
+          operation.nextOrder
         );
       } else {
         alert("Select both Source and Anchor 1");
@@ -141,11 +142,12 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(anchor2AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
-        this._operation.addLink(
+        const operation = getSelectedOperation();
+        operation.addLink(
           this._source,
           this._anchor2,
           this._desc.value,
-          this._operation.nextOrder
+          operation.nextOrder
         );
       } else {
         alert(wX("SEL_SRC_ANC2"));
@@ -158,20 +160,21 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));
+      const operation = getSelectedOperation();
       if (this._anchor1) {
-        this._operation.addLink(
+        operation.addLink(
           this._source,
           this._anchor1,
           this._desc.value,
-          this._operation.nextOrder
+          operation.nextOrder
         );
       }
       if (this._anchor2) {
-        this._operation.addLink(
+        operation.addLink(
           this._source,
           this._anchor2,
           this._desc.value,
-          this._operation.nextOrder
+          operation.nextOrder
         );
       }
     });
