@@ -21,8 +21,6 @@ const OpPermList = WDialog.extend({
   addHooks: async function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const operation = getSelectedOperation();
-    this._opID = operation.ID;
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
@@ -44,10 +42,6 @@ const OpPermList = WDialog.extend({
 
   update: async function () {
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
-      this._opID = operation.ID;
-      console.warn("operation changed while perm dialog open");
-    }
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
@@ -58,14 +52,10 @@ const OpPermList = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const operation = getSelectedOperation();
 
     this.buildTable(operation);
-
     this._html = L.DomUtil.create("div", null);
-
     this._html.appendChild(this._table.table);
     if (this._me && operation.IsOwnedOp()) {
       const already = new Set();

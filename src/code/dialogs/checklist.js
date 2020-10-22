@@ -33,7 +33,6 @@ const OperationChecklistDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const context = this;
     const operation = getSelectedOperation();
-    // this._opID = operation.ID;
     // magic context incantation to make "this" work...
     this._UIUpdateHook = () => {
       context.checklistUpdate();

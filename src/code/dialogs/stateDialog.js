@@ -1,7 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
-import { SetMarkerState, SetLinkState } from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
@@ -57,7 +56,7 @@ const StateDialog = WDialog.extend({
 
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
-      console.log("operation changed");
+      console.log("operation changed between create/setup?!");
       this._opID = operation.ID;
     }
 

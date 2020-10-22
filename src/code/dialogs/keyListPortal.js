@@ -34,9 +34,6 @@ const KeyListPortal = WDialog.extend({
 
   setup: function (portalID) {
     this._portalID = portalID;
-    const op = getSelectedOperation();
-    this._opID = op.ID;
-    this._portal = op.getPortal(portalID);
     this._sortable = this.getSortable();
   },
 
@@ -46,19 +43,17 @@ const KeyListPortal = WDialog.extend({
       return;
     }
 
-    const op = getSelectedOperation();
-    if (this._opID != op.ID) {
-      console.log("this._opID != op.ID");
-    }
-
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
 
+    const op = getSelectedOperation();
+    const portal = op.getPortal(this._portalID);
+
     this._dialog = window.dialog({
-      title: wX("PORTAL KEY LIST", this._portal.displayName),
-      html: this.getListDialogContent(op, this._portalID),
+      title: wX("PORTAL KEY LIST", portal.displayName),
+      html: this.getListDialogContent(this._portalID),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
@@ -71,12 +66,19 @@ const KeyListPortal = WDialog.extend({
   },
 
   keyListUpdate: function () {
-    const operation = getSelectedOperation();
-    if (operation.ID != this._opID) {
-      this._dialog.dialog("close"); // op changed, bail
+    // handle operation changes gracefully
+    const op = getSelectedOperation();
+    const portal = op.getPortal(this._portalID);
+    if (portal == null) {
+      // needs wX
+      this._dialog("option", "title", "unknown portal");
+      this._dialog.html("selected operation changed");
+      return;
     }
-    const table = this.getListDialogContent(operation, this._portalID);
+
+    const table = this.getListDialogContent(this._portalID);
     this._dialog.html(table);
+    this._dialog("option", "title", wX("PORTAL KEY LIST", portal.displayName));
   },
 
   getSortable: function () {
@@ -94,8 +96,6 @@ const KeyListPortal = WDialog.extend({
       {
         name: wX("ON_HAND"),
         value: (key) => key.onhand,
-        // sort: (a, b) => a - b,
-        // format: (cell, value) => { cell.textContent = value; }
       },
       {
         name: wX("CAPSULE"),
@@ -111,7 +111,8 @@ const KeyListPortal = WDialog.extend({
     return sortable;
   },
 
-  getListDialogContent: function (operation, portalID) {
+  getListDialogContent: function (portalID) {
+    const operation = getSelectedOperation();
     this._sortable.items = operation.keysonhand.filter(function (k) {
       return k.portalId == portalID;
     });

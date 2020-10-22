@@ -4,15 +4,9 @@ import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
-import {
-  assignLinkPromise,
-  assignMarkerPromise,
-  updateOpPromise,
-  opPromise,
-} from "../server";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const AssignDialog = WDialog.extend({
   statics: {
