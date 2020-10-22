@@ -48,7 +48,7 @@ const StateDialog = WDialog.extend({
   },
 
   setup: function (target, opID) {
-    this._opID = opID;
+    this._opID = opID; // used to determine if a different op has been selected, can probably be removed
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
@@ -58,6 +58,7 @@ const StateDialog = WDialog.extend({
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       console.log("operation changed");
+      this._opID = operation.ID;
     }
 
     if (target instanceof WasabeeLink) {
@@ -105,21 +106,14 @@ const StateDialog = WDialog.extend({
       if (current.state == s) option.selected = true;
     }
 
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode == "active") {
-      menu.addEventListener("change", (value) => {
-        this.activeSetState(value);
-      });
-    } else {
-      menu.addEventListener("change", (value) => {
-        this.designSetState(value);
-      });
-    }
+    menu.addEventListener("change", (value) => {
+      this.setState(value);
+    });
 
     return container;
   },
 
-  designSetState: function (value) {
+  setState: function (value) {
     const operation = getSelectedOperation();
     if (this._opID != operation.ID) {
       console.log("operation changed -- bailing");
@@ -131,38 +125,6 @@ const StateDialog = WDialog.extend({
     // link states are different, but the WasabeeLink object knows what to do...
     if (this._type == "Link") {
       operation.setLinkState(this._targetID, value.srcElement.value);
-    }
-  },
-
-  activeSetState: async function (value) {
-    const operation = getSelectedOperation();
-    if (operation.ID != this._opID) {
-      console.log("operation changed, bailing");
-      return;
-    }
-
-    if (this._type == "Marker") {
-      try {
-        await SetMarkerState(
-          this._opID,
-          this._targetID,
-          value.srcElement.value
-        );
-        // changing it locally in battle mode will push the entire draw...
-        operation.setMarkerState(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    if (this._type == "Link") {
-      try {
-        await SetLinkState(this._opID, this._targetID, value.srcElement.value);
-        // changing it locally in battle mode will push the entire draw...
-        operation.setLinkState(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.log(e);
-      }
     }
   },
 });

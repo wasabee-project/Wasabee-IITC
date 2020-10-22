@@ -57,7 +57,6 @@ const AssignDialog = WDialog.extend({
 
   setup: async function (target) {
     const operation = getSelectedOperation();
-    this._opID = operation.ID;
     this._dialog = null;
     this._targetID = target.ID;
     this._html = L.DomUtil.create("div", null);
@@ -115,16 +114,9 @@ const AssignDialog = WDialog.extend({
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode == "active") {
-      menu.addEventListener("change", (value) => {
-        this.activeAssign(value); // async, but no need to await
-      });
-    } else {
-      menu.addEventListener("change", (value) => {
-        this.designAssign(value);
-      });
-    }
+    menu.addEventListener("change", (value) => {
+      this.localAssign(value);
+    });
 
     const me = await WasabeeMe.waitGet();
     for (const t of getSelectedOperation().teamlist) {
@@ -150,7 +142,7 @@ const AssignDialog = WDialog.extend({
     return container;
   },
 
-  designAssign: function (value) {
+  localAssign: function (value) {
     const operation = getSelectedOperation();
     if (this._type == "Marker") {
       operation.assignMarker(this._targetID, value.srcElement.value);
@@ -167,76 +159,6 @@ const AssignDialog = WDialog.extend({
           operation.assignLink(l.ID, value.srcElement.value);
         }
       }
-    }
-  },
-
-  activeAssign: async function (value) {
-    const operation = getSelectedOperation();
-    // if operation.localchanged...
-    try {
-      console.debug("pushing op to server");
-      await updateOpPromise(operation);
-      console.debug("update pushed");
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-
-    if (this._type == "Marker") {
-      try {
-        await assignMarkerPromise(
-          operation.ID,
-          this._targetID,
-          value.srcElement.value
-        );
-        console.debug("assignment processed by server");
-        // operation.assignMarker(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.error(e);
-        operation.assignMarker(this._targetID, value.srcElement.value);
-        throw e;
-      }
-    }
-    if (this._type == "Link") {
-      try {
-        await assignLinkPromise(
-          operation.ID,
-          this._targetID,
-          value.srcElement.value
-        );
-        console.debug("assignment processed by server");
-        // operation.assignLink(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.error(e);
-        operation.assignLink(this._targetID, value.srcElement.value);
-        throw e;
-      }
-    }
-    if (this._type == "Anchor") {
-      const links = operation.getLinkListFromPortal(
-        operation.getPortal(this._targetID)
-      );
-      for (const l of links) {
-        try {
-          await assignLinkPromise(operation.ID, l.ID, value.srcElement.value);
-          console.debug("assignment processed by server");
-          // operation.assignLink(l.ID, value.srcElement.value);
-        } catch (e) {
-          console.error(e);
-          operation.assignLink(l.ID, value.srcElement.value);
-          throw e;
-        }
-      }
-    }
-
-    try {
-      console.debug("refreshing local copy of op from server");
-      const updated = await opPromise(operation.ID);
-      updated.store();
-      makeSelectedOperation(updated.ID);
-    } catch (e) {
-      console.error(e);
-      throw e;
     }
   },
 });

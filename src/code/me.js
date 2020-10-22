@@ -130,7 +130,6 @@ export default class WasabeeMe {
 
   static purge() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-    localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
     delete localStorage["sentToServer"]; // resend firebase token on login
 
     if (window.plugin.wasabee._agentCache)

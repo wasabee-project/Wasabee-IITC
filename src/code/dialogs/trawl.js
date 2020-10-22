@@ -85,12 +85,6 @@ const TrawlDialog = WDialog.extend({
 
   // define our work in _displayDialog
   _displayDialog: function () {
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode != "design") {
-      console.log("switching to design mode for trawl");
-      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
-    }
-
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
