@@ -26,9 +26,6 @@ const BlockerList = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
 
-    const operation = getSelectedOperation();
-    this._opID = operation.ID;
-
     const context = this;
     this._UIUpdateHook = () => {
       context.blockerlistUpdate();
@@ -50,8 +47,6 @@ const BlockerList = WDialog.extend({
 
   _displayDialog: function () {
     const operation = getSelectedOperation();
-    if (!this._map) return;
-
     this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
     loadFaked(operation);
     const buttons = {};
@@ -93,9 +88,6 @@ const BlockerList = WDialog.extend({
   // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function () {
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
-      console.log("op changed");
-    }
     if (!this._enabled) return;
     this.sortable = this._getListDialogContent(
       this.sortable.sortBy,
@@ -105,6 +97,7 @@ const BlockerList = WDialog.extend({
     this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", operation.name));
   },
 
+  // because the sortable values depend on the operation, we can't have it created at addHooks unless we want a lot of getSelectedOperations embedded here
   _getListDialogContent(sortBy, sortAsc) {
     const operation = getSelectedOperation();
     const content = new Sortable();
@@ -130,7 +123,6 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value),
       },
       {
@@ -154,12 +146,11 @@ const BlockerList = WDialog.extend({
           );
           return c.length;
         },
-        // sort: (a, b) => a - b,
         format: (row, value) => (row.textContent = value),
       },
     ];
     content.sortBy = sortBy;
-    content.sortAsc = !sortAsc; // I don't know why this flips
+    content.sortAsc = sortAsc;
     content.items = operation.blockers;
     return content;
   },

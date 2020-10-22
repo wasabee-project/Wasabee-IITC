@@ -19,6 +19,7 @@ const MadridDialog = MultimaxDialog.extend({
 
   // addHooks inherited from MultimaxDialog
   // removeHooks inherited from MultimaxDialog
+  // this._operation should be safe due to multimax.uiupdate();
   _displayDialog: function () {
     if (!this._map) return;
 
@@ -203,7 +204,7 @@ const MadridDialog = MultimaxDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("MADRID");
     this.label = wX("MADRID");
-    this._operation = getSelectedOperation();
+    this._operation = getSelectedOperation(); // updated from multimax.uiupdate if necessary
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];

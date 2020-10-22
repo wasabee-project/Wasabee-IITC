@@ -17,20 +17,25 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
-    // requires newer leaflet, poke user to upgrade their IITC
-    if (!this._map.distance) {
-      alert("Requires IITC 0.30.1 or newer");
-      return;
-    }
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
+    const context = this;
+    this._UIUpdateHook = () => {
+      context.uiupdate();
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._displayDialog();
   },
 
   removeHooks: function () {
     window.removeLayerGroup(this._layerGroup);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     WDialog.prototype.removeHooks.call(this);
+  },
+
+  uiupdate: function () {
+    // if the screen redraws, make sure we are using the correct operation
+    this._operation = getSelectedOperation();
   },
 
   _displayDialog: function () {

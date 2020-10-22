@@ -144,7 +144,6 @@ const FanfieldDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("FAN_FIELD3");
     this.label = wX("FAN_FIELD3");
-    this._operation = getSelectedOperation();
     let p = localStorage["wasabee-anchor-1"];
     if (p) this._anchor = new WasabeePortal(p);
     p = localStorage["wasabee-fanfield-start"];
@@ -174,7 +173,8 @@ const FanfieldDialog = WDialog.extend({
     }
 
     const good = new Map();
-    for (const p of getAllPortalsOnScreen(this._operation)) {
+    const op = getSelectedOperation();
+    for (const p of getAllPortalsOnScreen(op)) {
       if (p.id == this._anchor.id) continue;
       const pAngle = this._angle(this._anchor, p);
 
@@ -206,7 +206,8 @@ const FanfieldDialog = WDialog.extend({
   // draw takes the sorted list of poratls and draws the links
   // determining any sub-fields can be added
   _draw: function (sorted) {
-    this._operation.startBatchMode();
+    const op = getSelectedOperation();
+    op.startBatchMode();
     let order = 0;
     let fields = 0;
 
@@ -216,7 +217,7 @@ const FanfieldDialog = WDialog.extend({
     for (let i = available.length - 1; i >= 0; i--) {
       const wp = available[i];
       order++;
-      this._operation.addLink(wp, this._anchor, "fan anchor", order);
+      op.addLink(wp, this._anchor, "fan anchor", order);
 
       // skip back links if first portal
       if (i + 1 == available.length) continue;
@@ -226,10 +227,10 @@ const FanfieldDialog = WDialog.extend({
       for (; j < available.length; j++) {
         const testlink = new WasabeeLink(
           { fromPortalId: wp.id, toPortalId: available[j].id },
-          this._operation
+          op
         );
         let crossed = false;
-        for (const real of this._operation.links) {
+        for (const real of op.links) {
           // Check links to anchor only
           if (real.toPortalId != this._anchor.id) continue;
           if (greatCircleArcIntersect(real, testlink)) {
@@ -240,18 +241,18 @@ const FanfieldDialog = WDialog.extend({
         if (crossed) break;
       }
       j--;
-      this._operation.addLink(wp, available[j], "fan subfield", ++order);
+      op.addLink(wp, available[j], "fan subfield", ++order);
       fields++;
 
       for (var k = j - 1; k > i; k--) {
         const check = available[k];
-        this._operation.addLink(wp, check, "fan double subfield", ++order);
+        op.addLink(wp, check, "fan double subfield", ++order);
         fields += 2;
       }
       // remove covered portals
       available.splice(i + 1, j - i - 1);
     }
-    this._operation.endBatchMode();
+    op.endBatchMode();
     const ap = 313 * order + 1250 * fields;
     // too many parameters for wX();
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);

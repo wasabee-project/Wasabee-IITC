@@ -13,18 +13,23 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
-    // requires newer leaflet, poke user to upgrade their IITC
-    if (!this._map.distance) {
-      alert("Requires IITC 0.30.1 or newer");
-      return;
-    }
+    const context = this;
+    this._UIUpdateHook = () => {
+      context.uiupdate();
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function () {
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     WDialog.prototype.removeHooks.call(this);
+  },
+
+  uiupdate: function () {
+    // nothing needed, this._operation is (re)set at execute time
   },
 
   _displayDialog: function () {
