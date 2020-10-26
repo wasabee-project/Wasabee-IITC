@@ -70,6 +70,12 @@ const BlockerList = WDialog.extend({
       const td = new TrawlDialog();
       td.enable();
     };
+    buttons["Clear Automark"] = () => {
+      const operation = getSelectedOperation();
+      for (const m of operation.markers) {
+        if (m.comment == "auto-marked") operation.removeMarker(m);
+      }
+    };
 
     this._dialog = window.dialog({
       title: wX("KNOWN_BLOCK", operation.name),
