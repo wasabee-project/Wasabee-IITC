@@ -160,6 +160,13 @@ const MadridDialog = MultimaxDialog.extend({
     this._flcheck.type = "checkbox";
     this._flcheck.id = "wasabee-madrid-backlink";
 
+    const balancedLabel = L.DomUtil.create("label", null, container);
+    balancedLabel.textContent = "Balanced";
+    balancedLabel.htmlFor = "wasabee-madrid-balanced";
+    this._balancedcheck = L.DomUtil.create("input", null, container);
+    this._balancedcheck.type = "checkbox";
+    this._balancedcheck.id = "wasabee-madrid-balanced";
+
     const newLine = L.DomUtil.create("label", "newline", container);
     const dividerBeforeDraw = L.DomUtil.create("span", null, container);
     newLine.textContent = "\u0000";
@@ -172,7 +179,9 @@ const MadridDialog = MultimaxDialog.extend({
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
-      const total = this.doMadrid.call(this);
+      const total = this._balancedcheck.checked
+        ? this.doBalancedMadrid.call(this)
+        : this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);
       // this._dialog.dialog("close");
     });
