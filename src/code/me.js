@@ -13,8 +13,8 @@ export default class WasabeeMe {
       }
     }
     this.GoogleID = data.GoogleID;
-    this.IngressName = data.IngressName;
-    this.Level = data.level ? data.level : 0;
+    this.name = data.name;
+    this.level = data.level ? data.level : 0;
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
