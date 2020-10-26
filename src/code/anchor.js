@@ -138,12 +138,27 @@ export default class WasabeeAnchor {
     L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
-      window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-          this._portal.lat +
-          "," +
-          this._portal.lng
-      );
+      // use intent on android
+      if (
+        typeof window.android !== "undefined" &&
+        window.android &&
+        window.android.intentPosLink
+      ) {
+        window.android.intentPosLink(
+          +this._portal.lat,
+          +this._portal.lng,
+          window.map.getZoom(),
+          this.name,
+          true
+        );
+      } else {
+        window.open(
+          "https://www.google.com/maps/search/?api=1&query=" +
+            this._portal.lat +
+            "," +
+            this._portal.lng
+        );
+      }
     });
 
     if (operation.IsServerOp()) {

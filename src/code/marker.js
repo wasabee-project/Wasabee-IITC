@@ -161,12 +161,27 @@ export default class WasabeeMarker {
     L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
-      window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-          portal.lat +
-          "," +
-          portal.lng
-      );
+      // use intent on android
+      if (
+        typeof window.android !== "undefined" &&
+        window.android &&
+        window.android.intentPosLink
+      ) {
+        window.android.intentPosLink(
+          +portal.lat,
+          +portal.lng,
+          window.map.getZoom(),
+          portal.name,
+          true
+        );
+      } else {
+        window.open(
+          "https://www.google.com/maps/search/?api=1&query=" +
+            portal.lat +
+            "," +
+            portal.lng
+        );
+      }
     });
 
     return content;
