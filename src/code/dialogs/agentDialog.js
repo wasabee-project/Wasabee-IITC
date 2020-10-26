@@ -37,7 +37,7 @@ const AgentDialog = WDialog.extend({
       L.DomUtil.create("div", null, vLabel).textContent = data.Vverified;
       const rocksLabel = L.DomUtil.create("label", null, agent);
       rocksLabel.textContent = "Rocks Verified: ";
-      L.DomUtil.create("div", null, rocksLabel).textContent = data.Vverified;
+      L.DomUtil.create("div", null, rocksLabel).textContent = data.rocks;
       const img = L.DomUtil.create("img", null, agent);
       img.src = data.pic;
     } catch (e) {
