@@ -16,35 +16,35 @@
 }
 
 /* overwrite leaflet css */
-.wasabee-buttons .leaflet-bar li a {
+.wasabee-buttons .leaflet-bar > li > a {
     border-radius: unset;
 }
 
-.leaflet-touch .wasabee-buttons .leaflet-bar li a {
+.leaflet-touch .wasabee-buttons .leaflet-bar > li > a {
     border-radius: unset;
 }
 
-.wasabee-buttons .leaflet-bar li a {
+.wasabee-buttons .leaflet-bar > li > a {
     border-bottom: 1px solid #ccc;
 }
 
-.wasabee-buttons .leaflet-bar li:first-child a {
+.wasabee-buttons .leaflet-bar > li:first-child > a {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 }
 
-.leaflet-touch .wasabee-buttons .leaflet-bar li:first-child a {
+.leaflet-touch .wasabee-buttons .leaflet-bar > li:first-child > a {
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
 }
 
-.wasabee-buttons .leaflet-bar li:last-child a {
+.wasabee-buttons .leaflet-bar > li:last-child > a {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     border-bottom: none;
 }
 
-.leaflet-touch .wasabee-buttons .leaflet-bar li:last-child a {
+.leaflet-touch .wasabee-buttons .leaflet-bar > li:last-child > a {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
     border-bottom: none;
