@@ -213,6 +213,116 @@ const MadridDialog = MultimaxDialog.extend({
     postToFirebase({ id: "analytics", action: MadridDialog.TYPE });
   },
 
+  getSpine: function (pOne, pTwo, portals) {
+    const portalsMap = new Map(portals.map((p) => [p.id, p]));
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+    const sequence = this.longestSequence(poset, null, (a, b) =>
+      this._map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+    );
+
+    return sequence.map((id) => portalsMap.get(id));
+  },
+
+  doBalancedMadrid: function () {
+    // Calculate the multimax
+    if (
+      !this._anchorOne ||
+      !this._anchorTwo ||
+      !this._portalSetOne ||
+      !this._portalSetTwo ||
+      !this._portalSetThree
+    ) {
+      alert(wX("INVALID REQUEST"));
+      return 0;
+    }
+
+    // the set 1 must contain anchor 1 (first back link)
+    if (this._portalSetOne.find((p) => this._anchorOne.id == p.id) == undefined)
+      this._portalSetOne.push(this._anchorOne);
+    // the set 2 must contain anchor 2 (first back link)
+    if (this._portalSetTwo.find((p) => this._anchorTwo.id == p.id) == undefined)
+      this._portalSetTwo.push(this._anchorTwo);
+
+    const spineThree = this.getSpine(
+      this._anchorOne,
+      this._anchorTwo,
+      this._portalSetThree
+    );
+    const lastThree = spineThree[spineThree.length - 1];
+
+    const spineOne = this.getSpine(
+      this._anchorTwo,
+      lastThree,
+      this._portalSetOne.filter(
+        (p) =>
+          this._anchorOne.id == p.id ||
+          this.fieldCoversPortal(this._anchorTwo, lastThree, p, this._anchorOne)
+      )
+    );
+    const lastOne = spineOne[spineOne.length - 1];
+
+    const spineTwo = this.getSpine(
+      lastThree,
+      lastOne,
+      this._portalSetTwo.filter(
+        (p) =>
+          this._anchorTwo.id == p.id ||
+          this.fieldCoversPortal(lastThree, lastOne, p, this._anchorTwo)
+      )
+    );
+    // const lastTwo = spineTwo[spineTwo.length - 1];
+
+    const spines = [spineOne, spineTwo, spineThree];
+    const step = spines.map((s) => 1 / s.length);
+
+    this._operation.startBatchMode();
+
+    // ignore order + direction
+    this._operation.addLink(spines[0][0], spines[1][0], "inner field");
+    this._operation.addLink(spines[1][0], spines[2][0], "inner field");
+    this._operation.addLink(spines[2][0], spines[0][0], "inner field");
+
+    const indices = [1, 1, 1];
+
+    while (indices.some((v, i) => v < spines[i].length)) {
+      let spineOrder = [0, 1, 2].sort(
+        (a, b) => indices[a] * step[a] - indices[b] * step[b]
+      );
+      let p = spines[spineOrder[0]][indices[spineOrder[0]]];
+      let pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
+      let pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
+      let pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
+
+      // hackish, I have no proof of this working in all cases
+      for (
+        let i = 0;
+        (!p || !this.fieldCoversPortal(p, pTwo, pThree, pOne)) && i < 3;
+        i++
+      ) {
+        spineOrder = [spineOrder[1], spineOrder[2], spineOrder[0]];
+        p = spines[spineOrder[0]][indices[spineOrder[0]]];
+        pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
+        pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
+        pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
+      }
+      if (!this.fieldCoversPortal(p, pTwo, pThree, pOne))
+        console.log("well, this doesn't work here...");
+      this._operation.addLink(p, pTwo, "link");
+      this._operation.addLink(p, pThree, "link");
+      indices[spineOrder[0]] += 1;
+
+      console.log(
+        "advance on ",
+        spineOrder[0],
+        `(${indices[spineOrder[0]]}/${spines[spineOrder[0]].length})`
+      );
+    }
+
+    this._operation.endBatchMode();
+
+    return indices[0] + indices[1] + indices[2] - 2;
+  },
+
   // fieldCoversPortal inherited from MultimaxDialog
   // MM "
 
