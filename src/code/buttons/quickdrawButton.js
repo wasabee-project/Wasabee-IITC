@@ -9,8 +9,7 @@ const QuickdrawButton = WButton.extend({
     TYPE: "quickdrawButton",
   },
 
-  initialize: function (map, container) {
-    if (!map) map = window.map;
+  initialize: function (map = window.map, container) {
     this._map = map;
 
     this.title = wX("QD TITLE");
@@ -34,12 +33,8 @@ const QuickdrawButton = WButton.extend({
     };
 
     this.actionsContainer = this._createSubActions([this._endSubAction]);
-    // this should be automaticly detected
-    // this.actionsContainer.style.top = "52px";
     this._container.appendChild(this.actionsContainer);
   },
-
-  // Wupdate: function(container) { }
 });
 
 const QuickDrawControl = L.Handler.extend({
@@ -86,26 +81,27 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip = new WTooltip(this._map);
 
     this._operation = getSelectedOperation();
+    this._opID = this._operation.ID;
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
-    // IITC hook format for IITC event
+    const context = this;
+    this._UIUpdateHook = () => {
+      context._uiupdate();
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+
     this._portalClickedHook = (data) => {
-      QuickDrawControl.prototype._portalClicked.call(this, data);
+      context._portalClicked(data);
     };
     window.addHook("portalSelected", this._portalClickedHook);
+
     // Leaflet format for leaflet DOM event
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
-    // this._map.on("click", this._clickHook, this);
-  },
-
-  _clickHook: function (e) {
-    console.log("click detected");
-    console.log(e);
   },
 
   removeHooks: function () {
@@ -113,23 +109,32 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._map) return;
     if (this._guideLayerGroup) {
       window.removeLayerGroup(this._guideLayerGroup);
-      delete this._guideLayerGroup;
+      this._guideLayerGroup = null;
     }
-    if (this._operation) delete this._operation;
-    if (this._anchor1) delete this._anchor1;
-    if (this._anchor2) delete this._anchor2;
-    if (this._previous) delete this._previous;
-    if (this._guideA) delete this._guideA;
-    if (this._guideB) delete this._guideB;
+
+    this._anchor1 = null;
+    this._anchor2 = null;
+    this._previous = null;
+    this._guideA = null;
+    this._guideB = null;
 
     L.DomUtil.enableTextSelection();
     this._tooltip.dispose();
     this._tooltip = null;
 
     window.removeHook("portalSelected", this._portalClickedHook);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     this._map.off("keyup", this._keyUpListener, this);
     this._map.off("mousemove", this._onMouseMove, this);
-    // this._map.off("click", this._clickHook, this);
+  },
+
+  _uiupdate: function () {
+    if (!this._enabled) return;
+
+    if (getSelectedOperation().ID != this._opID) {
+      console.log("operation changed mid-quickdraw - disabling");
+      this.disable();
+    }
   },
 
   _keyUpListener: function (e) {
@@ -183,7 +188,6 @@ const QuickDrawControl = L.Handler.extend({
       window.Render.prototype.bringPortalsToFront();
     } else {
       window.removeLayerGroup(this._guideLayerGroup);
-      delete this._guideLayerGroup;
       this._guideLayerGroup = null;
     }
   },
@@ -203,8 +207,8 @@ const QuickDrawControl = L.Handler.extend({
   _portalClicked: function (data) {
     // console.log(data);
     if (data.selectedPortalGuid == data.unselectedPortalGuid) {
-      console.log("same portal clicked");
-      // return;
+      console.log("ignoring duplicate click");
+      return;
     }
 
     // const selectedPortal = WasabeePortal.getSelected();
@@ -280,11 +284,11 @@ const QuickDrawControl = L.Handler.extend({
 
   _toggleMode: function () {
     // changing mode resets all the things
-    if (this._anchor1) delete this._anchor1;
-    if (this._anchor2) delete this._anchor2;
-    if (this._previous) delete this._anchor2;
-    if (this._guideA) delete this._guideA;
-    if (this._guideB) delete this._guideB;
+    this._anchor1 = null;
+    this._anchor2 = null;
+    this._anchor2 = null;
+    this._guideA = null;
+    this._guideB = null;
 
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");
@@ -297,14 +301,11 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _portalClickedSingle: function (selectedPortal) {
-    // console.log("portal clicked", selectedPortal);
     // IITC sending 2 portalClicked for 1 mouse click
     if (this._previous && this._previous.id == selectedPortal.id) {
-      // this.disable();
       return;
     }
 
-    // not the first portal in the chain, draw a link
     if (this._previous) {
       this._operation.addLink(
         this._previous,
