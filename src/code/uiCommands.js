@@ -215,15 +215,14 @@ export function sendLocation() {
 }
 
 export function getAllPortalsOnScreen(operation) {
-  const bounds = window.clampLatLngBounds(window.map.getBounds());
+  const bounds = window.map.getBounds();
   const x = [];
   for (const portal in window.portals) {
-    if (_isOnScreen(window.portals[portal].getLatLng(), bounds)) {
+    if (bounds.contains(window.portals[portal].getLatLng())) {
       if (
-        _hasMarker(
+        operation.containsMarkerByID(
           window.portals[portal].options.guid,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE,
-          operation
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
         )
       )
         continue;
@@ -232,26 +231,6 @@ export function getAllPortalsOnScreen(operation) {
     }
   }
   return x;
-}
-
-// const _isOnScreen = function (ll, bounds) {
-function _isOnScreen(ll, bounds) {
-  return (
-    ll.lat < bounds._northEast.lat &&
-    ll.lng < bounds._northEast.lng &&
-    ll.lat > bounds._southWest.lat &&
-    ll.lng > bounds._southWest.lng
-  );
-}
-
-function _hasMarker(portalid, markerType, operation) {
-  if (operation.markers.length == 0) return false;
-  for (const m of operation.markers) {
-    if (m.portalId == portalid && m.type == markerType) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // this is the test point used in several auto-draws
