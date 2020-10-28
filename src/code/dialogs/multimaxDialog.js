@@ -154,7 +154,7 @@ const MultimaxDialog = WDialog.extend({
   },
 
   /*
-  Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
+  Calculate, given two anchors and a set of portals, the deepest sequence of nested fields.
   */
   MM: function (
     pOne,
@@ -164,10 +164,13 @@ const MultimaxDialog = WDialog.extend({
     base = true,
     commentPrefix = "multimax "
   ) {
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-    const sequence = this.longestSequence(poset);
-
     const portalsMap = new Map(portals.map((p) => [p.id, p]));
+
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+
+    const sequence = this.longestSequence(poset, null, (a, b) =>
+      this._map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+    );
 
     if (base)
       this._operation.addLink(pOne, pTwo, commentPrefix + "base", ++order);
@@ -258,28 +261,49 @@ const MultimaxDialog = WDialog.extend({
   // - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
   //   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
   //   (inner to outer)
-  longestSequence: function (poset, start) {
+  longestSequence: function (poset, start, dist) {
     const alreadyCalculatedSequences = new Map();
+    if (!dist) dist = () => 0;
     const sequence_from = (c) => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
-        let sequence = Array.from(
-          poset
-            .get(c)
-            .filter((i) => i !== c)
-            .map(sequence_from)
-            .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), [])
-        );
-        sequence.push(c);
-        alreadyCalculatedSequences.set(c, sequence);
+        const best = poset
+          .get(c)
+          .filter((i) => i !== c)
+          .map(sequence_from)
+          .reduce(
+            (S1, S2) =>
+              S1.seq.length > S2.seq.length ||
+              (S1.seq.length == S2.seq.length &&
+                S1.dist + dist(c, S1.seq[S1.seq.length - 1]) <
+                  S2.dist + dist(c, S2.seq[S2.seq.length - 1]))
+                ? S1
+                : S2,
+            { seq: [], dist: 0 }
+          );
+        const res = {
+          seq: Array.from(best.seq),
+          dist: best.dist,
+        };
+        if (dist && res.seq.length > 0)
+          res.dist += dist(res.seq[res.seq.length - 1], c);
+        res.seq.push(c);
+        alreadyCalculatedSequences.set(c, res);
       }
       return alreadyCalculatedSequences.get(c);
     };
 
-    if (start) return sequence_from(start);
+    if (start) return sequence_from(start).seq;
 
     return Array.from(poset.keys())
       .map(sequence_from)
-      .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
+      .reduce(
+        (S1, S2) =>
+          S1.seq.length > S2.seq.length ||
+          (S1.seq.length == S2.seq.length && S1.dist < S2.dist)
+            ? S1
+            : S2,
+        { seq: [], dist: 0 }
+      ).seq;
   },
 });
 
