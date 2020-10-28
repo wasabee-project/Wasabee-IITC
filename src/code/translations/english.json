@@ -272,7 +272,6 @@
   "SEL_SB_ANCHOR": "Select the anchor.",
   "SEL_SB_ANCHOR2": "Zoom out. Make sure portals have all loaded, then click draw.",
   "SEL_SB_ANCHOR3": "Please be patient, it can take a bit.",
-  "SELECT PORTAL": "Select a portal to send",
   "SECONDS": " (${value} seconds ago)",
   "SEND TARGET": "Send Target",
   "SEND TARGET AGENT": "Select target recipient",
