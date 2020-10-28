@@ -286,7 +286,7 @@ const QuickDrawControl = L.Handler.extend({
     // changing mode resets all the things
     this._anchor1 = null;
     this._anchor2 = null;
-    this._anchor2 = null;
+    this._previous = null;
     this._guideA = null;
     this._guideB = null;
 
