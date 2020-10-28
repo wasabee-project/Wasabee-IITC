@@ -252,55 +252,6 @@ const MultimaxDialog = WDialog.extend({
     return poset;
   },
 
-  // build a map that shows which and how many portals are covering each possible field by guid
-  // note: a portal is always covered by itself
-  buildRevPOSet: function (anchor1, anchor2, visible) {
-    const poset = new Map();
-    for (const i of visible) {
-      poset.set(
-        i.id,
-        visible
-          .filter((j) => {
-            return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
-          })
-          .map((j) => j.id)
-      );
-    }
-    return poset;
-  },
-
-  /* not working properly */
-  buildPOSetFaster: function (a, b, visible) {
-    const poset = new Map();
-    for (const i of visible) {
-      const iCovers = new Array();
-      for (const j of visible) {
-        // console.log(iCovers);
-        if (iCovers.includes(j.id)) {
-          // we've already found this one
-          // console.log("saved some searching");
-          continue;
-        }
-        if (j.id == i.id) {
-          // iCovers.push(j.options.guid);
-          continue;
-        }
-        if (this.fieldCoversPortal(a, b, i, j)) {
-          iCovers.push(j.id);
-          if (poset.has(j.id)) {
-            // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
-            // console.log("found savings");
-            for (const n of poset.get(j.id)) {
-              if (!iCovers.includes(j.id)) iCovers.push(n);
-            }
-          }
-        }
-      }
-      poset.set(i.id, iCovers);
-    }
-    return poset;
-  },
-
   // given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
   // notes:
   // - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
