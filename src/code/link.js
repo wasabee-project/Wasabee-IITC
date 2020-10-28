@@ -15,10 +15,10 @@ export default class WasabeeLink {
     this.toPortalId = obj.toPortalId;
     this.description = obj.description ? obj.description : null;
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    this.throwOrderPos = obj.throwOrderPos ? Number(obj.throwOrderPos) : 0;
     this.color = obj.color ? obj.color : "main";
-    this.completed = obj.completed ? obj.completed : false;
-    this.zone = obj.zone ? obj.zone : 1;
+    this.completed = obj.completed ? !!obj.completed : false;
+    this.zone = obj.zone ? Number(obj.zone) : 1;
   }
 
   // build object to serialize
@@ -29,9 +29,9 @@ export default class WasabeeLink {
       toPortalId: this.toPortalId,
       description: this.description,
       assignedTo: this.assignedTo,
-      throwOrderPos: this.throwOrderPos,
+      throwOrderPos: Number(this.throwOrderPos),
       color: this.color,
-      completed: this.completed,
+      completed: !!this.completed, // !! forces a boolean value
       zone: Number(this.zone),
     };
   }

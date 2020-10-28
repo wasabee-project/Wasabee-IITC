@@ -16,8 +16,8 @@ export default class WasabeeMarker {
     this.comment = obj.comment ? obj.comment : "";
     this.completedBy = obj.completedBy ? obj.completedBy : "";
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    this.order = obj.order ? obj.order : 0;
-    this.zone = obj.zone ? obj.zone : 1;
+    this.order = obj.order ? Number(obj.order) : 0;
+    this.zone = obj.zone ? Number(obj.zone) : 1;
 
     // some constants
     this.STATE_UNASSIGNED = "pending";
@@ -38,7 +38,7 @@ export default class WasabeeMarker {
       state: this._state, // no need to validate here
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
-      order: this.order,
+      order: Number(this.order),
       zone: Number(this.zone),
     };
   }
