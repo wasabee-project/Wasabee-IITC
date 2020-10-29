@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
+import ZoneSetColorDialog from "./zoneSetColor";
 
 const ZoneDialog = WDialog.extend({
   statics: {
@@ -91,6 +92,16 @@ const ZoneDialog = WDialog.extend({
         getSelectedOperation().renameZone(z.id, nameinput.value);
       });
       const commandcell = L.DomUtil.create("td", null, tr);
+
+      const color = L.DomUtil.create("a", null, commandcell);
+      color.textContent = "🖌";
+      color.href = "#";
+      L.DomEvent.on(color, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const zoneSetColorDialog = new ZoneSetColorDialog();
+        zoneSetColorDialog.setup(z);
+        zoneSetColorDialog.enable();
+      });
       if (z.id != 1) {
         const del = L.DomUtil.create("a", null, commandcell);
         del.textContent = "🗑";
