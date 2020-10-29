@@ -318,8 +318,11 @@ const MadridDialog = MultimaxDialog.extend({
       }
       if (!this.fieldCoversPortal(p, pTwo, pThree, pOne))
         console.log("well, this doesn't work here...");
-      this._operation.addLink(p, pTwo, "link");
-      this._operation.addLink(p, pThree, "link");
+      const toTwo = this._operation.addLink(p, pTwo, "link");
+      const toThree = this._operation.addLink(p, pThree, "link");
+      toTwo.zone = spineOrder[0] + 1;
+      toThree.zone = spineOrder[0] + 1;
+
       indices[spineOrder[0]] += 1;
     }
 
