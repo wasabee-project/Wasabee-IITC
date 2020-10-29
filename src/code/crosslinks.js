@@ -275,11 +275,9 @@ function* realLinks() {
 }
 
 export function checkAllLinks() {
+  if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
+
   const operation = getSelectedOperation();
-  if (operation == null) {
-    console.log("crosslinks run, no op loaded?");
-    return;
-  }
 
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
