@@ -255,55 +255,92 @@ const MultimaxDialog = WDialog.extend({
     return poset;
   },
 
+  // given a poset, compute the maximal paths from all elements
+  // the result contains a map that gives for any element the next ones and the list of the elements
+  // that have the longest paths
+  longestSequencesPoset: function (poset) {
+    const alreadyCalculatedChildren = new Map();
+    const preds_from = (c) => {
+      if (alreadyCalculatedChildren.get(c) === undefined) {
+        const res = {
+          children: [],
+          length: 1,
+          number: 1,
+        };
+        for (const id of poset.get(c).filter((i) => i !== c)) {
+          const val = preds_from(id);
+          if (val.length + 1 > res.length) {
+            res.length = val.length + 1;
+            res.children = [];
+            res.number = 0;
+          }
+          if (val.length + 1 == res.length) {
+            res.children.push(id);
+            res.number += val.number;
+          }
+        }
+        alreadyCalculatedChildren.set(c, res);
+      }
+      return alreadyCalculatedChildren.get(c);
+    };
+
+    poset.set("__start__", Array.from(poset.keys()));
+    return {
+      maxima: preds_from("__start__").children,
+      poset: alreadyCalculatedChildren,
+      number: preds_from("__start__").number,
+    };
+  },
+
   // given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
+  // that minimizes the flight distance
   // notes:
   // - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
   // - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
   //   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
   //   (inner to outer)
   longestSequence: function (poset, start, dist) {
+    const maximalPaths = this.longestSequencesPoset(poset);
     const alreadyCalculatedSequences = new Map();
     if (!dist) dist = () => 0;
     const sequence_from = (c) => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
-        const best = poset
-          .get(c)
-          .filter((i) => i !== c)
-          .map(sequence_from)
-          .reduce(
-            (S1, S2) =>
-              S1.seq.length > S2.seq.length ||
-              (S1.seq.length == S2.seq.length &&
-                S1.dist + dist(c, S1.seq[S1.seq.length - 1]) <
-                  S2.dist + dist(c, S2.seq[S2.seq.length - 1]))
+        const mP = maximalPaths.poset.get(c);
+        if (mP.length == 1)
+          alreadyCalculatedSequences.set(c, { seq: [c], dist: 0 });
+        else {
+          const best = mP.children
+            .map(sequence_from)
+            .reduce((S1, S2) =>
+              S1.dist + dist(c, S1.seq[S1.seq.length - 1]) <
+              S2.dist + dist(c, S2.seq[S2.seq.length - 1])
                 ? S1
-                : S2,
-            { seq: [], dist: 0 }
-          );
-        const res = {
-          seq: Array.from(best.seq),
-          dist: best.dist,
-        };
-        if (dist && res.seq.length > 0)
+                : S2
+            );
+          const res = {
+            seq: Array.from(best.seq),
+            dist: best.dist,
+          };
           res.dist += dist(res.seq[res.seq.length - 1], c);
-        res.seq.push(c);
-        alreadyCalculatedSequences.set(c, res);
+          res.seq.push(c);
+          alreadyCalculatedSequences.set(c, res);
+        }
       }
       return alreadyCalculatedSequences.get(c);
     };
 
-    if (start) return sequence_from(start).seq;
+    if (start) {
+      console.debug(
+        maximalPaths.poset.get(start).number,
+        "possible paths from the given start"
+      );
+      return sequence_from(start).seq;
+    }
 
-    return Array.from(poset.keys())
+    console.debug(maximalPaths.number, "possible paths");
+    return maximalPaths.maxima
       .map(sequence_from)
-      .reduce(
-        (S1, S2) =>
-          S1.seq.length > S2.seq.length ||
-          (S1.seq.length == S2.seq.length && S1.dist < S2.dist)
-            ? S1
-            : S2,
-        { seq: [], dist: 0 }
-      ).seq;
+      .reduce((S1, S2) => (S1.dist < S2.dist ? S1 : S2)).seq;
   },
 });
 
