@@ -308,6 +308,8 @@ const MadridDialog = MultimaxDialog.extend({
         (!p || !this.fieldCoversPortal(p, pTwo, pThree, pOne)) && i < 3;
         i++
       ) {
+        this._operation.setPortalComment(pOne, "point of disbalance");
+
         spineOrder = [spineOrder[1], spineOrder[2], spineOrder[0]];
         p = spines[spineOrder[0]][indices[spineOrder[0]]];
         pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
@@ -319,12 +321,6 @@ const MadridDialog = MultimaxDialog.extend({
       this._operation.addLink(p, pTwo, "link");
       this._operation.addLink(p, pThree, "link");
       indices[spineOrder[0]] += 1;
-
-      console.log(
-        "advance on ",
-        spineOrder[0],
-        `(${indices[spineOrder[0]]}/${spines[spineOrder[0]].length})`
-      );
     }
 
     this._operation.endBatchMode();
