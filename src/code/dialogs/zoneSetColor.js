@@ -2,8 +2,6 @@ import { WDialog } from "../leafletClasses";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
-// generic confirmation screen w/ ok and cancel buttons
-
 const ZoneSetColorDialog = WDialog.extend({
   statics: {
     TYPE: "zoneSetColorDialog",
@@ -31,12 +29,11 @@ const ZoneSetColorDialog = WDialog.extend({
       title: "Zone color",
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-confirm",
+      dialogClass: "wasabee-dialog wasabee-dialog-zone-color",
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
-      // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 
