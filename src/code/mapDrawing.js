@@ -256,9 +256,9 @@ export async function drawSingleTeam(
             icon: L.divIcon({
               className: "wasabee-agent-icon",
               shadowUrl: null,
-              iconSize: L.point(41, 41),
-              iconAnchor: L.point(25, 41),
-              popupAnchor: L.point(-1, -48),
+              iconSize: L.point(49, 63),
+              iconAnchor: L.point(24, 63),
+              popupAnchor: L.point(0, -70),
               html: agent.icon,
             }),
             id: agent.id,
