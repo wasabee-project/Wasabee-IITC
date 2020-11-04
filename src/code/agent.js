@@ -168,4 +168,30 @@ export default class WasabeeAgent {
     interval = Math.floor(seconds);
     return wX("SECONDS", interval);
   }
+
+  // unused
+  get icon() {
+    if (this._icon != null) return this._icon;
+    this.updateIcon();
+    return this._icon;
+  }
+
+  updateIcon() {
+    this._icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    // this._icon.setAttribute("id", `${this.id}-wasabee-agent-icon`);
+    this._icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    this._icon.setAttribute("viewBox", "0 0 70 90");
+    this._icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="35" cy="35" r="27" /></clipPath></defs>
+    <path fill="orange" stroke="#aaa" stroke-width="2" stroke-opacity="0.8" stroke-miterlimit="8" d="m 70 35 a 35 35 90 0 0 -70 0 c 0 10 5 20 10 25 l 22 25 c 3 4 3 4 6 0 l 21 -25 c 5 -5 11 -15 11 -25 z" />
+    <circle fill="#fff" cx="35" cy="35" r="28" />
+    <image x="8" y="8" width="55" height="55" xlink:href="${this.pic}" clip-path="url(#circleView)" />`;
+  }
+
+  get iconURL() {
+    if (this._icon == null) this.updateIcon();
+    const s = new XMLSerializer();
+    const str = s.serializeToString(this._icon);
+    const b = btoa(str);
+    return `data:image/svg+xml;base64,${b}`;
+  }
 }

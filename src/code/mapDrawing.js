@@ -254,7 +254,7 @@ export async function drawSingleTeam(
           const marker = L.marker(agent.latLng, {
             title: agent.name,
             icon: L.icon({
-              iconUrl: agent.pic,
+              iconUrl: agent.iconURL,
               shadowUrl: null,
               iconSize: L.point(41, 41),
               iconAnchor: L.point(25, 41),
