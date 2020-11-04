@@ -253,12 +253,13 @@ export async function drawSingleTeam(
         if (agent.lat && agent.lng) {
           const marker = L.marker(agent.latLng, {
             title: agent.name,
-            icon: L.icon({
-              iconUrl: agent.iconURL,
+            icon: L.divIcon({
+              className: "wasabee-agent-icon",
               shadowUrl: null,
               iconSize: L.point(41, 41),
               iconAnchor: L.point(25, 41),
               popupAnchor: L.point(-1, -48),
+              html: agent.icon,
             }),
             id: agent.id,
           });
