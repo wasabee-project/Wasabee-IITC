@@ -198,27 +198,21 @@ function addLink(wlink, operation) {
 /** this function fetches and displays agent location */
 export async function drawAgents() {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-
-  if (!WasabeeMe.isLoggedIn()) {
-    return;
-  }
+  if (!WasabeeMe.isLoggedIn()) return;
 
   const layerMap = agentLayerMap();
 
   let doneAgents = new Array();
-  const me = await WasabeeMe.waitGet();
+  const me = await WasabeeMe.waitGet(); // cache hold-time age is 24 hours... not too frequent
   for (const t of me.Teams) {
     const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
     doneAgents = doneAgents.concat(freshlyDone);
   }
 
   // remove those not found in this fetch
-  // there is probably a cute filter one-liner to do this
-  for (const d of doneAgents) {
-    layerMap.delete(d.id);
-  }
+  for (const d of doneAgents) layerMap.delete(d.id);
   for (const agent in layerMap) {
-    console.log("removing stale agent", agent);
+    console.debug("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 }
@@ -231,59 +225,58 @@ function agentLayerMap() {
   return layerMap;
 }
 
-// use layerMap and alreadyDone to reduce processing when using this in a loop, otherwise leave them unset
+// use alreadyDone to reduce processing when using this in a loop, otherwise leave it unset
 export async function drawSingleTeam(
   teamID,
   layerMap = agentLayerMap(),
-  alreadyDone = new Array()
+  alreadyDone
 ) {
   const done = new Array();
-
-  // only display enabled teams
-  // if (t.State != "On") return done;
-
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await WasabeeTeam.waitGet(teamID, 15);
+    const team = await WasabeeTeam.waitGet(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
     // we don't need to draw if pulled from cache
-    // if (team.cached === true) return done; // behaves weirdly in early tests
+    if (team.cached === true) return done;
 
     for (const agent of team.agents) {
-      if (!alreadyDone.includes(agent.id)) {
-        _drawAgent(agent, layerMap);
+      if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
         done.push(agent.id);
-      }
     }
   } catch (err) {
     console.error(err);
   }
+  // report the icons successfully drawn to the caller, drawAgents uses this to remove stale icons
   return done;
 }
 
 export async function drawSingleAgent(gid) {
   const agent = await WasabeeAgent.waitGet(gid);
-  console.log(agent);
   if (agent != null) _drawAgent(agent);
 }
 
+// returns true if drawn, false if ignored
 function _drawAgent(agent, layerMap = agentLayerMap()) {
-  if (!agent.id || !agent.lat || !agent.lng) return;
+  if (!agent.id || !agent.lat || !agent.lng) {
+    return false;
+  }
+
+  const zoom = window.map.getZoom();
   if (!layerMap.has(agent.id)) {
     // new, add to map
-    console.log("adding ", agent.name, agent.latLng);
+    console.debug("adding ", agent.name, agent.latLng);
     const marker = L.marker(agent.latLng, {
       title: agent.name,
       icon: L.divIcon({
         className: "wasabee-agent-icon",
-        shadowUrl: null,
-        iconSize: agent.iconSize(window.map.getZoom()),
-        iconAnchor: agent.iconAnchor(window.map.getZoom()),
+        iconSize: agent.iconSize(zoom),
+        iconAnchor: agent.iconAnchor(zoom),
         popupAnchor: L.point(0, -70),
-        html: agent.icon(window.map.getZoom()),
+        html: agent.icon(zoom),
       }),
       id: agent.id,
+      zoom: zoom,
     });
 
     window.registerMarkerForOMS(marker);
@@ -308,25 +301,33 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     );
     marker.addTo(Wasabee.agentLayerGroup);
   } else {
-    console.log("moving ", agent.name, agent.latLng);
-    // just move existing if not already moved
+    // move existing icons, if they actually moved
     const a = layerMap.get(agent.id);
     const al = Wasabee.agentLayerGroup.getLayer(a);
-    if (agent.lat && agent.lng) {
+    // if the location is different...
+    if (agent.lat != al._latlng.lat || agent.lng != al._latlng.lng) {
+      console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
       al.setLatLng(agent.latLng);
+      al.update();
+    }
+
+    // if the zoom factor changed, refresh the icon
+    if (zoom != al.options.zoom) {
+      console.debug("changing icon zoom: ", zoom, al.options.zoom);
       al.setIcon(
         L.divIcon({
           className: "wasabee-agent-icon",
-          shadowUrl: null,
-          iconSize: agent.iconSize(window.map.getZoom()),
-          iconAnchor: agent.iconAnchor(window.map.getZoom()),
+          iconSize: agent.iconSize(zoom),
+          iconAnchor: agent.iconAnchor(zoom),
           popupAnchor: L.point(0, -70),
-          html: agent.icon(window.map.getZoom()),
+          html: agent.icon(zoom),
         })
       );
+      al.options.zoom = zoom;
       al.update();
     }
   }
+  return true;
 }
 
 function updateAnchors(op) {

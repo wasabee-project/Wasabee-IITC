@@ -66,6 +66,7 @@ export function initFirebase() {
         // display to console somehow?
         console.debug("server reported teammate login: ", event.data.data.gid);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        window.runHooks("wasabeeUIUpdate", "onlineAgent");
         break;
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
@@ -118,12 +119,12 @@ export function initFirebase() {
 
 export function postToFirebase(message) {
   // prevent analytics data from being sent if not enabled by the user: GPDR
-  if (
+  /* if (
     message.id == "analytics" &&
     localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
       "true"
   )
-    return;
+    return; */
 
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 }

@@ -58,9 +58,10 @@ export default class WasabeeAgent {
   }
 
   static async waitGet(gid) {
-    if (window.plugin.wasabee._agentCache.has(gid)) {
+    // need a hold timer on this
+    /* if (window.plugin.wasabee._agentCache.has(gid)) {
       return window.plugin.wasabee._agentCache.get(gid);
-    }
+    } */
 
     try {
       const result = await agentPromise(gid);

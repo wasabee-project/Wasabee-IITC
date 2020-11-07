@@ -499,7 +499,7 @@ async function genericGet(url) {
     const response = await fetch(GetWasabeeServer() + url, {
       method: "GET",
       mode: "cors",
-      cache: "no-store",
+      cache: "default",
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
