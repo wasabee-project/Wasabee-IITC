@@ -229,7 +229,7 @@ function agentLayerMap() {
 export async function drawSingleTeam(
   teamID,
   layerMap = agentLayerMap(),
-  alreadyDone
+  alreadyDone = new Array()
 ) {
   const done = new Array();
   /* this also caches the team into Wasabee.teams for uses elsewhere */
