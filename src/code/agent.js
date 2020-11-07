@@ -2,6 +2,7 @@ import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import AgentDialog from "./dialogs/agentDialog";
 import { agentPromise, targetPromise, routePromise } from "./server";
+import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 
 export default class WasabeeAgent {
@@ -147,6 +148,17 @@ export default class WasabeeAgent {
       );
       d.enable();
     });
+
+    const op = getSelectedOperation();
+    const assignments = L.DomUtil.create("ul", "assignments", content);
+    for (const m of op.markers) {
+      if (m.assignedTo != this.id) continue;
+      const a = L.DomUtil.create("li", "assignment", assignments);
+      const portal = op.getPortal(m.portalId);
+      a.textContent = `${m.order}: ${wX(m.type)} `;
+      a.appendChild(portal.displayFormat());
+    }
+
     return content;
   }
 
@@ -169,20 +181,73 @@ export default class WasabeeAgent {
     return wX("SECONDS", interval);
   }
 
-  get icon() {
-    if (this._icon != null) return this._icon;
-    this.updateIcon();
-    return this._icon;
+  icon(z = 7) {
+    if (z < 6) return this.globalIcon();
+    if (z >= 6 && z < 9) return this.smallIcon();
+    if (z >= 9 && z < 11) return this.mediumIcon();
+    return this.bigIcon();
   }
 
-  updateIcon() {
-    this._icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    // this._icon.setAttribute("id", `${this.id}-wasabee-agent-icon`);
-    this._icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    this._icon.setAttribute("viewBox", "0 0 70 90");
-    this._icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="35" cy="35" r="27" /></clipPath></defs>
-    <path fill="orange" stroke="#aaa" stroke-width="2" stroke-opacity="0.8" stroke-miterlimit="8" d="m 70 35 a 35 35 90 0 0 -70 0 c 0 10 5 20 10 25 l 22 25 c 3 4 3 4 6 0 l 21 -25 c 5 -5 11 -15 11 -25 z" />
-    <circle fill="#fff" cx="35" cy="35" r="28" />
-    <image x="8" y="8" width="55" height="55" href="${this.pic}" clip-path="url(#circleView)" />`;
+  iconSize(z = 7) {
+    if (z < 6) return [30, 30];
+    if (z >= 6 && z < 9) return [42, 62];
+    if (z >= 9 && z < 11) return [48, 64];
+    return [52, 68];
+  }
+
+  iconAnchor(z = 7) {
+    if (z < 6) return [15, 30];
+    if (z >= 6 && z < 9) return [21, 68];
+    if (z >= 9 && z < 11) return [24, 68];
+    return [26, 68];
+  }
+
+  globalIcon() {
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    icon.setAttribute("viewBox", "200 70 630 520");
+    icon.setAttribute("height", "30");
+    icon.setAttribute("width", "30");
+    icon.setAttribute(
+      "style",
+      "fill-rule: evenodd; clip-rule: evenodd; stroke-miterlimit: 10;"
+    );
+    icon.innerHTML = `<path d="M693.958,342.221L835.444,376.094L698.886,412.048L693.958,342.221Z" style="fill:rgb(220,110,110);" /><path d="M554.884,74.903C600.248,91.286 616.43,164.041 591.029,237.406C565.628,310.771 497.181,350.802 462.898,340.58C422.146,328.43 401.352,251.442 426.754,178.077C452.155,104.712 509.521,58.52 554.884,74.903Z" style="fill:rgb(182,182,182);" /><path d="M479.375,188.5C608.126,188.5 712.5,273.286 712.5,377.875C712.5,482.464 608.126,567.25 479.375,567.25C350.624,567.25 246.25,482.464 246.25,377.875C246.25,273.286 350.624,188.5 479.375,188.5Z" style="fill:rgb(220,110,110);" /><path d="M716.932,123.894C756.272,152.549 750.931,226.895 705.002,289.952C659.072,353.008 580.963,371.826 550.607,352.241C514.522,328.958 516.608,249.239 562.537,186.183C608.467,123.126 677.592,95.239 716.932,123.894Z" style="fill:rgb(214,214,214);" /><path d="M397.5,364.75C403.713,364.75 408.75,374.264 408.75,386C408.75,397.736 403.713,407.25 397.5,407.25C391.287,407.25 386.25,397.736 386.25,386C386.25,374.264 391.287,364.75 397.5,364.75Z" style="fill:rgb(43,43,33);" /><path d="M288.75,356C294.963,356 300,365.514 300,377.25C300,388.986 294.963,398.5 288.75,398.5C282.537,398.5 277.5,388.986 277.5,377.25C277.5,365.514 282.537,356 288.75,356Z" style="fill:rgb(43,43,33);" /><path d="M312.505,424.759C315.597,438.472 332.043,479.75 341.912,479.75C351.793,475.936 355.726,449.332 361.247,426.943C328.26,428.493 326.511,426.63 312.505,424.759Z" style="fill:rgb(43,43,33);fill-opacity:0.6;" />`;
+    return icon;
+  }
+
+  // XXX resize this properly
+  smallIcon() {
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    icon.setAttribute("viewBox", "0 0 52 68");
+    icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
+      <path fill="yellow" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
+      <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
+    return icon;
+  }
+
+  // XXX resize this properly
+  mediumIcon() {
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    icon.setAttribute("viewBox", "0 0 52 68");
+    icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
+      <path fill="orange" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
+      <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
+    return icon;
+  }
+
+  bigIcon() {
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    icon.setAttribute("viewBox", "0 0 52 68");
+    icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
+      <path fill="red" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
+      <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
+    return icon;
   }
 }

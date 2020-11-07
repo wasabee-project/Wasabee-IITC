@@ -207,7 +207,7 @@ export async function drawAgents() {
   let doneAgents = new Array();
   const me = await WasabeeMe.waitGet();
   for (const t of me.Teams) {
-    const freshlyDone = await drawSingleTeam(t, layerMap, doneAgents);
+    const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
     doneAgents = doneAgents.concat(freshlyDone);
   }
 
@@ -232,20 +232,23 @@ function agentLayerMap() {
 
 // use layerMap and alreadyDone to reduce processing when using this in a loop, otherwise leave them unset
 export async function drawSingleTeam(
-  t,
+  teamID,
   layerMap = agentLayerMap(),
   alreadyDone = new Array()
 ) {
   const done = new Array();
 
   // only display enabled teams
-  if (t.State != "On") return done;
+  // if (t.State != "On") return done;
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await WasabeeTeam.waitGet(t.ID, 15);
+    const team = await WasabeeTeam.waitGet(teamID, 15);
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
+    // we don't need to draw if pulled from cache
+    // if (team.cached === true) return done; // behaves weirdly in early tests
+
     for (const agent of team.agents) {
       if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
         // new, add to map
@@ -256,10 +259,10 @@ export async function drawSingleTeam(
             icon: L.divIcon({
               className: "wasabee-agent-icon",
               shadowUrl: null,
-              iconSize: L.point(49, 63),
-              iconAnchor: L.point(24, 63),
+              iconSize: agent.iconSize(window.map.getZoom()),
+              iconAnchor: agent.iconAnchor(window.map.getZoom()),
               popupAnchor: L.point(0, -70),
-              html: agent.icon,
+              html: agent.icon(window.map.getZoom()),
             }),
             id: agent.id,
           });
@@ -293,6 +296,16 @@ export async function drawSingleTeam(
           const al = Wasabee.agentLayerGroup.getLayer(a);
           if (agent.lat && agent.lng) {
             al.setLatLng(agent.latLng);
+            al.setIcon(
+              L.divIcon({
+                className: "wasabee-agent-icon",
+                shadowUrl: null,
+                iconSize: agent.iconSize(window.map.getZoom()),
+                iconAnchor: agent.iconAnchor(window.map.getZoom()),
+                popupAnchor: L.point(0, -70),
+                html: agent.icon(window.map.getZoom()),
+              })
+            );
             done.push(agent.id);
             al.update();
           }

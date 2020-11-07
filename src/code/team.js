@@ -40,7 +40,8 @@ export default class WasabeeTeam {
     if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamID)) {
       const t = window.plugin.wasabee.teams.get(teamID);
       if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        console.debug("returning team from cache");
+        // console.debug("returning team from cache");
+        t.cached = true;
         return t;
       }
     }
