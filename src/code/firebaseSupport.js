@@ -4,7 +4,7 @@
  * This way we can setup a service worker under a domain we control and
  * simply pass the messages along using window.parent.postMessage.
  */
-import { drawSingleTeam } from "./mapDrawing";
+import { drawSingleTeam, drawSingleAgent } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import {
   makeSelectedOperation,
@@ -36,9 +36,23 @@ export function initFirebase() {
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
       case "Agent Location Change":
-        console.debug("firebase update of agent location: ", event.data.data);
-        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
-        drawSingleTeam(event.data.data.msg);
+        if (event.data.data.gid != null) {
+          console.debug(
+            "firebase update of single agent location: ",
+            event.data.data
+          );
+          window.plugin.wasabee.onlineAgents.set(
+            event.data.data.gid,
+            Date.now()
+          );
+          drawSingleAgent(event.data.data.gid);
+        } else {
+          console.debug(
+            "firebase update of whole team location: ",
+            event.data.data
+          );
+          drawSingleTeam(event.data.data.msg);
+        }
         break;
       case "Delete":
         console.warn("server requested op delete: ", event.data.data.opID);
