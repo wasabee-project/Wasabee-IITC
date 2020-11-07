@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
-import WasabeeTeam from "../team";
+// import WasabeeTeam from "../team";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 
@@ -18,11 +18,18 @@ const OnlineAgentList = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    const context = this;
+    this._UIUpdateHook = () => {
+      context.update();
+    };
+    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   _displayDialog: function () {
@@ -30,6 +37,8 @@ const OnlineAgentList = WDialog.extend({
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
+
+    this.update();
 
     this._dialog = window.dialog({
       title: "Online Agents",
@@ -45,12 +54,12 @@ const OnlineAgentList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: async function (teamID) {
+  update: function () {
     this._table = new Sortable();
     this._table.fields = [
       {
         name: wX("AGENT"),
-        value: (agent) => agent.name
+        value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => cell.appendChild(agent.formatDisplay()),
       },
@@ -59,15 +68,15 @@ const OnlineAgentList = WDialog.extend({
         value: (agent) => agent.date,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => {
-	  if (agent) cell.textContent = value.timeSinceformat(); 
+          if (agent) cell.textContent = agent.timeSinceformat();
         },
       },
     ];
     this._table.sortBy = 0;
-   
+
     const a = new Array();
     for (const k of window.plugin.wasabee.onlineAgents.keys()) {
-      a.append(window.plugin.wasabee._agentCache.get(k));
+      a.push(window.plugin.wasabee._agentCache.get(k));
     }
     this._table.items = a;
   },

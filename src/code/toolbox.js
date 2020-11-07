@@ -1,5 +1,6 @@
 import AboutDialog from "./dialogs/about";
 import SettingsDialog from "./dialogs/settingsDialog";
+import OnlineAgentList from "./dialogs/onlineAgentList";
 import wX from "./wX";
 import { locationPromise } from "./server";
 
@@ -46,5 +47,13 @@ export function setupToolbox() {
         console.error(err);
       }
     );
+  });
+
+  const onlineAgentLink = L.DomUtil.create("a", null, toolbox);
+  onlineAgentLink.textContent = "Teammates Online";
+  L.DomEvent.on(onlineAgentLink, "click", (ev) => {
+    L.DomEvent.stop(ev);
+    const oll = new OnlineAgentList();
+    oll.enable();
   });
 }
