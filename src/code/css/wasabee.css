@@ -180,6 +180,16 @@
   width: 100%;
 }
 
+.wasabee-agent-popup ul.assignments {
+  color: rgb(56, 142, 60);
+}
+
+.wasabee-agent-popup li.assignment {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .wasabee-anchor-popup {
 }
 .wasabee-anchor-popup div.desc {
