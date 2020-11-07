@@ -2,6 +2,7 @@ import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import WasabeeOp from "./operation";
+import WasabeeAgent from "./agent";
 import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
@@ -250,72 +251,84 @@ export async function drawSingleTeam(
     // if (team.cached === true) return done; // behaves weirdly in early tests
 
     for (const agent of team.agents) {
-      if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
-        // new, add to map
+      if (!alreadyDone.includes(agent.id)) {
+        _drawAgent(agent, layerMap);
         done.push(agent.id);
-        if (agent.lat && agent.lng) {
-          const marker = L.marker(agent.latLng, {
-            title: agent.name,
-            icon: L.divIcon({
-              className: "wasabee-agent-icon",
-              shadowUrl: null,
-              iconSize: agent.iconSize(window.map.getZoom()),
-              iconAnchor: agent.iconAnchor(window.map.getZoom()),
-              popupAnchor: L.point(0, -70),
-              html: agent.icon(window.map.getZoom()),
-            }),
-            id: agent.id,
-          });
-
-          window.registerMarkerForOMS(marker);
-          marker.bindPopup("Loading...", {
-            className: "wasabee-popup",
-            closeButton: false,
-          });
-          // marker.off("click", agent.openPopup, agent);
-          marker.on(
-            "click spiderfiedclick",
-            (ev) => {
-              L.DomEvent.stop(ev);
-              if (marker.isPopupOpen && marker.isPopupOpen()) return;
-              const a = window.plugin.wasabee._agentCache.get(agent.id);
-              marker.setPopupContent(a.getPopup());
-              if (marker._popup._wrapper)
-                marker._popup._wrapper.classList.add("wasabee-popup");
-              marker.update();
-              marker.openPopup();
-            },
-            marker
-          );
-          marker.addTo(Wasabee.agentLayerGroup);
-        }
-      } else {
-        // just move existing if not already moved
-        if (!alreadyDone.includes(agent.id)) {
-          const a = layerMap.get(agent.id);
-          const al = Wasabee.agentLayerGroup.getLayer(a);
-          if (agent.lat && agent.lng) {
-            al.setLatLng(agent.latLng);
-            al.setIcon(
-              L.divIcon({
-                className: "wasabee-agent-icon",
-                shadowUrl: null,
-                iconSize: agent.iconSize(window.map.getZoom()),
-                iconAnchor: agent.iconAnchor(window.map.getZoom()),
-                popupAnchor: L.point(0, -70),
-                html: agent.icon(window.map.getZoom()),
-              })
-            );
-            done.push(agent.id);
-            al.update();
-          }
-        }
       }
     }
   } catch (err) {
     console.error(err);
   }
   return done;
+}
+
+export async function drawSingleAgent(gid) {
+  try {
+    const agent = await WasabeeAgent.waitGet(gid);
+    if (agent != null) _drawAgent(agent);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function _drawAgent(agent, layerMap = agentLayerMap()) {
+  if (!layerMap.has(agent.id)) {
+    // new, add to map
+    if (agent.lat && agent.lng) {
+      const marker = L.marker(agent.latLng, {
+        title: agent.name,
+        icon: L.divIcon({
+          className: "wasabee-agent-icon",
+          shadowUrl: null,
+          iconSize: agent.iconSize(window.map.getZoom()),
+          iconAnchor: agent.iconAnchor(window.map.getZoom()),
+          popupAnchor: L.point(0, -70),
+          html: agent.icon(window.map.getZoom()),
+        }),
+        id: agent.id,
+      });
+
+      window.registerMarkerForOMS(marker);
+      marker.bindPopup("Loading...", {
+        className: "wasabee-popup",
+        closeButton: false,
+      });
+      // marker.off("click", agent.openPopup, agent);
+      marker.on(
+        "click spiderfiedclick",
+        (ev) => {
+          L.DomEvent.stop(ev);
+          if (marker.isPopupOpen && marker.isPopupOpen()) return;
+          const a = window.plugin.wasabee._agentCache.get(agent.id);
+          marker.setPopupContent(a.getPopup());
+          if (marker._popup._wrapper)
+            marker._popup._wrapper.classList.add("wasabee-popup");
+          marker.update();
+          marker.openPopup();
+        },
+        marker
+      );
+      marker.addTo(Wasabee.agentLayerGroup);
+    }
+  } else {
+    // just move existing if not already moved
+    const a = layerMap.get(agent.id);
+    const al = Wasabee.agentLayerGroup.getLayer(a);
+    if (agent.lat && agent.lng) {
+      al.setLatLng(agent.latLng);
+      al.setIcon(
+        L.divIcon({
+          className: "wasabee-agent-icon",
+          shadowUrl: null,
+          iconSize: agent.iconSize(window.map.getZoom()),
+          iconAnchor: agent.iconAnchor(window.map.getZoom()),
+          popupAnchor: L.point(0, -70),
+          html: agent.icon(window.map.getZoom()),
+        })
+      );
+      al.update();
+    }
+  }
 }
 
 function updateAnchors(op) {
