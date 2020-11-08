@@ -1082,4 +1082,139 @@ export default class WasabeeOp {
     this.zones.push({ id: newid, name: newid });
     this.update(true);
   }
+
+  changes() {
+    const changes = {
+      addition: new Array(),
+      edition: new Array(),
+      deletion: new Array(),
+    };
+    // old OP or local OP
+    if (!this.fetchedOp) return changes;
+    const oldOp = new WasabeeOp(this.fetchedOp);
+    const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
+    const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
+
+    const newLinks = new Map(this.links.map((l) => [l.ID, l]));
+    const newMarkers = new Map(this.markers.map((m) => [m.ID, m]));
+
+    for (const [id, p] of this._idToOpportals) {
+      if (!oldOp._idToOpportals.has(id))
+        changes.addition.push({ type: "portal", portal: p });
+      else {
+        const oldPortal = oldOp._idToOpportals.get(id);
+        const fields = ["name", "lat", "lng", "comment", "hardness"];
+        const diff = fields
+          .filter((k) => oldPortal[k] != p[k])
+          .map((k) => [k, p[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "portal", portal: p, diff: diff });
+      }
+    }
+
+    for (const id of oldLinks) {
+      if (!newLinks.has(id)) {
+        changes.deletion.push({ type: "link", id: id });
+      }
+    }
+    for (const l of this.links) {
+      if (!oldLinks.has(l.ID)) {
+        changes.addition.push({ type: "link", link: l });
+      } else {
+        const oldLink = oldLinks.get(l.ID);
+        const fields = [
+          "fromPortalId",
+          "toPortalId",
+          "assignedTo",
+          "description",
+          "throwOrderPos",
+          "color",
+          "zone",
+        ];
+        const diff = fields
+          .filter((k) => oldLink[k] != l[k])
+          .map((k) => [k, l[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "link", link: l, diff: diff });
+      }
+    }
+
+    for (const id of oldMarkers) {
+      if (!newMarkers.has(id)) {
+        changes.deletion.push({ type: "marker", id: id });
+      }
+    }
+    for (const m of this.markers) {
+      if (!oldMarkers.has(m.ID)) {
+        changes.addition.push({ type: "marker", marker: m });
+      } else {
+        const oldMarker = oldMarkers.get(m.ID);
+        const fields = ["type", "comment", "assignedTo", "order", "zone"];
+        const diff = fields
+          .filter((k) => oldMarker[k] != m[k])
+          .map((k) => [k, m[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "marker", marker: m, diff: diff });
+      }
+    }
+    return changes;
+  }
+
+  applyChanges(changes, op) {
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+    for (const d of changes.deletion) {
+      if (d.type == "link") this.links = this.links.filter((l) => l.ID != d.id);
+      else if (d.type == "marker")
+        this.markers = this.markers.filter((m) => m.ID != d.id);
+    }
+    for (const a of changes.addition) {
+      // `this` takes over `changes`
+      if (a.type == "portal") this._addPortal(a.portal);
+      else if (a.type == "link") {
+        // `this` takes over `changes`
+        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId))
+          this.links.push(a.link);
+      } else if (a.type == "marker") {
+        // `this` takes over `changes`
+        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type))
+          this.markers.push(a.marker);
+      }
+    }
+    for (const e of changes.edition) {
+      if (e.type == "link") {
+        for (const l of this.links) {
+          if (l.ID == e.link.ID) {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link && link != l) {
+              // remove the link if leading to a duplicate
+              // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
+              this.links = this.links.filter((l) => l.ID == e.link.ID);
+            } else {
+              for (const [k, v] of e.diff) l[k] = v;
+            }
+            break;
+          }
+        }
+      } else if (e.type == "marker") {
+        for (const m of this.markers) {
+          if (m.ID == e.marker.ID) {
+            const markers = this.getPortalMarkers(e.marker.portalId);
+            const marker = markers.get(e.marker.type);
+            if (marker && marker != m) {
+              // remove the marker if leading to a duplicate
+              this.markers = this.markers.filter((m) => m.ID == e.marker.ID);
+            } else {
+              for (const [k, v] of e.diff) m[k] = v;
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
 }
