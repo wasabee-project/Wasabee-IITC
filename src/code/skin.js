@@ -6,6 +6,7 @@ const Wasabee = window.plugin.wasabee;
 // the skins probably aren't loaded by the time W's init is called
 export function initSkin() {
   Wasabee.skin = {};
+  Wasabee.skin.defaultOperationColor = Wasabee.static.defaultOperationColor;
   Wasabee.skin.layerTypes = new Map(Wasabee.static.layerTypes);
   Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
   Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
@@ -91,6 +92,8 @@ export function changeSkin(names) {
       addCSS(k, skin.CSS[k]);
     }
 
+    if (skin.defaultOperationColor)
+      Wasabee.skin.defaultOperationColor = skin.defaultOperationColor;
     if (skin.layerTypes)
       for (const [k, v] of skin.layerTypes) Wasabee.skin.layerTypes.set(k, v);
     if (skin.linkStyle) Wasabee.skin.linkStyle = skin.linkStyle;

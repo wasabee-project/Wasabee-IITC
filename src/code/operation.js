@@ -9,8 +9,7 @@ import { addOperation, getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
-// this should be in statics.js
-const DEFAULT_OPERATION_COLOR = "groupa";
+const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeOp {
   constructor(obj) {
@@ -29,7 +28,7 @@ export default class WasabeeOp {
     this.anchors = obj.anchors ? obj.anchors : Array();
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
-    this.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
+    this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
     this.color = WasabeeOp.oldColors(this.color); // for 0.17, use old colors
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
@@ -173,7 +172,7 @@ export default class WasabeeOp {
 
   getColor() {
     if (this.color == null) {
-      return DEFAULT_OPERATION_COLOR;
+      return Wasabee.skin.defaultOperationColor;
     } else {
       return this.color;
     }

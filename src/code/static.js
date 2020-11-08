@@ -110,6 +110,8 @@ W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_EXCLUDE,
 ]);
 
+W.static.defaultOperationColor = "orange";
+
 W.static.linkStyle = {
   dashArray: [5, 5, 1, 5],
   assignedDashArray: [4, 2, 1],
