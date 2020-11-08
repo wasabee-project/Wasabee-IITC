@@ -124,11 +124,26 @@ const OnionfieldDialog = WDialog.extend({
       alert("no anchor selected");
       return;
     }
-    this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
-      this._colors.push(k);
-      this._trash = c;
-    }
+    this._colors = [
+      "#f80c12",
+      "#ee1100",
+      "#ff3311",
+      "#ff4422",
+      "#ff6644",
+      "#ff9933",
+      "#feae2d",
+      "#ccbb33",
+      "#d0c310",
+      "#aacc22",
+      "#69d025",
+      "#22ccaa",
+      "#12bdb9",
+      "#11aabb",
+      "#4444dd",
+      "#3311bb",
+      "#3b0cbd",
+      "#442299",
+    ];
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
     const allPortals = getAllPortalsOnScreen(this._operation);

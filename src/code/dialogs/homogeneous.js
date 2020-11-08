@@ -315,10 +315,26 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _draw: function () {
-    this._colors = new Array();
-    for (const c of window.plugin.wasabee.skin.layerTypes.values()) {
-      this._colors.push(c.color);
-    }
+    this._colors = [
+      "#f80c12",
+      "#ee1100",
+      "#ff3311",
+      "#ff4422",
+      "#ff6644",
+      "#ff9933",
+      "#feae2d",
+      "#ccbb33",
+      "#d0c310",
+      "#aacc22",
+      "#69d025",
+      "#22ccaa",
+      "#12bdb9",
+      "#11aabb",
+      "#4444dd",
+      "#3311bb",
+      "#3b0cbd",
+      "#442299",
+    ];
 
     this._operation.startBatchMode();
     if (this.orderMenu.value == "base12")
