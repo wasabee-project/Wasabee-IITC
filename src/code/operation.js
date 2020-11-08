@@ -1168,15 +1168,13 @@ export default class WasabeeOp {
       else if (d.type == "marker")
         this.markers = this.markers.filter((m) => m.ID != d.id);
     }
+    // `this` takes over `changes` for additions
     for (const a of changes.addition) {
-      // `this` takes over `changes`
       if (a.type == "portal") this._addPortal(a.portal);
       else if (a.type == "link") {
-        // `this` takes over `changes`
         if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId))
           this.links.push(a.link);
       } else if (a.type == "marker") {
-        // `this` takes over `changes`
         if (!this.containsMarkerByID(a.marker.portalId, a.marker.type))
           this.markers.push(a.marker);
       }

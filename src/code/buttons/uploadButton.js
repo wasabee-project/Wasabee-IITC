@@ -122,7 +122,7 @@ const UploadButton = WButton.extend({
     await updateOpPromise(op);
     op.localchanged = false;
     op.fetched = new Date().toUTCString();
-    op.fetchedOp = op.toJSON();
+    op.fetchedOp = JSON.stringify(op);
     op.store();
     alert(wX("UPDATED"));
     this.Wupdate(this._container, op);
