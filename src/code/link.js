@@ -10,7 +10,7 @@ import { addToColorList } from "./skin";
 
 export default class WasabeeLink {
   constructor(obj) {
-    this.ID = generateId();
+    this.ID = obj.ID ? obj.ID : generateId();
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
     this.description = obj.description ? obj.description : null;

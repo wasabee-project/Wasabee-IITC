@@ -10,7 +10,7 @@ import { getSelectedOperation } from "./selectedOp";
 
 export default class WasabeeMarker {
   constructor(obj) {
-    this.ID = generateId();
+    this.ID = obj.ID ? obj.ID : generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
     this.comment = obj.comment ? obj.comment : "";
