@@ -238,16 +238,20 @@ export default class WasabeeOp {
     return markers;
   }
 
-  getLink(portal1, portal2) {
+  getLinkByPortalIDs(portalId1, portalId2) {
     for (const l of this.links) {
       if (
-        (l.fromPortalId == portal1.id && l.toPortalId == portal2.id) ||
-        (l.fromPortalId == portal2.id && l.toPortalId == portal1.id)
+        (l.fromPortalId == portalId1 && l.toPortalId == portalId2) ||
+        (l.fromPortalId == portalId2 && l.toPortalId == portalId1)
       ) {
         return l;
       }
     }
     return null;
+  }
+
+  getLink(portal1, portal2) {
+    return this.getLinkByPortalIDs(portal1.id, portal2.id);
   }
 
   getLinkListFromPortal(portal) {
