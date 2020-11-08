@@ -1089,9 +1089,8 @@ export default class WasabeeOp {
       edition: new Array(),
       deletion: new Array(),
     };
-    // old OP or local OP
-    if (!this.fetchedOp) return changes;
-    const oldOp = new WasabeeOp(this.fetchedOp);
+    // empty op if old OP (or local OP)
+    const oldOp = new WasabeeOp(this.fetchedOp || {});
     const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
     const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
 
@@ -1103,7 +1102,7 @@ export default class WasabeeOp {
         changes.addition.push({ type: "portal", portal: p });
       else {
         const oldPortal = oldOp._idToOpportals.get(id);
-        const fields = ["name", "lat", "lng", "comment", "hardness"];
+        const fields = ["comment", "hardness"];
         const diff = fields
           .filter((k) => oldPortal[k] != p[k])
           .map((k) => [k, p[k]]);
@@ -1183,7 +1182,10 @@ export default class WasabeeOp {
       }
     }
     for (const e of changes.edition) {
-      if (e.type == "link") {
+      if (e.type == "portal") {
+        const portal = this.getPortal(e.type.portal.id);
+        for (const [k, v] of e.diff) portal[k] = v;
+      } else if (e.type == "link") {
         for (const l of this.links) {
           if (l.ID == e.link.ID) {
             const link = this.getLinkByPortalIDs(
