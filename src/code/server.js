@@ -80,6 +80,7 @@ export async function opPromise(opID) {
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
         newop.server = server;
+        newop.fetchedOp = raw;
         return Promise.resolve(newop);
       case 304: // If-Modified-Since replied NotModified
         console.warn("server copy is older/unmodified, keeping local copy");

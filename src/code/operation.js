@@ -41,6 +41,8 @@ export default class WasabeeOp {
 
     this.server = this.fetched ? obj.server : null;
 
+    this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
+
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
     if (!this.blockers) this.blockers = new Array();
@@ -70,7 +72,11 @@ export default class WasabeeOp {
 
   store() {
     this.stored = Date.now();
-    localStorage[this.ID] = JSON.stringify(this);
+    const json = this.toJSON();
+    // ignored by the server but useful for localStorage
+    json.server = this.server;
+    json.fetchedOp = this.fetchedOp;
+    localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
     // some debug info to trace race condition
@@ -99,8 +105,6 @@ export default class WasabeeOp {
       keysonhand: this.keysonhand,
       mode: this.mode,
       zones: this.zones,
-      // ignored by the server but useful for localStorage
-      server: this.server,
     };
   }
 
