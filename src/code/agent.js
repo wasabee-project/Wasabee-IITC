@@ -182,25 +182,26 @@ export default class WasabeeAgent {
     return wX("SECONDS", interval);
   }
 
+  // change this to return an L.Marker() to make the logic in mapDrawing simpler
   icon(z = 7) {
     if (z < 6) return this.globalIcon();
     if (z >= 6 && z < 9) return this.smallIcon();
-    if (z >= 9 && z < 11) return this.mediumIcon();
+    if (z >= 9 && z < 15) return this.mediumIcon();
     return this.bigIcon();
   }
 
   iconSize(z = 7) {
     if (z < 6) return [30, 30];
-    if (z >= 6 && z < 9) return [42, 62];
-    if (z >= 9 && z < 11) return [48, 64];
-    return [52, 68];
+    if (z >= 6 && z < 9) return [36, 47];
+    if (z >= 9 && z < 15) return [40, 52];
+    return [46, 60];
   }
 
   iconAnchor(z = 7) {
     if (z < 6) return [15, 30];
-    if (z >= 6 && z < 9) return [21, 68];
-    if (z >= 9 && z < 11) return [24, 68];
-    return [26, 68];
+    if (z >= 6 && z < 9) return [18, 47];
+    if (z >= 9 && z < 15) return [20, 52];
+    return [23, 60];
   }
 
   // XXX there has to be a way to apply the viewBox onto the paths, to get rid of that extra nonsense
