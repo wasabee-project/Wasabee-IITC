@@ -49,7 +49,8 @@ function updateMarkers(op) {
 
   // remove any that were not processed
   // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  // for (const [k, v] of layerMap) {
+  for (const v of layerMap) {
     Wasabee.markerLayerGroup.removeLayer(v);
   }
 }
@@ -210,9 +211,9 @@ export async function drawAgents() {
   }
 
   // remove those not found in this fetch
-  for (const d of doneAgents) layerMap.delete(d.id);
+  for (const d of doneAgents) layerMap.delete(d);
   for (const agent in layerMap) {
-    console.debug("removing stale agent", agent);
+    // console.debug("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 }
@@ -265,7 +266,6 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
   const zoom = window.map.getZoom();
   if (!layerMap.has(agent.id)) {
     // new, add to map
-    console.debug("adding ", agent.name, agent.latLng);
     const marker = L.marker(agent.latLng, {
       title: agent.name,
       icon: L.divIcon({
@@ -305,15 +305,16 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     const a = layerMap.get(agent.id);
     const al = Wasabee.agentLayerGroup.getLayer(a);
     // if the location is different...
-    if (agent.lat != al._latlng.lat || agent.lng != al._latlng.lng) {
-      console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
+    const ll = al.getLatLng();
+    if (agent.lat != ll.lat || agent.lng != ll.lng) {
+      // console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
       al.setLatLng(agent.latLng);
       al.update();
     }
 
     // if the zoom factor changed, refresh the icon
     if (zoom != al.options.zoom) {
-      console.debug("changing icon zoom: ", zoom, al.options.zoom);
+      // console.debug("changing icon zoom: ", zoom, al.options.zoom);
       al.setIcon(
         L.divIcon({
           className: "wasabee-agent-icon",
@@ -355,9 +356,7 @@ function updateAnchors(op) {
     }
   }
 
-  // XXX use "in" instead of "of" and the first value
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v in layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
 }
