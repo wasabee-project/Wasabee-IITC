@@ -1118,9 +1118,9 @@ export default class WasabeeOp {
       }
     }
 
-    for (const id of oldLinks) {
+    for (const [id, l] of oldLinks) {
       if (!newLinks.has(id)) {
-        changes.deletion.push({ type: "link", id: id });
+        changes.deletion.push({ type: "link", link: l, id: id });
       }
     }
     for (const l of this.links) {
@@ -1146,9 +1146,9 @@ export default class WasabeeOp {
       }
     }
 
-    for (const id of oldMarkers) {
+    for (const [id, m] of oldMarkers) {
       if (!newMarkers.has(id)) {
-        changes.deletion.push({ type: "marker", id: id });
+        changes.deletion.push({ type: "marker", marker: m, id: id });
       }
     }
     for (const m of this.markers) {
@@ -1190,6 +1190,73 @@ export default class WasabeeOp {
         ids.add(z.id);
       }
       for (const z of op.zones) if (!ids.has(z.id)) op.zones.push(z);
+    }
+
+    // try to detect 0.18 ops with inconsistent IDs
+    {
+      const ids = new Set();
+      for (const l of this.links) {
+        ids.add(l.ID);
+      }
+      for (const m of this.markers) {
+        ids.add(m.ID);
+      }
+      let foundCollision = false;
+      for (const d of changes.deletion) {
+        if (d.type == "link" || d.type == "marker")
+          if (ids.has(d.id)) {
+            foundCollision = true;
+            break;
+          }
+      }
+      if (!foundCollision) {
+        for (const e of changes.edition) {
+          if (e.type == "link" && ids.has(e.link.ID)) {
+            foundCollision = true;
+            break;
+          }
+          if (e.type == "marker" && ids.has(e.marker.ID)) {
+            foundCollision = true;
+            break;
+          }
+        }
+      }
+      // foundCollision: either there is a collision in IDs, or everything fine
+      if (!foundCollision) {
+        // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`
+        // we need to use the server IDs so everyone use the same IDs
+        // this will occur with old client editing the ops, and old ops with always parallel writers (none is sync; bound to disappear)
+        for (const d of changes.deletion) {
+          if (d.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              d.link.fromPortalId,
+              d.link.toPortalId
+            );
+            if (link) d.id = link.ID;
+          }
+          if (d.type == "marker") {
+            const marker = this.getPortalMarkers(d.marker.portalId).get(
+              d.marker.type
+            );
+            if (marker) d.id = marker.ID;
+          }
+        }
+        for (const e of changes.edition) {
+          if (e.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link) e.id = link.ID;
+          }
+          if (e.type == "marker") {
+            const marker = this.getPortalMarkers(e.marker.portalId).get(
+              e.marker.type
+            );
+            if (marker) e.id = marker.ID;
+          }
+        }
+      }
     }
 
     for (const d of changes.deletion) {
