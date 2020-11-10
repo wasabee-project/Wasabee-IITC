@@ -111,7 +111,10 @@ const UploadButton = WButton.extend({
 
   doUpdate: async function (op) {
     const operation = getSelectedOperation();
-    if (op) {
+    const rebaseOnUpdate =
+      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
+      "true";
+    if (rebaseOnUpdate && op) {
       const changes = operation.changes();
       console.log(changes);
       op.applyChanges(changes, operation);
