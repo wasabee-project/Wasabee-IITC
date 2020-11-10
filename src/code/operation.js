@@ -1128,6 +1128,7 @@ export default class WasabeeOp {
           "description",
           "throwOrderPos",
           "color",
+          "completed",
           "zone",
         ];
         const diff = fields
@@ -1148,7 +1149,14 @@ export default class WasabeeOp {
         changes.addition.push({ type: "marker", marker: m });
       } else {
         const oldMarker = oldMarkers.get(m.ID);
-        const fields = ["type", "comment", "assignedTo", "order", "zone"];
+        const fields = [
+          "type",
+          "comment",
+          "assignedTo",
+          "state",
+          "order",
+          "zone",
+        ];
         const diff = fields
           .filter((k) => oldMarker[k] != m[k])
           .map((k) => [k, m[k]]);
@@ -1179,6 +1187,7 @@ export default class WasabeeOp {
           this.markers.push(a.marker);
       }
     }
+    // links/markers absent from `this` are not added back
     for (const e of changes.edition) {
       if (e.type == "portal") {
         const portal = this.getPortal(e.type.portal.id);
