@@ -1097,6 +1097,13 @@ export default class WasabeeOp {
     const newLinks = new Map(this.links.map((l) => [l.ID, l]));
     const newMarkers = new Map(this.markers.map((m) => [m.ID, m]));
 
+    // Note: teams/keyonhand are atomic
+    if (oldOp.name != this.name) changes.name = this.name;
+    if (oldOp.color != this.color) changes.color = this.color;
+    if (oldOp.comment != this.comment) changes.comment = this.comment;
+    // blockers: ignored by the server, handle them later
+    // zones: handle them later
+
     for (const [id, p] of this._idToOpportals) {
       if (!oldOp._idToOpportals.has(id))
         changes.addition.push({ type: "portal", portal: p });
@@ -1164,13 +1171,27 @@ export default class WasabeeOp {
           changes.edition.push({ type: "marker", marker: m, diff: diff });
       }
     }
+
     return changes;
   }
 
+  // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     for (const p of op.opportals) {
       this._addPortal(p);
     }
+
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+
+    // add missing zones
+    {
+      const ids = new Set();
+      for (const z of this.zones) {
+        ids.add(z.id);
+      }
+      for (const z of op.zones) if (!ids.has(z.id)) op.zones.push(z);
+    }
+
     for (const d of changes.deletion) {
       if (d.type == "link") this.links = this.links.filter((l) => l.ID != d.id);
       else if (d.type == "marker")
