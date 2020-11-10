@@ -33,12 +33,12 @@ window.plugin.wasabee.init = () => {
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
 
+  initSkin();
   // can this be moved to the auth dialog?
   initGoogleAPI();
   setupLocalStorage();
   initSelectedOperation();
   initServer();
-  initSkin();
 
   const skins = [];
   const ss = localStorage[Wasabee.static.constants.SKIN_KEY];
