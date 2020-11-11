@@ -1177,6 +1177,30 @@ export default class WasabeeOp {
 
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
+    const summary = {
+      compatibility: {
+        ok: true,
+        rewrite: {
+          link: 0,
+          marker: 0,
+        },
+      },
+      addition: {
+        link: 0,
+        marker: 0,
+        zone: 0,
+      },
+      deletion: {
+        link: 0,
+        marker: 0,
+      },
+      edition: {
+        link: 0,
+        marker: 0,
+        assignment: 0,
+        duplicate: 0,
+      },
+    };
     for (const p of op.opportals) {
       this._addPortal(p);
     }
@@ -1189,7 +1213,11 @@ export default class WasabeeOp {
       for (const z of this.zones) {
         ids.add(z.id);
       }
-      for (const z of op.zones) if (!ids.has(z.id)) op.zones.push(z);
+      for (const z of op.zones)
+        if (!ids.has(z.id)) {
+          op.zones.push(z);
+          summary.addition.zone += 1;
+        }
     }
 
     // try to detect 0.18 ops with inconsistent IDs
@@ -1226,19 +1254,26 @@ export default class WasabeeOp {
         // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`
         // we need to use the server IDs so everyone use the same IDs
         // this will occur with old client editing the ops, and old ops with always parallel writers (none is sync; bound to disappear)
+        summary.compatibility.ok = false;
         for (const d of changes.deletion) {
           if (d.type == "link") {
             const link = this.getLinkByPortalIDs(
               d.link.fromPortalId,
               d.link.toPortalId
             );
-            if (link) d.id = link.ID;
+            if (link) {
+              d.id = link.ID;
+              summary.compatibility.rewrite.link += 1;
+            }
           }
           if (d.type == "marker") {
             const marker = this.getPortalMarkers(d.marker.portalId).get(
               d.marker.type
             );
-            if (marker) d.id = marker.ID;
+            if (marker) {
+              d.id = marker.ID;
+              summary.compatibility.rewrite.marker += 1;
+            }
           }
         }
         for (const e of changes.edition) {
@@ -1247,32 +1282,48 @@ export default class WasabeeOp {
               e.link.fromPortalId,
               e.link.toPortalId
             );
-            if (link) e.id = link.ID;
+            if (link) {
+              e.id = link.ID;
+              summary.compatibility.rewrite.link += 1;
+            }
           }
           if (e.type == "marker") {
             const marker = this.getPortalMarkers(e.marker.portalId).get(
               e.marker.type
             );
-            if (marker) e.id = marker.ID;
+            if (marker) {
+              e.id = marker.ID;
+              summary.compatibility.rewrite.marker += 1;
+            }
           }
         }
       }
     }
 
     for (const d of changes.deletion) {
-      if (d.type == "link") this.links = this.links.filter((l) => l.ID != d.id);
-      else if (d.type == "marker")
-        this.markers = this.markers.filter((m) => m.ID != d.id);
+      if (d.type == "link") {
+        const links = this.links.filter((l) => l.ID != d.id);
+        summary.deletion.link += this.links.length - links.length;
+        this.links = links;
+      } else if (d.type == "marker") {
+        const markers = this.markers.filter((m) => m.ID != d.id);
+        summary.deletion.marker += this.markers.length - markers.length;
+        this.markers = markers;
+      }
     }
     // `this` takes over `changes` for additions
     for (const a of changes.addition) {
       if (a.type == "portal") this._addPortal(a.portal);
       else if (a.type == "link") {
-        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId))
+        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
           this.links.push(a.link);
+          summary.addition.link += 1;
+        }
       } else if (a.type == "marker") {
-        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type))
+        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
           this.markers.push(a.marker);
+          summary.addition.marker += 1;
+        }
       }
     }
     // links/markers absent from `this` are not added back
@@ -1291,8 +1342,11 @@ export default class WasabeeOp {
               // remove the link if leading to a duplicate
               // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
               this.links = this.links.filter((l) => l.ID == e.link.ID);
+              summary.edition.duplicate += 1;
             } else {
               for (const [k, v] of e.diff) l[k] = v;
+              summary.edition.link += 1;
+              if (e.diff.assignedTo) summary.edition.assignment += 1;
             }
             break;
           }
@@ -1305,13 +1359,17 @@ export default class WasabeeOp {
             if (marker && marker != m) {
               // remove the marker if leading to a duplicate
               this.markers = this.markers.filter((m) => m.ID == e.marker.ID);
+              summary.edition.duplicate += 1;
             } else {
               for (const [k, v] of e.diff) m[k] = v;
+              summary.edition.marker += 1;
+              if (e.diff.assignedTo) summary.edition.assignment += 1;
             }
             break;
           }
         }
       }
     }
+    return summary;
   }
 }
