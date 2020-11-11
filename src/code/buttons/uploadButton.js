@@ -145,7 +145,7 @@ const UploadButton = WButton.extend({
           operation.fetched = new Date().toUTCString();
           operation.fetchedOp = JSON.stringify(operation);
           operation.store();
-          // reload we use rebase
+          // reload if we use rebase
           if (operation != getSelectedOperation())
             makeSelectedOperation(operation.ID);
           alert(wX("UPDATED"));

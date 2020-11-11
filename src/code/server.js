@@ -30,7 +30,8 @@ export async function uploadOpPromise() {
 
 // sends a changed op to the server
 export async function updateOpPromise(operation) {
-  operation.cleanAll();
+  operation.cleanAnchorList();
+  operation.cleanPortalList();
   const json = JSON.stringify(operation);
   delete operation.mode;
 
