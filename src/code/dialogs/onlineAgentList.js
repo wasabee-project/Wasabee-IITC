@@ -71,6 +71,28 @@ const OnlineAgentList = WDialog.extend({
           if (agent) cell.textContent = agent.timeSinceformat();
         },
       },
+      {
+        name: "Actions",
+        value: (agent) => agent.id,
+        format: (cell, value, agent) => {
+          if (value) {
+            const sat = L.DomUtil.create("a", null, cell);
+            sat.textContent = "🛰";
+            sat.href = "#";
+            L.DomEvent.on(sat, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              window.map.setView(agent.latLng, 7);
+            });
+            const close = L.DomUtil.create("a", null, cell);
+            close.textContent = "🚁";
+            close.href = "#";
+            L.DomEvent.on(close, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              window.map.setView(agent.latLng, 13);
+            });
+          }
+        },
+      },
     ];
     this._table.sortBy = 0;
 
