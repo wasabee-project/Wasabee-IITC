@@ -227,12 +227,12 @@ function agentLayerMap() {
 }
 
 // use alreadyDone to reduce processing when using this in a loop, otherwise leave it unset
-export async function drawSingleTeam(teamID, layerMap alreadyDone) {
-  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
+export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
+  const done = new Array();
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return done; // yes, === false, undefined == true
   if (!alreadyDone) alreadyDone = new Array();
   if (!layerMap) layerMap = agentLayerMap();
 
-  const done = new Array();
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
     const team = await WasabeeTeam.waitGet(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
