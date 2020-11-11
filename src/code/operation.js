@@ -1278,7 +1278,7 @@ export default class WasabeeOp {
     // links/markers absent from `this` are not added back
     for (const e of changes.edition) {
       if (e.type == "portal") {
-        const portal = this.getPortal(e.type.portal.id);
+        const portal = this.getPortal(e.portal.id);
         for (const [k, v] of e.diff) portal[k] = v;
       } else if (e.type == "link") {
         for (const l of this.links) {
