@@ -29,16 +29,76 @@ export async function uploadOpPromise() {
 }
 
 // sends a changed op to the server
-export function updateOpPromise(operation) {
+export async function updateOpPromise(operation) {
   operation.cleanAll();
   const json = JSON.stringify(operation);
   delete operation.mode;
 
-  return genericPut(
-    `/api/v1/draw/${operation.ID}`,
-    json,
-    "application/json;charset=UTF-8"
-  );
+  try {
+    const construct = {
+      method: "PUT",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      body: json,
+      headers: { "Content-Type": "application/json;charset=UTF-8" },
+    };
+    if (operation.etag) construct.headers["If-Match"] = operation.etag;
+
+    const response = await fetch(
+      GetWasabeeServer() + `/api/v1/draw/${operation.ID}`,
+      construct
+    );
+
+    switch (response.status) {
+      case 200:
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
+          operation.etag = response.headers.get("ETag");
+          operation.fetched = new Date().toUTCString();
+          return Promise.resolve(true);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      case 412:
+        // mismatch etag
+        try {
+          return Promise.resolve(false);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", err.error));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      default:
+        try {
+          const err = await response.text();
+          return Promise.reject(response.statusText, err);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+    }
+  } catch (e) {
+    console.error(e);
+    return Promise.reject(e);
+  }
 }
 
 // removes an op from the server
@@ -79,6 +139,7 @@ export async function opPromise(opID) {
         raw = await response.json();
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
+        newop.etag = response.headers.get("ETag");
         newop.server = server;
         newop.fetchedOp = JSON.stringify(raw);
         return Promise.resolve(newop);

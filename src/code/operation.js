@@ -76,6 +76,7 @@ export default class WasabeeOp {
     // ignored by the server but useful for localStorage
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
+    json.etag = this.etag;
     localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
