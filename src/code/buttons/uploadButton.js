@@ -129,7 +129,6 @@ const UploadButton = WButton.extend({
     rebaseMessage += `- ignore ${summary.edition.duplicate} new duplicates\n`;
     rebaseMessage += `- edit ${summary.edition.link} links and ${summary.edition.marker} markers\n`;
     rebaseMessage += `- change ${summary.edition.assignment} assignments\n`;
-    alert(rebaseMessage);
     return rebaseMessage;
   },
 
@@ -165,10 +164,10 @@ const UploadButton = WButton.extend({
           let message = wX("UPDATE_CONFLICT_DESC");
           if (rebaseOnUpdate) {
             const rebaseMessage = this.doRebase(lastOp);
-            message += "\n" + rebaseMessage;
-            const html = L.DomUtil.create("p");
-            html.innerHTML = message.replaceAll(/\n/g, "<br/>");
-            message = html;
+            message = L.DomUtil.create("p");
+            message.innerHTML =
+              "Server OP has changed since last sync. Wasabee rebased your changes on top of the server OP. Check the summary (not visible on the map) and confirm in order to push.<br/>" +
+              rebaseMessage.replaceAll(/\n/g, "<br/>");
           }
           const md = new ConfirmDialog();
           md.setup(wX("UPDATE_CONFLICT_TITLE"), message, () =>
