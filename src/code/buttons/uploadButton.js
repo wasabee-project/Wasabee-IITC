@@ -32,7 +32,7 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = getSelectedOperation();
         if (operation.IsServerOp()) {
-          await this.doPullAndUpdate();
+          await this.doUpdate(operation);
           return;
         }
 
@@ -132,51 +132,47 @@ const UploadButton = WButton.extend({
     return rebaseMessage;
   },
 
-  doUpdate: async function (op) {
-    const operation = getSelectedOperation();
-    const rebaseOnUpdate =
-      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
-      "true";
-    if (rebaseOnUpdate && op) {
-      op.cleanAll();
-      // reload selected OP
-      op = makeSelectedOperation(op.ID);
-    } else op = operation;
-    await updateOpPromise(op);
-    op.localchanged = false;
-    op.fetched = new Date().toUTCString();
-    op.fetchedOp = JSON.stringify(op);
-    op.store();
-    alert(wX("UPDATED"));
-    this.Wupdate(this._container, op);
-  },
-
-  doPullAndUpdate: async function () {
-    const operation = getSelectedOperation();
+  doUpdate: async function (operation, force = false) {
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
       "true";
     if (operation.IsServerOp()) {
       try {
-        const lastOp = await opPromise(operation.ID);
-        // conflict
-        if (!lastOp.localchanged) {
-          let message = wX("UPDATE_CONFLICT_DESC");
-          if (rebaseOnUpdate) {
+        if (force) delete operation.etag;
+        const success = await updateOpPromise(operation);
+        if (success) {
+          operation.localchanged = false;
+          operation.fetched = new Date().toUTCString();
+          operation.fetchedOp = JSON.stringify(operation);
+          operation.store();
+          // reload we use rebase
+          if (operation != getSelectedOperation())
+            makeSelectedOperation(operation.ID);
+          alert(wX("UPDATED"));
+          this.Wupdate(this._container, operation);
+        } else {
+          // need rebase or force
+          if (!rebaseOnUpdate) {
+            const md = new ConfirmDialog();
+            md.setup(
+              wX("UPDATE_CONFLICT_TITLE"),
+              wX("UPDATE_CONFLICT_DESC"),
+              () => this.doUpdate(getSelectedOperation(), true)
+            );
+            md.enable();
+          } else {
+            const lastOp = await opPromise(operation.ID);
             const rebaseMessage = this.doRebase(lastOp);
-            message = L.DomUtil.create("p");
+            const message = L.DomUtil.create("p");
             message.innerHTML =
               "Server OP has changed since last sync. Wasabee rebased your changes on top of the server OP. Check the summary (not visible on the map) and confirm in order to push.<br/>" +
               rebaseMessage.replaceAll(/\n/g, "<br/>");
+            const md = new ConfirmDialog();
+            md.setup(wX("UPDATE_CONFLICT_TITLE"), message, () =>
+              this.doUpdate(lastOp)
+            );
+            md.enable();
           }
-          const md = new ConfirmDialog();
-          md.setup(wX("UPDATE_CONFLICT_TITLE"), message, () =>
-            this.doUpdate(lastOp)
-          );
-          md.enable();
-        } else {
-          // no conflict
-          this.doUpdate();
         }
       } catch (e) {
         console.error(e);
