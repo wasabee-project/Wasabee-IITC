@@ -1346,7 +1346,8 @@ export default class WasabeeOp {
             } else {
               for (const [k, v] of e.diff) l[k] = v;
               summary.edition.link += 1;
-              if (e.diff.assignedTo) summary.edition.assignment += 1;
+              if (e.diff.some((kv) => kv[0] == "assignedTo"))
+                summary.edition.assignment += 1;
             }
             break;
           }
@@ -1363,7 +1364,8 @@ export default class WasabeeOp {
             } else {
               for (const [k, v] of e.diff) m[k] = v;
               summary.edition.marker += 1;
-              if (e.diff.assignedTo) summary.edition.assignment += 1;
+              if (e.diff.some((kv) => kv[0] == "assignedTo"))
+                summary.edition.assignment += 1;
             }
             break;
           }
