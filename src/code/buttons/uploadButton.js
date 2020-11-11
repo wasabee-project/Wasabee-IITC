@@ -109,15 +109,36 @@ const UploadButton = WButton.extend({
     this.button.style.display = "none";
   },
 
+  doRebase: function (op) {
+    const operation = getSelectedOperation();
+    const changes = operation.changes();
+    console.log(changes);
+    const summary = op.applyChanges(changes, operation);
+    op.cleanAnchorList();
+    op.cleanPortalList();
+
+    let rebaseMessage = "Rebase summary:\n";
+    if (!summary.compatibility.ok) {
+      rebaseMessage +=
+        `- old OP detected, merge:\n` +
+        `  - ${summary.compatibility.rewrite.link} links\n` +
+        `  - ${summary.compatibility.rewrite.marker} markers\n`;
+    }
+    rebaseMessage += `- add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones\n`;
+    rebaseMessage += `- delete ${summary.deletion.link} links and ${summary.deletion.marker} markers\n`;
+    rebaseMessage += `- ignore ${summary.edition.duplicate} new duplicates\n`;
+    rebaseMessage += `- edit ${summary.edition.link} links and ${summary.edition.marker} markers\n`;
+    rebaseMessage += `- change ${summary.edition.assignment} assignments\n`;
+    alert(rebaseMessage);
+    return rebaseMessage;
+  },
+
   doUpdate: async function (op) {
     const operation = getSelectedOperation();
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
       "true";
     if (rebaseOnUpdate && op) {
-      const changes = operation.changes();
-      console.log(changes);
-      op.applyChanges(changes, operation);
       op.cleanAll();
       // reload selected OP
       op = makeSelectedOperation(op.ID);
@@ -133,16 +154,25 @@ const UploadButton = WButton.extend({
 
   doPullAndUpdate: async function () {
     const operation = getSelectedOperation();
+    const rebaseOnUpdate =
+      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
+      "true";
     if (operation.IsServerOp()) {
       try {
         const lastOp = await opPromise(operation.ID);
         // conflict
         if (!lastOp.localchanged) {
+          let message = wX("UPDATE_CONFLICT_DESC");
+          if (rebaseOnUpdate) {
+            const rebaseMessage = this.doRebase(lastOp);
+            message += "\n" + rebaseMessage;
+            const html = L.DomUtil.create("p");
+            html.innerHTML = message.replaceAll(/\n/g, "<br/>");
+            message = html;
+          }
           const md = new ConfirmDialog();
-          md.setup(
-            wX("UPDATE_CONFLICT_TITLE"),
-            wX("UPDATE_CONFLICT_DESC"),
-            () => this.doUpdate(lastOp)
+          md.setup(wX("UPDATE_CONFLICT_TITLE"), message, () =>
+            this.doUpdate(lastOp)
           );
           md.enable();
         } else {
