@@ -48,8 +48,7 @@ function updateMarkers(op) {
   }
 
   // remove any that were not processed
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v of layerMap.values()) {
     // for (const v of layerMap) {
     Wasabee.markerLayerGroup.removeLayer(v);
   }
@@ -138,8 +137,7 @@ function updateLinks(operation) {
     }
   }
 
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v of layerMap.values()) {
     Wasabee.linkLayerGroup.removeLayer(v);
   }
 }; */
@@ -230,8 +228,8 @@ function agentLayerMap() {
 export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
   const done = new Array();
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return done; // yes, === false, undefined == true
-  if (!alreadyDone) alreadyDone = new Array();
-  if (!layerMap) layerMap = agentLayerMap();
+  if (alreadyDone === undefined) alreadyDone = new Array();
+  if (layerMap === undefined) layerMap = agentLayerMap();
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
@@ -357,9 +355,7 @@ function updateAnchors(op) {
     }
   }
 
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
-    // for (const v in layerMap) {
+  for (const v of layerMap.values()) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
 }
