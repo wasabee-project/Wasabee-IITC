@@ -60,6 +60,7 @@ W.static = {
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",
     SERVER_BASE_DEFAULT: "https://am.wasabee.rocks",
+    REBASE_UPDATE_KEY: "wasabee-rebase-on-update",
     MARKER_TYPE_CAPTURE: "CapturePortalMarker",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
     MARKER_TYPE_EXCLUDE: "ExcludeMarker",

@@ -41,6 +41,8 @@ export default class WasabeeOp {
 
     this.server = this.fetched ? obj.server : null;
 
+    this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
+
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
     if (!this.blockers) this.blockers = new Array();
@@ -70,7 +72,11 @@ export default class WasabeeOp {
 
   store() {
     this.stored = Date.now();
-    localStorage[this.ID] = JSON.stringify(this);
+    const json = this.toJSON();
+    // ignored by the server but useful for localStorage
+    json.server = this.server;
+    json.fetchedOp = this.fetchedOp;
+    localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
     // some debug info to trace race condition
@@ -99,8 +105,6 @@ export default class WasabeeOp {
       keysonhand: this.keysonhand,
       mode: this.mode,
       zones: this.zones,
-      // ignored by the server but useful for localStorage
-      server: this.server,
     };
   }
 
@@ -234,16 +238,20 @@ export default class WasabeeOp {
     return markers;
   }
 
-  getLink(portal1, portal2) {
+  getLinkByPortalIDs(portalId1, portalId2) {
     for (const l of this.links) {
       if (
-        (l.fromPortalId == portal1.id && l.toPortalId == portal2.id) ||
-        (l.fromPortalId == portal2.id && l.toPortalId == portal1.id)
+        (l.fromPortalId == portalId1 && l.toPortalId == portalId2) ||
+        (l.fromPortalId == portalId2 && l.toPortalId == portalId1)
       ) {
         return l;
       }
     }
     return null;
+  }
+
+  getLink(portal1, portal2) {
+    return this.getLinkByPortalIDs(portal1.id, portal2.id);
   }
 
   getLinkListFromPortal(portal) {
@@ -1073,5 +1081,237 @@ export default class WasabeeOp {
     const newid = Math.max(...ids) + 1;
     this.zones.push({ id: newid, name: newid });
     this.update(true);
+  }
+
+  changes() {
+    const changes = {
+      addition: new Array(),
+      edition: new Array(),
+      deletion: new Array(),
+    };
+    // empty op if old OP (or local OP)
+    const oldOp = new WasabeeOp(this.fetchedOp || {});
+    const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
+    const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
+
+    const newLinks = new Map(this.links.map((l) => [l.ID, l]));
+    const newMarkers = new Map(this.markers.map((m) => [m.ID, m]));
+
+    // Note: teams/keyonhand are atomic
+    if (oldOp.name != this.name) changes.name = this.name;
+    if (oldOp.color != this.color) changes.color = this.color;
+    if (oldOp.comment != this.comment) changes.comment = this.comment;
+    // blockers: ignored by the server, handle them later
+    // zones: handle them later
+
+    for (const [id, p] of this._idToOpportals) {
+      if (!oldOp._idToOpportals.has(id))
+        changes.addition.push({ type: "portal", portal: p });
+      else {
+        const oldPortal = oldOp._idToOpportals.get(id);
+        const fields = ["comment", "hardness"];
+        const diff = fields
+          .filter((k) => oldPortal[k] != p[k])
+          .map((k) => [k, p[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "portal", portal: p, diff: diff });
+      }
+    }
+
+    for (const [id, l] of oldLinks) {
+      if (!newLinks.has(id)) {
+        changes.deletion.push({ type: "link", link: l, id: id });
+      }
+    }
+    for (const l of this.links) {
+      if (!oldLinks.has(l.ID)) {
+        changes.addition.push({ type: "link", link: l });
+      } else {
+        const oldLink = oldLinks.get(l.ID);
+        const fields = [
+          "fromPortalId",
+          "toPortalId",
+          "assignedTo",
+          "description",
+          "throwOrderPos",
+          "color",
+          "completed",
+          "zone",
+        ];
+        const diff = fields
+          .filter((k) => oldLink[k] != l[k])
+          .map((k) => [k, l[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "link", link: l, diff: diff });
+      }
+    }
+
+    for (const [id, m] of oldMarkers) {
+      if (!newMarkers.has(id)) {
+        changes.deletion.push({ type: "marker", marker: m, id: id });
+      }
+    }
+    for (const m of this.markers) {
+      if (!oldMarkers.has(m.ID)) {
+        changes.addition.push({ type: "marker", marker: m });
+      } else {
+        const oldMarker = oldMarkers.get(m.ID);
+        const fields = [
+          "type",
+          "comment",
+          "assignedTo",
+          "state",
+          "order",
+          "zone",
+        ];
+        const diff = fields
+          .filter((k) => oldMarker[k] != m[k])
+          .map((k) => [k, m[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "marker", marker: m, diff: diff });
+      }
+    }
+
+    return changes;
+  }
+
+  // assume that `this` is a server OP (no blockers, teams/keys are correct)
+  applyChanges(changes, op) {
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+
+    // add missing zones
+    {
+      const ids = new Set();
+      for (const z of this.zones) {
+        ids.add(z.id);
+      }
+      for (const z of op.zones) if (!ids.has(z.id)) op.zones.push(z);
+    }
+
+    // try to detect 0.18 ops with inconsistent IDs
+    {
+      const ids = new Set();
+      for (const l of this.links) {
+        ids.add(l.ID);
+      }
+      for (const m of this.markers) {
+        ids.add(m.ID);
+      }
+      let foundCollision = false;
+      for (const d of changes.deletion) {
+        if (d.type == "link" || d.type == "marker")
+          if (ids.has(d.id)) {
+            foundCollision = true;
+            break;
+          }
+      }
+      if (!foundCollision) {
+        for (const e of changes.edition) {
+          if (e.type == "link" && ids.has(e.link.ID)) {
+            foundCollision = true;
+            break;
+          }
+          if (e.type == "marker" && ids.has(e.marker.ID)) {
+            foundCollision = true;
+            break;
+          }
+        }
+      }
+      // foundCollision: either there is a collision in IDs, or everything fine
+      if (!foundCollision) {
+        // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`
+        // we need to use the server IDs so everyone use the same IDs
+        // this will occur with old client editing the ops, and old ops with always parallel writers (none is sync; bound to disappear)
+        for (const d of changes.deletion) {
+          if (d.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              d.link.fromPortalId,
+              d.link.toPortalId
+            );
+            if (link) d.id = link.ID;
+          }
+          if (d.type == "marker") {
+            const marker = this.getPortalMarkers(d.marker.portalId).get(
+              d.marker.type
+            );
+            if (marker) d.id = marker.ID;
+          }
+        }
+        for (const e of changes.edition) {
+          if (e.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link) e.id = link.ID;
+          }
+          if (e.type == "marker") {
+            const marker = this.getPortalMarkers(e.marker.portalId).get(
+              e.marker.type
+            );
+            if (marker) e.id = marker.ID;
+          }
+        }
+      }
+    }
+
+    for (const d of changes.deletion) {
+      if (d.type == "link") this.links = this.links.filter((l) => l.ID != d.id);
+      else if (d.type == "marker")
+        this.markers = this.markers.filter((m) => m.ID != d.id);
+    }
+    // `this` takes over `changes` for additions
+    for (const a of changes.addition) {
+      if (a.type == "portal") this._addPortal(a.portal);
+      else if (a.type == "link") {
+        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId))
+          this.links.push(a.link);
+      } else if (a.type == "marker") {
+        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type))
+          this.markers.push(a.marker);
+      }
+    }
+    // links/markers absent from `this` are not added back
+    for (const e of changes.edition) {
+      if (e.type == "portal") {
+        const portal = this.getPortal(e.type.portal.id);
+        for (const [k, v] of e.diff) portal[k] = v;
+      } else if (e.type == "link") {
+        for (const l of this.links) {
+          if (l.ID == e.link.ID) {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link && link != l) {
+              // remove the link if leading to a duplicate
+              // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
+              this.links = this.links.filter((l) => l.ID == e.link.ID);
+            } else {
+              for (const [k, v] of e.diff) l[k] = v;
+            }
+            break;
+          }
+        }
+      } else if (e.type == "marker") {
+        for (const m of this.markers) {
+          if (m.ID == e.marker.ID) {
+            const markers = this.getPortalMarkers(e.marker.portalId);
+            const marker = markers.get(e.marker.type);
+            if (marker && marker != m) {
+              // remove the marker if leading to a duplicate
+              this.markers = this.markers.filter((m) => m.ID == e.marker.ID);
+            } else {
+              for (const [k, v] of e.diff) m[k] = v;
+            }
+            break;
+          }
+        }
+      }
+    }
   }
 }

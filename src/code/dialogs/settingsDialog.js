@@ -153,6 +153,21 @@ const SettingsDialog = WDialog.extend({
       localStorage[urpKey] = urpSelect.value;
     });
 
+    const rebaseUpdateTitle = L.DomUtil.create("label", null, container);
+    rebaseUpdateTitle.textContent =
+      "Rebase on update (alpha, may break your op)";
+    rebaseUpdateTitle.htmlFor = "wasabee-setting-rebase-update";
+    const rebaseUpdateCheck = L.DomUtil.create("input", null, container);
+    rebaseUpdateCheck.type = "checkbox";
+    rebaseUpdateCheck.id = "wasabee-setting-rebase-update";
+    const ruc = window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY;
+    const ru = localStorage[ruc];
+    if (ru === "true") rebaseUpdateCheck.checked = true;
+    L.DomEvent.on(rebaseUpdateCheck, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      localStorage[ruc] = rebaseUpdateCheck.checked;
+    });
+
     const autoLoadTitle = L.DomUtil.create("label", null, container);
     autoLoadTitle.textContent = wX("AUTOLOAD");
     autoLoadTitle.htmlFor = "wasabee-setting-autoload";

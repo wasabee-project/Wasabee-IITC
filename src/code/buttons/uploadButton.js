@@ -110,9 +110,22 @@ const UploadButton = WButton.extend({
   },
 
   doUpdate: async function (op) {
+    const operation = getSelectedOperation();
+    const rebaseOnUpdate =
+      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
+      "true";
+    if (rebaseOnUpdate && op) {
+      const changes = operation.changes();
+      console.log(changes);
+      op.applyChanges(changes, operation);
+      op.cleanAll();
+      // reload selected OP
+      op = makeSelectedOperation(op.ID);
+    } else op = operation;
     await updateOpPromise(op);
     op.localchanged = false;
     op.fetched = new Date().toUTCString();
+    op.fetchedOp = JSON.stringify(op);
     op.store();
     alert(wX("UPDATED"));
     this.Wupdate(this._container, op);
@@ -129,12 +142,12 @@ const UploadButton = WButton.extend({
           md.setup(
             wX("UPDATE_CONFLICT_TITLE"),
             wX("UPDATE_CONFLICT_DESC"),
-            () => this.doUpdate(operation)
+            () => this.doUpdate(lastOp)
           );
           md.enable();
         } else {
           // no conflict
-          this.doUpdate(operation);
+          this.doUpdate();
         }
       } catch (e) {
         console.error(e);
