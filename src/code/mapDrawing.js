@@ -49,8 +49,8 @@ function updateMarkers(op) {
 
   // remove any that were not processed
   // eslint-disable-next-line
-  // for (const [k, v] of layerMap) {
-  for (const v of layerMap) {
+  for (const [k, v] of layerMap) {
+    // for (const v of layerMap) {
     Wasabee.markerLayerGroup.removeLayer(v);
   }
 }
@@ -227,11 +227,11 @@ function agentLayerMap() {
 }
 
 // use alreadyDone to reduce processing when using this in a loop, otherwise leave it unset
-export async function drawSingleTeam(
-  teamID,
-  layerMap = agentLayerMap(),
-  alreadyDone = new Array()
-) {
+export async function drawSingleTeam(teamID, layerMap alreadyDone) {
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
+  if (!alreadyDone) alreadyDone = new Array();
+  if (!layerMap) layerMap = agentLayerMap();
+
   const done = new Array();
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
@@ -253,6 +253,7 @@ export async function drawSingleTeam(
 }
 
 export async function drawSingleAgent(gid) {
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
   const agent = await WasabeeAgent.waitGet(gid);
   if (agent != null) _drawAgent(agent);
 }
@@ -356,7 +357,9 @@ function updateAnchors(op) {
     }
   }
 
-  for (const v in layerMap) {
+  // eslint-disable-next-line
+  for (const [k, v] of layerMap) {
+    // for (const v in layerMap) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
 }
