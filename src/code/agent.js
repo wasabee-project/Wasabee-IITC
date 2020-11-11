@@ -42,6 +42,18 @@ export default class WasabeeAgent {
     this.state = obj.state;
 
     // push the new data into the agent cache
+    this._updateCache();
+  }
+
+  _updateCache() {
+    // if already cached, merge some values that might be present if pulled from a different team
+    if (window.plugin.wasabee._agentCache.has(this.id)) {
+      window.plugin.wasabee._agentCache.set(this.id, this);
+      const cached = window.plugin.wasabee._agentCache.get(this.id);
+      if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
+      if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
+      // XXX do something with displayname to ensure that name is the "real" name?
+    }
     window.plugin.wasabee._agentCache.set(this.id, this);
   }
 
