@@ -461,6 +461,8 @@ export default class WasabeeOp {
       alert(
         `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers/blockers. Please check your OP and report to the devs.`
       );
+      // leave some trace
+      console.trace();
       this.cleanAnchorList();
       for (const id of missingPortal) newPortals.delete(id);
     }
