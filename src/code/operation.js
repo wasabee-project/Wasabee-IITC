@@ -1202,6 +1202,7 @@ export default class WasabeeOp {
         marker: 0,
         assignment: 0,
         duplicate: 0,
+        singlePortalLink: 0,
       },
     };
     for (const p of op.opportals) {
@@ -1344,13 +1345,18 @@ export default class WasabeeOp {
             if (link && link != l) {
               // remove the link if leading to a duplicate
               // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
-              this.links = this.links.filter((l) => l.ID == e.link.ID);
+              this.links = this.links.filter((l) => l.ID != e.link.ID);
               summary.edition.duplicate += 1;
             } else {
               for (const [k, v] of e.diff) l[k] = v;
-              summary.edition.link += 1;
-              if (e.diff.some((kv) => kv[0] == "assignedTo"))
-                summary.edition.assignment += 1;
+              if (l.fromPortalId == l.toPortalId) {
+                this.links = this.links.filter((link) => link.ID != l.ID);
+                summary.edition.singlePortalLink += 1;
+              } else {
+                summary.edition.link += 1;
+                if (e.diff.some((kv) => kv[0] == "assignedTo"))
+                  summary.edition.assignment += 1;
+              }
             }
             break;
           }
@@ -1362,7 +1368,7 @@ export default class WasabeeOp {
             const marker = markers.get(e.marker.type);
             if (marker && marker != m) {
               // remove the marker if leading to a duplicate
-              this.markers = this.markers.filter((m) => m.ID == e.marker.ID);
+              this.markers = this.markers.filter((m) => m.ID != e.marker.ID);
               summary.edition.duplicate += 1;
             } else {
               for (const [k, v] of e.diff) m[k] = v;

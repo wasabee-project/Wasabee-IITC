@@ -124,6 +124,7 @@ const UploadButton = WButton.extend({
     rebaseMessage += `- delete ${summary.deletion.link} links and ${summary.deletion.marker} markers\n`;
     rebaseMessage += `- ignore ${summary.edition.duplicate} new duplicates\n`;
     rebaseMessage += `- edit ${summary.edition.link} links and ${summary.edition.marker} markers\n`;
+    rebaseMessage += `- delete ${summary.edition.singlePortalLink} single portal links\n`;
     rebaseMessage += `- change ${summary.edition.assignment} assignments\n`;
     return rebaseMessage;
   },
