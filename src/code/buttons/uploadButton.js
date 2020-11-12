@@ -132,6 +132,9 @@ const UploadButton = WButton.extend({
     return rebaseMessage;
   },
 
+  // update operation that is either
+  // - selectedOP if no conflict or rebase is disabled
+  // - rebase temp op otherwise
   doUpdate: async function (operation, force = false) {
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
