@@ -449,9 +449,9 @@ export default class WasabeeOp {
         this.links = this.links.filter(
           (l) => l.fromPortalId != id && l.toPortalId != id
         );
-        this.markers = this.links.filter((l) => l.portalId != id);
-        this.blockers = this.links.filter(
-          (l) => l.fromPortalId != id && l.toPortalId != id
+        this.markers = this.markers.filter((m) => m.portalId != id);
+        this.blockers = this.blockers.filter(
+          (b) => b.fromPortalId != id && b.toPortalId != id
         );
         missingPortal.add(id);
       }
