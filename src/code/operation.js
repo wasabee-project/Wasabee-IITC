@@ -38,6 +38,8 @@ export default class WasabeeOp {
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
+    // this.modified = obj.modified ? obj.modified : null;
+    this.starttime = obj.starttime ? obj.starttime : null;
 
     this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
 
@@ -79,6 +81,9 @@ export default class WasabeeOp {
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
     json.lasteditid = this.lasteditid;
+    json.fetched = this.fetched;
+    json.stored = this.stored;
+    json.localchanged = this.localchanged;
     localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
@@ -101,14 +106,28 @@ export default class WasabeeOp {
       color: this.color,
       comment: this.comment,
       teamlist: this.teamlist,
-      fetched: this.fetched,
-      stored: this.stored,
-      localchanged: this.localchanged,
+      // fetched: this.fetched,
+      // stored: this.stored,
+      // localchanged: this.localchanged,
       blockers: this.blockers,
       keysonhand: this.keysonhand,
-      mode: this.mode,
       zones: this.zones,
+      starttime: this.starttime,
     };
+  }
+
+  // a deep copy with everything optional removed -- inception grade logic here
+  toExport() {
+    // round-trip through JSON to ensure a deep copy
+    const o = new WasabeeOp(JSON.stringify(this));
+    // remove anything which the server doesn't need to see
+    o.blockers = new Array(); // save bandwidth and don't send this
+    o.cleanAll(); // cleans oppportals to save bandwidth
+    // delete o.fetched;
+    // delete o.stored;
+    // delete o.localchanged;
+    delete o.teamlist; // teamlist is not needed on export/push
+    return JSON.stringify(o);
   }
 
   // read only (for inspection)

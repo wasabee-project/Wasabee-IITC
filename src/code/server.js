@@ -12,8 +12,8 @@ export default function () {
 // refreshed op stored to localStorage; "me" upated to reflect new op in list
 export async function uploadOpPromise() {
   const operation = getSelectedOperation();
-  operation.cleanAll();
-  const json = JSON.stringify(operation);
+  const json = operation.toExport();
+  console.log(json);
 
   const response = await genericPost(
     "/api/v1/draw",
@@ -30,10 +30,8 @@ export async function uploadOpPromise() {
 
 // sends a changed op to the server
 export async function updateOpPromise(operation) {
-  operation.cleanAnchorList();
-  operation.cleanPortalList();
-  const json = JSON.stringify(operation);
-  delete operation.mode;
+  const json = operation.toExport();
+  console.log(json);
 
   try {
     const construct = {

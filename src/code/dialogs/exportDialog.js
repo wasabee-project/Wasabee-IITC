@@ -57,7 +57,7 @@ const ExportDialog = WDialog.extend({
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
     operation.cleanAll();
-    textArea.value = JSON.stringify(operation);
+    textArea.value = operation.toExport();
     return mainContent;
   },
 
