@@ -440,6 +440,30 @@ export default class WasabeeOp {
       newPortals.set(b.toPortalId, this._idToOpportals.get(b.toPortalId));
     }
 
+    // sanitize OP if it get corrupt by my code elsewhere...
+    const missingPortal = new Set();
+    let corrupt =
+      this.links.length + this.markers.length + this.blockers.length;
+    for (const [id, v] of newPortals) {
+      if (v === undefined) {
+        this.links = this.links.filter(
+          (l) => l.fromPortalId != id && l.toPortalId != id
+        );
+        this.markers = this.links.filter((l) => l.portalId != id);
+        this.blockers = this.links.filter(
+          (l) => l.fromPortalId != id && l.toPortalId != id
+        );
+        missingPortal.add(id);
+      }
+    }
+    corrupt -= this.links.length + this.markers.length + this.blockers.length;
+    if (missingPortal.size > 0) {
+      alert(
+        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers/blockers. Please check your OP and report to the devs.`
+      );
+      this.cleanAnchorList();
+      for (const id of missingPortal) newPortals.delete(id);
+    }
     this._idToOpportals = newPortals;
     this.buildCoordsLookupTable();
   }
