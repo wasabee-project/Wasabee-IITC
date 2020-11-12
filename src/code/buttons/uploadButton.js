@@ -138,7 +138,7 @@ const UploadButton = WButton.extend({
       "true";
     if (operation.IsServerOp()) {
       try {
-        if (force) delete operation.etag;
+        if (force) delete operation.lasteditid;
         const success = await updateOpPromise(operation);
         if (success) {
           operation.localchanged = false;

@@ -46,7 +46,8 @@ export async function updateOpPromise(operation) {
       body: json,
       headers: { "Content-Type": "application/json;charset=UTF-8" },
     };
-    if (operation.etag) construct.headers["If-Match"] = operation.etag;
+    if (operation.lasteditid)
+      construct.headers["If-Match"] = operation.lasteditid;
 
     const response = await fetch(
       GetWasabeeServer() + `/api/v1/draw/${operation.ID}`,
@@ -59,7 +60,7 @@ export async function updateOpPromise(operation) {
           const text = await response.text();
           const obj = JSON.parse(text);
           if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
-          operation.etag = response.headers.get("ETag");
+          operation.lasteditid = obj.updateID;
           operation.fetched = new Date().toUTCString();
           return Promise.resolve(true);
         } catch (e) {
@@ -140,7 +141,6 @@ export async function opPromise(opID) {
         raw = await response.json();
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
-        newop.etag = response.headers.get("ETag");
         newop.server = server;
         newop.fetchedOp = JSON.stringify(raw);
         return Promise.resolve(newop);

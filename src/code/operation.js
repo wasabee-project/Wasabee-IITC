@@ -39,6 +39,8 @@ export default class WasabeeOp {
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
 
+    this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
+
     this.server = this.fetched ? obj.server : null;
 
     this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
@@ -76,7 +78,7 @@ export default class WasabeeOp {
     // ignored by the server but useful for localStorage
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
-    json.etag = this.etag;
+    json.lasteditid = this.lasteditid;
     localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
