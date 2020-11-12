@@ -141,7 +141,7 @@ export default class WasabeeLink {
 
   getColor(operation) {
     // 0.17 -- use the old names internally no matter what we are sent
-    let color = WasabeeOp.oldColors(this.color);
+    let color = WasabeeOp.newColors(this.color);
     if (color == "main") color = operation.color;
     if (window.plugin.wasabee.skin.layerTypes.has(color))
       color = window.plugin.wasabee.skin.layerTypes.get(color).color;

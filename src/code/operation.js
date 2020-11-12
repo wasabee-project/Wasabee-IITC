@@ -29,7 +29,7 @@ export default class WasabeeOp {
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
-    this.color = WasabeeOp.oldColors(this.color); // for 0.17, use old colors
+    this.color = WasabeeOp.newColors(this.color);
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
@@ -74,16 +74,21 @@ export default class WasabeeOp {
     return null;
   }
 
+  // writes to localStorage with all data included
   store() {
     this.stored = Date.now();
     const json = this.toJSON();
-    // ignored by the server but useful for localStorage
+
+    // include things not required by the server but necessary for localStorage
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
     json.lasteditid = this.lasteditid;
     json.fetched = this.fetched;
     json.stored = this.stored;
     json.localchanged = this.localchanged;
+    json.blockers = this.blockers;
+    json.keysonhand = this.keysonhand;
+    json.teamlist = this.teamlist;
     localStorage[this.ID] = JSON.stringify(json);
     addOperation(this.ID);
 
@@ -93,40 +98,28 @@ export default class WasabeeOp {
       console.trace("store current OP from a different obj");
   }
 
-  // build object to serialize
+  // build object to serialize, shallow copy, local-only values excluded
   toJSON() {
     return {
       ID: this.ID,
       name: this.name,
       creator: this.creator,
-      opportals: Array.from(this._idToOpportals.values()),
+      opportals: Array.from(this._idToOpportals.values()), // includes blocker portals
       anchors: this.anchors,
       links: this.links,
       markers: this.markers,
       color: this.color,
       comment: this.comment,
-      teamlist: this.teamlist,
-      // fetched: this.fetched,
-      // stored: this.stored,
-      // localchanged: this.localchanged,
-      blockers: this.blockers,
-      keysonhand: this.keysonhand,
       zones: this.zones,
       starttime: this.starttime,
     };
   }
 
-  // a deep copy with everything optional removed -- inception grade logic here
+  // JSON with everything optional removed -- inception grade logic here
   toExport() {
-    // round-trip through JSON to ensure a deep copy
+    // round-trip through JSON.stringify to ensure a deep copy
     const o = new WasabeeOp(JSON.stringify(this));
-    // remove anything which the server doesn't need to see
-    o.blockers = new Array(); // save bandwidth and don't send this
-    o.cleanAll(); // cleans oppportals to save bandwidth
-    // delete o.fetched;
-    // delete o.stored;
-    // delete o.localchanged;
-    delete o.teamlist; // teamlist is not needed on export/push
+    o.cleanPortalList(); // remove portals which are only relevant to blockers
     return JSON.stringify(o);
   }
 
@@ -189,8 +182,6 @@ export default class WasabeeOp {
       }
 
       for (const id of toRemove) this._idToOpportals.delete(id);
-
-      //this.opportals = Array.from(this._idToOpportals.values());
     }
 
     this._dirtyCoordsTable = false;
@@ -205,7 +196,6 @@ export default class WasabeeOp {
   }
 
   containsPortal(portal) {
-    console.assert(portal && portal.id, "containsPortal w/o args");
     return this._idToOpportals.has(portal.id);
   }
 
@@ -421,7 +411,6 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.cleanCaches();
-    this.store();
   }
 
   cleanCaches() {
@@ -628,8 +617,6 @@ export default class WasabeeOp {
     this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-      // don't update, anchors are bound to links
-      //this.update(true);
     }
   }
 
@@ -713,9 +700,6 @@ export default class WasabeeOp {
 
   swapPortal(originalPortal, newPortal) {
     this._addPortal(newPortal);
-
-    //this.opportals = Array.from(this._idToOpportals.values());
-
     this._swapPortal(originalPortal, newPortal);
     this.update(true);
     this.runCrosslinks();
@@ -723,11 +707,6 @@ export default class WasabeeOp {
 
   addMarker(markerType, portal, comment) {
     if (!portal) return;
-    const destructMarkerTypes = [
-      window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
-      window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
-      window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
-    ];
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
@@ -740,7 +719,12 @@ export default class WasabeeOp {
       this.markers.push(marker);
       this.update(true);
 
-      // only need this for virus/destroy
+      // only need this for virus/destroy/decay -- this should be in the marker class
+      const destructMarkerTypes = [
+        window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
+      ];
       if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
     }
   }
@@ -1039,34 +1023,7 @@ export default class WasabeeOp {
     return zoneID;
   }
 
-  // for 0.18, if we see the new, we change to the old
-  // for 0.19 we will change from old-to-new...
-  static oldColors(incoming) {
-    switch (incoming) {
-      case "orange":
-        return "groupa";
-      case "yellow":
-        return "groupb";
-      case "lime":
-        return "groupc";
-      case "purple":
-        return "groupd";
-      case "teal":
-        return "groupe";
-      case "fuchsia":
-        return "groupf";
-      case "red":
-        return "main";
-      case "blue":
-        return "main";
-      case "green":
-        return "groupc";
-      default:
-        return incoming;
-    }
-  }
-
-  // not used in 0.18, will be default in 0.19
+  // clean up from the old layergroup names
   static newColors(incoming) {
     switch (incoming) {
       case "groupa":
