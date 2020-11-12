@@ -129,6 +129,11 @@ export async function opPromise(opID) {
 
   try {
     const server = GetWasabeeServer();
+    const headers = {};
+    // ops synced since 0.19: prefer lasteditid if available
+    if (localop && localop.lasteditid)
+      headers["If-None-Match"] = localop.lasteditid;
+    else headers["If-Modified-Since"] = ims;
     const response = await fetch(server + `/api/v1/draw/${opID}`, {
       method: "GET",
       mode: "cors",
@@ -136,7 +141,7 @@ export async function opPromise(opID) {
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      headers: { "If-Modified-Since": ims },
+      headers: headers,
     });
 
     let raw = null;
