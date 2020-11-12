@@ -108,6 +108,11 @@ export function deleteOpPromise(opID) {
   return genericDelete(`/api/v1/draw/${opID}`, new FormData());
 }
 
+// returns a promise to op stat from the server
+export function statOpPromise(opID) {
+  return genericGet(`/api/v1/draw/${opID}/stat`);
+}
+
 // returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
 // use WasabeeTeam.waitGet and WasabeeTeam.cacheGet
 export function teamPromise(teamid) {
