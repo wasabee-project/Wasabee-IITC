@@ -118,12 +118,8 @@ const UploadButton = WButton.extend({
     op.cleanPortalList();
 
     let rebaseMessage = "Rebase summary:\n";
-    if (!summary.compatibility.ok) {
-      rebaseMessage +=
-        `- old OP detected, merge:\n` +
-        `  - ${summary.compatibility.rewrite.link} links\n` +
-        `  - ${summary.compatibility.rewrite.marker} markers\n`;
-    }
+    if (!summary.compatibility.ok)
+      rebaseMessage += `- old OP detected, merge ${summary.compatibility.rewrite.link} links and ${summary.compatibility.rewrite.marker} markers\n`;
     rebaseMessage += `- add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones\n`;
     rebaseMessage += `- delete ${summary.deletion.link} links and ${summary.deletion.marker} markers\n`;
     rebaseMessage += `- ignore ${summary.edition.duplicate} new duplicates\n`;
