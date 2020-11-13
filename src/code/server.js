@@ -13,7 +13,6 @@ export default function () {
 export async function uploadOpPromise() {
   const operation = getSelectedOperation();
   const json = operation.toExport();
-  console.log(json);
 
   const response = await genericPost(
     "/api/v1/draw",
@@ -31,7 +30,6 @@ export async function uploadOpPromise() {
 // sends a changed op to the server
 export async function updateOpPromise(operation) {
   const json = operation.toExport();
-  console.log(json);
 
   try {
     const construct = {
@@ -152,7 +150,7 @@ export async function opPromise(opID) {
         newop.server = server;
         newop.fetchedOp = JSON.stringify(raw);
         return Promise.resolve(newop);
-      case 304: // If-Modified-Since replied NotModified
+      case 304: // If-None-Match or If-Modified-Since replied NotModified
         console.warn("server copy is older/unmodified, keeping local copy");
         localop.server = server;
         return Promise.resolve(localop);
