@@ -1,6 +1,7 @@
 import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
+import MergeDialog from "./dialogs/mergeDialog";
 import WasabeeMe from "./me";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
@@ -379,5 +380,19 @@ export async function fullSync() {
   } catch (e) {
     console.error(e);
     new AuthDialog().enable();
+  }
+}
+
+export async function syncOp(opID) {
+  const localOp = WasabeeOp.load(opID);
+  const remoteOp = await opPromise(opID);
+  if (remoteOp.lasteditid != localOp.lasteditid) {
+    if (!localOp.localchanged) {
+      remoteOp.store();
+    } else {
+      const con = new MergeDialog();
+      con.setup(localOp, remoteOp);
+      con.enable();
+    }
   }
 }
