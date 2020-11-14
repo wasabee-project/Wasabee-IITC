@@ -17,6 +17,8 @@ import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
+import GetWasabeeServer from "../server";
+import { syncOp } from "../uiCommands";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -261,6 +263,18 @@ const OpsDialog = WDialog.extend({
             );
             con.enable();
           });
+
+          if (WasabeeMe.isLoggedIn() && server == GetWasabeeServer()) {
+            // download op
+            const download = L.DomUtil.create("a", "", actions);
+            download.href = "#";
+            download.textContent = "↻";
+            download.title = "Download " + op.name;
+            L.DomEvent.on(download, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              syncOp(op.id);
+            });
+          }
         }
       }
     }
