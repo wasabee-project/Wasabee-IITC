@@ -1243,18 +1243,11 @@ export default class WasabeeOp {
             break;
           }
       }
-      if (!foundCollision) {
-        for (const e of changes.edition) {
-          if (e.type == "link" && ids.has(e.link.ID)) {
-            foundCollision = true;
-            break;
-          }
-          if (e.type == "marker" && ids.has(e.marker.ID)) {
-            foundCollision = true;
-            break;
-          }
-        }
-      }
+      if (!foundCollision && op.links.some((l) => ids.has(l.ID)))
+        foundCollision = true;
+      if (!foundCollision && op.markers.some((m) => ids.has(m.ID)))
+        foundCollision = true;
+
       // foundCollision: either there is a collision in IDs, or everything fine
       if (!foundCollision) {
         // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`

@@ -112,7 +112,7 @@ const UploadButton = WButton.extend({
   doRebase: function (op) {
     const operation = getSelectedOperation();
     const changes = operation.changes();
-    console.log(changes);
+    console.debug(changes);
     const summary = op.applyChanges(changes, operation);
     op.cleanAnchorList();
     op.cleanPortalList();
