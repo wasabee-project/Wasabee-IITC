@@ -108,6 +108,7 @@ const OpsDialog = WDialog.extend({
         id: opID,
         name: tmpOp.name,
         localchanged: tmpOp.localchanged,
+        remotechanged: tmpOp.remoteChanged,
         local: tmpOp.fetched === null,
         owner: tmpOp.creator,
         perm: tmpOp.getPermission(),
@@ -177,9 +178,10 @@ const OpsDialog = WDialog.extend({
             if (isLocal) {
               status.textContent = "!";
               status.style.color = "red";
-            } else if (op.localchanged) {
-              status.textContent = "*";
+            } else {
               status.style.color = "red";
+              if (op.localchanged) status.textContent += "↑";
+              if (op.remotechanged) status.textContent += "↓";
             }
           }
         }

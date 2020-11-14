@@ -367,7 +367,19 @@ export async function fullSync() {
       promises.push(opPromise(opID));
     }
     const ops = await Promise.all(promises);
-    for (const newop of ops) newop.store();
+    for (const newop of ops) {
+      const localOp = WasabeeOp.load(newop.ID);
+      if (!localOp || !localOp.localchanged) newop.store();
+      else if (localOp.lasteditid != newop.lasteditid) {
+        if (localOp.ID != so.ID) {
+          localOp.remoteChanged = true;
+          localOp.store();
+        } else {
+          so.remoteChanged = true;
+          so.store();
+        }
+      }
+    }
 
     // replace current op by the server version if any
     if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);

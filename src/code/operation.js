@@ -42,6 +42,7 @@ export default class WasabeeOp {
     this.starttime = obj.starttime ? obj.starttime : null;
 
     this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
+    this.remoteChanged = !!obj.remoteChanged;
 
     this.server = this.fetched ? obj.server : null;
 
@@ -83,6 +84,7 @@ export default class WasabeeOp {
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
     json.lasteditid = this.lasteditid;
+    json.remoteChanged = this.remoteChanged;
     json.fetched = this.fetched;
     json.stored = this.stored;
     json.localchanged = this.localchanged;

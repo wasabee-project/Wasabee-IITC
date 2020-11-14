@@ -59,6 +59,7 @@ export async function updateOpPromise(operation) {
           const obj = JSON.parse(text);
           if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           operation.lasteditid = obj.updateID;
+          operation.remoteChanged = false;
           operation.fetched = new Date().toUTCString();
           return Promise.resolve(true);
         } catch (e) {
