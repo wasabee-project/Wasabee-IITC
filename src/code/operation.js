@@ -65,7 +65,9 @@ export default class WasabeeOp {
   static load(opID) {
     try {
       const raw = localStorage[opID];
-      if (raw == null) throw new Error("invalid operation ID");
+      if (raw == null)
+        //throw new Error("invalid operation ID");
+        return null;
       const op = new WasabeeOp(raw);
       if (op == null) throw new Error("corrupted operation");
       return op;
