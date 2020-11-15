@@ -1,16 +1,13 @@
 import WasabeeOp from "../operation";
 import { WDialog } from "../leafletClasses";
-import ConfirmDialog from "./confirmDialog";
 import {
   getSelectedOperation,
   makeSelectedOperation,
   opsList,
-  removeOperation,
   resetHiddenOps,
   hiddenOpsList,
   showOperation,
   hideOperation,
-  changeOpIfNeeded,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
@@ -18,7 +15,7 @@ import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
 import GetWasabeeServer from "../server";
-import { syncOp } from "../uiCommands";
+import { syncOp, deleteLocalOp } from "../uiCommands";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -251,25 +248,7 @@ const OpsDialog = WDialog.extend({
           deleteLocaly.title = wX("REM_LOC_CP", op.name);
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
-            // this should be moved to uiCommands
-            const con = new ConfirmDialog(window.map);
-            con.setup(
-              wX("REM_LOC_CP", op.name),
-              wX("YESNO_DEL", op.name),
-              () => {
-                removeOperation(op.id);
-                const newop = changeOpIfNeeded();
-                const mbr = newop.mbr;
-                if (
-                  mbr &&
-                  isFinite(mbr._southWest.lat) &&
-                  isFinite(mbr._northEast.lat)
-                ) {
-                  this._map.fitBounds(mbr);
-                }
-              }
-            );
-            con.enable();
+            deleteLocalOp(op.name, op.id);
           });
 
           if (WasabeeMe.isLoggedIn() && server == GetWasabeeServer()) {

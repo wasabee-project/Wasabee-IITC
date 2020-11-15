@@ -408,3 +408,16 @@ export async function syncOp(opID) {
     }
   }
 }
+
+export function deleteLocalOp(opname, opid) {
+  const con = new ConfirmDialog(window.map);
+  con.setup(wX("REM_LOC_CP", opname), wX("YESNO_DEL", opname), () => {
+    removeOperation(opid);
+    const newop = changeOpIfNeeded();
+    const mbr = newop.mbr;
+    if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+      window.map.fitBounds(mbr);
+    }
+  });
+  con.enable();
+}
