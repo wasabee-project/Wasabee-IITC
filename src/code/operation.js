@@ -1092,14 +1092,14 @@ export default class WasabeeOp {
     this.update(true);
   }
 
-  changes() {
+  changes(origin) {
     const changes = {
       addition: new Array(),
       edition: new Array(),
       deletion: new Array(),
     };
     // empty op if old OP (or local OP)
-    const oldOp = new WasabeeOp(this.fetchedOp || {});
+    const oldOp = new WasabeeOp(origin ? origin : this.fetchedOp || {});
     const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
     const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
 
