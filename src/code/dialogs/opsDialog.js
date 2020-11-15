@@ -109,6 +109,7 @@ const OpsDialog = WDialog.extend({
         name: tmpOp.name,
         localchanged: tmpOp.localchanged,
         remotechanged: tmpOp.remoteChanged,
+        fetched: tmpOp.fetched,
         local: tmpOp.fetched === null,
         owner: tmpOp.creator,
         perm: tmpOp.getPermission(),
@@ -156,6 +157,11 @@ const OpsDialog = WDialog.extend({
           const link = L.DomUtil.create("a", "", opName);
           link.href = "#";
           link.textContent = op.name;
+          if (!isLocal) {
+            link.title = `Last fetched: ${op.fetched}\n`;
+            if (op.localchanged) link.title += "Local has changed\n";
+            if (op.remotechanged) link.title += "Remote has changed";
+          }
           if (op.id == selectedOp.ID) link.classList.add("enl");
           L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
