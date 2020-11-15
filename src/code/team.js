@@ -1,4 +1,5 @@
 import WasabeeAgent from "./agent";
+import WasabeeMe from "./me";
 import { teamPromise } from "./server";
 
 export default class WasabeeTeam {
@@ -45,6 +46,8 @@ export default class WasabeeTeam {
         return t;
       }
     }
+
+    if (!WasabeeMe.isLoggedIn()) return null;
 
     try {
       const t = await teamPromise(teamID);

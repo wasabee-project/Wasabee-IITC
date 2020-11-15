@@ -4,6 +4,7 @@ import AgentDialog from "./dialogs/agentDialog";
 import { agentPromise, targetPromise, routePromise } from "./server";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
+import WasabeeMe from "./me";
 
 export default class WasabeeAgent {
   constructor(obj) {
@@ -70,6 +71,7 @@ export default class WasabeeAgent {
   }
 
   static async waitGet(gid) {
+    if (!WasabeeMe.isLoggedIn()) return null;
     // need a hold timer on this
     /* if (window.plugin.wasabee._agentCache.has(gid)) {
       return window.plugin.wasabee._agentCache.get(gid);
