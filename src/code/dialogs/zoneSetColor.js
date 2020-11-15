@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
+import { addToColorList } from "./skin";
 
 const ZoneSetColorDialog = WDialog.extend({
   statics: {
@@ -57,6 +58,7 @@ const ZoneSetColorDialog = WDialog.extend({
         if (l.zone == this._zone.id) l.color = picker.value;
       }
       so.store();
+      addToColorList(picker.value);
       window.runHooks("wasabeeUIUpdate");
     });
 
