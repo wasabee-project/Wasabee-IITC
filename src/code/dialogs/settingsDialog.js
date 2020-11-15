@@ -94,7 +94,7 @@ const SettingsDialog = WDialog.extend({
     });
 
     const expertTitle = L.DomUtil.create("label", null, container);
-    expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
+    expertTitle.textContent = "Disable Confirmation Prompts"; // wX("SEND LOCATION");
     expertTitle.htmlFor = "wasabee-setting-expert";
     const expertCheck = L.DomUtil.create("input", null, container);
     expertCheck.type = "checkbox";
