@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
-import { addToColorList } from "./skin";
+import { addToColorList } from "../skin";
 
 const ZoneSetColorDialog = WDialog.extend({
   statics: {

@@ -13,7 +13,7 @@ import {
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import { postToFirebase } from "../firebaseSupport";
-import { addToColorList } from "./skin";
+import { addToColorList } from "../skin";
 
 import { convertColorToHex } from "../auxiliar";
 
