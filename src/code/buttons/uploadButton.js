@@ -41,7 +41,7 @@ const UploadButton = WButton.extend({
           // switch to the new version in local store -- uploadOpPromise stores it
           makeSelectedOperation(r.ID);
           alert(wX("UPLOADED"));
-          this.Wupdate(this._container, r);
+          this.Wupdate();
           // this._invisible();
         } catch (e) {
           // not triggered this in a while...
@@ -49,7 +49,7 @@ const UploadButton = WButton.extend({
           try {
             await updateOpPromise(operation);
             alert(wX("UPDATED"));
-            this.Wupdate(this._container, operation);
+            this.Wupdate();
           } catch (e) {
             console.error(e);
             alert(`Upload + Update Failed: ${e.toString()}`);
@@ -149,7 +149,7 @@ const UploadButton = WButton.extend({
           if (operation != getSelectedOperation())
             makeSelectedOperation(operation.ID);
           alert(wX("UPDATED"));
-          this.Wupdate(this._container, operation);
+          this.Wupdate();
         } else {
           // need rebase or force
           if (!rebaseOnUpdate) {

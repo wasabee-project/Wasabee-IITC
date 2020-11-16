@@ -70,8 +70,8 @@ const ImportDialog = WDialog.extend({
       closeCallback: () => {
         this.disable();
         delete this._dialog;
-        window.runHooks("wasabeeUIUpdate");
-        window.runHooks("wasabeeCrosslinks");
+        window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
+        window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });

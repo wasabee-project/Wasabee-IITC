@@ -29,20 +29,14 @@ const OpSettingDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
-
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {
@@ -98,7 +92,7 @@ const OpSettingDialog = WDialog.extend({
           so.name = input.value;
           so.localchanged = true;
           so.store();
-          window.runHooks("wasabeeUIUpdate");
+          window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
         }
       });
     } else {
@@ -121,7 +115,7 @@ const OpSettingDialog = WDialog.extend({
         so.localchanged = true;
         so.store();
         addToColorList(picker.value);
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
       });
     }
 

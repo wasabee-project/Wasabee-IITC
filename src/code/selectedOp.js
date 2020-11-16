@@ -84,8 +84,16 @@ export function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  window.runHooks("wasabeeUIUpdate", "makeSelectedOperation");
-  window.runHooks("wasabeeCrosslinks");
+  window.map.fire(
+    "wasabeeUIUpdate",
+    { reason: "makeSelectedOperation" },
+    false
+  );
+  window.map.fire(
+    "wasabeeCrosslinks",
+    { reason: "makeSelectedOperation" },
+    false
+  );
   return window.plugin.wasabee._selectedOp;
 }
 

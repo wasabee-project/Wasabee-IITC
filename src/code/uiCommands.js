@@ -76,7 +76,7 @@ export function clearAllItems(operation) {
     `Do you want to reset ${operation.name}?`,
     () => {
       operation.clearAllItems();
-      window.runHooks("wasabeeCrosslinks");
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
     }
   );
   con.enable();
@@ -89,7 +89,7 @@ export function clearAllLinks(operation) {
     `Do you want to remove all links from ${operation.name}?`,
     () => {
       operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks");
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
     }
   );
   con.enable();
@@ -102,7 +102,7 @@ export function clearAllMarkers(operation) {
     `Do you want to remove all markers from ${operation.name}?`,
     () => {
       operation.clearAllMarkers();
-      window.runHooks("wasabeeCrosslinks");
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
     }
   );
   con.enable();
@@ -296,7 +296,7 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.runHooks("wasabeeUIUpdate", "blockerAutomark");
+    window.map.fire("wasabeeUIUpdate", { reason: "blockerAutomark" }, false);
     return;
   }
 
@@ -386,7 +386,7 @@ export async function fullSync() {
     // change op if the current does not exist anymore
     else if (!opsList().includes(so.ID)) changeOpIfNeeded();
     // update UI to reflect new ops list
-    else window.runHooks("wasabeeUIUpdate");
+    else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
 
     alert(wX("SYNC DONE"));
   } catch (e) {

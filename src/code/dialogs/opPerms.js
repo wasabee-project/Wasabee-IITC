@@ -19,24 +19,19 @@ const OpPermList = WDialog.extend({
   },
 
   addHooks: async function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
 
     this._displayDialog();
   },
 
   removeHooks: function () {
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
     WDialog.prototype.removeHooks.call(this);
   },
 
@@ -186,7 +181,7 @@ const OpPermList = WDialog.extend({
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
         console.warn("not adding duplicate permission");
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
         return;
       }
     }
@@ -195,7 +190,7 @@ const OpPermList = WDialog.extend({
       // add locally for display
       operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
       operation.store();
-      window.runHooks("wasabeeUIUpdate");
+      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
       alert(e.toString());
@@ -217,7 +212,7 @@ const OpPermList = WDialog.extend({
       }
       operation.teamlist = n;
       operation.store();
-      window.runHooks("wasabeeUIUpdate");
+      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
       alert(e.toString());

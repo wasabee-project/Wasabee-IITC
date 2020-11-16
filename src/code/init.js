@@ -76,16 +76,18 @@ window.plugin.wasabee.init = () => {
     });
   });
 
-  // custom hook for updating our UI
+  // OLD WAY: custom IITC hook for updating our UI
   window.addHook("wasabeeUIUpdate", (caller) => {
-    if (caller != null) console.debug("ui update", caller);
-    drawMap();
+    if (caller != null) console.debug("OLD ui update", caller);
+    window.map.fire("wasabeeUIUpdate", caller);
   });
+  // NEW WAY: directly use Leaflet
+  window.map.on("wasabeeUIUpdate", drawMap);
 
   // IITC-CE, not 0.26
   if (window.addResumeFunction) {
     window.addResumeFunction(() => {
-      window.runHooks("wasabeeUIUpdate", "resume");
+      window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
       sendLocation();
     });
   }
@@ -97,7 +99,7 @@ window.plugin.wasabee.init = () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.runHooks("wasabeeUIUpdate", "layeradd");
+      window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
     }
   });
 
@@ -123,14 +125,14 @@ window.plugin.wasabee.init = () => {
   }
 
   // setup UI elements
-  addButtons(Wasabee._selectedOp);
+  addButtons();
   setupToolbox();
 
   // draw the UI with the op data for the first time
-  window.runHooks("wasabeeUIUpdate", "startup");
+  window.map.fire("wasabeeUIUpdate", { reason: "startup" }, false);
 
   // run crosslinks
-  window.runHooks("wasabeeCrosslinks");
+  window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not

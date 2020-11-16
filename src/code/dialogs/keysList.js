@@ -23,11 +23,7 @@ const KeysList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
@@ -38,7 +34,7 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {

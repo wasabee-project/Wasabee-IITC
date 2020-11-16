@@ -25,13 +25,9 @@ const BlockerList = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.blockerlistUpdate, this);
+    window.map.on("wasabeeCrosslinksDone", this.blockerlistUpdate, this);
 
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.blockerlistUpdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.addHook("wasabeeCrosslinksDone", this._UIUpdateHook);
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
@@ -39,8 +35,9 @@ const BlockerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-    window.removeHook("wasabeeCrosslinksDone", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.blockerlistUpdate, this);
+    window.map.off("wasabeeCrosslinksDone", this.blockerlistUpdate, this);
+
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
@@ -52,7 +49,7 @@ const BlockerList = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
-      window.runHooks("wasabeeUIUpdate");
+      window.map.fire("wasabeeUIUpdate", { reason: "blockerlist" }, false);
     };
     buttons[wX("AUTOMARK")] = () => {
       blockerAutomark(operation);
@@ -61,7 +58,7 @@ const BlockerList = WDialog.extend({
       operation.blockers = new Array();
       this.blockerlistUpdate();
       operation.update(false); // blockers do not need to be sent to server
-      window.runHooks("wasabeeCrosslinks");
+      window.map.fire("wasabeeCrosslinks", { reason: "blockerlist" }, false);
     };
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(operation, true); // force

@@ -31,18 +31,13 @@ const OpsDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
-
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {

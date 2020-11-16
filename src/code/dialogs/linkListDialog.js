@@ -28,17 +28,13 @@ const LinkListDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.updateLinkList();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.updateLinkList, this);
   },
 
   _displayDialog: function () {

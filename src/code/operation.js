@@ -285,7 +285,7 @@ export default class WasabeeOp {
 
   removeAnchor(portalId) {
     console.debug("removing anchor");
-    console.debug(this.links);
+    // console.debug(this.links);
     this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
@@ -295,7 +295,7 @@ export default class WasabeeOp {
       );
     });
 
-    console.debug(this.links);
+    // console.debug(this.links);
 
     this.cleanAnchorList();
     this.cleanPortalList();
@@ -786,12 +786,12 @@ export default class WasabeeOp {
     }
 
     this.store();
-    window.runHooks("wasabeeUIUpdate", "op update");
+    window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
   }
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.runHooks("wasabeeCrosslinks");
+    window.map.fire("wasabeeCrosslinks", { reason: "op runCrosslinks" }, false);
   }
 
   startBatchMode() {

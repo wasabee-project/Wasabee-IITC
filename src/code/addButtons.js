@@ -5,12 +5,9 @@ import OpButton from "./buttons/opButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
-import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
-export function addButtons(selectedOp) {
-  selectedOp = selectedOp || getSelectedOperation();
-
+export function addButtons() {
   if (window.plugin.wasabee.buttons) {
     console.log("replacing buttons");
     window.map.removeControl(window.plugin.wasabee.buttons);
@@ -21,7 +18,7 @@ export function addButtons(selectedOp) {
     options: {
       position: "topleft",
     },
-    onAdd: function (map) {
+    onAdd: function (map = window.map) {
       const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
       this._container = L.DomUtil.create("ul", "leaflet-bar", outerDiv);
       this._modes = {};
@@ -42,12 +39,9 @@ export function addButtons(selectedOp) {
       return outerDiv;
     },
 
-    update: function (operation) {
+    update: function () {
       for (const id in window.plugin.wasabee.buttons._modes) {
-        window.plugin.wasabee.buttons._modes[id].Wupdate(
-          window.plugin.wasabee.buttons._container,
-          operation
-        );
+        window.plugin.wasabee.buttons._modes[id].Wupdate();
       }
     },
   });
@@ -57,10 +51,11 @@ export function addButtons(selectedOp) {
     window.map.addControl(window.plugin.wasabee.buttons);
   }
 
-  // this should not be run multiple times...
-  window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
+  // listen for UI changes, update buttons that need it
+  window.map.on("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
 
-  window.plugin.wasabee.buttons.update(selectedOp);
+  // start off with a fresh update
+  window.plugin.wasabee.buttons.update();
 }
 
 export default addButtons;

@@ -17,19 +17,14 @@ const KeyListPortal = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.keyListUpdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.keyListUpdate, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.keyListUpdate, this);
   },
 
   setup: function (portalID) {

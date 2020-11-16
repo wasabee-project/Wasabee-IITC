@@ -29,17 +29,13 @@ const OperationChecklistDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    const operation = getSelectedOperation();
-    // magic context incantation to make "this" work...
-    this._UIUpdateHook = () => {
-      context.checklistUpdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.checklistUpdate, this);
+
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
+
+    const operation = getSelectedOperation();
     loadFaked(operation);
 
     this._displayDialog();
@@ -47,7 +43,8 @@ const OperationChecklistDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.checklistUpdate, this);
+
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
   },

@@ -32,18 +32,13 @@ const ManageTeamDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    // magic context incantation to make "this" work...
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   setup: async function (team) {
@@ -83,7 +78,11 @@ const ManageTeamDialog = WDialog.extend({
                       this._team.ID,
                       squadDialog.inputField.value
                     );
-                    window.runHooks("wasabeeUIUpdate");
+                    window.map.fire(
+                      "wasabeeUIUpdate",
+                      { reason: "manageTeamDialog" },
+                      false
+                    );
                     alert(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
@@ -121,7 +120,11 @@ const ManageTeamDialog = WDialog.extend({
                 } catch (e) {
                   console.error(e);
                 }
-                window.runHooks("wasabeeUIUpdate");
+                window.map.fire(
+                  "wasabeeUIUpdate",
+                  { reason: "manageTeamDialog" },
+                  false
+                );
               }
             );
             con.enable();
@@ -166,7 +169,11 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await addAgentToTeamPromise(addField.value, this._team.ID);
         alert(wX("ADD_SUCC_INSTR"));
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "manageTeamDialog" },
+          false
+        );
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -186,7 +193,11 @@ const ManageTeamDialog = WDialog.extend({
         await renameTeamPromise(this._team.ID, renameField.value);
         alert(`renamed to ${renameField.value}`);
         this._team.Name = renameField.value; // for display
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "manageTeamDialog" },
+          false
+        );
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -216,7 +227,11 @@ const ManageTeamDialog = WDialog.extend({
         alert("updated rocks info");
         this._team.RocksComm = rockscommField.value; // for display
         this._team.RocksKey = rocksapiField.value; // for display
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "manageTeamDialog" },
+          false
+        );
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -236,7 +251,11 @@ const ManageTeamDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         await deleteJoinLinkPromise(this._team.ID);
         this._team.JoinLinkToken = "";
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "manageTeamDialog" },
+          false
+        );
       });
     } else {
       L.DomUtil.create("span", null, container).textContent = "not set";
@@ -247,7 +266,11 @@ const ManageTeamDialog = WDialog.extend({
         const response = await createJoinLinkPromise(this._team.ID);
         const j = JSON.parse(response);
         this._team.JoinLinkToken = j.Key;
-        window.runHooks("wasabeeUIUpdate");
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "manageTeamDialog" },
+          false
+        );
       });
     }
 

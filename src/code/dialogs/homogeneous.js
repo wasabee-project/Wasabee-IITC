@@ -19,17 +19,13 @@ const HomogeneousDialog = WDialog.extend({
   addHooks: function () {
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.uiupdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.uiupdate, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     window.removeLayerGroup(this._layerGroup);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.uiupdate, this);
     WDialog.prototype.removeHooks.call(this);
   },
 

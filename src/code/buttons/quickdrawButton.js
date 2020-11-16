@@ -89,17 +89,13 @@ const QuickDrawControl = L.Handler.extend({
     this._throwOrder = this._operation.nextOrder;
 
     const context = this;
-    this._UIUpdateHook = () => {
-      context._uiupdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-
     this._portalClickedHook = (data) => {
       context._portalClicked(data);
     };
     window.addHook("portalSelected", this._portalClickedHook);
 
     // Leaflet format for leaflet DOM event
+    this._map.on("wasabeeUIUpdate", this._uiupdate, this);
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
   },
@@ -123,7 +119,7 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip = null;
 
     window.removeHook("portalSelected", this._portalClickedHook);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    this._map.off("wasabeeUIUpdate", this._uiupdate, this);
     this._map.off("keyup", this._keyUpListener, this);
     this._map.off("mousemove", this._onMouseMove, this);
   },
@@ -155,7 +151,7 @@ const QuickDrawControl = L.Handler.extend({
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks", this._operation);
+      window.map.fire("wasabeeCrosslinks", { reason: "qd keyup X" }, false);
     }
   },
 

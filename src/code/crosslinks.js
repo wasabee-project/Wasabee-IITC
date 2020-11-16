@@ -292,7 +292,7 @@ export function checkAllLinks() {
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
-  window.runHooks("wasabeeCrosslinksDone");
+  window.map.fire("wasabeeCrosslinksDone");
 }
 
 function onLinkAdded(data) {
@@ -312,10 +312,7 @@ function onMapDataRefreshEnd() {
 }
 
 export function initCrossLinks() {
-  window.addHook("wasabeeCrosslinks", () => {
-    checkAllLinks();
-  });
-
+  window.map.on("wasabeeCrosslinks", checkAllLinks);
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
   window.plugin.wasabee._crosslinkCache = new Map();
   window.addLayerGroup(

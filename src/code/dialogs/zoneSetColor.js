@@ -15,14 +15,13 @@ const ZoneSetColorDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.runHooks("wasabeeUIUpdate");
+    window.map.fire("wasabeeUIUpdate", { reason: "ZoneSetColorDialog" }, false);
   },
 
   _displayDialog: function () {
@@ -59,7 +58,11 @@ const ZoneSetColorDialog = WDialog.extend({
       }
       so.store();
       addToColorList(picker.value);
-      window.runHooks("wasabeeUIUpdate");
+      window.map.fire(
+        "wasabeeUIUpdate",
+        { reason: "ZonzeSetColorDialog" },
+        false
+      );
     });
 
     return container;

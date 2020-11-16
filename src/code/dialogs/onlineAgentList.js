@@ -16,20 +16,14 @@ const OnlineAgentList = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {

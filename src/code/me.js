@@ -123,7 +123,7 @@ export default class WasabeeMe {
         alert(e.toString());
         me = null;
       }
-      window.runHooks("wasabeeUIUpdate", "me waitGet");
+      window.map.fire("wasabeeUIUpdate", { reason: "me waitGet" }, false);
     }
     return me;
   }
@@ -140,7 +140,7 @@ export default class WasabeeMe {
       window.runHooks("wasabeeDkeys");
     }
 
-    window.runHooks("wasabeeUIUpdate", "me purge");
+    window.map.fire("wasabeeUIUpdate", { reason: "me purge" }, false);
   }
 
   teamJoined(teamID) {

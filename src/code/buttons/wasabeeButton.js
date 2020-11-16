@@ -157,7 +157,7 @@ const WasabeeButton = WButton.extend({
     this.actionsContainer = this._getActions();
     this._container.appendChild(this.actionsContainer);
     // check login state and update if necessary
-    this.Wupdate(); // takes container and operation, not needed here
+    this.Wupdate();
   },
 
   _getActions: function () {

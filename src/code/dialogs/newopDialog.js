@@ -50,8 +50,12 @@ const NewopDialog = WDialog.extend({
           });
           newop.store();
           makeSelectedOperation(newop.ID);
-          window.runHooks("wasabeeUIUpdate");
-          window.runHooks("wasabeeCrosslinks");
+          window.map.fire("wasabeeUIUpdate", { reason: "NewopDialog" }, false);
+          window.map.fire(
+            "wasabeeCrosslinks",
+            { reason: "NewopDialog" },
+            false
+          );
         } else {
           alert(wX("OP_NAME_UNSET"));
         }

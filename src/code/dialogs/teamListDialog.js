@@ -28,23 +28,20 @@ const TeamListDialog = WDialog.extend({
   },
 
   addHooks: async function () {
-    if (!this._map) return;
     this._me = await WasabeeMe.waitGet(true);
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
-    // magic context incantation to make "this" work...
-    const context = this;
-    this._UIUpdateHook = async () => {
-      await context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   update: async function () {
-    // async
     if (!this._enabled) return;
-    // this._me = WasabeeMe.cacheGet();
-    this._me = await WasabeeMe.waitGet(); // breaks logout ; Still? try again now
+    this._me = await WasabeeMe.waitGet();
     this._dialog.html(this._buildContent());
   },
 
@@ -245,10 +242,6 @@ const TeamListDialog = WDialog.extend({
       alert(e.toString());
     }
     return newState;
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
   },
 });
 

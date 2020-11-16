@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { getSelectedOperation } from "../selectedOp";
 import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
@@ -30,12 +29,7 @@ const SettingsDialog = WDialog.extend({
   addHooks: function () {
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    // magic context incantation to make "this" work...
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     // put any per-open setup here
     // this is the call to actually do our work
     if (this._smallScreen) {
@@ -46,9 +40,8 @@ const SettingsDialog = WDialog.extend({
   },
 
   removeHooks: function () {
-    // put any post close teardown here
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
     WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   update: function () {
@@ -75,8 +68,8 @@ const SettingsDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
         langMenu.value;
-      addButtons(getSelectedOperation());
-      window.runHooks("wasabeeUIUpdate");
+      addButtons();
+      window.map.fire("wasabeeUIUpdate", { reason: "settings dialog" }, false);
     });
 
     const sendLocTitle = L.DomUtil.create("label", null, container);

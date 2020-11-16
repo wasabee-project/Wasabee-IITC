@@ -17,11 +17,7 @@ const ZoneDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
 
     if (this._smallScreen) {
       this._displaySmallDialog();
@@ -32,7 +28,7 @@ const ZoneDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   update: function () {

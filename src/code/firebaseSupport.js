@@ -66,7 +66,7 @@ export function initFirebase() {
         // display to console somehow?
         console.debug("server reported teammate login: ", event.data.data.gid);
         window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
-        window.runHooks("wasabeeUIUpdate", "onlineAgent");
+        window.map.fire("wasabeeUIUpdate", { reason: "onlineAgent" }, false);
         break;
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
