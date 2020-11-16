@@ -42,6 +42,7 @@ export default class WasabeeOp {
     this.starttime = obj.starttime ? obj.starttime : null;
 
     this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
+    this.remoteChanged = !!obj.remoteChanged;
 
     this.server = this.fetched ? obj.server : null;
 
@@ -64,7 +65,9 @@ export default class WasabeeOp {
   static load(opID) {
     try {
       const raw = localStorage[opID];
-      if (raw == null) throw new Error("invalid operation ID");
+      if (raw == null)
+        //throw new Error("invalid operation ID");
+        return null;
       const op = new WasabeeOp(raw);
       if (op == null) throw new Error("corrupted operation");
       return op;
@@ -83,6 +86,7 @@ export default class WasabeeOp {
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
     json.lasteditid = this.lasteditid;
+    json.remoteChanged = this.remoteChanged;
     json.fetched = this.fetched;
     json.stored = this.stored;
     json.localchanged = this.localchanged;
@@ -1088,14 +1092,14 @@ export default class WasabeeOp {
     this.update(true);
   }
 
-  changes() {
+  changes(origin) {
     const changes = {
       addition: new Array(),
       edition: new Array(),
       deletion: new Array(),
     };
     // empty op if old OP (or local OP)
-    const oldOp = new WasabeeOp(this.fetchedOp || {});
+    const oldOp = new WasabeeOp(origin ? origin : this.fetchedOp || {});
     const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
     const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
 
@@ -1243,18 +1247,11 @@ export default class WasabeeOp {
             break;
           }
       }
-      if (!foundCollision) {
-        for (const e of changes.edition) {
-          if (e.type == "link" && ids.has(e.link.ID)) {
-            foundCollision = true;
-            break;
-          }
-          if (e.type == "marker" && ids.has(e.marker.ID)) {
-            foundCollision = true;
-            break;
-          }
-        }
-      }
+      if (!foundCollision && op.links.some((l) => ids.has(l.ID)))
+        foundCollision = true;
+      if (!foundCollision && op.markers.some((m) => ids.has(m.ID)))
+        foundCollision = true;
+
       // foundCollision: either there is a collision in IDs, or everything fine
       if (!foundCollision) {
         // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`

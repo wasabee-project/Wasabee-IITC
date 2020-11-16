@@ -1,6 +1,7 @@
 import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
+import MergeDialog from "./dialogs/mergeDialog";
 import WasabeeMe from "./me";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
@@ -366,7 +367,19 @@ export async function fullSync() {
       promises.push(opPromise(opID));
     }
     const ops = await Promise.all(promises);
-    for (const newop of ops) newop.store();
+    for (const newop of ops) {
+      const localOp = WasabeeOp.load(newop.ID);
+      if (!localOp || !localOp.localchanged) newop.store();
+      else if (localOp.lasteditid != newop.lasteditid) {
+        if (localOp.ID != so.ID) {
+          localOp.remoteChanged = true;
+          localOp.store();
+        } else {
+          so.remoteChanged = true;
+          so.store();
+        }
+      }
+    }
 
     // replace current op by the server version if any
     if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
@@ -380,4 +393,31 @@ export async function fullSync() {
     console.error(e);
     new AuthDialog().enable();
   }
+}
+
+export async function syncOp(opID) {
+  const localOp = WasabeeOp.load(opID);
+  const remoteOp = await opPromise(opID);
+  if (remoteOp.lasteditid != localOp.lasteditid) {
+    if (!localOp.localchanged) {
+      remoteOp.store();
+    } else {
+      const con = new MergeDialog();
+      con.setup(localOp, remoteOp);
+      con.enable();
+    }
+  }
+}
+
+export function deleteLocalOp(opname, opid) {
+  const con = new ConfirmDialog(window.map);
+  con.setup(wX("REM_LOC_CP", opname), wX("YESNO_DEL", opname), () => {
+    removeOperation(opid);
+    const newop = changeOpIfNeeded();
+    const mbr = newop.mbr;
+    if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+      window.map.fitBounds(mbr);
+    }
+  });
+  con.enable();
 }
