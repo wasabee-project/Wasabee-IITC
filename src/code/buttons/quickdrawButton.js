@@ -6,14 +6,14 @@ import { postToFirebase } from "../firebaseSupport";
 
 const QuickdrawButton = WButton.extend({
   statics: {
-    TYPE: "quickdrawButton",
+    TYPE: "QuickdrawButton",
   },
 
   initialize: function (map = window.map, container) {
     this._map = map;
 
     this.title = wX("QD TITLE");
-    this.handler = new QuickDrawControl(map);
+    this.handler = new QuickDrawControl(map, { button: this });
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
@@ -35,46 +35,50 @@ const QuickdrawButton = WButton.extend({
     this.actionsContainer = this._createSubActions([this._endSubAction]);
     this._container.appendChild(this.actionsContainer);
   },
+
+  enable: function () {
+    WButton.prototype.enable.call(this);
+    this.button.classList.add("active");
+  },
+
+  disable: function () {
+    WButton.prototype.disable.call(this);
+    if (this.handler._enabled) this.handler.disable.call(this.handler);
+    this.button.classList.remove("active");
+  },
 });
 
 const QuickDrawControl = L.Handler.extend({
   initialize: function (map = window.map, options) {
     this._map = map;
     this._container = map._container;
-    this.type = "QuickDrawControl";
-    this.buttonName = "quickdrawButton";
-    this._drawMode = "quickdraw";
+
     L.Handler.prototype.initialize.call(this, map, options);
-    L.Util.extend(this.options, options);
+    this.options = options;
+    // L.Util.extend(this.options, options);
+
+    this.type = "QuickDrawControl";
+    this._drawMode = "quickdraw";
   },
 
   enable: function () {
-    console.log("qd enable called");
     if (this._enabled) {
       this.disable();
       return;
     }
     L.Handler.prototype.enable.call(this);
-    window.plugin.wasabee.buttons._modes[this.buttonName].enable();
-    window.plugin.wasabee.buttons._modes[this.buttonName].button.classList.add(
-      "active"
-    );
+    this.options.button.enable();
     postToFirebase({ id: "analytics", action: "quickdrawStart" });
   },
 
   disable: function () {
-    console.log("qd disable called");
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-    window.plugin.wasabee.buttons._modes[this.buttonName].disable();
-    window.plugin.wasabee.buttons._modes[
-      this.buttonName
-    ].button.classList.remove("active");
+    this.options.button.disable();
     postToFirebase({ id: "analytics", action: "quickdrawEnd" });
   },
 
   addHooks: function () {
-    console.log("qd addHooks called");
     if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
@@ -101,8 +105,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   removeHooks: function () {
-    console.log("qd removeHooks called");
-    if (!this._map) return;
     if (this._guideLayerGroup) {
       window.removeLayerGroup(this._guideLayerGroup);
       this._guideLayerGroup = null;
@@ -171,7 +173,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _guideLayerToggle: function () {
-    console.log("toggle guide layer");
     if (!this._guideLayerGroup) {
       this._guideLayerGroup = new L.LayerGroup();
       window.addLayerGroup(

@@ -72,6 +72,43 @@ export const WDialog = L.Handler.extend({
   },
 });
 
+// the wrapper class for the buttons
+// pass in the WButtons as a Map in options.buttons
+export const ButtonsControl = L.Control.extend({
+  // options: { position: "topleft", },
+
+  // From L.Control: onAdd is called when this is added to window.map
+  onAdd: function () {
+    // allow the buttons to call this ButtonsControl...
+    for (const b of this.options.buttons.values()) {
+      b.setControl(this);
+    }
+
+    const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
+    outerDiv.appendChild(this.options.container);
+
+    return outerDiv;
+  },
+
+  // called when wasabeeUIUpdate fires
+  update: function () {
+    for (const b of this.options.buttons.values()) {
+      b.Wupdate();
+    }
+  },
+
+  // called by a WButton when it is enabled
+  disableAllExcept: function (name) {
+    for (const [n, b] of this.options.buttons) {
+      if (n != name) b.disable();
+    }
+  },
+
+  // we could add logic for adding new buttons, removing existing, etc
+  // but there is not need at the moment since hiding/showing seems
+  // to work fine
+});
+
 export const WButton = L.Class.extend({
   statics: {
     TYPE: "unextendedWButton",
@@ -82,8 +119,9 @@ export const WButton = L.Class.extend({
   title: "Unset",
 
   // make sure all these bases are covered in your button
+  // XXX this initializer is not used by any buttons
   initialize: function (map, container) {
-    console.log("Wbutton init");
+    console.log("WButton init");
     if (!map) map = window.map;
     this._map = map;
 
@@ -91,6 +129,7 @@ export const WButton = L.Class.extend({
     this.title = "Unextended WButton";
     this._container = container;
     this.handler = this._toggleActions;
+    // this.actionsContainer == the sub menu items created by the individual buttons
 
     this.button = this._createButton({
       container: container,
@@ -111,6 +150,10 @@ export const WButton = L.Class.extend({
     }
   },
 
+  setControl: function (control) {
+    this.control = control;
+  },
+
   disable: function () {
     if (!this._enabled) return;
     this._enabled = false;
@@ -121,14 +164,10 @@ export const WButton = L.Class.extend({
 
   enable: function () {
     if (this._enabled) return;
+    if (this.control) this.control.disableAllExcept(this.type);
     this._enabled = true;
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
-    }
-    // disable all the others
-    for (const m in window.plugin.wasabee.buttons._modes) {
-      if (window.plugin.wasabee.buttons._modes[m].type != this.type)
-        window.plugin.wasabee.buttons._modes[m].disable();
     }
   },
 
@@ -190,7 +229,7 @@ export const WButton = L.Class.extend({
   },
 
   _disposeButton: function (button, callback) {
-    console.log("Wbutton _disposeButton");
+    console.log("WButton _disposeButton");
     L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
       .off(button, "mousedown", L.DomEvent.stopPropagation)
       .off(button, "dblclick", L.DomEvent.stopPropagation)

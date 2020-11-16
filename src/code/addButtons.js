@@ -1,3 +1,4 @@
+import { ButtonsControl } from "./leafletClasses";
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
@@ -9,53 +10,47 @@ import UploadButton from "./buttons/uploadButton";
 /* This function adds the plugin buttons on the left side of the screen */
 export function addButtons() {
   if (window.plugin.wasabee.buttons) {
-    console.log("replacing buttons");
+    console.warn("replacing buttons");
+    window.map.off(
+      "wasabeeUIUpdate",
+      window.plugin.wasabee.buttons.update,
+      window.plugin.wasabee.buttons
+    );
     window.map.removeControl(window.plugin.wasabee.buttons);
     delete window.plugin.wasabee.buttons;
   }
 
-  const ButtonsControl = L.Control.extend({
-    options: {
-      position: "topleft",
-    },
-    onAdd: function (map = window.map) {
-      const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
-      this._container = L.DomUtil.create("ul", "leaflet-bar", outerDiv);
-      this._modes = {};
-
-      for (const Constructor of [
-        WasabeeButton,
-        OpButton,
-        QuickdrawButton,
-        LinkButton,
-        MarkerButton,
-        SyncButton,
-        UploadButton,
-      ]) {
-        const item = L.DomUtil.create("li", null, this._container);
-        const button = new Constructor(map, item);
-        this._modes[button.type] = button;
-      }
-      return outerDiv;
-    },
-
-    update: function () {
-      for (const id in window.plugin.wasabee.buttons._modes) {
-        window.plugin.wasabee.buttons._modes[id].Wupdate();
-      }
-    },
-  });
-
-  if (typeof window.plugin.wasabee.buttons === "undefined") {
-    window.plugin.wasabee.buttons = new ButtonsControl();
-    window.map.addControl(window.plugin.wasabee.buttons);
+  const options = {};
+  // XXX next refactor pass, don't require a container to be passed in, get the formatting on ButtonsControl.onAdd()
+  options.container = L.DomUtil.create("ul", "leaflet-bar");
+  options.position = "topleft";
+  options.buttons = new Map();
+  for (const Constructor of [
+    WasabeeButton,
+    OpButton,
+    QuickdrawButton,
+    LinkButton,
+    MarkerButton,
+    SyncButton,
+    UploadButton,
+  ]) {
+    const item = L.DomUtil.create("li", null, options.container);
+    const button = new Constructor(window.map, item);
+    options.buttons.set(button.type, button);
   }
 
-  // listen for UI changes, update buttons that need it
-  window.map.on("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
+  window.plugin.wasabee.buttons = new ButtonsControl(options);
+  window.map.addControl(window.plugin.wasabee.buttons);
 
   // start off with a fresh update
   window.plugin.wasabee.buttons.update();
+
+  // listen for UI changes, update buttons that need it
+  window.map.on(
+    "wasabeeUIUpdate",
+    window.plugin.wasabee.buttons.update,
+    window.plugin.wasabee.buttons
+  );
 }
 
 export default addButtons;

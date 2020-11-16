@@ -83,8 +83,7 @@ const OpButton = WButton.extend({
       },
     ]);
 
-    // this.actionsContainer.style.top = "26px";
-    this._container.appendChild(this.actionsContainer); // parentNode
+    this._container.appendChild(this.actionsContainer);
   },
 
   // enable: // default is good
