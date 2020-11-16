@@ -137,7 +137,7 @@ export default class WasabeeMe {
     if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();
     if (window.plugin.wasabee._Dkeys) {
       window.plugin.wasabee._Dkeys.clear();
-      window.runHooks("wasabeeDkeys");
+      window.map.fire("wasabeeDkeys", { reason: "me purge" }, false);
     }
 
     window.map.fire("wasabeeUIUpdate", { reason: "me purge" }, false);

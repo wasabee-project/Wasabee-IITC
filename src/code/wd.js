@@ -1,4 +1,3 @@
-// the counter-op / defensive tools are Wasabee-D
 import WasabeeMe from "./me";
 import WasabeePortal from "./portal";
 import { dKeylistPromise, dKeyPromise } from "./server";
@@ -16,9 +15,7 @@ export function initWasabeeD() {
   );
 
   // hook called in init.js after load
-  window.addHook("wasabeeDkeys", () => {
-    drawWasabeeDkeys();
-  });
+  window.map.on("wasabeeDkeys", drawWasabeeDkeys);
 
   if (!window.plugin.wasabee._Dkey) {
     window.plugin.wasabee._Dkeys = new Map();
@@ -26,7 +23,7 @@ export function initWasabeeD() {
 
   window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.defensiveLayers) {
-      window.runHooks("wasabeeDkeys");
+      window.map.fire("wasabeeDkeys", { reason: "init D" }, false);
     }
   });
 

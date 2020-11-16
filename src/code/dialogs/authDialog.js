@@ -210,7 +210,7 @@ const AuthDialog = WDialog.extend({
           sendLocation();
         this.randomTip();
         window.map.fire("wasabeeUIUpdate", { reason: "authDialog" }, false);
-        window.runHooks("wasabeeDkeys");
+        window.map.fire("wasabeeDkeys", { reason: "authDialog" }, false);
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth,
     });

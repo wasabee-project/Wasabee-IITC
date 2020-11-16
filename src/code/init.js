@@ -76,12 +76,6 @@ window.plugin.wasabee.init = () => {
     });
   });
 
-  // OLD WAY: custom IITC hook for updating our UI
-  window.addHook("wasabeeUIUpdate", (caller) => {
-    if (caller != null) console.debug("OLD ui update", caller);
-    window.map.fire("wasabeeUIUpdate", caller);
-  });
-  // NEW WAY: directly use Leaflet
   window.map.on("wasabeeUIUpdate", drawMap);
 
   // IITC-CE, not 0.26
@@ -142,7 +136,7 @@ window.plugin.wasabee.init = () => {
     WasabeeMe.waitGet(true);
 
     // load Wasabee-Defense keys if logged in
-    window.runHooks("wasabeeDkeys");
+    window.map.fire("wasabeeDkeys", { reason: "startup" }, false);
   }
 };
 

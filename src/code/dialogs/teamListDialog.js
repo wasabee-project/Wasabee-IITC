@@ -75,7 +75,11 @@ const TeamListDialog = WDialog.extend({
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
-            window.runHooks("wasabeeDkeys");
+            window.map.fire(
+              "wasabeeDkeys",
+              { reason: "teamListDialog" },
+              false
+            );
           };
         },
       },
@@ -90,7 +94,11 @@ const TeamListDialog = WDialog.extend({
           if (curshare == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleShareWD(obj.ID, curshare);
-            window.runHooks("wasabeeDkeys");
+            window.map.fire(
+              "wasabeeDkeys",
+              { reason: "teamListDialog" },
+              false
+            );
           };
         },
       },
@@ -105,7 +113,11 @@ const TeamListDialog = WDialog.extend({
           if (curload == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleLoadWD(obj.ID, curload);
-            window.runHooks("wasabeeDkeys");
+            window.map.fire(
+              "wasabeeDkeys",
+              { reason: "teamListDialog" },
+              false
+            );
           };
         },
       },
@@ -128,7 +140,11 @@ const TeamListDialog = WDialog.extend({
                   try {
                     await leaveTeamPromise(obj.ID);
                     await WasabeeMe.waitGet(true);
-                    window.runHooks("wasabeeDkeys");
+                    window.map.fire(
+                      "wasabeeDkeys",
+                      { reason: "teamListDialog" },
+                      false
+                    );
                   } catch (e) {
                     console.error(e);
                   }

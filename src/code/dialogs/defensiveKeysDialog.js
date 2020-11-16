@@ -118,7 +118,7 @@ const DefensiveKeysDialog = WDialog.extend({
       console.log(j);
       await dKeyPromise(j);
       alert("Registered with server");
-      window.runHooks("wasabeeDkeys");
+      window.map.fire("wasabeeDkeys", { reason: "D key dialogs" }, false);
     } catch (e) {
       console.error(e);
       alert(e.toString());
