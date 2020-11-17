@@ -8,7 +8,8 @@ import { getSelectedOperation } from "./selectedOp";
 const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
-export function drawMap() {
+export function drawMap(ev) {
+  console.debug(ev);
   const operation = getSelectedOperation();
   updateAnchors(operation);
   updateMarkers(operation);
