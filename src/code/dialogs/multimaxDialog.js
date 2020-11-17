@@ -17,19 +17,8 @@ const MultimaxDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    window.map.on("wasabeeUIUpdate", this.uiupdate, this);
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    window.map.off("wasabeeUIUpdate", this.uiupdate, this);
-    WDialog.prototype.removeHooks.call(this);
-  },
-
-  uiupdate: function () {
-    // if the screen redraws, make sure we are on the current operation
-    this._operation = getSelectedOperation();
   },
 
   _displayDialog: function () {
