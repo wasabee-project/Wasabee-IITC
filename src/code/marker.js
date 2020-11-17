@@ -196,8 +196,7 @@ export default class WasabeeMarker {
     kind.href = "#";
     L.DomEvent.on(kind, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ch = new MarkerChangeDialog();
-      ch.setup(this);
+      const ch = new MarkerChangeDialog(window.map, { marker: this });
       ch.enable();
       marker.closePopup();
     });

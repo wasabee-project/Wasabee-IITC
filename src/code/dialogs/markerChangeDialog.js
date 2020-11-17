@@ -17,15 +17,11 @@ const MarkerChangeDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  setup: function (target) {
-    this._marker = target;
-  },
-
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const content = L.DomUtil.create("div", "content");
 
-    const portal = operation.getPortal(this._marker.portalId);
+    const portal = operation.getPortal(this.options.marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
     portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
@@ -37,9 +33,9 @@ const MarkerChangeDialog = WDialog.extend({
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
-      if (markers.has(k) && k != this._marker.type) o.disabled = true;
+      if (markers.has(k) && k != this.options.marker.type) o.disabled = true;
     }
-    this._type.value = this._marker.type;
+    this._type.value = this.options.marker.type;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -47,8 +43,12 @@ const MarkerChangeDialog = WDialog.extend({
         window.plugin.wasabee.static.markerTypes.has(this._type.value) &&
         !markers.has(this._type.value)
       ) {
-        operation.removeMarker(this._marker);
-        operation.addMarker(this._type.value, portal, this._marker.comment);
+        operation.removeMarker(this.options.marker);
+        operation.addMarker(
+          this._type.value,
+          portal,
+          this.options.marker.comment
+        );
       }
       this._dialog.dialog("close");
     };
