@@ -54,7 +54,6 @@ export default class WasabeeMe {
     );
   }
 
-  // eslint-diable-next-line
   remove() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
   }
