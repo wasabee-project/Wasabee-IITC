@@ -11,7 +11,6 @@ const NewopDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog(this);
   },
@@ -27,14 +26,14 @@ const NewopDialog = WDialog.extend({
     L.DomEvent.on(importButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
-      const id = new ImportDialog(this._map, null);
+      const id = new ImportDialog(null);
       id.enable();
     });
 
     L.DomEvent.on(addButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
-      const addDialog = new PromptDialog(this._map, {
+      const addDialog = new PromptDialog({
         title: wX("NEW_OP"),
         label: wX("SET_NEW_OP"),
         callback: () => {

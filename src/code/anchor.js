@@ -82,7 +82,7 @@ export default class WasabeeAnchor {
     pcLink.href = "#";
     L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const scd = new SetCommentDialog(window.map, {
+      const scd = new SetCommentDialog({
         target: this._portal,
         operation: operation,
       });
@@ -100,7 +100,7 @@ export default class WasabeeAnchor {
       phLink.href = "#";
       L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const scd = new SetCommentDialog(window.map, {
+        const scd = new SetCommentDialog({
           target: this._portal,
           operation: operation,
         });
@@ -117,7 +117,7 @@ export default class WasabeeAnchor {
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const lld = new LinkListDialog(window.map, { portal: this._portal });
+      const lld = new LinkListDialog({ portal: this._portal });
       lld.enable();
       marker.closePopup();
     });
@@ -169,7 +169,7 @@ export default class WasabeeAnchor {
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const ad = new AssignDialog(window.map, { target: this });
+        const ad = new AssignDialog({ target: this });
         ad.enable();
         marker.closePopup();
       });
@@ -179,7 +179,7 @@ export default class WasabeeAnchor {
       sendButton.textContent = wX("SEND TARGET");
       L.DomEvent.on(sendButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const std = new SendTargetDialog(window.map, { target: this });
+        const std = new SendTargetDialog({ target: this });
         std.enable();
         marker.closePopup();
       });

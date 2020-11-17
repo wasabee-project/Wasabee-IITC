@@ -11,7 +11,6 @@ const ImportDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     this._autoload = false;
     if (
       localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ===
@@ -28,8 +27,6 @@ const ImportDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", null);
     container.style.width = "420px";
 
@@ -113,7 +110,7 @@ const ImportDialog = WDialog.extend({
       checklist.enable();
       // zoom to it
       // OR use pointTileDataRequest to try to load faked portals?
-      this._map.fitBounds(newop.mbr);
+      window.map.fitBounds(newop.mbr);
 
       return;
     }

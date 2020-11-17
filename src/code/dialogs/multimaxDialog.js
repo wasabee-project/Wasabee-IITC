@@ -33,8 +33,6 @@ const MultimaxDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -134,8 +132,8 @@ const MultimaxDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
@@ -161,7 +159,7 @@ const MultimaxDialog = WDialog.extend({
     const poset = this.buildPOSet(pOne, pTwo, portals);
 
     const sequence = this.longestSequence(poset, null, (a, b) =>
-      this._map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
     );
 
     if (base)

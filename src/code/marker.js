@@ -140,7 +140,7 @@ export default class WasabeeMarker {
       assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const ad = new AssignDialog(window.map, { target: this });
+        const ad = new AssignDialog({ target: this });
         ad.enable();
         marker.closePopup();
       });
@@ -149,7 +149,7 @@ export default class WasabeeMarker {
       sendTargetButton.textContent = wX("SEND TARGET");
       L.DomEvent.on(sendTargetButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const std = new SendTargetDialog(window.map, { target: this });
+        const std = new SendTargetDialog({ target: this });
         std.enable();
         marker.closePopup();
       });
@@ -195,7 +195,7 @@ export default class WasabeeMarker {
     kind.href = "#";
     L.DomEvent.on(kind, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ch = new MarkerChangeDialog(window.map, { marker: this });
+      const ch = new MarkerChangeDialog({ marker: this });
       ch.enable();
       marker.closePopup();
     });
@@ -209,7 +209,7 @@ export default class WasabeeMarker {
       comment.textContent = this.comment;
       L.DomEvent.on(comment, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const scd = new SetCommentDialog(window.map, {
+        const scd = new SetCommentDialog({
           target: this,
           operation: operation,
         });
@@ -223,7 +223,7 @@ export default class WasabeeMarker {
     cl.href = "#";
     L.DomEvent.on(cl, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const scd = new SetCommentDialog(window.map, {
+      const scd = new SetCommentDialog({
         target: portal,
         operation: operation,
       });
@@ -241,7 +241,7 @@ export default class WasabeeMarker {
       hl.href = "#";
       L.DomEvent.on(hl, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const scd = new SetCommentDialog(window.map, {
+        const scd = new SetCommentDialog({
           target: portal,
           operation: operation,
         });

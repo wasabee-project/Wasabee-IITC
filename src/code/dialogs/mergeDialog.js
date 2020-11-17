@@ -9,7 +9,6 @@ const MergeDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
@@ -20,8 +19,6 @@ const MergeDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const buttons = [];
     buttons.push({
       text: "Rebase",

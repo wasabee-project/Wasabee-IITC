@@ -14,8 +14,8 @@ const LinkListDialog = WDialog.extend({
     TYPE: "linkListDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     const operation = getSelectedOperation();
     this._opID = operation.ID;
@@ -71,7 +71,7 @@ const LinkListDialog = WDialog.extend({
             comment.textContent = window.escapeHtmlSpecialChars(data);
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const scd = new SetCommentDialog(window.map, {
+              const scd = new SetCommentDialog({
                 target: link,
                 operation: operation,
               });
@@ -101,7 +101,7 @@ const LinkListDialog = WDialog.extend({
           if (operation.IsServerOp() && operation.IsWritableOp()) {
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog(window.map, { target: link });
+              const ad = new AssignDialog({ target: link });
               ad.enable();
             });
           }
@@ -149,7 +149,6 @@ const LinkListDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
     this._displayDialog();
@@ -185,7 +184,7 @@ const LinkListDialog = WDialog.extend({
     prompt.textContent = wX("CONFIRM_DELETE");
     const operation = getSelectedOperation();
     prompt.appendChild(link.displayFormat(operation));
-    const con = new ConfirmDialog(window.map, {
+    const con = new ConfirmDialog({
       title: "Delete Link",
       label: prompt,
       callback: () => {

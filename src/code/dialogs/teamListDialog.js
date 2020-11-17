@@ -51,7 +51,7 @@ const TeamListDialog = WDialog.extend({
           link.textContent = value;
           L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const td = new TeamMembershipList(window.map, { teamID: team.ID });
+            const td = new TeamMembershipList({ teamID: team.ID });
             td.enable();
           });
         },
@@ -124,7 +124,7 @@ const TeamListDialog = WDialog.extend({
             link.textContent = wX("LEAVE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const cd = new ConfirmDialog(window.map, {
+              const cd = new ConfirmDialog({
                 title: `Leave ${obj.Name}?`,
                 label: `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
                 callback: async () => {
@@ -148,7 +148,7 @@ const TeamListDialog = WDialog.extend({
             link.textContent = wX("MANAGE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const mtd = new ManageTeamDialog(window.map, { team: obj });
+              const mtd = new ManageTeamDialog({ team: obj });
               mtd.enable();
             });
           }
@@ -176,7 +176,7 @@ const TeamListDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
     buttons[wX("NEW_TEAM")] = () => {
-      const p = new PromptDialog(window.map, {
+      const p = new PromptDialog({
         title: wX("CREATE_NEW_TEAM"),
         label: wX("NTNAME"),
         callback: async () => {

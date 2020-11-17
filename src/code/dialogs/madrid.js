@@ -20,8 +20,6 @@ const MadridDialog = MultimaxDialog.extend({
   // removeHooks inherited from MultimaxDialog
   // this._operation should be safe due to multimax.uiupdate();
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -207,8 +205,8 @@ const MadridDialog = MultimaxDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = wX("MADRID");
     this.label = wX("MADRID");
     this._operation = getSelectedOperation(); // updated from multimax.uiupdate if necessary
@@ -223,7 +221,7 @@ const MadridDialog = MultimaxDialog.extend({
     const portalsMap = new Map(portals.map((p) => [p.id, p]));
     const poset = this.buildPOSet(pOne, pTwo, portals);
     const sequence = this.longestSequence(poset, null, (a, b) =>
-      this._map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
     );
 
     return sequence.map((id) => portalsMap.get(id));

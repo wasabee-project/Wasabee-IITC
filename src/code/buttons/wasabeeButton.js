@@ -41,7 +41,7 @@ const WasabeeButton = WButton.extend({
       text: wX("LOG IN"),
       callback: () => {
         this.disable();
-        const ad = new AuthDialog(this._map);
+        const ad = new AuthDialog();
         ad.enable();
       },
       context: this,
@@ -52,7 +52,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new TeamListDialog(this._map);
+        const wd = new TeamListDialog();
         wd.enable();
       },
       context: this,
@@ -84,7 +84,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new TeamListDialog(this._map);
+        const wd = new TeamListDialog();
         wd.enable();
       },
       context: this,
@@ -96,7 +96,7 @@ const WasabeeButton = WButton.extend({
         text: wX("OPS BUTTON"),
         callback: () => {
           this.disable();
-          const od = new OpsDialog(map);
+          const od = new OpsDialog();
           od.enable();
         },
         context: this,
@@ -106,7 +106,7 @@ const WasabeeButton = WButton.extend({
         text: wX("NEWOP BUTTON"),
         callback: () => {
           this.disable();
-          const nb = new NewopDialog(this._map);
+          const nb = new NewopDialog();
           nb.enable();
         },
         context: this,
@@ -116,7 +116,7 @@ const WasabeeButton = WButton.extend({
         text: wX("CLEAROPS BUTTON"),
         callback: () => {
           this.disable();
-          const con = new ConfirmDialog(this._map, {
+          const con = new ConfirmDialog({
             title: wX("CLEAROPS BUTTON TITLE"),
             label: wX("CLEAROPS PROMPT"),
             callback: () => {

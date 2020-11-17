@@ -12,7 +12,6 @@ const KeysList = WDialog.extend({
   },
 
   addHooks: async function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
@@ -211,7 +210,7 @@ const KeysList = WDialog.extend({
   },
 
   showKeyByPortal: function (e) {
-    const klp = new KeyListPortal(window.map, { portalID: e.srcElement.name });
+    const klp = new KeyListPortal({ portalID: e.srcElement.name });
     klp.enable();
   },
 });

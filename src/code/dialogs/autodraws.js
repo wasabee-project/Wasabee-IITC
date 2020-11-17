@@ -14,14 +14,14 @@ const AutodrawsDialog = WDialog.extend({
     TYPE: "autodraws",
   },
 
-  initialize: function (map = window.map, options) {
-    this._map = map;
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.menuItems = [
       {
         text: wX("MM"),
         callback: () => {
           this._dialog.dialog("close");
-          const mm = new MultimaxButtonControl(this._map);
+          const mm = new MultimaxButtonControl();
           mm.enable();
         },
       },
@@ -29,7 +29,7 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("MAX"),
         callback: () => {
           this._dialog.dialog("close");
-          const ff = new FanfieldDialog(this._map);
+          const ff = new FanfieldDialog();
           ff.enable();
         },
       },
@@ -37,7 +37,7 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("STARBURST"),
         callback: () => {
           this._dialog.dialog("close");
-          const sb = new StarburstDialog(this._map);
+          const sb = new StarburstDialog();
           sb.enable();
         },
       },
@@ -45,7 +45,7 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("ONION_WAS_TAKEN"),
         callback: () => {
           this._dialog.dialog("close");
-          const o = new OnionfieldDialog(this._map);
+          const o = new OnionfieldDialog();
           o.enable();
         },
       },
@@ -53,7 +53,7 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("HG"),
         callback: () => {
           this._dialog.dialog("close");
-          const h = new HomogeneousDialog(this._map);
+          const h = new HomogeneousDialog();
           h.enable();
         },
       },
@@ -61,13 +61,11 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("MADRID_WAS_TAKEN"),
         callback: () => {
           this._dialog.dialog("close");
-          const m = new MadridDialog(this._map);
+          const m = new MadridDialog();
           m.enable();
         },
       },
     ];
-
-    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function () {

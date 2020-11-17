@@ -22,7 +22,6 @@ const OpsDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
@@ -157,7 +156,7 @@ const OpsDialog = WDialog.extend({
               isFinite(mbr._southWest.lat) &&
               isFinite(mbr._northEast.lat)
             ) {
-              this._map.fitBounds(mbr);
+              window.map.fitBounds(mbr);
             }
           });
         }

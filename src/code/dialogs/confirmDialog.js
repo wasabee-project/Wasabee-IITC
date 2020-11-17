@@ -14,7 +14,6 @@ const ConfirmDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     if (
       localStorage[window.plugin.wasabee.static.constants.EXPERT_MODE_KEY] ==
@@ -33,8 +32,6 @@ const ConfirmDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const buttons = {};
     buttons[wX("OK")] = () => {
       if (this.options.callback) this.options.callback();

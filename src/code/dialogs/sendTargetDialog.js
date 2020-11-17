@@ -13,7 +13,6 @@ const SendTargetDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._setup();
     this._displayDialog();

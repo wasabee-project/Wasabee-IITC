@@ -28,8 +28,6 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_ONION_PORTALS");
@@ -101,8 +99,8 @@ const OnionfieldDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
     const p =
@@ -188,7 +186,7 @@ const OnionfieldDialog = WDialog.extend({
         continue;
       }
 
-      const pDist = this._map.distance(one.latLng, p.latLng);
+      const pDist = window.map.distance(one.latLng, p.latLng);
       m.set(pDist, p);
     }
     // sort by distance
@@ -339,9 +337,9 @@ const OnionfieldDialog = WDialog.extend({
   // angle a<bc in radians
   _angle: function (a, b, c) {
     // this formua finds b, swap a&b for our purposes
-    const A = this._map.project(b.latLng);
-    const B = this._map.project(a.latLng);
-    const C = this._map.project(c.latLng);
+    const A = window.map.project(b.latLng);
+    const B = window.map.project(a.latLng);
+    const C = window.map.project(c.latLng);
 
     const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
     const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));

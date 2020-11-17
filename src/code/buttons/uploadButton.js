@@ -153,7 +153,7 @@ const UploadButton = WButton.extend({
         } else {
           // need rebase or force
           if (!rebaseOnUpdate) {
-            const md = new ConfirmDialog(window.map, {
+            const md = new ConfirmDialog({
               title: wX("UPDATE_CONFLICT_TITLE"),
               label: wX("UPDATE_CONFLICT_DESC"),
               callback: () => this.doUpdate(getSelectedOperation(), true),
@@ -166,7 +166,7 @@ const UploadButton = WButton.extend({
             message.innerHTML =
               "Server OP has changed since last sync. Wasabee rebased your changes on top of the server OP. Check the summary (not visible on the map) and confirm in order to push.<br/>" +
               rebaseMessage.replaceAll(/\n/g, "<br/>");
-            const md = new ConfirmDialog(window.map, {
+            const md = new ConfirmDialog({
               title: wX("UPDATE_CONFLICT_TITLE"),
               label: message,
               callback: () => this.doUpdate(lastOp),

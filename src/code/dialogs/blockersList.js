@@ -16,7 +16,6 @@ const BlockerList = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.blockerlistUpdate, this);
     window.map.on("wasabeeCrosslinksDone", this.blockerlistUpdate, this);

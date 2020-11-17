@@ -8,8 +8,8 @@ const LinkDialog = WDialog.extend({
     TYPE: "linkDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     let p =
       localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
@@ -21,7 +21,6 @@ const LinkDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     // this._operation = getSelectedOperation();
     this._displayDialog();
@@ -32,7 +31,6 @@ const LinkDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
     const container = L.DomUtil.create("div", "container");
 
     const sourceLabel = L.DomUtil.create("label", null, container);

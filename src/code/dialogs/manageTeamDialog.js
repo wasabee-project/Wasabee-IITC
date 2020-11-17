@@ -60,7 +60,7 @@ const ManageTeamDialog = WDialog.extend({
           button.textContent = value;
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const squadDialog = new PromptDialog(window.map, {
+            const squadDialog = new PromptDialog({
               title: `Set Squad for ${obj.name}`,
               label: "Squad",
               callback: async () => {
@@ -103,7 +103,7 @@ const ManageTeamDialog = WDialog.extend({
           button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const con = new ConfirmDialog(window.map, {
+            const con = new ConfirmDialog({
               title: `${button.textContent}: ${obj.name}`,
               label: `${button.textContent}: ${obj.name}?`,
               callback: async () => {
@@ -278,7 +278,7 @@ const ManageTeamDialog = WDialog.extend({
     removeButton.textContent = wX("REMOVE");
     L.DomEvent.on(removeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new ConfirmDialog(window.map, {
+      const cd = new ConfirmDialog({
         title: wX("REMOVE_TEAM_CONFIRM_TITLE", this.options.team.Name),
         label: wX("REMOVE_TEAM_CONFIRM_LABEL", this.options.team.Name),
         callback: async () => {

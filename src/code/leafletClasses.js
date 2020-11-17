@@ -41,10 +41,8 @@ export const WDialog = L.Handler.extend({
     TYPE: "Unextended Wasabee Dialog",
   },
 
-  initialize: function (map = window.map, options) {
+  initialize: function (options) {
     L.setOptions(this, options);
-    this._map = map;
-    this._container = map._container;
     this._enabled = false;
     this._smallScreen = this._isMobile();
     this._dialog = null;

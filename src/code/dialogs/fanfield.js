@@ -12,7 +12,6 @@ const FanfieldDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
@@ -22,8 +21,6 @@ const FanfieldDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
@@ -137,8 +134,8 @@ const FanfieldDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = wX("FAN_FIELD3");
     this.label = wX("FAN_FIELD3");
     let p = localStorage["wasabee-anchor-1"];
