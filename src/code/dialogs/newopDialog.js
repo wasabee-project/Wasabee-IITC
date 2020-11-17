@@ -34,26 +34,33 @@ const NewopDialog = WDialog.extend({
     L.DomEvent.on(addButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       noHandler._dialog.dialog("close");
-      const addDialog = new PromptDialog(this._map);
-      addDialog.setup(wX("NEW_OP"), wX("SET_NEW_OP"), () => {
-        if (addDialog.inputField.value) {
-          const newop = new WasabeeOp({
-            creator: PLAYER.nickname,
-            name: addDialog.inputField.value,
-          });
-          newop.store();
-          makeSelectedOperation(newop.ID);
-          window.map.fire("wasabeeUIUpdate", { reason: "NewopDialog" }, false);
-          window.map.fire(
-            "wasabeeCrosslinks",
-            { reason: "NewopDialog" },
-            false
-          );
-        } else {
-          alert(wX("OP_NAME_UNSET"));
-        }
+      const addDialog = new PromptDialog(this._map, {
+        title: wX("NEW_OP"),
+        label: wX("SET_NEW_OP"),
+        callback: () => {
+          if (addDialog.inputField.value) {
+            const newop = new WasabeeOp({
+              creator: PLAYER.nickname,
+              name: addDialog.inputField.value,
+            });
+            newop.store();
+            makeSelectedOperation(newop.ID);
+            window.map.fire(
+              "wasabeeUIUpdate",
+              { reason: "NewopDialog" },
+              false
+            );
+            window.map.fire(
+              "wasabeeCrosslinks",
+              { reason: "NewopDialog" },
+              false
+            );
+          } else {
+            alert(wX("OP_NAME_UNSET"));
+          }
+        },
+        placeholder: wX("MUST_NOT_BE_EMPTY"),
       });
-      addDialog.placeholder = wX("MUST_NOT_BE_EMPTY");
       addDialog.enable();
     });
 
