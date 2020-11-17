@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import WasabeeAgent from "../agent";
 
 const AgentDialog = WDialog.extend({
@@ -9,10 +8,8 @@ const AgentDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = AgentDialog.TYPE;
     this._gid = options.gid;
     WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: AgentDialog.TYPE });
   },
 
   addHooks: function () {

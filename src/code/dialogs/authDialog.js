@@ -16,12 +16,6 @@ const AuthDialog = WDialog.extend({
     TYPE: "authDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = AuthDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: AuthDialog.TYPE });
-  },
-
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);

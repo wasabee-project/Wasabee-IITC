@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // generic confirmation screen w/ ok and cancel buttons
 
@@ -10,11 +9,9 @@ const ConfirmDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = ConfirmDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE");
     this._label = wX("NO_LABEL");
-    postToFirebase({ id: "analytics", action: ConfirmDialog.TYPE });
   },
 
   addHooks: function () {

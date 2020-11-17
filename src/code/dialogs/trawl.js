@@ -5,17 +5,10 @@ import { blockerAutomark } from "../uiCommands";
 // why trust my own math when someone else has done the work?
 import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
 // import { datums } from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-datum";
-import { postToFirebase } from "../firebaseSupport";
 
 const TrawlDialog = WDialog.extend({
   statics: {
     TYPE: "trawl",
-  },
-
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this.type = TrawlDialog.TYPE;
-    postToFirebase({ id: "analytics", action: TrawlDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks

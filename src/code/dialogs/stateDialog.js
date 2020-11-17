@@ -2,18 +2,11 @@ import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
 const StateDialog = WDialog.extend({
   statics: {
     TYPE: "stateDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = StateDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: StateDialog.TYPE });
   },
 
   addHooks: function () {

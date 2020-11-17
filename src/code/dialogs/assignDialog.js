@@ -5,18 +5,11 @@ import WasabeeAnchor from "../anchor";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
 const AssignDialog = WDialog.extend({
   statics: {
     TYPE: "assignDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = AssignDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: AssignDialog.TYPE });
   },
 
   addHooks: function () {

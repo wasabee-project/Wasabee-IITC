@@ -4,17 +4,10 @@ import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const NewopDialog = WDialog.extend({
   statics: {
     TYPE: "newopButton",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = NewopDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: NewopDialog.TYPE });
   },
 
   addHooks: function () {

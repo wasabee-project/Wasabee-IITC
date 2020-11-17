@@ -4,7 +4,7 @@ import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawMap, drawAgents } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
-import { initFirebase } from "./firebaseSupport";
+import { initFirebase, postToFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
@@ -138,6 +138,10 @@ window.plugin.wasabee.init = () => {
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabeeDkeys", { reason: "startup" }, false);
   }
+
+  window.map.on("wdialog", (dialog) => {
+    postToFirebase({ id: "analytics", action: dialog.constructor.TYPE });
+  });
 };
 
 // this can be moved to auth dialog, no need to init it for people who never log in

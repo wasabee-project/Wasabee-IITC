@@ -3,17 +3,10 @@ import Sortable from "../../lib/sortable";
 import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const KeyListPortal = WDialog.extend({
   statics: {
     TYPE: "keyListPortal",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = KeyListPortal.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: KeyListPortal.TYPE });
   },
 
   addHooks: function () {

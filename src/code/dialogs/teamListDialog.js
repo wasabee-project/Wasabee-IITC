@@ -14,17 +14,10 @@ import TeamMembershipList from "./teamMembershipList";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const TeamListDialog = WDialog.extend({
   statics: {
     TYPE: "wasabeeButton",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = TeamListDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: TeamListDialog.TYPE });
   },
 
   addHooks: async function () {

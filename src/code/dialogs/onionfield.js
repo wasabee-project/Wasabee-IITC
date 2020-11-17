@@ -5,7 +5,6 @@ import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OnionfieldDialog = WDialog.extend({
   statics: {
@@ -103,14 +102,12 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = OnionfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: OnionfieldDialog.TYPE });
   },
 
   onion: function () {

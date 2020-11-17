@@ -2,7 +2,6 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const LinkDialog = WDialog.extend({
   statics: {
@@ -10,7 +9,6 @@ const LinkDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = LinkDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
 
     let p =
@@ -20,7 +18,6 @@ const LinkDialog = WDialog.extend({
     if (p) this._anchor1 = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchor2 = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: LinkDialog.TYPE });
   },
 
   addHooks: function () {

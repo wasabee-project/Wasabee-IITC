@@ -1,17 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
     TYPE: "markerButton",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = MarkerChangeDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: MarkerChangeDialog.TYPE });
   },
 
   addHooks: function () {

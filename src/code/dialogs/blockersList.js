@@ -9,17 +9,10 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
-import { postToFirebase } from "../firebaseSupport";
 
 const BlockerList = WDialog.extend({
   statics: {
     TYPE: "blockerList",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = BlockerList.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: BlockerList.TYPE });
   },
 
   addHooks: function () {

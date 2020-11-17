@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { changeSkin } from "../skin";
 import Sortable from "sortablejs";
 
@@ -10,9 +9,7 @@ const SkinDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = SkinDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: SkinDialog.TYPE });
 
     if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
     this._skinSet = new Set(

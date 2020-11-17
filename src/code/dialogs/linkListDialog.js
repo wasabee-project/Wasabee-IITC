@@ -6,7 +6,6 @@ import ConfirmDialog from "./confirmDialog";
 import WasabeeAgent from "../agent";
 import wX from "../wX";
 // import WasabeeMe from "../me";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 // import WasabeeOp from "../operation";
 
@@ -16,13 +15,11 @@ const LinkListDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = LinkListDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this._title = wX("NO_TITLE");
     this._label = wX("NO_LABEL");
     this.placeholder = "";
     this.current = "";
-    postToFirebase({ id: "analytics", action: LinkListDialog.TYPE });
   },
 
   addHooks: function () {

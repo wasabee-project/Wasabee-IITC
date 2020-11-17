@@ -16,18 +16,11 @@ import Sortable from "../../lib/sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
-import { postToFirebase } from "../firebaseSupport";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = WDialog.extend({
   statics: {
     TYPE: "manageTeamDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = ManageTeamDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ManageTeamDialog.TYPE });
   },
 
   addHooks: function () {
