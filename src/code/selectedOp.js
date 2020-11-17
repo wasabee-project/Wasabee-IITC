@@ -73,7 +73,6 @@ export function makeSelectedOperation(opID) {
   }
 
   // get the op from localStorage
-  // in 0.19 this becomes WasabeeOp.load(opID);
   const op = WasabeeOp.load(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
@@ -193,27 +192,9 @@ export function opsList(hidden = true) {
       return ops;
     } catch (e) {
       console.error(e);
-      //falback to old listing
     }
   }
-
-  // <0.18 migration
-  const list = oldOpsList();
-  storeOpsList(list);
-  return list;
-}
-
-// to remove on 0.19
-function oldOpsList() {
-  const out = new Array();
-
-  for (const key in localStorage) {
-    if (key.length == 40) out.push(key);
-    // after 0.18
-    // if (key.length) == 40 && localStorage[key].includes(`"ID":`)) out.push(key);
-  }
-
-  return out;
+  return new Array();
 }
 
 export function duplicateOperation(opID) {
@@ -224,6 +205,8 @@ export function duplicateOperation(opID) {
   } else {
     op = WasabeeOp.load(opID);
   }
+
+  // XXX op.toExport() might be helpful here
 
   op.ID = generateId();
   op.name = op.name + " " + new Date().toGMTString();
