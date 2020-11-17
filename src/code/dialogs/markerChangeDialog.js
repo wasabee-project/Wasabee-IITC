@@ -7,6 +7,10 @@ const MarkerChangeDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
+  options: {
+    // marker
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

@@ -7,6 +7,10 @@ const ZoneSetColorDialog = WDialog.extend({
     TYPE: "zoneSetColorDialog",
   },
 
+  options: {
+    // zone
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

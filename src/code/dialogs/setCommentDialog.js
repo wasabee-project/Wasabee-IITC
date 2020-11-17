@@ -9,6 +9,11 @@ export const SetCommentDialog = WDialog.extend({
     TYPE: "setCommentDialog",
   },
 
+  options: {
+    // target
+    // operation
+  },
+
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
 

@@ -12,6 +12,10 @@ const SendTargetDialog = WDialog.extend({
     TYPE: "sendTargetDialog",
   },
 
+  options: {
+    // target
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._setup();

@@ -8,6 +8,10 @@ const TeamMembershipList = WDialog.extend({
     TYPE: "teamMembershipList",
   },
 
+  options: {
+    // teamID
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

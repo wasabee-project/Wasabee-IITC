@@ -12,6 +12,10 @@ const AssignDialog = WDialog.extend({
     TYPE: "assignDialog",
   },
 
+  options: {
+    // target,
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._setup();

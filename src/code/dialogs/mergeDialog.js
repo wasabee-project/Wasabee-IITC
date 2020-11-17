@@ -8,6 +8,11 @@ const MergeDialog = WDialog.extend({
     TYPE: "megeDialog",
   },
 
+  options: {
+    // opOwn
+    // opRemote
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

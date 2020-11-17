@@ -23,6 +23,10 @@ const ManageTeamDialog = WDialog.extend({
     TYPE: "manageTeamDialog",
   },
 
+  options: {
+    // team
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);

@@ -13,6 +13,8 @@ const PromptDialog = WDialog.extend({
     label: wX("NO_LABEL"), // should never be displayed
     placeholder: "",
     current: "",
+    // callback
+    // cancelCallback
   },
 
   addHooks: function () {
