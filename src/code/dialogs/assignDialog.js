@@ -18,7 +18,6 @@ const AssignDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._setup();
     this._displayDialog();
   },
 
@@ -27,6 +26,10 @@ const AssignDialog = WDialog.extend({
     buttons[wX("OK")] = () => {
       this._dialog.dialog("close");
     };
+
+    // create container then setup asynchronously
+    this._html = L.DomUtil.create("div", "container");
+    this._setup();
 
     this._dialog = window.dialog({
       title: this._name,
@@ -47,7 +50,6 @@ const AssignDialog = WDialog.extend({
     const operation = getSelectedOperation();
     this._dialog = null;
     this._targetID = target.ID;
-    this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = await this._getAgentMenu(target.assignedTo);
 

@@ -30,7 +30,6 @@ const ManageTeamDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
-    this._setup(); // populate the list
     this._displayDialog();
   },
 
@@ -39,9 +38,9 @@ const ManageTeamDialog = WDialog.extend({
     window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
-  _setup: async function () {
-    this._table = new Sortable();
-    this._table.fields = [
+  _setupTable: function () {
+    const table = new Sortable();
+    table.fields = [
       {
         name: wX("AGENT"),
         value: (agent) => agent.name,
@@ -128,13 +127,20 @@ const ManageTeamDialog = WDialog.extend({
         },
       },
     ];
-    this._table.sortBy = 0;
+    table.sortBy = 0;
 
+    // async populate
+    this._refreshTeam(table);
+
+    return table;
+  },
+
+  _refreshTeam: async function (table) {
     try {
       // max 5 seconds cache for this screen
       const teamdata = await WasabeeTeam.waitGet(this.options.team.ID, 5);
       if (teamdata.agents && teamdata.agents.length > 0) {
-        this._table.items = teamdata.agents;
+        table.items = teamdata.agents;
       }
     } catch (e) {
       console.error(e);
@@ -142,7 +148,6 @@ const ManageTeamDialog = WDialog.extend({
   },
 
   update: function () {
-    this._setup(); // populate the list
     const container = this._dialogContent(); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this._dialog.html(container);
@@ -156,7 +161,9 @@ const ManageTeamDialog = WDialog.extend({
   _dialogContent: function () {
     const container = L.DomUtil.create("div", "container");
     const list = L.DomUtil.create("div", "list", container);
-    list.appendChild(this._table.table);
+
+    const table = this._setupTable();
+    list.appendChild(table.table);
 
     const addlabel = L.DomUtil.create("label", null, container);
     addlabel.textContent = wX("ADD_AGENT");

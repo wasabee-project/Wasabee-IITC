@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import MultimaxButtonControl from "../dialogs/multimaxDialog";
+import MultimaxDialog from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";
 import OnionfieldDialog from "../dialogs/onionfield";
@@ -21,7 +21,7 @@ const AutodrawsDialog = WDialog.extend({
         text: wX("MM"),
         callback: () => {
           this._dialog.dialog("close");
-          const mm = new MultimaxButtonControl();
+          const mm = new MultimaxDialog();
           mm.enable();
         },
       },

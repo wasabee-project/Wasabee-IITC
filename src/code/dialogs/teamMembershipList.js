@@ -14,14 +14,17 @@ const TeamMembershipList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._displayDialog();
+    this._displayDialog().catch((e) => {
+      console.error(e);
+      alert(e.toString());
+    });
   },
 
   _displayDialog: async function () {
-    await this._setup();
-    // sometimes we are too quick, try again
-    if (!this._team)
-      this._team = window.plugin.wasabee.teams.get(this.options.teamID);
+    const table = this._setupTable();
+
+    const team = await WasabeeTeam.waitGet(this.options.teamID, 2);
+    table.items = team.agents;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -29,8 +32,8 @@ const TeamMembershipList = WDialog.extend({
     };
 
     this._dialog = window.dialog({
-      title: this._team.name,
-      html: this._table.table,
+      title: team.name,
+      html: table.table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-teamlist",
       closeCallback: () => {
@@ -42,20 +45,9 @@ const TeamMembershipList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _setup: async function () {
-    try {
-      this._team = await WasabeeTeam.waitGet(this.options.teamID, 2);
-    } catch (e) {
-      console.error(e);
-      alert(e.toString());
-      return;
-    }
-    if (!this._team.name) {
-      alert(wX("NOT_LOADED"));
-    }
-
-    this._table = new Sortable();
-    this._table.fields = [
+  _setupTable: function () {
+    const table = new Sortable();
+    table.fields = [
       {
         name: wX("AGENT"),
         value: (agent) => agent.name,
@@ -86,8 +78,9 @@ const TeamMembershipList = WDialog.extend({
         },
       },
     ];
-    this._table.sortBy = 0;
-    this._table.items = this._team.agents;
+    table.sortBy = 0;
+
+    return table;
   },
 });
 
