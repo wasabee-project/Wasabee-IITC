@@ -12,11 +12,6 @@ const ZoneSetColorDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    window.map.fire("wasabeeUIUpdate", { reason: "ZoneSetColorDialog" }, false);
-  },
-
   _displayDialog: function () {
     this._dialog = window.dialog({
       title: "Zone color",

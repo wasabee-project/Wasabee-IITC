@@ -13,11 +13,6 @@ const MergeDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    window.map.fire("wasabeeUIUpdate", { reason: "mergeDialog" }, false);
-  },
-
   _displayDialog: function () {
     const buttons = [];
     buttons.push({
