@@ -12,6 +12,7 @@ const StateDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    this._setup();
     this._displayDialog();
   },
 
@@ -39,32 +40,33 @@ const StateDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (target, opID) {
-    this._opID = opID; // used to determine if a different op has been selected, can probably be removed
+  _setup: function () {
     this._dialog = null;
-    this._targetID = target.ID;
+    this._targetID = this.options.target.ID;
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
-    const menu = this._getStateMenu(target);
+    const menu = this._getStateMenu(this.options.target);
 
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
+    if (this.options.opID != operation.ID) {
       console.log("operation changed between create/setup?!");
-      this._opID = operation.ID;
+      this.options.opID = operation.ID;
     }
 
-    if (target instanceof WasabeeLink) {
-      const portal = operation.getPortal(target.fromPortalId);
+    if (this.options.target instanceof WasabeeLink) {
+      const portal = operation.getPortal(this.options.target.fromPortalId);
       this._type = "Link";
       this._name = wX("LINK STATE PROMPT", portal.name);
-      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
+      divtitle.appendChild(
+        this.options.target.displayFormat(operation, this._smallScreen)
+      );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK STATE");
       menu.prepend(t);
     }
 
-    if (target instanceof WasabeeMarker) {
-      const portal = operation.getPortal(target.portalId);
+    if (this.options.target instanceof WasabeeMarker) {
+      const portal = operation.getPortal(this.options.target.portalId);
       this._type = "Marker";
       this._name = wX("MARKER STATE PROMPT", portal.name);
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
@@ -107,7 +109,7 @@ const StateDialog = WDialog.extend({
 
   setState: function (value) {
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
+    if (this.options.opID != operation.ID) {
       console.log("operation changed -- bailing");
       return;
     }

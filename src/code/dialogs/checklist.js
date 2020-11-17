@@ -222,8 +222,10 @@ const OperationChecklistDialog = WDialog.extend({
           a.textContent = wX(value);
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const sd = new StateDialog();
-            sd.setup(thing, operation.ID);
+            const sd = new StateDialog(window.map, {
+              target: thing,
+              opID: operation.ID,
+            });
             sd.enable();
           });
         },
