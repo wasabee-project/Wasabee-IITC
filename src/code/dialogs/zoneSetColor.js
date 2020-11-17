@@ -30,14 +30,11 @@ const ZoneSetColorDialog = WDialog.extend({
     });
   },
 
-  setup: function (zone) {
-    this._zone = zone;
-  },
-
   _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", container);
-    desc.textContent = "Set the color of all links in zone " + this._zone.name;
+    desc.textContent =
+      "Set the color of all links in zone " + this.options.zone.name;
 
     const picker = L.DomUtil.create("input", "picker", container);
     picker.type = "color";
@@ -47,7 +44,7 @@ const ZoneSetColorDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       const so = getSelectedOperation();
       for (const l of so.links) {
-        if (l.zone == this._zone.id) l.color = picker.value;
+        if (l.zone == this.options.zone.id) l.color = picker.value;
       }
       so.store();
       addToColorList(picker.value);
