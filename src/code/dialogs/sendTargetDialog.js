@@ -18,10 +18,6 @@ const SendTargetDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {

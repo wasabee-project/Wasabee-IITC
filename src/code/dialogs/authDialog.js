@@ -21,10 +21,6 @@ const AuthDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   randomTip: function () {
     const lang = getLanguage();
     if (!window.plugin.wasabee.static.tips[lang]) return;

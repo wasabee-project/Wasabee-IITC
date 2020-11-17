@@ -13,10 +13,6 @@ const TeamMembershipList = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: async function () {
     await this._setup();
     // sometimes we are too quick, try again

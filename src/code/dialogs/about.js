@@ -21,11 +21,6 @@ const AboutDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function () {
-    // put any post close teardown here
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   // define our work in _displayDialog
   _displayDialog: function () {
     // use leaflet's DOM object creation, not bare DOM or Jquery

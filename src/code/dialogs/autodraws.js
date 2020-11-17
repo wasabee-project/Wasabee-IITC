@@ -77,10 +77,6 @@ const AutodrawsDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     const html = L.DomUtil.create("div", "container");
     for (const i of this.menuItems) {

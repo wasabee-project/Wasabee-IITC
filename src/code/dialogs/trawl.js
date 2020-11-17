@@ -17,10 +17,6 @@ const TrawlDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayTrawlerDialog: function (tiles) {
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);

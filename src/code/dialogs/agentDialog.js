@@ -12,10 +12,6 @@ const AgentDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: async function () {
     const html = L.DomUtil.create("div", null);
     const agent = L.DomUtil.create("div", null, html);

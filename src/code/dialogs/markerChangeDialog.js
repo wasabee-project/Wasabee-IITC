@@ -12,10 +12,6 @@ const MarkerChangeDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const content = L.DomUtil.create("div", "content");
