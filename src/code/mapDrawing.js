@@ -253,7 +253,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
 
 export async function drawSingleAgent(gid) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-  const agent = await WasabeeAgent.waitGet(gid);
+  const agent = await WasabeeAgent.waitGet(gid, 10); // default is 60 seconds, we can be faster if firebase tells us of an update
   if (agent != null) _drawAgent(agent);
 }
 
