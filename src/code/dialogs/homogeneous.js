@@ -18,19 +18,12 @@ const HomogeneousDialog = WDialog.extend({
   addHooks: function () {
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
-    window.map.on("wasabeeUIUpdate", this.uiupdate, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     window.removeLayerGroup(this._layerGroup);
-    window.map.off("wasabeeUIUpdate", this.uiupdate, this);
     WDialog.prototype.removeHooks.call(this);
-  },
-
-  uiupdate: function () {
-    // if the screen redraws, make sure we are using the correct operation
-    this._operation = getSelectedOperation();
   },
 
   _displayDialog: function () {
@@ -160,6 +153,7 @@ const HomogeneousDialog = WDialog.extend({
     this._redrawButton.style.display = "none";
     L.DomEvent.on(this._redrawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
+      this._operation = getSelectedOperation();
       if (this._tree) this._draw.call(this);
     });
 
@@ -168,6 +162,7 @@ const HomogeneousDialog = WDialog.extend({
     drawButton.textContent = wX("HF_DRAW_BUTTON");
     L.DomEvent.on(drawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
+      this._operation = getSelectedOperation();
       if (this._fullSearchCheck.checked) this.hdeepfield.call(this);
       else this.hfield.call(this);
     });
@@ -198,7 +193,6 @@ const HomogeneousDialog = WDialog.extend({
     WDialog.prototype.initialize.call(this, options);
     this.title = "Homogeneous";
     this.label = "Homogeneous";
-    this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
