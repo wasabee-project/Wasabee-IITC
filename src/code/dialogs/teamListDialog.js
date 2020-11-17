@@ -149,8 +149,7 @@ const TeamListDialog = WDialog.extend({
             link.textContent = wX("MANAGE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const mtd = new ManageTeamDialog();
-              mtd.setup(obj);
+              const mtd = new ManageTeamDialog(window.map, { team: obj });
               mtd.enable();
             });
           }
