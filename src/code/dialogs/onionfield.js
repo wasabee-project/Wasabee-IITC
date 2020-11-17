@@ -12,19 +12,8 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    // window.map.on("wasabeeUIUpdate", this.uiupdate, this);
-
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    // window.map.off("wasabeeUIUpdate", this.uiupdate, this);
-    WDialog.prototype.removeHooks.call(this);
-  },
-
-  uiupdate: function () {
-    // nothing needed, this._operation is (re)set at execute time
   },
 
   _displayDialog: function () {
