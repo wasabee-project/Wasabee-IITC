@@ -17,8 +17,6 @@ const MadridDialog = MultimaxDialog.extend({
   },
 
   // addHooks inherited from MultimaxDialog
-  // removeHooks inherited from MultimaxDialog
-  // this._operation should be safe due to multimax.uiupdate();
   _displayDialog: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
@@ -65,7 +63,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      this._portalSetOne = getAllPortalsOnScreen(getSelectedOperation());
       // XXX this is not enough, need to cache them in case IITC purges them
       this._setOneDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -114,7 +112,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
+      this._portalSetTwo = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
       this._setTwoDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -141,7 +139,7 @@ const MadridDialog = MultimaxDialog.extend({
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(this._operation);
+      this._portalSetThree = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
       this._setThreeDisplay.textContent = wX(
         "PORTAL_COUNT",
@@ -176,6 +174,7 @@ const MadridDialog = MultimaxDialog.extend({
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
+      this._operation = getSelectedOperation();
       const total = this._balancedcheck.checked
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
@@ -209,7 +208,6 @@ const MadridDialog = MultimaxDialog.extend({
     WDialog.prototype.initialize.call(this, options);
     this.title = wX("MADRID");
     this.label = wX("MADRID");
-    this._operation = getSelectedOperation(); // updated from multimax.uiupdate if necessary
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
