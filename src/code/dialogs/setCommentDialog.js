@@ -5,36 +5,39 @@ import WasabeeMarker from "../marker";
 import wX from "../wX";
 
 export const SetCommentDialog = WDialog.extend({
-  setup: function (target, operation) {
-    this.operation = operation;
-    this.target = target;
+  statics: {
+    TYPE: "setCommentDialog",
+  },
 
-    if (target instanceof WasabeeLink) {
+  initialize: function (map = window.map, options) {
+    WDialog.prototype.initialize.call(this, map, options);
+
+    if (this.options.target instanceof WasabeeLink) {
       this.commentType = "link";
       this.dialogTitle = wX("SET_LCOMMENT");
-      this.portal = this.operation.getPortal(this.target.fmPortalId);
+      this.portal = this.options.operation.getPortal(
+        this.options.target.fmPortalId
+      );
     }
 
-    if (target instanceof WasabeeMarker) {
+    if (this.options.target instanceof WasabeeMarker) {
       this.commentType = "marker";
-      this.portal = this.operation.getPortal(this.target.portalId);
+      this.portal = this.options.operation.getPortal(
+        this.options.target.portalId
+      );
       this.dialogTitle = wX("SET_MCOMMENT", this.portal.displayName);
     }
 
-    if (target instanceof WasabeePortal) {
+    if (this.options.target instanceof WasabeePortal) {
       this.commentType = "portal";
-      this.dialogTitle = wX("SET_PCOMMENT", target.displayName);
-      this.portal = this.target;
+      this.dialogTitle = wX("SET_PCOMMENT", this.options.target.displayName);
+      this.portal = this.options.target;
     }
 
     if (!this.commentType) {
       console.log("comment dialog requested for unknown type");
-      console.log(target);
+      console.log(this.options.target);
     }
-  },
-
-  statics: {
-    TYPE: "setCommentDialog",
   },
 
   addHooks: function () {
@@ -76,13 +79,20 @@ export const SetCommentDialog = WDialog.extend({
     if (this.commentType == "link") {
       desc.textContent = wX("SET_LINK_COMMENT");
       desc.appendChild(
-        this.target.displayFormat(this.operation, this._smallScreen)
+        this.options.target.displayFormat(
+          this.options.operation,
+          this._smallScreen
+        )
       );
-      if (this.target.comment) input.value = this.target.comment;
+      if (this.options.target.comment)
+        input.value = this.options.target.comment;
       input.addEventListener(
         "change",
         () => {
-          this.operation.setLinkComment(this.target, input.value);
+          this.options.operation.setLinkComment(
+            this.options.target,
+            input.value
+          );
         },
         false
       );
@@ -90,13 +100,17 @@ export const SetCommentDialog = WDialog.extend({
 
     if (this.commentType == "marker") {
       desc.textContent = wX("SET_MARKER_COMMENT");
-      desc.appendChild(this.portal.displayFormat(this.operation));
+      desc.appendChild(this.portal.displayFormat(this.options.operation));
 
-      if (this.target.comment) input.value = this.target.comment;
+      if (this.options.target.comment)
+        input.value = this.options.target.comment;
       input.addEventListener(
         "change",
         () => {
-          this.operation.setMarkerComment(this.target, input.value);
+          this.options.operation.setMarkerComment(
+            this.options.target,
+            input.value
+          );
         },
         false
       );
@@ -110,7 +124,10 @@ export const SetCommentDialog = WDialog.extend({
       input.addEventListener(
         "change",
         () => {
-          this.operation.setPortalComment(this.target, input.value);
+          this.options.operation.setPortalComment(
+            this.options.target,
+            input.value
+          );
         },
         false
       );
@@ -121,7 +138,10 @@ export const SetCommentDialog = WDialog.extend({
       hardnessInput.addEventListener(
         "change",
         () => {
-          this.operation.setPortalHardness(this.target, hardnessInput.value);
+          this.options.operation.setPortalHardness(
+            this.options.target,
+            hardnessInput.value
+          );
         },
         false
       );

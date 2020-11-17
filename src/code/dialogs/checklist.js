@@ -175,8 +175,10 @@ const OperationChecklistDialog = WDialog.extend({
           comment.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const scd = new SetCommentDialog(window.map);
-            scd.setup(thing, operation);
+            const scd = new SetCommentDialog(window.map, {
+              target: thing,
+              operation: operation,
+            });
             scd.enable();
           });
         },

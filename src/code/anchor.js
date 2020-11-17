@@ -82,9 +82,11 @@ export default class WasabeeAnchor {
     pcLink.href = "#";
     L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new SetCommentDialog();
-      cd.setup(this._portal, operation);
-      cd.enable();
+      const scd = new SetCommentDialog(window.map, {
+        target: this._portal,
+        operation: operation,
+      });
+      scd.enable();
       marker.closePopup();
     });
     if (this._portal.hardness) {
@@ -98,9 +100,11 @@ export default class WasabeeAnchor {
       phLink.href = "#";
       L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(this._portal, operation);
-        cd.enable();
+        const scd = new SetCommentDialog(window.map, {
+          target: this._portal,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }

@@ -209,9 +209,11 @@ export default class WasabeeMarker {
       comment.textContent = this.comment;
       L.DomEvent.on(comment, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const com = new SetCommentDialog();
-        com.setup(this, operation);
-        com.enable();
+        const scd = new SetCommentDialog(window.map, {
+          target: this,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }
@@ -221,9 +223,11 @@ export default class WasabeeMarker {
     cl.href = "#";
     L.DomEvent.on(cl, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new SetCommentDialog();
-      cd.setup(portal, operation);
-      cd.enable();
+      const scd = new SetCommentDialog(window.map, {
+        target: portal,
+        operation: operation,
+      });
+      scd.enable();
       marker.closePopup();
     });
     if (portal.hardness) {
@@ -237,9 +241,11 @@ export default class WasabeeMarker {
       hl.href = "#";
       L.DomEvent.on(hl, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(portal, operation);
-        cd.enable();
+        const scd = new SetCommentDialog(window.map, {
+          target: portal,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }
