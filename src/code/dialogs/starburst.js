@@ -14,10 +14,6 @@ const StarburstDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     //Instructions
     const container = L.DomUtil.create("div", "container");

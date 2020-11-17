@@ -13,10 +13,6 @@ const ExportDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const buttons = {};

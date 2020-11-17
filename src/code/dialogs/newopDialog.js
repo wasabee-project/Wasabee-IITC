@@ -81,10 +81,6 @@ const NewopDialog = WDialog.extend({
     });
     this._dialog.dialog("option", "buttons", buttons);
   },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
 });
 
 export default NewopDialog;

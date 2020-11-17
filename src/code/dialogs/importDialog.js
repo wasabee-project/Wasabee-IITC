@@ -22,10 +22,6 @@ const ImportDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
     const container = L.DomUtil.create("div", null);
     container.style.width = "420px";

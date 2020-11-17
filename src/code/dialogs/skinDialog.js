@@ -22,12 +22,6 @@ const SkinDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
-  update: function () {},
-
   _buildContent() {
     const container = L.DomUtil.create("div", "content");
 
