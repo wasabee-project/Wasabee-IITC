@@ -1,11 +1,9 @@
-import { generateId } from "./auxiliar";
+import { generateId, convertColorToHex } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeOp from "./operation";
 import WasabeeMe from "./me";
 import AssignDialog from "./dialogs/assignDialog";
-// for named color
-import { convertColorToHex } from "./auxiliar";
 import { addToColorList } from "./skin";
 
 export default class WasabeeLink {
