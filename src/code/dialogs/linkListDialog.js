@@ -71,8 +71,10 @@ const LinkListDialog = WDialog.extend({
             comment.textContent = window.escapeHtmlSpecialChars(data);
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const scd = new SetCommentDialog(window.map);
-              scd.setup(link, operation);
+              const scd = new SetCommentDialog(window.map, {
+                target: link,
+                operation: operation,
+              });
               scd.enable();
             });
           }
