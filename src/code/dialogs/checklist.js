@@ -140,8 +140,7 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing instanceof WasabeeMarker) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ch = new MarkerChangeDialog();
-              ch.setup(thing);
+              const ch = new MarkerChangeDialog(window.map, { marker: thing });
               ch.enable();
             });
           }
