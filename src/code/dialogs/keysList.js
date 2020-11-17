@@ -211,8 +211,7 @@ const KeysList = WDialog.extend({
   },
 
   showKeyByPortal: function (e) {
-    const klp = new KeyListPortal();
-    klp.setup(e.srcElement.name);
+    const klp = new KeyListPortal(window.map, { portalID: e.srcElement.name });
     klp.enable();
   },
 });

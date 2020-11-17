@@ -20,16 +20,13 @@ const KeyListPortal = WDialog.extend({
     window.map.off("wasabeeUIUpdate", this.keyListUpdate, this);
   },
 
-  setup: function (portalID) {
-    this._portalID = portalID;
-    this._sortable = this.getSortable();
-  },
-
   _displayDialog: function () {
-    if (!this._portalID) {
+    if (!this.options.portalID) {
       this.disable();
       return;
     }
+
+    this._sortable = this.getSortable();
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -37,11 +34,11 @@ const KeyListPortal = WDialog.extend({
     };
 
     const op = getSelectedOperation();
-    const portal = op.getPortal(this._portalID);
+    const portal = op.getPortal(this.options.portalID);
 
     this._dialog = window.dialog({
       title: wX("PORTAL KEY LIST", portal.displayName),
-      html: this.getListDialogContent(this._portalID),
+      html: this.getListDialogContent(this.options.portalID),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
       closeCallback: () => {
@@ -56,7 +53,7 @@ const KeyListPortal = WDialog.extend({
   keyListUpdate: function () {
     // handle operation changes gracefully
     const op = getSelectedOperation();
-    const portal = op.getPortal(this._portalID);
+    const portal = op.getPortal(this.options.portalID);
     if (portal == null) {
       // needs wX
       this._dialog("option", "title", "unknown portal");
@@ -64,7 +61,7 @@ const KeyListPortal = WDialog.extend({
       return;
     }
 
-    const table = this.getListDialogContent(this._portalID);
+    const table = this.getListDialogContent(this.options.portalID);
     this._dialog.html(table);
     this._dialog("option", "title", wX("PORTAL KEY LIST", portal.displayName));
   },
