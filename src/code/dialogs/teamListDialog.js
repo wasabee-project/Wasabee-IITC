@@ -125,11 +125,10 @@ const TeamListDialog = WDialog.extend({
             link.textContent = wX("LEAVE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const cd = new ConfirmDialog();
-              cd.setup(
-                `Leave ${obj.Name}?`,
-                `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
-                async () => {
+              const cd = new ConfirmDialog(window.map, {
+                title: `Leave ${obj.Name}?`,
+                label: `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
+                callback: async () => {
                   try {
                     await leaveTeamPromise(obj.ID);
                     await WasabeeMe.waitGet(true);
@@ -141,8 +140,8 @@ const TeamListDialog = WDialog.extend({
                   } catch (e) {
                     console.error(e);
                   }
-                }
-              );
+                },
+              });
               cd.enable();
             });
           } else {

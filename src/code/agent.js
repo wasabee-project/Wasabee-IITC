@@ -169,19 +169,18 @@ export default class WasabeeAgent {
         return;
       }
 
-      const d = new ConfirmDialog();
-      d.setup(
-        wX("SEND TARGET"),
-        wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
-        async () => {
+      const d = new ConfirmDialog(window.map, {
+        title: wX("SEND TARGET"),
+        label: wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
+        callback: async () => {
           try {
             await targetPromise(this.id, selectedPortal);
             alert(wX("TARGET SENT"));
           } catch (e) {
             console.error(e);
           }
-        }
-      );
+        },
+      });
       d.enable();
     });
 
@@ -197,19 +196,18 @@ export default class WasabeeAgent {
         return;
       }
 
-      const d = new ConfirmDialog();
-      d.setup(
-        "Send Route to Target",
-        "Do you really want to request the route to be sent?",
-        async () => {
+      const d = new ConfirmDialog(window.map, {
+        title: "Send Route to Target",
+        label: "Do you really want to request the route to be sent?",
+        callback: async () => {
           try {
             await routePromise(this.id, selectedPortal);
             alert("Route Sent");
           } catch (e) {
             console.error(e);
           }
-        }
-      );
+        },
+      });
       d.enable();
     });
 

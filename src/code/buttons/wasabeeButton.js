@@ -116,10 +116,13 @@ const WasabeeButton = WButton.extend({
         text: wX("CLEAROPS BUTTON"),
         callback: () => {
           this.disable();
-          const con = new ConfirmDialog(this._map);
-          con.setup(wX("CLEAROPS BUTTON TITLE"), wX("CLEAROPS PROMPT"), () => {
-            resetOps();
-            setupLocalStorage();
+          const con = new ConfirmDialog(this._map, {
+            title: wX("CLEAROPS BUTTON TITLE"),
+            label: wX("CLEAROPS PROMPT"),
+            callback: () => {
+              resetOps();
+              setupLocalStorage();
+            },
           });
           con.enable();
         },

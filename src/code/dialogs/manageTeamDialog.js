@@ -104,11 +104,10 @@ const ManageTeamDialog = WDialog.extend({
           button.textContent = wX("REMOVE");
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const con = new ConfirmDialog();
-            con.setup(
-              `${button.textContent}: ${obj.name}`,
-              `${button.textContent}: ${obj.name}?`,
-              async () => {
+            const con = new ConfirmDialog(window.map, {
+              title: `${button.textContent}: ${obj.name}`,
+              label: `${button.textContent}: ${obj.name}?`,
+              callback: async () => {
                 try {
                   await removeAgentFromTeamPromise(value, this._team.ID);
                 } catch (e) {
@@ -119,8 +118,8 @@ const ManageTeamDialog = WDialog.extend({
                   { reason: "manageTeamDialog" },
                   false
                 );
-              }
-            );
+              },
+            });
             con.enable();
           });
         },
@@ -274,11 +273,10 @@ const ManageTeamDialog = WDialog.extend({
     removeButton.textContent = wX("REMOVE");
     L.DomEvent.on(removeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new ConfirmDialog();
-      cd.setup(
-        wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
-        wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
-        async () => {
+      const cd = new ConfirmDialog(window.map, {
+        title: wX("REMOVE_TEAM_CONFIRM_TITLE", this._team.Name),
+        label: wX("REMOVE_TEAM_CONFIRM_LABEL", this._team.Name),
+        callback: async () => {
           try {
             await deleteTeamPromise(this._team.ID);
             alert(`${this._team.Name} removed`);
@@ -288,8 +286,8 @@ const ManageTeamDialog = WDialog.extend({
             console.error(e);
             alert(e.toString());
           }
-        }
-      );
+        },
+      });
       cd.enable();
     });
 

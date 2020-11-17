@@ -186,13 +186,16 @@ const LinkListDialog = WDialog.extend({
   },
 
   deleteLink: function (link) {
-    const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
     prompt.textContent = wX("CONFIRM_DELETE");
     const operation = getSelectedOperation();
     prompt.appendChild(link.displayFormat(operation));
-    con.setup("Delete Link", prompt, () => {
-      operation.removeLink(link.fromPortalId, link.toPortalId);
+    const con = new ConfirmDialog(window.map, {
+      title: "Delete Link",
+      label: prompt,
+      callback: () => {
+        operation.removeLink(link.fromPortalId, link.toPortalId);
+      },
     });
     con.enable();
   },
