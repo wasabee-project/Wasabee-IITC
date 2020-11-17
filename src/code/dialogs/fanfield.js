@@ -5,7 +5,6 @@ import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const FanfieldDialog = WDialog.extend({
   statics: {
@@ -16,7 +15,6 @@ const FanfieldDialog = WDialog.extend({
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-    postToFirebase({ id: "analytics", action: FanfieldDialog.TYPE });
   },
 
   removeHooks: function () {
@@ -140,7 +138,6 @@ const FanfieldDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = FanfieldDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("FAN_FIELD3");
     this.label = wX("FAN_FIELD3");

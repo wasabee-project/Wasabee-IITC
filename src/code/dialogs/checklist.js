@@ -15,17 +15,10 @@ import {
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMe from "../me";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
     TYPE: "operationChecklist",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = OperationChecklistDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OperationChecklistDialog.TYPE });
   },
 
   addHooks: function () {

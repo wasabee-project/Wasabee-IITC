@@ -3,18 +3,11 @@ import WasabeePortal from "../portal";
 import { WDialog } from "../leafletClasses";
 import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { makeSelectedOperation } from "../selectedOp";
 
 const ImportDialog = WDialog.extend({
   statics: {
     TYPE: "importDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = ImportDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ImportDialog.TYPE });
   },
 
   addHooks: function () {

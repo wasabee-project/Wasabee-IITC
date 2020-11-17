@@ -6,7 +6,6 @@ import StarburstDialog from "../dialogs/starburst";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
 import MadridDialog from "../dialogs/madrid";
-import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({
@@ -16,7 +15,6 @@ const AutodrawsDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    postToFirebase({ id: "analytics", action: AutodrawsDialog.TYPE });
     this._map = map;
     this.menuItems = [
       {
@@ -69,7 +67,6 @@ const AutodrawsDialog = WDialog.extend({
       },
     ];
 
-    this.type = AutodrawsDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
   },
 

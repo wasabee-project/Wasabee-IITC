@@ -3,7 +3,6 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const StarburstDialog = WDialog.extend({
   statics: {
@@ -95,14 +94,12 @@ const StarburstDialog = WDialog.extend({
   },
 
   initialize: function (map = window.map, options) {
-    this.type = StarburstDialog.TYPE;
     WDialog.prototype.initialize.call(this, map, options);
     this.title = wX("STARBURST");
     this.label = wX("STARBURST TITLE");
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: StarburstDialog.TYPE });
   },
 
   starburst: function () {

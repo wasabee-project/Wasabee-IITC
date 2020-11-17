@@ -1,18 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // export screen
 const ExportDialog = WDialog.extend({
   statics: {
     TYPE: "exportDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = ExportDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ExportDialog.TYPE });
   },
 
   addHooks: function () {

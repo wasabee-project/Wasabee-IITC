@@ -1,17 +1,10 @@
 import { WDialog } from "../leafletClasses";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
 
 const ZoneSetColorDialog = WDialog.extend({
   statics: {
     TYPE: "zoneSetColorDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = ZoneSetColorDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ZoneSetColorDialog.TYPE });
   },
 
   addHooks: function () {

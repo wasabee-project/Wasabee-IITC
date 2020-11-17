@@ -2,17 +2,10 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../../lib/sortable";
 // import WasabeeTeam from "../team";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OnlineAgentList = WDialog.extend({
   statics: {
     TYPE: "OnlineAgentList",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = OnlineAgentList.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OnlineAgentList.TYPE });
   },
 
   addHooks: function () {

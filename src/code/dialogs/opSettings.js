@@ -12,7 +12,6 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { addToColorList } from "../skin";
 
 import { convertColorToHex } from "../auxiliar";
@@ -20,12 +19,6 @@ import { convertColorToHex } from "../auxiliar";
 const OpSettingDialog = WDialog.extend({
   statics: {
     TYPE: "opSettingDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = OpSettingDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OpSettingDialog.TYPE });
   },
 
   addHooks: function () {

@@ -37,6 +37,10 @@ export const WTooltip = L.Class.extend({
 });
 
 export const WDialog = L.Handler.extend({
+  statics: {
+    TYPE: "Unextended Wasabee Dialog",
+  },
+
   initialize: function (map = window.map, options) {
     if (this.type === undefined) this.type = "Unextended Wasabee Dialog";
     this._map = map;
@@ -48,6 +52,7 @@ export const WDialog = L.Handler.extend({
     this._dialog = null;
     // look for operation in options, if not set, get it
     // determine large or small screen dialog sizes
+    window.map.fire("wdialog", this);
   },
 
   enable: function () {

@@ -11,7 +11,6 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
 import GetWasabeeServer from "../server";
@@ -20,12 +19,6 @@ import { syncOp, deleteLocalOp } from "../uiCommands";
 const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = OpsDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OpsDialog.TYPE });
   },
 
   addHooks: function () {

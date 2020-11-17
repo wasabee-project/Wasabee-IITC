@@ -5,17 +5,10 @@ import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const KeysList = WDialog.extend({
   statics: {
     TYPE: "keysList",
-  },
-
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this.type = KeysList.TYPE;
-    postToFirebase({ id: "analytics", action: KeysList.TYPE });
   },
 
   addHooks: async function () {

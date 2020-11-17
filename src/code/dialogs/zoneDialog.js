@@ -1,18 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 import ZoneSetColorDialog from "./zoneSetColor";
 
 const ZoneDialog = WDialog.extend({
   statics: {
     TYPE: "zone",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = ZoneDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ZoneDialog.TYPE });
   },
 
   addHooks: function () {

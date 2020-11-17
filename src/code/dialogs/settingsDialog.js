@@ -4,7 +4,6 @@ import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
-import { postToFirebase } from "../firebaseSupport";
 import SkinDialog from "./skinDialog";
 
 // This file documents the minimum requirements of a dialog in wasabee
@@ -12,17 +11,6 @@ const SettingsDialog = WDialog.extend({
   // not strictly necessary, but good style
   statics: {
     TYPE: "settings",
-  },
-
-  // every leaflet class ought to have an initialize,
-  // inputs defined by leaflet, window.map is defined by IITC
-  // options can extended by callers
-  initialize: function (map = window.map, options) {
-    // always define type, it is used by the parent classes
-    this.type = SettingsDialog.TYPE;
-    // call the parent classes initialize as well
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: SettingsDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks

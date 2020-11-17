@@ -4,17 +4,10 @@ import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
 import { getPortalDetails } from "../uiCommands";
-import { postToFirebase } from "../firebaseSupport";
 
 const WasabeeDList = WDialog.extend({
   statics: {
     TYPE: "wasabeeDList",
-  },
-
-  initialize: function (map = window.map, options) {
-    this.type = WasabeeDList.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
   },
 
   addHooks: async function () {
