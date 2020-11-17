@@ -113,7 +113,7 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.waitGet(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        assignment.appendChild(a.formatDisplay());
+        assignment.appendChild(a.formatDisplay("all"));
       } catch (err) {
         console.error(err);
       }

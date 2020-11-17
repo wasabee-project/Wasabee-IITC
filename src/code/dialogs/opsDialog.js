@@ -186,7 +186,7 @@ const OpsDialog = WDialog.extend({
         {
           const opOwner = L.DomUtil.create("td", "opowner", opRow);
           const agent = WasabeeAgent.cacheGet(op.owner);
-          if (agent != null) opOwner.appendChild(agent.formatDisplay());
+          if (agent != null) opOwner.appendChild(agent.formatDisplay("all"));
           else if (op.local) opOwner.append(window.PLAYER.nickname);
           else {
             const placeholder = L.DomUtil.create("div", "", opOwner);
@@ -194,7 +194,7 @@ const OpsDialog = WDialog.extend({
               placeholder.textContent = "looking up: [" + op.owner + "]";
               WasabeeAgent.waitGet(op.owner).then((agent) => {
                 placeholder.remove();
-                opOwner.appendChild(agent.formatDisplay());
+                opOwner.appendChild(agent.formatDisplay("all"));
               });
             } else {
               // it is the local agent anyway

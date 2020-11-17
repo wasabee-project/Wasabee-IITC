@@ -7,7 +7,7 @@ import wX from "./wX";
 import WasabeeMe from "./me";
 
 export default class WasabeeAgent {
-  constructor(obj) {
+  constructor(obj, team = 0) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
@@ -42,14 +42,46 @@ export default class WasabeeAgent {
     this.squad = obj.squad ? obj.squad : null;
     this.state = obj.state;
 
+    this._fetched = Date.now();
+
     // push the new data into the agent cache
     this._updateCache();
+
+    // store per-team agent names in a cache
+    if (obj.displayname) {
+      if (!window.plugin.wasabee._agentDisplayNames) {
+        window.plugin.wasabee._agentDisplayNames = new Map();
+      }
+      if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) {
+        window.plugin.wasabee._agentDisplayNames.set(this.id, new Map());
+      }
+      const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
+      m.set(team, obj.displayname);
+      window.plugin.wasabee._agentDisplayNames.set(this.id, m);
+    }
+  }
+
+  _getDisplayName(teamID = 0) {
+    if (!window.plugin.wasabee._agentDisplayNames) return null;
+    if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) return null;
+    const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
+    if (m.has(teamID)) return m.get(teamID);
+    return null;
+  }
+
+  _getAllNames() {
+    if (!window.plugin.wasabee._agentDisplayNames) return null;
+    if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) return null;
+    const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
+    let out = " (";
+    for (const n of m.values()) out = out + " " + n;
+    out = out + " )";
+    return out;
   }
 
   _updateCache() {
     // if already cached, merge some values that might be present if pulled from a different team
     if (window.plugin.wasabee._agentCache.has(this.id)) {
-      window.plugin.wasabee._agentCache.set(this.id, this);
       const cached = window.plugin.wasabee._agentCache.get(this.id);
       if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
       if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
@@ -70,16 +102,22 @@ export default class WasabeeAgent {
     return null;
   }
 
-  static async waitGet(gid) {
+  static async waitGet(gid, maxAgeSeconds = 60) {
     if (!WasabeeMe.isLoggedIn()) return null;
-    // need a hold timer on this
-    /* if (window.plugin.wasabee._agentCache.has(gid)) {
-      return window.plugin.wasabee._agentCache.get(gid);
-    } */
 
+    let cached = null;
+    if (window.plugin.wasabee._agentCache.has(gid)) {
+      cached = window.plugin.wasabee._agentCache.get(gid);
+    }
+    if (cached && cached._fetched > Date.now() - 1000 * maxAgeSeconds) {
+      console.debug("returning agent from cache", cached._fetched, Date.now());
+      return cached;
+    }
+
+    console.debug("pulling server for new agent data");
     try {
       const result = await agentPromise(gid);
-      const newagent = new WasabeeAgent(result);
+      const newagent = new WasabeeAgent(result, 0);
       return newagent;
     } catch (e) {
       console.error(e);
@@ -87,7 +125,7 @@ export default class WasabeeAgent {
     return null;
   }
 
-  formatDisplay() {
+  formatDisplay(teamID = 0) {
     const display = L.DomUtil.create("a", "wasabee-agent-label");
     if (this.Vverified || this.rocks) {
       L.DomUtil.addClass(display, "enl");
@@ -100,7 +138,17 @@ export default class WasabeeAgent {
       const ad = new AgentDialog(window.map, { gid: this.id });
       ad.enable();
     });
-    display.textContent = this.name;
+    if (teamID == "all") {
+      const all = this._getAllNames();
+      if (all) {
+        display.textContent = this.name + all;
+      } else {
+        display.textContent = this.name;
+      }
+    } else {
+      const dn = this._getDisplayName(teamID);
+      display.textContent = dn ? dn : this.name;
+    }
     return display;
   }
 
@@ -108,7 +156,8 @@ export default class WasabeeAgent {
     const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
-    title.innerHTML = this.formatDisplay().outerHTML + this.timeSinceformat();
+    title.innerHTML =
+      this.formatDisplay("all").outerHTML + this.timeSinceformat();
 
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");

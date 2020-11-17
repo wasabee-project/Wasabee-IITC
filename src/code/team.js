@@ -23,7 +23,7 @@ export default class WasabeeTeam {
 
     // convert to WasabeeAgents and push them into the agent cache
     for (const agent of data.agents) {
-      this.agents.push(new WasabeeAgent(agent));
+      this.agents.push(new WasabeeAgent(agent, this.id));
     }
 
     // push into team cache

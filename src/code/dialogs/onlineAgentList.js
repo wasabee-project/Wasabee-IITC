@@ -55,7 +55,8 @@ const OnlineAgentList = WDialog.extend({
         name: wX("AGENT"),
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value, agent) => cell.appendChild(agent.formatDisplay()),
+        format: (cell, value, agent) =>
+          cell.appendChild(agent.formatDisplay("all")),
       },
       {
         name: "Last Seen",
