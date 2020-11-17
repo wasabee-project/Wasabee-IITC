@@ -35,9 +35,9 @@ const MergeDialog = WDialog.extend({
     buttons.push({
       text: "Replace",
       click: () => {
-        this._opRemote.store();
-        if (getSelectedOperation().ID == this._opRemote.ID)
-          makeSelectedOperation(this._opRemote.ID);
+        this.options.opRemote.store();
+        if (getSelectedOperation().ID == this.options.opRemote.ID)
+          makeSelectedOperation(this.options.opRemote.ID);
         this._dialog.dialog("close");
       },
     });
@@ -60,24 +60,18 @@ const MergeDialog = WDialog.extend({
     });
   },
 
-  setup: function (own, remote, callback) {
-    this._opOwn = own;
-    this._opRemote = remote;
-    this._opRebase = new WasabeeOp(remote);
-    if (callback) this._callback = callback;
-  },
-
   _buildContent: function () {
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);
     desc.textContent =
       "Do you want to merge your change with the server OP or to replace the local version by the server version ?";
 
-    const changes = this._opOwn.changes();
-    const summary = this._opRebase.applyChanges(changes, this._opOwn);
+    this._opRebase = new WasabeeOp(this.options.opRemote);
+    const changes = this.options.opOwn.changes();
+    const summary = this._opRebase.applyChanges(changes, this.options.opOwn);
     this._opRebase.cleanAll();
-    this._opRebase.remoteChanged = this._opOwn.remoteChanged;
-    this._opRebase.localchanged = this._opOwn.localchanged;
+    this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
+    this._opRebase.localchanged = this.options.opOwn.localchanged;
 
     const rebaseMessage = L.DomUtil.create("div", null, content);
     rebaseMessage.append("Rebase summary:");
