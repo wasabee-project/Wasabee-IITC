@@ -166,8 +166,7 @@ export default class WasabeeAnchor {
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const ad = new AssignDialog();
-        ad.setup(this, operation);
+        const ad = new AssignDialog(window.map, { target: this });
         ad.enable();
         marker.closePopup();
       });

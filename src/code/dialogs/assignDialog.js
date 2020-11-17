@@ -15,6 +15,7 @@ const AssignDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    this._setup();
     this._displayDialog();
   },
 
@@ -42,7 +43,8 @@ const AssignDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target) {
+  _setup: async function () {
+    const target = this.options.target;
     const operation = getSelectedOperation();
     this._dialog = null;
     this._targetID = target.ID;

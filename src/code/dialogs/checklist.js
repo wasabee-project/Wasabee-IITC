@@ -204,8 +204,7 @@ const OperationChecklistDialog = WDialog.extend({
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog();
-              ad.setup(thing);
+              const ad = new AssignDialog(window.map, { target: thing });
               ad.enable();
             });
           }

@@ -138,8 +138,7 @@ const MarkerList = WDialog.extend({
           const assigned = L.DomUtil.create("a", "", cell);
           assigned.textContent = value;
           L.DomEvent.on(cell, "click", () => {
-            const ad = new AssignDialog();
-            ad.setup(agent);
+            const ad = new AssignDialog(window.map, { target: agent });
             ad.enable();
           });
         },
