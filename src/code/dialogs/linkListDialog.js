@@ -138,8 +138,7 @@ const LinkListDialog = WDialog.extend({
           if (operation.IsServerOp() && operation.IsWritableOp()) {
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog();
-              ad.setup(link);
+              const ad = new AssignDialog(window.map, { target: link });
               ad.enable();
             });
           }
