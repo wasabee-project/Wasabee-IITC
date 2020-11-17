@@ -18,7 +18,6 @@ const SendTargetDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._setup();
     this._displayDialog();
   },
 
@@ -28,8 +27,11 @@ const SendTargetDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
+    this._html = L.DomUtil.create("div", null);
+    this._setup();
+
     this._dialog = window.dialog({
-      title: this._name,
+      title: wX("SEND TARGET AGENT"),
       html: this._html,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-sendtarget",
@@ -43,11 +45,8 @@ const SendTargetDialog = WDialog.extend({
   },
 
   _setup: async function () {
-    this._dialog = null;
-    this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = await this._getAgentMenu(this.options.target.assignedTo);
-    this._name = wX("SEND TARGET AGENT");
     this._targettype = "ad hoc target";
 
     const operation = getSelectedOperation();

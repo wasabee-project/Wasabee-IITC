@@ -26,6 +26,9 @@ const StateDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
+    // for this._name and this._html
+    this._buildContent();
+
     this._dialog = window.dialog({
       title: this._name,
       html: this._html,
@@ -40,8 +43,7 @@ const StateDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  _setup: function () {
-    this._dialog = null;
+  _buildContent: function () {
     this._targetID = this.options.target.ID;
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
@@ -76,16 +78,6 @@ const StateDialog = WDialog.extend({
     }
 
     this._html.appendChild(menu);
-  },
-
-  _buildContent: function () {
-    const content = L.DomUtil.create("div");
-    if (typeof this._label == "string") {
-      content.textContent = this._label;
-    } else {
-      content.appendChild(this._label);
-    }
-    return content;
   },
 
   _getStateMenu: function (current) {
