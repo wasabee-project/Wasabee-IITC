@@ -16,46 +16,7 @@ const LinkListDialog = WDialog.extend({
 
   initialize: function (map = window.map, options) {
     WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE");
-    this._label = wX("NO_LABEL");
-    this.placeholder = "";
-    this.current = "";
-  },
 
-  addHooks: function () {
-    if (!this._map) return;
-    WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
-    this._displayDialog();
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.updateLinkList, this);
-  },
-
-  _displayDialog: function () {
-    const buttons = {};
-    buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
-    };
-
-    this._dialog = window.dialog({
-      title: this._portal.displayName + wX("LINKS2"),
-      html: this._table.table,
-      width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
-      id: window.plugin.wasabee.static.dialogNames.linkList,
-    });
-    this._dialog.dialog("option", "buttons", buttons);
-  },
-
-  setup: function (UNUSED, portal) {
-    this._portal = portal;
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     this._table = new Sortable();
@@ -182,7 +143,39 @@ const LinkListDialog = WDialog.extend({
       },
     ];
     this._table.sortBy = 0;
-    this._table.items = operation.getLinkListFromPortal(this._portal);
+    this._table.items = operation.getLinkListFromPortal(this.options.portal);
+  },
+
+  addHooks: function () {
+    if (!this._map) return;
+    WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
+    this._displayDialog();
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabeeUIUpdate", this.updateLinkList, this);
+  },
+
+  _displayDialog: function () {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._dialog.dialog("close");
+    };
+
+    this._dialog = window.dialog({
+      title: this.options.portal.displayName + wX("LINKS2"),
+      html: this._table.table,
+      width: "auto",
+      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      closeCallback: () => {
+        this.disable();
+        delete this._dialog;
+      },
+      id: window.plugin.wasabee.static.dialogNames.linkList,
+    });
+    this._dialog.dialog("option", "buttons", buttons);
   },
 
   deleteLink: function (link) {
@@ -238,7 +231,7 @@ const LinkListDialog = WDialog.extend({
     const operation = getSelectedOperation();
     if (!this._enabled) return;
     if (this._opID == operation.ID) {
-      this._table.items = operation.getLinkListFromPortal(this._portal);
+      this._table.items = operation.getLinkListFromPortal(this.options.portal);
     } else {
       // the selected operation changed, just bail
       this._dialog.dialog("close");
