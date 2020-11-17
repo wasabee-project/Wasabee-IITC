@@ -113,8 +113,7 @@ export default class WasabeeAnchor {
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const lld = new LinkListDialog();
-      lld.setup(operation, this._portal);
+      const lld = new LinkListDialog(window.map, { portal: this._portal });
       lld.enable();
       marker.closePopup();
     });
