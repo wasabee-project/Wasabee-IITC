@@ -8,10 +8,9 @@ const ConfirmDialog = WDialog.extend({
     TYPE: "confirmDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE");
-    this._label = wX("NO_LABEL");
+  options: {
+    title: wX("NO_TITLE"),
+    label: wX("NO_LABEL"),
   },
 
   addHooks: function () {
@@ -22,7 +21,7 @@ const ConfirmDialog = WDialog.extend({
       "true"
     ) {
       console.log("expert mode: skipping dialog display");
-      if (this._callback) this._callback();
+      if (this.options.callback) this.options.callback();
     } else {
       this._displayDialog();
     }
@@ -38,16 +37,16 @@ const ConfirmDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (this._callback) this._callback();
+      if (this.options.callback) this.options.callback();
       this._dialog.dialog("close");
     };
     buttons[wX("CANCEL")] = () => {
-      if (this._cancelCallback) this._cancelCallback();
+      if (this.options.cancelCallback) this.options.cancelCallback();
       this._dialog.dialog("close");
     };
 
     this._dialog = window.dialog({
-      title: this._title,
+      title: this.options.title,
       html: this._buildContent(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-confirm",
@@ -60,19 +59,12 @@ const ConfirmDialog = WDialog.extend({
     });
   },
 
-  setup: function (title, label, callback, cancelCallback) {
-    this._title = title;
-    this._label = label;
-    if (callback) this._callback = callback;
-    if (cancelCallback) this._cancelCallback = cancelCallback;
-  },
-
   _buildContent: function () {
     const content = L.DomUtil.create("div", "title");
-    if (typeof this._label == "string") {
-      content.textContent = this._label;
+    if (typeof this.options.label == "string") {
+      content.textContent = this.options.label;
     } else {
-      content.appendChild(this._label);
+      content.appendChild(this.options.label);
     }
     return content;
   },

@@ -34,77 +34,83 @@ export function swapPortal(operation, portal) {
     return;
   }
 
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("SWAP PROMPT");
   pr.appendChild(portal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = "?";
-  con.setup(wX("SWAP TITLE"), pr, () => {
-    operation.swapPortal(portal, selectedPortal);
+  const con = new ConfirmDialog(window.map, {
+    title: wX("SWAP TITLE"),
+    label: pr,
+    callback: () => {
+      operation.swapPortal(portal, selectedPortal);
+    },
   });
   con.enable();
 }
 
 export function deletePortal(operation, portal) {
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
   pr.appendChild(portal.displayFormat());
-  con.setup(wX("DELETE ANCHOR TITLE"), pr, () => {
-    operation.removeAnchor(portal.id);
+  const con = new ConfirmDialog(window.map, {
+    title: wX("DELETE ANCHOR TITLE"),
+    label: pr,
+    callback: () => {
+      operation.removeAnchor(portal.id);
+    },
   });
   con.enable();
 }
 
 export function deleteMarker(operation, marker, portal) {
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
   pr.appendChild(portal.displayFormat());
-  con.setup(wX("DELETE MARKER TITLE"), pr, () => {
-    operation.removeMarker(marker);
+  const con = new ConfirmDialog(window.map, {
+    title: wX("DELETE MARKER TITLE"),
+    label: pr,
+    callback: () => {
+      operation.removeMarker(marker);
+    },
   });
   con.enable();
 }
 
 export function clearAllItems(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear: ${operation.name}`,
-    `Do you want to reset ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog(window.map, {
+    title: `Clear: ${operation.name}`,
+    label: `Do you want to reset ${operation.name}?`,
+    callback: () => {
       operation.clearAllItems();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
-    }
-  );
+    },
+  });
   con.enable();
 }
 
 export function clearAllLinks(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear Links: ${operation.name}`,
-    `Do you want to remove all links from ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog(window.map, {
+    title: `Clear Links: ${operation.name}`,
+    label: `Do you want to remove all links from ${operation.name}?`,
+    callback: () => {
       operation.clearAllLinks();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
-    }
-  );
+    },
+  });
   con.enable();
 }
 
 export function clearAllMarkers(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear Markers: ${operation.name}`,
-    `Do you want to remove all markers from ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog(window.map, {
+    title: `Clear Markers: ${operation.name}`,
+    label: `Do you want to remove all markers from ${operation.name}?`,
+    callback: () => {
       operation.clearAllMarkers();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
-    }
-  );
+    },
+  });
   con.enable();
 }
 
@@ -410,14 +416,17 @@ export async function syncOp(opID) {
 }
 
 export function deleteLocalOp(opname, opid) {
-  const con = new ConfirmDialog(window.map);
-  con.setup(wX("REM_LOC_CP", opname), wX("YESNO_DEL", opname), () => {
-    removeOperation(opid);
-    const newop = changeOpIfNeeded();
-    const mbr = newop.mbr;
-    if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
-      window.map.fitBounds(mbr);
-    }
+  const con = new ConfirmDialog(window.map, {
+    title: wX("REM_LOC_CP", opname),
+    label: wX("YESNO_DEL", opname),
+    callback: () => {
+      removeOperation(opid);
+      const newop = changeOpIfNeeded();
+      const mbr = newop.mbr;
+      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+        window.map.fitBounds(mbr);
+      }
+    },
   });
   con.enable();
 }

@@ -156,28 +156,31 @@ const OpSettingDialog = WDialog.extend({
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       // this should be moved to uiCommands
-      const con = new ConfirmDialog(window.map);
       const so = getSelectedOperation();
-      con.setup(wX("CON_DEL", so.name), wX("YESNO_DEL", so.name), async () => {
-        if (so.IsServerOp() && so.IsOwnedOp() && so.IsOnCurrentServer()) {
-          try {
-            await deleteOpPromise(so.ID);
-            console.log("delete from server successful");
-          } catch (e) {
-            console.error(e);
-            alert(e.toString());
+      const con = new ConfirmDialog(window.map, {
+        title: wX("CON_DEL", so.name),
+        label: wX("YESNO_DEL", so.name),
+        callback: async () => {
+          if (so.IsServerOp() && so.IsOwnedOp() && so.IsOnCurrentServer()) {
+            try {
+              await deleteOpPromise(so.ID);
+              console.log("delete from server successful");
+            } catch (e) {
+              console.error(e);
+              alert(e.toString());
+            }
           }
-        }
-        removeOperation(so.ID);
-        const newop = changeOpIfNeeded();
-        const mbr = newop.mbr;
-        if (
-          mbr &&
-          isFinite(mbr._southWest.lat) &&
-          isFinite(mbr._northEast.lat)
-        ) {
-          this._map.fitBounds(mbr);
-        }
+          removeOperation(so.ID);
+          const newop = changeOpIfNeeded();
+          const mbr = newop.mbr;
+          if (
+            mbr &&
+            isFinite(mbr._southWest.lat) &&
+            isFinite(mbr._northEast.lat)
+          ) {
+            this._map.fitBounds(mbr);
+          }
+        },
       });
       con.enable();
     });
