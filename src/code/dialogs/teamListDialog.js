@@ -49,10 +49,9 @@ const TeamListDialog = WDialog.extend({
           const link = L.DomUtil.create("a", "enl", row);
           link.href = "#";
           link.textContent = value;
-          L.DomEvent.on(link, "click", async (ev) => {
+          L.DomEvent.on(link, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const td = new TeamMembershipList();
-            await td.setup(team.ID);
+            const td = new TeamMembershipList(window.map, { teamID: team.ID });
             td.enable();
           });
         },

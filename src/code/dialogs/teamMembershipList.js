@@ -18,9 +18,11 @@ const TeamMembershipList = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
+    await this._setup();
     // sometimes we are too quick, try again
-    if (!this._team) this._team = window.plugin.wasabee.teams.get(this._teamID);
+    if (!this._team)
+      this._team = window.plugin.wasabee.teams.get(this.options.teamID);
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -41,11 +43,9 @@ const TeamMembershipList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (teamID) {
-    this._teamID = teamID;
-
+  _setup: async function () {
     try {
-      this._team = await WasabeeTeam.waitGet(teamID, 2);
+      this._team = await WasabeeTeam.waitGet(this.options.teamID, 2);
     } catch (e) {
       console.error(e);
       alert(e.toString());
@@ -62,7 +62,7 @@ const TeamMembershipList = WDialog.extend({
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) =>
-          cell.appendChild(agent.formatDisplay(this._teamID)),
+          cell.appendChild(agent.formatDisplay(this.options.teamID)),
       },
       {
         name: wX("SQUAD"),
