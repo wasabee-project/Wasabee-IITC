@@ -221,7 +221,7 @@ const SettingsDialog = WDialog.extend({
   },
 
   setServer: function () {
-    const serverDialog = new PromptDialog(window.map, {
+    const serverDialog = new PromptDialog({
       title: wX("CHANGE_WAS_SERVER"),
       label: wX("NEW_WAS_SERVER"),
       callback: () => {

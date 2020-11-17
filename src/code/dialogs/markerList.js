@@ -19,7 +19,6 @@ const MarkerList = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
@@ -100,7 +99,7 @@ const MarkerList = WDialog.extend({
           d.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const ch = new MarkerChangeDialog(window.map, { marker: marker });
+            const ch = new MarkerChangeDialog({ marker: marker });
             ch.enable();
           });
         },
@@ -114,7 +113,7 @@ const MarkerList = WDialog.extend({
           comment.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const scd = new SetCommentDialog(window.map, {
+            const scd = new SetCommentDialog({
               target: marker,
               operation: operation,
             });
@@ -139,7 +138,7 @@ const MarkerList = WDialog.extend({
           const assigned = L.DomUtil.create("a", "", cell);
           assigned.textContent = value;
           L.DomEvent.on(cell, "click", () => {
-            const ad = new AssignDialog(window.map, { target: agent });
+            const ad = new AssignDialog({ target: agent });
             ad.enable();
           });
         },

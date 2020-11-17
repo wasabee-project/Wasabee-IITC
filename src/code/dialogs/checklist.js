@@ -140,7 +140,7 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing instanceof WasabeeMarker) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ch = new MarkerChangeDialog(window.map, { marker: thing });
+              const ch = new MarkerChangeDialog({ marker: thing });
               ch.enable();
             });
           }
@@ -175,7 +175,7 @@ const OperationChecklistDialog = WDialog.extend({
           comment.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const scd = new SetCommentDialog(window.map, {
+            const scd = new SetCommentDialog({
               target: thing,
               operation: operation,
             });
@@ -205,7 +205,7 @@ const OperationChecklistDialog = WDialog.extend({
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog(window.map, { target: thing });
+              const ad = new AssignDialog({ target: thing });
               ad.enable();
             });
           }
@@ -222,7 +222,7 @@ const OperationChecklistDialog = WDialog.extend({
           a.textContent = wX(value);
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const sd = new StateDialog(window.map, {
+            const sd = new StateDialog({
               target: thing,
               opID: operation.ID,
             });

@@ -157,7 +157,7 @@ const OpSettingDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       // this should be moved to uiCommands
       const so = getSelectedOperation();
-      const con = new ConfirmDialog(window.map, {
+      const con = new ConfirmDialog({
         title: wX("CON_DEL", so.name),
         label: wX("YESNO_DEL", so.name),
         callback: async () => {
@@ -178,7 +178,7 @@ const OpSettingDialog = WDialog.extend({
             isFinite(mbr._southWest.lat) &&
             isFinite(mbr._northEast.lat)
           ) {
-            this._map.fitBounds(mbr);
+            window.map.fitBounds(mbr);
           }
         },
       });

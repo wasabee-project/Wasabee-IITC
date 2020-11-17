@@ -135,7 +135,7 @@ export default class WasabeeAgent {
     }
     L.DomEvent.on(display, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ad = new AgentDialog(window.map, { gid: this.id });
+      const ad = new AgentDialog({ gid: this.id });
       ad.enable();
     });
     if (teamID == "all") {
@@ -169,7 +169,7 @@ export default class WasabeeAgent {
         return;
       }
 
-      const d = new ConfirmDialog(window.map, {
+      const d = new ConfirmDialog({
         title: wX("SEND TARGET"),
         label: wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
         callback: async () => {
@@ -196,7 +196,7 @@ export default class WasabeeAgent {
         return;
       }
 
-      const d = new ConfirmDialog(window.map, {
+      const d = new ConfirmDialog({
         title: "Send Route to Target",
         label: "Do you really want to request the route to be sent?",
         callback: async () => {

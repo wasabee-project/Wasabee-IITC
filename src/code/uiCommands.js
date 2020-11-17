@@ -40,7 +40,7 @@ export function swapPortal(operation, portal) {
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = "?";
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: wX("SWAP TITLE"),
     label: pr,
     callback: () => {
@@ -54,7 +54,7 @@ export function deletePortal(operation, portal) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
   pr.appendChild(portal.displayFormat());
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: wX("DELETE ANCHOR TITLE"),
     label: pr,
     callback: () => {
@@ -68,7 +68,7 @@ export function deleteMarker(operation, marker, portal) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
   pr.appendChild(portal.displayFormat());
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: wX("DELETE MARKER TITLE"),
     label: pr,
     callback: () => {
@@ -79,7 +79,7 @@ export function deleteMarker(operation, marker, portal) {
 }
 
 export function clearAllItems(operation) {
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: `Clear: ${operation.name}`,
     label: `Do you want to reset ${operation.name}?`,
     callback: () => {
@@ -91,7 +91,7 @@ export function clearAllItems(operation) {
 }
 
 export function clearAllLinks(operation) {
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: `Clear Links: ${operation.name}`,
     label: `Do you want to remove all links from ${operation.name}?`,
     callback: () => {
@@ -103,7 +103,7 @@ export function clearAllLinks(operation) {
 }
 
 export function clearAllMarkers(operation) {
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: `Clear Markers: ${operation.name}`,
     label: `Do you want to remove all markers from ${operation.name}?`,
     callback: () => {
@@ -408,7 +408,7 @@ export async function syncOp(opID) {
     if (!localOp.localchanged) {
       remoteOp.store();
     } else {
-      const con = new MergeDialog(window.map, {
+      const con = new MergeDialog({
         opOwn: localOp,
         opRemote: remoteOp,
       });
@@ -418,7 +418,7 @@ export async function syncOp(opID) {
 }
 
 export function deleteLocalOp(opname, opid) {
-  const con = new ConfirmDialog(window.map, {
+  const con = new ConfirmDialog({
     title: wX("REM_LOC_CP", opname),
     label: wX("YESNO_DEL", opname),
     callback: () => {

@@ -34,8 +34,6 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description2 = L.DomUtil.create("div", "desc", container);
     description2.textContent = wX("H-GEN_INST");
@@ -196,8 +194,8 @@ const HomogeneousDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = "Homogeneous";
     this.label = "Homogeneous";
     this._operation = getSelectedOperation();
@@ -368,7 +366,7 @@ const HomogeneousDialog = WDialog.extend({
     const center = this._getCenter(one, two, three);
     for (const p of portalsCovered) {
       if (p == one.id || p == two.id || p == three.id) continue;
-      const cDist = this._map.distance(center, p.latLng || p._latlng);
+      const cDist = window.map.distance(center, p.latLng || p._latlng);
       m.set(cDist, p);
     }
     // sort by distance to centeroid the field
@@ -808,12 +806,12 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _getCenter: function (a, b, c) {
-    const A = this._map.project(a.latLng || a._latlng);
-    const B = this._map.project(b.latLng || b._latlng);
-    const C = this._map.project(c.latLng || c._latlng);
+    const A = window.map.project(a.latLng || a._latlng);
+    const B = window.map.project(b.latLng || b._latlng);
+    const C = window.map.project(c.latLng || c._latlng);
 
     const point = L.point((A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3);
-    return this._map.unproject(point);
+    return window.map.unproject(point);
   },
 
   _fieldCovers: function (a, b, c, p) {

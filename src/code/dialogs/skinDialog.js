@@ -8,8 +8,8 @@ const SkinDialog = WDialog.extend({
     TYPE: "skinDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
     this._skinSet = new Set(
@@ -18,7 +18,6 @@ const SkinDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },

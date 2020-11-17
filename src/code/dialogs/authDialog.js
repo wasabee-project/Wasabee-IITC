@@ -17,7 +17,6 @@ const AuthDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
@@ -143,7 +142,7 @@ const AuthDialog = WDialog.extend({
     changeServerButton.textContent = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const serverDialog = new PromptDialog(window.map, {
+      const serverDialog = new PromptDialog({
         title: wX("CHANGE SERVER"),
         label: wX("CHANGE SERVER PROMPT"),
         callback: () => {
@@ -163,7 +162,7 @@ const AuthDialog = WDialog.extend({
     oneTimeButton.textContent = "One Time Token Login";
     L.DomEvent.on(oneTimeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ottDialog = new PromptDialog(window.map, {
+      const ottDialog = new PromptDialog({
         title: "One Time Token",
         label: "One Time Token",
         callback: async () => {

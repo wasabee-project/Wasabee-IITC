@@ -87,7 +87,7 @@ const ZoneDialog = WDialog.extend({
       color.href = "#";
       L.DomEvent.on(color, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const zoneSetColorDialog = new ZoneSetColorDialog(window.map, {
+        const zoneSetColorDialog = new ZoneSetColorDialog({
           zone: z,
         });
         zoneSetColorDialog.enable();

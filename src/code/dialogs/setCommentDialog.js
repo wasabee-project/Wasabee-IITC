@@ -9,8 +9,8 @@ export const SetCommentDialog = WDialog.extend({
     TYPE: "setCommentDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     if (this.options.target instanceof WasabeeLink) {
       this.commentType = "link";
@@ -41,7 +41,6 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
