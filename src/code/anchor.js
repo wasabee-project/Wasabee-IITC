@@ -175,8 +175,7 @@ export default class WasabeeAnchor {
       sendButton.textContent = wX("SEND TARGET");
       L.DomEvent.on(sendButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const std = new SendTargetDialog();
-        std.setup(this, operation);
+        const std = new SendTargetDialog(window.map, { target: this });
         std.enable();
         marker.closePopup();
       });

@@ -15,6 +15,7 @@ const SendTargetDialog = WDialog.extend({
   addHooks: function () {
     if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    this._setup();
     this._displayDialog();
   },
 
@@ -42,28 +43,27 @@ const SendTargetDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target) {
+  _setup: async function () {
     this._dialog = null;
-    this._target = target;
     this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
-    const menu = await this._getAgentMenu(target.assignedTo);
+    const menu = await this._getAgentMenu(this.options.target.assignedTo);
     this._name = wX("SEND TARGET AGENT");
     this._targettype = "ad hoc target";
 
     const operation = getSelectedOperation();
 
-    if (target instanceof WasabeeMarker) {
-      const portal = operation.getPortal(target.portalId);
-      this._targettype = target.type;
+    if (this.options.target instanceof WasabeeMarker) {
+      const portal = operation.getPortal(this.options.target.portalId);
+      this._targettype = this.options.target.type;
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
     }
 
-    if (target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(target.portalId);
+    if (this.options.target instanceof WasabeeAnchor) {
+      const portal = operation.getPortal(this.options.target.portalId);
       this._targettype = "anchor";
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
@@ -96,7 +96,7 @@ const SendTargetDialog = WDialog.extend({
 
     menu.addEventListener("change", async (ev) => {
       L.DomEvent.stop(ev);
-      const portal = operation.getPortal(this._target.portalId);
+      const portal = operation.getPortal(this.options.target.portalId);
       try {
         await targetPromise(menu.value, portal, this._targettype);
         this._dialog.dialog("close");
