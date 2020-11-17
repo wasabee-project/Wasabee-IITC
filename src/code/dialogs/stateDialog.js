@@ -9,6 +9,11 @@ const StateDialog = WDialog.extend({
     TYPE: "stateDialog",
   },
 
+  options: {
+    // target
+    // opID
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._setup();

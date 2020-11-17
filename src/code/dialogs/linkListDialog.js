@@ -14,6 +14,10 @@ const LinkListDialog = WDialog.extend({
     TYPE: "linkListDialog",
   },
 
+  options: {
+    // portal
+  },
+
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
 

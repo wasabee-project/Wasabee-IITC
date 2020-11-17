@@ -9,6 +9,10 @@ const KeyListPortal = WDialog.extend({
     TYPE: "keyListPortal",
   },
 
+  options: {
+    // portalID
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.keyListUpdate, this);

@@ -11,6 +11,8 @@ const ConfirmDialog = WDialog.extend({
   options: {
     title: wX("NO_TITLE"),
     label: wX("NO_LABEL"),
+    // callback,
+    // cancelCallback
   },
 
   addHooks: function () {

@@ -7,6 +7,10 @@ const AgentDialog = WDialog.extend({
     TYPE: "agent",
   },
 
+  options: {
+    // gid
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
