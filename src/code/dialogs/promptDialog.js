@@ -8,12 +8,11 @@ const PromptDialog = WDialog.extend({
     TYPE: "promptDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE"); // should never be displayed
-    this._label = wX("NO_LABEL"); // should never be displayed
-    this.placeholder = "";
-    this.current = "";
+  options: {
+    title: wX("NO_TITLE"), // should never be displayed
+    label: wX("NO_LABEL"), // should never be displayed
+    placeholder: "",
+    current: "",
   },
 
   addHooks: function () {
@@ -29,16 +28,16 @@ const PromptDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (this._callback) this._callback();
+      if (this.options.callback) this.options.callback();
       this._dialog.dialog("close");
     };
     buttons[wX("CANCEL")] = () => {
-      if (this._cancelCallback) this._cancelCallback();
+      if (this.options.cancelCallback) this.options.cancelCallback();
       this._dialog.dialog("close");
     };
 
     this._dialog = window.dialog({
-      title: this._title,
+      title: this.options.title,
       html: this._buildContent(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-prompt",
@@ -55,25 +54,18 @@ const PromptDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: function (title, label, callback, cancelCallback) {
-    this._title = title;
-    this._label = label;
-    if (callback) this._callback = callback;
-    if (cancelCallback) this._cancelCallback = cancelCallback;
-  },
-
   _buildContent: function () {
     const content = L.DomUtil.create("div", "container");
-    if (typeof this._label == "string") {
+    if (typeof this.options.label == "string") {
       const label = L.DomUtil.create("label", null, content);
-      label.textContent = this._label;
+      label.textContent = this.options.label;
     } else {
-      content.appendChild(this._label);
+      content.appendChild(this.options.label);
     }
     this.inputField = L.DomUtil.create("input", null, content);
     this.inputField.id = "inputField";
-    this.inputField.placeholder = this.placeholder;
-    this.inputField.value = this.current;
+    this.inputField.placeholder = this.options.placeholder;
+    this.inputField.value = this.options.current;
     return content;
   },
 });

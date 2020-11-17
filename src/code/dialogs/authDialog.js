@@ -143,20 +143,19 @@ const AuthDialog = WDialog.extend({
     changeServerButton.textContent = wX("CHANGE SERVER");
     L.DomEvent.on(changeServerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const serverDialog = new PromptDialog();
-      serverDialog.setup(
-        wX("CHANGE SERVER"),
-        wX("CHANGE SERVER PROMPT"),
-        () => {
+      const serverDialog = new PromptDialog(window.map, {
+        title: wX("CHANGE SERVER"),
+        label: wX("CHANGE SERVER PROMPT"),
+        callback: () => {
           if (serverDialog.inputField.value) {
             SetWasabeeServer(serverDialog.inputField.value);
             this._server.textContent = GetWasabeeServer();
             WasabeeMe.purge();
           }
-        }
-      );
-      serverDialog.current = GetWasabeeServer();
-      serverDialog.placeholder = "https://am.wasabee.rocks";
+        },
+        current: GetWasabeeServer(),
+        placeholder: "https://am.wasabee.rocks",
+      });
       serverDialog.enable();
     });
 
@@ -164,24 +163,26 @@ const AuthDialog = WDialog.extend({
     oneTimeButton.textContent = "One Time Token Login";
     L.DomEvent.on(oneTimeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ottDialog = new PromptDialog();
-      ottDialog.setup("One Time Token", "One Time Token", async () => {
-        if (ottDialog.inputField.value) {
-          try {
-            await oneTimeToken(ottDialog.inputField.value);
-            const newme = await WasabeeMe.waitGet(true);
-            newme.store();
-            this._dialog.dialog("close");
-            fullSync();
-            postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
-          } catch (e) {
-            console.error(e);
-            alert(e.toString());
+      const ottDialog = new PromptDialog(window.map, {
+        title: "One Time Token",
+        label: "One Time Token",
+        callback: async () => {
+          if (ottDialog.inputField.value) {
+            try {
+              await oneTimeToken(ottDialog.inputField.value);
+              const newme = await WasabeeMe.waitGet(true);
+              newme.store();
+              this._dialog.dialog("close");
+              fullSync();
+              postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
+            } catch (e) {
+              console.error(e);
+              alert(e.toString());
+            }
           }
-        }
+        },
+        placeholder: "smurf-tears-4twn",
       });
-      // ott.current= "";
-      ottDialog.placeholder = "smurf-tears-4twn";
       ottDialog.enable();
     });
 

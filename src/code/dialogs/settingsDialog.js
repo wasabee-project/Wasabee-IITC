@@ -221,16 +221,18 @@ const SettingsDialog = WDialog.extend({
   },
 
   setServer: function () {
-    const serverDialog = new PromptDialog(window.map);
-    serverDialog.setup(wX("CHANGE_WAS_SERVER"), wX("NEW_WAS_SERVER"), () => {
-      if (serverDialog.inputField.value) {
-        SetWasabeeServer(serverDialog.inputField.value);
-        WasabeeMe.purge();
-      }
+    const serverDialog = new PromptDialog(window.map, {
+      title: wX("CHANGE_WAS_SERVER"),
+      label: wX("NEW_WAS_SERVER"),
+      callback: () => {
+        if (serverDialog.inputField.value) {
+          SetWasabeeServer(serverDialog.inputField.value);
+          WasabeeMe.purge();
+        }
+      },
+      current: GetWasabeeServer(),
+      placeholder: window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT,
     });
-    serverDialog.current = GetWasabeeServer();
-    serverDialog.placeholder =
-      window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT;
     serverDialog.enable();
   },
 

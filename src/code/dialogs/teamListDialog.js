@@ -177,24 +177,27 @@ const TeamListDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
     buttons[wX("NEW_TEAM")] = () => {
-      const p = new PromptDialog(window.map);
-      p.setup(wX("CREATE_NEW_TEAM"), wX("NTNAME"), async () => {
-        const newname = p.inputField.value;
-        if (!newname) {
-          alert(wX("NAME_REQ"));
-          return;
-        }
-        try {
-          await newTeamPromise(newname);
-          alert(wX("TEAM_CREATED", newname));
-          await WasabeeMe.waitGet(true); // triggers UIUpdate
-        } catch (e) {
-          console.error(e);
-          alert(e.toString());
-        }
+      const p = new PromptDialog(window.map, {
+        title: wX("CREATE_NEW_TEAM"),
+        label: wX("NTNAME"),
+        callback: async () => {
+          const newname = p.inputField.value;
+          if (!newname) {
+            alert(wX("NAME_REQ"));
+            return;
+          }
+          try {
+            await newTeamPromise(newname);
+            alert(wX("TEAM_CREATED", newname));
+            await WasabeeMe.waitGet(true); // triggers UIUpdate
+          } catch (e) {
+            console.error(e);
+            alert(e.toString());
+          }
+        },
+        current: wX("NEW_TEAM_NAME"),
+        placeholder: wX("AMAZ_TEAM_NAME"),
       });
-      p.current = wX("NEW_TEAM_NAME");
-      p.placeholder = wX("AMAZ_TEAM_NAME");
       p.enable();
     };
 

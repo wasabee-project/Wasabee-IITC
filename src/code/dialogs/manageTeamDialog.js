@@ -60,11 +60,10 @@ const ManageTeamDialog = WDialog.extend({
           button.textContent = value;
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const squadDialog = new PromptDialog(window.map);
-            squadDialog.setup(
-              `Set Squad for ${obj.name}`,
-              "Squad",
-              async () => {
+            const squadDialog = new PromptDialog(window.map, {
+              title: `Set Squad for ${obj.name}`,
+              label: "Squad",
+              callback: async () => {
                 if (squadDialog.inputField.value) {
                   try {
                     await setAgentTeamSquadPromise(
@@ -87,10 +86,10 @@ const ManageTeamDialog = WDialog.extend({
                 } else {
                   alert(wX("INPUT_SQUAD_NAME"));
                 }
-              }
-            );
-            squadDialog.current = value;
-            squadDialog.placeholder = "boots";
+              },
+              current: value,
+              placeholder: "boots",
+            });
             squadDialog.enable();
           });
         },
