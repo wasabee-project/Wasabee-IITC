@@ -408,8 +408,10 @@ export async function syncOp(opID) {
     if (!localOp.localchanged) {
       remoteOp.store();
     } else {
-      const con = new MergeDialog();
-      con.setup(localOp, remoteOp);
+      const con = new MergeDialog(window.map, {
+        opOwn: localOp,
+        opRemote: remoteOp,
+      });
       con.enable();
     }
   }
