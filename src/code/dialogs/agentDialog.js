@@ -7,11 +7,6 @@ const AgentDialog = WDialog.extend({
     TYPE: "agent",
   },
 
-  initialize: function (map = window.map, options) {
-    this._gid = options.gid;
-    WDialog.prototype.initialize.call(this, map, options);
-  },
-
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
@@ -26,7 +21,7 @@ const AgentDialog = WDialog.extend({
     const agent = L.DomUtil.create("div", null, html);
 
     try {
-      const data = await WasabeeAgent.waitGet(this._gid);
+      const data = await WasabeeAgent.waitGet(this.options.gid);
       const name = L.DomUtil.create("h2", "enl, wasabee-agent-label", agent);
       name.textContent = data.name;
       const vLabel = L.DomUtil.create("label", null, agent);
