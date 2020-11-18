@@ -51,16 +51,6 @@ export const WDialog = L.Handler.extend({
     window.map.fire("wdialog", this);
   },
 
-  enable: function () {
-    if (this._enabled) return;
-    L.Handler.prototype.enable.call(this);
-  },
-
-  disable: function () {
-    if (!this._enabled) return;
-    L.Handler.prototype.disable.call(this);
-  },
-
   addHooks: function () {},
 
   removeHooks: function () {},
