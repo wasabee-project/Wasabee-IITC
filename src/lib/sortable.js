@@ -6,7 +6,7 @@ export default class Sortable {
     this._sortAsc = false; // ascending or descending
     this._table = L.DomUtil.create("table", "wasabee-table");
 
-    // these really don't need to be defined here yet, since they are setup when the fields/items come in
+    // create this once for all
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
 
@@ -59,6 +59,8 @@ export default class Sortable {
   }
 
   set items(incoming) {
+    // clear body
+    this._body.textContent = '';
     let index = 0;
     this._items = incoming.map((obj) => {
       const row = L.DomUtil.create("tr");
@@ -75,25 +77,25 @@ export default class Sortable {
         const value = field.value(obj);
         // data.values.push(value);
 
-	if (value != null && typeof obj.then === 'function') {
+        if (value != null && typeof obj.then === 'function') {
           console.log("testing resolving promises", obj);
-	    obj.then(
-	      (resolve) => {
-	        data.value.push(resolve);
+            obj.then(
+              (resolve) => {
+                data.value.push(resolve);
               },
-	      (reject) => {
+              (reject) => {
                 console.log(reject);
-	        data.value.push("rejected");
-	      }
-	    );
-	} else {
-	  // not a promise, just use it directly
+                data.value.push("rejected");
+              }
+            );
+        } else {
+          // not a promise, just use it directly
           data.values.push(value);
-	}
+        }
 
-	// calculate sortValue using the field's rules if required
-	let sortValue = value;
-        if (field.sortValue) sortValue = field.sortValue(value, obj); 
+        // calculate sortValue using the field's rules if required
+        let sortValue = value;
+        if (field.sortValue) sortValue = field.sortValue(value, obj);
         data.sortValues.push(sortValue);
 
         const cell = row.insertCell(-1);
@@ -122,9 +124,8 @@ export default class Sortable {
   }
 
   renderHead() {
-    delete this._head;
-    this._head = L.DomUtil.create("thead", null, this._table);
-
+    // clear header
+    this._head.textContent = '';
     const titleRow = this._head.insertRow(-1);
     for (const [index, field] of this._fields.entries()) {
       const cell = L.DomUtil.create("th", null, titleRow);
@@ -136,7 +137,7 @@ export default class Sortable {
           cell,
           "click",
           (ev) => {
-	    L.DomEvent.stop(ev);
+            L.DomEvent.stop(ev);
             for (const element of titleRow.children) {
               L.DomUtil.removeClass(element, "sorted");
               L.DomUtil.removeClass(element, "asc");
@@ -157,9 +158,6 @@ export default class Sortable {
   }
 
   sort() {
-    delete this._body;
-    this._body = L.DomUtil.create("tbody", null, this._table);
-
     const sortfield = this._fields[this._sortBy];
 
     this._items.sort((a, b) => {
@@ -168,11 +166,11 @@ export default class Sortable {
 
       let l = 0;
       // if the field defined a sort function, use that
-      if (sortfield.sort) { 
+      if (sortfield.sort) {
         l = sortfield.sort(aval, bval, a.obj, b.obj)
       } else {
         // otherwise use simple sort
-	if (aval > bval) l = 1;
+      if (aval > bval) l = 1;
         if (bval > aval) l = -1;
       }
       // if two values are the same, preserve previous order
