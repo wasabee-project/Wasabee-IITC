@@ -1209,6 +1209,7 @@ export default class WasabeeOp {
         assignment: 0,
         duplicate: 0,
         singlePortalLink: 0,
+        removed: 0,
       },
     };
     for (const p of op.opportals) {
@@ -1335,6 +1336,7 @@ export default class WasabeeOp {
         const portal = this.getPortal(e.portal.id);
         for (const [k, v] of e.diff) portal[k] = v;
       } else if (e.type == "link") {
+        let found = false;
         for (const l of this.links) {
           if (l.ID == e.link.ID) {
             const link = this.getLinkByPortalIDs(
@@ -1357,10 +1359,13 @@ export default class WasabeeOp {
                   summary.edition.assignment += 1;
               }
             }
+            found = true;
             break;
           }
         }
+        if (!found) summary.edition.removed += 1;
       } else if (e.type == "marker") {
+        let found = false;
         for (const m of this.markers) {
           if (m.ID == e.marker.ID) {
             const markers = this.getPortalMarkers(e.marker.portalId);
@@ -1375,9 +1380,11 @@ export default class WasabeeOp {
               if (e.diff.some((kv) => kv[0] == "assignedTo"))
                 summary.edition.assignment += 1;
             }
+            found = true;
             break;
           }
         }
+        if (!found) summary.edition.removed += 1;
       }
     }
     return summary;
