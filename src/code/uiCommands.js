@@ -377,13 +377,14 @@ export async function fullSync() {
       const localOp = WasabeeOp.load(newop.ID);
       if (!localOp || !localOp.localchanged) newop.store();
       else if (localOp.lasteditid != newop.lasteditid) {
-        if (localOp.ID != so.ID) {
-          localOp.remoteChanged = true;
-          localOp.store();
-        } else {
-          so.remoteChanged = true;
-          so.store();
-        }
+        // partial update on fields the server is always right
+        // XXX: do we need zone for teamlist consistency ?
+        const op = localOp.ID != so.ID ? localOp : so;
+        op.teamlist = newop.teamlist;
+        // XXX: do we assume that a user won't set those unless connected ?
+        // op.keyonhand = newop.keyonhand;
+        op.remoteChanged = true;
+        op.store();
       }
     }
 
