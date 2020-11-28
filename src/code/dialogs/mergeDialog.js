@@ -70,26 +70,55 @@ const MergeDialog = WDialog.extend({
     this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
     this._opRebase.localchanged = this.options.opOwn.localchanged;
 
-    const rebaseMessage = L.DomUtil.create("div", null, content);
+    content.appendChild(this.formatSummary(summary));
+    return content;
+  },
+
+  formatSummary(summary) {
+    const rebaseMessage = L.DomUtil.create("div");
     rebaseMessage.append("Rebase summary:");
     const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
+    const list = [];
     if (!summary.compatibility.ok)
-      L.DomUtil.create(
-        "li",
-        null,
-        rebaseList
-      ).textContent = `old OP detected, merge ${summary.compatibility.rewrite.link} links and ${summary.compatibility.rewrite.marker} markers`;
-    for (const li of [
-      `add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones`,
-      `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`,
-      `ignore ${summary.edition.duplicate} new duplicates`,
-      `edit ${summary.edition.link} links and ${summary.edition.marker} markers`,
-      `delete ${summary.edition.singlePortalLink} single portal links`,
-      `change ${summary.edition.assignment} assignments`,
-    ])
-      L.DomUtil.create("li", null, rebaseList).textContent = li;
+      list.push(
+        `old OP detected, merge ${summary.compatibility.rewrite.link} links and ${summary.compatibility.rewrite.marker} markers`
+      );
+    if (
+      summary.addition.link + summary.addition.marker + summary.addition.zone >
+      0
+    )
+      list.push(
+        `add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones`
+      );
+    if (summary.addition.ignored > 0)
+      list.push(
+        `ignore ${summary.addition.ignored} new portals/links/markers already present on remote`
+      );
+    if (summary.deletion.link + summary.deletion.marker > 0)
+      list.push(
+        `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`
+      );
+    if (summary.edition.link + summary.edition.marker > 0)
+      list.push(
+        `edit ${summary.edition.link} links and ${summary.edition.marker} markers`
+      );
+    if (summary.edition.duplicate > 0)
+      list.push(`ignore ${summary.edition.duplicate} new duplicates`);
+    if (summary.edition.removed > 0)
+      list.push(
+        `ignore ${summary.edition.removed} links and markers removed from remote`
+      );
+    if (summary.edition.singlePortalLink > 0)
+      list.push(
+        `delete ${summary.edition.singlePortalLink} single portal links`
+      );
+    if (summary.edition.assignment > 0)
+      list.push(`change ${summary.edition.assignment} assignments`);
 
-    return content;
+    for (const item of list)
+      L.DomUtil.create("li", null, rebaseList).textContent = item;
+
+    return rebaseMessage;
   },
 });
 

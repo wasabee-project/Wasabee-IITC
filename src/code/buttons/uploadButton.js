@@ -119,7 +119,7 @@ const UploadButton = WButton.extend({
         `old OP detected, merge ${summary.compatibility.rewrite.link} links and ${summary.compatibility.rewrite.marker} markers`
       );
     if (
-      summary.addition.link + summary.addition.markers + summary.addition.zone >
+      summary.addition.link + summary.addition.marker + summary.addition.zone >
       0
     )
       list.push(
@@ -129,11 +129,11 @@ const UploadButton = WButton.extend({
       list.push(
         `ignore ${summary.addition.ignored} new portals/links/markers already present on remote`
       );
-    if (summary.deletion.link + summary.deletion.markers > 0)
+    if (summary.deletion.link + summary.deletion.marker > 0)
       list.push(
         `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`
       );
-    if (summary.edition.link + summary.edition.markers > 0)
+    if (summary.edition.link + summary.edition.marker > 0)
       list.push(
         `edit ${summary.edition.link} links and ${summary.edition.marker} markers`
       );
