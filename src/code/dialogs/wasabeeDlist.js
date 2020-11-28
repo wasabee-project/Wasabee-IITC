@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";

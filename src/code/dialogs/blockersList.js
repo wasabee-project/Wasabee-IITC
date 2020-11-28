@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import { getSelectedOperation } from "../selectedOp";
 import {
   listenForAddedPortals,

@@ -12,7 +12,7 @@ import {
 } from "../server";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";

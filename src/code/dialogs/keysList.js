@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";

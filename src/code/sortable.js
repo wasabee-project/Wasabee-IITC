@@ -53,21 +53,21 @@ export default class Sortable {
   }
 
   get items() {
-    return this._items.map((a) =>  {
+    return this._items.map((a) => {
       return a.obj;
     });
   }
 
   set items(incoming) {
     // clear body
-    this._body.textContent = '';
+    this._body.textContent = "";
     let index = 0;
     this._items = incoming.map((obj) => {
       const row = L.DomUtil.create("tr");
       const data = {
         obj: obj, // the raw value passed in
-        row: row,  // the complete DOM for the row -- drawn by sort()
-        index: index,  // the position in the list, set & used by sort()
+        row: row, // the complete DOM for the row -- drawn by sort()
+        index: index, // the position in the list, set & used by sort()
         values: [], // the computed values for this row
         sortValues: [], // the computed sort values for this row
       };
@@ -77,17 +77,17 @@ export default class Sortable {
         const value = field.value(obj);
         // data.values.push(value);
 
-        if (value != null && typeof obj.then === 'function') {
+        if (value != null && typeof obj.then === "function") {
           console.log("testing resolving promises", obj);
-            obj.then(
-              (resolve) => {
-                data.value.push(resolve);
-              },
-              (reject) => {
-                console.log(reject);
-                data.value.push("rejected");
-              }
-            );
+          obj.then(
+            (resolve) => {
+              data.value.push(resolve);
+            },
+            (reject) => {
+              console.log(reject);
+              data.value.push("rejected");
+            }
+          );
         } else {
           // not a promise, just use it directly
           data.values.push(value);
@@ -125,12 +125,13 @@ export default class Sortable {
 
   renderHead() {
     // clear header
-    this._head.textContent = '';
+    this._head.textContent = "";
     const titleRow = this._head.insertRow(-1);
     for (const [index, field] of this._fields.entries()) {
       const cell = L.DomUtil.create("th", null, titleRow);
       cell.textContent = field.name;
-      if (field.smallScreenHide && this._smallScreen) cell.style.display = "none";
+      if (field.smallScreenHide && this._smallScreen)
+        cell.style.display = "none";
       if (field.sort !== null) {
         L.DomUtil.addClass(cell, "sortable");
         L.DomEvent.on(
@@ -167,15 +168,15 @@ export default class Sortable {
       let l = 0;
       // if the field defined a sort function, use that
       if (sortfield.sort) {
-        l = sortfield.sort(aval, bval, a.obj, b.obj)
+        l = sortfield.sort(aval, bval, a.obj, b.obj);
       } else {
         // otherwise use simple sort
-      if (aval > bval) l = 1;
+        if (aval > bval) l = 1;
         if (bval > aval) l = -1;
       }
       // if two values are the same, preserve previous order
       if (l == 0) l = a.index - b.index;
-      return (this._sortAsc ? -l : l);
+      return this._sortAsc ? -l : l;
     });
 
     for (const [index, item] of this._items.entries()) {
