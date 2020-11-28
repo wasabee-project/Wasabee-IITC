@@ -1198,6 +1198,7 @@ export default class WasabeeOp {
         link: 0,
         marker: 0,
         zone: 0,
+        ignored: 0,
       },
       deletion: {
         link: 0,
@@ -1317,17 +1318,18 @@ export default class WasabeeOp {
     }
     // `this` takes over `changes` for additions
     for (const a of changes.addition) {
-      if (a.type == "portal") this._addPortal(a.portal);
-      else if (a.type == "link") {
+      if (a.type == "portal") {
+        if (!this._addPortal(a.portal)) summary.addition.ignored += 1;
+      } else if (a.type == "link") {
         if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
           this.links.push(a.link);
           summary.addition.link += 1;
-        }
+        } else summary.addition.ignored += 1;
       } else if (a.type == "marker") {
         if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
           this.markers.push(a.marker);
           summary.addition.marker += 1;
-        }
+        } else summary.addition.ignored += 1;
       }
     }
     // links/markers absent from `this` are not added back

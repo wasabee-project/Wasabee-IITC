@@ -125,6 +125,10 @@ const UploadButton = WButton.extend({
       list.push(
         `add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones`
       );
+    if (summary.addition.ignored > 0)
+      list.push(
+        `ignore ${summary.addition.ignored} new portals/links/markers already present on remote`
+      );
     if (summary.deletion.link + summary.deletion.markers > 0)
       list.push(
         `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`
