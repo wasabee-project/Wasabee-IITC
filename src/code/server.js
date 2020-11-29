@@ -110,8 +110,8 @@ export function statOpPromise(opID) {
   return genericGet(`/api/v1/draw/${opID}/stat`);
 }
 
-// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
-// use WasabeeTeam.waitGet and WasabeeTeam.cacheGet
+// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
+// use WasabeeTeam.get
 export function teamPromise(teamid) {
   return genericGet(`/api/v1/team/${teamid}`);
 }

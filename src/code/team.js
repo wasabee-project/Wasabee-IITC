@@ -13,41 +13,57 @@ export default class WasabeeTeam {
       }
     }
 
-    this.agents = new Array();
     this.id = data.id;
     this.name = data.name;
-    this.fetched = Date.now();
+    this.date = Date.now();
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
 
-    // convert to WasabeeAgents and push them into the agent cache
-    for (const agent of data.agents) {
-      this.agents.push(new WasabeeAgent(agent, this.id));
-    }
+    // from team cache: use as is
+    if (data.agentIDs) this.agentIDs = data.agentIDs;
 
-    // push into team cache
-    window.plugin.wasabee.teams.set(this.id, this);
+    // from server
+    if (data.agents) {
+      this.agentIDs = new Array(); // use this now
+      for (const agent of data.agents) {
+        const a = new WasabeeAgent(agent, this.id); // push to agent cache
+        this.agentIDs.push(a.id); // we only need the id here
+      }
+      this._updateCache();
+    }
   }
 
-  static cacheGet(teamID) {
-    if (window.plugin.wasabee.teams.has(teamID)) {
-      return window.plugin.wasabee.teams.get(teamID);
+  async agents() {
+    const p = new Array();
+    for (const id of this.agentIDs) p.push(WasabeeAgent.get(id));
+    const agents = new Array();
+    const results = await Promise.allSettled(p);
+    for (const result of results) {
+      if (result.status == "fulfilled") {
+        agents.push(result.value);
+      } else {
+        console.log(result.status, result.reason);
+      }
     }
-    return null;
+    return agents;
   }
 
-  static async waitGet(teamID, maxAgeSeconds = 60) {
-    if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamID)) {
-      const t = window.plugin.wasabee.teams.get(teamID);
-      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        // console.debug("returning team from cache");
+  async _updateCache() {
+    await window.plugin.wasabee.idb.put("teams", this);
+  }
+
+  static async get(teamID, maxAgeSeconds = 60) {
+    if (!WasabeeMe.isLoggedIn()) return null;
+
+    const cached = await window.plugin.wasabee.idb.get("teams", teamID);
+    if (cached) {
+      const t = new WasabeeTeam(cached);
+      if (t.date > Date.now() - 1000 * maxAgeSeconds) {
         t.cached = true;
         return t;
       }
     }
-
-    if (!WasabeeMe.isLoggedIn()) return null;
 
     try {
       const t = await teamPromise(teamID);

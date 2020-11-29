@@ -79,7 +79,7 @@ export default class WasabeeAgent {
     return out;
   }
 
-  _updateCache() {
+  async _updateCache() {
     // if already cached, merge some values that might be present if pulled from a different team
     if (window.plugin.wasabee._agentCache.has(this.id)) {
       const cached = window.plugin.wasabee._agentCache.get(this.id);
@@ -88,6 +88,7 @@ export default class WasabeeAgent {
       // XXX do something with displayname to ensure that name is the "real" name?
     }
     window.plugin.wasabee._agentCache.set(this.id, this);
+    await window.plugin.wasabee.idb.put("agents", this);
   }
 
   get latLng() {
@@ -95,6 +96,13 @@ export default class WasabeeAgent {
     return null;
   }
 
+  // TBD
+  static async get(gid) {
+    const r = await this.waitGet(gid, 60);
+    return r;
+  }
+
+  // deprecated
   static cacheGet(gid) {
     if (window.plugin.wasabee._agentCache.has(gid)) {
       return window.plugin.wasabee._agentCache.get(gid);
@@ -102,6 +110,7 @@ export default class WasabeeAgent {
     return null;
   }
 
+  // deprecated
   static async waitGet(gid, maxAgeSeconds = 60) {
     if (!WasabeeMe.isLoggedIn()) return null;
 

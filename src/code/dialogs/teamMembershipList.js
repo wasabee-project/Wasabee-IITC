@@ -23,8 +23,8 @@ const TeamMembershipList = WDialog.extend({
   _displayDialog: async function () {
     const table = this._setupTable();
 
-    const team = await WasabeeTeam.waitGet(this.options.teamID, 2);
-    table.items = team.agents;
+    const team = await WasabeeTeam.get(this.options.teamID, 2);
+    table.items = await team.agents();
 
     const buttons = {};
     buttons[wX("OK")] = () => {

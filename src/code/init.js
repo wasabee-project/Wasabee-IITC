@@ -9,6 +9,7 @@ import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
 import WasabeeMe from "./me";
+import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = () => {
@@ -32,6 +33,8 @@ window.plugin.wasabee.init = () => {
   Wasabee.onlineAgents = new Map();
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
+
+  initIdb();
 
   initSkin();
   // can this be moved to the auth dialog?
@@ -170,4 +173,17 @@ function initGoogleAPI() {
   (document.body || document.head || document.documentElement).appendChild(
     script
   );
+}
+
+// experiment with IndexDB
+async function initIdb() {
+  Wasabee.idb = await openDB("wasabee", 1, {
+    upgrade(db) {
+      const agents = db.createObjectStore("agents", { keyPath: "id" });
+      agents.createIndex("date", "date");
+      agents.createIndex("name", "name");
+      const teams = db.createObjectStore("teams", { keyPath: "id" });
+      teams.createIndex("date", "date");
+    },
+  });
 }
