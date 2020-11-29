@@ -1213,6 +1213,8 @@ export default class WasabeeOp {
         removed: 0,
       },
     };
+
+    // merge portals
     for (const p of op.opportals) {
       this._addPortal(p);
     }
@@ -1319,7 +1321,7 @@ export default class WasabeeOp {
     // `this` takes over `changes` for additions
     for (const a of changes.addition) {
       if (a.type == "portal") {
-        if (!this._addPortal(a.portal)) summary.addition.ignored += 1;
+        // already done
       } else if (a.type == "link") {
         if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
           this.links.push(a.link);

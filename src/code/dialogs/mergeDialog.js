@@ -61,7 +61,9 @@ const MergeDialog = WDialog.extend({
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);
     desc.textContent =
-      "Do you want to merge your change with the server OP or to replace the local version by the server version ?";
+      `It seems that ${this.options.opOwn.name} has local changes. ` +
+      "Do you want to merge your modifications with the server OP or to replace the local version by the server version? " +
+      "(or leave it for later)";
 
     this._opRebase = new WasabeeOp(this.options.opRemote);
     const changes = this.options.opOwn.changes();
@@ -75,9 +77,6 @@ const MergeDialog = WDialog.extend({
   },
 
   formatSummary(summary) {
-    const rebaseMessage = L.DomUtil.create("div");
-    rebaseMessage.append("Rebase summary:");
-    const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
     const list = [];
     if (!summary.compatibility.ok)
       list.push(
@@ -115,8 +114,16 @@ const MergeDialog = WDialog.extend({
     if (summary.edition.assignment > 0)
       list.push(`change ${summary.edition.assignment} assignments`);
 
-    for (const item of list)
-      L.DomUtil.create("li", null, rebaseList).textContent = item;
+    const rebaseMessage = L.DomUtil.create("div");
+    rebaseMessage.append("Rebase summary:");
+
+    if (list.length > 0) {
+      const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
+      for (const item of list)
+        L.DomUtil.create("li", null, rebaseList).textContent = item;
+    } else {
+      rebaseMessage.textContent = "No local change detected...";
+    }
 
     return rebaseMessage;
   },

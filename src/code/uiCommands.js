@@ -383,6 +383,15 @@ export async function fullSync() {
         op.teamlist = newop.teamlist;
         op.remoteChanged = true;
         op.store();
+
+        // In case of selected op, suggest merge to the user
+        if (so === op) {
+          const con = new MergeDialog({
+            opOwn: so,
+            opRemote: newop,
+          });
+          con.enable();
+        }
       }
     }
 

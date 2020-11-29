@@ -188,6 +188,7 @@
   "MARKER STATE PROMPT": "Marker Status",
   "MARKER STATE": " Set marker state",
   "MAX": "Fan Field",
+  "MERGE_TITLE": "Merge local&remote OP",
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": " (${value} minutes ago)",
   "MM": "Multimax",
