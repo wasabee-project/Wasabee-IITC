@@ -381,8 +381,6 @@ export async function fullSync() {
         // XXX: do we need zone for teamlist consistency ?
         const op = localOp.ID != so.ID ? localOp : so;
         op.teamlist = newop.teamlist;
-        // XXX: do we assume that a user won't set those unless connected ?
-        // op.keyonhand = newop.keyonhand;
         op.remoteChanged = true;
         op.store();
       }
