@@ -240,7 +240,8 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
     // we don't need to draw if pulled from cache
     if (team.cached === true) return done;
 
-    for await (const agent of team.agents()) {
+    const agents = await team.agents();
+    for (const agent of agents) {
       if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
         done.push(agent.id);
     }
@@ -287,10 +288,10 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     // marker.off("click", agent.openPopup, agent);
     marker.on(
       "click spiderfiedclick",
-      (ev) => {
+      async (ev) => {
         L.DomEvent.stop(ev);
         if (marker.isPopupOpen && marker.isPopupOpen()) return;
-        const a = window.plugin.wasabee._agentCache.get(agent.id);
+        const a = await WasabeeAgent.get(agent.id);
         marker.setPopupContent(a.getPopup());
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");

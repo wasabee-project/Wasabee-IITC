@@ -77,7 +77,7 @@ export default class WasabeeAgent {
     // if we have these from another team, hold onto it
     const cached = await window.plugin.wasabee.idb.get("agents", this.id);
     if (cached) {
-      console.log("updatecache pulled", cached);
+      // console.log("updatecache pulled", cached);
       if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
       if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
       this.teamData = cached.teamData;
@@ -95,8 +95,8 @@ export default class WasabeeAgent {
       this.teamData.set(this.forTeam, teamData);
     }
 
-    console.log("writing agent to idb", this);
     try {
+      // console.log("writing agent to idb", this);
       await window.plugin.wasabee.idb.put("agents", this);
     } catch (e) {
       console.log(e);
@@ -112,7 +112,7 @@ export default class WasabeeAgent {
   static async get(gid, teamID = 0, maxAgeSeconds = 86400) {
     const cached = await window.plugin.wasabee.idb.get("agents", gid);
     if (cached) {
-      console.log("get agent from idb", cached);
+      // console.log("get agent from idb", cached);
       const a = new WasabeeAgent(cached, teamID, false);
       if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
         // resolve team specific stuff
@@ -126,7 +126,7 @@ export default class WasabeeAgent {
         }
         a.cached = true;
         delete a.teamData;
-        console.log("returning from cache", a);
+        // console.log("returning from cache", a);
         return a;
       }
     }

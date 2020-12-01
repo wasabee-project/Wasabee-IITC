@@ -28,9 +28,6 @@ window.plugin.wasabee.init = () => {
   }
 
   Wasabee._selectedOp = null; // the in-memory working op;
-  Wasabee.teams = new Map();
-  Wasabee._agentCache = new Map();
-  Wasabee.onlineAgents = new Map();
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
 
@@ -180,10 +177,10 @@ async function initIdb() {
   Wasabee.idb = await openDB("wasabee", 1, {
     upgrade(db) {
       const agents = db.createObjectStore("agents", { keyPath: "id" });
-      agents.createIndex("fetched", "fetched");
-      agents.createIndex("name", "name");
+      agents.createIndex("date", "date"); // last location change
+      agents.createIndex("fetched", "fetched"); // last pull from server
       const teams = db.createObjectStore("teams", { keyPath: "id" });
-      teams.createIndex("fetched", "fetched");
+      teams.createIndex("fetched", "fetched"); // last pull from server
     },
   });
 }
