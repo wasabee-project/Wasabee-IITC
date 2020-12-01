@@ -113,7 +113,7 @@ export default class WasabeeAgent {
     const cached = await window.plugin.wasabee.idb.get("agents", gid);
     if (cached) {
       console.log("get agent from idb", cached);
-      const a = new WasabeeAgent(cached);
+      const a = new WasabeeAgent(cached, teamID, false);
       if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
         // resolve team specific stuff
         if (a.teamData && a.teamData.has(teamID)) {
@@ -136,7 +136,7 @@ export default class WasabeeAgent {
     console.debug("pulling server for new agent data");
     try {
       const result = await agentPromise(gid);
-      return new WasabeeAgent(result, 0, false);
+      return new WasabeeAgent(result, teamID, true);
     } catch (e) {
       console.error(e);
     }
