@@ -377,20 +377,32 @@ export async function fullSync() {
       const localOp = WasabeeOp.load(newop.ID);
       if (!localOp || !localOp.localchanged) newop.store();
       else if (localOp.lasteditid != newop.lasteditid) {
-        // partial update on fields the server is always right
-        // XXX: do we need zone for teamlist consistency ?
         const op = localOp.ID != so.ID ? localOp : so;
-        op.teamlist = newop.teamlist;
-        op.remoteChanged = true;
-        op.store();
+        // check if there are really local changes
+        // XXX: this may be too long to do
+        const changes = op.changes();
+        if (
+          changes.addition.length +
+            changes.edition.length +
+            changes.deletion.length ==
+          0
+        ) {
+          newop.store();
+        } else {
+          // partial update on fields the server is always right
+          // XXX: do we need zone for teamlist consistency ?
+          op.teamlist = newop.teamlist;
+          op.remoteChanged = true;
+          op.store();
 
-        // In case of selected op, suggest merge to the user
-        if (so === op) {
-          const con = new MergeDialog({
-            opOwn: so,
-            opRemote: newop,
-          });
-          con.enable();
+          // In case of selected op, suggest merge to the user
+          if (so === op) {
+            const con = new MergeDialog({
+              opOwn: so,
+              opRemote: newop,
+            });
+            con.enable();
+          }
         }
       }
     }
