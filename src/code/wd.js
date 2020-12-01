@@ -204,7 +204,7 @@ async function getMarkerPopup(PortalID) {
     const submap = window.plugin.wasabee._Dkeys.get(PortalID);
     for (const [k, v] of submap) {
       if (k != "loaded") {
-        const a = await WasabeeAgent.waitGet(v.GID);
+        const a = await WasabeeAgent.get(v.GID);
         const li = L.DomUtil.create("li", null, ul);
         if (a) {
           li.appendChild(a.formatDisplay());

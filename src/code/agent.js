@@ -7,7 +7,7 @@ import wX from "./wX";
 import WasabeeMe from "./me";
 
 export default class WasabeeAgent {
-  constructor(obj, team = 0) {
+  constructor(obj, team = 0, cache = true) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
@@ -17,8 +17,9 @@ export default class WasabeeAgent {
       }
     }
 
+    // things which are stable across all teams
     this.id = obj.id;
-    this.name = obj.name; // XXX gets messy in the cache if team display name is set
+    this.name = obj.name; // the primary name known to wasabee
     this.level = obj.level ? Number(obj.level) : 0;
     this.enlid = obj.enlid ? obj.enlid : 0;
     this.pic = obj.pic ? obj.pic : null;
@@ -27,68 +28,79 @@ export default class WasabeeAgent {
     this.rocks = obj.rocks ? obj.rocks : false;
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
-    this.date = obj.date ? obj.date : null;
-    this.cansendto = obj.cansendto ? obj.cansendto : false; // never true from a team pull
-    this.ShareWD = obj.ShareWD;
-    this.LoadWD = obj.LoadWD;
+    this.date = obj.date ? obj.date : null; // last location sub, not fetched
     this.startlat = obj.startlat ? obj.startlat : 0;
     this.startlng = obj.startlng ? obj.startlng : 0;
     this.startradius = obj.startradius ? Number(obj.startradius) : 0;
     this.sharestart = obj.sharestart ? obj.sharestart : false;
 
-    // distance, dispayname, squad and state are meaningless in the cache since you cannot know which team set them
+    // server only sets this on direct pulls
+    this.cansendto = obj.cansendto ? obj.cansendto : false; // never true from a team pull
+
+    // vary per-team
+    this.ShareWD = obj.ShareWD;
+    this.LoadWD = obj.LoadWD;
     this.distance = obj.distance ? Number(obj.distance) : 0; // don't use this
     this.displayname = obj.displayname ? obj.displayname : "";
     this.squad = obj.squad ? obj.squad : null;
     this.state = obj.state;
 
-    this._fetched = Date.now();
+    // not sent by server
+    this.fetched = Date.now();
+    this.forTeam = team;
 
     // push the new data into the agent cache
-    this._updateCache();
-
-    // store per-team agent names in a cache
-    if (obj.displayname) {
-      if (!window.plugin.wasabee._agentDisplayNames) {
-        window.plugin.wasabee._agentDisplayNames = new Map();
-      }
-      if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) {
-        window.plugin.wasabee._agentDisplayNames.set(this.id, new Map());
-      }
-      const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
-      m.set(team, obj.displayname);
-      window.plugin.wasabee._agentDisplayNames.set(this.id, m);
-    }
+    if (cache) this._updateCache();
   }
 
   _getDisplayName(teamID = 0) {
-    if (!window.plugin.wasabee._agentDisplayNames) return null;
-    if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) return null;
-    const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
-    if (m.has(teamID)) return m.get(teamID);
+    if (this.teamData && this.teamData.has(teamID)) {
+      const t = this.teamData.get(teamID);
+      return t.displayname;
+    }
     return null;
   }
 
   _getAllNames() {
-    if (!window.plugin.wasabee._agentDisplayNames) return null;
-    if (!window.plugin.wasabee._agentDisplayNames.has(this.id)) return null;
-    const m = window.plugin.wasabee._agentDisplayNames.get(this.id);
-    let out = " (";
-    for (const n of m.values()) out = out + " " + n;
-    out = out + " )";
-    return out;
+    if (this.teamData) {
+      let out = "(";
+      for (const t of this.teamData.values()) {
+        if (t.displayname) out += t.displayname + " ";
+      }
+      out += ")";
+      return out;
+    }
+    return null;
   }
 
   async _updateCache() {
-    // if already cached, merge some values that might be present if pulled from a different team
-    if (window.plugin.wasabee._agentCache.has(this.id)) {
-      const cached = window.plugin.wasabee._agentCache.get(this.id);
+    // if we have these from another team, hold onto it
+    const cached = await window.plugin.wasabee.idb.get("agents", this.id);
+    if (cached) {
+      console.log("updatecache pulled", cached);
       if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
       if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
-      // XXX do something with displayname to ensure that name is the "real" name?
+      this.teamData = cached.teamData;
     }
-    window.plugin.wasabee._agentCache.set(this.id, this);
-    await window.plugin.wasabee.idb.put("agents", this);
+
+    if (!this.teamData) this.teamData = new Map();
+    if (this.forTeam != 0) {
+      const teamData = {
+        ShareWD: this.ShareWD,
+        LoadWD: this.LoadWD,
+        displayname: this.displayname,
+        squad: this.squad,
+        state: this.state,
+      };
+      this.teamData.set(this.forTeam, teamData);
+    }
+
+    console.log("writing agent to idb", this);
+    try {
+      await window.plugin.wasabee.idb.put("agents", this);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   get latLng() {
@@ -96,38 +108,35 @@ export default class WasabeeAgent {
     return null;
   }
 
-  // TBD
-  static async get(gid) {
-    const r = await this.waitGet(gid, 60);
-    return r;
-  }
-
-  // deprecated
-  static cacheGet(gid) {
-    if (window.plugin.wasabee._agentCache.has(gid)) {
-      return window.plugin.wasabee._agentCache.get(gid);
+  // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
+  static async get(gid, teamID = 0, maxAgeSeconds = 86400) {
+    const cached = await window.plugin.wasabee.idb.get("agents", gid);
+    if (cached) {
+      console.log("get agent from idb", cached);
+      const a = new WasabeeAgent(cached);
+      if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
+        // resolve team specific stuff
+        if (a.teamData && a.teamData.has(teamID)) {
+          const td = a.teamData.get(teamID);
+          a.ShareWD = td.ShareWD;
+          a.LoadWD = td.LoadWD;
+          a.displayname = td.displayname;
+          a.squad = td.squad;
+          a.state = td.state;
+        }
+        a.cached = true;
+        delete a.teamData;
+        console.log("returning from cache", a);
+        return a;
+      }
     }
-    return null;
-  }
 
-  // deprecated
-  static async waitGet(gid, maxAgeSeconds = 60) {
     if (!WasabeeMe.isLoggedIn()) return null;
-
-    let cached = null;
-    if (window.plugin.wasabee._agentCache.has(gid)) {
-      cached = window.plugin.wasabee._agentCache.get(gid);
-    }
-    if (cached && cached._fetched > Date.now() - 1000 * maxAgeSeconds) {
-      console.debug("returning agent from cache", cached._fetched, Date.now());
-      return cached;
-    }
 
     console.debug("pulling server for new agent data");
     try {
       const result = await agentPromise(gid);
-      const newagent = new WasabeeAgent(result, 0);
-      return newagent;
+      return new WasabeeAgent(result, 0, false);
     } catch (e) {
       console.error(e);
     }

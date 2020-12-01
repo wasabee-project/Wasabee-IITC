@@ -189,8 +189,7 @@ export async function mePromise() {
   }
 }
 
-// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.waitGet()
-// use WasabeeAgent.waitGet and WasabeeAgent.cacheGet for caching
+// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
 export function agentPromise(GID) {
   return genericGet(`/api/v1/agent/${GID}`);
 }

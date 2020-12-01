@@ -180,10 +180,10 @@ async function initIdb() {
   Wasabee.idb = await openDB("wasabee", 1, {
     upgrade(db) {
       const agents = db.createObjectStore("agents", { keyPath: "id" });
-      agents.createIndex("date", "date");
+      agents.createIndex("fetched", "fetched");
       agents.createIndex("name", "name");
       const teams = db.createObjectStore("teams", { keyPath: "id" });
-      teams.createIndex("date", "date");
+      teams.createIndex("fetched", "fetched");
     },
   });
 }

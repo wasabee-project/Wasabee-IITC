@@ -87,12 +87,10 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "Assigned To",
-        value: (link) => {
+        value: async (link) => {
           if (link.assignedTo != null && link.assignedTo != "") {
-            const agent = WasabeeAgent.cacheGet(link.assignedTo);
+            const agent = await WasabeeAgent.get(link.assignedTo);
             if (agent != null) return agent.name;
-            // we can't use async here, so just request it now and it should be in cache next time
-            WasabeeAgent.waitGet(link.assignedTo);
             return "GID: [" + link.assignedTo + "]";
           }
 

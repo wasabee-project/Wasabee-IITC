@@ -8,14 +8,14 @@ export default class WasabeeTeam {
       try {
         data = JSON.parse(data);
       } catch (e) {
-        console.error("corrupted team");
-        return null;
+        console.error(e);
+        return;
       }
     }
 
     this.id = data.id;
     this.name = data.name;
-    this.date = Date.now();
+    this.feteched = Date.now();
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
@@ -25,9 +25,9 @@ export default class WasabeeTeam {
 
     // from server
     if (data.agents) {
-      this.agentIDs = new Array(); // use this now
+      this.agentIDs = new Array();
       for (const agent of data.agents) {
-        const a = new WasabeeAgent(agent, this.id); // push to agent cache
+        const a = new WasabeeAgent(agent, this.id, true); // push to agent cache
         this.agentIDs.push(a.id); // we only need the id here
       }
       this._updateCache();
@@ -36,7 +36,7 @@ export default class WasabeeTeam {
 
   async agents() {
     const p = new Array();
-    for (const id of this.agentIDs) p.push(WasabeeAgent.get(id));
+    for (const id of this.agentIDs) p.push(WasabeeAgent.get(id, this.id));
     const agents = new Array();
     const results = await Promise.allSettled(p);
     for (const result of results) {
@@ -53,17 +53,18 @@ export default class WasabeeTeam {
     await window.plugin.wasabee.idb.put("teams", this);
   }
 
+  // 60 seconds seems too short for the default here...
   static async get(teamID, maxAgeSeconds = 60) {
-    if (!WasabeeMe.isLoggedIn()) return null;
-
     const cached = await window.plugin.wasabee.idb.get("teams", teamID);
     if (cached) {
       const t = new WasabeeTeam(cached);
-      if (t.date > Date.now() - 1000 * maxAgeSeconds) {
+      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
         t.cached = true;
         return t;
       }
     }
+
+    if (!WasabeeMe.isLoggedIn()) return null;
 
     try {
       const t = await teamPromise(teamID);

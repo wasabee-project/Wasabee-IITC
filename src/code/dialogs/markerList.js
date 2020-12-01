@@ -123,12 +123,10 @@ const MarkerList = WDialog.extend({
       },
       {
         name: wX("ASS_TO"),
-        value: (marker) => {
+        value: async (marker) => {
           if (marker.assignedTo != null && marker.assignedTo != "") {
-            const agent = WasabeeAgent.cacheGet(marker.assignedTo);
+            const agent = await WasabeeAgent.get(marker.assignedTo);
             if (agent != null) return agent.name;
-            // we can't use async here, so just request it now and it should be in cache next time
-            WasabeeAgent.waitGet(marker.assignedTo);
             return "looking up: [" + marker.assignedTo + "]";
           }
           return "";
