@@ -1114,9 +1114,7 @@ export default class WasabeeOp {
     // zones: handle them later
 
     for (const [id, p] of this._idToOpportals) {
-      if (!oldOp._idToOpportals.has(id))
-        changes.addition.push({ type: "portal", portal: p });
-      else {
+      if (oldOp._idToOpportals.has(id)) {
         const oldPortal = oldOp._idToOpportals.get(id);
         const fields = ["comment", "hardness"];
         const diff = fields
