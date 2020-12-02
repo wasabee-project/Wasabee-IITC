@@ -110,9 +110,6 @@ const UploadButton = WButton.extend({
   },
 
   formatSummary(summary) {
-    const rebaseMessage = L.DomUtil.create("div");
-    rebaseMessage.append("Rebase summary:");
-    const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
     const list = [];
     if (!summary.compatibility.ok)
       list.push(
@@ -150,8 +147,16 @@ const UploadButton = WButton.extend({
     if (summary.edition.assignment > 0)
       list.push(`change ${summary.edition.assignment} assignments`);
 
-    for (const item of list)
-      L.DomUtil.create("li", null, rebaseList).textContent = item;
+    const rebaseMessage = L.DomUtil.create("div");
+    rebaseMessage.append("Rebase summary:");
+
+    if (list.length > 0) {
+      const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
+      for (const item of list)
+        L.DomUtil.create("li", null, rebaseList).textContent = item;
+    } else {
+      rebaseMessage.textContent = "No local change detected...";
+    }
 
     return rebaseMessage;
   },
