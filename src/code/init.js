@@ -27,11 +27,10 @@ window.plugin.wasabee.init = () => {
     return;
   }
 
+  initIdb();
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
-
-  initIdb();
 
   initSkin();
   // can this be moved to the auth dialog?
@@ -172,15 +171,24 @@ function initGoogleAPI() {
   );
 }
 
-// experiment with IndexDB
 async function initIdb() {
-  Wasabee.idb = await openDB("wasabee", 1, {
+  const version = 1;
+  // if (Wasabee.idb && Wasabee.idb.version == version) return;
+
+  // XXX audit these to make sure all the various indexes are used
+  Wasabee.idb = await openDB("wasabee", version, {
     upgrade(db) {
       const agents = db.createObjectStore("agents", { keyPath: "id" });
       agents.createIndex("date", "date"); // last location change
       agents.createIndex("fetched", "fetched"); // last pull from server
       const teams = db.createObjectStore("teams", { keyPath: "id" });
       teams.createIndex("fetched", "fetched"); // last pull from server
+
+      // do not set an implied key, explicitly set GID/PortalID on insert
+      const defensivekeys = db.createObjectStore("defensivekeys");
+      defensivekeys.createIndex("PortalID", "PortalID");
+      defensivekeys.createIndex("Count", "Count"); // To be used to remove 0-count entries
+      // defensivekeys.createIndex("pk", ["GID", "PortalID"], { unique: true });
     },
   });
 }
