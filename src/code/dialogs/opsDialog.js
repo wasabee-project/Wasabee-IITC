@@ -169,9 +169,16 @@ const OpsDialog = WDialog.extend({
               status.textContent = "!";
               status.style.color = "red";
             } else {
-              status.style.color = "red";
-              if (op.localchanged) status.textContent += "↑";
-              if (op.remotechanged) status.textContent += "↓";
+              if (op.localchanged) {
+                status.textContent = "☀";
+                status.style.color = "green";
+                status.title = "Local changes";
+              }
+              if (op.remotechanged) {
+                status.textContent = "⛅";
+                status.style.color = "red";
+                status.title = "Local&remote changes";
+              }
             }
           }
         }
