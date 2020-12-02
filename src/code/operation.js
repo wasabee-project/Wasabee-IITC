@@ -1182,6 +1182,20 @@ export default class WasabeeOp {
     return changes;
   }
 
+  checkChanges() {
+    if (this.localchanged) {
+      const changes = this.changes();
+      if (
+        changes.addition.length +
+          changes.edition.length +
+          changes.deletion.length ==
+        0
+      )
+        this.localchanged = false;
+    }
+    return this.localchanged;
+  }
+
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {

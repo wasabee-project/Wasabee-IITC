@@ -380,13 +380,7 @@ export async function fullSync() {
         const op = localOp.ID != so.ID ? localOp : so;
         // check if there are really local changes
         // XXX: this may be too long to do
-        const changes = op.changes();
-        if (
-          changes.addition.length +
-            changes.edition.length +
-            changes.deletion.length ==
-          0
-        ) {
+        if (!op.checkChanges()) {
           newop.store();
         } else {
           // partial update on fields the server is always right
