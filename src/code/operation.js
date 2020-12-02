@@ -1217,6 +1217,7 @@ export default class WasabeeOp {
         marker: 0,
       },
       edition: {
+        portal: 0,
         link: 0,
         marker: 0,
         assignment: 0,
@@ -1351,6 +1352,7 @@ export default class WasabeeOp {
       if (e.type == "portal") {
         const portal = this.getPortal(e.portal.id);
         for (const [k, v] of e.diff) portal[k] = v;
+        summary.edition.portal += 1;
       } else if (e.type == "link") {
         let found = false;
         for (const l of this.links) {

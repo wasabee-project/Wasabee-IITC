@@ -97,9 +97,12 @@ const MergeDialog = WDialog.extend({
       list.push(
         `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`
       );
-    if (summary.edition.link + summary.edition.marker > 0)
+    if (
+      summary.edition.portal + summary.edition.link + summary.edition.marker >
+      0
+    )
       list.push(
-        `edit ${summary.edition.link} links and ${summary.edition.marker} markers`
+        `edit ${summary.edition.portal} portals, ${summary.edition.link} links and ${summary.edition.marker} markers`
       );
     if (summary.edition.duplicate > 0)
       list.push(`ignore ${summary.edition.duplicate} new duplicates`);
