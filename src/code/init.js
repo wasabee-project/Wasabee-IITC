@@ -185,7 +185,11 @@ async function initIdb() {
       teams.createIndex("fetched", "fetched"); // last pull from server
 
       // do not set an implied key, explicitly set GID/PortalID on insert
-      const defensivekeys = db.createObjectStore("defensivekeys");
+      // XXX we can do this with a keyPath https://stackoverflow.com/questions/33852508/how-to-create-an-indexeddb-composite-key
+      // const defensivekeys = db.createObjectStore("defensivekeys");
+      const defensivekeys = db.createObjectStore("defensivekeys", {
+        keyPath: ["GID", "PortalID"],
+      });
       defensivekeys.createIndex("PortalID", "PortalID");
       defensivekeys.createIndex("Count", "Count"); // To be used to remove 0-count entries
       // defensivekeys.createIndex("pk", ["GID", "PortalID"], { unique: true });

@@ -62,7 +62,10 @@ export default class Sortable {
     // clear body
     this._body.textContent = "";
     let index = 0;
-    this._items = incoming.map((obj) => {
+
+    // class getters and setter's can't be async,
+    // this lets us build each row as a promise, then resolve them all together
+    const promises = incoming.map(async (obj) => {
       const row = L.DomUtil.create("tr");
       const data = {
         obj: obj, // the raw value passed in
@@ -74,29 +77,17 @@ export default class Sortable {
       index++;
       for (const field of this._fields) {
         // calculate the value using the field's rules
-        const value = field.value(obj);
-        // data.values.push(value);
-
-        if (value != null && typeof obj.then === "function") {
-          console.log("testing resolving promises", obj);
-          obj.then(
-            (resolve) => {
-              data.value.push(resolve);
-            },
-            (reject) => {
-              console.log(reject);
-              data.value.push("rejected");
-            }
-          );
-        } else {
-          // not a promise, just use it directly
-          data.values.push(value);
-        }
+        let value = field.value(obj);
+        if (typeof value.then === "function") value = await value; // resolve promises
+        data.values.push(value);
 
         // calculate sortValue using the field's rules if required
         let sortValue = value;
-        if (field.sortValue) sortValue = field.sortValue(value, obj);
-        data.sortValues.push(sortValue);
+        if (field.sortValue) {
+          sortValue = field.sortValue(value, obj);
+          if (typeof sortValue.then === "function") sortValue = await sortValue; // resolve promises
+          data.sortValues.push(sortValue);
+        }
 
         const cell = row.insertCell(-1);
         if (field.format) {
@@ -111,7 +102,17 @@ export default class Sortable {
       return data;
     });
 
-    this.sort();
+    // resolve all rows at once
+    // XXX convert to allSettled and check for individual errors rather than failing hard if any row fails
+    Promise.all(promises).then(
+      (values) => {
+        this._items = values;
+        this.sort();
+      },
+      (reject) => {
+        console.log("rejected", reject);
+      }
+    );
   }
 
   get fields() {

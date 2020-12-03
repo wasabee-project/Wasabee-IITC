@@ -23,7 +23,7 @@ const TeamMembershipList = WDialog.extend({
   _displayDialog: async function () {
     const table = this._setupTable();
 
-    const team = await WasabeeTeam.get(this.options.teamID, 2);
+    const team = await WasabeeTeam.get(this.options.teamID, 10); // max cache age of 10 seconds
     table.items = await team.agents();
 
     const buttons = {};

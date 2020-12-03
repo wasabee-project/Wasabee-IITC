@@ -34,6 +34,9 @@ export default class WasabeeTeam {
     }
   }
 
+  // this could be written to pull directly from the agent store using an idb query based on this.agentIDs
+  // we would need to resolve _teamData ourselves, but it _might_ be measurably faster, something to test when we have time
+  // ....openCursor(IDBKeyRange.only(this.agentIDs));
   async agents() {
     const p = new Array();
     for (const id of this.agentIDs) p.push(WasabeeAgent.get(id, this.id));
@@ -41,6 +44,8 @@ export default class WasabeeTeam {
     const results = await Promise.allSettled(p);
     for (const result of results) {
       if (result.status == "fulfilled") {
+        if (result.value.forTeam != this.id)
+          console.log("team mismatch", result.value);
         agents.push(result.value);
       } else {
         console.log(result.status, result.reason);

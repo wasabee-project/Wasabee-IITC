@@ -50,10 +50,8 @@ export async function drawWasabeeDkeys() {
           console.log("old format WD key, ignoring", n);
           continue;
         }
-        await window.plugin.wasabee.idb.put("defensivekeys", n, [
-          n.GID,
-          n.PortalID,
-        ]);
+        // await window.plugin.wasabee.idb.put("defensivekeys", n, [ n.GID, n.PortalID, ]);
+        await window.plugin.wasabee.idb.put("defensivekeys", n);
       }
     } catch (err) {
       console.error(err);
