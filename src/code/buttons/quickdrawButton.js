@@ -190,10 +190,15 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _getTooltipText: function () {
-    if (this._drawMode == "quickdraw") {
+    if (this._drawMode === "quickdraw") {
       if (!this._anchor1) return { text: wX("QDSTART") };
       if (!this._anchor2) return { text: wX("QDNEXT") };
       return { text: wX("QDCONT") };
+    }
+    if (this._drawMode === "star") {
+      // XXX wX this
+      if (!this._anchor1) return { text: "Select the star anchor" };
+      return { text: "Select a portal" };
     }
     // must be in single-link mode
     // XXX wX this
@@ -218,6 +223,8 @@ const QuickDrawControl = L.Handler.extend({
     }
     if (this._drawMode == "quickdraw") {
       this._portalClickedQD(selectedPortal);
+    } else if (this._drawMode == "star") {
+      this._portalClickedStar(selectedPortal);
     } else {
       this._portalClickedSingle(selectedPortal);
     }
@@ -290,6 +297,9 @@ const QuickDrawControl = L.Handler.extend({
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");
       this._drawMode = "singlelink";
+    } else if (this._drawMode == "singlelink") {
+      console.log("switching to star");
+      this._drawMode = "star";
     } else {
       console.log("switching to layers");
       this._drawMode = "quickdraw";
@@ -323,6 +333,34 @@ const QuickDrawControl = L.Handler.extend({
     );
     if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
     this._previous = selectedPortal;
+    this._tooltip.updateContent(this._getTooltipText());
+  },
+
+  _portalClickedStar: function (selectedPortal) {
+    // IITC sending 2 portalClicked for 1 mouse click
+    if (this._anchor && this._anchor.id == selectedPortal.id) {
+      return;
+    }
+
+    if (this._anchor) {
+      this._operation.addLink(
+        this._anchor,
+        selectedPortal,
+        null,
+        this._throwOrder++
+      );
+    } else this._anchor = selectedPortal;
+
+    // all portals, including the first
+    const guideStyle =
+      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
+    guideStyle.anchorLL = selectedPortal.latLng;
+
+    this._guideA = L.geodesicPolyline(
+      [this._anchor.latLng, selectedPortal.latLng],
+      guideStyle
+    );
+    if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
     this._tooltip.updateContent(this._getTooltipText());
   },
 });
