@@ -111,7 +111,7 @@ const DefensiveKeysDialog = WDialog.extend({
       CapID: this._capID.value,
       Name: this._selectedPortal.name,
       Lat: this._selectedPortal.lat,
-      Lng: this._selectedPortal.lat,
+      Lng: this._selectedPortal.lng,
     };
     try {
       const j = JSON.stringify(dk);
