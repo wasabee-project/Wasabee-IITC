@@ -215,12 +215,17 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
+    // portal unselect
+    if (!data.selectedPortalGuid) return;
+
     // const selectedPortal = WasabeePortal.getSelected();
     // this way saves a small step
     const selectedPortal = WasabeePortal.get(data.selectedPortalGuid);
     if (!selectedPortal) {
       // XXX wX this
-      this._tooltip.updateContent("Portal data not loaded, please try again");
+      this._tooltip.updateContent({
+        text: "Portal data not loaded, please try again",
+      });
       return;
     }
     if (this._drawMode == "quickdraw") {
