@@ -344,8 +344,8 @@ const QuickDrawControl = L.Handler.extend({
 
     if (this._anchor) {
       this._operation.addLink(
-        this._anchor,
         selectedPortal,
+        this._anchor,
         null,
         this._throwOrder++
       );
