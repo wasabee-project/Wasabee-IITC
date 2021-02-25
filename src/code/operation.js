@@ -525,6 +525,30 @@ export default class WasabeeOp {
     const old = this.getPortal(portal.id);
     if (old) {
       if (!portal.faked) {
+        if (portal.lat !== old.lat || portal.lng !== old.lng) {
+          // portal has moved, so we create a fake portal to replace this
+          console.warn(
+            "portal %s has moved, replacing by a fake at old location",
+            old.id
+          );
+          const fake = WasabeePortal.fake(old.lat, old.lng, null, old.name);
+          // and swap the old with the fake
+          this._coordsToOpportals.delete(old.lat + "/" + old.lng); // prevent dirty
+          this._addPortal(fake);
+          this._swapPortal(old, fake);
+          // re-attribute markers
+          for (const m of this.markers) {
+            if (m.portalId == old.id) m.portalId = fake.id;
+          }
+          // remove blockers on the old portal
+          this.blockers = this.blockers.filter(
+            (b) => b.fromPortalId != old.id && b.toPortalId != old.id
+          );
+          this._idToOpportals.delete(old.id);
+          // add the new portal so any data related to the real portal (keys) still works
+          this._addPortal(portal);
+          return true;
+        }
         if (old.name == portal.name) return false;
         old.name = portal.name;
         return true;
