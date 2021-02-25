@@ -86,6 +86,7 @@ const QuickDrawControl = L.Handler.extend({
 
     this._operation = getSelectedOperation();
     this._opID = this._operation.ID;
+    this._anchor = null;
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
@@ -110,6 +111,7 @@ const QuickDrawControl = L.Handler.extend({
       this._guideLayerGroup = null;
     }
 
+    this._anchor = null;
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
@@ -197,7 +199,7 @@ const QuickDrawControl = L.Handler.extend({
     }
     if (this._drawMode === "star") {
       // XXX wX this
-      if (!this._anchor1) return { text: "Select the star anchor" };
+      if (!this._anchor) return { text: "Select the star anchor" };
       return { text: "Select a portal" };
     }
     // must be in single-link mode
@@ -288,6 +290,7 @@ const QuickDrawControl = L.Handler.extend({
 
   _toggleMode: function () {
     // changing mode resets all the things
+    this._anchor = null;
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
