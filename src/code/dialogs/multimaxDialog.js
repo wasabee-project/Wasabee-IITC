@@ -223,27 +223,51 @@ const MultimaxDialog = WDialog.extend({
   buildPOSet: function (anchor1, anchor2, visible) {
     const poset = new Map();
 
-    // cache polylines
-    const urps = new Map(
-      visible.map((p) => [p.id, L.polyline([this._urp, p.latLng])])
-    );
-    const lab = L.polyline([anchor1.latLng, anchor2.latLng]);
-    for (const i of visible) {
-      const lac = L.polyline([anchor1.latLng, i.latLng]);
-      const lbc = L.polyline([i.latLng, anchor2.latLng]);
+    const ll1 = anchor1.latLng;
+    const ll2 = anchor2.latLng;
 
-      const result = [];
-      for (const j of visible) {
-        const urp = urps.get(j.id);
-        let crossings = 0;
-        if (greatCircleArcIntersect(urp, lab)) crossings++;
-        if (greatCircleArcIntersect(urp, lac)) crossings++;
-        if (greatCircleArcIntersect(urp, lbc)) crossings++;
-        if (crossings == 1)
-          // crossing 0 or 2 is OK, crossing 3 is impossible
-          result.push(j.id);
+    // cache polylines
+    if (window.plugin.crossLinks) {
+      const urp = L.latLng(this._urp);
+      const latLngs = new Map(visible.map((p) => [p.id, p.latLng]));
+      const gCAI = window.plugin.crossLinks.greatCircleArcIntersect;
+      for (const i of visible) {
+        const result = [];
+        const lli = latLngs.get(i.id);
+        for (const j of visible) {
+          const llj = latLngs.get(j.id);
+          let crossings = 0;
+          if (gCAI(urp, llj, ll1, ll2)) crossings++;
+          if (gCAI(urp, llj, ll1, lli)) crossings++;
+          if (gCAI(urp, llj, lli, ll2)) crossings++;
+          if (crossings == 1)
+            // crossing 0 or 2 is OK, crossing 3 is impossible
+            result.push(j.id);
+        }
+        poset.set(i.id, result);
       }
-      poset.set(i.id, result);
+    } else {
+      const urps = new Map(
+        visible.map((p) => [p.id, L.polyline([this._urp, p.latLng])])
+      );
+      const lab = L.polyline([anchor1.latLng, anchor2.latLng]);
+      for (const i of visible) {
+        const lac = L.polyline([anchor1.latLng, i.latLng]);
+        const lbc = L.polyline([i.latLng, anchor2.latLng]);
+
+        const result = [];
+        for (const j of visible) {
+          const urp = urps.get(j.id);
+          let crossings = 0;
+          if (greatCircleArcIntersect(urp, lab)) crossings++;
+          if (greatCircleArcIntersect(urp, lac)) crossings++;
+          if (greatCircleArcIntersect(urp, lbc)) crossings++;
+          if (crossings == 1)
+            // crossing 0 or 2 is OK, crossing 3 is impossible
+            result.push(j.id);
+        }
+        poset.set(i.id, result);
+      }
     }
     return poset;
   },
