@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersect } from "../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
 // import WasabeeLink from "../link";
 import {
   clearAllLinks,
@@ -200,7 +200,7 @@ const HomogeneousDialog = WDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY];
     if (p) this._anchorThree = new WasabeePortal(p);
 
-    this._urp = testPortal();
+    this._urp = L.latLng(testPortal());
     this._failed = 0;
   },
 
@@ -809,18 +809,16 @@ const HomogeneousDialog = WDialog.extend({
   },
 
   _fieldCovers: function (a, b, c, p) {
-    const unreachableMapPoint = this._urp;
-
-    const urp = L.polyline([unreachableMapPoint, p.latLng]);
-    const lab = L.polyline([a.latLng, b.latLng]);
-    const lac = L.polyline([a.latLng, c.latLng]);
-    const lbc = L.polyline([c.latLng, b.latLng]);
+    const urp = this._urp;
 
     let crossings = 0;
-    if (greatCircleArcIntersect(urp, lab)) crossings++;
-    if (greatCircleArcIntersect(urp, lac)) crossings++;
-    if (greatCircleArcIntersect(urp, lbc)) crossings++;
-    return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, b.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, c.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, b.latLng, c.latLng))
+      crossings++;
+    return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is
   },
 });
 

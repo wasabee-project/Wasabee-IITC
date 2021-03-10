@@ -7,7 +7,7 @@ import {
   testPortal,
   clearAllLinks,
 } from "../uiCommands";
-import { greatCircleArcIntersect } from "../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -129,7 +129,7 @@ const MultimaxDialog = WDialog.extend({
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
-    this._urp = testPortal();
+    this._urp = L.latLng(testPortal());
   },
 
   /*
@@ -201,74 +201,33 @@ const MultimaxDialog = WDialog.extend({
   },
 
   fieldCoversPortal: function (a, b, c, p) {
-    const unreachableMapPoint = this._urp;
-
-    // greatCircleArcIntersect now takes either WasabeeLink or window.link format
-    // needs link.getLatLngs(); and to be an object we can cache in
-    const urp = L.polyline([unreachableMapPoint, p.latLng]);
-    const lab = L.polyline([a.latLng, b.latLng]);
-    const lac = L.polyline([a.latLng, c.latLng]);
-    const lbc = L.polyline([c.latLng, b.latLng]);
+    const urp = this._urp;
 
     let crossings = 0;
-    if (greatCircleArcIntersect(urp, lab)) crossings++;
-    if (greatCircleArcIntersect(urp, lac)) crossings++;
-    if (greatCircleArcIntersect(urp, lbc)) crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, b.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, c.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, b.latLng, c.latLng))
+      crossings++;
     return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
   },
 
   // given two anchor, build a map that shows which and how many portals are covered by each possible field by guid
   // note: a portal always covers itself
-  // note2: this does not use fieldCoversPortal for performance issue: the number of polylines is be linear.
   buildPOSet: function (anchor1, anchor2, visible) {
     const poset = new Map();
 
-    const ll1 = anchor1.latLng;
-    const ll2 = anchor2.latLng;
-
-    // cache polylines
-    if (window.plugin.crossLinks) {
-      const urp = L.latLng(this._urp);
-      const latLngs = new Map(visible.map((p) => [p.id, p.latLng]));
-      const gCAI = window.plugin.crossLinks.greatCircleArcIntersect;
-      for (const i of visible) {
-        const result = [];
-        const lli = latLngs.get(i.id);
-        for (const j of visible) {
-          const llj = latLngs.get(j.id);
-          let crossings = 0;
-          if (gCAI(urp, llj, ll1, ll2)) crossings++;
-          if (gCAI(urp, llj, ll1, lli)) crossings++;
-          if (gCAI(urp, llj, lli, ll2)) crossings++;
-          if (crossings == 1)
-            // crossing 0 or 2 is OK, crossing 3 is impossible
-            result.push(j.id);
-        }
-        poset.set(i.id, result);
+    for (const i of visible) {
+      const result = [];
+      for (const j of visible) {
+        if (i === j) result.push(j.id);
+        else if (this.fieldCoversPortal(anchor1, anchor2, i, j))
+          result.push(j.id);
       }
-    } else {
-      const urps = new Map(
-        visible.map((p) => [p.id, L.polyline([this._urp, p.latLng])])
-      );
-      const lab = L.polyline([anchor1.latLng, anchor2.latLng]);
-      for (const i of visible) {
-        const lac = L.polyline([anchor1.latLng, i.latLng]);
-        const lbc = L.polyline([i.latLng, anchor2.latLng]);
-
-        const result = [];
-        for (const j of visible) {
-          const urp = urps.get(j.id);
-          let crossings = 0;
-          if (greatCircleArcIntersect(urp, lab)) crossings++;
-          if (greatCircleArcIntersect(urp, lac)) crossings++;
-          if (greatCircleArcIntersect(urp, lbc)) crossings++;
-          if (crossings == 1)
-            // crossing 0 or 2 is OK, crossing 3 is impossible
-            result.push(j.id);
-        }
-        poset.set(i.id, result);
-      }
+      poset.set(i.id, result);
     }
+
     return poset;
   },
 
