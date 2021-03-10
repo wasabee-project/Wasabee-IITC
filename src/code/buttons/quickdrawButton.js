@@ -93,6 +93,8 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
+    this._firstSelect = true;
+
     const context = this;
     this._portalClickedHook = (data) => {
       context._portalClicked(data);
@@ -210,13 +212,18 @@ const QuickDrawControl = L.Handler.extend({
 
   _portalClicked: function (data) {
     // console.log(data);
-    if (data.selectedPortalGuid == data.unselectedPortalGuid) {
+    if (
+      data.selectedPortalGuid == data.unselectedPortalGuid &&
+      !this._firstSelect
+    ) {
       console.log("ignoring duplicate click");
       return;
     }
 
     // portal unselect
     if (!data.selectedPortalGuid) return;
+
+    this._firstSelect = false;
 
     // const selectedPortal = WasabeePortal.getSelected();
     // this way saves a small step
@@ -301,6 +308,8 @@ const QuickDrawControl = L.Handler.extend({
     this._previous = null;
     this._guideA = null;
     this._guideB = null;
+
+    this._firstSelect = true;
 
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");
