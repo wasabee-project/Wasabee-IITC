@@ -128,13 +128,14 @@ const OnionfieldDialog = WDialog.extend({
     this._color = this._colors[this._colorIterator];
     const allPortals = getAllPortalsOnScreen(this._operation);
 
+    // batch mode isn't strictly necessary since we are loading the links in one operation, but portals are added during the recursion
+    this._operation.startBatchMode();
+
     // add the anchor to the operation, needed to check for crosslinks
     this._operation.addPortal(this._anchor);
     // start digging for onions
     const onion = this._recurser(allPortals, [], this._anchor);
 
-    // batch mode isn't strictly necessary since we are loading the links in one operation
-    this._operation.startBatchMode();
     // add all the found links at once
     // this is a minor abuse of the _operation object since we aren't using the  operation.addLink() method to add links
     this._operation.links.push(...onion);
