@@ -886,7 +886,7 @@ export default class WasabeeOp {
   convertZonesToObjs(zones) {
     if (!zones || zones.length == 0) {
       // if not set, use the defaults
-      const primary = new WasabeeZone(
+      return [
         { id: 1, name: "Primary" },
         { id: 2, name: "Alpha" },
         { id: 3, name: "Beta" },
@@ -895,9 +895,8 @@ export default class WasabeeOp {
         { id: 6, name: "Epsilon" },
         { id: 7, name: "Zeta" },
         { id: 8, name: "Eta" },
-        { id: 9, name: "Theta" }
-      );
-      return new Array(primary);
+        { id: 9, name: "Theta" },
+      ].map((obj) => new WasabeeZone(obj));
     }
     const tmpZones = Array();
     for (const z of zones) {
@@ -1112,8 +1111,9 @@ export default class WasabeeOp {
       ids.add(z.id);
     }
     const newid = Math.max(...ids) + 1;
-    this.zones.push({ id: newid, name: newid });
+    this.zones.push(new WasabeeZone({ id: newid, name: newid }));
     this.update(true);
+    return newid;
   }
 
   changes(origin) {
