@@ -85,14 +85,14 @@ export default class WasabeeLink {
       console.log("unable to get source portal");
       return null;
     }
-    returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+    returnArray.push(fromPortal.latLng);
 
     const toPortal = operation.getPortal(this.toPortalId);
     if (!toPortal || !toPortal.lat) {
       console.log("unable to get destination portal");
       return null;
     }
-    returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+    returnArray.push(toPortal.latLng);
 
     return returnArray;
   }
