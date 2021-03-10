@@ -31,6 +31,8 @@ export default class WasabeePortal {
     }
     this.comment = obj.comment;
     this.hardness = obj.hardness;
+
+    this._latLng = new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
   // build object to serialize
@@ -73,13 +75,7 @@ export default class WasabeePortal {
   }
 
   get latLng() {
-    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
-  }
-
-  // easy compat with IITC's format -- just here for safety as we use more WP
-  get _latlng() {
-    console.trace("calling WasabeePortal._latlng() compat");
-    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+    return this._latLng;
   }
 
   get team() {
