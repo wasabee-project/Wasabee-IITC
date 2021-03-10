@@ -31,6 +31,7 @@ function equals(a, b) {
 }
 
 // take L.LatLng
+// note: cache cos/sin calls in the object, in order to be efficient, try using same LatLng objects across calls, like using latLng from WasabeePortal attached to an op
 export function greatCircleArcIntersectByLatLngs(a0, a1, b0, b1) {
   // 0) quick checks
   // zero length line
