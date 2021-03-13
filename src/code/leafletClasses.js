@@ -68,6 +68,14 @@ export const WDialog = L.Handler.extend({
     return this._dialog;
   },
 
+  setTitle: function (title) {
+    if (this._dialog) this._dialog.dialog("option", "title", title);
+  },
+
+  setContent: function (content) {
+    if (this._dialog) this._dialog.html(content);
+  },
+
   closeDialog: function () {
     if (this._dialog) {
       this._dialog.dialog("close");

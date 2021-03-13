@@ -35,7 +35,7 @@ const TeamListDialog = WDialog.extend({
   update: async function () {
     if (!this._enabled) return;
     this._me = await WasabeeMe.waitGet();
-    this._dialog.html(this._buildContent());
+    this.setContent(this._buildContent());
   },
 
   _buildContent: function () {

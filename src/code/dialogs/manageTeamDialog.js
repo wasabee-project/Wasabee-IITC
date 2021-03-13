@@ -151,12 +151,8 @@ const ManageTeamDialog = WDialog.extend({
   update: function () {
     const container = this._dialogContent(); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
-    this._dialog.html(container);
-    this._dialog.dialog(
-      "option",
-      "title",
-      wX("MANAGE_TEAM", this.options.team.Name)
-    );
+    this.setContent(container);
+    this.setTitle(wX("MANAGE_TEAM", this.options.team.Name));
   },
 
   _dialogContent: function () {

@@ -56,9 +56,9 @@ const OpsDialog = WDialog.extend({
   },
 
   update: async function () {
-    if (this._enabled && this._dialog && this._dialog.html) {
+    if (this._enabled) {
       await this.makeContent(getSelectedOperation());
-      this._dialog.html(this._content);
+      this.setContent(this._content);
     }
   },
 

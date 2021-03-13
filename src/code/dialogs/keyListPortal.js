@@ -56,14 +56,14 @@ const KeyListPortal = WDialog.extend({
     const portal = op.getPortal(this.options.portalID);
     if (portal == null) {
       // needs wX
-      this._dialog("option", "title", "unknown portal");
-      this._dialog.html("selected operation changed");
+      this.setTitle("unknown portal");
+      this.setContent("selected operation changed");
       return;
     }
 
     const table = this.getListDialogContent(this.options.portalID);
-    this._dialog.html(table);
-    this._dialog("option", "title", wX("PORTAL KEY LIST", portal.displayName));
+    this.setContent(table);
+    this.setTitle(wX("PORTAL KEY LIST", portal.displayName));
   },
 
   getSortable: function () {

@@ -26,7 +26,7 @@ const ZoneDialog = WDialog.extend({
 
   update: function () {
     const h = this.buildList();
-    this._dialog.html(h);
+    this.setContent(h);
   },
 
   _displayDialog: function () {

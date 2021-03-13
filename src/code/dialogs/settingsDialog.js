@@ -33,7 +33,7 @@ const SettingsDialog = WDialog.extend({
   },
 
   update: function () {
-    this._dialog.html(this._getContent());
+    this.setContent(this._getContent());
     // TODO also update the title
   },
 
