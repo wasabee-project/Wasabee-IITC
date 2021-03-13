@@ -182,10 +182,6 @@ const HomogeneousDialog = WDialog.extend({
       width: "auto",
       dialogClass: "homogeneous",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
     });
   },
 

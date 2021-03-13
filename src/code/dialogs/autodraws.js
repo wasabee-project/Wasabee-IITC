@@ -110,10 +110,6 @@ const AutodrawsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "autodraws",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.autodraws,
     });
   },

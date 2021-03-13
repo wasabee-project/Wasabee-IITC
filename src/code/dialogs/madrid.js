@@ -196,10 +196,6 @@ const MadridDialog = MultimaxDialog.extend({
       width: "auto",
       dialogClass: "madrid",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.madrid,
     });
   },

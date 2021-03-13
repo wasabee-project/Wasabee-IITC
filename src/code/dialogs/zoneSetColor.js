@@ -22,10 +22,6 @@ const ZoneSetColorDialog = WDialog.extend({
       html: this._buildContent(),
       width: "auto",
       dialogClass: "zone-color",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
     });
   },
 

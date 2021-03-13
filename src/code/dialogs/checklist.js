@@ -60,10 +60,6 @@ const OperationChecklistDialog = WDialog.extend({
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._listDialogData;
-      },
       id: window.plugin.wasabee.static.dialogNames.operationChecklist,
     });
   },

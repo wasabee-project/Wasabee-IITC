@@ -62,10 +62,6 @@ export const SetCommentDialog = WDialog.extend({
       width: "auto",
       dialogClass: "setcomment",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.setComment,
     });
   },

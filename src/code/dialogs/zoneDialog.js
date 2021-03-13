@@ -43,10 +43,6 @@ const ZoneDialog = WDialog.extend({
       width: "auto",
       dialogClass: "zone",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.zone,
     });
   },

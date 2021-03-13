@@ -23,6 +23,11 @@ const PromptDialog = WDialog.extend({
     this._displayDialog();
   },
 
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.fire("wasabeeUIUpdate", { reason: "PromptDialogClose" }, false);
+  },
+
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -40,15 +45,6 @@ const PromptDialog = WDialog.extend({
       width: "auto",
       dialogClass: "prompt",
       buttons: buttons,
-      closeCallback: () => {
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "PromptDialogClose" },
-          false
-        );
-        this.disable();
-        delete this._dialog;
-      },
     });
   },
 

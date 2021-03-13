@@ -42,10 +42,6 @@ const KeysList = WDialog.extend({
       width: "auto",
       dialogClass: "keyslist",
       buttons: buttons,
-      closeCallback: () => {
-        delete this._dialog;
-        this.disable();
-      },
       id: window.plugin.wasabee.static.dialogNames.keysList,
     });
   },

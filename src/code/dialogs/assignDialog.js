@@ -37,10 +37,6 @@ const AssignDialog = WDialog.extend({
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.assign,
     });
   },
@@ -48,7 +44,6 @@ const AssignDialog = WDialog.extend({
   _setup: async function () {
     const target = this.options.target;
     const operation = getSelectedOperation();
-    this._dialog = null;
     this._targetID = target.ID;
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = await this._getAgentMenu(target.assignedTo);

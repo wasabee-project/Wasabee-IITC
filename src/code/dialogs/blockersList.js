@@ -72,10 +72,6 @@ const BlockerList = WDialog.extend({
       width: "auto",
       dialogClass: "blockerlist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.blockerList,
     });
   },

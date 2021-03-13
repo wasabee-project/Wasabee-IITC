@@ -37,10 +37,6 @@ const TeamMembershipList = WDialog.extend({
       width: "auto",
       dialogClass: "teamlist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },

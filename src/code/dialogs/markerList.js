@@ -54,10 +54,6 @@ const MarkerList = WDialog.extend({
       width: "auto",
       dialogClass: "markerlist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.markerList,
     });
   },

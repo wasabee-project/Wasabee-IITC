@@ -43,10 +43,6 @@ const WasabeeDList = WDialog.extend({
       width: "auto",
       dialogClass: "wasabeedlist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDList,
     });
   },

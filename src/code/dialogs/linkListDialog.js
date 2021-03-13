@@ -173,10 +173,6 @@ const LinkListDialog = WDialog.extend({
       width: "auto",
       dialogClass: "linklist",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },

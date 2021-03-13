@@ -48,10 +48,6 @@ const AgentDialog = WDialog.extend({
       width: "auto",
       dialogClass: "agent",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       // id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },

@@ -51,11 +51,6 @@ const OpsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "ops",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._content;
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.opsList,
     });
   },

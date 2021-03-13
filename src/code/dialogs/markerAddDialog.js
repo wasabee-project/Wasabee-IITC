@@ -93,10 +93,6 @@ const MarkerAddDialog = WDialog.extend({
       width: "auto",
       dialogClass: "markeradd",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.markerButton,
     });
   },

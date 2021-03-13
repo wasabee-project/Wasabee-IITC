@@ -17,6 +17,13 @@ const TrawlDialog = WDialog.extend({
     this._displayDialog();
   },
 
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+
+    if (window.plugin.wasabee.tileTrawlQueue)
+      delete window.plugin.wasabee.tileTrawlQueue;
+  },
+
   _displayTrawlerDialog: function (tiles) {
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
@@ -57,12 +64,6 @@ const TrawlDialog = WDialog.extend({
       width: "auto",
       dialogClass: "trawl",
       buttons: buttons,
-      closeCallback: () => {
-        if (window.plugin.wasabee.tileTrawlQueue)
-          delete window.plugin.wasabee.tileTrawlQueue;
-        this.disable();
-        delete this._dialog;
-      },
       // id: window.plugin.wasabee.static.dialogNames.trawl
     });
   },
@@ -133,10 +134,6 @@ const TrawlDialog = WDialog.extend({
       width: "auto",
       dialogClass: "trawl",
       buttons: buttons,
-      closeCallback: () => {
-        // this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.trawl,
     });
   },

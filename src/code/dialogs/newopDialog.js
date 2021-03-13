@@ -15,7 +15,7 @@ const NewopDialog = WDialog.extend({
     this._displayDialog(this);
   },
 
-  _displayDialog: function (noHandler) {
+  _displayDialog: function () {
     const content = L.DomUtil.create("div", null);
     const buttonSet = L.DomUtil.create("div", "buttonset", content);
     const addButton = L.DomUtil.create("button", null, buttonSet);
@@ -25,14 +25,14 @@ const NewopDialog = WDialog.extend({
     importButton.textContent = wX("IMPORT_OP");
     L.DomEvent.on(importButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      noHandler._dialog.dialog("close");
+      this.closeDialog();
       const id = new ImportDialog(null);
       id.enable();
     });
 
     L.DomEvent.on(addButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      noHandler._dialog.dialog("close");
+      this.closeDialog();
       const addDialog = new PromptDialog({
         title: wX("NEW_OP"),
         label: wX("SET_NEW_OP"),
@@ -74,10 +74,6 @@ const NewopDialog = WDialog.extend({
       width: "auto",
       dialogClass: "newop",
       buttons: buttons,
-      closeCallback: function () {
-        noHandler.disable();
-        delete noHandler._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.newopButton,
     });
   },

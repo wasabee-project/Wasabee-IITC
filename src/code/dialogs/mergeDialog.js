@@ -50,10 +50,6 @@ const MergeDialog = WDialog.extend({
       width: "auto",
       dialogClass: "merge",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
     });
   },
 

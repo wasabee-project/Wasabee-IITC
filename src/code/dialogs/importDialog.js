@@ -22,6 +22,13 @@ const ImportDialog = WDialog.extend({
     this._displayDialog();
   },
 
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+
+    window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
+    window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
+  },
+
   _displayDialog: function () {
     const container = L.DomUtil.create("div", null);
     container.style.width = "420px";
@@ -54,12 +61,6 @@ const ImportDialog = WDialog.extend({
       width: "auto",
       dialogClass: "import",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-        window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
-        window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
-      },
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });
   },

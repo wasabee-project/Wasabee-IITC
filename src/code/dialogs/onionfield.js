@@ -81,10 +81,6 @@ const OnionfieldDialog = WDialog.extend({
       width: "auto",
       dialogClass: "onion",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
     });
   },
 

@@ -88,10 +88,6 @@ const DefensiveKeysDialog = WDialog.extend({
       width: "auto",
       dialogClass: "wdkeys",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton,
     });
   },
