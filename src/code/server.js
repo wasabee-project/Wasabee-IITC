@@ -652,9 +652,9 @@ export function GetUpdateList() {
 }
 
 export function SetWasabeeServer(server) {
-  // XXX sanity checking here please:
-  // starts w/ https://
-  // does not end with /
+  server = server.trim();
+  if (!server.startsWith("http")) server = "https://" + server;
+  if (server.endsWith("/")) server = server.slice(0, -1);
   localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY] = server;
 }
 
