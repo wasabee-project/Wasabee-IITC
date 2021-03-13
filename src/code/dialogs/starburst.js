@@ -72,18 +72,18 @@ const StarburstDialog = WDialog.extend({
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("STARBURST TITLE"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-starburst",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.starburst,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function (options) {

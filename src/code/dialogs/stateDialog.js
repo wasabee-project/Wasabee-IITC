@@ -29,18 +29,18 @@ const StateDialog = WDialog.extend({
     // for this._name and this._html
     this._buildContent();
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: this._name,
       html: this._html,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-state",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.state,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildContent: function () {

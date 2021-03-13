@@ -30,18 +30,18 @@ const SendTargetDialog = WDialog.extend({
     this._html = L.DomUtil.create("div", null);
     this._setup();
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("SEND TARGET AGENT"),
       html: this._html,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-sendtarget",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.assign,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _setup: async function () {

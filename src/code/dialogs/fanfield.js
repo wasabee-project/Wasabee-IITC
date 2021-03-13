@@ -116,18 +116,18 @@ const FanfieldDialog = WDialog.extend({
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("FANFIELD2"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-fanfield",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.fanfield,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function (options) {

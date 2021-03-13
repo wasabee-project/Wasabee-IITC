@@ -51,11 +51,12 @@ const TrawlDialog = WDialog.extend({
       this._trawlerDialog.dialog("close");
     };
 
-    this._trawlerDialog = window.dialog({
+    this._trawlerDialog = this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
+      buttons: buttons,
       closeCallback: () => {
         if (window.plugin.wasabee.tileTrawlQueue)
           delete window.plugin.wasabee.tileTrawlQueue;
@@ -64,7 +65,6 @@ const TrawlDialog = WDialog.extend({
       },
       // id: window.plugin.wasabee.static.dialogNames.trawl
     });
-    this._trawlerDialog.dialog("option", "buttons", buttons);
   },
 
   _updateTrawlerDialog: function (tiles) {
@@ -127,18 +127,18 @@ const TrawlDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-trawl",
+      buttons: buttons,
       closeCallback: () => {
         // this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.trawl,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _getTrawlPoints: function () {

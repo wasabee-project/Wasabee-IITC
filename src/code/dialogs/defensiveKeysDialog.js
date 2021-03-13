@@ -81,19 +81,19 @@ const DefensiveKeysDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("INPUT_DT_KEY_COUNT"),
       // position: { my: "center top", at: "center center+30" },
       html: this._content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-wdkeys",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _addDKey: async function () {

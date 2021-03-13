@@ -248,18 +248,18 @@ const SettingsDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("SETTINGS"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-settings",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.settings,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // small-screen versions go in _displaySmallDialog

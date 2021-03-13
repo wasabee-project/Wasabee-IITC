@@ -52,6 +52,13 @@ export const WDialog = L.Handler.extend({
 
   removeHooks: function () {},
 
+  createDialog: function (options) {
+    const dialog = window.dialog(options);
+    // swap in our buttons, replacing the defaults
+    if (options.buttons) dialog.dialog("option", "buttons", options.buttons);
+    return dialog;
+  },
+
   _isMobile: function () {
     // return true;
     // XXX this is a cheap hack -- determine a better check

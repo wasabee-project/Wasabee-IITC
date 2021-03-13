@@ -26,18 +26,18 @@ const ExportDialog = WDialog.extend({
       this._bookmarkFormat(operation);
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("EXPORT") + operation.name,
       html: this._buildContent(operation),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-export",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.exportDialog,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildContent: function (operation) {

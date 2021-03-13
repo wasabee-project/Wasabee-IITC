@@ -40,18 +40,18 @@ const KeyListPortal = WDialog.extend({
     const op = getSelectedOperation();
     const portal = op.getPortal(this.options.portalID);
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("PORTAL KEY LIST", portal.displayName),
       html: this.getListDialogContent(this.options.portalID),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
+      buttons: buttons,
       closeCallback: () => {
         delete this._dialog;
         this.disable();
       },
       id: window.plugin.wasabee.static.dialogNames.keyListPortal,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   keyListUpdate: function () {

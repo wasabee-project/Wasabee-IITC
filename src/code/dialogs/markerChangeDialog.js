@@ -55,7 +55,7 @@ const MarkerChangeDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("SET_MARKER_TYPE_TITLE"),
       html: content,
       width: "auto",

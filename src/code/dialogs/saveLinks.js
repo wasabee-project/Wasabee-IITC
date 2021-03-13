@@ -69,7 +69,7 @@ const SaveLinksDialog = WDialog.extend({
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("SAVELINKS TITLE"),
       html: container,
       width: "auto",
@@ -78,9 +78,9 @@ const SaveLinksDialog = WDialog.extend({
         this.disable();
         delete this._dialog;
       },
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.savelinks,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function (options) {

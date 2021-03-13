@@ -34,11 +34,12 @@ const PromptDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: this.options.title,
       html: this._buildContent(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-prompt",
+      buttons: buttons,
       closeCallback: () => {
         window.map.fire(
           "wasabeeUIUpdate",
@@ -49,7 +50,6 @@ const PromptDialog = WDialog.extend({
         delete this._dialog;
       },
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildContent: function () {

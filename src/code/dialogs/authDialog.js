@@ -189,11 +189,12 @@ const AuthDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("AUTH REQUIRED"),
       html: content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-auth",
+      buttons: buttons,
       closeCallback: () => {
         if (
           localStorage[
@@ -207,7 +208,6 @@ const AuthDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.mustauth,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // this works in most cases
