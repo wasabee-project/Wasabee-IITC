@@ -164,10 +164,10 @@ const LinkListDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: this.options.portal.displayName + wX("LINKS2"),
       html: this._table.table,
       width: "auto",
@@ -237,7 +237,7 @@ const LinkListDialog = WDialog.extend({
       this._table.items = operation.getLinkListFromPortal(this.options.portal);
     } else {
       // the selected operation changed, just bail
-      this._dialog.dialog("close");
+      this.closeDialog();
     }
   },
 });

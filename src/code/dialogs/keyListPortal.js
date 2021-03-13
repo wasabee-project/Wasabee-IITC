@@ -34,13 +34,13 @@ const KeyListPortal = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     const op = getSelectedOperation();
     const portal = op.getPortal(this.options.portalID);
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("PORTAL KEY LIST", portal.displayName),
       html: this.getListDialogContent(this.options.portalID),
       width: "auto",

@@ -63,7 +63,7 @@ const SaveLinksDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());

@@ -48,10 +48,10 @@ const TrawlDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._trawlerDialog.dialog("close");
+      this.closeDialog("close");
     };
 
-    this._trawlerDialog = this.createDialog({
+    this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
@@ -61,7 +61,7 @@ const TrawlDialog = WDialog.extend({
         if (window.plugin.wasabee.tileTrawlQueue)
           delete window.plugin.wasabee.tileTrawlQueue;
         this.disable();
-        delete this._trawlerDialog;
+        delete this._dialog;
       },
       // id: window.plugin.wasabee.static.dialogNames.trawl
     });
@@ -105,8 +105,8 @@ const TrawlDialog = WDialog.extend({
       const points = this._getTrawlPoints();
       this._pointTileDataRequest(points, 13);
       const tiles = window.plugin.wasabee.tileTrawlQueue.size;
+      this.closeDialog();
       this._displayTrawlerDialog(tiles);
-      this._dialog.dialog("close");
     });
 
     const crazyWarning = L.DomUtil.create("h4", null, container);
@@ -119,15 +119,15 @@ const TrawlDialog = WDialog.extend({
       if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
-      this._dialog.dialog("close");
+      this.closeDialog();
     });
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",

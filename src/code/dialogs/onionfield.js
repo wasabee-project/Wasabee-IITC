@@ -69,13 +69,13 @@ const OnionfieldDialog = WDialog.extend({
     });
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: "Onion/Rose",
       html: container,
       width: "auto",

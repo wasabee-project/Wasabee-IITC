@@ -24,13 +24,13 @@ const SendTargetDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     this._html = L.DomUtil.create("div", null);
     this._setup();
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("SEND TARGET AGENT"),
       html: this._html,
       width: "auto",
@@ -97,7 +97,7 @@ const SendTargetDialog = WDialog.extend({
       const portal = operation.getPortal(this.options.target.portalId);
       try {
         await targetPromise(menu.value, portal, this._targettype);
-        this._dialog.dialog("close");
+        this.closeDialog();
         alert(wX("TARGET SENT"));
       } catch (e) {
         console.error(e);

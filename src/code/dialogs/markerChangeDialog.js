@@ -49,13 +49,13 @@ const MarkerChangeDialog = WDialog.extend({
           this.options.marker.comment
         );
       }
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("SET_MARKER_TYPE_TITLE"),
       html: content,
       width: "auto",

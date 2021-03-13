@@ -174,10 +174,10 @@ const LinkDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("ADD_LINKS"),
       html: container,
       width: "auto",

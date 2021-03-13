@@ -46,14 +46,14 @@ const AboutDialog = WDialog.extend({
     // Since the JqueryUI dialog buttons are hard-coded, we have to override them to translate them
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     // create a JQueryUI dialog, store it in _dialog
     // set closeCallback to report that we are done and free up the memory
     // set id if you want only one instance of this dialog to be displayed at a time
     // enable/disable are inherited from L.Handler via WDialog
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("ABOUT_WASABEE"),
       html: html,
       width: "auto",

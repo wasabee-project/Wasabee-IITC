@@ -26,7 +26,7 @@ const MergeDialog = WDialog.extend({
         await this._opRebase.store();
         if (getSelectedOperation().ID == this._opRebase.ID)
           await makeSelectedOperation(this._opRebase.ID);
-        this._dialog.dialog("close");
+        this.closeDialog();
       },
     });
     buttons.push({
@@ -35,16 +35,16 @@ const MergeDialog = WDialog.extend({
         await this.options.opRemote.store();
         if (getSelectedOperation().ID == this.options.opRemote.ID)
           await makeSelectedOperation(this.options.opRemote.ID);
-        this._dialog.dialog("close");
+        this.closeDialog();
       },
     });
     buttons.push({
       text: wX("CANCEL"),
       click: () => {
-        this._dialog.dialog("close");
+        this.closeDialog();
       },
     });
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("MERGE_TITLE"),
       html: this._buildContent(),
       width: "auto",

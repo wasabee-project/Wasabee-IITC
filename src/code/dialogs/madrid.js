@@ -179,18 +179,18 @@ const MadridDialog = MultimaxDialog.extend({
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);
-      // this._dialog.dialog("close");
+      // this.closeDialog();
     });
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("MADRID_TITLE"),
       html: container,
       width: "auto",

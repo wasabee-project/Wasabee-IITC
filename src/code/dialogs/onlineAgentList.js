@@ -22,12 +22,12 @@ const OnlineAgentList = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     this.update();
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: "Online Agents",
       html: this._table.table,
       width: "auto",

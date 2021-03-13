@@ -45,10 +45,10 @@ const MarkerList = WDialog.extend({
     };
 
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("MARKER_LIST", operation.name),
       html: this.getListDialogContent(operation).table,
       width: "auto",

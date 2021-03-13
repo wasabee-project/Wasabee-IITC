@@ -33,10 +33,10 @@ const KeysList = WDialog.extend({
     const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("KEY_LIST2", operation.name),
       html: this.getListDialogContent(operation).table,
       width: "auto",
