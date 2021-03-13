@@ -68,18 +68,18 @@ const NewopDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("NEW_OP"),
       html: content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-newop",
+      buttons: buttons,
       closeCallback: function () {
         noHandler.disable();
         delete noHandler._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.newopButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 });
 

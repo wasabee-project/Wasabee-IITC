@@ -37,18 +37,18 @@ const WasabeeDList = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("WASABEE_D_LIST"),
       html: this.getListDialogContent().table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-wasabeedlist",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.wasabeeDList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   getListDialogContent: function () {

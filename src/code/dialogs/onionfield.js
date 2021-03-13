@@ -75,17 +75,17 @@ const OnionfieldDialog = WDialog.extend({
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: "Onion/Rose",
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-onion",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function (options) {

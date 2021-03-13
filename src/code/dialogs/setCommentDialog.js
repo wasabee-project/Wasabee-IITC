@@ -56,18 +56,18 @@ export const SetCommentDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: this.dialogTitle,
       html: this._buildHtml(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.setComment,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildHtml: function () {

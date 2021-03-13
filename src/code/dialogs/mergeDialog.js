@@ -44,7 +44,7 @@ const MergeDialog = WDialog.extend({
         this._dialog.dialog("close");
       },
     });
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("MERGE_TITLE"),
       html: this._buildContent(),
       width: "auto",

@@ -87,18 +87,18 @@ const MarkerAddDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("ADD MARKER TITLE"),
       html: content,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _addMarker: function (selectedType, comment) {

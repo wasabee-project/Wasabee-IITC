@@ -200,18 +200,18 @@ const TeamListDialog = WDialog.extend({
       p.enable();
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("CUR_USER_INFO"),
       html: this._buildContent(),
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.wasabeeButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   toggleTeam: async function (teamID, currentState) {

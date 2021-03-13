@@ -48,11 +48,12 @@ const ImportDialog = WDialog.extend({
       this.drawToolsFormat();
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("IMP_WAS_OP"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-import",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -61,7 +62,6 @@ const ImportDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   drawToolsFormat() {

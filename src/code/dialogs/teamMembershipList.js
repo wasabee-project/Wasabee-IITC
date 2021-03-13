@@ -31,18 +31,18 @@ const TeamMembershipList = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: team.name,
       html: table.table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-teamlist",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _setupTable: function () {

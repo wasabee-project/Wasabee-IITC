@@ -190,18 +190,18 @@ const MadridDialog = MultimaxDialog.extend({
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("MADRID_TITLE"),
       html: container,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-madrid",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.madrid,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   initialize: function (options) {

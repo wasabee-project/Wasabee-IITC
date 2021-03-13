@@ -42,18 +42,18 @@ const AgentDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("AGENT_STATS"),
       html: html,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-agent",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       // id: window.plugin.wasabee.static.dialogNames.linkList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _displaySmallDialog: function () {

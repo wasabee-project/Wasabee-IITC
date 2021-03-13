@@ -36,18 +36,18 @@ const KeysList = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("KEY_LIST2", operation.name),
       html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
+      buttons: buttons,
       closeCallback: () => {
         delete this._dialog;
         this.disable();
       },
       id: window.plugin.wasabee.static.dialogNames.keysList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: async function () {

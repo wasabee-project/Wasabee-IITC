@@ -66,7 +66,7 @@ const BlockerList = WDialog.extend({
       }
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("KNOWN_BLOCK", operation.name),
       html: this.sortable.table,
       width: "auto",

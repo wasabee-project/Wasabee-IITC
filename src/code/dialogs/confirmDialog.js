@@ -44,7 +44,7 @@ const ConfirmDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: this.options.title,
       html: this._buildContent(),
       width: "auto",

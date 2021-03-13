@@ -48,18 +48,18 @@ const MarkerList = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("MARKER_LIST", operation.name),
       html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-markerlist",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
       },
       id: window.plugin.wasabee.static.dialogNames.markerList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   markerListUpdate: function () {

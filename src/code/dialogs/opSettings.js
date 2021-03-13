@@ -40,12 +40,13 @@ const OpSettingDialog = WDialog.extend({
       this._dialog.dialog("close");
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("OP_SETTINGS_TITLE"),
       html: this._content,
       height: "auto",
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-op-settings",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._content;
@@ -53,7 +54,6 @@ const OpSettingDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.opSettings,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: function () {

@@ -17,7 +17,7 @@ const ZoneSetColorDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: "Zone color",
       html: this._buildContent(),
       width: "auto",

@@ -54,18 +54,18 @@ const OperationChecklistDialog = WDialog.extend({
       loadFaked(operation, true); // force
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("OP_CHECKLIST", operation.name),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._listDialogData;
       },
       id: window.plugin.wasabee.static.dialogNames.operationChecklist,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   checklistUpdate: function () {

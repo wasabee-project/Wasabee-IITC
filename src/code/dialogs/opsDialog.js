@@ -44,12 +44,13 @@ const OpsDialog = WDialog.extend({
       this.update();
     };
 
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("OPERATIONS"),
       html: this._content,
       height: "auto",
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-ops",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._content;
@@ -57,7 +58,6 @@ const OpsDialog = WDialog.extend({
       },
       id: window.plugin.wasabee.static.dialogNames.opsList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: async function () {

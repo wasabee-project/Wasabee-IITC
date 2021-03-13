@@ -53,11 +53,12 @@ const AboutDialog = WDialog.extend({
     // set closeCallback to report that we are done and free up the memory
     // set id if you want only one instance of this dialog to be displayed at a time
     // enable/disable are inherited from L.Handler via WDialog
-    this._dialog = window.dialog({
+    this._dialog = this.createDialog({
       title: wX("ABOUT_WASABEE"),
       html: html,
       width: "auto",
       dialogClass: "wasabee-dialog wasabee-dialog-about",
+      buttons: buttons,
       closeCallback: () => {
         this.disable();
         delete this._dialog;
@@ -65,8 +66,6 @@ const AboutDialog = WDialog.extend({
       // setting buttons: buttons here would append them -- swap in below
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
-    // swap in our buttons, replacing the defaults
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // small-screen versions go in _displaySmallDialog
