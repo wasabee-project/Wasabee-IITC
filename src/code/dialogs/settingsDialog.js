@@ -224,6 +224,7 @@ const SettingsDialog = WDialog.extend({
     const serverDialog = new PromptDialog({
       title: wX("CHANGE_WAS_SERVER"),
       label: wX("NEW_WAS_SERVER"),
+      suggestions: window.plugin.wasabee.static.publicServers,
       callback: () => {
         if (serverDialog.inputField.value) {
           SetWasabeeServer(serverDialog.inputField.value);

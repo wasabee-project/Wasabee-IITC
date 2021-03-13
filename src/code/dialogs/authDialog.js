@@ -141,6 +141,7 @@ const AuthDialog = WDialog.extend({
       const serverDialog = new PromptDialog({
         title: wX("CHANGE SERVER"),
         label: wX("CHANGE SERVER PROMPT"),
+        suggestions: window.plugin.wasabee.static.publicServers,
         callback: () => {
           if (serverDialog.inputField.value) {
             SetWasabeeServer(serverDialog.inputField.value);
