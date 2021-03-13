@@ -110,13 +110,13 @@ const FanfieldDialog = WDialog.extend({
     });
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("FANFIELD2"),
       html: container,
       width: "auto",

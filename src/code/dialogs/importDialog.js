@@ -42,13 +42,13 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("GET DT")] = () => {
       this.drawToolsFormat();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("IMP_WAS_OP"),
       html: container,
       width: "auto",

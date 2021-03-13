@@ -37,10 +37,10 @@ const OpSettingDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("OP_SETTINGS_TITLE"),
       html: this._content,
       height: "auto",

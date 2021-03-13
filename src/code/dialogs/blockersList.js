@@ -40,7 +40,7 @@ const BlockerList = WDialog.extend({
     loadFaked(operation);
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
       window.map.fire("wasabeeUIUpdate", { reason: "blockerlist" }, false);
     };
     buttons[wX("AUTOMARK")] = () => {
@@ -66,7 +66,7 @@ const BlockerList = WDialog.extend({
       }
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("KNOWN_BLOCK", operation.name),
       html: this.sortable.table,
       width: "auto",

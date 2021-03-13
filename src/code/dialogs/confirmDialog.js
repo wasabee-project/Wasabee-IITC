@@ -37,14 +37,14 @@ const ConfirmDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       if (this.options.callback) this.options.callback();
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
       if (this.options.cancelCallback) this.options.cancelCallback();
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: this.options.title,
       html: this._buildContent(),
       width: "auto",

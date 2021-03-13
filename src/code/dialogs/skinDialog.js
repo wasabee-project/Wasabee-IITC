@@ -75,7 +75,7 @@ const SkinDialog = WDialog.extend({
   _displayDialog: function () {
     const content = this._buildContent();
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("SKINS_MANAGE_TITLE"),
       html: content,
       width: "auto",

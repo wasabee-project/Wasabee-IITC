@@ -23,13 +23,13 @@ const StateDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     // for this._name and this._html
     this._buildContent();
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: this._name,
       html: this._html,
       width: "auto",

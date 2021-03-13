@@ -48,13 +48,13 @@ const OperationChecklistDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(operation, true); // force
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("OP_CHECKLIST", operation.name),
       html: this.sortable.table,
       width: "auto",

@@ -21,7 +21,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("MM"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const mm = new MultimaxDialog();
           mm.enable();
         },
@@ -29,7 +29,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("MAX"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const ff = new FanfieldDialog();
           ff.enable();
         },
@@ -37,7 +37,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("STARBURST"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const sb = new StarburstDialog();
           sb.enable();
         },
@@ -45,7 +45,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("ONION_WAS_TAKEN"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const o = new OnionfieldDialog();
           o.enable();
         },
@@ -53,7 +53,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("HG"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const h = new HomogeneousDialog();
           h.enable();
         },
@@ -61,7 +61,7 @@ const AutodrawsDialog = WDialog.extend({
       {
         text: wX("MADRID_WAS_TAKEN"),
         callback: () => {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const m = new MadridDialog();
           m.enable();
         },
@@ -101,10 +101,10 @@ const AutodrawsDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("AUTODRAWS"),
       html: html,
       width: "auto",

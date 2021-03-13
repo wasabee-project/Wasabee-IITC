@@ -24,14 +24,14 @@ const AssignDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     // create container then setup asynchronously
     this._html = L.DomUtil.create("div", "container");
     this._setup();
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: this._name,
       html: this._html,
       width: "auto",

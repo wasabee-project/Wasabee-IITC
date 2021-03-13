@@ -169,14 +169,14 @@ const HomogeneousDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       this._layerGroup.clearLayers();
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: "Homogeneous",
       html: container,
       width: "auto",

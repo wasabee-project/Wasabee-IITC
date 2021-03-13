@@ -53,10 +53,10 @@ export const SetCommentDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: this.dialogTitle,
       html: this._buildHtml(),
       width: "auto",

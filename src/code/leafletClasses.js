@@ -55,10 +55,18 @@ export const WDialog = L.Handler.extend({
   createDialog: function (options) {
     options.dialogClass =
       "wasabee-dialog wasabee-dialog-" + options.dialogClass;
-    const dialog = window.dialog(options);
+    this._dialog = window.dialog(options);
     // swap in our buttons, replacing the defaults
-    if (options.buttons) dialog.dialog("option", "buttons", options.buttons);
-    return dialog;
+    if (options.buttons)
+      this._dialog.dialog("option", "buttons", options.buttons);
+    return this._dialog;
+  },
+
+  closeDialog: function () {
+    if (this._dialog) {
+      this._dialog.dialog("close");
+      delete this._dialog;
+    }
   },
 
   _isMobile: function () {

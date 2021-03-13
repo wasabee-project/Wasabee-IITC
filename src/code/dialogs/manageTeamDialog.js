@@ -298,7 +298,7 @@ const ManageTeamDialog = WDialog.extend({
           try {
             await deleteTeamPromise(this.options.team.ID);
             alert(`${this.options.team.Name} removed`);
-            this._dialog.dialog("close");
+            this.closeDialog();
             await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
@@ -329,10 +329,10 @@ const ManageTeamDialog = WDialog.extend({
     const container = this._dialogContent();
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("MANAGE_TEAM", this.options.team.Name),
       width: "auto",
       html: container,

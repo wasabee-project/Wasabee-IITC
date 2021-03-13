@@ -66,13 +66,13 @@ const StarburstDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("STARBURST TITLE"),
       html: container,
       width: "auto",

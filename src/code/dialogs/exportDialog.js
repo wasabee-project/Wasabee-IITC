@@ -17,7 +17,7 @@ const ExportDialog = WDialog.extend({
     const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
       this._drawToolsFormat(operation);
@@ -26,7 +26,7 @@ const ExportDialog = WDialog.extend({
       this._bookmarkFormat(operation);
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("EXPORT") + operation.name,
       html: this._buildContent(operation),
       width: "auto",

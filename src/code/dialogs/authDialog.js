@@ -124,7 +124,7 @@ const AuthDialog = WDialog.extend({
         try {
           const newme = await WasabeeMe.waitGet(true);
           newme.store();
-          this._dialog.dialog("close");
+          this.closeDialog();
           fullSync();
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
@@ -170,7 +170,7 @@ const AuthDialog = WDialog.extend({
               await oneTimeToken(ottDialog.inputField.value);
               const newme = await WasabeeMe.waitGet(true);
               newme.store();
-              this._dialog.dialog("close");
+              this.closeDialog();
               fullSync();
               postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
             } catch (e) {
@@ -186,10 +186,10 @@ const AuthDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("AUTH REQUIRED"),
       html: content,
       width: "auto",
@@ -248,7 +248,7 @@ const AuthDialog = WDialog.extend({
               const r = await SendAccessTokenAsync(responseSelect.access_token);
               const newme = new WasabeeMe(r);
               newme.store();
-              this._dialog.dialog("close");
+              this.closeDialog();
               fullSync();
               postToFirebase({
                 id: "wasabeeLogin",
@@ -257,11 +257,11 @@ const AuthDialog = WDialog.extend({
             } catch (e) {
               alert(wX("AUTH TOKEN REJECTED", e.toString()));
               console.error(e);
-              this._dialog.dialog("close");
+              this.closeDialog();
             }
           });
         } else {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
           postToFirebase({ id: "exception", error: err });
           console.log(err);
@@ -273,14 +273,14 @@ const AuthDialog = WDialog.extend({
         const r = await SendAccessTokenAsync(response.access_token);
         const newme = new WasabeeMe(r);
         newme.store();
-        this._dialog.dialog("close");
+        this.closeDialog();
         fullSync();
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
       } catch (e) {
         postToFirebase({ id: "exception", error: e.toString() });
         console.error(e);
         alert(e.toString());
-        this._dialog.dialog("close");
+        this.closeDialog();
       }
     });
   },
@@ -296,7 +296,7 @@ const AuthDialog = WDialog.extend({
       },
       async (response) => {
         if (response.error) {
-          this._dialog.dialog("close");
+          this.closeDialog();
           const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
           alert(err);
           postToFirebase({ id: "exception", error: err });
@@ -306,7 +306,7 @@ const AuthDialog = WDialog.extend({
           const r = await SendAccessTokenAsync(response.access_token);
           const newme = new WasabeeMe(r);
           newme.store();
-          this._dialog.dialog("close");
+          this.closeDialog();
           fullSync();
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {

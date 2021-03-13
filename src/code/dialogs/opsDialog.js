@@ -37,14 +37,14 @@ const OpsDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons["Unhide all OPs"] = () => {
       resetHiddenOps();
       this.update();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("OPERATIONS"),
       html: this._content,
       height: "auto",

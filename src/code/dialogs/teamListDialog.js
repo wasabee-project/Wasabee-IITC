@@ -173,7 +173,7 @@ const TeamListDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("NEW_TEAM")] = () => {
       const p = new PromptDialog({
@@ -200,7 +200,7 @@ const TeamListDialog = WDialog.extend({
       p.enable();
     };
 
-    this._dialog = this.createDialog({
+    this.createDialog({
       title: wX("CUR_USER_INFO"),
       html: this._buildContent(),
       width: "auto",
