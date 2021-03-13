@@ -142,7 +142,7 @@ const AuthDialog = WDialog.extend({
         title: wX("CHANGE SERVER"),
         label: wX("CHANGE SERVER PROMPT"),
         suggestions: window.plugin.wasabee.static.publicServers.map((e) => ({
-          text: e.name,
+          text: `${e.name} (${e.url})`,
           value: e.url,
         })),
         callback: () => {

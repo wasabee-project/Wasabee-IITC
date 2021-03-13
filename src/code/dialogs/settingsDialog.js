@@ -225,7 +225,7 @@ const SettingsDialog = WDialog.extend({
       title: wX("CHANGE_WAS_SERVER"),
       label: wX("NEW_WAS_SERVER"),
       suggestions: window.plugin.wasabee.static.publicServers.map((e) => ({
-        text: e.name,
+        text: `${e.name} (${e.url})`,
         value: e.url,
       })),
       callback: () => {
