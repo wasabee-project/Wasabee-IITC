@@ -36,10 +36,6 @@ const SendTargetDialog = WDialog.extend({
       width: "auto",
       dialogClass: "sendtarget",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.assign,
     });
   },

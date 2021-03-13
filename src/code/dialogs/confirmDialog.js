@@ -50,10 +50,6 @@ const ConfirmDialog = WDialog.extend({
       width: "auto",
       dialogClass: "confirm",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },

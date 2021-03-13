@@ -254,10 +254,6 @@ const SettingsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "settings",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.settings,
     });
   },

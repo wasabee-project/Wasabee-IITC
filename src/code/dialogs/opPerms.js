@@ -102,10 +102,6 @@ const OpPermList = WDialog.extend({
       height: "auto",
       dialogClass: "perms",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },

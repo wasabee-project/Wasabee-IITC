@@ -32,10 +32,6 @@ const ExportDialog = WDialog.extend({
       width: "auto",
       dialogClass: "export",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.exportDialog,
     });
   },

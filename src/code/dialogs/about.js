@@ -59,10 +59,6 @@ const AboutDialog = WDialog.extend({
       width: "auto",
       dialogClass: "about",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       // setting buttons: buttons here would append them -- swap in below
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });

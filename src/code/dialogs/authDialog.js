@@ -21,6 +21,18 @@ const AuthDialog = WDialog.extend({
     this._displayDialog();
   },
 
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    if (
+      localStorage[window.plugin.wasabee.static.constants.SEND_LOCATION_KEY] ===
+      "true"
+    )
+      sendLocation();
+    this.randomTip();
+    window.map.fire("wasabeeUIUpdate", { reason: "authDialog" }, false);
+    window.map.fire("wasabeeDkeys", { reason: "authDialog" }, false);
+  },
+
   randomTip: function () {
     const lang = getLanguage();
     if (!window.plugin.wasabee.static.tips[lang]) return;
@@ -195,17 +207,6 @@ const AuthDialog = WDialog.extend({
       width: "auto",
       dialogClass: "auth",
       buttons: buttons,
-      closeCallback: () => {
-        if (
-          localStorage[
-            window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
-          ] === "true"
-        )
-          sendLocation();
-        this.randomTip();
-        window.map.fire("wasabeeUIUpdate", { reason: "authDialog" }, false);
-        window.map.fire("wasabeeDkeys", { reason: "authDialog" }, false);
-      },
       id: window.plugin.wasabee.static.dialogNames.mustauth,
     });
   },

@@ -74,10 +74,6 @@ const SaveLinksDialog = WDialog.extend({
       html: container,
       width: "auto",
       dialogClass: "savelinks",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.savelinks,
     });

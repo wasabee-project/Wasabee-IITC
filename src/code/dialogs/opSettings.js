@@ -47,11 +47,6 @@ const OpSettingDialog = WDialog.extend({
       width: "auto",
       dialogClass: "op-settings",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._content;
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.opSettings,
     });
   },

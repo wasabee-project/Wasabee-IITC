@@ -338,10 +338,6 @@ const ManageTeamDialog = WDialog.extend({
       html: container,
       dialogClass: "manageteam",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.manageTeam,
     });
   },

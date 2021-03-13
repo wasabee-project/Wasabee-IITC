@@ -113,10 +113,6 @@ const MultimaxDialog = WDialog.extend({
       width: "auto",
       dialogClass: "multimax",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.multimaxButton,
     });
   },

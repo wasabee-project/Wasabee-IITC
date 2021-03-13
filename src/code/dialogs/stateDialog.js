@@ -35,10 +35,6 @@ const StateDialog = WDialog.extend({
       width: "auto",
       dialogClass: "state",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.state,
     });
   },

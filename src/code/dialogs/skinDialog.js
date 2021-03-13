@@ -80,10 +80,6 @@ const SkinDialog = WDialog.extend({
       html: content,
       width: "auto",
       dialogClass: "skin",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.skinDialog,
     });
   },
