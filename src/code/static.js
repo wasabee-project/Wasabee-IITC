@@ -85,9 +85,9 @@ W.static = {
     },
   },
   publicServers: [
-    "https://am.wasabee.rocks",
-    "https://eu.wasabee.rocks",
-    "https://ap.wasabee.rocks",
+    { name: "Americas", url: "https://am.wasabee.rocks" },
+    { name: "Europe", url: "https://eu.wasabee.rocks" },
+    { name: "Asia/Pacific", url: "https://ap.wasabee.rocks" },
   ],
 };
 
