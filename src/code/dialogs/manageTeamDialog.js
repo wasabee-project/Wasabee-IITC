@@ -336,7 +336,7 @@ const ManageTeamDialog = WDialog.extend({
       title: wX("MANAGE_TEAM", this.options.team.Name),
       width: "auto",
       html: container,
-      dialogClass: "wasabee-dialog wasabee-dialog-manageteam",
+      dialogClass: "manageteam",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

@@ -79,7 +79,7 @@ const SkinDialog = WDialog.extend({
       title: wX("SKINS_MANAGE_TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-skin",
+      dialogClass: "skin",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

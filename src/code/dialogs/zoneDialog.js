@@ -41,7 +41,7 @@ const ZoneDialog = WDialog.extend({
       title: "Zones",
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-zone",
+      dialogClass: "zone",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

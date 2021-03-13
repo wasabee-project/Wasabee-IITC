@@ -21,7 +21,7 @@ const ZoneSetColorDialog = WDialog.extend({
       title: "Zone color",
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-zone-color",
+      dialogClass: "zone-color",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

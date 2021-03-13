@@ -194,7 +194,7 @@ const MadridDialog = MultimaxDialog.extend({
       title: wX("MADRID_TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-madrid",
+      dialogClass: "madrid",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

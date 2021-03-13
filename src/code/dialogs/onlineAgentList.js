@@ -31,7 +31,7 @@ const OnlineAgentList = WDialog.extend({
       title: "Online Agents",
       html: this._table.table,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-teamlist",
+      dialogClass: "teamlist",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

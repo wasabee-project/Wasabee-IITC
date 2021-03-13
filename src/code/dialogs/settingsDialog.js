@@ -252,7 +252,7 @@ const SettingsDialog = WDialog.extend({
       title: wX("SETTINGS"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-settings",
+      dialogClass: "settings",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

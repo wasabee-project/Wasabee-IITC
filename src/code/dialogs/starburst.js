@@ -76,7 +76,7 @@ const StarburstDialog = WDialog.extend({
       title: wX("STARBURST TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-starburst",
+      dialogClass: "starburst",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

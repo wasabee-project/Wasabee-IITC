@@ -79,7 +79,7 @@ const OnionfieldDialog = WDialog.extend({
       title: "Onion/Rose",
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-onion",
+      dialogClass: "onion",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

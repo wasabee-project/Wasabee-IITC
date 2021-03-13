@@ -49,7 +49,7 @@ const OpsDialog = WDialog.extend({
       html: this._content,
       height: "auto",
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-ops",
+      dialogClass: "ops",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

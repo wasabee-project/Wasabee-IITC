@@ -73,7 +73,7 @@ const SaveLinksDialog = WDialog.extend({
       title: wX("SAVELINKS TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-savelinks",
+      dialogClass: "savelinks",
       closeCallback: () => {
         this.disable();
         delete this._dialog;

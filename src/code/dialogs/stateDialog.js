@@ -33,7 +33,7 @@ const StateDialog = WDialog.extend({
       title: this._name,
       html: this._html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-state",
+      dialogClass: "state",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

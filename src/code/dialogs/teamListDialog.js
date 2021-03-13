@@ -204,7 +204,7 @@ const TeamListDialog = WDialog.extend({
       title: wX("CUR_USER_INFO"),
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-wasabee",
+      dialogClass: "wasabee",
       buttons: buttons,
       closeCallback: () => {
         this.disable();
