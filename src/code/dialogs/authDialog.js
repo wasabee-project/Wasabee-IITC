@@ -152,8 +152,9 @@ const AuthDialog = WDialog.extend({
             WasabeeMe.purge();
           }
         },
-        current: GetWasabeeServer(),
-        placeholder: "https://am.wasabee.rocks",
+        placeholder:
+          GetWasabeeServer() ||
+          window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT,
       });
       serverDialog.enable();
     });

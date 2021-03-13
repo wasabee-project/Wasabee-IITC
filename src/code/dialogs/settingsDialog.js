@@ -234,8 +234,9 @@ const SettingsDialog = WDialog.extend({
           WasabeeMe.purge();
         }
       },
-      current: GetWasabeeServer(),
-      placeholder: window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT,
+      placeholder:
+        GetWasabeeServer() ||
+        window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT,
     });
     serverDialog.enable();
   },
