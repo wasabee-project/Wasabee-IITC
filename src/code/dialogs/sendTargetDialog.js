@@ -34,7 +34,7 @@ const SendTargetDialog = WDialog.extend({
       title: wX("SEND TARGET AGENT"),
       html: this._html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-sendtarget",
+      dialogClass: "sendtarget",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

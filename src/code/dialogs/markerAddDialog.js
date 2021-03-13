@@ -91,7 +91,7 @@ const MarkerAddDialog = WDialog.extend({
       title: wX("ADD MARKER TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-markeradd",
+      dialogClass: "markeradd",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

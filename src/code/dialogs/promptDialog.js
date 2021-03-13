@@ -38,7 +38,7 @@ const PromptDialog = WDialog.extend({
       title: this.options.title,
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-prompt",
+      dialogClass: "prompt",
       buttons: buttons,
       closeCallback: () => {
         window.map.fire(

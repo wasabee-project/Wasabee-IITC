@@ -180,7 +180,7 @@ const HomogeneousDialog = WDialog.extend({
       title: "Homogeneous",
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-homogeneous",
+      dialogClass: "homogeneous",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

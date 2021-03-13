@@ -181,7 +181,7 @@ const LinkDialog = WDialog.extend({
       title: wX("ADD_LINKS"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-link",
+      dialogClass: "link",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

@@ -55,7 +55,7 @@ const TrawlDialog = WDialog.extend({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-trawl",
+      dialogClass: "trawl",
       buttons: buttons,
       closeCallback: () => {
         if (window.plugin.wasabee.tileTrawlQueue)
@@ -131,7 +131,7 @@ const TrawlDialog = WDialog.extend({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-trawl",
+      dialogClass: "trawl",
       buttons: buttons,
       closeCallback: () => {
         // this.disable();

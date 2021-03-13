@@ -57,7 +57,7 @@ const AboutDialog = WDialog.extend({
       title: wX("ABOUT_WASABEE"),
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-about",
+      dialogClass: "about",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

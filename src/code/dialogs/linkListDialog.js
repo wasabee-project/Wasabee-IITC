@@ -171,7 +171,7 @@ const LinkListDialog = WDialog.extend({
       title: this.options.portal.displayName + wX("LINKS2"),
       html: this._table.table,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
+      dialogClass: "linklist",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

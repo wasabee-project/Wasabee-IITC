@@ -46,7 +46,7 @@ const AgentDialog = WDialog.extend({
       title: wX("AGENT_STATS"),
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-agent",
+      dialogClass: "agent",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

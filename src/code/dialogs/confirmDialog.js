@@ -48,7 +48,7 @@ const ConfirmDialog = WDialog.extend({
       title: this.options.title,
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-confirm",
+      dialogClass: "confirm",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

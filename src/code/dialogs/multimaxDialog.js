@@ -111,7 +111,7 @@ const MultimaxDialog = WDialog.extend({
       title: wX("MULTI_M_TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-multimax",
+      dialogClass: "multimax",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

@@ -60,7 +60,7 @@ export const SetCommentDialog = WDialog.extend({
       title: this.dialogTitle,
       html: this._buildHtml(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-setcomment",
+      dialogClass: "setcomment",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

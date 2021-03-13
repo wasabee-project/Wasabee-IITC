@@ -45,7 +45,7 @@ const OpSettingDialog = WDialog.extend({
       html: this._content,
       height: "auto",
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-op-settings",
+      dialogClass: "op-settings",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

@@ -48,7 +48,7 @@ const MergeDialog = WDialog.extend({
       title: wX("MERGE_TITLE"),
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-merge",
+      dialogClass: "merge",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

@@ -59,7 +59,7 @@ const MarkerChangeDialog = WDialog.extend({
       title: wX("SET_MARKER_TYPE_TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-markerchange",
+      dialogClass: "markerchange",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

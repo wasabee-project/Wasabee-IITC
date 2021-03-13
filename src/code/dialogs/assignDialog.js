@@ -35,7 +35,7 @@ const AssignDialog = WDialog.extend({
       title: this._name,
       html: this._html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-assign",
+      dialogClass: "assign",
       buttons: buttons,
       closeCallback: () => {
         this.disable();

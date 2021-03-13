@@ -100,7 +100,7 @@ const OpPermList = WDialog.extend({
       title: wX("PERMS", operation.name),
       html: this._html,
       height: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-perms",
+      dialogClass: "perms",
       buttons: buttons,
       closeCallback: () => {
         this.disable();
