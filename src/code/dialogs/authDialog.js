@@ -152,9 +152,7 @@ const AuthDialog = WDialog.extend({
             WasabeeMe.purge();
           }
         },
-        placeholder:
-          GetWasabeeServer() ||
-          window.plugin.wasabee.static.constants.SERVER_BASE_DEFAULT,
+        placeholder: GetWasabeeServer(),
       });
       serverDialog.enable();
     });
