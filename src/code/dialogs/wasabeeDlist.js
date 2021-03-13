@@ -28,7 +28,7 @@ const WasabeeDList = WDialog.extend({
 
   update: function () {
     const table = this.getListDialogContent().table;
-    this._dialog.html(table);
+    this.setContent(table);
   },
 
   _displayDialog: function () {

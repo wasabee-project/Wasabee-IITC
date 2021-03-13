@@ -52,9 +52,9 @@ const OpSettingDialog = WDialog.extend({
   },
 
   update: function () {
-    if (this._enabled && this._dialog && this._dialog.html) {
+    if (this._enabled) {
       this.makeContent();
-      this._dialog.html(this._content);
+      this.setContent(this._content);
     }
   },
 

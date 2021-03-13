@@ -62,8 +62,8 @@ const MarkerList = WDialog.extend({
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("op changed");
     const table = this.getListDialogContent(operation).table;
-    this._dialog.html(table);
-    this._dialog.dialog("option", "title", wX("MARKER_LIST", operation.name));
+    this.setContent(table);
+    this.setTitle(wX("MARKER_LIST", operation.name));
   },
 
   getListDialogContent: function (operation) {

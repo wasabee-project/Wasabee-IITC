@@ -84,8 +84,8 @@ const BlockerList = WDialog.extend({
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
-    this._dialog.html(this.sortable.table);
-    this._dialog.dialog("option", "title", wX("KNOWN_BLOCK", operation.name));
+    this.setContent(this.sortable.table);
+    this.setTitle(wX("KNOWN_BLOCK", operation.name));
   },
 
   // because the sortable values depend on the operation, we can't have it created at addHooks unless we want a lot of getSelectedOperations embedded here

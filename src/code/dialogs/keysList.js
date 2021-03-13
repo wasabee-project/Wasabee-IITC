@@ -54,9 +54,9 @@ const KeysList = WDialog.extend({
     if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
     else this._me = null;
 
-    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
+    this.setTitle(wX("KEY_LIST", operation.name));
     const table = this.getListDialogContent(operation).table;
-    this._dialog.html(table);
+    this.setContent(table);
   },
 
   getListDialogContent: function (operation) {
