@@ -13,11 +13,35 @@
 	display: none;
 }
 
-.wasabee-pane .header {
+.wasabee-pane .wasabee-dialog .header {
+	position: sticky;
+	top: 0;
   font-size: 1.3em;
   line-height: 1.5em;
   font-weight: bold;
   text-align: center;
   color: #ffce00;
-  background-color: #000a;
+  background-color: rgba(8, 48, 78, 0.9);
+	border: 1px solid #20A8B1;
+}
+
+.wasabee-pane .wasabee-dialog .content {
+	overflow-y: hidden;
+}
+
+.wasabee-pane .wasabee-dialog .buttonset {
+  position: sticky;
+  bottom: 0;
+  text-align: right;
+  background-color: rgba(8, 48, 78, 0.9);
+	border: 1px solid #20A8B1;
+}
+
+.wasabee-pane .wasabee-dialog .buttonset button {
+		padding: 2px 4px;
+		margin: 2px;
+    min-width: 40px;
+    color: #FFCE00;
+    border: 1px solid #FFCE00;
+    background-color: rgba(8, 48, 78, 0.9);
 }
