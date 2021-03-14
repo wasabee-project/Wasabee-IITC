@@ -8,6 +8,7 @@ import { initFirebase, postToFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
+import { WPane } from "./leafletClasses";
 import WasabeeMe from "./me";
 import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
@@ -81,6 +82,13 @@ window.plugin.wasabee.init = async () => {
     window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
     sendLocation();
   });
+
+  // Android panes
+  const usePanes =
+    localStorage[Wasabee.static.constants.USE_ANDROID_PANES] === "true";
+  if (window.useAndroidPanes() && usePanes) {
+    new WPane();
+  }
 
   // hooks called when layers are enabled/disabled
   window.map.on("layeradd", (obj) => {

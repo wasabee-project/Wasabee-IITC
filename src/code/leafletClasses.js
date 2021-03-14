@@ -36,9 +36,52 @@ export const WTooltip = L.Class.extend({
   },
 });
 
+// Android pane
+export const WPane = L.Handler.extend({
+  options: {
+    paneId: "wasabee",
+    paneName: "Wasabee",
+  },
+
+  initialize: function (options) {
+    L.setOptions(this, options);
+    android.addPane(this.options.paneId, this.options.paneName);
+    window.addHook("paneChanged", (pane) => {
+      if (pane === this.options.paneId) this.enable();
+      else this.disable();
+    });
+    this._container = L.DomUtil.create(
+      "div",
+      "wasabee-pane hidden",
+      document.body
+    );
+    window.map.on("wasabee:paneset", (data) => {
+      if (data.pane !== this.options.paneId) return;
+      if (this._dialog) this._dialog.closeDialog();
+      this._dialog = data.dialog;
+      this._container.textContent = "";
+      this._container.appendChild(this._dialog._container);
+      window.show(data.pane);
+    });
+  },
+
+  addHooks: function () {
+    this._container.classList.remove("hidden");
+  },
+
+  removeHooks: function () {
+    this._container.classList.add("hidden");
+  },
+});
+
 export const WDialog = L.Handler.extend({
   statics: {
     TYPE: "Unextended Wasabee Dialog",
+  },
+
+  options: {
+    usePane: false,
+    paneId: "wasabee",
   },
 
   initialize: function (options) {
@@ -46,6 +89,11 @@ export const WDialog = L.Handler.extend({
     // determine large or small screen dialog sizes
     this._smallScreen = this._isMobile();
     window.map.fire("wdialog", this);
+    this.options.usePane =
+      this.options.usePane &&
+      window.useAndroidPanes() &&
+      localStorage[window.plugin.wasabee.static.constants.USE_ANDROID_PANES] ===
+        "true";
   },
 
   addHooks: function () {},
@@ -55,17 +103,27 @@ export const WDialog = L.Handler.extend({
   createDialog: function (options) {
     options.dialogClass =
       "wasabee-dialog wasabee-dialog-" + options.dialogClass;
-    if (!options.closeCallback) {
-      options.closeCallback = () => {
-        this.disable();
-        delete this._dialog;
-      };
+    if (this.options.usePane) {
+      this._container = L.DomUtil.create("div", options.dialogClass);
+      if (options.id) this._container.id = options.id;
+      if (options.html) this._container.appendChild(options.html);
+      window.map.fire("wasabee:paneset", {
+        pane: this.options.paneId,
+        dialog: this,
+      });
+      /// XXX butons/title etc
+    } else {
+      if (!options.closeCallback) {
+        options.closeCallback = () => {
+          this.disable();
+          delete this._dialog;
+        };
+      }
+      this._dialog = window.dialog(options);
+      // swap in our buttons, replacing the defaults
+      if (options.buttons)
+        this._dialog.dialog("option", "buttons", options.buttons);
     }
-    this._dialog = window.dialog(options);
-    // swap in our buttons, replacing the defaults
-    if (options.buttons)
-      this._dialog.dialog("option", "buttons", options.buttons);
-    return this._dialog;
   },
 
   setTitle: function (title) {
@@ -74,12 +132,19 @@ export const WDialog = L.Handler.extend({
 
   setContent: function (content) {
     if (this._dialog) this._dialog.html(content);
+    else if (this._container) {
+      this._container.textContent = "";
+      this._container.appendChild(content);
+    }
   },
 
   closeDialog: function () {
     if (this._dialog) {
       this._dialog.dialog("close");
       delete this._dialog;
+    } else if (this._container) {
+      this.disable();
+      delete this._container;
     }
   },
 

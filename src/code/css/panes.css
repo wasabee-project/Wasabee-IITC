@@ -1,0 +1,14 @@
+.wasabee-pane {
+  background: transparent;
+  border: 0 none;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: absolute;
+  overflow: auto;
+}
+
+.wasabee-pane.hidden {
+	display: none;
+}
