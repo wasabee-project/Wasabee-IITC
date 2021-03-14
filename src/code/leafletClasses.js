@@ -61,6 +61,7 @@ export const WPane = L.Handler.extend({
       if (this._dialog) this._dialog.closeDialog();
       this._dialog = data.dialog;
       this._container.textContent = "";
+      this._container.appendChild(this._dialog._header);
       this._container.appendChild(this._dialog._container);
       window.show(data.pane);
     });
@@ -101,9 +102,12 @@ export const WDialog = L.Handler.extend({
   removeHooks: function () {},
 
   createDialog: function (options) {
+    this.options.title = options.title;
     options.dialogClass =
       "wasabee-dialog wasabee-dialog-" + options.dialogClass;
     if (this.options.usePane) {
+      this._header = L.DomUtil.create("div", "header");
+      if (options.title) this._header.textContent = options.title;
       this._container = L.DomUtil.create("div", options.dialogClass);
       if (options.id) this._container.id = options.id;
       if (options.html) this._container.appendChild(options.html);
@@ -128,6 +132,7 @@ export const WDialog = L.Handler.extend({
 
   setTitle: function (title) {
     if (this._dialog) this._dialog.dialog("option", "title", title);
+    else if (this._header) this._header.textContent = title;
   },
 
   setContent: function (content) {
