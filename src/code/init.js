@@ -84,9 +84,8 @@ window.plugin.wasabee.init = async () => {
   });
 
   // Android panes
-  const usePanes =
-    localStorage[Wasabee.static.constants.USE_ANDROID_PANES] === "true";
-  if (window.useAndroidPanes() && usePanes) {
+  const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
+  if (window.isSmartphone() && usePanes) {
     new WPane();
   }
 

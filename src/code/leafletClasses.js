@@ -45,7 +45,8 @@ export const WPane = L.Handler.extend({
 
   initialize: function (options) {
     L.setOptions(this, options);
-    android.addPane(this.options.paneId, this.options.paneName);
+    if (window.useAndroidPanes())
+      android.addPane(this.options.paneId, this.options.paneName);
     window.addHook("paneChanged", (pane) => {
       if (pane === this.options.paneId) this.enable();
       else this.disable();
@@ -91,9 +92,8 @@ export const WDialog = L.Handler.extend({
     window.map.fire("wdialog", this);
     this.options.usePane =
       this.options.usePane &&
-      window.useAndroidPanes() &&
-      localStorage[window.plugin.wasabee.static.constants.USE_ANDROID_PANES] ===
-        "true";
+      window.isSmartphone() &&
+      localStorage[window.plugin.wasabee.static.constants.USE_PANES] === "true";
   },
 
   addHooks: function () {},
