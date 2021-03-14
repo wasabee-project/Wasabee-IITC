@@ -11,6 +11,10 @@ const KeysList = WDialog.extend({
     TYPE: "keysList",
   },
 
+  options: {
+    usePane: true,
+  },
+
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();

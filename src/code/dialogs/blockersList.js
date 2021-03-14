@@ -15,6 +15,10 @@ const BlockerList = WDialog.extend({
     TYPE: "blockerList",
   },
 
+  options: {
+    usePane: true,
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.blockerlistUpdate, this);
