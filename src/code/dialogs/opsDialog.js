@@ -37,7 +37,7 @@ const OpsDialog = WDialog.extend({
   },
 
   _displayDialog: async function () {
-    await this.makeContent(getSelectedOperation());
+    const content = await this.makeContent(getSelectedOperation());
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -50,7 +50,7 @@ const OpsDialog = WDialog.extend({
 
     this.createDialog({
       title: wX("OPERATIONS"),
-      html: this._content,
+      html: content,
       height: "auto",
       width: "auto",
       dialogClass: "ops",
@@ -61,8 +61,8 @@ const OpsDialog = WDialog.extend({
 
   update: async function () {
     if (this._enabled) {
-      await this.makeContent(getSelectedOperation());
-      this.setContent(this._content);
+      const content = await this.makeContent(getSelectedOperation());
+      this.setContent(content);
     }
   },
 
@@ -259,7 +259,7 @@ const OpsDialog = WDialog.extend({
       }
     }
 
-    this._content = container;
+    return container;
   },
 });
 

@@ -33,7 +33,7 @@ const OpSettingDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    this.makeContent();
+    const content = this.makeContent();
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -42,7 +42,7 @@ const OpSettingDialog = WDialog.extend({
 
     this.createDialog({
       title: wX("OP_SETTINGS_TITLE"),
-      html: this._content,
+      html: content,
       height: "auto",
       width: "auto",
       dialogClass: "op-settings",
@@ -53,8 +53,8 @@ const OpSettingDialog = WDialog.extend({
 
   update: function () {
     if (this._enabled) {
-      this.makeContent();
-      this.setContent(this._content);
+      const content = this.makeContent();
+      this.setContent(content);
     }
   },
 
@@ -210,7 +210,7 @@ const OpSettingDialog = WDialog.extend({
       await makeSelectedOperation(newop.ID);
     });
 
-    this._content = content;
+    return content;
   },
 });
 
