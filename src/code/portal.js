@@ -19,16 +19,10 @@ export default class WasabeePortal {
     // check window.portals[id].options.data for updated name ?
     this.name = obj.name;
 
-    if (typeof obj.lat == "number") {
-      this.lat = obj.lat.toFixed(6);
-    } else {
-      this.lat = obj.lat;
-    }
-    if (typeof obj.lng == "number") {
-      this.lng = obj.lng.toFixed(6);
-    } else {
-      this.lng = obj.lng;
-    }
+    // make sure we are using 6-digits precision "number"
+    this.lat = (+obj.lat).toFixed(6);
+    this.lng = (+obj.lng).toFixed(6);
+
     this.comment = obj.comment;
     this.hardness = obj.hardness;
 
