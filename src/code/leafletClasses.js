@@ -61,9 +61,12 @@ export const WPane = L.Handler.extend({
       if (this._dialog) this._dialog.closeDialog();
       this._dialog = data.dialog;
       this._container.textContent = "";
-      this._container.appendChild(this._dialog._header);
       this._container.appendChild(this._dialog._container);
       window.show(data.pane);
+    });
+    window.map.on("wasabee:paneclear", (data) => {
+      if (data.pane !== this.options.paneId) return;
+      if (this._dialog === data.dialog) delete this._dialog;
     });
   },
 
@@ -106,11 +109,29 @@ export const WDialog = L.Handler.extend({
     options.dialogClass =
       "wasabee-dialog wasabee-dialog-" + options.dialogClass;
     if (this.options.usePane) {
-      this._header = L.DomUtil.create("div", "header");
-      if (options.title) this._header.textContent = options.title;
       this._container = L.DomUtil.create("div", options.dialogClass);
       if (options.id) this._container.id = options.id;
-      if (options.html) this._container.appendChild(options.html);
+
+      this._header = L.DomUtil.create("div", "header", this._container);
+      if (options.title) this._header.textContent = options.title;
+
+      this._content = L.DomUtil.create("div", "content", this._container);
+      if (options.html) this._content.appendChild(options.html);
+
+      this._buttons = L.DomUtil.create("div", "buttonset", this._container);
+      if (options.buttons) {
+        if (!(options.buttons instanceof Array)) {
+          options.buttons = Object.entries(options.buttons).map(([k, v]) => ({
+            text: k,
+            click: v,
+          }));
+        }
+        for (const entry of options.buttons) {
+          const button = L.DomUtil.create("button", null, this._buttons);
+          button.textContent = entry.text;
+          L.DomEvent.on(button, "click", entry.click);
+        }
+      }
       window.map.fire("wasabee:paneset", {
         pane: this.options.paneId,
         dialog: this,
@@ -138,8 +159,8 @@ export const WDialog = L.Handler.extend({
   setContent: function (content) {
     if (this._dialog) this._dialog.html(content);
     else if (this._container) {
-      this._container.textContent = "";
-      this._container.appendChild(content);
+      this._content.textContent = "";
+      this._content.appendChild(content);
     }
   },
 
@@ -148,8 +169,13 @@ export const WDialog = L.Handler.extend({
       this._dialog.dialog("close");
       delete this._dialog;
     } else if (this._container) {
+      window.map.fire("wasabee:paneclear", {
+        pane: this.options.paneId,
+        dialog: this,
+      });
       this.disable();
       delete this._container;
+      window.show("map");
     }
   },
 
