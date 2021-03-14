@@ -13,6 +13,7 @@ const PromptDialog = WDialog.extend({
     label: wX("NO_LABEL"), // should never be displayed
     placeholder: "",
     current: "",
+    suggestions: [],
     // callback
     // cancelCallback
   },
@@ -63,6 +64,21 @@ const PromptDialog = WDialog.extend({
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.options.placeholder;
     this.inputField.value = this.options.current;
+
+    if (this.options.suggestions) {
+      const datalist = L.DomUtil.create("datalist", null, content);
+      datalist.id = "wasabee-prompt-suggestions";
+      for (const entry of this.options.suggestions) {
+        const option = L.DomUtil.create("option", null, datalist);
+        if (typeof entry === "string") {
+          option.value = entry;
+        } else {
+          option.textContent = entry.text;
+          option.value = entry.value;
+        }
+      }
+      this.inputField.setAttribute("list", "wasabee-prompt-suggestions");
+    }
     return content;
   },
 });

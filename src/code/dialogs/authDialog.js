@@ -141,6 +141,10 @@ const AuthDialog = WDialog.extend({
       const serverDialog = new PromptDialog({
         title: wX("CHANGE SERVER"),
         label: wX("CHANGE SERVER PROMPT"),
+        suggestions: window.plugin.wasabee.static.publicServers.map((e) => ({
+          text: `${e.name} (${e.url})`,
+          value: e.url,
+        })),
         callback: () => {
           if (serverDialog.inputField.value) {
             SetWasabeeServer(serverDialog.inputField.value);
@@ -148,8 +152,7 @@ const AuthDialog = WDialog.extend({
             WasabeeMe.purge();
           }
         },
-        current: GetWasabeeServer(),
-        placeholder: "https://am.wasabee.rocks",
+        placeholder: GetWasabeeServer(),
       });
       serverDialog.enable();
     });

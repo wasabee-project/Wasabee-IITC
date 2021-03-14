@@ -84,6 +84,11 @@ W.static = {
       interactive: false,
     },
   },
+  publicServers: [
+    { name: "Americas", url: "https://am.wasabee.rocks" },
+    { name: "Europe", url: "https://eu.wasabee.rocks" },
+    { name: "Asia/Pacific", url: "https://ap.wasabee.rocks" },
+  ],
 };
 
 W.static.strings = {}; // empty object, fill it below
