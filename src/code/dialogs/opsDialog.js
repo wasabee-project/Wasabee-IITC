@@ -21,6 +21,10 @@ const OpsDialog = WDialog.extend({
     TYPE: "opsDialog",
   },
 
+  options: {
+    usePane: true,
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
