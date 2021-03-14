@@ -9,6 +9,7 @@ import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
+import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
 import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
@@ -86,7 +87,11 @@ window.plugin.wasabee.init = async () => {
   // Android panes
   const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
   if (window.isSmartphone() && usePanes) {
-    new WPane();
+    new WPane({
+      paneId: "wasabee",
+      paneName: "Wasabee",
+      default: () => new OperationChecklist(),
+    });
   }
 
   // hooks called when layers are enabled/disabled

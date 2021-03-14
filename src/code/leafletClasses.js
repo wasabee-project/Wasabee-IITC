@@ -41,6 +41,7 @@ export const WPane = L.Handler.extend({
   options: {
     paneId: "wasabee",
     paneName: "Wasabee",
+    default: null,
   },
 
   initialize: function (options) {
@@ -72,6 +73,10 @@ export const WPane = L.Handler.extend({
 
   addHooks: function () {
     this._container.classList.remove("hidden");
+    if (!this._dialog && this.options.default) {
+      const defaultDialog = this.options.default();
+      defaultDialog.enable();
+    }
   },
 
   removeHooks: function () {
@@ -136,7 +141,6 @@ export const WDialog = L.Handler.extend({
         pane: this.options.paneId,
         dialog: this,
       });
-      /// XXX butons/title etc
     } else {
       if (!options.closeCallback) {
         options.closeCallback = () => {
