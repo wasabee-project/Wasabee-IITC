@@ -209,6 +209,23 @@ const SettingsDialog = WDialog.extend({
         trawlSelect.value;
     });
 
+    if (window.useAndroidPanes()) {
+      const panesTitle = L.DomUtil.create("label", null, container);
+      // XXX:  wX
+      panesTitle.textContent = "Use Android Panes (need reload)";
+      panesTitle.htmlFor = "wasabee-setting-usepanes";
+      const panesCheck = L.DomUtil.create("input", null, container);
+      panesCheck.type = "checkbox";
+      panesCheck.id = "wasabee-setting-usepanes";
+      const exm = window.plugin.wasabee.static.constants.USE_ANDROID_PANES;
+      const ex = localStorage[exm];
+      if (ex === "true") panesCheck.checked = true;
+      L.DomEvent.on(panesCheck, "change", (ev) => {
+        L.DomEvent.stop(ev);
+        localStorage[exm] = panesCheck.checked;
+      });
+    }
+
     const skinsButton = L.DomUtil.create("button", null, container);
     skinsButton.textContent = wX("SKINS_BUTTON");
     L.DomEvent.on(skinsButton, "click", (ev) => {
