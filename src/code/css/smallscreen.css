@@ -1,8 +1,13 @@
-#wasabee-operation-checklist.wasabee-small-screen  .wasabee-table td:first-child input {
+.wasabee-dialog-checklist.wasabee-small-screen .ui-dialog-content,
+.wasabee-dialog-blockerlist.wasabee-small-screen .ui-dialog-content {
+  padding: 0;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen  .wasabee-table td:first-child input {
   width: 3em;
 }
 
-#wasabee-operation-checklist.wasabee-small-screen  .wasabee-table td:nth-child(3) span {
+.wasabee-dialog-checklist.wasabee-small-screen  .wasabee-table td:nth-child(3) span {
   display: inline-block;
   width: 5em;
   white-space: nowrap;
@@ -11,26 +16,26 @@
   vertical-align: bottom;
 }
 
-#wasabee-operation-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div {
   display: grid;
   grid-template-columns: auto auto auto;
   grid-column-gap: 2px;
   align-items: center;
 }
 
-#wasabee-operation-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-#wasabee-operation-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal {
   display: inline-block;
   vertical-align: bottom;
-  width: calc(100vw - 13em);
+  width: calc(100vw - 13em - 24px);
 }
 
-#wasabee-blockerlist.wasabee-small-screen .wasabee-table a.wasabee-portal {
+.wasabee-dialog-blockerlist.wasabee-small-screen .wasabee-table a.wasabee-portal {
   display: inline-block;
   width: 40vw;
   vertical-align: bottom;
