@@ -105,11 +105,11 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = operation.getPortal(blocker.fromPortalId);
-          row.appendChild(p.displayFormat(this._smallScreen));
+          row.appendChild(p.displayFormat());
         },
       },
       {
-        name: wX("COUNT"),
+        name: this._smallScreen ? "#" : wX("COUNT"),
         value: (blocker) => {
           const c = operation.blockers.filter(
             (b) =>
@@ -128,11 +128,11 @@ const BlockerList = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
           const p = operation.getPortal(blocker.toPortalId);
-          row.appendChild(p.displayFormat(this._smallScreen));
+          row.appendChild(p.displayFormat());
         },
       },
       {
-        name: wX("COUNT"),
+        name: this._smallScreen ? "#" : wX("COUNT"),
         value: (blocker) => {
           const c = operation.blockers.filter(
             (b) =>
