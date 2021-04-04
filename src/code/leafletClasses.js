@@ -113,6 +113,7 @@ export const WDialog = L.Handler.extend({
     this.options.title = options.title;
     options.dialogClass =
       "wasabee-dialog wasabee-dialog-" + options.dialogClass;
+    if (this._smallScreen) options.dialogClass += " wasabee-small-screen";
     if (this.options.usePane) {
       this._container = L.DomUtil.create("div", options.dialogClass);
       if (options.id) this._container.id = options.id;
