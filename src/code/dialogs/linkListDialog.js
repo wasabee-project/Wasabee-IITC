@@ -15,6 +15,7 @@ const LinkListDialog = WDialog.extend({
   },
 
   options: {
+    usePane: true,
     // portal
   },
 
