@@ -7,6 +7,7 @@ W.static = {
     autodraws: require("./css/autodraws.css"),
     toolbar: require("./css/toolbar.css"),
     panes: require("./css/panes.css"),
+    smallScreen: require("./css/smallscreen.css"),
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
     iitcfix: require("./css/iitcfix.css"),

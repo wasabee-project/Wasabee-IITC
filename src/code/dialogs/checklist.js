@@ -111,12 +111,11 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, thing) => {
           if (thing instanceof WasabeeLink) {
-            cell.appendChild(thing.displayFormat(operation, this._smallScreen));
+            cell.appendChild(thing.displayFormat(operation));
+            if (this._smallScreen) cell.colSpan = 2;
           } else {
             cell.appendChild(
-              operation
-                .getPortal(thing.portalId)
-                .displayFormat(this._smallScreen)
+              operation.getPortal(thing.portalId).displayFormat()
             );
           }
         },
@@ -137,7 +136,9 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing.type) L.DomUtil.addClass(span, thing.type);
           span.textContent = value;
 
-          if (thing instanceof WasabeeMarker) {
+          if (thing instanceof WasabeeLink) {
+            if (this._smallScreen) cell.style.display = "none";
+          } else if (thing instanceof WasabeeMarker) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ch = new MarkerChangeDialog({ marker: thing });
@@ -230,7 +231,7 @@ const OperationChecklistDialog = WDialog.extend({
         smallScreenHide: true,
       },
       {
-        name: "Commands",
+        name: this._smallScreen ? "Cmds" : "Commands",
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
