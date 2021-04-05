@@ -240,6 +240,41 @@ export function getAllPortalsOnScreen(operation) {
   return x;
 }
 
+export function getAllPortalsLinked(operation, originPortal) {
+  const x = [];
+  for (const link in window.links) {
+    const p = window.links[link];
+
+    const linkPortal1 = new WasabeePortal({
+      id: p.options.data.oGuid,
+      lat: (p.options.data.oLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.oLngE6 / 1e6).toFixed(6),
+      name: p.options.data.oGuid,
+      comment: "out",
+    });
+
+    const linkPortal2 = new WasabeePortal({
+      id: p.options.data.dGuid,
+      lat: (p.options.data.dLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.dLngE6 / 1e6).toFixed(6),
+      name: p.options.data.dGuid,
+      comment: "in",
+    });
+
+    if (operation.containsLinkFromTo(linkPortal1, linkPortal2)) {
+      continue;
+    }
+    if (linkPortal1.id === originPortal.id) {
+      x.push(linkPortal2);
+    }
+    if (linkPortal2.id === originPortal.id) {
+      x.push(linkPortal1);
+    }
+  }
+  console.log(x);
+  return x;
+}
+
 // this is the test point used in several auto-draws
 // settings allow there to be several different due to
 // rouding errors resulting from long distances

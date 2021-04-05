@@ -34,6 +34,7 @@ W.static = {
     madrid: "wasabee-madrid",
     autodraws: "wasabee-autodraws",
     starburst: "wasabee-starburst",
+    savelinks: "wasabee-savelinks",
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
