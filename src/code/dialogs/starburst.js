@@ -88,8 +88,6 @@ const StarburstDialog = WDialog.extend({
 
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
-    this.title = wX("STARBURST");
-    this.label = wX("STARBURST TITLE");
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
