@@ -16,7 +16,6 @@ const StateDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._setup();
     this._displayDialog();
   },
 
