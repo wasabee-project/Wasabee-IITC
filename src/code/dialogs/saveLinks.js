@@ -18,7 +18,7 @@ const SaveLinksDialog = WDialog.extend({
     //Instructions
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
-    description.textContent = wX("SEL_SB_ANCHOR");
+    description.textContent = wX("SEL_SL_ANCHOR");
 
     //anchor portal text
     const anchorLabel = L.DomUtil.create("label", null, container);
@@ -53,9 +53,6 @@ const SaveLinksDialog = WDialog.extend({
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
     });
-
-    const description2 = L.DomUtil.create("div", "desc2", container);
-    description2.textContent = wX("SEL_SL_ANCHOR2");
 
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("SAVELINKS_DRAW");
