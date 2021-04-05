@@ -3,6 +3,7 @@ import wX from "../wX";
 import MultimaxDialog from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";
+import SaveLinksDialog from "../dialogs/saveLinks";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
 import MadridDialog from "../dialogs/madrid";
@@ -63,6 +64,14 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const m = new MadridDialog();
           m.enable();
+        },
+      },
+      {
+        text: wX("SAVELINKS"),
+        callback: () => {
+          this._dialog.dialog("close");
+          const sl = new SaveLinksDialog();
+          sl.enable();
         },
       },
     ];
