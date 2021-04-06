@@ -78,14 +78,16 @@ export default class Sortable {
       for (const field of this._fields) {
         // calculate the value using the field's rules
         let value = field.value(obj);
-        if (typeof value.then === "function") value = await value; // resolve promises
+        if (value != null && typeof value.then === "function")
+          value = await value; // resolve promises
         data.values.push(value);
 
         // calculate sortValue using the field's rules if required
         let sortValue = value;
         if (field.sortValue) {
           sortValue = field.sortValue(value, obj);
-          if (typeof sortValue.then === "function") sortValue = await sortValue; // resolve promises
+          if (sortValue != null && typeof sortValue.then === "function")
+            sortValue = await sortValue; // resolve promises
           data.sortValues.push(sortValue);
         }
 
@@ -104,7 +106,7 @@ export default class Sortable {
 
     // resolve all rows at once
     // XXX convert to allSettled and check for individual errors rather than failing hard if any row fails
-    console.log(promises);
+    // console.log(promises);
     Promise.all(promises).then(
       (values) => {
         this._items = values;
@@ -167,9 +169,14 @@ export default class Sortable {
       const aval = a.sortValues[this._sortBy];
       const bval = b.sortValues[this._sortBy];
 
+      // figure out why these are undefined
+      if (aval === undefined && bval == undefined) return 0;
+      if (aval == undefined) return -1;
+      if (bval == undefined) return 1;
+
       let l = 0;
       // if the field defined a sort function, use that
-      if (sortfield.sort) {
+      if (typeof sortfield.sort === "function") {
         l = sortfield.sort(aval, bval, a.obj, b.obj);
       } else {
         // otherwise use simple sort
