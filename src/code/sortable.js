@@ -88,8 +88,8 @@ export default class Sortable {
           sortValue = field.sortValue(value, obj);
           if (sortValue != null && typeof sortValue.then === "function")
             sortValue = await sortValue; // resolve promises
-          data.sortValues.push(sortValue);
         }
+        data.sortValues.push(sortValue);
 
         const cell = row.insertCell(-1);
         if (field.format) {
