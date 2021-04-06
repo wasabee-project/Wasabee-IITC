@@ -78,9 +78,8 @@ export default class WasabeeAgent {
         if (t.displayname) out += t.displayname + " ";
       }
       out += ")";
-      return out;
     }
-    return null;
+    return out;
   }
 
   async _updateCache() {
