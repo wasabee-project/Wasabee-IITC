@@ -8,40 +8,62 @@ export default class WasabeeTeam {
       try {
         data = JSON.parse(data);
       } catch (e) {
-        console.error("corrupted team");
-        return null;
+        console.error(e);
+        return;
       }
     }
 
-    this.agents = new Array();
     this.id = data.id;
     this.name = data.name;
-    this.fetched = Date.now();
+    this.feteched = Date.now();
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
 
-    // convert to WasabeeAgents and push them into the agent cache
-    for (const agent of data.agents) {
-      this.agents.push(new WasabeeAgent(agent, this.id));
-    }
+    // from team cache: use as is
+    if (data.agentIDs) this.agentIDs = data.agentIDs;
 
-    // push into team cache
-    window.plugin.wasabee.teams.set(this.id, this);
+    // from server
+    if (data.agents) {
+      this.agentIDs = new Array();
+      for (const agent of data.agents) {
+        const a = new WasabeeAgent(agent, this.id, true); // push to agent cache
+        this.agentIDs.push(a.id); // we only need the id here
+      }
+      this._updateCache();
+    }
   }
 
-  static cacheGet(teamID) {
-    if (window.plugin.wasabee.teams.has(teamID)) {
-      return window.plugin.wasabee.teams.get(teamID);
+  // this could be written to pull directly from the agent store using an idb query based on this.agentIDs
+  // we would need to resolve _teamData ourselves, but it _might_ be measurably faster, something to test when we have time
+  // ....openCursor(IDBKeyRange.only(this.agentIDs));
+  async agents() {
+    const p = new Array();
+    for (const id of this.agentIDs) p.push(WasabeeAgent.get(id, this.id));
+    const agents = new Array();
+    const results = await Promise.allSettled(p);
+    for (const result of results) {
+      if (result.status == "fulfilled") {
+        if (result.value.forTeam != this.id)
+          console.log("team mismatch", result.value);
+        agents.push(result.value);
+      } else {
+        console.log(result.status, result.reason);
+      }
     }
-    return null;
+    return agents;
   }
 
-  static async waitGet(teamID, maxAgeSeconds = 60) {
-    if (maxAgeSeconds > 0 && window.plugin.wasabee.teams.has(teamID)) {
-      const t = window.plugin.wasabee.teams.get(teamID);
+  async _updateCache() {
+    await window.plugin.wasabee.idb.put("teams", this);
+  }
+
+  // 60 seconds seems too short for the default here...
+  static async get(teamID, maxAgeSeconds = 60) {
+    const cached = await window.plugin.wasabee.idb.get("teams", teamID);
+    if (cached) {
+      const t = new WasabeeTeam(cached);
       if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        // console.debug("returning team from cache");
         t.cached = true;
         return t;
       }

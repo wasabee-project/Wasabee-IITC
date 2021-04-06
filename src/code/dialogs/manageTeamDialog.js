@@ -138,9 +138,10 @@ const ManageTeamDialog = WDialog.extend({
   _refreshTeam: async function (table) {
     try {
       // max 5 seconds cache for this screen
-      const teamdata = await WasabeeTeam.waitGet(this.options.team.ID, 5);
-      if (teamdata.agents && teamdata.agents.length > 0) {
-        table.items = teamdata.agents;
+      const teamdata = await WasabeeTeam.get(this.options.team.ID, 5);
+      const agents = await teamdata.agents();
+      if (agents && agents.length > 0) {
+        table.items = agents;
       }
     } catch (e) {
       console.error(e);

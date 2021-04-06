@@ -9,6 +9,7 @@ import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
 import WasabeeMe from "./me";
+import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = () => {
@@ -26,10 +27,8 @@ window.plugin.wasabee.init = () => {
     return;
   }
 
+  initIdb();
   Wasabee._selectedOp = null; // the in-memory working op;
-  Wasabee.teams = new Map();
-  Wasabee._agentCache = new Map();
-  Wasabee.onlineAgents = new Map();
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
 
@@ -170,4 +169,30 @@ function initGoogleAPI() {
   (document.body || document.head || document.documentElement).appendChild(
     script
   );
+}
+
+async function initIdb() {
+  const version = 1;
+  // if (Wasabee.idb && Wasabee.idb.version == version) return;
+
+  // XXX audit these to make sure all the various indexes are used
+  Wasabee.idb = await openDB("wasabee", version, {
+    upgrade(db) {
+      const agents = db.createObjectStore("agents", { keyPath: "id" });
+      agents.createIndex("date", "date"); // last location change
+      agents.createIndex("fetched", "fetched"); // last pull from server
+      const teams = db.createObjectStore("teams", { keyPath: "id" });
+      teams.createIndex("fetched", "fetched"); // last pull from server
+
+      // do not set an implied key, explicitly set GID/PortalID on insert
+      // XXX we can do this with a keyPath https://stackoverflow.com/questions/33852508/how-to-create-an-indexeddb-composite-key
+      // const defensivekeys = db.createObjectStore("defensivekeys");
+      const defensivekeys = db.createObjectStore("defensivekeys", {
+        keyPath: ["GID", "PortalID"],
+      });
+      defensivekeys.createIndex("PortalID", "PortalID");
+      defensivekeys.createIndex("Count", "Count"); // To be used to remove 0-count entries
+      // defensivekeys.createIndex("pk", ["GID", "PortalID"], { unique: true });
+    },
+  });
 }

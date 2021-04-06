@@ -46,6 +46,7 @@
   "dependencies": {
     "arc": "^0.1.1",
     "color-string": "^1.5.4",
+    "idb": "^5.0.7",
     "sortablejs": "^1.12.0"
   }
 }

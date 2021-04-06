@@ -67,7 +67,7 @@ const OpsDialog = WDialog.extend({
     }
   },
 
-  makeContent: function (selectedOp) {
+  makeContent: async function (selectedOp) {
     const container = L.DomUtil.create("div", "container");
     const opTable = L.DomUtil.create(
       "tbody",
@@ -184,14 +184,14 @@ const OpsDialog = WDialog.extend({
         }
         {
           const opOwner = L.DomUtil.create("td", "opowner", opRow);
-          const agent = WasabeeAgent.cacheGet(op.owner);
+          const agent = await WasabeeAgent.get(op.owner);
           if (agent != null) opOwner.appendChild(agent.formatDisplay("all"));
           else if (op.local) opOwner.append(window.PLAYER.nickname);
           else {
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {
               placeholder.textContent = "looking up: [" + op.owner + "]";
-              WasabeeAgent.waitGet(op.owner).then((agent) => {
+              WasabeeAgent.get(op.owner).then((agent) => {
                 placeholder.remove();
                 opOwner.appendChild(agent.formatDisplay("all"));
               });

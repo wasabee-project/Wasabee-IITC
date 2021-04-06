@@ -110,8 +110,8 @@ export function statOpPromise(opID) {
   return genericGet(`/api/v1/draw/${opID}/stat`);
 }
 
-// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
-// use WasabeeTeam.waitGet and WasabeeTeam.cacheGet
+// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
+// use WasabeeTeam.get
 export function teamPromise(teamid) {
   return genericGet(`/api/v1/team/${teamid}`);
 }
@@ -189,8 +189,7 @@ export async function mePromise() {
   }
 }
 
-// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.waitGet()
-// use WasabeeAgent.waitGet and WasabeeAgent.cacheGet for caching
+// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
 export function agentPromise(GID) {
   return genericGet(`/api/v1/agent/${GID}`);
 }

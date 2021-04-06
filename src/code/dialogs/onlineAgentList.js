@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-// import WasabeeTeam from "../team";
+import WasabeeAgent from "../agent";
 import wX from "../wX";
 
 const OnlineAgentList = WDialog.extend({
@@ -41,7 +41,7 @@ const OnlineAgentList = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function () {
+  update: async function () {
     this._table = new Sortable();
     this._table.fields = [
       {
@@ -85,10 +85,39 @@ const OnlineAgentList = WDialog.extend({
     this._table.sortBy = 0;
 
     const a = new Array();
-    for (const k of window.plugin.wasabee.onlineAgents.keys()) {
-      a.push(window.plugin.wasabee._agentCache.get(k));
+    const tx = window.plugin.wasabee.idb.transaction(["agents"], "readonly");
+    const range = IDBKeyRange.lowerBound(this._last_hour());
+    let cursor = await tx.store.index("date").openCursor(range);
+    while (cursor) {
+      a.push(new WasabeeAgent(cursor.value, 0, false));
+      cursor = await cursor.continue();
     }
+
     this._table.items = a;
+  },
+
+  _last_hour: function () {
+    const date = new Date(Date.now() - 3600 * 1000); // one hour ago
+    const d = date.getUTCDate();
+    const m = date.getUTCMonth() + 1;
+    const y = date.getUTCFullYear();
+    const h = date.getUTCHours();
+    const mm = date.getUTCMinutes();
+    const s = date.getUTCSeconds();
+    const out =
+      "" +
+      y +
+      "-" +
+      (m <= 9 ? "0" + m : m) +
+      "-" +
+      (d <= 9 ? "0" + d : d) +
+      " " +
+      (h <= 9 ? "0" + h : h) +
+      ":" +
+      (mm <= 9 ? "0" + mm : mm) +
+      ":" +
+      (s <= 9 ? "0" + s : s);
+    return out;
   },
 });
 

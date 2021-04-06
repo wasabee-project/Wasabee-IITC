@@ -127,17 +127,18 @@ export default class WasabeeMe {
     return me;
   }
 
-  static purge() {
+  static async purge() {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     delete localStorage["sentToServer"]; // resend firebase token on login
 
-    if (window.plugin.wasabee._agentCache)
-      window.plugin.wasabee._agentCache.clear();
-    if (window.plugin.wasabee.teams) window.plugin.wasabee.teams.clear();
-    if (window.plugin.wasabee._Dkeys) {
-      window.plugin.wasabee._Dkeys.clear();
-      window.map.fire("wasabeeDkeys", { reason: "me purge" }, false);
-    }
+    const tr = window.plugin.wasabee.idb.transaction(
+      ["agents", "teams", "defensivekeys"],
+      "readwrite"
+    );
+    const agentos = tr.objectStore("agents");
+    const teamos = tr.objectStore("teams");
+    const dkos = tr.objectStore("defensivekeys");
+    await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
     window.map.fire("wasabeeUIUpdate", { reason: "me purge" }, false);
   }

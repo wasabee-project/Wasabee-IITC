@@ -78,7 +78,7 @@ const KeyListPortal = WDialog.extend({
         value: (key) => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
-          const agent = await WasabeeAgent.waitGet(key.gid);
+          const agent = await WasabeeAgent.get(key.gid);
           cell.textContent = agent.name;
         },
       },

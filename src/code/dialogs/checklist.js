@@ -186,12 +186,10 @@ const OperationChecklistDialog = WDialog.extend({
       },
       {
         name: wX("ASS_TO"),
-        value: (thing) => {
+        value: async (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            const agent = WasabeeAgent.cacheGet(thing.assignedTo);
+            const agent = await WasabeeAgent.get(thing.assignedTo);
             if (agent != null) return agent.name;
-            // we can't use async here, so just request it now and it should be in cache next time
-            WasabeeAgent.waitGet(thing.assignedTo);
             return "GID: [" + thing.assignedTo + "]";
           }
           return ". . .";

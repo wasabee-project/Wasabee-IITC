@@ -234,13 +234,14 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await WasabeeTeam.waitGet(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
+    const team = await WasabeeTeam.get(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
     // we don't need to draw if pulled from cache
     if (team.cached === true) return done;
 
-    for (const agent of team.agents) {
+    const agents = await team.agents();
+    for (const agent of agents) {
       if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
         done.push(agent.id);
     }
@@ -253,7 +254,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
 
 export async function drawSingleAgent(gid) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-  const agent = await WasabeeAgent.waitGet(gid, 10); // default is 60 seconds, we can be faster if firebase tells us of an update
+  const agent = await WasabeeAgent.get(gid, 0, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
   if (agent != null) _drawAgent(agent);
 }
 
@@ -287,10 +288,10 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     // marker.off("click", agent.openPopup, agent);
     marker.on(
       "click spiderfiedclick",
-      (ev) => {
+      async (ev) => {
         L.DomEvent.stop(ev);
         if (marker.isPopupOpen && marker.isPopupOpen()) return;
-        const a = window.plugin.wasabee._agentCache.get(agent.id);
+        const a = await WasabeeAgent.get(agent.id);
         marker.setPopupContent(a.getPopup());
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");

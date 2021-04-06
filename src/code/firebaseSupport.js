@@ -41,10 +41,6 @@ export function initFirebase() {
             "firebase update of single agent location: ",
             event.data.data
           );
-          window.plugin.wasabee.onlineAgents.set(
-            event.data.data.gid,
-            Date.now()
-          );
           drawSingleAgent(event.data.data.gid);
         } else {
           console.debug(
@@ -63,9 +59,7 @@ export function initFirebase() {
         alert(JSON.stringify(event.data.data));
         break;
       case "Login":
-        // display to console somehow?
         console.debug("server reported teammate login: ", event.data.data.gid);
-        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
         window.map.fire("wasabeeUIUpdate", { reason: "onlineAgent" }, false);
         break;
       case "Map Change":
