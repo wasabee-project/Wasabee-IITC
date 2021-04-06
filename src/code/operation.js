@@ -70,6 +70,7 @@ export default class WasabeeOp {
         return null;
       const op = new WasabeeOp(raw);
       if (op == null) throw new Error("corrupted operation");
+      console.debug(op);
       return op;
     } catch (e) {
       console.error(e);
@@ -83,18 +84,26 @@ export default class WasabeeOp {
   }
 
   static async migrate(opID) {
-    const raw = localStorage[opID];
-    if (raw == null) {
-      console.log("not migrating missing op", opID);
+    const have = await window.plugin.wasabee.idb.get("operations", opID);
+    if (have != null) {
+      console.log("already have this one, not migrating", opID);
       return;
     }
 
-    await window.plugin.wasabee.idb.put("operations", raw);
+    const op = await WasabeeOp.load(opID);
+    if (op == null) {
+      console.log("not migrating missing op", opID);
+      return;
+    }
+    console.debug(op);
+
+    await window.plugin.wasabee.idb.put("operations", op);
     // delete localStorage[opID];
   }
 
   // writes to localStorage with all data included
   async store() {
+    console.log("storing ", this.ID);
     this.stored = Date.now();
     const json = this.toJSON();
 

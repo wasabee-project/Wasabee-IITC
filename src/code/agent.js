@@ -141,20 +141,17 @@ export default class WasabeeAgent {
           a.state = td.state;
           a.forTeam = teamID;
         } else {
-          console.log(
-            "found in cache: missing data for the requested team, using team 0",
-            a
-          );
+          // console.debug("found in cache: missing data for the requested team, using team 0", gid);
         }
         a.cached = true;
         // delete a._teamData;
         // console.log("returning from cache", a);
         return a;
       } else {
-        console.log("found in cache, but too old", a);
+        // console.debug("found in cache, but too old", gid);
       }
     } else {
-      console.log("not found in cache", gid);
+      // console.debug("not found in cache", gid);
     }
 
     if (!WasabeeMe.isLoggedIn()) {

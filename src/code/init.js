@@ -12,7 +12,7 @@ import WasabeeMe from "./me";
 import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
-window.plugin.wasabee.init = () => {
+window.plugin.wasabee.init = async () => {
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -27,8 +27,7 @@ window.plugin.wasabee.init = () => {
     return;
   }
 
-  // async, do we need to await? can we make this async or will IITC have problems?
-  initIdb();
+  await initIdb();
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
@@ -36,10 +35,8 @@ window.plugin.wasabee.init = () => {
   initSkin();
   // can this be moved to the auth dialog?
   initGoogleAPI();
-  // async ....
-  setupLocalStorage();
-  // async, do we need to await? can we make this async or will IITC have problems?
-  initSelectedOperation();
+  await setupLocalStorage();
+  await initSelectedOperation();
   initServer();
 
   const skins = [];

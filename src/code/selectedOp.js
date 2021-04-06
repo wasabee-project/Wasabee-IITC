@@ -112,18 +112,21 @@ export async function setupLocalStorage() {
     ops = opsList();
   }
 
-  // if the restore ID is not set, set it to the first thing we find
-  let rID = getRestoreOpID();
-  if (rID == null) {
-    rID = ops[0]; // ops cannot be empty due to previous block
-    setRestoreOpID(rID);
-  }
-
+  console.log("ops: ", ops);
   // COPY (not move, yet) from localStorage to indexeddb
   // XXX promise.all would be better
   for (const opID of ops) {
+    console.log("migrating to idb", opID);
     await WasabeeOp.migrate(opID);
   }
+
+  // if the restore ID is not set, set it to the first thing we find
+  let rID = getRestoreOpID();
+  if (rID == null || rID == undefined) {
+    rID = ops[0]; // ops cannot be empty due to previous block
+    setRestoreOpID(rID);
+  }
+  console.log("rID:", rID);
 }
 
 function storeOpsList(ops) {
