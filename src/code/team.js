@@ -15,7 +15,7 @@ export default class WasabeeTeam {
 
     this.id = data.id;
     this.name = data.name;
-    this.feteched = Date.now();
+    this.fetched = Date.now();
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
