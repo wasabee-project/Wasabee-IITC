@@ -32,8 +32,8 @@ const OpsDialog = WDialog.extend({
     window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
-  _displayDialog: function () {
-    this.makeContent(getSelectedOperation());
+  _displayDialog: async function () {
+    await this.makeContent(getSelectedOperation());
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -60,9 +60,9 @@ const OpsDialog = WDialog.extend({
     this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function () {
+  update: async function () {
     if (this._enabled && this._dialog && this._dialog.html) {
-      this.makeContent(getSelectedOperation());
+      await this.makeContent(getSelectedOperation());
       this._dialog.html(this._content);
     }
   },
