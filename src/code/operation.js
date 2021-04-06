@@ -62,9 +62,9 @@ export default class WasabeeOp {
     this.cleanPortalList();
   }
 
-  static load(opID) {
+  static async load(opID) {
     try {
-      const raw = localStorage[opID];
+      const raw = await window.plugin.wasabee.idb.get("operations", opID);
       if (raw == null)
         //throw new Error("invalid operation ID");
         return null;
@@ -77,8 +77,24 @@ export default class WasabeeOp {
     return null;
   }
 
+  static async delete(opID) {
+    delete localStorage[opID];
+    await window.plugin.wasabee.idb.get("operations", opID);
+  }
+
+  static async migrate(opID) {
+    const raw = localStorage[opID];
+    if (raw == null) {
+      console.log("not migrating missing op", opID);
+      return;
+    }
+
+    await window.plugin.wasabee.idb.put("operations", raw);
+    // delete localStorage[opID];
+  }
+
   // writes to localStorage with all data included
-  store() {
+  async store() {
     this.stored = Date.now();
     const json = this.toJSON();
 
@@ -94,6 +110,10 @@ export default class WasabeeOp {
     json.keysonhand = this.keysonhand;
     json.teamlist = this.teamlist;
     localStorage[this.ID] = JSON.stringify(json);
+
+    // also update in idb while we transisition
+    await window.plugin.wasabee.idb.put("operations", json);
+
     addOperation(this.ID);
 
     // some debug info to trace race condition
@@ -667,7 +687,7 @@ export default class WasabeeOp {
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
       // this.update(false); // can trigger a redraw-storm, just skip
-      this.store();
+      this.store(); // do not await, let it happen in the background -- ideally now blockers should not be part of the op json, but stored independently in indexeddb
     }
   }
 
@@ -809,7 +829,7 @@ export default class WasabeeOp {
       this.localchanged = true;
     }
 
-    this.store();
+    this.store(); // no await, let it happen in the background unless we see races
     window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
   }
 

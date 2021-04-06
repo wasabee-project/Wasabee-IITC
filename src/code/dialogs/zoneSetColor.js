@@ -39,13 +39,13 @@ const ZoneSetColorDialog = WDialog.extend({
     picker.type = "color";
     picker.setAttribute("list", "wasabee-colors-datalist");
 
-    L.DomEvent.on(picker, "change", (ev) => {
+    L.DomEvent.on(picker, "change", async (ev) => {
       L.DomEvent.stop(ev);
       const so = getSelectedOperation();
       for (const l of so.links) {
         if (l.zone == this.options.zone.id) l.color = picker.value;
       }
-      so.store();
+      await so.store();
       addToColorList(picker.value);
       window.map.fire(
         "wasabeeUIUpdate",

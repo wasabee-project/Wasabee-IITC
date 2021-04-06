@@ -23,7 +23,7 @@ export async function uploadOpPromise() {
   newme.store();
   const newop = await opPromise(operation.ID);
   newop.localchanged = false;
-  newop.store();
+  await newop.store();
   return newop;
 }
 
@@ -121,7 +121,7 @@ export function teamPromise(teamid) {
 // not generic since 304 result processing and If-Modified-Since header
 export async function opPromise(opID) {
   let ims = "Sat, 29 Oct 1994 19:43:31 GMT"; // the dawn of time...
-  const localop = WasabeeOp.load(opID);
+  const localop = await WasabeeOp.load(opID);
   if (localop != null && localop.fetched) ims = localop.fetched;
 
   try {
@@ -160,11 +160,11 @@ export async function opPromise(opID) {
         raw = await response.json();
         return Promise.reject(wX("NOT LOGGED IN", raw.error));
       case 403:
-        removeOperation(opID);
+        await removeOperation(opID);
         raw = await response.json();
         return Promise.reject(wX("OP PERM DENIED", opID) + ": " + raw.error);
       case 410:
-        removeOperation(opID);
+        await removeOperation(opID);
         raw = await response.json();
         return Promise.reject(wX("OP DELETED", opID) + ": " + raw.error);
       default:

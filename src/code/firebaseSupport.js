@@ -52,8 +52,8 @@ export function initFirebase() {
         break;
       case "Delete":
         console.warn("server requested op delete: ", event.data.data.opID);
-        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
-        removeOperation(event.data.data.opID);
+        if (event.data.data.opID == operation.ID) await loadNewDefaultOp();
+        await removeOperation(event.data.data.opID);
         break;
       case "Generic Message":
         alert(JSON.stringify(event.data.data));
@@ -72,7 +72,7 @@ export function initFirebase() {
                 "firebase trigger reload of current op: ",
                 event.data.data
               );
-              makeSelectedOperation(refreshed.ID);
+              await makeSelectedOperation(refreshed.ID);
             } else {
               console.debug(
                 "firebase trigger update of op",

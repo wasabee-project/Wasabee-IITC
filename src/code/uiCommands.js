@@ -385,18 +385,18 @@ export async function fullSync() {
     // delete operations absent from server unless the owner
     const serverOps = new Set(
       opsList()
-        .map(WasabeeOp.load)
+        .map(await WasabeeOp.load)
         .filter((op) => op)
         .filter((op) => op.server == server && !opsID.has(op.ID))
     );
     for (const op of serverOps) {
       // if owned, duplicate the OP
       if (op.IsOwnedOp()) {
-        const newop = duplicateOperation(op.ID);
+        const newop = await duplicateOperation(op.ID);
         newop.name = op.name;
-        newop.store();
+        await newop.store();
       }
-      removeOperation(op.ID);
+      await removeOperation(op.ID);
     }
     if (serverOps.size > 0)
       console.log(
@@ -409,20 +409,20 @@ export async function fullSync() {
     }
     const ops = await Promise.all(promises);
     for (const newop of ops) {
-      const localOp = WasabeeOp.load(newop.ID);
-      if (!localOp || !localOp.localchanged) newop.store();
+      const localOp = await WasabeeOp.load(newop.ID);
+      if (!localOp || !localOp.localchanged) await newop.store();
       else if (localOp.lasteditid != newop.lasteditid) {
         const op = localOp.ID != so.ID ? localOp : so;
         // check if there are really local changes
         // XXX: this may be too long to do
         if (!op.checkChanges()) {
-          newop.store();
+          await newop.store();
         } else {
           // partial update on fields the server is always right
           // XXX: do we need zone for teamlist consistency ?
           op.teamlist = newop.teamlist;
           op.remoteChanged = true;
-          op.store();
+          await op.store();
 
           // In case of selected op, suggest merge to the user
           if (so === op) {
@@ -437,9 +437,9 @@ export async function fullSync() {
     }
 
     // replace current op by the server version if any
-    if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
+    if (ops.some((op) => op.ID == so.ID)) await makeSelectedOperation(so.ID);
     // change op if the current does not exist anymore
-    else if (!opsList().includes(so.ID)) changeOpIfNeeded();
+    else if (!opsList().includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
     else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
 
@@ -455,7 +455,7 @@ export async function syncOp(opID) {
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
     if (!localOp.localchanged) {
-      remoteOp.store();
+      await remoteOp.store();
     } else {
       const con = new MergeDialog({
         opOwn: localOp,
@@ -470,9 +470,9 @@ export function deleteLocalOp(opname, opid) {
   const con = new ConfirmDialog({
     title: wX("REM_LOC_CP", opname),
     label: wX("YESNO_DEL", opname),
-    callback: () => {
-      removeOperation(opid);
-      const newop = changeOpIfNeeded();
+    callback: async () => {
+      await removeOperation(opid);
+      const newop = await changeOpIfNeeded();
       const mbr = newop.mbr;
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         window.map.fitBounds(mbr);

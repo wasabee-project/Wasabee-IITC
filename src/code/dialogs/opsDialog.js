@@ -84,7 +84,7 @@ const OpsDialog = WDialog.extend({
     const data = new Map();
     data.set("", []);
     for (const opID of ol) {
-      const tmpOp = WasabeeOp.load(opID);
+      const tmpOp = await WasabeeOp.load(opID);
       if (!tmpOp) continue;
       const server = tmpOp.server || "";
       if (!data.has(server)) data.set(server, []);
@@ -147,9 +147,10 @@ const OpsDialog = WDialog.extend({
             if (op.remotechanged) link.title += "Remote has changed";
           }
           if (op.id == selectedOp.ID) link.classList.add("enl");
-          L.DomEvent.on(link, "click", (ev) => {
+          L.DomEvent.on(link, "click", async (ev) => {
             L.DomEvent.stop(ev);
-            const newop = makeSelectedOperation(op.id);
+            await makeSelectedOperation(op.id);
+            const newop = getSelectedOperation();
             const mbr = newop.mbr;
             if (
               mbr &&
@@ -191,6 +192,7 @@ const OpsDialog = WDialog.extend({
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {
               placeholder.textContent = "looking up: [" + op.owner + "]";
+              // is this redundant with above?  // XXX
               WasabeeAgent.get(op.owner).then((agent) => {
                 placeholder.remove();
                 opOwner.appendChild(agent.formatDisplay("all"));

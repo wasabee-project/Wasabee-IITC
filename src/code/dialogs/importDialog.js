@@ -73,7 +73,7 @@ const ImportDialog = WDialog.extend({
     }
   },
 
-  importTextareaAsOp() {
+  async importTextareaAsOp() {
     const string = this._textarea.value;
     if (
       string.match(
@@ -96,9 +96,9 @@ const ImportDialog = WDialog.extend({
       }
 
       // needs to be saved, but not update UI
-      newop.store();
+      await newop.store();
       // this updates the UI and runs crosslinks
-      makeSelectedOperation(newop.ID);
+      await makeSelectedOperation(newop.ID);
       // open the checklist to get a pass at loading portals
       // although that is now off-by-default, at least let the user
       // see which portals need attention
@@ -115,8 +115,8 @@ const ImportDialog = WDialog.extend({
     try {
       const data = JSON.parse(string);
       const importedOp = new WasabeeOp(data);
-      importedOp.store();
-      makeSelectedOperation(importedOp.ID);
+      await importedOp.store();
+      await makeSelectedOperation(importedOp.ID);
       alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);

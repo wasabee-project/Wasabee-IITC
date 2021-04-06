@@ -27,6 +27,7 @@ window.plugin.wasabee.init = () => {
     return;
   }
 
+  // async, do we need to await? can we make this async or will IITC have problems?
   initIdb();
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee._updateList = new Map();
@@ -35,7 +36,9 @@ window.plugin.wasabee.init = () => {
   initSkin();
   // can this be moved to the auth dialog?
   initGoogleAPI();
+  // async ....
   setupLocalStorage();
+  // async, do we need to await? can we make this async or will IITC have problems?
   initSelectedOperation();
   initServer();
 
@@ -77,13 +80,10 @@ window.plugin.wasabee.init = () => {
 
   window.map.on("wasabeeUIUpdate", drawMap);
 
-  // IITC-CE, not 0.26
-  if (window.addResumeFunction) {
-    window.addResumeFunction(() => {
-      window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
-      sendLocation();
-    });
-  }
+  window.addResumeFunction(() => {
+    window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
+    sendLocation();
+  });
 
   // hooks called when layers are enabled/disabled
   window.map.on("layeradd", (obj) => {
@@ -193,6 +193,10 @@ async function initIdb() {
       defensivekeys.createIndex("PortalID", "PortalID");
       defensivekeys.createIndex("Count", "Count"); // To be used to remove 0-count entries
       // defensivekeys.createIndex("pk", ["GID", "PortalID"], { unique: true });
+      //
+      const ops = db.createObjectStore("operations", { keyPath: "ID" });
+      ops.createIndex("fetched", "fetched");
+      ops.createIndex("server", "server");
     },
   });
 }

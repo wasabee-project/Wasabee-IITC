@@ -30,7 +30,7 @@ const UploadButton = WButton.extend({
       className: "wasabee-toolbar-upload",
       context: this,
       callback: async () => {
-        const operation = getSelectedOperation();
+        const operation = await getSelectedOperation();
         if (operation.IsServerOp()) {
           await this.doUpdate(operation);
           return;
@@ -39,7 +39,7 @@ const UploadButton = WButton.extend({
         try {
           const r = await uploadOpPromise();
           // switch to the new version in local store -- uploadOpPromise stores it
-          makeSelectedOperation(r.ID);
+          await makeSelectedOperation(r.ID);
           alert(wX("UPLOADED"));
           this.Wupdate();
           // this._invisible();
@@ -190,10 +190,10 @@ const UploadButton = WButton.extend({
           operation.localchanged = false;
           operation.fetched = new Date().toUTCString();
           operation.fetchedOp = JSON.stringify(operation);
-          operation.store();
+          await operation.store();
           // reload if we use rebase
           if (operation != getSelectedOperation())
-            makeSelectedOperation(operation.ID);
+            await makeSelectedOperation(operation.ID);
           alert(wX("UPDATED"));
           this.Wupdate();
         } else {

@@ -36,14 +36,14 @@ const NewopDialog = WDialog.extend({
       const addDialog = new PromptDialog({
         title: wX("NEW_OP"),
         label: wX("SET_NEW_OP"),
-        callback: () => {
+        callback: async () => {
           if (addDialog.inputField.value) {
             const newop = new WasabeeOp({
               creator: PLAYER.nickname,
               name: addDialog.inputField.value,
             });
-            newop.store();
-            makeSelectedOperation(newop.ID);
+            await newop.store();
+            await makeSelectedOperation(newop.ID);
             window.map.fire(
               "wasabeeUIUpdate",
               { reason: "NewopDialog" },

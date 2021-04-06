@@ -22,19 +22,19 @@ const MergeDialog = WDialog.extend({
     const buttons = [];
     buttons.push({
       text: "Rebase",
-      click: () => {
-        this._opRebase.store();
+      click: async () => {
+        await this._opRebase.store();
         if (getSelectedOperation().ID == this._opRebase.ID)
-          makeSelectedOperation(this._opRebase.ID);
+          await makeSelectedOperation(this._opRebase.ID);
         this._dialog.dialog("close");
       },
     });
     buttons.push({
       text: "Replace",
-      click: () => {
-        this.options.opRemote.store();
+      click: async () => {
+        await this.options.opRemote.store();
         if (getSelectedOperation().ID == this.options.opRemote.ID)
-          makeSelectedOperation(this.options.opRemote.ID);
+          await makeSelectedOperation(this.options.opRemote.ID);
         this._dialog.dialog("close");
       },
     });

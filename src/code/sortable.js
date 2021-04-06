@@ -104,6 +104,7 @@ export default class Sortable {
 
     // resolve all rows at once
     // XXX convert to allSettled and check for individual errors rather than failing hard if any row fails
+    console.log(promises);
     Promise.all(promises).then(
       (values) => {
         this._items = values;

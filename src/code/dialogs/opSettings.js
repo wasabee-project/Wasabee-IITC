@@ -76,7 +76,7 @@ const OpSettingDialog = WDialog.extend({
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
       input.value = selectedOp.name;
-      L.DomEvent.on(input, "change", (ev) => {
+      L.DomEvent.on(input, "change", async (ev) => {
         L.DomEvent.stop(ev);
         if (!input.value || input.value == "") {
           alert(wX("USE_VALID_NAME"));
@@ -84,7 +84,7 @@ const OpSettingDialog = WDialog.extend({
           const so = getSelectedOperation();
           so.name = input.value;
           so.localchanged = true;
-          so.store();
+          await so.store();
           window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
         }
       });
@@ -101,12 +101,12 @@ const OpSettingDialog = WDialog.extend({
       picker.value = convertColorToHex(selectedOp.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
 
-      L.DomEvent.on(picker, "change", (ev) => {
+      L.DomEvent.on(picker, "change", async (ev) => {
         L.DomEvent.stop(ev);
         const so = getSelectedOperation();
         so.color = picker.value;
         so.localchanged = true;
-        so.store();
+        await so.store();
         addToColorList(picker.value);
         window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
       });
@@ -116,12 +116,12 @@ const OpSettingDialog = WDialog.extend({
       const commentInput = L.DomUtil.create("textarea", null, topSet);
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
-      L.DomEvent.on(commentInput, "change", (ev) => {
+      L.DomEvent.on(commentInput, "change", async (ev) => {
         L.DomEvent.stop(ev);
         const so = getSelectedOperation();
         so.comment = commentInput.value;
         so.localchanged = true;
-        so.store();
+        await so.store();
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
@@ -170,8 +170,8 @@ const OpSettingDialog = WDialog.extend({
               alert(e.toString());
             }
           }
-          removeOperation(so.ID);
-          const newop = changeOpIfNeeded();
+          await removeOperation(so.ID);
+          const newop = await changeOpIfNeeded();
           const mbr = newop.mbr;
           if (
             mbr &&
@@ -208,11 +208,11 @@ const OpSettingDialog = WDialog.extend({
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
     dupeButton.textContent = wX("DUPE_OP");
-    L.DomEvent.on(dupeButton, "click", (ev) => {
+    L.DomEvent.on(dupeButton, "click", async (ev) => {
       L.DomEvent.stop(ev);
       const so = getSelectedOperation();
-      const newop = duplicateOperation(so.ID);
-      makeSelectedOperation(newop.ID);
+      const newop = await duplicateOperation(so.ID);
+      await makeSelectedOperation(newop.ID);
     });
 
     this._content = content;

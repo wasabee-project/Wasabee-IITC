@@ -182,7 +182,7 @@ const OpPermList = WDialog.extend({
       await addPermPromise(operation.ID, teamID, role, zone);
       // add locally for display
       operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
-      operation.store();
+      await operation.store();
       window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
@@ -204,7 +204,7 @@ const OpPermList = WDialog.extend({
           n.push(p);
       }
       operation.teamlist = n;
-      operation.store();
+      await operation.store();
       window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
