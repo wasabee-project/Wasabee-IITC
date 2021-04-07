@@ -45,8 +45,8 @@ const ManageTeamDialog = WDialog.extend({
         name: wX("AGENT"),
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value, agent) =>
-          cell.appendChild(agent.formatDisplay(this.options.team.id)),
+        format: async (cell, value, agent) =>
+          cell.appendChild(await agent.formatDisplay(this.options.team.id)),
       },
       {
         name: wX("TEAM STATE"),

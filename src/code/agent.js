@@ -5,6 +5,7 @@ import { agentPromise, targetPromise, routePromise } from "./server";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeMe from "./me";
+import WasabeeTeam from "./team";
 
 export default class WasabeeAgent {
   constructor(obj, cache = true) {
@@ -16,6 +17,7 @@ export default class WasabeeAgent {
         obj = {};
       }
     }
+    console.log("passed to constructor", obj);
 
     // things which are stable across all teams
     this.id = obj.id;
@@ -30,40 +32,46 @@ export default class WasabeeAgent {
     this.lng = obj.lng ? obj.lng : 0;
     this.date = obj.date ? obj.date : null; // last location sub, not fetched
 
+    /* what did we decide to do with these?
     this.startlat = obj.startlat ? obj.startlat : 0;
     this.startlng = obj.startlng ? obj.startlng : 0;
     this.startradius = obj.startradius ? Number(obj.startradius) : 0;
-    this.sharestart = obj.sharestart ? obj.sharestart : false;
+    this.sharestart = obj.sharestart ? obj.sharestart : false; */
 
     // server only sets this on direct pulls
     this.cansendto = obj.cansendto ? obj.cansendto : false; // never true from a team pull
 
-    // vary per-team
-    this.ShareWD = obj.ShareWD ? obj.ShareWD : false;
-    this.LoadWD = obj.LoadWD ? obj.LoadWD : false;
-    this.displayname = obj.displayname ? obj.displayname : null;
-    this.squad = obj.squad ? obj.squad : null;
-    this.state = obj.state;
+    // vary per-team, don't set on direct pulls
+    if (obj.ShareWD) this.ShareWD = obj.ShareWD;
+    if (obj.LoadWD) this.LoadWD = obj.LoadWD;
+    if (obj.displayname) this.displayname = obj.displayname;
+    if (obj.squad) this.squad = obj.squa;
+    if (obj.state) this.state = obj.state;
     // this.distance = obj.distance ? Number(obj.distance) : 0; // don't use this
 
-    // not sent by server
-    this.fetched = Date.now();
+    // not sent by server, but preserve if from cache
+    this.fetched = obj.fetched ? obj.fetched : Date.now();
 
     // push the new data into the agent cache
     if (cache) this._updateCache();
   }
 
-  _getDisplayName(teamID = 0) {
-    if (teamID == 0 && this._realName) return this._realName;
+  async _getDisplayName(teamID = 0) {
+    if (teamID == 0) return this.name;
 
     // TODO look at the team cache for this team...
+    const team = await WasabeeTeam.get(teamID);
+    if (team == null) return this.name;
+    for (const a of team.agents) {
+      if (a.id == this.id) return a.name;
+    }
 
     return this.name;
   }
 
   _getAllNames() {
     let out = "";
-    if (this._realName) out = this._realName;
+    out = this.name;
 
     // TODO look through the team cache...
 
@@ -71,21 +79,52 @@ export default class WasabeeAgent {
   }
 
   async _updateCache() {
-    // if we have these from another team, hold onto it
+    // load anything currently cached
     const cached = await window.plugin.wasabee.idb.get("agents", this.id);
-    if (cached) {
-      if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
-      if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
+
+    // nothing already in the cache, just dump this in and call it good
+    // will contain the extras, but that's fine for now
+    if (cached == null) {
+      console.log("not cached, adding");
+      await window.plugin.wasabee.idb.put("agents", this);
+      return;
     }
 
-    this.ShareWD = false;
-    this.LoadWD = false;
-    this.displayname = null;
-    this.squad = null;
-    this.state = false;
+    // if the cached version is newer, do not update
+    if (cached.fetched > this.fetched) {
+      console.log("incoming is older, not updating cache");
+      return;
+    }
+    // note the new fetched time
+    cached.fetched = this.fetched;
+    console.log("updating cache");
+
+    // update location only if known
+    if (this.lat != 0 && this.lng != 0) {
+      cached.lat = this.lat;
+      cached.lng = this.lng;
+      cached.date = this.date;
+    }
+
+    // these probably won't change, but just be sure
+    cached.name = this.name;
+    cached.level = this.level;
+    cached.enlid = this.enlid;
+    cached.pic = this.pic;
+    cached.Vverified = this.Vverified;
+    cached.blacklisted = this.blacklisted;
+    cached.rocks = this.rocks;
+    // cansendto is never true from a team pull, but might be true from a direct pull
+
+    // remove things which make no sense in the global cache
+    delete cached.ShareWD;
+    delete cached.LoadWD;
+    delete cached.displayname;
+    delete cached.squad;
+    delete cached.state;
 
     try {
-      await window.plugin.wasabee.idb.put("agents", this);
+      await window.plugin.wasabee.idb.put("agents", cached);
     } catch (e) {
       console.log(e);
     }
@@ -126,7 +165,7 @@ export default class WasabeeAgent {
     return null;
   }
 
-  formatDisplay(teamID = 0) {
+  async formatDisplay(teamID = 0) {
     const display = L.DomUtil.create("a", "wasabee-agent-label");
     if (this.Vverified || this.rocks) {
       L.DomUtil.addClass(display, "enl");
@@ -139,20 +178,16 @@ export default class WasabeeAgent {
       const ad = new AgentDialog({ gid: this.id });
       ad.enable();
     });
-    if (teamID == "all") {
-      display.textContent = this._getAllNames();
-    } else {
-      display.textContent = this._getDisplayName(teamID);
-    }
+    display.textContent = await this._getDisplayName(teamID);
     return display;
   }
 
-  getPopup() {
+  async getPopup() {
     const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = this.id;
-    title.innerHTML =
-      this.formatDisplay("all").outerHTML + this.timeSinceformat();
+    const fd = await this.formatDisplay(0);
+    title.innerHTML = fd.outerHTML + this.timeSinceformat();
 
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");

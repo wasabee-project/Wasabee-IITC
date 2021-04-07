@@ -13,24 +13,25 @@ export default class WasabeeTeam {
       }
     }
 
+    let fromServer = false;
+    if (data.fetched == null) fromServer = true;
+    this.fetched = data.fetched ? data.fetched : Date.now();
+
     this.id = data.id;
     this.name = data.name;
-    this.fetched = Date.now();
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
     this.agents = data.agents; // raw agent data
 
-    // no _a, must be from server
-    if (!data._a) {
-      this._a = new Array();
-      for (const agent of data.agents) {
-        this._a.push(new WasabeeAgent(agent, true)); // add to agent cache
-      }
-      this._updateCache();
-    } else {
-      this._a = data._a;
+    this._a = new Array();
+    for (const agent of data.agents) {
+      console.log("building agent from team pull", fromServer, agent);
+      agent.fetched = this.fetched;
+      this._a.push(new WasabeeAgent(agent, true)); // add to agent cache
     }
+
+    if (fromServer) this._updateCache();
   }
 
   getAgents() {

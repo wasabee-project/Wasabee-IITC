@@ -193,7 +193,7 @@ const OpsDialog = WDialog.extend({
               // is this redundant with above?  // XXX
               WasabeeAgent.get(op.owner).then((agent) => {
                 placeholder.remove();
-                opOwner.appendChild(agent.formatDisplay("all"));
+                opOwner.appendChild(agent.name); // XXX brain to tired to figure out how to await agent.formatDisplay() here
               });
             } else {
               // it is the local agent anyway

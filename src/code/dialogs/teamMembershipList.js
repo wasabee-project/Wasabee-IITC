@@ -52,8 +52,8 @@ const TeamMembershipList = WDialog.extend({
         name: wX("AGENT"),
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, value, agent) =>
-          cell.appendChild(agent.formatDisplay(this.options.teamID)),
+        format: async (cell, value, agent) =>
+          cell.appendChild(await agent.formatDisplay(this.options.teamID)),
       },
       {
         name: wX("SQUAD"),
