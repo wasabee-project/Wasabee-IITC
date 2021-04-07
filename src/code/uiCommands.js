@@ -250,7 +250,7 @@ export function getAllPortalsLinked(operation, originPortal) {
       lat: (p.options.data.oLatE6 / 1e6).toFixed(6),
       lng: (p.options.data.oLngE6 / 1e6).toFixed(6),
       name: p.options.data.oGuid,
-      comment: "out",
+      comment: "in",
     });
 
     const linkPortal2 = new WasabeePortal({
@@ -258,7 +258,7 @@ export function getAllPortalsLinked(operation, originPortal) {
       lat: (p.options.data.dLatE6 / 1e6).toFixed(6),
       lng: (p.options.data.dLngE6 / 1e6).toFixed(6),
       name: p.options.data.dGuid,
-      comment: "in",
+      comment: "out",
     });
 
     if (operation.containsLinkFromTo(linkPortal1, linkPortal2)) {
