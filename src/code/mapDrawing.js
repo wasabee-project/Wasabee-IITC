@@ -292,7 +292,7 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
         L.DomEvent.stop(ev);
         if (marker.isPopupOpen && marker.isPopupOpen()) return;
         const a = await WasabeeAgent.get(agent.id);
-        marker.setPopupContent(a.getPopup());
+        marker.setPopupContent(await a.getPopup());
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");
         marker.update();
