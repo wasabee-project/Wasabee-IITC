@@ -19,39 +19,22 @@ export default class WasabeeTeam {
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
+    this.agents = data.agents; // raw agent data
 
-    // from team cache: use as is
-    if (data.agentIDs) this.agentIDs = data.agentIDs;
-
-    // from server
-    if (data.agents) {
-      this.agentIDs = new Array();
+    // no _a, must be from server
+    if (!data._a) {
+      this._a = new Array();
       for (const agent of data.agents) {
-        const a = new WasabeeAgent(agent, this.id, true); // push to agent cache
-        this.agentIDs.push(a.id); // we only need the id here
+        this._a.push(new WasabeeAgent(agent, true)); // add to agent cache
       }
       this._updateCache();
+    } else {
+      this._a = data._a;
     }
   }
 
-  // this could be written to pull directly from the agent store using an idb query based on this.agentIDs
-  // we would need to resolve _teamData ourselves, but it _might_ be measurably faster, something to test when we have time
-  // ....openCursor(IDBKeyRange.only(this.agentIDs));
-  async agents() {
-    const p = new Array();
-    for (const id of this.agentIDs) p.push(WasabeeAgent.get(id, this.id));
-    const agents = new Array();
-    const results = await Promise.allSettled(p);
-    for (const result of results) {
-      if (result.status == "fulfilled") {
-        if (result.value.forTeam != this.id)
-          console.log("team mismatch", result.value);
-        agents.push(result.value);
-      } else {
-        console.log(result.status, result.reason);
-      }
-    }
-    return agents;
+  getAgents() {
+    return this._a;
   }
 
   async _updateCache() {

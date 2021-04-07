@@ -84,9 +84,9 @@ export default class WasabeeOp {
   }
 
   static async migrate(opID) {
+    // skip ones already completed
     const have = await window.plugin.wasabee.idb.get("operations", opID);
     if (have != null) {
-      console.log("already have this one, not migrating", opID);
       return;
     }
 
@@ -95,7 +95,6 @@ export default class WasabeeOp {
       console.log("not migrating missing op", opID);
       return;
     }
-    console.debug(op);
 
     await window.plugin.wasabee.idb.put("operations", op);
     // delete localStorage[opID];
@@ -123,7 +122,8 @@ export default class WasabeeOp {
     // also update in idb while we transisition
     await window.plugin.wasabee.idb.put("operations", json);
 
-    addOperation(this.ID);
+    // manage the list of known operations, can be removed in 0.20
+    await addOperation(this.ID);
 
     // some debug info to trace race condition
     const s = getSelectedOperation();

@@ -89,7 +89,7 @@ const OnlineAgentList = WDialog.extend({
     const range = IDBKeyRange.lowerBound(this._last_hour());
     let cursor = await tx.store.index("date").openCursor(range);
     while (cursor) {
-      a.push(new WasabeeAgent(cursor.value, 0, false));
+      a.push(new WasabeeAgent(cursor.value, false));
       cursor = await cursor.continue();
     }
 

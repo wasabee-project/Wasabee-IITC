@@ -37,7 +37,7 @@ export async function initSelectedOperation() {
 
 export async function changeOpIfNeeded() {
   const selectedOp = getSelectedOperation();
-  const ops = opsList();
+  const ops = await opsList();
   if (!ops.includes(selectedOp.ID)) {
     if (ops.length == 0) await loadNewDefaultOp();
     else await makeSelectedOperation(ops[ops.length - 1]);
@@ -67,7 +67,8 @@ export async function makeSelectedOperation(opID) {
       );
     } else {
       // should not be necessary now, but still safe
-      if (opsList().includes(window.plugin.wasabee._selectedOp.ID))
+      const ol = await opsList();
+      if (ol.includes(window.plugin.wasabee._selectedOp.ID))
         await window.plugin.wasabee._selectedOp.store();
     }
   }
@@ -106,19 +107,18 @@ async function initOps() {
 //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
 export async function setupLocalStorage() {
   // make sure we have at least one op
-  let ops = opsList();
+  let ops = await opsList();
   if (ops == undefined || ops.length == 0) {
     await initOps();
-    ops = opsList();
+    ops = await opsList();
   }
 
-  console.log("ops: ", ops);
-  // COPY (not move, yet) from localStorage to indexeddb
-  // XXX promise.all would be better
+  const migrations = Array();
   for (const opID of ops) {
-    console.log("migrating to idb", opID);
-    await WasabeeOp.migrate(opID);
+    migrations.push(WasabeeOp.migrate(opID));
   }
+  // no need to see the results, just wait until all are done
+  await Promise.allSettled(migrations);
 
   // if the restore ID is not set, set it to the first thing we find
   let rID = getRestoreOpID();
@@ -126,7 +126,6 @@ export async function setupLocalStorage() {
     rID = ops[0]; // ops cannot be empty due to previous block
     setRestoreOpID(rID);
   }
-  console.log("rID:", rID);
 }
 
 function storeOpsList(ops) {
@@ -137,14 +136,15 @@ function storeOpsList(ops) {
 
 //** This function removes an operation from the main list */
 export async function removeOperation(opID) {
-  const ops = opsList().filter((ID) => ID != opID);
+  const ol = await opsList();
+  const ops = ol.filter((ID) => ID != opID);
   storeOpsList(ops);
   await WasabeeOp.delete(opID);
 }
 
 //** This function adds an operation to the main list */
-export function addOperation(opID) {
-  const ops = opsList();
+export async function addOperation(opID) {
+  const ops = await opsList();
   if (!ops.includes(opID)) ops.push(opID);
   storeOpsList(ops);
 }
@@ -173,7 +173,7 @@ export function resetHiddenOps() {
 
 //*** This function resets the local op list
 export async function resetOps() {
-  const ops = opsList();
+  const ops = await opsList();
   for (const opID of ops) {
     await removeOperation(opID); // promise.all...
   }
@@ -189,11 +189,17 @@ export function hiddenOpsList() {
   }
 }
 
-export function opsList(hidden = true) {
+export async function opsList(hidden = true) {
+  // after 0.19, remove the list and just query the idb keys
+
   const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
   if (raw) {
     try {
       const ops = JSON.parse(raw);
+      const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
+      for (const k of fromIdb) {
+        if (!ops.includes(k)) ops.push(k);
+      }
       if (!hidden) {
         const hiddenOps = hiddenOpsList();
         return ops.filter((o) => !hiddenOps.includes(o));
@@ -230,7 +236,7 @@ export async function duplicateOperation(opID) {
 
 // this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
 export async function removeNonOwnedOps() {
-  for (const opID of opsList()) {
+  for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
     if (!op || !op.IsOwnedOp()) await removeOperation(opID);
   }

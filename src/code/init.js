@@ -170,11 +170,10 @@ function initGoogleAPI() {
 
 async function initIdb() {
   const version = 2;
-  // if (Wasabee.idb && Wasabee.idb.version == version) return;
 
   // XXX audit these to make sure all the various indexes are used
   Wasabee.idb = await openDB("wasabee", version, {
-    upgrade(db, oldVersion) {
+    upgrade(db, oldVersion, newVersion, tx) {
       if (oldVersion < 1) {
         const agents = db.createObjectStore("agents", { keyPath: "id" });
         agents.createIndex("date", "date"); // last location change
@@ -197,6 +196,11 @@ async function initIdb() {
         ops.createIndex("fetched", "fetched");
         ops.createIndex("server", "server");
       }
+      /* if (oldVersion < 3) {
+        const teams = tx.objectStore("teams");
+        teams.createIndex("_agents", "_agents[].id");
+      } */
+      console.debug(newVersion, tx);
     },
   });
 }

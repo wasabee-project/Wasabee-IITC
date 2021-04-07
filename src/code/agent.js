@@ -7,7 +7,7 @@ import wX from "./wX";
 import WasabeeMe from "./me";
 
 export default class WasabeeAgent {
-  constructor(obj, teamID = 0, cache = true) {
+  constructor(obj, cache = true) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
@@ -29,13 +29,11 @@ export default class WasabeeAgent {
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
     this.date = obj.date ? obj.date : null; // last location sub, not fetched
+
     this.startlat = obj.startlat ? obj.startlat : 0;
     this.startlng = obj.startlng ? obj.startlng : 0;
     this.startradius = obj.startradius ? Number(obj.startradius) : 0;
     this.sharestart = obj.sharestart ? obj.sharestart : false;
-
-    // XXX kludge until the server gets updated
-    if (teamID == 0) this._realName = obj.name;
 
     // server only sets this on direct pulls
     this.cansendto = obj.cansendto ? obj.cansendto : false; // never true from a team pull
@@ -50,20 +48,15 @@ export default class WasabeeAgent {
 
     // not sent by server
     this.fetched = Date.now();
-    this.forTeam = teamID;
 
     // push the new data into the agent cache
     if (cache) this._updateCache();
   }
 
   _getDisplayName(teamID = 0) {
-    // XXX kludge
     if (teamID == 0 && this._realName) return this._realName;
 
-    if (this._teamData && this._teamData.has(teamID)) {
-      const t = this._teamData.get(teamID);
-      return t.displayname;
-    }
+    // TODO look at the team cache for this team...
 
     return this.name;
   }
@@ -72,13 +65,8 @@ export default class WasabeeAgent {
     let out = "";
     if (this._realName) out = this._realName;
 
-    if (this._teamData) {
-      out += " (";
-      for (const t of this._teamData.values()) {
-        if (t.displayname) out += t.displayname + " ";
-      }
-      out += ")";
-    }
+    // TODO look through the team cache...
+
     return out;
   }
 
@@ -88,31 +76,15 @@ export default class WasabeeAgent {
     if (cached) {
       if (this.lat == 0 && cached.lat != 0) this.lat = cached.lat;
       if (this.lng == 0 && cached.lng != 0) this.lng = cached.lng;
-      this._teamData = cached._teamData;
     }
 
-    // store per-team info in a Map
-    if (!this._teamData) this._teamData = new Map();
-    if (this.forTeam != 0) {
-      this._teamData.set(this.forTeam, {
-        ShareWD: this.ShareWD,
-        LoadWD: this.LoadWD,
-        displayname: this.displayname,
-        squad: this.squad,
-        state: this.state,
-      });
-    }
-
-    // do not store team-specific data on the top level
     this.ShareWD = false;
     this.LoadWD = false;
     this.displayname = null;
     this.squad = null;
     this.state = false;
-    this.forTeam = 0;
 
     try {
-      // console.log("writing agent to idb", this);
       await window.plugin.wasabee.idb.put("agents", this);
     } catch (e) {
       console.log(e);
@@ -125,36 +97,21 @@ export default class WasabeeAgent {
   }
 
   // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
-  static async get(gid, teamID = 0, maxAgeSeconds = 86400) {
+  static async get(gid, maxAgeSeconds = 86400) {
     const cached = await window.plugin.wasabee.idb.get("agents", gid);
     if (cached) {
-      const a = new WasabeeAgent(cached, teamID, false);
+      const a = new WasabeeAgent(cached, false);
       if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        // resolve team specific stuff
-        if (teamID != 0 && cached._teamData && cached._teamData.has(teamID)) {
-          const td = cached._teamData.get(teamID);
-          a.ShareWD = td.ShareWD;
-          a.LoadWD = td.LoadWD;
-          a.displayname = td.displayname;
-          a.squad = td.squad;
-          a.state = td.state;
-          a.forTeam = teamID;
-        } else {
-          // console.debug("found in cache: missing data for the requested team, using team 0", gid);
-        }
         a.cached = true;
-        // delete a._teamData;
-        // console.log("returning from cache", a);
+        // console.debug("returning from cache", a);
         return a;
       } else {
         // console.debug("found in cache, but too old", gid);
       }
-    } else {
-      // console.debug("not found in cache", gid);
     }
 
     if (!WasabeeMe.isLoggedIn()) {
-      console.log("not logged in, giving up");
+      console.debug("not logged in, giving up");
       return null;
     }
 
@@ -165,7 +122,7 @@ export default class WasabeeAgent {
     } catch (e) {
       console.error(e);
     }
-    console.log("giving up");
+    // console.debug("giving up");
     return null;
   }
 

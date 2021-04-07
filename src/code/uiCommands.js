@@ -271,7 +271,7 @@ export function getAllPortalsLinked(operation, originPortal) {
       x.push(linkPortal1);
     }
   }
-  console.log(x);
+  // console.log(x);
   return x;
 }
 
@@ -383,8 +383,9 @@ export async function fullSync() {
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner
+    const ol = await opsList();
     const serverOps = new Set(
-      opsList()
+      ol
         .map(await WasabeeOp.load)
         .filter((op) => op)
         .filter((op) => op.server == server && !opsID.has(op.ID))
@@ -439,7 +440,7 @@ export async function fullSync() {
     // replace current op by the server version if any
     if (ops.some((op) => op.ID == so.ID)) await makeSelectedOperation(so.ID);
     // change op if the current does not exist anymore
-    else if (!opsList().includes(so.ID)) await changeOpIfNeeded();
+    else if (!ol.includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
     else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
 

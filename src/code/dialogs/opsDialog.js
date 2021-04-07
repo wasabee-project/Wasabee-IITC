@@ -80,7 +80,7 @@ const OpsDialog = WDialog.extend({
         window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
       ] !== "false";
 
-    const ol = opsList(showHiddenOps);
+    const ol = await opsList(showHiddenOps);
     const data = new Map();
     data.set("", []);
     for (const opID of ol) {

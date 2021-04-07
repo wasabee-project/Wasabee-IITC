@@ -240,7 +240,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
     // we don't need to draw if pulled from cache
     if (team.cached === true) return done;
 
-    const agents = await team.agents();
+    const agents = team.getAgents();
     for (const agent of agents) {
       if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
         done.push(agent.id);
@@ -254,7 +254,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
 
 export async function drawSingleAgent(gid) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-  const agent = await WasabeeAgent.get(gid, 0, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
+  const agent = await WasabeeAgent.get(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
   if (agent != null) _drawAgent(agent);
 }
 
