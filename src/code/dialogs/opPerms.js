@@ -111,9 +111,9 @@ const OpPermList = WDialog.extend({
     this._table.fields = [
       {
         name: wX("TEAM"),
-        value: (perm) => {
+        value: async (perm) => {
           // try the team cache first
-          const t = WasabeeTeam.get(perm.teamid);
+          const t = await WasabeeTeam.get(perm.teamid);
           if (t) return t.name;
           // check the "me" list
           if (this._me) {
