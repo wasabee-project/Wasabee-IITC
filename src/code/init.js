@@ -50,9 +50,12 @@ window.plugin.wasabee.init = async () => {
     skins.push(ss);
   }
   if (skins.length > 0) {
-    window.addHook("iitcLoaded", () => {
-      changeSkin(skins);
-    });
+    if (window.iitcLoaded) changeSkin(skins);
+    else {
+      window.addHook("iitcLoaded", () => {
+        changeSkin(skins);
+      });
+    }
   }
 
   Wasabee.portalLayerGroup = new L.LayerGroup();
