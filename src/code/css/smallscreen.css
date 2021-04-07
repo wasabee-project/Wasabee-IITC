@@ -1,3 +1,18 @@
+/* align verticaly button subactions */
+.leaflet-touch .wasabee-actions li {
+  display: block;
+  border-bottom: 1px solid transparent;
+}
+
+.leaflet-touch li.wasabee-subactions a {
+  min-width: 50px;
+  width: unset !important;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* ellipsis for portal names */
+
 .wasabee-dialog-checklist.wasabee-small-screen .ui-dialog-content,
 .wasabee-dialog-blockerlist.wasabee-small-screen .ui-dialog-content {
   padding: 0;
