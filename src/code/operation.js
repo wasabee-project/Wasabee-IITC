@@ -92,7 +92,7 @@ export default class WasabeeOp {
 
     const op = await WasabeeOp.load(opID);
     if (op == null) {
-      console.log("not migrating missing op", opID);
+      // console.debug("not migrating missing op", opID);
       return;
     }
 
@@ -102,7 +102,7 @@ export default class WasabeeOp {
 
   // writes to localStorage with all data included
   async store() {
-    console.log("storing ", this.ID);
+    // console.debug("storing ", this.ID);
     this.stored = Date.now();
     const json = this.toJSON();
 
@@ -117,9 +117,11 @@ export default class WasabeeOp {
     json.blockers = this.blockers;
     json.keysonhand = this.keysonhand;
     json.teamlist = this.teamlist;
+
+    // store to localStorage -- for now
     localStorage[this.ID] = JSON.stringify(json);
 
-    // also update in idb while we transisition
+    // store to idb
     await window.plugin.wasabee.idb.put("operations", json);
 
     // manage the list of known operations, can be removed in 0.20
@@ -128,7 +130,13 @@ export default class WasabeeOp {
     // some debug info to trace race condition
     const s = getSelectedOperation();
     if (s && s.ID == this.ID && s != this)
-      console.trace("store current OP from a different obj");
+      console.trace(
+        "store current OP from a different obj",
+        s.ID,
+        s.name,
+        this.ID,
+        this.name
+      );
   }
 
   // build object to serialize, shallow copy, local-only values excluded

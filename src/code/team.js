@@ -24,9 +24,10 @@ export default class WasabeeTeam {
     this.jlt = data.jlt;
     this.agents = data.agents; // raw agent data
 
+    // this block (1) adds agent to agents cache and (2) populates _a
+    // _a is a buffer of pre-built WasabeeAgents we can return via getAgents() w/o having to await
     this._a = new Array();
     for (const agent of data.agents) {
-      console.log("building agent from team pull", fromServer, agent);
       agent.fetched = this.fetched;
       this._a.push(new WasabeeAgent(agent, true)); // add to agent cache
     }

@@ -8,6 +8,11 @@ import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
 import { getSelectedOperation } from "./selectedOp";
 
+const STATE_UNASSIGNED = "pending";
+const STATE_ASSIGNED = "assigned";
+const STATE_ACKNOWLEDGED = "acknowledged";
+const STATE_COMPLETED = "completed";
+
 export default class WasabeeMarker {
   constructor(obj) {
     this.ID = obj.ID ? obj.ID : generateId();
@@ -18,12 +23,6 @@ export default class WasabeeMarker {
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
-
-    // some constants
-    this.STATE_UNASSIGNED = "pending";
-    this.STATE_ASSIGNED = "assigned";
-    this.STATE_ACKNOWLEDGED = "acknowledged";
-    this.STATE_COMPLETED = "completed";
 
     // validation happens in the setter, setting up this._state
     this.state = obj.state;
@@ -53,33 +52,33 @@ export default class WasabeeMarker {
 
   assign(gid) {
     if (!gid || gid == "") {
-      this._state = this.STATE_UNASSIGNED;
+      this._state = STATE_UNASSIGNED;
       this.assignedTo = "";
       return;
     }
 
     this.assignedTo = gid;
-    this._state = this.STATE_ASSIGNED;
+    this._state = STATE_ASSIGNED;
     return;
   }
 
   set state(state) {
     // sanitize state
     if (
-      state != this.STATE_UNASSIGNED &&
-      state != this.STATE_ASSIGNED &&
-      state != this.STATE_ACKNOWLEDGED &&
-      state != this.STATE_COMPLETED
+      state != STATE_UNASSIGNED &&
+      state != STATE_ASSIGNED &&
+      state != STATE_ACKNOWLEDGED &&
+      state != STATE_COMPLETED
     )
-      state = this.STATE_UNASSIGNED;
+      state = STATE_UNASSIGNED;
     // if setting to "pending", clear assignments
-    if (state == this.STATE_UNASSIGNED) this.assignedTo = null;
+    if (state == STATE_UNASSIGNED) this.assignedTo = null;
     // if setting to assigned or acknowledged and there is no assignment, set to "pending". A task _can_ be completed w/o being assigned
     if (
-      (state == this.STATE_ASSIGNED || state == this.STATE_ACKNOWLEDGED) &&
+      (state == STATE_ASSIGNED || state == STATE_ACKNOWLEDGED) &&
       (!this.assignedTo || this.assignedTo == "")
     ) {
-      state = this.STATE_UNASSIGNED;
+      state = STATE_UNASSIGNED;
     }
     this._state = state;
   }
@@ -113,7 +112,7 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.get(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        assignment.appendChild(a.formatDisplay("all"));
+        assignment.appendChild(await a.formatDisplay());
       } catch (err) {
         console.error(err);
       }

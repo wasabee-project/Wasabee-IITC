@@ -17,11 +17,11 @@ export default class WasabeeAgent {
         obj = {};
       }
     }
-    console.log("passed to constructor", obj);
+    // console.debug("passed to constructor", obj);
 
     // things which are stable across all teams
     this.id = obj.id;
-    this.name = obj.name; // the primary name known to wasabee
+    this.name = obj.name;
     this.level = obj.level ? Number(obj.level) : 0;
     this.enlid = obj.enlid ? obj.enlid : 0;
     this.pic = obj.pic ? obj.pic : null;
@@ -52,29 +52,21 @@ export default class WasabeeAgent {
     this.fetched = obj.fetched ? obj.fetched : Date.now();
 
     // push the new data into the agent cache
+    // do not await this, let it happen in the background
     if (cache) this._updateCache();
   }
 
   async _getDisplayName(teamID = 0) {
     if (teamID == 0) return this.name;
 
-    // TODO look at the team cache for this team...
     const team = await WasabeeTeam.get(teamID);
     if (team == null) return this.name;
+    // XXX is there a cute team.agents.filter() we can use here?
     for (const a of team.agents) {
       if (a.id == this.id) return a.name;
     }
 
     return this.name;
-  }
-
-  _getAllNames() {
-    let out = "";
-    out = this.name;
-
-    // TODO look through the team cache...
-
-    return out;
   }
 
   async _updateCache() {
@@ -84,19 +76,19 @@ export default class WasabeeAgent {
     // nothing already in the cache, just dump this in and call it good
     // will contain the extras, but that's fine for now
     if (cached == null) {
-      console.log("not cached, adding");
+      // console.debug("not cached, adding");
       await window.plugin.wasabee.idb.put("agents", this);
       return;
     }
 
     // if the cached version is newer, do not update
     if (cached.fetched > this.fetched) {
-      console.log("incoming is older, not updating cache");
+      console.debug("incoming is older, not updating cache");
       return;
     }
     // note the new fetched time
     cached.fetched = this.fetched;
-    console.log("updating cache");
+    console.debug("updating cache");
 
     // update location only if known
     if (this.lat != 0 && this.lng != 0) {
@@ -121,11 +113,7 @@ export default class WasabeeAgent {
     delete cached.squad;
     delete cached.state;
 
-    try {
-      await window.plugin.wasabee.idb.put("agents", cached);
-    } catch (e) {
-      console.log(e);
-    }
+    await window.plugin.wasabee.idb.put("agents", cached);
   }
 
   get latLng() {
@@ -152,7 +140,7 @@ export default class WasabeeAgent {
       return null;
     }
 
-    console.debug("pulling server for new agent data (no team)");
+    // console.debug("pulling server for new agent data (no team)");
     try {
       const result = await agentPromise(gid);
       return new WasabeeAgent(result, true);
