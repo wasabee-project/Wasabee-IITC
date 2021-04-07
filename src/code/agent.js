@@ -44,7 +44,6 @@ export default class WasabeeAgent {
     // vary per-team, don't set on direct pulls
     if (obj.ShareWD) this.ShareWD = obj.ShareWD;
     if (obj.LoadWD) this.LoadWD = obj.LoadWD;
-    if (obj.displayname) this.displayname = obj.displayname;
     if (obj.squad) this.squad = obj.squa;
     if (obj.state) this.state = obj.state;
     // this.distance = obj.distance ? Number(obj.distance) : 0; // don't use this
@@ -119,7 +118,6 @@ export default class WasabeeAgent {
     // remove things which make no sense in the global cache
     delete cached.ShareWD;
     delete cached.LoadWD;
-    delete cached.displayname;
     delete cached.squad;
     delete cached.state;
 

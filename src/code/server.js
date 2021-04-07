@@ -673,12 +673,6 @@ export function loadConfig() {
   return genericGet(`/static/wasabee-webui-config.json`);
 }
 
-export function setDisplayName(teamID, googleID, displayname) {
-  const fd = new FormData();
-  fd.append("displayname", displayname);
-  return genericPost(`/api/v1/team/${teamID}/${googleID}/displayname`, fd);
-}
-
 export function changeTeamOwnerPromise(teamID, newOwner) {
   return genericGet(`/api/v1/team/${teamID}/chown?to=${newOwner}`);
 }
