@@ -80,7 +80,7 @@ export default class WasabeeOp {
 
   static async delete(opID) {
     delete localStorage[opID];
-    await window.plugin.wasabee.idb.get("operations", opID);
+    await window.plugin.wasabee.idb.delete("operations", opID);
   }
 
   static async migrate(opID) {
