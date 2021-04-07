@@ -87,6 +87,7 @@ window.plugin.wasabee.init = async () => {
   // Android panes
   const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
   if (window.isSmartphone() && usePanes) {
+    /* eslint-disable no-new */
     new WPane({
       paneId: "wasabee",
       paneName: "Wasabee",
