@@ -189,10 +189,9 @@ const OpsDialog = WDialog.extend({
             const placeholder = L.DomUtil.create("div", "", opOwner);
             if (WasabeeMe.isLoggedIn()) {
               placeholder.textContent = "looking up: [" + op.owner + "]";
-              // is this redundant with above?  // XXX
-              WasabeeAgent.get(op.owner).then((agent) => {
+              WasabeeAgent.get(op.owner).then(async (agent) => {
                 placeholder.remove();
-                opOwner.appendChild(agent.name); // XXX brain to tired to figure out how to await agent.formatDisplay() here
+                opOwner.appendChild(await agent.formatDisplay());
               });
             } else {
               // it is the local agent anyway
