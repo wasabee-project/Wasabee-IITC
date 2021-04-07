@@ -155,7 +155,7 @@ export default class WasabeeAgent {
     console.debug("pulling server for new agent data (no team)");
     try {
       const result = await agentPromise(gid);
-      return new WasabeeAgent(result, 0, true);
+      return new WasabeeAgent(result, true);
     } catch (e) {
       console.error(e);
     }
