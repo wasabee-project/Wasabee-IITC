@@ -96,7 +96,7 @@ export default class WasabeeOp {
       return;
     }
 
-    await window.plugin.wasabee.idb.put("operations", op);
+    await op.store();
     // delete localStorage[opID];
   }
 
@@ -704,7 +704,7 @@ export default class WasabeeOp {
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
       // this.update(false); // can trigger a redraw-storm, just skip
-      this.store(); // do not await, let it happen in the background -- ideally now blockers should not be part of the op json, but stored independently in indexeddb
+      // this.store(); // do not await, let it happen in the background -- ideally now blockers should not be part of the op json, but stored independently in indexeddb
     }
   }
 
