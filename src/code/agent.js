@@ -8,7 +8,7 @@ import WasabeeMe from "./me";
 import WasabeeTeam from "./team";
 
 export default class WasabeeAgent {
-  constructor(obj, cache = true) {
+  constructor(obj) {
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
@@ -53,7 +53,7 @@ export default class WasabeeAgent {
 
     // push the new data into the agent cache
     // do not await this, let it happen in the background
-    if (cache) this._updateCache();
+    this._updateCache();
   }
 
   async _getDisplayName(teamID = 0) {
@@ -82,7 +82,7 @@ export default class WasabeeAgent {
     }
 
     // if the cached version is newer, do not update
-    if (cached.fetched > this.fetched) {
+    if (cached.fetched >= this.fetched) {
       console.debug("incoming is older, not updating cache");
       return;
     }
@@ -113,7 +113,11 @@ export default class WasabeeAgent {
     delete cached.squad;
     delete cached.state;
 
-    await window.plugin.wasabee.idb.put("agents", cached);
+    try {
+      await window.plugin.wasabee.idb.put("agents", cached);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   get latLng() {
@@ -125,7 +129,7 @@ export default class WasabeeAgent {
   static async get(gid, maxAgeSeconds = 86400) {
     const cached = await window.plugin.wasabee.idb.get("agents", gid);
     if (cached) {
-      const a = new WasabeeAgent(cached, false);
+      const a = new WasabeeAgent(cached);
       if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
         a.cached = true;
         // console.debug("returning from cache", a);
@@ -143,7 +147,7 @@ export default class WasabeeAgent {
     // console.debug("pulling server for new agent data (no team)");
     try {
       const result = await agentPromise(gid);
-      return new WasabeeAgent(result, true);
+      return new WasabeeAgent(result);
     } catch (e) {
       console.error(e);
     }

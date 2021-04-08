@@ -29,7 +29,7 @@ export default class WasabeeTeam {
     this._a = new Array();
     for (const agent of data.agents) {
       agent.fetched = this.fetched;
-      this._a.push(new WasabeeAgent(agent, true)); // add to agent cache
+      this._a.push(new WasabeeAgent(agent)); // add to agent cache
     }
 
     if (fromServer) this._updateCache();
