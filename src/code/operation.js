@@ -90,14 +90,18 @@ export default class WasabeeOp {
       return;
     }
 
-    const op = await WasabeeOp.load(opID);
-    if (op == null) {
-      // console.debug("not migrating missing op", opID);
-      return;
+    try {
+      const raw = localStorage[opID];
+      if (raw == null) throw new Error("invalid operation ID");
+      const obj = JSON.parse(raw);
+      const op = new WasabeeOp(obj);
+      if (op == null) throw new Error("corrupted operation");
+      console.debug(op);
+      await op.store();
+      // delete localStorage[opID];
+    } catch (e) {
+      console.error(e);
     }
-
-    await op.store();
-    // delete localStorage[opID];
   }
 
   // writes to localStorage with all data included
