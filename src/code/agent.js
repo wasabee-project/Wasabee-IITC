@@ -128,15 +128,11 @@ export default class WasabeeAgent {
   // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
   static async get(gid, maxAgeSeconds = 86400) {
     const cached = await window.plugin.wasabee.idb.get("agents", gid);
-    if (cached) {
+    if (cached && cached.fetched > Date.now() - 1000 * maxAgeSeconds) {
       const a = new WasabeeAgent(cached);
-      if (a.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        a.cached = true;
-        // console.debug("returning from cache", a);
-        return a;
-      } else {
-        // console.debug("found in cache, but too old", gid);
-      }
+      a.cached = true;
+      console.debug("returning from cache", a);
+      return a;
     }
 
     if (!WasabeeMe.isLoggedIn()) {
@@ -144,7 +140,7 @@ export default class WasabeeAgent {
       return null;
     }
 
-    // console.debug("pulling server for new agent data (no team)");
+    console.debug("pulling server for new agent data (no team)");
     try {
       const result = await agentPromise(gid);
       return new WasabeeAgent(result);
