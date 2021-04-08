@@ -18,16 +18,19 @@ export default class WasabeeMarker {
     this.ID = obj.ID ? obj.ID : generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
-    this.comment = obj.comment ? obj.comment : "";
+    this.comment = obj.comment ? obj.comment : ""; // why "" and not null? This isn't go
     this.completedBy = obj.completedBy ? obj.completedBy : "";
-    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
 
-    // validation happens in the setter, setting up this._state
-    this.state = obj.state;
+    this.assign(obj.assignedTo); // WAS this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    // if ._state then it came from indexeddb, otherwise from server/localStorage
+    if (obj._state) {
+      this.state = obj._state;
+    } else this.state = obj.state ? obj.state : null;
   }
 
+  // not called when pushing to indexeddb, but used when sending to server
   toJSON() {
     return {
       ID: this.ID,
@@ -63,24 +66,26 @@ export default class WasabeeMarker {
   }
 
   set state(state) {
-    // sanitize state
-    if (
-      state != STATE_UNASSIGNED &&
-      state != STATE_ASSIGNED &&
-      state != STATE_ACKNOWLEDGED &&
-      state != STATE_COMPLETED
-    )
-      state = STATE_UNASSIGNED;
-    // if setting to "pending", clear assignments
-    if (state == STATE_UNASSIGNED) this.assignedTo = null;
-    // if setting to assigned or acknowledged and there is no assignment, set to "pending". A task _can_ be completed w/o being assigned
-    if (
-      (state == STATE_ASSIGNED || state == STATE_ACKNOWLEDGED) &&
-      (!this.assignedTo || this.assignedTo == "")
-    ) {
-      state = STATE_UNASSIGNED;
+    switch (state) {
+      case STATE_UNASSIGNED:
+        this.assignedTo = null;
+        this._state = STATE_UNASSIGNED;
+        break;
+      case STATE_ASSIGNED: // fall-through
+      case STATE_ACKNOWLEDGED:
+        if (!this.assignedTo || this.assignedTo == "") {
+          this._state = STATE_UNASSIGNED;
+          break;
+        }
+        this._state = state;
+        break;
+      case STATE_COMPLETED:
+        this._state = STATE_COMPLETED;
+        break;
+      default:
+        this._state = STATE_UNASSIGNED;
+        break;
     }
-    this._state = state;
   }
 
   get state() {
