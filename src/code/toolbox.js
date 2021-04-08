@@ -40,7 +40,7 @@ export function setupToolbox() {
           );
           alert(wX("LOC_PROC"));
         } catch (e) {
-          console.error(e.toString());
+          console.error(e);
         }
       },
       (err) => {

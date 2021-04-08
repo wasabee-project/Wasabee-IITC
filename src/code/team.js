@@ -60,7 +60,7 @@ export default class WasabeeTeam {
       const t = await teamPromise(teamID);
       return new WasabeeTeam(t);
     } catch (e) {
-      console.error(e.toString());
+      console.error(e);
     }
     return null;
   }
