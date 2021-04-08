@@ -46,7 +46,7 @@ const OperationChecklistDialog = WDialog.extend({
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
     this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
 
@@ -58,6 +58,8 @@ const OperationChecklistDialog = WDialog.extend({
       loadFaked(operation, true); // force
     };
 
+    await this.sortable.done;
+
     this.createDialog({
       title: wX("OP_CHECKLIST", operation.name),
       html: this.sortable.table,
@@ -68,7 +70,7 @@ const OperationChecklistDialog = WDialog.extend({
     });
   },
 
-  checklistUpdate: function () {
+  checklistUpdate: async function () {
     const operation = getSelectedOperation();
     this.setTitle(wX("OP_CHECKLIST", operation.name));
     this.sortable = this.getListDialogContent(
@@ -76,6 +78,7 @@ const OperationChecklistDialog = WDialog.extend({
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
+    await this.sortable.done;
     this.setContent(this.sortable.table);
   },
 
