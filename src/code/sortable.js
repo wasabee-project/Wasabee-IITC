@@ -12,6 +12,8 @@ export default class Sortable {
 
     // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
+
+    this._done = true;
   }
 
   /* How to use this:
@@ -107,13 +109,15 @@ export default class Sortable {
     // resolve all rows at once
     // XXX convert to allSettled and check for individual errors rather than failing hard if any row fails
     // console.log(promises);
-    Promise.all(promises).then(
+    this._done = Promise.all(promises).then(
       (values) => {
         this._items = values;
         this.sort();
+        return true;
       },
       (reject) => {
         console.log("rejected", reject);
+        this._done = false;
       }
     );
   }
@@ -125,6 +129,10 @@ export default class Sortable {
   set fields(value) {
     this._fields = value;
     this.renderHead();
+  }
+
+  get done() {
+    return this._done;
   }
 
   renderHead() {
