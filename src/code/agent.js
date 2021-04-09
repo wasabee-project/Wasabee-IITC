@@ -44,7 +44,7 @@ export default class WasabeeAgent {
     // vary per-team, don't set on direct pulls
     if (obj.ShareWD) this.ShareWD = obj.ShareWD;
     if (obj.LoadWD) this.LoadWD = obj.LoadWD;
-    if (obj.squad) this.squad = obj.squa;
+    if (obj.squad) this.squad = obj.squad;
     if (obj.state) this.state = obj.state;
     // this.distance = obj.distance ? Number(obj.distance) : 0; // don't use this
 
