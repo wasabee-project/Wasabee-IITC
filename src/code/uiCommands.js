@@ -482,3 +482,9 @@ export function deleteLocalOp(opname, opid) {
   });
   con.enable();
 }
+
+export async function resetCaches() {
+  await window.plugin.wasabee.idb.clear("agents");
+  await window.plugin.wasabee.idb.clear("teams");
+  await window.plugin.wasabee.idb.clear("defensivekeys");
+}

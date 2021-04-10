@@ -11,6 +11,7 @@ import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
 import { postToFirebase } from "../firebaseSupport";
+import { resetCaches } from "../uiCommands";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -119,9 +120,10 @@ const WasabeeButton = WButton.extend({
           const con = new ConfirmDialog({
             title: wX("CLEAROPS BUTTON TITLE"),
             label: wX("CLEAROPS PROMPT"),
-            callback: () => {
-              resetOps();
-              setupLocalStorage();
+            callback: async () => {
+              await resetCaches();
+              await resetOps();
+              await setupLocalStorage();
             },
           });
           con.enable();
