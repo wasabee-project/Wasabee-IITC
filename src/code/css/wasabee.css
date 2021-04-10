@@ -109,7 +109,10 @@
   background: rgba(235, 235, 235, 0.75) !important;
   -webkit-border-radius: 6px !important;
   font-weight: bolder;
-  color: black !important;
+}
+
+#map .wasabee-popup .leaflet-popup-content {
+    color: black;
 }
 
 .wasabee-popup a.enl {
@@ -206,6 +209,10 @@
 .wasabee-anchor-buttonset button {
   display: block;
   width: 100%;
+}
+
+.wasabee-wd-popup ul {
+  padding-left: 1em;
 }
 
 .wasabee-marker-icon {
@@ -564,10 +571,6 @@
   padding: 4px;
 }
 .wasabee-dialog-wdkeys button {
-}
-
-.wasabee-wdpopup-entry li {
-  color: black !important;
 }
 
 .wasabee-dialog-export {

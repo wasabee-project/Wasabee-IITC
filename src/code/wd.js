@@ -130,7 +130,7 @@ function drawMarker(dk) {
 
 // draw the popup, display the individual agents and their counts
 async function getMarkerPopup(PortalID) {
-  const container = L.DomUtil.create("span", null); // leaflet-draw-tooltip would be cool
+  const container = L.DomUtil.create("div", "wasabee-wd-popup"); // leaflet-draw-tooltip would be cool
   const ul = L.DomUtil.create("ul", null, container);
 
   const dks = new Array();
@@ -148,7 +148,7 @@ async function getMarkerPopup(PortalID) {
   // since there is an await in here, it can't be in the while loop above
   for (const dk of dks) {
     const a = await WasabeeAgent.get(dk.GID);
-    const li = L.DomUtil.create("li", "wasabee-wdpopup-entry", ul);
+    const li = L.DomUtil.create("li", null, ul);
     if (a) {
       li.appendChild(await a.formatDisplay());
     } else {
