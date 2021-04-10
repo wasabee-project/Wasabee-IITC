@@ -109,6 +109,7 @@
   background: rgba(235, 235, 235, 0.75) !important;
   -webkit-border-radius: 6px !important;
   font-weight: bolder;
+  color: black !important;
 }
 
 .wasabee-popup a.enl {
@@ -563,6 +564,10 @@
   padding: 4px;
 }
 .wasabee-dialog-wdkeys button {
+}
+
+.wasabee-wdpopup-entry li {
+  color: black !important;
 }
 
 .wasabee-dialog-export {

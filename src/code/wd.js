@@ -113,7 +113,6 @@ function drawMarker(dk) {
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
       try {
         const content = await getMarkerPopup(dk.PortalID);
-        console.log(content);
         marker.setPopupContent(content);
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");
@@ -149,9 +148,9 @@ async function getMarkerPopup(PortalID) {
   // since there is an await in here, it can't be in the while loop above
   for (const dk of dks) {
     const a = await WasabeeAgent.get(dk.GID);
-    const li = L.DomUtil.create("li", null, ul);
+    const li = L.DomUtil.create("li", "wasabee-wdpopup-entry", ul);
     if (a) {
-      li.appendChild(a.formatDisplay());
+      li.appendChild(await a.formatDisplay());
     } else {
       const fake = L.DomUtil.create("span", null, li);
       fake.textContent = wX("LOADING");
