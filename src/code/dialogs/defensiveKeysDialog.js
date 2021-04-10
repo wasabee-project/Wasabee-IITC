@@ -72,6 +72,7 @@ const DefensiveKeysDialog = WDialog.extend({
     });
 
     this._portalClickedHook();
+    return content;
   },
 
   _displayDialog: function () {
