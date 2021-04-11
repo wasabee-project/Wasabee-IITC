@@ -13,6 +13,7 @@ import {
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import { addToColorList } from "../skin";
+import WasabeeMe from "../me";
 
 import { convertColorToHex } from "../auxiliar";
 
@@ -138,15 +139,17 @@ const OpSettingDialog = WDialog.extend({
 
     const deleteDiv = L.DomUtil.create("div", null, buttonSection);
     const deleteButton = L.DomUtil.create("button", null, deleteDiv);
-    if (selectedOp.IsOwnedOp()) {
-      deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
-      if (selectedOp.IsServerOp()) {
-        if (selectedOp.IsOnCurrentServer())
-          deleteButton.textContent += wX("LOCFRMSER");
-        else deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
-      }
+    if (selectedOp.IsServerOp()) {
+      if (
+        WasabeeMe.isLoggedIn() &&
+        selectedOp.IsOwnedOp() &&
+        selectedOp.IsOnCurrentServer()
+      )
+        deleteButton.textContent =
+          wX("DELETE_OP", selectedOp.name) + wX("LOCFRMSER");
+      else deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
     } else {
-      deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
+      deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
     }
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
@@ -156,7 +159,12 @@ const OpSettingDialog = WDialog.extend({
         title: wX("CON_DEL", so.name),
         label: wX("YESNO_DEL", so.name),
         callback: async () => {
-          if (so.IsServerOp() && so.IsOwnedOp() && so.IsOnCurrentServer()) {
+          if (
+            WasabeeMe.isLoggedIn() &&
+            so.IsServerOp() &&
+            so.IsOwnedOp() &&
+            so.IsOnCurrentServer()
+          ) {
             try {
               await deleteOpPromise(so.ID);
               console.log("delete from server successful");

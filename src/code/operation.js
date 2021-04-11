@@ -972,10 +972,10 @@ export default class WasabeeOp {
   IsWritableOp() {
     // not from the server, must be writable
     if (!this.IsServerOp()) return true;
-    // if logged on a different server from the one used for the op, not writable
-    if (!this.IsOnCurrentServer()) return false;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
+    // if logged on a different server from the one used for the op, not writable
+    if (!this.IsOnCurrentServer()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
