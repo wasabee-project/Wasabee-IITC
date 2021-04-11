@@ -1030,7 +1030,7 @@ export default class WasabeeOp {
 
   IsOwnedOp() {
     if (!this.IsServerOp()) return true;
-    if (!WasabeeMe.isLoggedIn()) return false;
+    if (!WasabeeMe.isLoggedIn()) return true;
 
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
