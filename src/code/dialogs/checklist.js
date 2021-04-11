@@ -160,11 +160,11 @@ const OperationChecklistDialog = WDialog.extend({
             o.textContent = zone.name;
             o.value = zone.id;
             if (zone.id == thing.zone) o.selected = true;
-            L.DomEvent.on(z, "change", (ev) => {
-              L.DomEvent.stop(ev);
-              operation.setZone(thing, z.value);
-            });
           }
+          L.DomEvent.on(z, "change", (ev) => {
+            L.DomEvent.stop(ev);
+            operation.setZone(thing, z.value);
+          });
         },
         smallScreenHide: true,
       },
