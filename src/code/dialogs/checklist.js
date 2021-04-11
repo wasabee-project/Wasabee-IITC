@@ -13,7 +13,6 @@ import {
   loadFaked,
 } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeMe from "../me";
 import wX from "../wX";
 
 const OperationChecklistDialog = WDialog.extend({
@@ -203,7 +202,7 @@ const OperationChecklistDialog = WDialog.extend({
           const assigned = L.DomUtil.create("a", null, cell);
           assigned.textContent = value;
           // do not use agent.formatDisplay since that links and overwrites the assign event
-          if (WasabeeMe.isLoggedIn()) {
+          if (operation.IsServerOp() && operation.IsWritableOp()) {
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);

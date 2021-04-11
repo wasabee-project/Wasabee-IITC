@@ -131,10 +131,12 @@ const MarkerList = WDialog.extend({
         format: (cell, value, agent) => {
           const assigned = L.DomUtil.create("a", "", cell);
           assigned.textContent = value;
-          L.DomEvent.on(cell, "click", () => {
-            const ad = new AssignDialog({ target: agent });
-            ad.enable();
-          });
+          if (operation.IsServerOp() && operation.IsWritableOp()) {
+            L.DomEvent.on(cell, "click", () => {
+              const ad = new AssignDialog({ target: agent });
+              ad.enable();
+            });
+          }
         },
       },
       {

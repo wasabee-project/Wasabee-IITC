@@ -164,7 +164,7 @@ export default class WasabeeAnchor {
       }
     });
 
-    if (operation.IsServerOp()) {
+    if (operation.IsServerOp() && operation.IsWritableOp()) {
       const assignButton = L.DomUtil.create("button", null, buttonSet);
       assignButton.textContent = wX("ASSIGN OUTBOUND");
       L.DomEvent.on(assignButton, "click", (ev) => {

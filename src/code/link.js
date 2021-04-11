@@ -2,7 +2,6 @@ import { generateId, convertColorToHex } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeOp from "./operation";
-import WasabeeMe from "./me";
 import AssignDialog from "./dialogs/assignDialog";
 import { addToColorList } from "./skin";
 
@@ -213,7 +212,7 @@ export default class WasabeeLink {
       L.DomEvent.stop(ev);
       operation.reverseLink(this.fromPortalId, this.toPortalId);
     });
-    if (operation.IsServerOp() && WasabeeMe.isLoggedIn()) {
+    if (operation.IsServerOp() && operation.IsWritableOp()) {
       const assignButton = L.DomUtil.create("button", null, div);
       assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", (ev) => {

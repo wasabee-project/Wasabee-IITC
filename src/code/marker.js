@@ -140,14 +140,16 @@ export default class WasabeeMarker {
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("button", null, buttonSet);
-      assignButton.textContent = wX("ASSIGN");
-      L.DomEvent.on(assignButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const ad = new AssignDialog({ target: this });
-        ad.enable();
-        marker.closePopup();
-      });
+      if (operation.IsWritableOp()) {
+        const assignButton = L.DomUtil.create("button", null, buttonSet);
+        assignButton.textContent = wX("ASSIGN");
+        L.DomEvent.on(assignButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const ad = new AssignDialog({ target: this });
+          ad.enable();
+          marker.closePopup();
+        });
+      }
 
       const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
       sendTargetButton.textContent = wX("SEND TARGET");
