@@ -3,7 +3,7 @@ import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
-import { generateId } from "./auxiliar";
+import { generateId, newColors } from "./auxiliar";
 import { GetWasabeeServer } from "./server";
 import { addOperation, getSelectedOperation } from "./selectedOp";
 
@@ -29,7 +29,7 @@ export default class WasabeeOp {
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
-    this.color = WasabeeOp.newColors(this.color);
+    this.color = newColors(this.color);
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
@@ -1090,28 +1090,6 @@ export default class WasabeeOp {
       if (z.id == zoneID) return z.name;
     }
     return zoneID;
-  }
-
-  // clean up from the old layergroup names
-  static newColors(incoming) {
-    switch (incoming) {
-      case "groupa":
-        return "orange";
-      case "groupb":
-        return "yellow";
-      case "groupc":
-        return "lime";
-      case "groupd":
-        return "purple";
-      case "groupe":
-        return "teal";
-      case "groupf":
-        return "fuchsia";
-      case "main":
-        return "red";
-      default:
-        return incoming;
-    }
   }
 
   // a wrapper to set WasabeePortal or WasabeeLink zone and update

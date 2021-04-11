@@ -1,8 +1,8 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
-import WasabeeOp from "./operation";
 import WasabeeAgent from "./agent";
+import { newColors } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
@@ -366,9 +366,9 @@ function updateAnchors(op) {
 function addAnchorToMap(portalId) {
   const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
-  // use WasabeeOp.newColors(anchor.color) for 0.19
+  // use newColors(anchor.color) for 0.19
   let layer = anchor.color;
-  if (WasabeeOp.newColors(layer) == layer) layer = "custom";
+  if (newColors(layer) == layer) layer = "custom";
   let marker;
   if (layer != "custom") {
     marker = L.marker(anchor.latLng, {

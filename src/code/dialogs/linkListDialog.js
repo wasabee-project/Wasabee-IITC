@@ -210,7 +210,7 @@ const LinkListDialog = WDialog.extend({
 
     // TODO: picker here
     // custom color
-    if (WasabeeOp.newColors(data) == data) {
+    if (newColors(data) == data) {
       const option = L.DomUtil.create("option");
       option.value = data;
       option.selected = true;

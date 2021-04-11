@@ -1,7 +1,6 @@
-import { generateId, convertColorToHex } from "./auxiliar";
+import { generateId, convertColorToHex, newColors } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
-import WasabeeOp from "./operation";
 import AssignDialog from "./dialogs/assignDialog";
 import { addToColorList } from "./skin";
 
@@ -140,7 +139,7 @@ export default class WasabeeLink {
     // 0.17 -- use the old names internally no matter what we are sent
     let color = this.color;
     if (color == "main") color = operation.color;
-    color = WasabeeOp.newColors(color);
+    color = newColors(color);
     if (window.plugin.wasabee.skin.layerTypes.has(color))
       color = window.plugin.wasabee.skin.layerTypes.get(color).color;
     return color;
