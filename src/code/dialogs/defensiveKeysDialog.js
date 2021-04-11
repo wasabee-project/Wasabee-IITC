@@ -4,6 +4,7 @@ import WasabeeMe from "../me";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
+import { getAgentPortalWasabeeDkeys } from "../wd";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -26,14 +27,17 @@ const DefensiveKeysDialog = WDialog.extend({
     window.removeHook("portalSelected", this._pch);
   },
 
-  _portalClickedHook: function () {
+  _portalClickedHook: async function () {
     this._selectedPortal = WasabeePortal.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.appendChild(
         this._selectedPortal.displayFormat(this._smallScreen)
       );
-      const mine = this._getMyData(this._selectedPortal.id);
+      const mine = await getAgentPortalWasabeeDkeys(
+        this._me.GoogleID,
+        this._selectedPortal.id
+      );
       if (mine) {
         this._count.value = mine.Count;
         this._capID.value = mine.CapID;

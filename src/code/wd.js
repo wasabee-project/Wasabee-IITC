@@ -30,6 +30,27 @@ export function initWasabeeD() {
   });
 }
 
+export function getAllWasabeeDkeys() {
+  return window.plugin.wasabee.idb.getAll("defensivekeys");
+}
+
+export async function getAgentWasabeeDkeys(gid) {
+  const dks = await getAllWasabeeDkeys();
+  return dks.filter((dk) => dk.GID == gid);
+}
+
+export function getAllPortalWasabeeDkeys(portalid) {
+  return window.plugin.wasabee.idb.getFromIndex(
+    "defensivekeys",
+    "PortalID",
+    portalid
+  );
+}
+
+export function getAgentPortalWasabeeDkeys(gid, portalid) {
+  return window.plugin.wasabee.idb.get("defensivekeys", [gid, portalid]);
+}
+
 // This is the primary hook that is called on map refresh
 // it clears the UI, updates the cache from the server and redraws the UI
 // XXX Triggered BEFORE the IDB store gets setup, so first load fails -- subsequent runs are fine
@@ -63,7 +84,7 @@ export async function drawWasabeeDkeys() {
 
 // draws each distinct portalID once
 async function drawMarkers() {
-  const dks = await window.plugin.wasabee.idb.getAll("defensivekeys");
+  const dks = await getAllWasabeeDkeys();
   const done = new Map();
   for (const dk of dks) {
     if (done.has(dk.PortalID)) continue;
@@ -133,17 +154,11 @@ async function getMarkerPopup(PortalID) {
   const container = L.DomUtil.create("div", "wasabee-wd-popup"); // leaflet-draw-tooltip would be cool
   const ul = L.DomUtil.create("ul", null, container);
 
-  const dks = new Array();
-  const tx = window.plugin.wasabee.idb.transaction(
-    ["defensivekeys"],
-    "readonly"
+  const dks = await window.plugin.wasabee.idb.getFromIndex(
+    "defensivekeys",
+    "PortalID",
+    PortalID
   );
-  let cursor = await tx.store.index("PortalID").openCursor(PortalID);
-  while (cursor) {
-    dks.push(cursor.value);
-    cursor = await cursor.continue();
-  }
-  await tx.done;
 
   // since there is an await in here, it can't be in the while loop above
   for (const dk of dks) {
