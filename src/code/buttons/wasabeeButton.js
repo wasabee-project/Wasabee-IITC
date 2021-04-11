@@ -68,7 +68,7 @@ const WasabeeButton = WButton.extend({
         try {
           // if not actually logged in, this removes ALL server ops
           // but this button _should_ not be visible in that case
-          removeNonOwnedOps();
+          await removeNonOwnedOps();
           await logoutPromise();
         } catch (e) {
           console.error(e);
