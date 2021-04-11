@@ -67,12 +67,16 @@ export async function drawWasabeeDkeys() {
         return;
 
       for (const n of list.DefensiveKeys) {
+        // remove in 0.20
         if (!n.Name) {
           console.log("old format WD key, ignoring", n);
           continue;
         }
-        // await window.plugin.wasabee.idb.put("defensivekeys", n, [ n.GID, n.PortalID, ]);
-        await window.plugin.wasabee.idb.put("defensivekeys", n);
+        try {
+          await window.plugin.wasabee.idb.put("defensivekeys", n);
+        } catch (e) {
+          console.error(e);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -103,7 +107,7 @@ function drawMarker(dk) {
       window.plugin.wasabee.defensiveLayers[dk.PortalID]
     );
 
-  // should never be triggered now
+  // should never be triggered now; remove in 0.20
   if (!dk.Name) {
     console.debug("skipping old format", dk);
     return;
@@ -131,7 +135,6 @@ function drawMarker(dk) {
     "click spiderfiedclick",
     async (ev) => {
       L.DomEvent.stop(ev);
-      if (marker.isPopupOpen && marker.isPopupOpen()) return;
       try {
         const content = await getMarkerPopup(dk.PortalID);
         marker.setPopupContent(content);

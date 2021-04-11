@@ -77,7 +77,11 @@ export default class WasabeeAgent {
     // will contain the extras, but that's fine for now
     if (cached == null) {
       // console.debug("not cached, adding");
-      await window.plugin.wasabee.idb.put("agents", this);
+      try {
+        await window.plugin.wasabee.idb.put("agents", this);
+      } catch (e) {
+        console.error(e);
+      }
       return;
     }
 

@@ -126,7 +126,11 @@ export default class WasabeeOp {
     localStorage[this.ID] = JSON.stringify(json);
 
     // store to idb
-    await window.plugin.wasabee.idb.put("operations", json);
+    try {
+      await window.plugin.wasabee.idb.put("operations", json);
+    } catch (e) {
+      console.error(e);
+    }
 
     // manage the list of known operations, can be removed in 0.20
     await addOperation(this.ID);

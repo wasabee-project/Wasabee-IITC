@@ -40,7 +40,11 @@ export default class WasabeeTeam {
   }
 
   async _updateCache() {
-    await window.plugin.wasabee.idb.put("teams", this);
+    try {
+      await window.plugin.wasabee.idb.put("teams", this);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // 60 seconds seems too short for the default here...
