@@ -40,7 +40,7 @@ export async function getAgentWasabeeDkeys(gid) {
 }
 
 export function getAllPortalWasabeeDkeys(portalid) {
-  return window.plugin.wasabee.idb.getFromIndex(
+  return window.plugin.wasabee.idb.getAllFromIndex(
     "defensivekeys",
     "PortalID",
     portalid
@@ -154,11 +154,7 @@ async function getMarkerPopup(PortalID) {
   const container = L.DomUtil.create("div", "wasabee-wd-popup"); // leaflet-draw-tooltip would be cool
   const ul = L.DomUtil.create("ul", null, container);
 
-  const dks = await window.plugin.wasabee.idb.getFromIndex(
-    "defensivekeys",
-    "PortalID",
-    PortalID
-  );
+  const dks = await getAllPortalWasabeeDkeys(PortalID);
 
   // since there is an await in here, it can't be in the while loop above
   for (const dk of dks) {
