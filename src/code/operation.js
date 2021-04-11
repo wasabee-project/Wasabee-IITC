@@ -969,6 +969,7 @@ export default class WasabeeOp {
     return L.latLngBounds(min, max);
   }
 
+  // is the op writable to the current server
   IsWritableOp() {
     // not from the server, must be writable
     if (!this.IsServerOp()) return true;
