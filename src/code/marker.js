@@ -151,14 +151,16 @@ export default class WasabeeMarker {
         });
       }
 
-      const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
-      sendTargetButton.textContent = wX("SEND TARGET");
-      L.DomEvent.on(sendTargetButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const std = new SendTargetDialog({ target: this });
-        std.enable();
-        marker.closePopup();
-      });
+      if (operation.IsOnCurrentServer()) {
+        const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
+        sendTargetButton.textContent = wX("SEND TARGET");
+        L.DomEvent.on(sendTargetButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const std = new SendTargetDialog({ target: this });
+          std.enable();
+          marker.closePopup();
+        });
+      }
     }
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
