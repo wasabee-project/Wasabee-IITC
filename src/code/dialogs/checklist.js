@@ -97,10 +97,11 @@ const OperationChecklistDialog = WDialog.extend({
           oif.size = 3;
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
-            thing.opOrder = oif.value;
-            // since we are changing the values in the (thing)
-            // let the op know it has changed (save/redraw);
-            operation.update(); // OK - necessary
+            if (thing instanceof WasabeeLink) {
+              operation.setLinkOrder(thing.ID, oif.value);
+            } else {
+              operation.setMarkerOrder(thing.ID, oif.value);
+            }
           });
           cell.appendChild(oif);
         },
@@ -128,7 +129,7 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing instanceof WasabeeLink) {
             return "Link";
           } else {
-            // push this shit in to the marker class
+            // push this shit into the marker class
             return wX(thing.type);
           }
         },

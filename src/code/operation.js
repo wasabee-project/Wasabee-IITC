@@ -413,6 +413,15 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  setMarkerOrder(markerID, order) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.opOrder = order;
+      }
+    }
+    this.update(true);
+  }
+
   setPortalComment(portal, comment) {
     const p = this.getPortal(portal.id);
     if (p) {
