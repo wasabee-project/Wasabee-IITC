@@ -604,12 +604,14 @@ const HomogeneousDialog = WDialog.extend({
         const borderTriangle = sortedDepths[0] + 1 == sortedDepths[1];
         for (const anchor of r.anchors) {
           const ap = portalDepth.get(anchor.id);
-          const order = orderByDepth(r.portal, anchor);
+          let order = orderByDepth(r.portal, anchor);
           let [fromPortal, toPortal] = [anchor, r.portal];
           if (ap > 0 && dp == ap + 1)
             [toPortal, fromPortal] = [anchor, r.portal];
-          else if (borderTriangle && ap == sortedDepths[1])
+          else if (borderTriangle && ap == sortedDepths[1]) {
             [toPortal, fromPortal] = [anchor, r.portal];
+            order = orderByDepth(r.portal, r.anchors[2]); // father is always last
+          }
           const link = this._operation.addLink(
             fromPortal,
             toPortal,
