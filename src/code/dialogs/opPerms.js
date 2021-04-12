@@ -145,15 +145,16 @@ const OpPermList = WDialog.extend({
       this._table.fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
-        sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
-          const link = L.DomUtil.create("a", null, cell);
-          link.href = "#";
-          link.textContent = value;
-          L.DomEvent.on(link, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
-          });
+          if (operation.IsOwnedOp()) {
+            const link = L.DomUtil.create("a", null, cell);
+            link.href = "#";
+            link.textContent = value;
+            L.DomEvent.on(link, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
+            });
+          }
         },
       });
     }
@@ -167,13 +168,16 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
+    if (!operation.IsOwnedOp()) return;
+
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
-        console.warn("not adding duplicate permission");
+        console.debug("not adding duplicate permission");
         window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
         return;
       }
     }
+
     try {
       await addPermPromise(operation.ID, teamID, role, zone);
       // add locally for display
@@ -192,6 +196,8 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
+    if (!operation.IsOwnedOp()) return;
+
     try {
       await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);
       const n = new Array();
@@ -204,7 +210,7 @@ const OpPermList = WDialog.extend({
       window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      alert(e);
     }
   },
 });
