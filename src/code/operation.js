@@ -79,7 +79,7 @@ export default class WasabeeOp {
   }
 
   static async delete(opID) {
-    delete localStorage[opID];
+    delete localStorage[opID]; // leave for now
     await window.plugin.wasabee.idb.delete("operations", opID);
   }
 
@@ -87,6 +87,7 @@ export default class WasabeeOp {
     // skip ones already completed
     const have = await window.plugin.wasabee.idb.get("operations", opID);
     if (have != null) {
+      delete localStorage[opID]; // active now
       return;
     }
 
@@ -98,7 +99,7 @@ export default class WasabeeOp {
       if (op == null) throw new Error("corrupted operation");
       console.debug(op);
       await op.store();
-      // delete localStorage[opID];
+      delete localStorage[opID]; // active now
     } catch (e) {
       console.error(e);
     }
@@ -110,7 +111,7 @@ export default class WasabeeOp {
     this.stored = Date.now();
     const json = this.toJSON();
 
-    // include things not required by the server but necessary for localStorage
+    // include things not required by the server but necessary for local storage
     json.server = this.server;
     json.fetchedOp = this.fetchedOp;
     json.lasteditid = this.lasteditid;
@@ -123,7 +124,7 @@ export default class WasabeeOp {
     json.teamlist = this.teamlist;
 
     // store to localStorage -- for now
-    localStorage[this.ID] = JSON.stringify(json);
+    // localStorage[this.ID] = JSON.stringify(json); // deactivated now
 
     // store to idb
     try {
