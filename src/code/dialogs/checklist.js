@@ -54,7 +54,10 @@ const OperationChecklistDialog = WDialog.extend({
       this.closeDialog();
     };
     buttons[wX("LOAD PORTALS")] = () => {
-      loadFaked(operation, true); // force
+      loadFaked(getSelectedOperation(), true); // force
+    };
+    buttons["Check empty field"] = () => {
+      this.checkEmptyField(getSelectedOperation());
     };
 
     await this.sortable.done;
@@ -269,6 +272,76 @@ const OperationChecklistDialog = WDialog.extend({
     content.sortAsc = sortAsc;
     content.items = allThings;
     return content;
+  },
+
+  checkEmptyField: function (operation) {
+    const links = Array.from(operation.links);
+    links.sort((a, b) => a.opOrder - b.opOrder);
+
+    const portalLinks = new Map();
+    const emptyFieldLinks = [];
+    for (const link of links) {
+      if (!portalLinks.has(link.fromPortalId))
+        portalLinks.set(link.fromPortalId, new Set());
+      if (!portalLinks.has(link.toPortalId))
+        portalLinks.set(link.toPortalId, new Set());
+      const a = portalLinks.get(link.fromPortalId);
+      const b = portalLinks.get(link.toPortalId);
+
+      const intersect = new Set();
+      for (const p of a) if (b.has(p)) intersect.add(p);
+
+      if (intersect.size > 1) {
+        const p1 = operation.getPortal(link.fromPortalId);
+        const p2 = operation.getPortal(link.toPortalId);
+        const positive = [];
+        const negative = [];
+        for (const pid of intersect) {
+          const p = operation.getPortal(pid);
+          const det =
+            (p1.lat - p2.lat) * (p.lng - p2.lng) -
+            (p1.lng - p2.lng) * (p.lat - p2.lat);
+          if (det > 0) positive.push(p);
+          else negative.push(p);
+        }
+        if (positive.length > 1 || negative.length > 1) {
+          const count =
+            Math.max(positive.length - 1, 0) + Math.max(negative.length - 1, 0);
+          emptyFieldLinks.push([link, count]);
+          console.debug(
+            "empty field:",
+            p1.name,
+            p2.name,
+            positive.map((p) => p.name)
+          );
+          console.debug(
+            "empty field:",
+            p1.name,
+            p2.name,
+            negative.map((p) => p.name)
+          );
+        }
+      }
+
+      a.add(link.toPortalId);
+      b.add(link.fromPortalId);
+    }
+    if (emptyFieldLinks.length > 0) {
+      const container = L.DomUtil.create("div");
+      const header = L.DomUtil.create("div", null, container);
+      let count = 0;
+      const content = L.DomUtil.create("ul", null, container);
+      for (const [link, c] of emptyFieldLinks) {
+        const li = L.DomUtil.create("li", null, content);
+        li.textContent = c;
+        li.appendChild(link.displayFormat(operation));
+        count += c;
+      }
+      header.textContent = `Found ${count} empty field(s) on ${emptyFieldLinks.length} link(s)`;
+      alert(container, true);
+    } else {
+      alert("No empty field found");
+    }
   },
 });
 
