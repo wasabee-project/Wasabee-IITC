@@ -599,11 +599,16 @@ const HomogeneousDialog = WDialog.extend({
     const draw = (depth, r) => {
       if (r.portal) {
         const dp = portalDepth.get(r.portal.id);
+        // [ x, y, dp-1]
+        const sortedDepths = r.anchors.map((a) => portalDepth.get(a.id)).sort();
+        const borderTriangle = sortedDepths[0] + 1 == sortedDepths[1];
         for (const anchor of r.anchors) {
           const ap = portalDepth.get(anchor.id);
           const order = orderByDepth(r.portal, anchor);
           let [fromPortal, toPortal] = [anchor, r.portal];
           if (ap > 0 && dp == ap + 1)
+            [toPortal, fromPortal] = [anchor, r.portal];
+          else if (borderTriangle && ap == sortedDepths[1])
             [toPortal, fromPortal] = [anchor, r.portal];
           const link = this._operation.addLink(
             fromPortal,
