@@ -2,9 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
-// why trust my own math when someone else has done the work?
-import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
-// import { datums } from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-datum";
+import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 
 const TrawlDialog = WDialog.extend({
   statics: {
