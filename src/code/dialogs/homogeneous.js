@@ -572,17 +572,20 @@ const HomogeneousDialog = WDialog.extend({
     computeDepth(1, tree, portalDepth);
 
     // the order follows this process (consider only op links)
-    // (0) if max depth is 1, goto 7
-    // (1) start from maximal depth (D) portals
-    // (2) for each portals of depth (D):
+    // (0) if max depth is 1, goto (9)
+    // (1) start from maximal depth D portals
+    // (2) for each portals of depth D:
     // (3)   link to the _only_ portal deepless by 1 (D-1)
-    // (4) for each of the 1 deepless portals:
-    // (5)   link to all the deeper portals by _increasing_ depth (D+1, D+2 etc)
-    // (6) if D > 1 then goto (1) with D = D-1
-    // (7) for each anchor:
-    // (8)   deploy it (or don't link it before this step)
-    // (9)   link to previous anchors
-    // (A)   link to all deeper portals by _increasing_ depth (1, 2 etc)
+    // (4)   if the two other deepless portals' depth differ by 1
+    // (5)     link to the second deepest portal
+    // (6) for each of the 1 deepless portals:
+    // (7)   link to all the deeper portals by _increasing_ depth (D+1, D+2 etc)
+    // (8) if D > 1 then goto (2) with D = D-1
+    // (9) for each anchor:
+    // (A)   deploy it (or don't link it before this step)
+    // (B)   link to previous anchors
+    // (C)   link to all deeper portals by _increasing_ depth (1, 2 etc)
+    // NB: rules 4/5 were added to reduce the number of outbound links the center portal. Those links can be done earlier because they are not backlinks
     const orderByDepth = (a, b) => {
       let ad = portalDepth.get(a.id);
       let bd = portalDepth.get(b.id);
