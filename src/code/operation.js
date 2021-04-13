@@ -407,7 +407,7 @@ export default class WasabeeOp {
   setLinkOrder(linkID, order) {
     for (const v of this.links) {
       if (v.ID == linkID) {
-        v.opOrder = order;
+        v.opOrder = Number(order);
       }
     }
     this.update(true);
@@ -416,7 +416,7 @@ export default class WasabeeOp {
   setMarkerOrder(markerID, order) {
     for (const v of this.markers) {
       if (v.ID == markerID) {
-        v.opOrder = order;
+        v.opOrder = Number(order);
       }
     }
     this.update(true);
