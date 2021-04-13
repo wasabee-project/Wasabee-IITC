@@ -598,27 +598,27 @@ const HomogeneousDialog = WDialog.extend({
 
     const draw = (depth, r) => {
       if (r.portal) {
-        const dp = portalDepth.get(r.portal.id);
-        // [ x, y, dp-1]
-        const sortedDepths = r.anchors.map((a) => portalDepth.get(a.id)).sort();
-        const borderTriangle = sortedDepths[0] + 1 == sortedDepths[1];
-        for (const anchor of r.anchors) {
-          const ap = portalDepth.get(anchor.id);
-          let order = orderByDepth(r.portal, anchor);
-          let [fromPortal, toPortal] = [anchor, r.portal];
-          if (ap > 0 && dp == ap + 1)
-            [toPortal, fromPortal] = [anchor, r.portal];
-          else if (borderTriangle && ap == sortedDepths[1]) {
-            [toPortal, fromPortal] = [anchor, r.portal];
-            order = orderByDepth(r.portal, r.anchors[2]); // father is always last
-          }
-          const link = this._operation.addLink(
-            fromPortal,
-            toPortal,
-            dp > 0 && ap == 0 ? "intern link" : "",
-            order,
-            true
-          );
+        const [first, second, father] = r.anchors
+          .map((p) => [portalDepth.get(p.id), p])
+          .sort()
+          .map((a) => a[1]);
+        const firstOrder = orderByDepth(r.portal, first);
+        const secondOrder = orderByDepth(r.portal, second);
+        const fatherOrder = orderByDepth(r.portal, father);
+        const data = [
+          portalDepth.get(first.id) // not outer anchor
+            ? [first, r.portal, "intern", firstOrder]
+            : [first, r.portal, "anchor intern", firstOrder],
+          // not an intern link (no double field)
+          portalDepth.get(first.id) + 1 == portalDepth.get(second.id)
+            ? [r.portal, second, "early", fatherOrder]
+            : portalDepth.get(second.id) // not outer anchor
+            ? [second, r.portal, "intern", secondOrder]
+            : [second, r.portal, "anchor intern", secondOrder],
+          [r.portal, father, "to father", fatherOrder],
+        ];
+        for (const [from, to, comment, order] of data) {
+          const link = this._operation.addLink(from, to, comment, order, true);
           link.color = this._colors[order % this._colors.length];
         }
         for (const child of r.children) draw(depth + 1, child);
