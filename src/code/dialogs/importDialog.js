@@ -4,6 +4,7 @@ import { WDialog } from "../leafletClasses";
 import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
+import PromptDialog from "./promptDialog";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -54,6 +55,10 @@ const ImportDialog = WDialog.extend({
     buttons[wX("GET DT")] = () => {
       this.drawToolsFormat();
     };
+    // wX
+    buttons["Fill from URL"] = () => {
+      this.fillFromURL();
+    };
 
     this.createDialog({
       title: wX("IMP_WAS_OP"),
@@ -74,8 +79,27 @@ const ImportDialog = WDialog.extend({
     }
   },
 
+  fillFromURL() {
+    // todo: wX
+    const prompt = new PromptDialog({
+      title: "Fill from URL",
+      label: "URL",
+      callback: async () => {
+        try {
+          const url = new URL(prompt.inputField.value.trim());
+          const rq = await fetch(url, { mode: "cors" });
+          this._textarea.value = await rq.text();
+        } catch (e) {
+          alert("Unable to fetch data from the given url.");
+          return;
+        }
+      },
+    });
+    prompt.enable();
+  },
+
   async importTextareaAsOp() {
-    const string = this._textarea.value;
+    let string = this._textarea.value;
     if (
       string.match(
         new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
