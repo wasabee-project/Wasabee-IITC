@@ -1,10 +1,6 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
-import {
-  setupLocalStorage,
-  initSelectedOperation,
-  opsList,
-} from "./selectedOp";
+import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
 import { drawMap, drawAgents, drawBackgroundOps } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
@@ -98,9 +94,14 @@ window.plugin.wasabee.init = async () => {
     sendLocation();
   });
 
-  window.map.on("wasabee:op:select", async (data) => {
-    const ol = await opsList();
-    drawBackgroundOps(ol.filter((id) => id !== data.current));
+  window.map.on("wasabee:op:select", () => {
+    drawBackgroundOps();
+  });
+  window.map.on("wasabee:op:hide", () => {
+    drawBackgroundOps();
+  });
+  window.map.on("wasabee:op:show", () => {
+    drawBackgroundOps();
   });
 
   // Android panes
@@ -122,6 +123,9 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.markerLayerGroup
     ) {
       window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
+    }
+    if (obj.layer === Wasabee.backgroundOpsGroup) {
+      drawBackgroundOps();
     }
   });
 

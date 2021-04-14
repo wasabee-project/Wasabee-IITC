@@ -158,19 +158,25 @@ export async function addOperation(opID) {
 
 //** This function shows an operation to the main list */
 export function showOperation(opID) {
-  const hiddenOps = hiddenOpsList().filter((ID) => ID != opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  const hiddenOps = hiddenOpsList();
+  if (hiddenOps.includes(opID)) {
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps.filter((ID) => ID != opID));
+    window.map.fire("wasabee:op:show", opID);
+  }
 }
 
 //** This function hides an operation to the main list */
 export function hideOperation(opID) {
   const hiddenOps = hiddenOpsList();
-  if (!hiddenOps.includes(opID)) hiddenOps.push(opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  if (!hiddenOps.includes(opID)) {
+    hiddenOps.push(opID);
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps);
+    window.map.fire("wasabee:op:hide", opID);
+  }
 }
 
 export function resetHiddenOps() {
