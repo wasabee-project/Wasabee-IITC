@@ -60,7 +60,9 @@ export async function loadNewDefaultOp() {
 // only this should write to _selectedOp
 export async function makeSelectedOperation(opID) {
   // _selectedOp is null at first load (or page reload), should never be after that
+  let previousID;
   if (window.plugin.wasabee._selectedOp != null) {
+    previousID = window.plugin.wasabee._selectedOp.ID;
     if (opID == window.plugin.wasabee._selectedOp.ID) {
       console.log(
         "makeSelectedOperation called on the current op; replacing with version from local store. not saving live changes first"
@@ -94,6 +96,11 @@ export async function makeSelectedOperation(opID) {
     { reason: "makeSelectedOperation" },
     false
   );
+  if (previousID !== opID)
+    window.map.fire("wasabee:op:select", {
+      previous: previousID,
+      current: opID,
+    });
   // return window.plugin.wasabee._selectedOp;
 }
 

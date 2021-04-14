@@ -2,6 +2,7 @@ import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import WasabeeAgent from "./agent";
+import WasabeeOp from "./operation";
 import { newColors } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 
@@ -104,6 +105,31 @@ function resetLinks(operation) {
 
   for (const l of operation.links) {
     addLink(l, operation);
+  }
+}
+
+export function drawBackgroundOps(opIDs) {
+  if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
+  Wasabee.backgroundOpsGroup.clearLayers();
+
+  for (const opID of opIDs) {
+    WasabeeOp.load(opID).then(drawBackgroundOp);
+  }
+}
+
+function drawBackgroundOp(operation) {
+  if (!operation) return;
+  if (!operation.links || operation.links.length == 0) return;
+
+  for (const link of operation.links) {
+    const latLngs = link.getLatLngs(operation);
+    if (!latLngs) continue;
+
+    const newlink = new L.GeodesicPolyline(
+      latLngs,
+      Wasabee.skin.backgroundLinkStyle
+    );
+    newlink.addTo(Wasabee.backgroundOpsGroup);
   }
 }
 

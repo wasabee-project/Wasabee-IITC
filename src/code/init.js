@@ -1,7 +1,11 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
-import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import { drawMap, drawAgents } from "./mapDrawing";
+import {
+  setupLocalStorage,
+  initSelectedOperation,
+  opsList,
+} from "./selectedOp";
+import { drawMap, drawAgents, drawBackgroundOps } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
 import { initFirebase, postToFirebase } from "./firebaseSupport";
@@ -67,6 +71,13 @@ window.plugin.wasabee.init = async () => {
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
 
+  Wasabee.backgroundOpsGroup = new L.LayerGroup();
+  window.addLayerGroup(
+    "Wasabee Background Ops",
+    Wasabee.backgroundOpsGroup,
+    false
+  );
+
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
@@ -85,6 +96,11 @@ window.plugin.wasabee.init = async () => {
   window.addResumeFunction(() => {
     window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
     sendLocation();
+  });
+
+  window.map.on("wasabee:op:select", async (data) => {
+    const ol = await opsList();
+    drawBackgroundOps(ol.filter((id) => id !== data.current));
   });
 
   // Android panes
