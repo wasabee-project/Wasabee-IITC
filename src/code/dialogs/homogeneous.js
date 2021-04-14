@@ -576,7 +576,7 @@ const HomogeneousDialog = WDialog.extend({
     // (1) start from maximal depth D portals
     // (2) for each portals of depth D:
     // (3)   link to the _only_ portal deepless by 1 (D-1)
-    // (4)   if the two other deepless portals' depth differ by 1
+    // (4)   if the second deepless portal isn't an anchor
     // (5)     link to the second deepest portal
     // (6) for each of the 1 deepless portals:
     // (7)   link to all the deeper portals by _increasing_ depth (D+1, D+2 etc)
@@ -613,10 +613,8 @@ const HomogeneousDialog = WDialog.extend({
             ? [first, r.portal, "intern", firstOrder]
             : [first, r.portal, "anchor intern", firstOrder],
           // not an intern link (no double field)
-          portalDepth.get(first.id) + 1 == portalDepth.get(second.id)
+          portalDepth.get(second.id) > 0
             ? [r.portal, second, "early", fatherOrder]
-            : portalDepth.get(second.id) // not outer anchor
-            ? [second, r.portal, "intern", secondOrder]
             : [second, r.portal, "anchor intern", secondOrder],
           portalDepth.get(father.id) == 0
             ? [father, r.portal, "anchor intern", fatherOrder]
