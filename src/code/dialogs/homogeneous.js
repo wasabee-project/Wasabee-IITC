@@ -618,7 +618,9 @@ const HomogeneousDialog = WDialog.extend({
             : portalDepth.get(second.id) // not outer anchor
             ? [second, r.portal, "intern", secondOrder]
             : [second, r.portal, "anchor intern", secondOrder],
-          [r.portal, father, "to father", fatherOrder],
+          portalDepth.get(father.id) == 0
+            ? [father, r.portal, "anchor intern", fatherOrder]
+            : [r.portal, father, "to father", fatherOrder],
         ];
         for (const [from, to, comment, order] of data) {
           const link = this._operation.addLink(from, to, comment, order, true);
