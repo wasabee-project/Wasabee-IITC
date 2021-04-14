@@ -108,16 +108,18 @@ function resetLinks(operation) {
   }
 }
 
-export async function drawBackgroundOps() {
+export async function drawBackgroundOps(opIDs) {
   if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
   Wasabee.backgroundOpsGroup.clearLayers();
 
-  const sop = getSelectedOperation().ID;
-  const ol = await opsList();
-  const hol = hiddenOpsList();
-  for (const opID of ol) {
-    if (opID !== sop && !hol.includes(opID))
-      WasabeeOp.load(opID).then(drawBackgroundOp);
+  if (opIDs === undefined) {
+    const sop = getSelectedOperation().ID;
+    const hol = hiddenOpsList();
+    opIDs = await opsList();
+    opIDs = opIDs.filter((id) => id !== sop && !hol.includes(id));
+  }
+  for (const opID of opIDs) {
+    WasabeeOp.load(opID).then(drawBackgroundOp);
   }
 }
 

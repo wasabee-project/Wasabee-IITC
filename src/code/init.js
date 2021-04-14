@@ -160,6 +160,9 @@ window.plugin.wasabee.init = async () => {
   // run crosslinks
   window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
 
+  // draw background ops
+  drawBackgroundOps();
+
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
