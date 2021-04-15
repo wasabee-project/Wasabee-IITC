@@ -138,7 +138,6 @@ W.static.selfBlockStyle = {
 
 W.static.backgroundLinkStyle = {
   dashArray: [8, 5],
-  assignedDashArray: [8, 5],
   opacity: 0.4,
   weight: 2,
   color: "green",

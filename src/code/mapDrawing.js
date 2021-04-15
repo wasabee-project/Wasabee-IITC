@@ -123,19 +123,19 @@ export async function drawBackgroundOps(opIDs) {
   }
 }
 
-function drawBackgroundOp(operation) {
+export function drawBackgroundOp(operation, layerGroup, style) {
   if (!operation) return;
   if (!operation.links || operation.links.length == 0) return;
+
+  if (!layerGroup) layerGroup = Wasabee.backgroundOpsGroup;
+  if (!style) style = Wasabee.skin.backgroundLinkStyle;
 
   for (const link of operation.links) {
     const latLngs = link.getLatLngs(operation);
     if (!latLngs) continue;
 
-    const newlink = new L.GeodesicPolyline(
-      latLngs,
-      Wasabee.skin.backgroundLinkStyle
-    );
-    newlink.addTo(Wasabee.backgroundOpsGroup);
+    const newlink = new L.GeodesicPolyline(latLngs, style);
+    newlink.addTo(layerGroup);
   }
 }
 

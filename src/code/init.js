@@ -1,7 +1,12 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import { drawMap, drawAgents, drawBackgroundOps } from "./mapDrawing";
+import {
+  drawMap,
+  drawAgents,
+  drawBackgroundOps,
+  drawBackgroundOp,
+} from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
 import { initFirebase, postToFirebase } from "./firebaseSupport";
@@ -11,6 +16,7 @@ import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
+import WasabeeOp from "./operation";
 import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
@@ -100,8 +106,9 @@ window.plugin.wasabee.init = async () => {
   window.map.on("wasabee:op:hide", () => {
     drawBackgroundOps();
   });
-  window.map.on("wasabee:op:show", () => {
-    drawBackgroundOps();
+  window.map.on("wasabee:op:show", (opID) => {
+    if (Wasabee._selectedOp && Wasabee._selectedOp.ID !== opID)
+      WasabeeOp.load(opID).then(drawBackgroundOp);
   });
 
   // Android panes
