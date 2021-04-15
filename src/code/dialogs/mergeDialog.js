@@ -19,6 +19,21 @@ const MergeDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
+    this._opRebase = new WasabeeOp(this.options.opRemote);
+    const changes = this.options.opOwn.changes();
+    const summary = this._opRebase.applyChanges(changes, this.options.opOwn);
+    this._opRebase.cleanAll();
+    this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
+    this._opRebase.localchanged = this.options.opOwn.localchanged;
+
+    const content = L.DomUtil.create("div", "container");
+    const desc = L.DomUtil.create("div", "desc", content);
+    desc.textContent =
+      `It seems that ${this.options.opOwn.name} has local changes. ` +
+      "Do you want to merge your modifications with the server OP or to replace the local version by the server version? " +
+      "(or leave it for later)";
+    content.appendChild(this.formatSummary(summary));
+
     const buttons = [];
     buttons.push({
       text: "Rebase",
@@ -46,33 +61,14 @@ const MergeDialog = WDialog.extend({
     });
     this.createDialog({
       title: wX("MERGE_TITLE"),
-      html: this._buildContent(),
+      html: content,
       width: "auto",
       dialogClass: "merge",
       buttons: buttons,
     });
   },
 
-  _buildContent: function () {
-    const content = L.DomUtil.create("div", "container");
-    const desc = L.DomUtil.create("div", "desc", content);
-    desc.textContent =
-      `It seems that ${this.options.opOwn.name} has local changes. ` +
-      "Do you want to merge your modifications with the server OP or to replace the local version by the server version? " +
-      "(or leave it for later)";
-
-    this._opRebase = new WasabeeOp(this.options.opRemote);
-    const changes = this.options.opOwn.changes();
-    const summary = this._opRebase.applyChanges(changes, this.options.opOwn);
-    this._opRebase.cleanAll();
-    this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
-    this._opRebase.localchanged = this.options.opOwn.localchanged;
-
-    content.appendChild(this.formatSummary(summary));
-    return content;
-  },
-
-  formatSummary(summary) {
+  formatSummary: function (summary) {
     const list = [];
     if (!summary.compatibility.ok)
       list.push(
@@ -126,6 +122,8 @@ const MergeDialog = WDialog.extend({
 
     return rebaseMessage;
   },
+
+  formatChanges: function () {},
 });
 
 export default MergeDialog;
