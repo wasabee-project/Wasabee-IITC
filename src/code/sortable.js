@@ -94,6 +94,8 @@ export default class Sortable {
         data.sortValues.push(sortValue);
 
         const cell = row.insertCell(-1);
+        if (field.className) cell.classList.add(field.className);
+
         if (field.format) {
           field.format(cell, value, obj);
         } else {
@@ -140,7 +142,7 @@ export default class Sortable {
     this._head.textContent = "";
     const titleRow = this._head.insertRow(-1);
     for (const [index, field] of this._fields.entries()) {
-      const cell = L.DomUtil.create("th", null, titleRow);
+      const cell = L.DomUtil.create("th", field.className, titleRow);
       cell.textContent = field.name;
       if (field.smallScreenHide && this._smallScreen)
         cell.style.display = "none";
