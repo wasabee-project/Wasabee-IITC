@@ -205,7 +205,8 @@ export function hiddenOpsList() {
 }
 
 export async function setOpBackground(opID, background) {
-  const op = await WasabeeOp.load(opID);
+  const sop = getSelectedOperation();
+  const op = sop.ID === opID ? sop : await WasabeeOp.load(opID);
   if (op.background == background) return;
   op.background = background;
   await op.store();

@@ -29,8 +29,7 @@ const OpsDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
-    window.map.on("wasabee:op:showhide", this.update, this);
-    window.map.on("wasabee:op:select", this.update, this);
+    window.map.on("wasabee:op:background", this.update, this);
     window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
@@ -38,7 +37,7 @@ const OpsDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabeeUIUpdate", this.update, this);
-    window.map.off("wasabee:op:showhide", this.update, this);
+    window.map.off("wasabee:op:background", this.update, this);
     window.map.off("wasabee:op:delete", this.update, this);
   },
 
@@ -92,7 +91,6 @@ const OpsDialog = WDialog.extend({
         value: (op) => op.server,
         // sort: (a, b) => a - b,
         format: (cell, value, op) => {
-          cell.classList.add("opserver");
           cell.textContent = op.server;
         },
       },
@@ -101,7 +99,6 @@ const OpsDialog = WDialog.extend({
         value: (op) => op.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
-          cell.classList.add("opname");
           const link = L.DomUtil.create("a", "", cell);
           link.href = "#";
           link.textContent = op.name;
@@ -132,7 +129,6 @@ const OpsDialog = WDialog.extend({
           1 * op.local + 2 * op.localchanged + 4 * op.remotechanged,
         // sort: (a, b) => a - b,
         format: (cell, value, op) => {
-          cell.classList.add("opstatus");
           const status = L.DomUtil.create("span", "", cell);
           status.textContent = "";
           if (!op.local) {
@@ -163,7 +159,6 @@ const OpsDialog = WDialog.extend({
         name: "P",
         value: (op) => op.perm,
         format: (cell, value, op) => {
-          cell.classList.add("opperm");
           let text = wX("ASSIGNED_ONLY_SHORT");
           if (op.perm == "read") text = wX("READ_SHORT");
           else if (op.perm == "write") text = wX("WRITE_SHORT");
@@ -182,21 +177,28 @@ const OpsDialog = WDialog.extend({
         },
       },
       {
-        name: "Cmds",
+        name: "Bg",
         value: () => null,
         sort: null,
         format: (cell, value, op) => {
-          cell.classList.add("actions");
-          const hide = L.DomUtil.create("a", "", cell);
-          hide.href = "#";
-          hide.textContent = op.hidden ? "☽" : "👀";
-          hide.title = (op.hidden ? "Show " : "Hide ") + op.name;
-          L.DomEvent.on(hide, "click", (ev) => {
+          // background
+          const background = L.DomUtil.create("a", "", cell);
+          background.textContent = op.background ? "👀" : "☽";
+          background.title = op.background
+            ? "Disable background"
+            : "Show in background";
+          L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            if (op.hidden) showOperation(op.id);
-            else hideOperation(op.id);
+            setOpBackground(op.id, !op.background);
           });
-
+        },
+      },
+      {
+        name: "Cmds",
+        value: () => null,
+        sort: null,
+        className: "actions",
+        format: (cell, value, op) => {
           // delete locally
           const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
@@ -218,14 +220,22 @@ const OpsDialog = WDialog.extend({
               syncOp(op.id);
             });
           }
-
-          // background
-          const background = L.DomUtil.create("input", "background", cell);
-          background.type = "checkbox";
-          background.checked = op.background;
-          L.DomEvent.on(background, "change", (ev) => {
+        },
+      },
+      {
+        name: "V",
+        value: () => null,
+        sort: null,
+        className: "visibility",
+        format: (cell, value, op) => {
+          // show in the list
+          const show = L.DomUtil.create("input", null, cell);
+          show.type = "checkbox";
+          show.checked = !op.hidden;
+          L.DomEvent.on(show, "change", (ev) => {
             L.DomEvent.stop(ev);
-            setOpBackground(op.id, background.checked);
+            if (show.checked) showOperation(op.id);
+            else hideOperation(op.id);
           });
         },
       },
@@ -284,6 +294,9 @@ const OpsDialog = WDialog.extend({
     this.sortable.sortAsc = sortAsc;
     this.sortable.items = ops;
     await this.sortable.done;
+
+    if (showHiddenOps) this.sortable.table.classList.remove("hideOps");
+    else this.sortable.table.classList.add("hideOps");
   },
 });
 
