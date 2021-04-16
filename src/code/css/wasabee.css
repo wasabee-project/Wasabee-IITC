@@ -708,19 +708,6 @@
 .wasabee-dialog-ops div.container {
     overflow-y: hidden;
 }
-.wasabee-dialog-ops .wasabee-table .servername th {
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-    border-left: none;
-    border-right: none;
-    background-color: rgba(0,0,0,.4)
-}
-.wasabee-dialog-ops .wasabee-table th.show-hidden-ops {
-    text-align: right
-}
-.wasabee-dialog-ops .wasabee-table th.show-hidden-ops label {
-    padding-right: 1em
-}
 .wasabee-dialog-ops .wasabee-table .actions {
     white-space: nowrap;
 }
