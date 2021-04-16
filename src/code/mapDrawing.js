@@ -4,7 +4,7 @@ import WasabeeTeam from "./team";
 import WasabeeAgent from "./agent";
 import WasabeeOp from "./operation";
 import { newColors } from "./auxiliar";
-import { getSelectedOperation, opsList, hiddenOpsList } from "./selectedOp";
+import { getSelectedOperation, opsList } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -112,14 +112,13 @@ export async function drawBackgroundOps(opIDs) {
   if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
   Wasabee.backgroundOpsGroup.clearLayers();
 
-  if (opIDs === undefined) {
-    const sop = getSelectedOperation().ID;
-    const hol = hiddenOpsList();
-    opIDs = await opsList();
-    opIDs = opIDs.filter((id) => id !== sop && !hol.includes(id));
-  }
+  const sop = getSelectedOperation().ID;
+  if (opIDs === undefined) opIDs = await opsList();
+
   for (const opID of opIDs) {
-    WasabeeOp.load(opID).then(drawBackgroundOp);
+    if (opID === sop) continue;
+    const op = await WasabeeOp.load(opID);
+    if (op.background) drawBackgroundOp(op);
   }
 }
 

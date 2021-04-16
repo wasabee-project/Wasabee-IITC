@@ -103,12 +103,13 @@ window.plugin.wasabee.init = async () => {
   window.map.on("wasabee:op:select", () => {
     drawBackgroundOps();
   });
-  window.map.on("wasabee:op:hide", () => {
-    drawBackgroundOps();
-  });
-  window.map.on("wasabee:op:show", (opID) => {
-    if (Wasabee._selectedOp && Wasabee._selectedOp.ID !== opID)
-      WasabeeOp.load(opID).then(drawBackgroundOp);
+  window.map.on("wasabee:op:background", (data) => {
+    if (data.background) {
+      if (Wasabee._selectedOp && Wasabee._selectedOp.ID !== data.opID)
+        WasabeeOp.load(data.opID).then(drawBackgroundOp);
+    } else {
+      drawBackgroundOps();
+    }
   });
 
   // Android panes

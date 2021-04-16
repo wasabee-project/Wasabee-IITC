@@ -8,6 +8,7 @@ import {
   hiddenOpsList,
   showOperation,
   hideOperation,
+  setOpBackground,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
@@ -28,12 +29,17 @@ const OpsDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:op:showhide", this.update, this);
+    window.map.on("wasabee:op:select", this.update, this);
+    window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:op:showhide", this.update, this);
+    window.map.off("wasabee:op:delete", this.update, this);
   },
 
   _displayDialog: async function () {
@@ -189,7 +195,6 @@ const OpsDialog = WDialog.extend({
             L.DomEvent.stop(ev);
             if (op.hidden) showOperation(op.id);
             else hideOperation(op.id);
-            this.update();
           });
 
           // delete locally
@@ -213,6 +218,15 @@ const OpsDialog = WDialog.extend({
               syncOp(op.id);
             });
           }
+
+          // background
+          const background = L.DomUtil.create("input", "background", cell);
+          background.type = "checkbox";
+          background.checked = op.background;
+          L.DomEvent.on(background, "change", (ev) => {
+            L.DomEvent.stop(ev);
+            setOpBackground(op.id, background.checked);
+          });
         },
       },
     ];
@@ -220,6 +234,7 @@ const OpsDialog = WDialog.extend({
   },
 
   updateSortable: async function (sortBy, sortAsc) {
+    if (!this.sortable) return;
     // collapse markers and links into one array.
     const showHiddenOps =
       localStorage[
@@ -250,6 +265,7 @@ const OpsDialog = WDialog.extend({
           WasabeeMe.isLoggedIn() &&
           tmpOp.IsOnCurrentServer(),
         server: "",
+        background: tmpOp.background,
       };
       if (sum.currentserver) {
         const agent = await WasabeeAgent.get(tmpOp.creator);

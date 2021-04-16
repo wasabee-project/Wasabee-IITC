@@ -147,6 +147,7 @@ export async function removeOperation(opID) {
   const ops = ol.filter((ID) => ID != opID);
   storeOpsList(ops);
   await WasabeeOp.delete(opID);
+  window.map.fire("wasabee:op:delete", opID);
 }
 
 //** This function adds an operation to the main list */
@@ -154,6 +155,7 @@ export async function addOperation(opID) {
   const ops = await opsList();
   if (!ops.includes(opID)) ops.push(opID);
   storeOpsList(ops);
+  window.map.fire("wasabee:op:add", opID);
 }
 
 //** This function shows an operation to the main list */
@@ -163,7 +165,7 @@ export function showOperation(opID) {
     localStorage[
       window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
     ] = JSON.stringify(hiddenOps.filter((ID) => ID != opID));
-    window.map.fire("wasabee:op:show", opID);
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: true });
   }
 }
 
@@ -175,7 +177,7 @@ export function hideOperation(opID) {
     localStorage[
       window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
     ] = JSON.stringify(hiddenOps);
-    window.map.fire("wasabee:op:hide", opID);
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: false });
   }
 }
 
@@ -200,6 +202,17 @@ export function hiddenOpsList() {
   } catch {
     return [];
   }
+}
+
+export async function setOpBackground(opID, background) {
+  const op = await WasabeeOp.load(opID);
+  if (op.background == background) return;
+  op.background = background;
+  await op.store();
+  window.map.fire("wasabee:op:background", {
+    opID: opID,
+    background: background,
+  });
 }
 
 export async function opsList(hidden = true) {
