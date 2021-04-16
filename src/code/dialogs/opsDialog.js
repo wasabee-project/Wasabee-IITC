@@ -75,25 +75,6 @@ const OpsDialog = WDialog.extend({
     }
   },
 
-  makeContent: async function () {
-    // const hideOps = L.DomUtil.create("th", "show-hidden-ops", serverRow);
-    // hideOps.colSpan = 4;
-    // const label = L.DomUtil.create("label", null, hideOps);
-    // label.htmlFor = "show-hidden-ops";
-    // label.textContent = "Show hidden OPs";
-    // const checkbox = L.DomUtil.create("input", null, hideOps);
-    // checkbox.id = "show-hidden-ops";
-    // checkbox.type = "checkbox";
-    // checkbox.checked = showHiddenOps;
-    // L.DomEvent.on(checkbox, "change", (ev) => {
-    //   L.DomEvent.stop(ev);
-    //   localStorage[
-    //     window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
-    //   ] = checkbox.checked;
-    //   this.update();
-    // });
-  },
-
   initSortable: function () {
     const content = new Sortable();
     content.fields = [
@@ -162,7 +143,7 @@ const OpsDialog = WDialog.extend({
       {
         name: "Owner",
         value: (op) => op.owner,
-        // sort: (a, b) => a - b,
+        sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
           cell.classList.add("opowner");
           if (!op.currentserver) cell.append(op.owner);
@@ -193,8 +174,8 @@ const OpsDialog = WDialog.extend({
       },
       {
         name: "Cmds",
-        value: () => "",
-        // sort: (a, b) => a - b,
+        value: () => null,
+        sort: null,
         format: (cell, value, op) => {
           cell.classList.add("actions");
           const hide = L.DomUtil.create("a", "", cell);
