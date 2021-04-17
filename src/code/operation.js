@@ -1096,6 +1096,18 @@ export default class WasabeeOp {
     this.update(false);
   }
 
+  KeysOnHandForPortal(portalId) {
+    let i = 0;
+    for (const k of this.keysonhand) if (k.portalId == portalId) i += k.onhand;
+    return i;
+  }
+
+  KeysRequiredForPortal(portalId) {
+    let i = 0;
+    for (const l of this.links) if (l.toPortalId == portalId) i++;
+    return i;
+  }
+
   zoneName(zoneID) {
     if (zoneID == "0")
       // All zone

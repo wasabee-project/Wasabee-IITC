@@ -108,6 +108,12 @@ export default class WasabeeAnchor {
         marker.closePopup();
       });
     }
+
+    const requiredKeys = L.DomUtil.create("div", "desc", content);
+    const onHand = operation.KeysOnHandForPortal(this._portal.id);
+    const required = operation.KeysRequiredForPortal(this._portal.id);
+    requiredKeys.textContent = "Keys: " + onHand + " / " + required;
+
     const buttonSet = L.DomUtil.create(
       "div",
       "wasabee-marker-buttonset",
