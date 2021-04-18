@@ -56,6 +56,9 @@ const OpsDialog = WDialog.extend({
       ] = !showHiddenOps;
       this.update();
     };
+    buttons[wX("CLOSE")] = () => {
+      this.closeDialog();
+    };
 
     this.createDialog({
       title: wX("OPERATIONS"),
