@@ -887,11 +887,7 @@ export default class WasabeeOp {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
-      if (l instanceof WasabeeLink) {
-        tmpLinks.push(l);
-      } else {
-        tmpLinks.push(new WasabeeLink(l, this));
-      }
+      tmpLinks.push(new WasabeeLink(l, this));
     }
     return tmpLinks;
   }
@@ -900,11 +896,7 @@ export default class WasabeeOp {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
-      if (l instanceof WasabeeLink) {
-        tmpLinks.push(l);
-      } else {
-        tmpLinks.push(new WasabeeLink(l, this));
-      }
+      tmpLinks.push(new WasabeeLink(l, this));
     }
     return tmpLinks;
   }
@@ -914,11 +906,7 @@ export default class WasabeeOp {
     if (!markers || markers.length == 0) return tmpMarkers;
     if (markers) {
       for (const m of markers) {
-        if (m instanceof WasabeeMarker) {
-          tmpMarkers.push(m);
-        } else {
-          tmpMarkers.push(new WasabeeMarker(m));
-        }
+        tmpMarkers.push(new WasabeeMarker(m));
       }
     }
     return tmpMarkers;
