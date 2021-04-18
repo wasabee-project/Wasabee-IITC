@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import WasabeeOp from "../operation";
+import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const MergeDialog = WDialog.extend({
@@ -20,7 +21,8 @@ const MergeDialog = WDialog.extend({
 
   _displayDialog: function () {
     this._opRebase = new WasabeeOp(this.options.opRemote);
-    const changes = this.options.opOwn.changes();
+    const origin = new WasabeeOp(this.options.opOwn.fetchedOp);
+    const changes = this.options.opOwn.changes(origin);
     const summary = this._opRebase.applyChanges(changes, this.options.opOwn);
     this._opRebase.cleanAll();
     this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
@@ -33,6 +35,35 @@ const MergeDialog = WDialog.extend({
       "Do you want to merge your modifications with the server OP or to replace the local version by the server version? " +
       "(or leave it for later)";
     content.appendChild(this.formatSummary(summary));
+
+    const details = L.DomUtil.create("div", "details", content);
+    {
+      const div = L.DomUtil.create("div", "local", details);
+      div.innerHTML = "<span>My changes</span>";
+      div.appendChild(this.formatChanges(changes, origin, this.options.opOwn));
+    }
+    {
+      const div = L.DomUtil.create("div", "merge", details);
+      div.innerHTML = "<span>Merge changes</span>";
+      div.appendChild(
+        this.formatChanges(
+          this._opRebase.changes(origin),
+          origin,
+          this._opRebase
+        )
+      );
+    }
+    {
+      const div = L.DomUtil.create("div", "server", details);
+      div.innerHTML = "<span>Server changes</span>";
+      div.appendChild(
+        this.formatChanges(
+          this.options.opRemote.changes(origin),
+          origin,
+          this.options.opRemote
+        )
+      );
+    }
 
     const buttons = [];
     buttons.push({
@@ -123,7 +154,82 @@ const MergeDialog = WDialog.extend({
     return rebaseMessage;
   },
 
-  formatChanges: function () {},
+  formatChanges: function (changes, origin, operation) {
+    const sortable = new Sortable();
+    sortable.fields = [
+      {
+        name: " ",
+        value: (e) => e.type,
+        format: (cell, value) => {
+          cell.textContent = value;
+        },
+      },
+      {
+        name: " ",
+        value: (e) => {
+          let v = "";
+          if (e.data.type === "link") {
+            v = e.data.link.ID;
+          } else if (e.data.type === "portal") {
+            v = e.data.portal.id;
+          } else if (e.data.type === "marker") {
+            v = e.data.marker.ID;
+          }
+          return v.slice(0, 4);
+        },
+        format: (cell, value) => {
+          cell.innerHTML = `<code>${value}</code>`;
+        },
+      },
+      {
+        name: "Entry",
+        value: (e) => e.data.type,
+        format: (cell, value, e) => {
+          const op = e.type === "-" ? origin : operation;
+          if (e.data.type === "link") {
+            cell.appendChild(e.data.link.displayFormat(op));
+          } else if (e.data.type === "portal") {
+            cell.appendChild(e.data.portal.displayFormat());
+          } else if (e.data.type === "marker") {
+            const portal = op.getPortal(e.data.marker.portalId);
+            cell.appendChild(portal.displayFormat());
+          } else {
+            cell.textContent = value;
+          }
+          if (e.type === "~") {
+            const pre = L.DomUtil.create("code", null, cell);
+            const diff = e.data.diff.map((a) =>
+              a[0].endsWith("ortalId") ? [a[0], origin.getPortal(a[1]).name] : a
+            );
+            pre.textContent = JSON.stringify(diff);
+          }
+        },
+      },
+    ];
+
+    const items = [];
+    for (const a of changes.addition) {
+      items.push({
+        type: "+",
+        data: a,
+      });
+    }
+    for (const e of changes.edition) {
+      items.push({
+        type: "~",
+        data: e,
+      });
+    }
+    for (const d of changes.deletion) {
+      items.push({
+        type: "-",
+        data: d,
+      });
+    }
+
+    sortable.items = items;
+    return sortable.table;
+  },
 });
 
 export default MergeDialog;

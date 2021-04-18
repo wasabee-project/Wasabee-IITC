@@ -909,3 +909,22 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 .field-count ul {
   padding-left: 1em;
 }
+
+/* merge dialog */
+@media (min-width: 700px) {
+    .wasabee-dialog-merge .details {
+        display: grid;
+        grid-template-columns: auto auto auto;
+    }
+}
+
+.wasabee-dialog-merge .details .wasabee-table {
+    margin-bottom: auto;
+    border: 1px solid white;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+
+.wasabee-dialog-merge .details .wasabee-table code {
+  display: block;
+}
