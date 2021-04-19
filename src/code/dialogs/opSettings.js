@@ -66,8 +66,7 @@ const OpSettingDialog = WDialog.extend({
 
     const writable = selectedOp.getPermission() == "write";
 
-    const nameLabel = L.DomUtil.create("label", null, topSet);
-    nameLabel.textContent = wX("OPER_NAME");
+    L.DomUtil.create("label", null, topSet).textContent = wX("OPER_NAME");
     const nameDisplay = L.DomUtil.create("div", null, topSet);
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
@@ -89,8 +88,7 @@ const OpSettingDialog = WDialog.extend({
     }
 
     if (writable) {
-      const colorLabel = L.DomUtil.create("label", null, topSet);
-      colorLabel.textContent = wX("OPER_COLOR");
+      L.DomUtil.create("label", null, topSet).textContent = wX("OPER_COLOR");
 
       const picker = L.DomUtil.create("input", "picker", topSet);
       picker.type = "color";
@@ -125,17 +123,21 @@ const OpSettingDialog = WDialog.extend({
     }
 
     if (writable) {
-      const startInput = L.DomUtil.create("input", null, topSet);
-      startInput.placeholder = "Sun, 21 Oct 2018 12:16:24 GMT";
-      startInput.value = selectedOp.referencetime;
-      L.DomEvent.on(startInput, "change", async (ev) => {
+      L.DomUtil.create("label", null, topSet).textContent = wX(
+        "REFERENCE_TIME"
+      );
+      const rtInput = L.DomUtil.create("input", null, topSet);
+      rtInput.size = 30;
+      rtInput.placeholder = "Sun, 21 Oct 2018 12:16:24 GMT";
+      rtInput.value = selectedOp.referencetime;
+      L.DomEvent.on(rtInput, "change", async (ev) => {
         L.DomEvent.stop(ev);
         const so = getSelectedOperation();
         try {
-          const d = new Date(startInput.value); // accept whatever the JS engine can parse
+          const d = new Date(rtInput.value); // accept whatever the JS engine can parse
           if (d == "Invalid Date" || isNaN(d)) throw d;
           so.referencetime = d.toUTCString(); // RFC 1123 format as expected by server
-          startInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
+          rtInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
           so.localchanged = true;
           await so.store();
         } catch (e) {
@@ -145,7 +147,8 @@ const OpSettingDialog = WDialog.extend({
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
-      commentDisplay.textContent = selectedOp.comment;
+      commentDisplay.textContent =
+        wX("REFERENCE_TIME") + " " + selectedOp.referencetime;
     }
 
     const buttonSection = L.DomUtil.create("div", "buttonset", content);

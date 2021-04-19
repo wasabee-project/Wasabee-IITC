@@ -258,6 +258,7 @@
   "QDSTART": "Click the first anchor portal.",
   "READ": "Read",
   "READ_SHORT": "RO",
+  "REFERENCE_TIME": "Reference Time: ",
   "REM_LOC_CP": "Remove local copy of ${value}",
   "REMOVE": "Remove",
   "REMOVE_TEAM": "Remove Team: ",
