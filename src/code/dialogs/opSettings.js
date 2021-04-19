@@ -124,6 +124,30 @@ const OpSettingDialog = WDialog.extend({
       commentDisplay.textContent = selectedOp.comment;
     }
 
+    if (writable) {
+      const startInput = L.DomUtil.create("input", null, topSet);
+      startInput.placeholder = "Sun, 21 Oct 2018 12:16:24 GMT";
+      startInput.value = selectedOp.referencetime;
+      L.DomEvent.on(startInput, "change", async (ev) => {
+        L.DomEvent.stop(ev);
+        const so = getSelectedOperation();
+        try {
+          const d = new Date(startInput.value); // accept whatever the JS engine can parse
+          if (d == "Invalid Date" || isNaN(d)) throw d;
+          so.referencetime = d.toUTCString(); // RFC 1123 format as expected by server
+          startInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
+          so.localchanged = true;
+          await so.store();
+        } catch (e) {
+          console.log(e);
+          alert("Invalid date format");
+        }
+      });
+    } else {
+      const commentDisplay = L.DomUtil.create("p", "comment", topSet);
+      commentDisplay.textContent = selectedOp.comment;
+    }
+
     const buttonSection = L.DomUtil.create("div", "buttonset", content);
     if (writable) {
       const clearOpDiv = L.DomUtil.create("div", null, buttonSection);

@@ -39,7 +39,7 @@ export default class WasabeeOp {
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
     // this.modified = obj.modified ? obj.modified : null;
-    this.starttime = obj.starttime ? obj.starttime : null;
+    this.referencetime = obj.referencetime ? obj.referencetime : null;
 
     this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
     this.remoteChanged = !!obj.remoteChanged;
@@ -161,7 +161,7 @@ export default class WasabeeOp {
       color: this.color,
       comment: this.comment,
       zones: this.zones,
-      starttime: this.starttime,
+      referencetime: this.referencetime,
     };
   }
 
