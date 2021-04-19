@@ -1189,7 +1189,7 @@ export default class WasabeeOp {
         const fields = ["comment", "hardness"];
         const diff = fields
           .filter((k) => oldPortal[k] != p[k])
-          .map((k) => [k, p[k]]);
+          .map((k) => [k, oldPortal[k]]);
         if (diff.length > 0)
           changes.edition.push({ type: "portal", portal: p, diff: diff });
       }
@@ -1217,7 +1217,7 @@ export default class WasabeeOp {
         ];
         const diff = fields
           .filter((k) => oldLink[k] != l[k])
-          .map((k) => [k, l[k]]);
+          .map((k) => [k, oldLink[k]]);
         if (diff.length > 0)
           changes.edition.push({ type: "link", link: l, diff: diff });
       }
@@ -1243,7 +1243,7 @@ export default class WasabeeOp {
         ];
         const diff = fields
           .filter((k) => oldMarker[k] != m[k])
-          .map((k) => [k, m[k]]);
+          .map((k) => [k, oldMarker[k]]);
         if (diff.length > 0)
           changes.edition.push({ type: "marker", marker: m, diff: diff });
       }
@@ -1401,27 +1401,11 @@ export default class WasabeeOp {
         this.markers = markers;
       }
     }
-    // `this` takes over `changes` for additions
-    for (const a of changes.addition) {
-      if (a.type == "portal") {
-        // already done
-      } else if (a.type == "link") {
-        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
-          this.links.push(a.link);
-          summary.addition.link += 1;
-        } else summary.addition.ignored += 1;
-      } else if (a.type == "marker") {
-        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
-          this.markers.push(a.marker);
-          summary.addition.marker += 1;
-        } else summary.addition.ignored += 1;
-      }
-    }
     // links/markers absent from `this` are not added back
     for (const e of changes.edition) {
       if (e.type == "portal") {
         const portal = this.getPortal(e.portal.id);
-        for (const [k, v] of e.diff) portal[k] = v;
+        for (const kv of e.diff) portal[kv[0]] = e.portal[kv[0]];
         summary.edition.portal += 1;
       } else if (e.type == "link") {
         let found = false;
@@ -1437,7 +1421,7 @@ export default class WasabeeOp {
               this.links = this.links.filter((l) => l.ID != e.link.ID);
               summary.edition.duplicate += 1;
             } else {
-              for (const [k, v] of e.diff) l[k] = v;
+              for (const kv of e.diff) l[kv[0]] = e.link[kv[0]];
               if (l.fromPortalId == l.toPortalId) {
                 this.links = this.links.filter((link) => link.ID != l.ID);
                 summary.edition.singlePortalLink += 1;
@@ -1463,7 +1447,7 @@ export default class WasabeeOp {
               this.markers = this.markers.filter((m) => m.ID != e.marker.ID);
               summary.edition.duplicate += 1;
             } else {
-              for (const [k, v] of e.diff) m[k] = v;
+              for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
               summary.edition.marker += 1;
               if (e.diff.some((kv) => kv[0] == "assignedTo"))
                 summary.edition.assignment += 1;
@@ -1473,6 +1457,22 @@ export default class WasabeeOp {
           }
         }
         if (!found) summary.edition.removed += 1;
+      }
+    }
+    // `this` takes over `changes` for additions
+    for (const a of changes.addition) {
+      if (a.type == "portal") {
+        // already done
+      } else if (a.type == "link") {
+        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
+          this.links.push(a.link);
+          summary.addition.link += 1;
+        } else summary.addition.ignored += 1;
+      } else if (a.type == "marker") {
+        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
+          this.markers.push(a.marker);
+          summary.addition.marker += 1;
+        } else summary.addition.ignored += 1;
       }
     }
     return summary;
