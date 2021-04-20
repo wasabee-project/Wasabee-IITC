@@ -71,9 +71,7 @@ const KeysList = WDialog.extend({
         value: (key) => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          cell.appendChild(
-            operation.getPortal(key.id).displayFormat(this._smallScreen)
-          );
+          cell.appendChild(operation.getPortal(key.id).displayFormat());
         },
       },
       {
