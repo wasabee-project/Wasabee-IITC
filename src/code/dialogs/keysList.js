@@ -42,7 +42,7 @@ const KeysList = WDialog.extend({
 
     this.createDialog({
       title: wX("KEY_LIST2", operation.name),
-      html: this.getListDialogContent(operation).table,
+      html: this.getListDialogContent(operation, 0, false).table,
       width: "auto",
       dialogClass: "keyslist",
       buttons: buttons,
@@ -59,12 +59,16 @@ const KeysList = WDialog.extend({
     else this._me = null;
 
     this.setTitle(wX("KEY_LIST", operation.name));
-    const table = this.getListDialogContent(operation).table;
+    const table = this.getListDialogContent(
+      operation,
+      this.sortable.sortBy,
+      this.sortable.sortAsc
+    ).table;
     this.setContent(table);
   },
 
-  getListDialogContent: function (operation) {
-    const sortable = new Sortable();
+  getListDialogContent: function (operation, sortBy, sortAsc) {
+    this.sortable = new Sortable();
     const always = [
       {
         name: wX("PORTAL"),
@@ -111,7 +115,7 @@ const KeysList = WDialog.extend({
     let gid = "no-user";
     if (this._me) {
       gid = this._me.GoogleID;
-      sortable.fields = always.concat([
+      this.sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
           value: (key) => parseInt(key.iHave, 10),
@@ -146,7 +150,7 @@ const KeysList = WDialog.extend({
         },
       ]);
     } else {
-      sortable.fields = always;
+      this.sortable.fields = always;
     }
 
     const keys = new Array();
@@ -206,9 +210,10 @@ const KeysList = WDialog.extend({
       keys.push(k);
     }
 
-    sortable.sortBy = 0;
-    sortable.items = keys;
-    return sortable;
+    this.sortable.sortBy = sortBy;
+    this.sortable.sortAsc = sortAsc;
+    this.sortable.items = keys;
+    return this.sortable;
   },
 
   showKeyByPortal: function (e) {
