@@ -690,20 +690,22 @@ const HomogeneousDialog = WDialog.extend({
     const drawFractal = (depth, r, pOne, pTwo, order) => {
       if (r.portal) {
         // draw inner HF on base 1-2
-        const pThree = r.anchors.filter((p) => p != pOne && p != pTwo)[0];
+        const pThree = r.anchors.filter(
+          (p) => p.id !== pOne.id && p.id !== pTwo.id
+        )[0];
         for (const child of r.children)
-          if (!child.anchors.includes(pThree))
+          if (child.anchors.every((p) => p.id !== pThree.id))
             order = draw(depth + 1, child, pOne, pTwo, order);
 
         let order1, order2;
         // draw fractal on 1-p
         for (const child of r.children)
-          if (!child.anchors.includes(pTwo))
+          if (child.anchors.every((p) => p.id !== pTwo.id))
             order1 = drawFractal(depth + 1, child, pOne, r.portal, order);
 
         // draw fractal on 2-p
         for (const child of r.children)
-          if (!child.anchors.includes(pOne))
+          if (child.anchors.every((p) => p.id !== pOne.id))
             order2 = drawFractal(depth + 1, child, pTwo, r.portal, order);
 
         // should be computed with a formula
@@ -734,7 +736,9 @@ const HomogeneousDialog = WDialog.extend({
     const draw = (depth, r, pOne, pTwo, order = 1) => {
       // draw fratal on 1-2
       order = drawFractal(depth, r, pOne, pTwo, order);
-      const pThree = r.anchors.filter((p) => p != pOne && p != pTwo)[0];
+      const pThree = r.anchors.filter(
+        (p) => p.id !== pOne.id && p.id !== pTwo.id
+      )[0];
       // draw outer link
       for (const anchor of [pOne, pTwo]) {
         const link = this._operation.addLink(
