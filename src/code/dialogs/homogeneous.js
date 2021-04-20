@@ -287,7 +287,6 @@ const HomogeneousDialog = WDialog.extend({
     }
 
     this._failed = 0;
-    this._layerGroup.clearLayers();
 
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
       alert("please select three anchors");
