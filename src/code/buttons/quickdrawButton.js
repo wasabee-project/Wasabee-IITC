@@ -17,6 +17,18 @@ const QuickdrawButton = WButton.extend({
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
+    this.picker = null;
+    this.picker = L.DomUtil.create("input", "", this.button);
+    this.picker.type = "color";
+    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
+    this.picker.style.display = "none";
+    this.picker.setAttribute("list", "wasabee-colors-datalist");
+
+    L.DomEvent.on(this.picker, "change", (ev) => {
+      this.handler._nextDrawnLinksColor = ev.target.value;
+      this.picker.value = ev.target.value;
+    });
+
     this.button = this._createButton({
       title: this.title,
       container: container,
@@ -25,6 +37,15 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     });
 
+    this._changeColorSubAction = {
+      title: wX("QD BUTTON CHANGE COLOR"),
+      text: wX("QD CHANGE COLOR"),
+      callback: () => {
+        this.picker.click();
+      },
+      context: null,
+    };
+
     this._endSubAction = {
       title: wX("QD BUTTON END"),
       text: wX("QD END"),
@@ -32,7 +53,10 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     };
 
-    this.actionsContainer = this._createSubActions([this._endSubAction]);
+    this.actionsContainer = this._createSubActions([
+      this._changeColorSubAction,
+      this._endSubAction,
+    ]);
     this._container.appendChild(this.actionsContainer);
   },
 
@@ -85,6 +109,7 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip = new WTooltip(this._map);
 
     this._operation = getSelectedOperation();
+    this._nextDrawnLinksColor = this._operation.color;
     this._opID = this._operation.ID;
     this._anchor = null;
     this._anchor1 = null;
@@ -271,7 +296,8 @@ const QuickDrawControl = L.Handler.extend({
         this._anchor1,
         this._anchor2,
         wX("QDBASE"),
-        this._operation.nextOrder
+        this._operation.nextOrder,
+        this._nextDrawnLinksColor
       );
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
@@ -289,13 +315,15 @@ const QuickDrawControl = L.Handler.extend({
       selectedPortal,
       this._anchor1,
       null,
-      this._operation.nextOrder
+      this._operation.nextOrder,
+      this._nextDrawnLinksColor
     );
     this._operation.addLink(
       selectedPortal,
       this._anchor2,
       null,
-      this._operation.nextOrder
+      this._operation.nextOrder,
+      this._nextDrawnLinksColor
     );
     this._tooltip.updateContent(this._getTooltipText());
   },
@@ -335,7 +363,8 @@ const QuickDrawControl = L.Handler.extend({
         this._previous,
         selectedPortal,
         null,
-        this._throwOrder++
+        this._throwOrder++,
+        this._nextDrawnLinksColor
       );
     }
 
@@ -364,7 +393,8 @@ const QuickDrawControl = L.Handler.extend({
         selectedPortal,
         this._anchor,
         null,
-        this._throwOrder++
+        this._throwOrder++,
+        this._nextDrawnLinksColor
       );
     } else this._anchor = selectedPortal;
 

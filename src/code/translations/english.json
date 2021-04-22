@@ -247,6 +247,8 @@
   "PORTAL_COUNT": "${value} portals",
   "PORTAL KEY LIST": "Key list for portal ${value}",
   "PORT_FAKE": " portals. Faked ",
+  "QD BUTTON CHANGE COLOR": "Click to change next links color",
+  "QD CHANGE COLOR": "Change color",
   "QD BUTTON END": "Click to stop drawing fields",
   "QD END": "End",
   "QD TITLE": "Quick Draw Layers",
