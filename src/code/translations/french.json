@@ -229,6 +229,8 @@
   "PORTAL": "Portail",
   "PORTAL_COUNT": "${value} portails",
   "PORT_FAKE": "portails trouv\u00e9s. ",
+  "QD BUTTON TOGGLE MODE": "Cliquez pour changer le mode de dessin",
+  "QD TOGGLE MODE": "Changer de mode",
   "QD BUTTON CHANGE COLOR": "Cliquez pour changer la couleur des prochains liens",
   "QD CHANGE COLOR": "Changer de couleur",
   "QD BUTTON END": "Arr\u00eate le dessin",

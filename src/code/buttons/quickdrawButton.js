@@ -46,6 +46,15 @@ const QuickdrawButton = WButton.extend({
       context: null,
     };
 
+    this._toggleModeSubAction = {
+      title: wX("QD BUTTON TOGGLE MODE"),
+      text: wX("QD TOGGLE MODE"),
+      callback: () => {
+        this.handler._toggleMode();
+      },
+      context: null,
+    };
+
     this._endSubAction = {
       title: wX("QD BUTTON END"),
       text: wX("QD END"),
@@ -54,6 +63,7 @@ const QuickdrawButton = WButton.extend({
     };
 
     this.actionsContainer = this._createSubActions([
+      this._toggleModeSubAction,
       this._changeColorSubAction,
       this._endSubAction,
     ]);
