@@ -640,7 +640,14 @@ export default class WasabeeOp {
     return false;
   }
 
-  addLink(fromPortal, toPortal, description, order, color, replace = false) {
+  addLink(
+    fromPortal,
+    toPortal,
+    description,
+    order,
+    replace = false,
+    color = null
+  ) {
     console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
       console.debug(
@@ -663,12 +670,12 @@ export default class WasabeeOp {
               toPortalId: toPortal.id,
               description: description,
               throwOrderPos: order,
-              color: color,
             },
             this
           );
     link.description = description;
     if (order) link.opOrder = order;
+    if (color) link.color = color;
 
     if (!existingLink) {
       this.links.push(link);
