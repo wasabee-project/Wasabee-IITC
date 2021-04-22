@@ -20,7 +20,7 @@ const QuickdrawButton = WButton.extend({
     this.picker = null;
     this.picker = L.DomUtil.create("input", "", this.button);
     this.picker.type = "color";
-    this.picker.value = "#000000"; // force default to black to ensure selecting red works
+    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
     this.picker.style.display = "none";
     this.picker.setAttribute("list", "wasabee-colors-datalist");
 
