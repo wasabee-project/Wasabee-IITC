@@ -354,7 +354,7 @@ const HomogeneousDialog = WDialog.extend({
     const m = new Map();
     const center = this._getCenter(one, two, three);
     for (const p of portalsCovered) {
-      if (p == one.id || p == two.id || p == three.id) continue;
+      if (p.id === one.id || p.id === two.id || p.id === three.id) continue;
       const cDist = window.map.distance(center, p.latLng || p._latlng);
       m.set(cDist, p);
     }
@@ -791,18 +791,40 @@ const HomogeneousDialog = WDialog.extend({
     }
 
     const onePortals = new Array();
-    for (const p of possibleExceptAnchors) {
-      if (this._fieldCovers(one, two, centerPoint, p)) onePortals.push(p);
-    }
-
     const twoPortals = new Array();
-    for (const p of possibleExceptAnchors) {
-      if (this._fieldCovers(two, three, centerPoint, p)) twoPortals.push(p);
-    }
-
     const threePortals = new Array();
     for (const p of possibleExceptAnchors) {
-      if (this._fieldCovers(three, one, centerPoint, p)) threePortals.push(p);
+      if (
+        greatCircleArcIntersectByLatLngs(
+          p.latLng,
+          one.latLng,
+          centerPoint.latLng,
+          two.latLng
+        ) ||
+        greatCircleArcIntersectByLatLngs(
+          p.latLng,
+          one.latLng,
+          centerPoint.latLng,
+          three.latLng
+        )
+      )
+        twoPortals.push(p);
+      else if (
+        greatCircleArcIntersectByLatLngs(
+          p.latLng,
+          two.latLng,
+          centerPoint.latLng,
+          one.latLng
+        ) ||
+        greatCircleArcIntersectByLatLngs(
+          p.latLng,
+          two.latLng,
+          centerPoint.latLng,
+          three.latLng
+        )
+      )
+        threePortals.push(p);
+      else onePortals.push(p);
     }
 
     return [onePortals, twoPortals, threePortals];
