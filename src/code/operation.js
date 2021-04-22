@@ -641,7 +641,7 @@ export default class WasabeeOp {
   }
 
   // options: {description,order,color,replace}
-  addLink(fromPortal, toPortal, options) {
+  addLink(fromPortal, toPortal, options = {}) {
     console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
       console.debug(
@@ -649,8 +649,6 @@ export default class WasabeeOp {
       );
       return null;
     }
-
-    if (!options) options = {};
 
     this.addAnchor(fromPortal);
     this.addAnchor(toPortal);
