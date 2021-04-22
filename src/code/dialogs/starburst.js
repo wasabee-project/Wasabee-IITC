@@ -100,7 +100,7 @@ const StarburstDialog = WDialog.extend({
     operation.startBatchMode();
     for (const p of getAllPortalsOnScreen(operation)) {
       if (p.id == this._anchor.id) continue;
-      operation.addLink(p, this._anchor, "auto starburst");
+      operation.addLink(p, this._anchor, { description: "auto starburst" });
     }
     operation.endBatchMode();
   },

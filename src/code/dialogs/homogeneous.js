@@ -620,8 +620,12 @@ const HomogeneousDialog = WDialog.extend({
             : [r.portal, father, "to father", fatherOrder],
         ];
         for (const [from, to, comment, order] of data) {
-          const link = this._operation.addLink(from, to, comment, order, true);
-          link.color = this._colors[order % this._colors.length];
+          this._operation.addLink(from, to, {
+            description: comment,
+            order: order,
+            color: this._colors[order % this._colors.length],
+            replace: true,
+          });
         }
         for (const child of r.children) draw(depth + 1, child);
       }
@@ -647,39 +651,33 @@ const HomogeneousDialog = WDialog.extend({
     this._operation.addPortal(one);
     this._operation.addPortal(two);
     this._operation.addPortal(three);
-    const outer1 = this._operation.addLink(
-      two,
-      one,
-      "Outer 1",
-      (depthValue * (depthValue - 1)) / 2 + depthValue + 1,
-      true
-    );
-    outer1.color = this._colors[
-      ((depthValue * (depthValue - 1)) / 2 + depthValue + 1) %
-        this._colors.length
-    ];
-    const outer2 = this._operation.addLink(
-      three,
-      one,
-      "Outer 2",
-      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
-      true
-    );
-    outer2.color = this._colors[
-      ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
-        this._colors.length
-    ];
-    const outer3 = this._operation.addLink(
-      three,
-      two,
-      "Outer 3",
-      (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
-      true
-    );
-    outer3.color = this._colors[
-      ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
-        this._colors.length
-    ];
+    this._operation.addLink(two, one, {
+      description: "Outer 1",
+      order: (depthValue * (depthValue - 1)) / 2 + depthValue + 1,
+      color: this._colors[
+        ((depthValue * (depthValue - 1)) / 2 + depthValue + 1) %
+          this._colors.length
+      ],
+      replace: true,
+    });
+    this._operation.addLink(three, one, {
+      description: "Outer 2",
+      order: (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
+      color: this._colors[
+        ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+          this._colors.length
+      ],
+      replace: true,
+    });
+    this._operation.addLink(three, two, {
+      description: "Outer 3",
+      order: (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
+      color: this._colors[
+        ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+          this._colors.length
+      ],
+      replace: true,
+    });
     draw(1, tree);
   },
 
@@ -716,14 +714,12 @@ const HomogeneousDialog = WDialog.extend({
     // link an anchor to inner portals in depth order
     const drawBackLink = (depth, r, anchor, order) => {
       if (r.portal) {
-        const link = this._operation.addLink(
-          anchor,
-          r.portal,
-          "intern link",
-          order + 1,
-          true
-        );
-        link.color = this._colors[order % this._colors.length];
+        this._operation.addLink(anchor, r.portal, {
+          description: "intern link",
+          order: order + 1,
+          color: this._colors[order % this._colors.length],
+          replace: true,
+        });
         for (const child of r.children)
           if (child.anchors.includes(anchor))
             drawBackLink(depth + 1, child, anchor, order + 1);
@@ -740,14 +736,11 @@ const HomogeneousDialog = WDialog.extend({
       )[0];
       // draw outer link
       for (const anchor of [pOne, pTwo]) {
-        const link = this._operation.addLink(
-          pThree,
-          anchor,
-          "",
-          order + 1,
-          true
-        );
-        link.color = this._colors[order % this._colors.length];
+        this._operation.addLink(pThree, anchor, {
+          order: order + 1,
+          color: this._colors[order % this._colors.length],
+          replace: true,
+        });
       }
       if (!r.portal) return order + 1;
       // draw inner link from 3
@@ -772,8 +765,12 @@ const HomogeneousDialog = WDialog.extend({
     drawDebug(depthValue, tree);
 
     for (const p of tree.anchors) this._operation.addPortal(p);
-    const outerBase = this._operation.addLink(two, one, "Outer base", 1, true);
-    outerBase.color = this._colors[0];
+    this._operation.addLink(two, one, {
+      description: "Outer base",
+      order: 1,
+      color: this._colors[0],
+      replace: true,
+    });
     draw(1, tree, one, two);
   },
 

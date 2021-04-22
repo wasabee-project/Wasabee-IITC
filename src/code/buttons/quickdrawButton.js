@@ -302,14 +302,11 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._anchor2) {
       if (selectedPortal.id === this._anchor1.id) return;
       this._anchor2 = selectedPortal;
-      this._operation.addLink(
-        this._anchor1,
-        this._anchor2,
-        wX("QDBASE"),
-        this._operation.nextOrder,
-        false,
-        this._nextDrawnLinksColor
-      );
+      this._operation.addLink(this._anchor1, this._anchor2, {
+        description: wX("QDBASE"),
+        order: this._operation.nextOrder,
+        color: this._nextDrawnLinksColor,
+      });
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
         window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
@@ -322,22 +319,14 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
-    this._operation.addLink(
-      selectedPortal,
-      this._anchor1,
-      null,
-      this._operation.nextOrder,
-      false,
-      this._nextDrawnLinksColor
-    );
-    this._operation.addLink(
-      selectedPortal,
-      this._anchor2,
-      null,
-      this._operation.nextOrder,
-      false,
-      this._nextDrawnLinksColor
-    );
+    this._operation.addLink(selectedPortal, this._anchor1, {
+      order: this._operation.nextOrder,
+      color: this._nextDrawnLinksColor,
+    });
+    this._operation.addLink(selectedPortal, this._anchor2, {
+      order: this._operation.nextOrder,
+      color: this._nextDrawnLinksColor,
+    });
     this._tooltip.updateContent(this._getTooltipText());
   },
 
@@ -372,14 +361,10 @@ const QuickDrawControl = L.Handler.extend({
     }
 
     if (this._previous) {
-      this._operation.addLink(
-        this._previous,
-        selectedPortal,
-        null,
-        this._throwOrder++,
-        false,
-        this._nextDrawnLinksColor
-      );
+      this._operation.addLink(this._previous, selectedPortal, {
+        order: this._throwOrder++,
+        color: this._nextDrawnLinksColor,
+      });
     }
 
     // all portals, including the first
@@ -403,14 +388,10 @@ const QuickDrawControl = L.Handler.extend({
     }
 
     if (this._anchor) {
-      this._operation.addLink(
-        selectedPortal,
-        this._anchor,
-        null,
-        this._throwOrder++,
-        false,
-        this._nextDrawnLinksColor
-      );
+      this._operation.addLink(selectedPortal, this._anchor, {
+        order: this._throwOrder++,
+        color: this._nextDrawnLinksColor,
+      });
     } else this._anchor = selectedPortal;
 
     // all portals, including the first

@@ -276,9 +276,15 @@ const MadridDialog = MultimaxDialog.extend({
     this._operation.startBatchMode();
 
     // ignore order + direction
-    this._operation.addLink(spines[0][0], spines[1][0], "inner field");
-    this._operation.addLink(spines[1][0], spines[2][0], "inner field");
-    this._operation.addLink(spines[2][0], spines[0][0], "inner field");
+    this._operation.addLink(spines[0][0], spines[1][0], {
+      description: "inner field",
+    });
+    this._operation.addLink(spines[1][0], spines[2][0], {
+      description: "inner field",
+    });
+    this._operation.addLink(spines[2][0], spines[0][0], {
+      description: "inner field",
+    });
 
     const indices = [1, 1, 1];
 
@@ -307,8 +313,10 @@ const MadridDialog = MultimaxDialog.extend({
       }
       if (!this.fieldCoversPortal(p, pTwo, pThree, pOne))
         console.log("well, this doesn't work here...");
-      const toTwo = this._operation.addLink(p, pTwo, "link");
-      const toThree = this._operation.addLink(p, pThree, "link");
+      const toTwo = this._operation.addLink(p, pTwo, { description: "link" });
+      const toThree = this._operation.addLink(p, pThree, {
+        description: "link",
+      });
       toTwo.zone = spineOrder[0] + 1;
       toThree.zone = spineOrder[0] + 1;
 
@@ -336,7 +344,10 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
+    this._operation.addLink(this._anchorOne, this._anchorTwo, {
+      description: "madrid base",
+      order: 1,
+    });
 
     let len = 0;
     const [len1, order1, last1] = this.MM(
