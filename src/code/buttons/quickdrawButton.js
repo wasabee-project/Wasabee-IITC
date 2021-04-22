@@ -297,6 +297,7 @@ const QuickDrawControl = L.Handler.extend({
         this._anchor2,
         wX("QDBASE"),
         this._operation.nextOrder,
+        false,
         this._nextDrawnLinksColor
       );
       this._tooltip.updateContent(this._getTooltipText());
@@ -316,6 +317,7 @@ const QuickDrawControl = L.Handler.extend({
       this._anchor1,
       null,
       this._operation.nextOrder,
+      false,
       this._nextDrawnLinksColor
     );
     this._operation.addLink(
@@ -323,6 +325,7 @@ const QuickDrawControl = L.Handler.extend({
       this._anchor2,
       null,
       this._operation.nextOrder,
+      false,
       this._nextDrawnLinksColor
     );
     this._tooltip.updateContent(this._getTooltipText());
@@ -364,6 +367,7 @@ const QuickDrawControl = L.Handler.extend({
         selectedPortal,
         null,
         this._throwOrder++,
+        false,
         this._nextDrawnLinksColor
       );
     }
@@ -394,6 +398,7 @@ const QuickDrawControl = L.Handler.extend({
         this._anchor,
         null,
         this._throwOrder++,
+        false,
         this._nextDrawnLinksColor
       );
     } else this._anchor = selectedPortal;
