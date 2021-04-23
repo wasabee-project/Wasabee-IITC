@@ -90,12 +90,10 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
         const operation = getSelectedOperation();
-        operation.addLink(
-          this._source,
-          this._anchor1,
-          this._desc.value,
-          operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor1, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       } else {
         alert("Select both Source and Anchor 1");
       }
@@ -134,12 +132,10 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
         const operation = getSelectedOperation();
-        operation.addLink(
-          this._source,
-          this._anchor2,
-          this._desc.value,
-          operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor2, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       } else {
         alert(wX("SEL_SRC_ANC2"));
       }
@@ -153,20 +149,16 @@ const LinkDialog = WDialog.extend({
       if (!this._source) alert(wX("SEL_SRC_PORT"));
       const operation = getSelectedOperation();
       if (this._anchor1) {
-        operation.addLink(
-          this._source,
-          this._anchor1,
-          this._desc.value,
-          operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor1, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       }
       if (this._anchor2) {
-        operation.addLink(
-          this._source,
-          this._anchor2,
-          this._desc.value,
-          operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor2, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       }
     });
     this._desc = L.DomUtil.create("input", "desc", container);

@@ -98,17 +98,13 @@ const SaveLinksDialog = WDialog.extend({
     for (const p of getAllPortalsLinked(operation, this._anchor)) {
       if (p.id == this._anchor.id) continue;
       if (p.comment === "out") {
-        operation.addLink(
-          this._anchor,
-          p,
-          "Save Links on Portal (Outbound from anchor)"
-        );
+        operation.addLink(this._anchor, p, {
+          description: "Save Links (Outbound from anchor)",
+        });
       } else {
-        operation.addLink(
-          p,
-          this._anchor,
-          "Save Links on Portal (Inbound to anchor)"
-        );
+        operation.addLink(p, this._anchor, {
+          description: "Save Links (Inbound to anchor)",
+        });
       }
     }
     operation.endBatchMode();

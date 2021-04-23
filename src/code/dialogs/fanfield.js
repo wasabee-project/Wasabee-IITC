@@ -203,7 +203,7 @@ const FanfieldDialog = WDialog.extend({
     for (let i = available.length - 1; i >= 0; i--) {
       const wp = available[i];
       order++;
-      op.addLink(wp, this._anchor, "fan anchor", order);
+      op.addLink(wp, this._anchor, { description: "fan anchor", order: order });
 
       // skip back links if first portal
       if (i + 1 == available.length) continue;
@@ -227,12 +227,18 @@ const FanfieldDialog = WDialog.extend({
         if (crossed) break;
       }
       j--;
-      op.addLink(wp, available[j], "fan subfield", ++order);
+      op.addLink(wp, available[j], {
+        description: "fan subfield",
+        order: ++order,
+      });
       fields++;
 
       for (var k = j - 1; k > i; k--) {
         const check = available[k];
-        op.addLink(wp, check, "fan double subfield", ++order);
+        op.addLink(wp, check, {
+          description: "fan double subfield",
+          order: ++order,
+        });
         fields += 2;
       }
       // remove covered portals

@@ -640,14 +640,8 @@ export default class WasabeeOp {
     return false;
   }
 
-  addLink(
-    fromPortal,
-    toPortal,
-    description,
-    order,
-    replace = false,
-    color = null
-  ) {
+  // options: {description,order,color,replace}
+  addLink(fromPortal, toPortal, options = {}) {
     console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
       console.debug(
@@ -662,26 +656,24 @@ export default class WasabeeOp {
     const existingLink = this.getLink(fromPortal, toPortal);
 
     const link =
-      existingLink && replace
+      existingLink && options.replace
         ? existingLink
         : new WasabeeLink(
             {
               fromPortalId: fromPortal.id,
               toPortalId: toPortal.id,
-              description: description,
-              throwOrderPos: order,
             },
             this
           );
-    link.description = description;
-    if (order) link.opOrder = order;
-    if (color) link.color = color;
+    if (options.description) link.description = options.description;
+    if (options.order) link.opOrder = options.order;
+    if (options.color) link.color = options.color;
 
     if (!existingLink) {
       this.links.push(link);
       this.update(true);
       this.runCrosslinks();
-    } else if (replace) {
+    } else if (options.replace) {
       this.update(true);
       this.runCrosslinks();
     } else {

@@ -148,7 +148,10 @@ const MultimaxDialog = WDialog.extend({
     );
 
     if (base)
-      this._operation.addLink(pOne, pTwo, commentPrefix + "base", ++order);
+      this._operation.addLink(pOne, pTwo, {
+        description: commentPrefix + "base",
+        oder: ++order,
+      });
 
     if (!Array.isArray(sequence) || !sequence.length) {
       // alert("No layers found");
@@ -163,10 +166,19 @@ const MultimaxDialog = WDialog.extend({
         console.log("skipping: " + node);
         continue;
       }
-      this._operation.addLink(p, pOne, commentPrefix + "link", ++order);
-      this._operation.addLink(p, pTwo, commentPrefix + "link", ++order);
+      this._operation.addLink(p, pOne, {
+        description: commentPrefix + "link",
+        order: ++order,
+      });
+      this._operation.addLink(p, pTwo, {
+        description: commentPrefix + "link",
+        order: ++order,
+      });
       if (this._flcheck.checked && prev) {
-        this._operation.addLink(p, prev, commentPrefix + "back link", ++order);
+        this._operation.addLink(p, prev, {
+          description: commentPrefix + "back link",
+          order: ++order,
+        });
       }
       prev = p;
     }
