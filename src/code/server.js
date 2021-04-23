@@ -86,8 +86,8 @@ export async function updateOpPromise(operation) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -168,8 +168,14 @@ export async function opPromise(opID) {
         raw = await response.json();
         return Promise.reject(wX("OP DELETED", opID) + ": " + raw.error);
       default:
-        raw = await response.text();
-        return Promise.reject(response.statusText, raw);
+        try {
+          const err = await response.json();
+          return Promise.reject(err.error);
+        } catch (e) {
+          console.error(e);
+          raw = await response.text();
+          return Promise.reject(raw);
+        }
     }
   } catch (e) {
     console.error(e);
@@ -439,8 +445,8 @@ async function genericPut(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -494,8 +500,8 @@ async function genericPost(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -549,8 +555,8 @@ async function genericDelete(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
