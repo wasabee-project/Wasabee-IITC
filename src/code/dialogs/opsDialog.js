@@ -29,7 +29,6 @@ const OpsDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabeeUIUpdate", this.update, this);
-    window.map.on("wasabee:op:background", this.update, this);
     window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
@@ -37,7 +36,6 @@ const OpsDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabeeUIUpdate", this.update, this);
-    window.map.off("wasabee:op:background", this.update, this);
     window.map.off("wasabee:op:delete", this.update, this);
   },
 
@@ -190,6 +188,10 @@ const OpsDialog = WDialog.extend({
             : "Show in background";
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
+            const background = ev.target;
+            background.title = !op.background
+              ? "Disable background"
+              : "Show in background";
             setOpBackground(op.id, !op.background);
           });
         },
