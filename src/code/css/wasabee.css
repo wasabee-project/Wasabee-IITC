@@ -900,3 +900,12 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 .ExcludeMarker {
   color: #000099;
 }
+
+.field-count li.empty-field-link div {
+  display: inline;
+  padding-left: 1em;
+}
+
+.field-count ul {
+  padding-left: 1em;
+}
