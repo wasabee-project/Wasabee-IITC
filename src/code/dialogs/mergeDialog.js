@@ -6,7 +6,7 @@ import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 const MergeDialog = WDialog.extend({
   statics: {
-    TYPE: "megeDialog",
+    TYPE: "mergeDialog",
   },
 
   options: {
@@ -30,21 +30,18 @@ const MergeDialog = WDialog.extend({
 
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);
-    desc.textContent =
-      `It seems that ${this.options.opOwn.name} has local changes. ` +
-      "Do you want to merge your modifications with the server OP or to replace the local version by the server version? " +
-      "(or leave it for later)";
+    desc.textContent = wX("MERGE_MESSAGE", this.options.opOwn.name);
     content.appendChild(this.formatSummary(summary));
 
     const details = L.DomUtil.create("div", "details", content);
     {
       const div = L.DomUtil.create("div", "local", details);
-      div.innerHTML = "<span>My changes</span>";
+      div.innerHTML = "<span>" + wX("MERGE_CHANGES_LOCAL") + "</span>";
       div.appendChild(this.formatChanges(changes, origin, this.options.opOwn));
     }
     {
       const div = L.DomUtil.create("div", "merge", details);
-      div.innerHTML = "<span>Merge changes</span>";
+      div.innerHTML = "<span>" + wX("MERGE_CHANGES_MERGE") + "</span>";
       div.appendChild(
         this.formatChanges(
           this._opRebase.changes(origin),
@@ -55,7 +52,7 @@ const MergeDialog = WDialog.extend({
     }
     {
       const div = L.DomUtil.create("div", "server", details);
-      div.innerHTML = "<span>Server changes</span>";
+      div.innerHTML = "<span>" + wX("MERGE_CHANGES_REMOTE") + "</span>";
       div.appendChild(
         this.formatChanges(
           this.options.opRemote.changes(origin),
@@ -67,7 +64,7 @@ const MergeDialog = WDialog.extend({
 
     const buttons = [];
     buttons.push({
-      text: "Rebase",
+      text: wX("MERGE_REBASE"),
       click: async () => {
         await this._opRebase.store();
         if (getSelectedOperation().ID == this._opRebase.ID)
@@ -76,7 +73,7 @@ const MergeDialog = WDialog.extend({
       },
     });
     buttons.push({
-      text: "Replace",
+      text: wX("MERGE_REPLACE"),
       click: async () => {
         await this.options.opRemote.store();
         if (getSelectedOperation().ID == this.options.opRemote.ID)
@@ -100,6 +97,7 @@ const MergeDialog = WDialog.extend({
   },
 
   formatSummary: function (summary) {
+    // wX
     const list = [];
     if (!summary.compatibility.ok)
       list.push(
