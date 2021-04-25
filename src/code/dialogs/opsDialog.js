@@ -182,12 +182,13 @@ const OpsDialog = WDialog.extend({
         sort: null,
         format: (cell, value, op) => {
           // background
-          const background = L.DomUtil.create("a", "", cell);
-          background.textContent = op.background ? "👀" : "☽";
+          const background = L.DomUtil.create("input", null, cell);
+          background.type = "checkbox";
+          background.checked = op.background;
           background.title = op.background
             ? "Disable background"
             : "Show in background";
-          L.DomEvent.on(cell, "click", (ev) => {
+          L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             setOpBackground(op.id, !op.background);
           });
