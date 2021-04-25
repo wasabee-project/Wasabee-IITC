@@ -301,7 +301,7 @@ const OperationChecklistDialog = WDialog.extend({
       b.add(link.fromPortalId);
 
       // ignore link with order 0
-      if (link.opOrder > 0 && intersect.size > 1) {
+      if (link.opOrder > 0) {
         // the link closes at least one field
         const p1 = operation.getPortal(link.fromPortalId);
         const p2 = operation.getPortal(link.toPortalId);
