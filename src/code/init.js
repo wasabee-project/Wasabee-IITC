@@ -77,7 +77,7 @@ window.plugin.wasabee.init = async () => {
   window.addLayerGroup(
     "Wasabee Background Ops",
     Wasabee.backgroundOpsGroup,
-    false
+    true
   );
 
   // standard hook, add our call to it
