@@ -136,6 +136,14 @@ W.static.selfBlockStyle = {
   weight: 3,
 };
 
+W.static.backgroundLinkStyle = {
+  dashArray: [8, 5],
+  opacity: 0.4,
+  weight: 2,
+  color: "green",
+  interactive: false,
+};
+
 W.static.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");
 
 // https://leafletjs.com/reference-1.0.3.html#path

@@ -1,7 +1,12 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import { drawMap, drawAgents } from "./mapDrawing";
+import {
+  drawMap,
+  drawAgents,
+  drawBackgroundOps,
+  drawBackgroundOp,
+} from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
 import { initFirebase, postToFirebase } from "./firebaseSupport";
@@ -11,6 +16,7 @@ import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
+import WasabeeOp from "./operation";
 import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
@@ -67,6 +73,13 @@ window.plugin.wasabee.init = async () => {
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
 
+  Wasabee.backgroundOpsGroup = new L.LayerGroup();
+  window.addLayerGroup(
+    "Wasabee Background Ops",
+    Wasabee.backgroundOpsGroup,
+    true
+  );
+
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
     drawAgents(Wasabee._selectedOp);
@@ -85,6 +98,18 @@ window.plugin.wasabee.init = async () => {
   window.addResumeFunction(() => {
     window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
     sendLocation();
+  });
+
+  window.map.on("wasabee:op:select", () => {
+    drawBackgroundOps();
+  });
+  window.map.on("wasabee:op:background", (data) => {
+    if (data.background) {
+      if (Wasabee._selectedOp && Wasabee._selectedOp.ID !== data.opID)
+        WasabeeOp.load(data.opID).then(drawBackgroundOp);
+    } else {
+      drawBackgroundOps();
+    }
   });
 
   // Android panes
@@ -106,6 +131,9 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.markerLayerGroup
     ) {
       window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
+    }
+    if (obj.layer === Wasabee.backgroundOpsGroup) {
+      drawBackgroundOps();
     }
   });
 
@@ -139,6 +167,9 @@ window.plugin.wasabee.init = async () => {
 
   // run crosslinks
   window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
+
+  // draw background ops
+  drawBackgroundOps();
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not

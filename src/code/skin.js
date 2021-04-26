@@ -9,6 +9,7 @@ export function initSkin() {
   Wasabee.skin.layerTypes = new Map(Wasabee.static.layerTypes);
   Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
   Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
+  Wasabee.skin.backgroundLinkStyle = Wasabee.static.backgroundLinkStyle;
   Wasabee.skin.anchorTemplate = Wasabee.static.anchorTemplate;
   Wasabee.skin.strings = Object.assign({}, Wasabee.static.strings);
 

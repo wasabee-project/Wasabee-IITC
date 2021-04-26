@@ -92,11 +92,8 @@ export default class WasabeeMarker {
     return this._state;
   }
 
-  async popupContent(marker) {
-    const operation = getSelectedOperation();
-    if (operation == null) {
-      console.log("null op in marker?");
-    }
+  async popupContent(marker, operation) {
+    if (!operation) operation = getSelectedOperation();
 
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {

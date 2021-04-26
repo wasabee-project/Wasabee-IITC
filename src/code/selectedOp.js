@@ -60,7 +60,9 @@ export async function loadNewDefaultOp() {
 // only this should write to _selectedOp
 export async function makeSelectedOperation(opID) {
   // _selectedOp is null at first load (or page reload), should never be after that
+  let previousID;
   if (window.plugin.wasabee._selectedOp != null) {
+    previousID = window.plugin.wasabee._selectedOp.ID;
     if (opID == window.plugin.wasabee._selectedOp.ID) {
       console.log(
         "makeSelectedOperation called on the current op; replacing with version from local store. not saving live changes first"
@@ -94,6 +96,11 @@ export async function makeSelectedOperation(opID) {
     { reason: "makeSelectedOperation" },
     false
   );
+  if (previousID !== opID)
+    window.map.fire("wasabee:op:select", {
+      previous: previousID,
+      current: opID,
+    });
   // return window.plugin.wasabee._selectedOp;
 }
 
@@ -140,6 +147,7 @@ export async function removeOperation(opID) {
   const ops = ol.filter((ID) => ID != opID);
   storeOpsList(ops);
   await WasabeeOp.delete(opID);
+  window.map.fire("wasabee:op:delete", opID);
 }
 
 //** This function adds an operation to the main list */
@@ -147,23 +155,30 @@ export async function addOperation(opID) {
   const ops = await opsList();
   if (!ops.includes(opID)) ops.push(opID);
   storeOpsList(ops);
+  window.map.fire("wasabee:op:add", opID);
 }
 
 //** This function shows an operation to the main list */
 export function showOperation(opID) {
-  const hiddenOps = hiddenOpsList().filter((ID) => ID != opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  const hiddenOps = hiddenOpsList();
+  if (hiddenOps.includes(opID)) {
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps.filter((ID) => ID != opID));
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: true });
+  }
 }
 
 //** This function hides an operation to the main list */
 export function hideOperation(opID) {
   const hiddenOps = hiddenOpsList();
-  if (!hiddenOps.includes(opID)) hiddenOps.push(opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  if (!hiddenOps.includes(opID)) {
+    hiddenOps.push(opID);
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps);
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: false });
+  }
 }
 
 export function resetHiddenOps() {
@@ -187,6 +202,18 @@ export function hiddenOpsList() {
   } catch {
     return [];
   }
+}
+
+export async function setOpBackground(opID, background) {
+  const sop = getSelectedOperation();
+  const op = sop.ID === opID ? sop : await WasabeeOp.load(opID);
+  if (op.background == background) return;
+  op.background = background;
+  await op.store();
+  window.map.fire("wasabee:op:background", {
+    opID: opID,
+    background: background,
+  });
 }
 
 export async function opsList(hidden = true) {

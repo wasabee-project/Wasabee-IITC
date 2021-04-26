@@ -714,6 +714,9 @@
 .wasabee-dialog-ops .wasabee-table .actions a {
     padding: .25em
 }
+.wasabee-dialog-ops .wasabee-table.hideOps .visibility {
+  display: none;
+}
 .wasabee-dialog-checklist {
 }
 .wasabee-dialog-perms {

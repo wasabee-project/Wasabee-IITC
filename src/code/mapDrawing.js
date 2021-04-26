@@ -2,8 +2,9 @@ import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
 import WasabeeAgent from "./agent";
+import WasabeeOp from "./operation";
 import { newColors } from "./auxiliar";
-import { getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation, opsList } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -104,6 +105,36 @@ function resetLinks(operation) {
 
   for (const l of operation.links) {
     addLink(l, operation);
+  }
+}
+
+export async function drawBackgroundOps(opIDs) {
+  if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
+  Wasabee.backgroundOpsGroup.clearLayers();
+
+  const sop = getSelectedOperation().ID;
+  if (opIDs === undefined) opIDs = await opsList();
+
+  for (const opID of opIDs) {
+    if (opID === sop) continue;
+    const op = await WasabeeOp.load(opID);
+    if (op.background) drawBackgroundOp(op);
+  }
+}
+
+export function drawBackgroundOp(operation, layerGroup, style) {
+  if (!operation) return;
+  if (!operation.links || operation.links.length == 0) return;
+
+  if (!layerGroup) layerGroup = Wasabee.backgroundOpsGroup;
+  if (!style) style = Wasabee.skin.backgroundLinkStyle;
+
+  for (const link of operation.links) {
+    const latLngs = link.getLatLngs(operation);
+    if (!latLngs) continue;
+
+    const newlink = new L.GeodesicPolyline(latLngs, style);
+    newlink.addTo(layerGroup);
   }
 }
 

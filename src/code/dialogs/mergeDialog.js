@@ -4,6 +4,7 @@ import WasabeeAgent from "../agent";
 import WasabeeOp from "../operation";
 import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import { drawBackgroundOp } from "../mapDrawing";
 
 const MergeDialog = WDialog.extend({
   statics: {
@@ -17,7 +18,14 @@ const MergeDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    this._layer = new L.LayerGroup();
+    this._layer.addTo(window.map);
     this._displayDialog();
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.addHooks.call(this);
+    this._layer.remove();
   },
 
   _displayDialog: function () {
@@ -28,6 +36,15 @@ const MergeDialog = WDialog.extend({
     this._opRebase.cleanAll();
     this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
     this._opRebase.localchanged = this.options.opOwn.localchanged;
+
+    const style = {
+      dashArray: [2, 8],
+      opacity: 0.86,
+      weight: 4,
+      color: "blue",
+      interactive: false,
+    };
+    drawBackgroundOp(this._opRebase, this._layer, style);
 
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);

@@ -48,6 +48,8 @@ export default class WasabeeOp {
 
     this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
 
+    this.background = !!obj.background;
+
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
     if (!this.blockers) this.blockers = new Array();
@@ -122,6 +124,7 @@ export default class WasabeeOp {
     json.blockers = this.blockers;
     json.keysonhand = this.keysonhand;
     json.teamlist = this.teamlist;
+    json.background = this.background;
 
     // store to localStorage -- for now
     // localStorage[this.ID] = JSON.stringify(json); // deactivated now
