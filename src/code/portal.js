@@ -23,8 +23,8 @@ export default class WasabeePortal {
     this.lat = (+obj.lat).toFixed(6);
     this.lng = (+obj.lng).toFixed(6);
 
-    this.comment = obj.comment;
-    this.hardness = obj.hardness;
+    this.comment = obj.comment ? obj.comment : "";
+    this.hardness = obj.hardness ? obj.hardness : "";
 
     this._latLng = new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
