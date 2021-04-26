@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
+import WasabeeAgent from "../agent";
 import WasabeeOp from "../operation";
 import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
@@ -182,7 +183,7 @@ const MergeDialog = WDialog.extend({
       {
         name: "Entry",
         value: (e) => e.data.type,
-        format: (cell, value, e) => {
+        format: async (cell, value, e) => {
           const op = e.type === "-" ? origin : operation;
           if (e.data.type === "link") {
             cell.appendChild(e.data.link.displayFormat(op));
@@ -196,9 +197,22 @@ const MergeDialog = WDialog.extend({
           }
           if (e.type === "~") {
             const pre = L.DomUtil.create("code", null, cell);
-            const diff = e.data.diff.map((a) =>
-              a[0].endsWith("ortalId") ? [a[0], origin.getPortal(a[1]).name] : a
-            );
+            const diff = [];
+            for (const [k, v] of e.data.diff) {
+              let item = e.data.link || e.data.portal || e.data.marker;
+              let prev = v;
+              let cur = item[k];
+              if (k.endsWith("ortalId")) {
+                prev = origin.getPortal(prev).name;
+                cur = operation.getPortal(cur).name;
+              } else if (k === "assignedTo") {
+                if (prev !== "") prev = await WasabeeAgent.get(prev);
+                if (cur !== "") cur = await WasabeeAgent.get(cur);
+                if (prev) prev = prev.name;
+                if (cur) cur = cur.name;
+              }
+              diff.push([k, prev, cur]);
+            }
             pre.textContent = JSON.stringify(diff);
           }
         },
