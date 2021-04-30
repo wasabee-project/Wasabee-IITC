@@ -202,6 +202,7 @@ const UploadButton = WButton.extend({
             const md = new ConfirmDialog({
               title: wX("UPDATE_CONFLICT_TITLE"),
               label: wX("UPDATE_CONFLICT_DESC"),
+              type: "operation",
               callback: () => this.doUpdate(getSelectedOperation(), true),
             });
             md.enable();
@@ -215,6 +216,7 @@ const UploadButton = WButton.extend({
             const md = new ConfirmDialog({
               title: wX("UPDATE_CONFLICT_TITLE"),
               label: message,
+              type: "operation",
               callback: () => this.doUpdate(lastOp),
             });
             md.enable();

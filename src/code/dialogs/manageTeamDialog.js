@@ -109,6 +109,7 @@ const ManageTeamDialog = WDialog.extend({
             const con = new ConfirmDialog({
               title: `${button.textContent}: ${obj.name}`,
               label: `${button.textContent}: ${obj.name}?`,
+              type: "agent",
               callback: async () => {
                 try {
                   await removeAgentFromTeamPromise(value, this.options.team.ID);
@@ -290,6 +291,7 @@ const ManageTeamDialog = WDialog.extend({
       const cd = new ConfirmDialog({
         title: wX("REMOVE_TEAM_CONFIRM_TITLE", this.options.team.Name),
         label: wX("REMOVE_TEAM_CONFIRM_LABEL", this.options.team.Name),
+        type: "team",
         callback: async () => {
           try {
             await deleteTeamPromise(this.options.team.ID);

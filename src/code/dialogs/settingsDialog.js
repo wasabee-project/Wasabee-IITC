@@ -102,11 +102,15 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
     );
 
-    this._addCheckBox(
+    this._addSelect(
       container,
-      "Expert Mode",
-      "wasabee-setting-expert",
-      window.plugin.wasabee.static.constants.EXPERT_MODE_KEY
+      wX("SKIP_CONFIRM"),
+      window.plugin.wasabee.static.constants.SKIP_CONFIRM,
+      [
+        [wX("SKIP_CONFIRM_NEVER"), "never"],
+        [wX("SKIP_CONFIRM_ENTITY"), "entity"],
+        [wX("SKIP_CONFIRM_ALWAYS"), "always"],
+      ]
     );
 
     this._addCheckBox(

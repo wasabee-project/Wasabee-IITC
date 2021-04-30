@@ -43,6 +43,7 @@ export function swapPortal(operation, portal) {
   const con = new ConfirmDialog({
     title: wX("SWAP TITLE"),
     label: pr,
+    type: "anchor",
     callback: () => {
       operation.swapPortal(portal, selectedPortal);
     },
@@ -57,6 +58,7 @@ export function deletePortal(operation, portal) {
   const con = new ConfirmDialog({
     title: wX("DELETE ANCHOR TITLE"),
     label: pr,
+    type: "anchor",
     callback: () => {
       operation.removeAnchor(portal.id);
     },
@@ -71,6 +73,7 @@ export function deleteMarker(operation, marker, portal) {
   const con = new ConfirmDialog({
     title: wX("DELETE MARKER TITLE"),
     label: pr,
+    type: "marker",
     callback: () => {
       operation.removeMarker(marker);
     },
@@ -82,6 +85,7 @@ export function clearAllItems(operation) {
   const con = new ConfirmDialog({
     title: `Clear: ${operation.name}`,
     label: `Do you want to reset ${operation.name}?`,
+    type: "operation",
     callback: () => {
       operation.clearAllItems();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
@@ -94,6 +98,7 @@ export function clearAllLinks(operation) {
   const con = new ConfirmDialog({
     title: `Clear Links: ${operation.name}`,
     label: `Do you want to remove all links from ${operation.name}?`,
+    type: "operation",
     callback: () => {
       operation.clearAllLinks();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
@@ -106,6 +111,7 @@ export function clearAllMarkers(operation) {
   const con = new ConfirmDialog({
     title: `Clear Markers: ${operation.name}`,
     label: `Do you want to remove all markers from ${operation.name}?`,
+    type: "operation",
     callback: () => {
       operation.clearAllMarkers();
       window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
@@ -471,6 +477,7 @@ export function deleteLocalOp(opname, opid) {
   const con = new ConfirmDialog({
     title: wX("REM_LOC_CP", opname),
     label: wX("YESNO_DEL", opname),
+    type: "operation",
     callback: async () => {
       await removeOperation(opid);
       const newop = await changeOpIfNeeded();

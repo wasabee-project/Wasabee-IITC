@@ -120,6 +120,7 @@ const WasabeeButton = WButton.extend({
           const con = new ConfirmDialog({
             title: wX("CLEAROPS BUTTON TITLE"),
             label: wX("CLEAROPS PROMPT"),
+            type: "operation",
             callback: async () => {
               await resetCaches();
               await resetOps();
