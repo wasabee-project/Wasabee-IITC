@@ -37,84 +37,89 @@ const SettingsDialog = WDialog.extend({
     // TODO also update the title
   },
 
+  _addCheckBox(container, label, id, storageKey, onChange) {
+    const title = L.DomUtil.create("label", null, container);
+    title.textContent = label;
+    title.htmlFor = id;
+    const check = L.DomUtil.create("input", null, container);
+    check.type = "checkbox";
+    check.id = id;
+    const sl = localStorage[storageKey];
+    if (sl === "true") check.checked = true;
+    L.DomEvent.on(check, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      localStorage[storageKey] = check.checked;
+      if (onChange) onChange(check.checked);
+    });
+  },
+
+  _addSelect(container, label, storageKey, options, onChange) {
+    const title = L.DomUtil.create("label", null, container);
+    title.textContent = label;
+    const select = L.DomUtil.create("select", null, container);
+
+    const current = localStorage[storageKey];
+    for (const [k, v] of options) {
+      const option = L.DomUtil.create("option", null, select);
+      option.textContent = k;
+      option.value = v;
+      if (v == current) option.selected = true;
+    }
+    L.DomEvent.on(select, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      localStorage[storageKey] = select.value;
+      if (onChange) onChange(select.value);
+    });
+  },
+
   _getContent: function () {
     // use leaflet's DOM object creation, not bare DOM or Jquery
     const container = L.DomUtil.create("div", "container");
-    const langLabel = L.DomUtil.create("label", null, container);
-    langLabel.textContent = wX("LANG");
-    const langMenu = L.DomUtil.create("select", null, container);
 
-    const current =
-      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY];
+    const strings = [];
     for (const l in window.plugin.wasabee.skin.strings) {
-      const option = L.DomUtil.create("option", null, langMenu);
-      option.value = l;
-      option.textContent = l;
-      if (l == current) option.selected = true;
+      strings.push([l, l]);
     }
-    L.DomEvent.on(langMenu, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[window.plugin.wasabee.static.constants.LANGUAGE_KEY] =
-        langMenu.value;
-      addButtons();
-      window.map.fire("wasabeeUIUpdate", { reason: "settings dialog" }, false);
-    });
+    this._addSelect(
+      container,
+      wX("LANG"),
+      window.plugin.wasabee.static.constants.LANGUAGE_KEY,
+      strings,
+      () => {
+        addButtons();
+        window.map.fire(
+          "wasabeeUIUpdate",
+          { reason: "settings dialog" },
+          false
+        );
+      }
+    );
 
-    const sendLocTitle = L.DomUtil.create("label", null, container);
-    sendLocTitle.textContent = wX("SEND LOCATION");
-    sendLocTitle.htmlFor = "wasabee-setting-sendloc";
-    const sendLocCheck = L.DomUtil.create("input", null, container);
-    sendLocCheck.type = "checkbox";
-    sendLocCheck.id = "wasabee-setting-sendloc";
-    const c = window.plugin.wasabee.static.constants.SEND_LOCATION_KEY;
-    const sl = localStorage[c];
-    if (sl === "true") sendLocCheck.checked = true;
-    L.DomEvent.on(sendLocCheck, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[c] = sendLocCheck.checked;
-    });
+    this._addCheckBox(
+      container,
+      wX("SEND LOCATION"),
+      "wasabee-setting-sendloc",
+      window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+    );
 
-    const expertTitle = L.DomUtil.create("label", null, container);
-    expertTitle.textContent = "Expert Mode"; // wX("SEND LOCATION");
-    expertTitle.htmlFor = "wasabee-setting-expert";
-    const expertCheck = L.DomUtil.create("input", null, container);
-    expertCheck.type = "checkbox";
-    expertCheck.id = "wasabee-setting-expert";
-    const exm = window.plugin.wasabee.static.constants.EXPERT_MODE_KEY;
-    const ex = localStorage[exm];
-    if (ex === "true") expertCheck.checked = true;
-    L.DomEvent.on(expertCheck, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[exm] = expertCheck.checked;
-    });
+    this._addCheckBox(
+      container,
+      "Expert Mode",
+      "wasabee-setting-expert",
+      window.plugin.wasabee.static.constants.EXPERT_MODE_KEY
+    );
 
-    const analyticsTitle = L.DomUtil.create("label", null, container);
-    analyticsTitle.textContent = wX("SEND ANALYTICS");
-    analyticsTitle.htmlFor = "wasabee-setting-analytics";
-    const analyticsCheck = L.DomUtil.create("input", null, container);
-    analyticsCheck.type = "checkbox";
-    analyticsCheck.id = "wasabee-setting-analytics";
-    if (
-      localStorage[
-        window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
-      ] === "true"
-    )
-      analyticsCheck.checked = true;
-    L.DomEvent.on(analyticsCheck, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] =
-        analyticsCheck.checked;
-    });
+    this._addCheckBox(
+      container,
+      wX("SEND ANALYTICS"),
+      "wasabee-setting-analytics",
+      window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
+    );
 
-    const urpTitle = L.DomUtil.create("label", null, container);
-    urpTitle.textContent = "Multimax test point";
-    const urpSelect = L.DomUtil.create("select", null, container);
     const urpKey =
       window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY;
-    let urp = localStorage[urpKey];
-    if (!urp) {
-      urp = '{"lat": -74.2,"lng:"-143.4}';
-      localStorage[urpKey] = urp;
+    if (!localStorage[urpKey]) {
+      localStorage[urpKey] = '{"lat": -74.2,"lng:"-143.4}';
     }
     const pairs = [
       ["Antarctic West", '{"lat":-74.2,"lng":-143.4}'],
@@ -123,63 +128,28 @@ const SettingsDialog = WDialog.extend({
       ["Arctic West", '{"lat":74.2,"lng":-143.4}'],
       ["Arctic East", '{"lat":78.5,"lng":143.4}'],
     ];
-    for (const [k, v] of pairs) {
-      const option = L.DomUtil.create("option", null, urpSelect);
-      option.textContent = k;
-      option.value = v;
-      if (urp == v) option.selected = true;
-    }
-    L.DomEvent.on(urpSelect, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[urpKey] = urpSelect.value;
-    });
+    this._addSelect(container, "Multimax test point", urpKey, pairs);
 
-    const rebaseUpdateTitle = L.DomUtil.create("label", null, container);
-    rebaseUpdateTitle.textContent =
-      "Rebase on update (alpha, may break your op)";
-    rebaseUpdateTitle.htmlFor = "wasabee-setting-rebase-update";
-    const rebaseUpdateCheck = L.DomUtil.create("input", null, container);
-    rebaseUpdateCheck.type = "checkbox";
-    rebaseUpdateCheck.id = "wasabee-setting-rebase-update";
-    const ruc = window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY;
-    const ru = localStorage[ruc];
-    if (ru === "true") rebaseUpdateCheck.checked = true;
-    L.DomEvent.on(rebaseUpdateCheck, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[ruc] = rebaseUpdateCheck.checked;
-    });
+    this._addCheckBox(
+      container,
+      "Rebase on update (alpha, may break your op)",
+      "wasabee-setting-rebase-update",
+      window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY
+    );
 
-    const autoLoadTitle = L.DomUtil.create("label", null, container);
-    autoLoadTitle.textContent = wX("AUTOLOAD");
-    autoLoadTitle.htmlFor = "wasabee-setting-autoload";
-    const autoLoadCheck = L.DomUtil.create("input", null, container);
-    autoLoadCheck.type = "checkbox";
-    autoLoadCheck.id = "wasabee-setting-autoload";
-    const alc = window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED;
-    const al = localStorage[alc];
-    if (al === "true") autoLoadCheck.checked = true;
-    L.DomEvent.on(autoLoadCheck, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[alc] = autoLoadCheck.checked;
-    });
+    this._addCheckBox(
+      container,
+      wX("AUTOLOAD"),
+      "wasabee-setting-autoload",
+      window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED
+    );
 
-    const pdqTitle = L.DomUtil.create("label", null, container);
-    pdqTitle.textContent = wX("AUTOLOAD_RATE");
-    const pdqSelect = L.DomUtil.create("select", null, container);
-    const pdqKey =
-      window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY;
-    let pdq = localStorage[pdqKey] || 1000;
-    const pdqOpts = [1, 100, 250, 500, 750, 1000];
-    for (const p of pdqOpts) {
-      const option = L.DomUtil.create("option", null, pdqSelect);
-      option.textContent = p;
-      option.value = p;
-      if (pdq == p) option.selected = true;
-    }
-    L.DomEvent.on(pdqSelect, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[pdqKey] = pdqSelect.value;
-    });
+    this._addSelect(
+      container,
+      wX("AUTOLOAD_RATE"),
+      window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY,
+      [1, 100, 250, 500, 750, 1000].map((v) => [v, v])
+    );
 
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
@@ -189,41 +159,20 @@ const SettingsDialog = WDialog.extend({
       this.setServer();
     });
 
-    const trawlTitle = L.DomUtil.create("label", null, container);
-    trawlTitle.textContent = "Trawl Skip Tiles";
-    const trawlSelect = L.DomUtil.create("select", null, container);
-    const tss = Number(
-      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
+    this._addSelect(
+      container,
+      "Trawl Skip Tiles",
+      window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
-    let trawlCount = 0;
-    while (trawlCount < 15) {
-      const option = L.DomUtil.create("option", null, trawlSelect);
-      option.textContent = trawlCount;
-      option.value = trawlCount;
-      if (tss == trawlCount) option.selected = true;
-      trawlCount++;
-    }
-    L.DomEvent.on(trawlSelect, "change", (ev) => {
-      L.DomEvent.stop(ev);
-      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] =
-        trawlSelect.value;
-    });
 
     if (window.isSmartphone()) {
-      const panesTitle = L.DomUtil.create("label", null, container);
-      // XXX:  wX
-      panesTitle.textContent = "Use panes (need reload)";
-      panesTitle.htmlFor = "wasabee-setting-usepanes";
-      const panesCheck = L.DomUtil.create("input", null, container);
-      panesCheck.type = "checkbox";
-      panesCheck.id = "wasabee-setting-usepanes";
-      const exm = window.plugin.wasabee.static.constants.USE_PANES;
-      const ex = localStorage[exm];
-      if (ex === "true") panesCheck.checked = true;
-      L.DomEvent.on(panesCheck, "change", (ev) => {
-        L.DomEvent.stop(ev);
-        localStorage[exm] = panesCheck.checked;
-      });
+      this._addCheckBox(
+        container,
+        "Use panes (need reload)",
+        "wasabee-setting-usepanes",
+        window.plugin.wasabee.static.constants.USE_PANES
+      );
     }
 
     const skinsButton = L.DomUtil.create("button", null, container);

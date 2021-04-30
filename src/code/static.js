@@ -37,6 +37,7 @@ W.static = {
     autodraws: "wasabee-autodraws",
     starburst: "wasabee-starburst",
     savelinks: "wasabee-savelinks",
+    settings: "wasabee-settings",
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
