@@ -70,7 +70,7 @@ const UploadButton = WButton.extend({
     const operation = getSelectedOperation();
     if (!operation.IsServerOp()) {
       this._visible();
-      this.title = wX("UPLOAD BUTTON HOVER", operation.name);
+      this.title = wX("UPLOAD BUTTON HOVER", { opName: operation.name });
       this.button.title = this.title;
       return;
     }
@@ -84,20 +84,20 @@ const UploadButton = WButton.extend({
 
     if (!operation.localchanged) {
       this._invisible();
-      this.title = wX("UPDATE HOVER NOT CHANGED", operation.name);
+      this.title = wX("UPDATE HOVER NOT CHANGED", { opName: operation.name });
       this.button.title = this.title;
       return;
     }
 
     if (operation.server && operation.server != GetWasabeeServer()) {
       this._invisible();
-      this.title = wX("UPDATE HOVER WRONG SERVER", operation.name);
+      this.title = wX("UPDATE HOVER WRONG SERVER", { opName: operation.name });
       this.button.title = this.title;
       return;
     }
 
     this._visible();
-    this.title = wX("UPDATE HOVER", operation.name);
+    this.title = wX("UPDATE HOVER", { opName: operation.name });
     this.button.title = this.title;
   },
 

@@ -49,7 +49,7 @@ export async function changeOpIfNeeded() {
 export async function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
     creator: PLAYER.nickname,
-    name: wX("DEFAULT OP NAME", new Date().toGMTString()),
+    name: wX("DEFAULT OP NAME", { name: new Date().toGMTString() }),
   });
   await newOp.store();
   await makeSelectedOperation(newOp.ID);

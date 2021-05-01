@@ -256,7 +256,7 @@ const AuthDialog = WDialog.extend({
                 method: "gsapiAuth (immediate_failed)",
               });
             } catch (e) {
-              alert(wX("AUTH TOKEN REJECTED", e.toString()));
+              alert(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
               console.error(e);
               this.closeDialog();
             }

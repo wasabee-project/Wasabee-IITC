@@ -3,7 +3,9 @@ let strings = window.plugin.wasabee.static.strings;
 const defaultLang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
 const localStoreKey = window.plugin.wasabee.static.constants.LANGUAGE_KEY;
 
-export function wX(key, value, option) {
+const templateRe = /\{ *([\w_ -]+) *\}/g;
+
+export function wX(key, data) {
   const lang = getLanguage();
 
   // if the skin system is initialized, switch to it
@@ -28,12 +30,11 @@ export function wX(key, value, option) {
   }
   if (!s) s = `${key} not in ${lang} or ${defaultLang}`;
 
-  // do any necessary replacements
-  // eslint-disable-next-line
-  if (option !== undefined) s = s.replace("${option}", option);
-  // eslint-disable-next-line
-  if (value !== undefined) s = s.replace("${value}", value);
-  return s;
+  return s.replace(templateRe, function (str, key) {
+    const value = data[key];
+    if (value === undefined) return `{${key}}`;
+    return value;
+  });
 }
 
 export function getLanguage() {

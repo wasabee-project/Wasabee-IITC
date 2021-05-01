@@ -79,8 +79,8 @@ export default class WasabeePortal {
   }
 
   get displayName() {
-    if (this.pureFaked) return wX("FAKED", this.id);
-    if (this.loading) return wX("LOADING1", this.id);
+    if (this.pureFaked) return wX("FAKED", { id: this.id });
+    if (this.loading) return wX("LOADING1", { guid: this.id });
     return this.name;
   }
 

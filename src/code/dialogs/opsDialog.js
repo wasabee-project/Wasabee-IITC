@@ -208,7 +208,7 @@ const OpsDialog = WDialog.extend({
           const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
           deleteLocaly.textContent = "🗑️";
-          deleteLocaly.title = wX("REM_LOC_CP", op.name);
+          deleteLocaly.title = wX("REM_LOC_CP", { name: op.name });
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
             deleteLocalOp(op.name, op.id);

@@ -41,7 +41,7 @@ const KeyListPortal = WDialog.extend({
     const portal = op.getPortal(this.options.portalID);
 
     this.createDialog({
-      title: wX("PORTAL KEY LIST", portal.displayName),
+      title: wX("PORTAL KEY LIST", { name: portal.displayName }),
       html: this.getListDialogContent(this.options.portalID),
       width: "auto",
       dialogClass: "keylistportal",
@@ -63,7 +63,7 @@ const KeyListPortal = WDialog.extend({
 
     const table = this.getListDialogContent(this.options.portalID);
     this.setContent(table);
-    this.setTitle(wX("PORTAL KEY LIST", portal.displayName));
+    this.setTitle(wX("PORTAL KEY LIST", { name: portal.displayName }));
   },
 
   getSortable: function () {

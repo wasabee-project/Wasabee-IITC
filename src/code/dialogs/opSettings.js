@@ -173,18 +173,19 @@ const OpSettingDialog = WDialog.extend({
         selectedOp.IsOnCurrentServer()
       )
         deleteButton.textContent =
-          wX("DELETE_OP", selectedOp.name) + wX("LOCFRMSER");
-      else deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
+          wX("DELETE_OP", { name: selectedOp.name }) + wX("LOCFRMSER");
+      else
+        deleteButton.textContent = wX("REM_LOC_CP", { name: selectedOp.name });
     } else {
-      deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
+      deleteButton.textContent = wX("DELETE_OP", { name: selectedOp.name });
     }
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       // this should be moved to uiCommands
       const so = getSelectedOperation();
       const con = new ConfirmDialog({
-        title: wX("CON_DEL", so.name),
-        label: wX("YESNO_DEL", so.name),
+        title: wX("CON_DEL", { name: so.name }),
+        label: wX("YESNO_DEL", { name: so.name }),
         type: "operation",
         callback: async () => {
           if (
