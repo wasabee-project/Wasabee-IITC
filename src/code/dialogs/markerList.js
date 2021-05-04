@@ -49,7 +49,7 @@ const MarkerList = WDialog.extend({
     };
 
     this.createDialog({
-      title: wX("MARKER_LIST", operation.name),
+      title: wX("MARKER_LIST", { opName: operation.name }),
       html: this.getListDialogContent(operation).table,
       width: "auto",
       dialogClass: "markerlist",
@@ -63,7 +63,7 @@ const MarkerList = WDialog.extend({
     if (operation.ID != this._opID) console.log("op changed");
     const table = this.getListDialogContent(operation).table;
     this.setContent(table);
-    this.setTitle(wX("MARKER_LIST", operation.name));
+    this.setTitle(wX("MARKER_LIST", { opName: operation.name }));
   },
 
   getListDialogContent: function (operation) {

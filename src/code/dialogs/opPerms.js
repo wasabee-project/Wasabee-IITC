@@ -97,7 +97,7 @@ const OpPermList = WDialog.extend({
     };
 
     this.createDialog({
-      title: wX("PERMS", operation.name),
+      title: wX("PERMS", { opName: operation.name }),
       html: this._html,
       height: "auto",
       dialogClass: "perms",

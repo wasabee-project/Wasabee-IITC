@@ -117,7 +117,7 @@ const ImportDialog = WDialog.extend({
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
+        newop.name = wX("IMPORT_OP_TITLE", { date: new Date().toGMTString() });
       }
 
       // needs to be saved, but not update UI
@@ -142,7 +142,7 @@ const ImportDialog = WDialog.extend({
       const importedOp = new WasabeeOp(data);
       await importedOp.store();
       await makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
+      alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);
       alert(wX("IMP_NOPE"));

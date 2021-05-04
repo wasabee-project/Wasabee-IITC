@@ -153,7 +153,7 @@ const ManageTeamDialog = WDialog.extend({
     const container = this._dialogContent(); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this.setContent(container);
-    this.setTitle(wX("MANAGE_TEAM", this.options.team.Name));
+    this.setTitle(wX("MANAGE_TEAM", { teamName: this.options.team.Name }));
   },
 
   _dialogContent: function () {
@@ -289,9 +289,12 @@ const ManageTeamDialog = WDialog.extend({
     L.DomEvent.on(removeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const cd = new ConfirmDialog({
-        title: wX("REMOVE_TEAM_CONFIRM_TITLE", this.options.team.Name),
-        label: wX("REMOVE_TEAM_CONFIRM_LABEL", this.options.team.Name),
-        type: "team",
+        title: wX("REMOVE_TEAM_CONFIRM_TITLE", {
+          teamName: this.options.team.Name,
+        }),
+        label: wX("REMOVE_TEAM_CONFIRM_LABEL", {
+          teamName: this.options.team.Name,
+        }),
         callback: async () => {
           try {
             await deleteTeamPromise(this.options.team.ID);
@@ -331,7 +334,7 @@ const ManageTeamDialog = WDialog.extend({
     };
 
     this.createDialog({
-      title: wX("MANAGE_TEAM", this.options.team.Name),
+      title: wX("MANAGE_TEAM", { teamName: this.options.team.Name }),
       width: "auto",
       html: container,
       dialogClass: "manageteam",

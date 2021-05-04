@@ -29,7 +29,9 @@ const SkinDialog = WDialog.extend({
     desc.textContent = wX("SKINS_DESCRIPTION");
 
     const skinsAvailable = L.DomUtil.create("div", "desc", container);
-    skinsAvailable.textContent = wX("SKINS_AVAILABLE", this._skinSet.size);
+    skinsAvailable.textContent = wX("SKINS_AVAILABLE", {
+      count: this._skinSet.size,
+    });
 
     const leftList = L.DomUtil.create("ol", "left skin-list", container);
     const rightList = L.DomUtil.create("ul", "right skin-list", container);

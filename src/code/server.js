@@ -78,7 +78,7 @@ export async function updateOpPromise(operation) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -158,15 +158,19 @@ export async function opPromise(opID) {
       case 401:
         WasabeeMe.purge();
         raw = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", raw.error));
+        return Promise.reject(wX("NOT LOGGED IN", { error: raw.error }));
       case 403:
         await removeOperation(opID);
         raw = await response.json();
-        return Promise.reject(wX("OP PERM DENIED", opID) + ": " + raw.error);
+        return Promise.reject(
+          wX("OP PERM DENIED", { opID: opID }) + ": " + raw.error
+        );
       case 410:
         await removeOperation(opID);
         raw = await response.json();
-        return Promise.reject(wX("OP DELETED", opID) + ": " + raw.error);
+        return Promise.reject(
+          wX("OP DELETED", { opID: opID }) + ": " + raw.error
+        );
       default:
         try {
           const err = await response.json();
@@ -437,7 +441,7 @@ async function genericPut(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -492,7 +496,7 @@ async function genericPost(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -547,7 +551,7 @@ async function genericDelete(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -600,7 +604,7 @@ async function genericGet(url) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);

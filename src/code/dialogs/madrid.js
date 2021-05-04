@@ -55,20 +55,18 @@ const MadridDialog = MultimaxDialog.extend({
     setOneButton.textContent = wX("SET");
     this._setOneDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetOne) {
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
+      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetOne.length,
+      });
     } else {
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
       this._portalSetOne = getAllPortalsOnScreen(getSelectedOperation());
       // XXX this is not enough, need to cache them in case IITC purges them
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
+      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetOne.length,
+      });
     });
 
     const anchorTwoLabel = L.DomUtil.create("label", null, container);
@@ -104,20 +102,18 @@ const MadridDialog = MultimaxDialog.extend({
     setTwoButton.textContent = wX("SET");
     this._setTwoDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetTwo) {
-      this._setTwoDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetTwo.length
-      );
+      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetTwo.length,
+      });
     } else {
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
       this._portalSetTwo = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
-      this._setTwoDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetTwo.length
-      );
+      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetTwo.length,
+      });
     });
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
@@ -131,20 +127,18 @@ const MadridDialog = MultimaxDialog.extend({
     setThreeButton.textContent = wX("SET");
     this._setThreeDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetThree) {
-      this._setThreeDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetThree.length
-      );
+      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetThree.length,
+      });
     } else {
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
       this._portalSetThree = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
-      this._setThreeDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetThree.length
-      );
+      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetThree.length,
+      });
     });
 
     //Add backlinks after all the rest is set up

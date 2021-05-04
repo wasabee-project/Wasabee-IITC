@@ -475,8 +475,8 @@ export async function syncOp(opID) {
 
 export function deleteLocalOp(opname, opid) {
   const con = new ConfirmDialog({
-    title: wX("REM_LOC_CP", opname),
-    label: wX("YESNO_DEL", opname),
+    title: wX("REM_LOC_CP", { opName: opname }),
+    label: wX("YESNO_DEL", { opName: opname }),
     type: "operation",
     callback: async () => {
       await removeOperation(opid);

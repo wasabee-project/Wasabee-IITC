@@ -28,7 +28,7 @@ const TrawlDialog = WDialog.extend({
     warning.textContent = wX("TRAWLING", tiles);
     const stat = L.DomUtil.create("div", null, container);
     this.remaining = L.DomUtil.create("span", null, stat);
-    this.remaining.textContent = wX("TRAWL_REMAINING", tiles);
+    this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
 
     // same as dialogs/settings.js
     const trawlTitle = L.DomUtil.create("label", null, container);
@@ -68,7 +68,7 @@ const TrawlDialog = WDialog.extend({
 
   _updateTrawlerDialog: function (tiles) {
     if (this && this.remaining)
-      this.remaining.textContent = wX("TRAWL_REMAINING", tiles);
+      this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
   },
 
   // define our work in _displayDialog

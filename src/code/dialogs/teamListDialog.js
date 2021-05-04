@@ -188,7 +188,7 @@ const TeamListDialog = WDialog.extend({
           }
           try {
             await newTeamPromise(newname);
-            alert(wX("TEAM_CREATED", newname));
+            alert(wX("TEAM_CREATED", { teamName: newname }));
             await WasabeeMe.waitGet(true); // triggers UIUpdate
           } catch (e) {
             console.error(e);

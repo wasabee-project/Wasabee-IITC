@@ -41,7 +41,7 @@ const KeysList = WDialog.extend({
     };
 
     this.createDialog({
-      title: wX("KEY_LIST2", operation.name),
+      title: wX("KEY_LIST2", { opName: operation.name }),
       html: this.getListDialogContent(operation, 0, false).table,
       width: "auto",
       dialogClass: "keyslist",
@@ -58,7 +58,7 @@ const KeysList = WDialog.extend({
     if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
     else this._me = null;
 
-    this.setTitle(wX("KEY_LIST", operation.name));
+    this.setTitle(wX("KEY_LIST2", { opName: operation.name }));
     const table = this.getListDialogContent(
       operation,
       this.sortable.sortBy,

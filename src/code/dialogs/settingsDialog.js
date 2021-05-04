@@ -156,7 +156,7 @@ const SettingsDialog = WDialog.extend({
     );
 
     const serverInfo = L.DomUtil.create("button", "server", container);
-    serverInfo.textContent = wX("WSERVER", GetWasabeeServer());
+    serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
     serverInfo.href = "#";
     L.DomEvent.on(serverInfo, "click", (ev) => {
       L.DomEvent.stop(ev);

@@ -191,7 +191,10 @@ export default class WasabeeAgent {
 
       const d = new ConfirmDialog({
         title: wX("SEND TARGET"),
-        label: wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
+        label: wX("SEND TARGET CONFIRM", {
+          portalName: selectedPortal.displayName,
+          agent: this.name,
+        }),
         type: "agent",
         callback: async () => {
           try {
@@ -258,11 +261,11 @@ export default class WasabeeAgent {
 
     if (interval > 1) return wX("AGES");
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) return wX("HOURS", interval);
+    if (interval > 1) return wX("HOURS", { hours: interval });
     interval = Math.floor(seconds / 60);
-    if (interval > 1) return wX("MINUTES", interval);
+    if (interval > 1) return wX("MINUTES", { minutes: interval });
     interval = Math.floor(seconds);
-    return wX("SECONDS", interval);
+    return wX("SECONDS", { seconds: interval });
   }
 
   // change this to return an L.Marker() to make the logic in mapDrawing simpler
@@ -308,7 +311,7 @@ export default class WasabeeAgent {
     icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     icon.setAttribute("viewBox", "0 0 52 68");
     icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
-      <path fill="yellow" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <path fill="yellow" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" />
       <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
       <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
     return icon;
@@ -320,7 +323,7 @@ export default class WasabeeAgent {
     icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     icon.setAttribute("viewBox", "0 0 52 68");
     icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
-      <path fill="orange" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <path fill="orange" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" />
       <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
       <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
     return icon;
@@ -331,7 +334,7 @@ export default class WasabeeAgent {
     icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     icon.setAttribute("viewBox", "0 0 52 68");
     icon.innerHTML = `<defs><clipPath id="circleView"><circle fill="#fff" cx="26" cy="26" r="23" /></clipPath></defs>
-      <path fill="red" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" /> 
+      <path fill="red" stroke="#aaa" stroke-width="1" stroke-opacity="0.6" d="M 51 26 a 25 25 90 0 0 -50 0 c 0 11 5 20 10 25 l 12 12 c 3 3 3 3 6 0 l 11 -12 c 5 -5 11 -14 11 -25 z" />
       <circle fill="#fff" cx="26" cy="26" r="24" opacity="0.8" />
       <image x="2.5" y="2.5" width="47" height="47" href="${this.pic}" clip-path="url(#circleView)" />`;
     return icon;
