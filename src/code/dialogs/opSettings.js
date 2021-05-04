@@ -173,11 +173,11 @@ const OpSettingDialog = WDialog.extend({
         selectedOp.IsOnCurrentServer()
       )
         deleteButton.textContent =
-          wX("DELETE_OP", { name: selectedOp.name }) + wX("LOCFRMSER");
+          wX("DELETE_OP", { opName: selectedOp.name }) + wX("LOCFRMSER");
       else
-        deleteButton.textContent = wX("REM_LOC_CP", { name: selectedOp.name });
+        deleteButton.textContent = wX("REM_LOC_CP", { opName: selectedOp.name });
     } else {
-      deleteButton.textContent = wX("DELETE_OP", { name: selectedOp.name });
+      deleteButton.textContent = wX("DELETE_OP", { opName: selectedOp.name });
     }
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);

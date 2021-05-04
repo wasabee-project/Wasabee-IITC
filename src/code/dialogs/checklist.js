@@ -63,7 +63,7 @@ const OperationChecklistDialog = WDialog.extend({
     await this.sortable.done;
 
     this.createDialog({
-      title: wX("OP_CHECKLIST", { name: operation.name }),
+      title: wX("OP_CHECKLIST", { opName: operation.name }),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
@@ -74,7 +74,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   checklistUpdate: async function () {
     const operation = getSelectedOperation();
-    this.setTitle(wX("OP_CHECKLIST", { name: operation.name }));
+    this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
       this.sortable.sortBy,

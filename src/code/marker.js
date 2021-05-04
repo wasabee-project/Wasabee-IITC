@@ -120,7 +120,7 @@ export default class WasabeeMarker {
       }
     }
     if (this.state == "completed" && this.completedBy) {
-      assignment.innerHTML = wX("COMPLETED BY", { name: this.completedBy });
+      assignment.innerHTML = wX("COMPLETED BY", { agentName: this.completedBy });
     }
 
     const buttonSet = L.DomUtil.create(

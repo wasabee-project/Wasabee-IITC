@@ -71,7 +71,7 @@ const BlockerList = WDialog.extend({
     };
 
     this.createDialog({
-      title: wX("KNOWN_BLOCK", { name: operation.name }),
+      title: wX("KNOWN_BLOCK", { opName: operation.name }),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "blockerlist",
@@ -89,7 +89,7 @@ const BlockerList = WDialog.extend({
       this.sortable.sortAsc
     );
     this.setContent(this.sortable.table);
-    this.setTitle(wX("KNOWN_BLOCK", { name: operation.name }));
+    this.setTitle(wX("KNOWN_BLOCK", { opName: operation.name }));
   },
 
   // because the sortable values depend on the operation, we can't have it created at addHooks unless we want a lot of getSelectedOperations embedded here

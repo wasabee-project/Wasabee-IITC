@@ -142,7 +142,7 @@ const ImportDialog = WDialog.extend({
       const importedOp = new WasabeeOp(data);
       await importedOp.store();
       await makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP_SUCCESS", { name: importedOp.name }));
+      alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);
       alert(wX("IMP_NOPE"));
