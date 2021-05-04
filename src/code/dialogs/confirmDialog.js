@@ -11,17 +11,33 @@ const ConfirmDialog = WDialog.extend({
   options: {
     title: wX("NO_TITLE"),
     label: wX("NO_LABEL"),
+    // type (agent anchor link marker zone operation team)
     // callback,
     // cancelCallback
   },
 
+  _skippable: function () {
+    const level =
+      localStorage[window.plugin.wasabee.static.constants.SKIP_CONFIRM];
+    if (level === "always") return true;
+    if (level === "entity") {
+      switch (this.options.type) {
+        case "anchor":
+        case "link":
+        case "marker":
+        case "zone":
+        case "agent":
+          return true;
+        // no default
+      }
+    }
+    return false;
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    if (
-      localStorage[window.plugin.wasabee.static.constants.EXPERT_MODE_KEY] ==
-      "true"
-    ) {
-      console.log("expert mode: skipping dialog display");
+    if (this._skippable()) {
+      console.log("skipping dialog display");
       if (this.options.callback) this.options.callback();
     } else {
       this._displayDialog();

@@ -186,6 +186,7 @@ const LinkListDialog = WDialog.extend({
     const con = new ConfirmDialog({
       title: "Delete Link",
       label: prompt,
+      type: "link",
       callback: () => {
         operation.removeLink(link.fromPortalId, link.toPortalId);
       },

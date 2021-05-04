@@ -192,6 +192,7 @@ export default class WasabeeAgent {
       const d = new ConfirmDialog({
         title: wX("SEND TARGET"),
         label: wX("SEND TARGET CONFIRM", selectedPortal.displayName, this.name),
+        type: "agent",
         callback: async () => {
           try {
             await targetPromise(this.id, selectedPortal);
@@ -219,6 +220,7 @@ export default class WasabeeAgent {
       const d = new ConfirmDialog({
         title: "Send Route to Target",
         label: "Do you really want to request the route to be sent?",
+        type: "agent",
         callback: async () => {
           try {
             await routePromise(this.id, selectedPortal);

@@ -185,6 +185,7 @@ const OpSettingDialog = WDialog.extend({
       const con = new ConfirmDialog({
         title: wX("CON_DEL", so.name),
         label: wX("YESNO_DEL", so.name),
+        type: "operation",
         callback: async () => {
           if (
             WasabeeMe.isLoggedIn() &&

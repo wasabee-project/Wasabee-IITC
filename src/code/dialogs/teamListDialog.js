@@ -127,6 +127,7 @@ const TeamListDialog = WDialog.extend({
               const cd = new ConfirmDialog({
                 title: `Leave ${obj.Name}?`,
                 label: `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
+                type: "team",
                 callback: async () => {
                   try {
                     await leaveTeamPromise(obj.ID);
