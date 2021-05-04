@@ -184,8 +184,8 @@ const OpSettingDialog = WDialog.extend({
       // this should be moved to uiCommands
       const so = getSelectedOperation();
       const con = new ConfirmDialog({
-        title: wX("CON_DEL", { name: so.name }),
-        label: wX("YESNO_DEL", { name: so.name }),
+        title: wX("CON_DEL", { opName: so.name }),
+        label: wX("YESNO_DEL", { opName: so.name }),
         type: "operation",
         callback: async () => {
           if (
