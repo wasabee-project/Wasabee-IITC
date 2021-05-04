@@ -117,7 +117,7 @@ const ImportDialog = WDialog.extend({
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = wX("IMPORT_OP_TITLE", { name: new Date().toGMTString() });
+        newop.name = wX("IMPORT_OP_TITLE", { date: new Date().toGMTString() });
       }
 
       // needs to be saved, but not update UI
