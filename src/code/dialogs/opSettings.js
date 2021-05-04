@@ -175,7 +175,9 @@ const OpSettingDialog = WDialog.extend({
         deleteButton.textContent =
           wX("DELETE_OP", { opName: selectedOp.name }) + wX("LOCFRMSER");
       else
-        deleteButton.textContent = wX("REM_LOC_CP", { opName: selectedOp.name });
+        deleteButton.textContent = wX("REM_LOC_CP", {
+          opName: selectedOp.name,
+        });
     } else {
       deleteButton.textContent = wX("DELETE_OP", { opName: selectedOp.name });
     }

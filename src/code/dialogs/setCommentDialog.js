@@ -30,7 +30,9 @@ export const SetCommentDialog = WDialog.extend({
       this.portal = this.options.operation.getPortal(
         this.options.target.portalId
       );
-      this.dialogTitle = wX("SET_MCOMMENT", { portalName: this.portal.displayName });
+      this.dialogTitle = wX("SET_MCOMMENT", {
+        portalName: this.portal.displayName,
+      });
     }
 
     if (this.options.target instanceof WasabeePortal) {
