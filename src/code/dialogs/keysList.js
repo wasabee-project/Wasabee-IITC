@@ -58,7 +58,7 @@ const KeysList = WDialog.extend({
     if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
     else this._me = null;
 
-    this.setTitle(wX("KEY_LIST", { opName: operation.name }));
+    this.setTitle(wX("KEY_LIST2", { opName: operation.name }));
     const table = this.getListDialogContent(
       operation,
       this.sortable.sortBy,

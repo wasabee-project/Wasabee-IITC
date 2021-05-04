@@ -150,7 +150,6 @@
   "IOS NEED FAKE UA": "You must set a 'Custom UserAgent for Webviews' in the IITC-Mobile settings or login will fail",
   "KEYS": "Keys",
   "KEY_LIST2": "Key List for Operation: {opName}",
-  "KEY_LIST": "Key List for Portal: {opName}",
   "KNOWN_BLOCK": "Known Blockers: {opName}",
   "LA": "L8+ some LA",
   "LA DESC": "Depending on the number and type of Link Amps used, a lower source portal level might suffice.",
