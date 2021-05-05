@@ -14,12 +14,21 @@ export default class WasabeeMe {
     }
     this.GoogleID = data.GoogleID;
     this.name = data.name;
+    this.vname = data.vname;
+    this.rocksname = data.rocksname;
+    this.intelname = data.intelname;
     this.level = data.level ? data.level : 0;
     this.Teams = Array();
     this.Ops = Array();
     this.fetched = Date.now();
-    this.Assignments = Array();
+    this.Vverified = data.Vverified;
+    this.blacklisted = data.blacklisted;
+    this.enlid = data.enlid;
     this._teamMap = null;
+    // RAID and RISC are unused by clients
+    this.pic = data.pic;
+    this.intelfaction = data.intelfaction;
+    this.querytoken = data.querytoken;
 
     if (data.Teams && data.Teams.length > 0) {
       for (const team of data.Teams) {
@@ -29,11 +38,6 @@ export default class WasabeeMe {
     if (data.Ops && data.Ops.length > 0) {
       for (const op of data.Ops) {
         this.Ops.push(op);
-      }
-    }
-    if (data.Assignments && data.Assignments.length > 0) {
-      for (const assignment of data.Assignments) {
-        this.Assignments.push(assignment);
       }
     }
     this.fetched = data.fetched ? data.fetched : Date.now();
