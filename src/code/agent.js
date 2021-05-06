@@ -22,6 +22,10 @@ export default class WasabeeAgent {
     // things which are stable across all teams
     this.id = obj.id;
     this.name = obj.name;
+    this.vname = obj.vname;
+    this.rocksname = obj.rocksname;
+    this.intelname = obj.intelname;
+    this.intelfaction = obj.intelfaction;
     this.level = obj.level ? Number(obj.level) : 0;
     this.enlid = obj.enlid ? obj.enlid : 0;
     this.pic = obj.pic ? obj.pic : null;
@@ -37,9 +41,6 @@ export default class WasabeeAgent {
     this.startlng = obj.startlng ? obj.startlng : 0;
     this.startradius = obj.startradius ? Number(obj.startradius) : 0;
     this.sharestart = obj.sharestart ? obj.sharestart : false; */
-
-    // server only sets this on direct pulls
-    this.cansendto = obj.cansendto ? obj.cansendto : false; // never true from a team pull
 
     // vary per-team, don't set on direct pulls
     if (obj.ShareWD) this.ShareWD = obj.ShareWD;
