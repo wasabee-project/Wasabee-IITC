@@ -4,6 +4,7 @@ import {
   GetWasabeeServer,
   SetWasabeeServer,
   oneTimeToken,
+  setIntelID,
 } from "../server";
 import PromptDialog from "./promptDialog";
 import { sendLocation, fullSync } from "../uiCommands";
@@ -138,6 +139,11 @@ const AuthDialog = WDialog.extend({
           newme.store();
           this.closeDialog();
           fullSync();
+          setIntelID(
+            window.PLAYER.nickname,
+            window.PLAYER.team,
+            newme.querytoken
+          ); // no need to await
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
           console.error(e);
@@ -184,6 +190,11 @@ const AuthDialog = WDialog.extend({
               newme.store();
               this.closeDialog();
               fullSync();
+              setIntelID(
+                window.PLAYER.nickname,
+                window.PLAYER.team,
+                newme.querytoken
+              ); // no need to await
               postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
             } catch (e) {
               console.error(e);
@@ -251,6 +262,11 @@ const AuthDialog = WDialog.extend({
               newme.store();
               this.closeDialog();
               fullSync();
+              setIntelID(
+                window.PLAYER.nickname,
+                window.PLAYER.team,
+                newme.querytoken
+              ); // no need to await
               postToFirebase({
                 id: "wasabeeLogin",
                 method: "gsapiAuth (immediate_failed)",
@@ -277,6 +293,11 @@ const AuthDialog = WDialog.extend({
         this.closeDialog();
         fullSync();
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
+        setIntelID(
+          window.PLAYER.nickname,
+          window.PLAYER.team,
+          newme.querytoken
+        ); // no need to await
       } catch (e) {
         postToFirebase({ id: "exception", error: e.toString() });
         console.error(e);
@@ -310,6 +331,11 @@ const AuthDialog = WDialog.extend({
           this.closeDialog();
           fullSync();
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
+          setIntelID(
+            window.PLAYER.nickname,
+            window.PLAYER.team,
+            newme.querytoken
+          ); // no need to await
         } catch (e) {
           console.error(e);
           alert(`send access token failed (gsapiAuthChoose): ${e.toString()}`);
