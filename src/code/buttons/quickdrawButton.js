@@ -338,6 +338,7 @@ const QuickDrawControl = L.Handler.extend({
     this._previous = null;
     this._guideA = null;
     this._guideB = null;
+    if (this._guideLayerGroup) this._guideLayerGroup.clearLayers();
 
     this._firstSelect = true;
 
@@ -372,6 +373,7 @@ const QuickDrawControl = L.Handler.extend({
       window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
     guideStyle.anchorLL = selectedPortal.latLng;
 
+    if (this._guideA) this._guideA.remove();
     this._guideA = L.geodesicPolyline(
       [selectedPortal.latLng, selectedPortal.latLng],
       guideStyle
@@ -397,8 +399,9 @@ const QuickDrawControl = L.Handler.extend({
     // all portals, including the first
     const guideStyle =
       window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
-    guideStyle.anchorLL = selectedPortal.latLng;
+    guideStyle.anchorLL = this._anchor.latLng;
 
+    if (this._guideA) this._guideA.remove();
     this._guideA = L.geodesicPolyline(
       [this._anchor.latLng, selectedPortal.latLng],
       guideStyle
