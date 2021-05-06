@@ -48,15 +48,18 @@ const BlockerList = WDialog.extend({
       window.map.fire("wasabeeUIUpdate", { reason: "blockerlist" }, false);
     };
     buttons[wX("AUTOMARK")] = () => {
+      const operation = getSelectedOperation();
       blockerAutomark(operation);
     };
     buttons[wX("RESET")] = () => {
+      const operation = getSelectedOperation();
       operation.blockers = new Array();
       this.blockerlistUpdate();
       operation.update(false); // blockers do not need to be sent to server
       window.map.fire("wasabeeCrosslinks", { reason: "blockerlist" }, false);
     };
     buttons[wX("LOAD PORTALS")] = () => {
+      const operation = getSelectedOperation();
       loadFaked(operation, true); // force
     };
     buttons[wX("TRAWL TITLE")] = () => {
