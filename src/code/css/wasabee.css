@@ -491,53 +491,8 @@
   align-items: center;
 }
 
-/* this can be simplified now that the send location checkbox is not here */
-.wasabee-dialog-auth {
-  max-width: min-content;
-}
-.wasabee-dialog-auth div.content {
+.wasabee-dialog-auth .content {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  padding: 4px;
-}
-.wasabee-dialog-auth div.useragent {
-  padding: 4px;
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth div.desc {
-  padding: 4px;
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth button.andriod {
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth button.gapi {
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth div.options {
-  margin: 4px;
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth button.webview {
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth button.server {
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-
-.wasabee-dialog-auth-buttonset {
-  grid-column-start: 1;
-  grid-column-end: 5;
-}
-.wasabee-dialog-auth-buttonset button {
-  margin-right: 4px;
 }
 
 .wasabee-dialog-autodraws {
