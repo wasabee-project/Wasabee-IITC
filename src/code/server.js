@@ -737,15 +737,21 @@ export function setLinkComment(opID, linkID, desc) {
 }
 
 export function setLinkZone(opID, linkID, zone) {
-  console.log(opID, linkID, zone);
   const fd = new FormData();
   fd.append("zone", zone);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/zone`, fd);
 }
 
 export function setMarkerZone(opID, markerID, zone) {
-  console.log(opID, markerID, zone);
   const fd = new FormData();
   fd.append("zone", zone);
   return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/zone`, fd);
+}
+
+export function setIntelID(name, faction, querytoken) {
+  const fd = new FormData();
+  fd.append("name", name);
+  fd.append("faction", faction);
+  fd.append("qt", querytoken);
+  return genericPut(`/api/v1/me/intelid`, fd);
 }
