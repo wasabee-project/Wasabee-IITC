@@ -26,8 +26,7 @@ const AboutDialog = WDialog.extend({
     // use leaflet's DOM object creation, not bare DOM or Jquery
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
-    // wX is the translation call, looks for strings in translations.json based
-    // on the browser's langauge setting
+    // wX is the translation call, it looks up the string in the agent's chosen language
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const tips = L.DomUtil.create("div", null, html);
@@ -37,8 +36,7 @@ const AboutDialog = WDialog.extend({
     about.innerHTML =
       "<h3>About Wasabee-IITC</h3>" +
       "Current version: " +
-      window.plugin.wasabee.info.version +
-      "<ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
+      window.plugin.wasabee.info.version;
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
@@ -59,7 +57,6 @@ const AboutDialog = WDialog.extend({
       width: "auto",
       dialogClass: "about",
       buttons: buttons,
-      // setting buttons: buttons here would append them -- swap in below
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
