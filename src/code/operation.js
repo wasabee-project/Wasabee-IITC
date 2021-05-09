@@ -791,7 +791,8 @@ export default class WasabeeOp {
     this.runCrosslinks();
   }
 
-  addMarker(markerType, portal, comment) {
+  // XXX move comment to options in 0.20
+  addMarker(markerType, portal, comment, options) {
     if (!portal) return;
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
@@ -802,7 +803,11 @@ export default class WasabeeOp {
         portalId: portal.id,
         comment: comment,
       });
+      if (options && options.zone) marker.zone = options.zone;
+      if (options && options.assign && options.assign != 0)
+        marker.assign(options.assign);
       this.markers.push(marker);
+
       this.update(true);
 
       // only need this for virus/destroy/decay -- this should be in the marker class
