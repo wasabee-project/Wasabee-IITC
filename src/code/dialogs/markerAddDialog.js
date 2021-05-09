@@ -33,7 +33,7 @@ const MarkerAddDialog = WDialog.extend({
     this._zones.innerHTML = ""; // do we need to do this every time? the zone list can change while this dialog is open.
     const zoneAll = L.DomUtil.create("option", null, this._zones);
     zoneAll.value = 0;
-    zoneAll.name = "All"; // wX this
+    zoneAll.textContent = "All"; // wX this
     for (const z of getSelectedOperation().zones) {
       const o = L.DomUtil.create("option", null, this._zones);
       o.value = z.ID;
@@ -86,11 +86,8 @@ const MarkerAddDialog = WDialog.extend({
     this._portal = L.DomUtil.create("div", "portal", content);
 
     this._type = L.DomUtil.create("select", null, content);
-    this._type.name = "type";
     this._zones = L.DomUtil.create("select", null, content);
-    this._zones.name = "zones";
     this._assign = L.DomUtil.create("select", null, content);
-    this._assign.name = "assign";
     await this.update();
 
     this._comment = L.DomUtil.create("input", null, content);
