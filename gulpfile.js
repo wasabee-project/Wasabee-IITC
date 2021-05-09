@@ -198,8 +198,9 @@ gulp.task(
   gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"])
 );
 
-// eslint-fix to
-gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
+// eslint-fix too
+// gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
+gulp.task("format", gulp.series(["prettier"]));
 
 gulp.task(
   "build-dev",
