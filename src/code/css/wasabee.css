@@ -593,23 +593,23 @@
   min-width: 20px;
 }
 .wasabee-dialog-markeradd div.portal {
-  grid-column: 1 / span 3;
+  grid-column: 1 / span 4;
   grid-row: 1;
 }
 .wasabee-dialog-markeradd div.content select {
-  grid-column: 1;
+  grid-column: auto;
   grid-row: 3;
   width: 190px;
 }
 
 .wasabee-dialog-markeradd div.content input {
-  grid-column: 2 / span 2;
+  grid-column: 4;
   grid-row: 3;
   margin-left: 20px;
 }
 
 .wasabee-dialog-markeradd div.content button {
-  grid-column: 2;
+  grid-column: 4;
   grid-row: 6 / span 2;
   border-radius: 35px;
   border-style: groove;
