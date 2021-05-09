@@ -2,9 +2,7 @@
   "English": {
     "UPLOAD_CHANGES": "When you make changes to an OP, be sure to upload to the server so you can access it across all instances of Wasabee.",
     "DUPLICATE_OPERATION": "When Duplicating an Operation, Make sure you are NOT accidentally Deleting the Operation.",
-    "RECOVER_OPERATION": "If you delete an Operation you can recover it IF you have a local copy, but you must duplicate it before uploading to the server.",
     "MULTIMAX_SS": "When doing Multimax, you can select the first portal, go to the Second portal, Then open the Multimax Box.  Set A, select B, Set B, and Close the box.  Then go to where you want the spine to be.  Reopen and hit Multimax.  This is especially useful on small screen devices.",
-    "WD_KEYS": "You can use the \"W-D Keys\" option to show how many keys you have to a specific portal. The number of keys will only show up for those on teams you have marked active.",
     "LOCATION": "Wasabee can be used to share agent locations. These locations are visible to all agents that share an active group with you.",
     "OPSEC": "For OPSEC purposes, you should frequently check which groups you have marked active on the teams list. Disable any teams you are not actively using.",
     "AUTO_FIELD": "The speed of Wasabee's calculations when auto-fielding are primarily limited by the processing power of your system. Slower, and older, systems will take longer to calculate as the number of portals involved increases.",
@@ -22,7 +20,6 @@
     "WAIT_TIME": "Some fields take a while to calculate. After pressing draw, please be patient.",
     "OLD_IITC": "Disclaimer:  Full functionality requires  iitc-ce v0.30 or newer found at iitc.app. Most features are backwards compatible, but not all are. As always no guarantees. Chrome is the recommended browser.",
     "TESTING": "Have you found an issue or want to suggest a feature? Consider joining our telegram testers group '<a href=\"https://t.me/joinchat/PQGX2xo17HW3TLrANBPA3g\" target=\"_blank\">here<\/a>' or submit a request '<a href=\"https://forms.gle/3jsSHhtJyMv3cpwL9\" target=\"_blank\">here<\/a>'.",
-    "BATTLE_MODE": "If you are running an operation with multiple agents, Battle Mode can push notifications of changes to agents on telegram. Just click the bee>settings and change mode to battle.",
     "MULTIPLE_OPS": "You can have multiple separate operations in Wasabee. To create a new OP, make sure you are signed in then click the bee>New Op>AddNew Op and then create a name and click okay. To switch between OPS simply click menu>Ops and use the pulldown menu to switch between any existing OPS.",
     "QD_MODES": "QuickDraw can do single-link plans. Press 'm' on the keyboard to switch modes.",
     "QD_GUIDES": "QuickDraw has guides, use the 'g' key to display them. You will need to disable them (with the 'g' key) to click the next portal."
