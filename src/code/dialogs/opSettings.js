@@ -12,7 +12,8 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
+import { addToColorList } from "../skin";
+import WasabeeMe from "../me";
 
 import { convertColorToHex } from "../auxiliar";
 
@@ -21,57 +22,40 @@ const OpSettingDialog = WDialog.extend({
     TYPE: "opSettingDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = OpSettingDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OpSettingDialog.TYPE });
-  },
-
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     this._displayDialog();
-
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {
-    this.makeContent();
+    const content = this.makeContent();
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("OP_SETTINGS_TITLE"),
-      html: this._content,
+      html: content,
       height: "auto",
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-op-settings",
-      closeCallback: () => {
-        this.disable();
-        delete this._content;
-        delete this._dialog;
-      },
+      dialogClass: "op-settings",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.opSettings,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   update: function () {
-    if (this._enabled && this._dialog && this._dialog.html) {
-      this.makeContent();
-      this._dialog.html(this._content);
+    if (this._enabled) {
+      const content = this.makeContent();
+      this.setContent(content);
     }
   },
 
@@ -82,13 +66,12 @@ const OpSettingDialog = WDialog.extend({
 
     const writable = selectedOp.getPermission() == "write";
 
-    const nameLabel = L.DomUtil.create("label", null, topSet);
-    nameLabel.textContent = wX("OPER_NAME");
+    L.DomUtil.create("label", null, topSet).textContent = wX("OPER_NAME");
     const nameDisplay = L.DomUtil.create("div", null, topSet);
     if (writable) {
       const input = L.DomUtil.create("input", null, nameDisplay);
       input.value = selectedOp.name;
-      L.DomEvent.on(input, "change", (ev) => {
+      L.DomEvent.on(input, "change", async (ev) => {
         L.DomEvent.stop(ev);
         if (!input.value || input.value == "") {
           alert(wX("USE_VALID_NAME"));
@@ -96,8 +79,8 @@ const OpSettingDialog = WDialog.extend({
           const so = getSelectedOperation();
           so.name = input.value;
           so.localchanged = true;
-          so.store();
-          window.runHooks("wasabeeUIUpdate");
+          await so.store();
+          window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
         }
       });
     } else {
@@ -105,21 +88,21 @@ const OpSettingDialog = WDialog.extend({
     }
 
     if (writable) {
-      const colorLabel = L.DomUtil.create("label", null, topSet);
-      colorLabel.textContent = wX("OPER_COLOR");
+      L.DomUtil.create("label", null, topSet).textContent = wX("OPER_COLOR");
 
       const picker = L.DomUtil.create("input", "picker", topSet);
       picker.type = "color";
       picker.value = convertColorToHex(selectedOp.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
 
-      L.DomEvent.on(picker, "change", (ev) => {
+      L.DomEvent.on(picker, "change", async (ev) => {
         L.DomEvent.stop(ev);
         const so = getSelectedOperation();
         so.color = picker.value;
         so.localchanged = true;
-        so.store();
-        window.runHooks("wasabeeUIUpdate");
+        await so.store();
+        addToColorList(picker.value);
+        window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
       });
     }
 
@@ -127,16 +110,45 @@ const OpSettingDialog = WDialog.extend({
       const commentInput = L.DomUtil.create("textarea", null, topSet);
       commentInput.placeholder = "Op Comment";
       commentInput.value = selectedOp.comment;
-      L.DomEvent.on(commentInput, "change", (ev) => {
+      L.DomEvent.on(commentInput, "change", async (ev) => {
         L.DomEvent.stop(ev);
         const so = getSelectedOperation();
         so.comment = commentInput.value;
         so.localchanged = true;
-        so.store();
+        await so.store();
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
       commentDisplay.textContent = selectedOp.comment;
+    }
+
+    if (writable) {
+      L.DomUtil.create("label", null, topSet).textContent = wX(
+        "REFERENCE_TIME"
+      );
+      const rtInput = L.DomUtil.create("input", null, topSet);
+      rtInput.size = 30;
+      rtInput.placeholder = "Sun, 21 Oct 2018 12:16:24 GMT";
+      rtInput.value = selectedOp.referencetime;
+      L.DomEvent.on(rtInput, "change", async (ev) => {
+        L.DomEvent.stop(ev);
+        const so = getSelectedOperation();
+        try {
+          const d = new Date(rtInput.value); // accept whatever the JS engine can parse
+          if (d == "Invalid Date" || isNaN(d)) throw d;
+          so.referencetime = d.toUTCString(); // RFC 1123 format as expected by server
+          rtInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
+          so.localchanged = true;
+          await so.store();
+        } catch (e) {
+          console.log(e);
+          alert("Invalid date format");
+        }
+      });
+    } else {
+      const commentDisplay = L.DomUtil.create("p", "comment", topSet);
+      commentDisplay.textContent =
+        wX("REFERENCE_TIME") + " " + selectedOp.referencetime;
     }
 
     const buttonSection = L.DomUtil.create("div", "buttonset", content);
@@ -154,41 +166,55 @@ const OpSettingDialog = WDialog.extend({
 
     const deleteDiv = L.DomUtil.create("div", null, buttonSection);
     const deleteButton = L.DomUtil.create("button", null, deleteDiv);
-    if (selectedOp.IsOwnedOp()) {
-      deleteButton.textContent = wX("DELETE_OP", selectedOp.name);
-      if (selectedOp.IsServerOp()) {
-        if (selectedOp.IsOnCurrentServer())
-          deleteButton.textContent += wX("LOCFRMSER");
-        else deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
-      }
+    if (selectedOp.IsServerOp()) {
+      if (
+        WasabeeMe.isLoggedIn() &&
+        selectedOp.IsOwnedOp() &&
+        selectedOp.IsOnCurrentServer()
+      )
+        deleteButton.textContent =
+          wX("DELETE_OP", { opName: selectedOp.name }) + wX("LOCFRMSER");
+      else
+        deleteButton.textContent = wX("REM_LOC_CP", {
+          opName: selectedOp.name,
+        });
     } else {
-      deleteButton.textContent = wX("REM_LOC_CP", selectedOp.name);
+      deleteButton.textContent = wX("DELETE_OP", { opName: selectedOp.name });
     }
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       // this should be moved to uiCommands
-      const con = new ConfirmDialog(window.map);
       const so = getSelectedOperation();
-      con.setup(wX("CON_DEL", so.name), wX("YESNO_DEL", so.name), async () => {
-        if (so.IsServerOp() && so.IsOwnedOp() && so.IsOnCurrentServer()) {
-          try {
-            await deleteOpPromise(so.ID);
-            console.log("delete from server successful");
-          } catch (e) {
-            console.error(e);
-            alert(e.toString());
+      const con = new ConfirmDialog({
+        title: wX("CON_DEL", { opName: so.name }),
+        label: wX("YESNO_DEL", { opName: so.name }),
+        type: "operation",
+        callback: async () => {
+          if (
+            WasabeeMe.isLoggedIn() &&
+            so.IsServerOp() &&
+            so.IsOwnedOp() &&
+            so.IsOnCurrentServer()
+          ) {
+            try {
+              await deleteOpPromise(so.ID);
+              console.log("delete from server successful");
+            } catch (e) {
+              console.error(e);
+              alert(e.toString());
+            }
           }
-        }
-        removeOperation(so.ID);
-        const newop = changeOpIfNeeded();
-        const mbr = newop.mbr;
-        if (
-          mbr &&
-          isFinite(mbr._southWest.lat) &&
-          isFinite(mbr._northEast.lat)
-        ) {
-          this._map.fitBounds(mbr);
-        }
+          await removeOperation(so.ID);
+          const newop = await changeOpIfNeeded();
+          const mbr = newop.mbr;
+          if (
+            mbr &&
+            isFinite(mbr._southWest.lat) &&
+            isFinite(mbr._northEast.lat)
+          ) {
+            window.map.fitBounds(mbr);
+          }
+        },
       });
       con.enable();
     });
@@ -216,14 +242,14 @@ const OpSettingDialog = WDialog.extend({
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
     dupeButton.textContent = wX("DUPE_OP");
-    L.DomEvent.on(dupeButton, "click", (ev) => {
+    L.DomEvent.on(dupeButton, "click", async (ev) => {
       L.DomEvent.stop(ev);
       const so = getSelectedOperation();
-      const newop = duplicateOperation(so.ID);
-      makeSelectedOperation(newop.ID);
+      const newop = await duplicateOperation(so.ID);
+      await makeSelectedOperation(newop.ID);
     });
 
-    this._content = content;
+    return content;
   },
 });
 

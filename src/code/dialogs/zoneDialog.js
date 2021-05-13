@@ -1,26 +1,16 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
+import ZoneSetColorDialog from "./zoneSetColor";
 
 const ZoneDialog = WDialog.extend({
   statics: {
     TYPE: "zone",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = ZoneDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ZoneDialog.TYPE });
-  },
-
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
 
     if (this._smallScreen) {
       this._displaySmallDialog();
@@ -31,12 +21,12 @@ const ZoneDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   update: function () {
     const h = this.buildList();
-    this._dialog.html(h);
+    this.setContent(h);
   },
 
   _displayDialog: function () {
@@ -44,21 +34,17 @@ const ZoneDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: "Zones",
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-zone",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "zone",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.zone,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _displaySmallDialog: function () {
@@ -91,6 +77,17 @@ const ZoneDialog = WDialog.extend({
         getSelectedOperation().renameZone(z.id, nameinput.value);
       });
       const commandcell = L.DomUtil.create("td", null, tr);
+
+      const color = L.DomUtil.create("a", null, commandcell);
+      color.textContent = "🖌";
+      color.href = "#";
+      L.DomEvent.on(color, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const zoneSetColorDialog = new ZoneSetColorDialog({
+          zone: z,
+        });
+        zoneSetColorDialog.enable();
+      });
       if (z.id != 1) {
         const del = L.DomUtil.create("a", null, commandcell);
         del.textContent = "🗑";

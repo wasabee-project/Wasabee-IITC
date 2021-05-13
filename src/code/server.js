@@ -1,10 +1,6 @@
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
-import {
-  getSelectedOperation,
-  getOperationByID,
-  removeOperation,
-} from "./selectedOp";
+import { getSelectedOperation, removeOperation } from "./selectedOp";
 import wX from "./wX";
 import WasabeeMarker from "./marker";
 
@@ -16,8 +12,7 @@ export default function () {
 // refreshed op stored to localStorage; "me" upated to reflect new op in list
 export async function uploadOpPromise() {
   const operation = getSelectedOperation();
-  operation.cleanAll();
-  const json = JSON.stringify(operation);
+  const json = operation.toExport();
 
   const response = await genericPost(
     "/api/v1/draw",
@@ -28,24 +23,81 @@ export async function uploadOpPromise() {
   newme.store();
   const newop = await opPromise(operation.ID);
   newop.localchanged = false;
-  newop.store();
+  await newop.store();
   return newop;
 }
 
 // sends a changed op to the server
-export function updateOpPromise(operation) {
-  // let the server know how to process assignments etc
-  operation.mode =
-    localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-  operation.cleanAll();
-  const json = JSON.stringify(operation);
-  delete operation.mode;
+export async function updateOpPromise(operation) {
+  const json = operation.toExport();
 
-  return genericPut(
-    `/api/v1/draw/${operation.ID}`,
-    json,
-    "application/json;charset=UTF-8"
-  );
+  try {
+    const construct = {
+      method: "PUT",
+      mode: "cors",
+      cache: "default",
+      credentials: "include",
+      redirect: "manual",
+      referrerPolicy: "origin",
+      body: json,
+      headers: { "Content-Type": "application/json;charset=UTF-8" },
+    };
+    if (operation.lasteditid)
+      construct.headers["If-Match"] = operation.lasteditid;
+
+    const response = await fetch(
+      GetWasabeeServer() + `/api/v1/draw/${operation.ID}`,
+      construct
+    );
+
+    switch (response.status) {
+      case 200:
+        try {
+          const text = await response.text();
+          const obj = JSON.parse(text);
+          if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
+          operation.lasteditid = obj.updateID;
+          operation.remoteChanged = false;
+          operation.fetched = new Date().toUTCString();
+          return Promise.resolve(true);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      case 412:
+        // mismatch etag
+        try {
+          return Promise.resolve(false);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      case 401:
+        WasabeeMe.purge();
+        try {
+          const err = await response.json();
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+      default:
+        try {
+          const err = await response.json();
+          return Promise.reject(err.error);
+        } catch (e) {
+          console.error(e);
+          return Promise.reject(e);
+        }
+      // break;
+    }
+  } catch (e) {
+    console.error(e);
+    return Promise.reject(e);
+  }
 }
 
 // removes an op from the server
@@ -53,8 +105,13 @@ export function deleteOpPromise(opID) {
   return genericDelete(`/api/v1/draw/${opID}`, new FormData());
 }
 
-// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.waitGet
-// use WasabeeTeam.waitGet and WasabeeTeam.cacheGet
+// returns a promise to op stat from the server
+export function statOpPromise(opID) {
+  return genericGet(`/api/v1/draw/${opID}/stat`);
+}
+
+// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
+// use WasabeeTeam.get
 export function teamPromise(teamid) {
   return genericGet(`/api/v1/team/${teamid}`);
 }
@@ -64,11 +121,16 @@ export function teamPromise(teamid) {
 // not generic since 304 result processing and If-Modified-Since header
 export async function opPromise(opID) {
   let ims = "Sat, 29 Oct 1994 19:43:31 GMT"; // the dawn of time...
-  const localop = getOperationByID(opID);
+  const localop = await WasabeeOp.load(opID);
   if (localop != null && localop.fetched) ims = localop.fetched;
 
   try {
     const server = GetWasabeeServer();
+    const headers = {};
+    // ops synced since 0.19: prefer lasteditid if available
+    if (localop && localop.lasteditid)
+      headers["If-None-Match"] = localop.lasteditid;
+    else headers["If-Modified-Since"] = ims;
     const response = await fetch(server + `/api/v1/draw/${opID}`, {
       method: "GET",
       mode: "cors",
@@ -76,7 +138,7 @@ export async function opPromise(opID) {
       credentials: "include",
       redirect: "manual",
       referrerPolicy: "origin",
-      headers: { "If-Modified-Since": ims },
+      headers: headers,
     });
 
     let raw = null;
@@ -87,26 +149,37 @@ export async function opPromise(opID) {
         newop = new WasabeeOp(raw);
         newop.localchanged = false;
         newop.server = server;
+        newop.fetchedOp = JSON.stringify(raw);
         return Promise.resolve(newop);
-      case 304: // If-Modified-Since replied NotModified
+      case 304: // If-None-Match or If-Modified-Since replied NotModified
         console.warn("server copy is older/unmodified, keeping local copy");
         localop.server = server;
         return Promise.resolve(localop);
       case 401:
         WasabeeMe.purge();
         raw = await response.json();
-        return Promise.reject(wX("NOT LOGGED IN", raw.error));
+        return Promise.reject(wX("NOT LOGGED IN", { error: raw.error }));
       case 403:
-        removeOperation(opID);
+        await removeOperation(opID);
         raw = await response.json();
-        return Promise.reject(wX("OP PERM DENIED", opID) + ": " + raw.error);
+        return Promise.reject(
+          wX("OP PERM DENIED", { opID: opID }) + ": " + raw.error
+        );
       case 410:
-        removeOperation(opID);
+        await removeOperation(opID);
         raw = await response.json();
-        return Promise.reject(wX("OP DELETED", opID) + ": " + raw.error);
+        return Promise.reject(
+          wX("OP DELETED", { opID: opID }) + ": " + raw.error
+        );
       default:
-        raw = await response.text();
-        return Promise.reject(response.statusText, raw);
+        try {
+          const err = await response.json();
+          return Promise.reject(err.error);
+        } catch (e) {
+          console.error(e);
+          raw = await response.text();
+          return Promise.reject(raw);
+        }
     }
   } catch (e) {
     console.error(e);
@@ -126,8 +199,7 @@ export async function mePromise() {
   }
 }
 
-// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.waitGet()
-// use WasabeeAgent.waitGet and WasabeeAgent.cacheGet for caching
+// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
 export function agentPromise(GID) {
   return genericGet(`/api/v1/agent/${GID}`);
 }
@@ -369,7 +441,7 @@ async function genericPut(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -377,8 +449,8 @@ async function genericPut(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -424,7 +496,7 @@ async function genericPost(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -432,8 +504,8 @@ async function genericPost(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -479,7 +551,7 @@ async function genericDelete(url, formData, contentType) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -487,8 +559,8 @@ async function genericDelete(url, formData, contentType) {
       // break;
       default:
         try {
-          const err = await response.text();
-          return Promise.reject(response.statusText, err);
+          const err = await response.json();
+          return Promise.reject(err.error);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -532,7 +604,7 @@ async function genericGet(url) {
         WasabeeMe.purge();
         try {
           const err = await response.json();
-          return Promise.reject(wX("NOT LOGGED IN", err.error));
+          return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -589,9 +661,9 @@ export function GetUpdateList() {
 }
 
 export function SetWasabeeServer(server) {
-  // XXX sanity checking here please:
-  // starts w/ https://
-  // does not end with /
+  server = server.trim();
+  if (!server.startsWith("http")) server = "https://" + server;
+  if (server.endsWith("/")) server = server.slice(0, -1);
   localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY] = server;
 }
 
@@ -609,12 +681,6 @@ export function getCustomTokenFromServer() {
 
 export function loadConfig() {
   return genericGet(`/static/wasabee-webui-config.json`);
-}
-
-export function setDisplayName(teamID, googleID, displayname) {
-  const fd = new FormData();
-  fd.append("displayname", displayname);
-  return genericPost(`/api/v1/team/${teamID}/${googleID}/displayname`, fd);
 }
 
 export function changeTeamOwnerPromise(teamID, newOwner) {
@@ -671,15 +737,21 @@ export function setLinkComment(opID, linkID, desc) {
 }
 
 export function setLinkZone(opID, linkID, zone) {
-  console.log(opID, linkID, zone);
   const fd = new FormData();
   fd.append("zone", zone);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/zone`, fd);
 }
 
 export function setMarkerZone(opID, markerID, zone) {
-  console.log(opID, markerID, zone);
   const fd = new FormData();
   fd.append("zone", zone);
   return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/zone`, fd);
+}
+
+export function setIntelID(name, faction, querytoken) {
+  const fd = new FormData();
+  fd.append("name", name);
+  fd.append("faction", faction);
+  fd.append("qt", querytoken);
+  return genericPut(`/api/v1/me/intelid`, fd);
 }

@@ -1,23 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AboutDialog = WDialog.extend({
   // not strictly necessary, but good style
   statics: {
     TYPE: "about",
-  },
-
-  // every leaflet class ought to have an initialize,
-  // inputs defined by leaflet, window.map is defined by IITC
-  // options can extended by callers
-  initialize: function (map = window.map, options) {
-    // always define type, it is used by the parent classes
-    this.type = AboutDialog.TYPE;
-    // call the parent classes initialize as well
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: AboutDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -33,18 +21,12 @@ const AboutDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function () {
-    // put any post close teardown here
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   // define our work in _displayDialog
   _displayDialog: function () {
     // use leaflet's DOM object creation, not bare DOM or Jquery
     const html = L.DomUtil.create("div", null);
     const support = L.DomUtil.create("div", null, html);
-    // wX is the translation call, looks for strings in translations.json based
-    // on the browser's langauge setting
+    // wX is the translation call, it looks up the string in the agent's chosen language
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 
     const tips = L.DomUtil.create("div", null, html);
@@ -54,8 +36,7 @@ const AboutDialog = WDialog.extend({
     about.innerHTML =
       "<h3>About Wasabee-IITC</h3>" +
       "Current version: " +
-      window.plugin.wasabee.info.version +
-      "<ul><li>0.0-0.12: @Phtiv</li><li>0.13-0.17: @deviousness</li></ul>";
+      window.plugin.wasabee.info.version;
 
     const videos = L.DomUtil.create("div", null, html);
     videos.innerHTML = wX("HOW_TO_VIDS");
@@ -63,27 +44,21 @@ const AboutDialog = WDialog.extend({
     // Since the JqueryUI dialog buttons are hard-coded, we have to override them to translate them
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
     // create a JQueryUI dialog, store it in _dialog
     // set closeCallback to report that we are done and free up the memory
     // set id if you want only one instance of this dialog to be displayed at a time
     // enable/disable are inherited from L.Handler via WDialog
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("ABOUT_WASABEE"),
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-about",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
-      // setting buttons: buttons here would append them -- swap in below
+      dialogClass: "about",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
-    // swap in our buttons, replacing the defaults
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   // small-screen versions go in _displaySmallDialog

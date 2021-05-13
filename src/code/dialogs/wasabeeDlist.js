@@ -1,31 +1,23 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeePortal from "../portal";
-import { getPortalDetails } from "../uiCommands";
-import { postToFirebase } from "../firebaseSupport";
+import { getAgentWasabeeDkeys } from "../wd";
 
 const WasabeeDList = WDialog.extend({
   statics: {
     TYPE: "wasabeeDList",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = WasabeeDList.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: WasabeeDList.TYPE });
-  },
-
   addHooks: async function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const context = this;
     this._UIUpdateHook = () => {
       context.update();
     };
     this._me = await WasabeeMe.waitGet();
-    this._displayDialog();
+    await this._displayDialog();
     window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },
 
@@ -34,56 +26,47 @@ const WasabeeDList = WDialog.extend({
     window.removeHook("portalDetailLoaded", this._UIUpdateHook);
   },
 
-  update: function () {
-    const table = this.getListDialogContent().table;
-    this._dialog.html(table);
+  update: async function () {
+    const sortable = await this.getListDialogContent();
+    this.setContent(sortable.table);
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
+    const sortable = await this.getListDialogContent();
+
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("WASABEE_D_LIST"),
-      html: this.getListDialogContent().table,
+      html: sortable.table,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-wasabeedlist",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "wasabeedlist",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.wasabeeDList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  getListDialogContent: function () {
+  getListDialogContent: async function () {
     const content = new Sortable();
     content.fields = [
       {
         name: wX("PORTAL"),
         value: (n) => {
-          if (
-            window.portals[n.PortalID] &&
-            window.portals[n.PortalID].options.data.title
-          )
-            return window.portals[n.PortalID].options.data.title;
+          if (n.Name) return n.Name;
           return n.PortalID;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, n) => {
-          if (
-            window.portals[n.PortalID] &&
-            window.portals[n.PortalID].options.data.title
-          ) {
-            const p = WasabeePortal.get(n.PortalID);
-            cell.appendChild(p.displayFormat(this._smallScreen));
-          } else {
-            getPortalDetails(n.PortalID);
-            cell.textContent = value;
-          }
+          const p = new WasabeePortal({
+            id: n.PortalID,
+            name: n.Name,
+            lat: n.Lat,
+            lng: n.Lng,
+          });
+          cell.appendChild(p.displayFormat(this._smallScreen));
         },
       },
       {
@@ -105,16 +88,8 @@ const WasabeeDList = WDialog.extend({
     ];
     content.sortBy = 0;
 
-    const mylist = new Array();
-    for (const [portalID, data] of window.plugin.wasabee._Dkeys) {
-      for (const [gid, values] of data) {
-        if (portalID && gid == this._me.GoogleID) {
-          mylist.push(values);
-        }
-      }
-    }
+    content.items = await getAgentWasabeeDkeys(this._me.GoogleID);
 
-    content.items = mylist;
     return content;
   },
 });

@@ -4,7 +4,7 @@
  * This way we can setup a service worker under a domain we control and
  * simply pass the messages along using window.parent.postMessage.
  */
-import { drawSingleTeam } from "./mapDrawing";
+import { drawSingleTeam, drawSingleAgent } from "./mapDrawing";
 import { opPromise, GetWasabeeServer } from "./server";
 import {
   makeSelectedOperation,
@@ -36,22 +36,31 @@ export function initFirebase() {
     const operation = getSelectedOperation();
     switch (event.data.data.cmd) {
       case "Agent Location Change":
-        console.debug("firebase update of agent location: ", event.data.data);
-        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
-        drawSingleTeam(event.data.data.msg);
+        if (event.data.data.gid != null) {
+          console.debug(
+            "firebase update of single agent location: ",
+            event.data.data
+          );
+          drawSingleAgent(event.data.data.gid);
+        } else {
+          console.debug(
+            "firebase update of whole team location: ",
+            event.data.data
+          );
+          drawSingleTeam(event.data.data.msg);
+        }
         break;
       case "Delete":
         console.warn("server requested op delete: ", event.data.data.opID);
-        if (event.data.data.opID == operation.ID) loadNewDefaultOp();
-        removeOperation(event.data.data.opID);
+        if (event.data.data.opID == operation.ID) await loadNewDefaultOp();
+        await removeOperation(event.data.data.opID);
         break;
       case "Generic Message":
         alert(JSON.stringify(event.data.data));
         break;
       case "Login":
-        // display to console somehow?
         console.debug("server reported teammate login: ", event.data.data.gid);
-        window.plugin.wasabee.onlineAgents.set(event.data.data.gid, Date.now());
+        window.map.fire("wasabeeUIUpdate", { reason: "onlineAgent" }, false);
         break;
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
@@ -63,7 +72,7 @@ export function initFirebase() {
                 "firebase trigger reload of current op: ",
                 event.data.data
               );
-              makeSelectedOperation(refreshed.ID);
+              await makeSelectedOperation(refreshed.ID);
             } else {
               console.debug(
                 "firebase trigger update of op",
@@ -104,12 +113,12 @@ export function initFirebase() {
 
 export function postToFirebase(message) {
   // prevent analytics data from being sent if not enabled by the user: GPDR
-  if (
+  /* if (
     message.id == "analytics" &&
     localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
       "true"
   )
-    return;
+    return; */
 
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 }

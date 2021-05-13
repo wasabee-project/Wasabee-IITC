@@ -1,68 +1,27 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import SetCommentDialog from "./setCommentDialog";
 import ConfirmDialog from "./confirmDialog";
 import WasabeeAgent from "../agent";
 import wX from "../wX";
 // import WasabeeMe from "../me";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeOp from "../operation";
+// import WasabeeOp from "../operation";
 
 const LinkListDialog = WDialog.extend({
   statics: {
     TYPE: "linkListDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = LinkListDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE");
-    this._label = wX("NO_LABEL");
-    this.placeholder = "";
-    this.current = "";
-    postToFirebase({ id: "analytics", action: LinkListDialog.TYPE });
+  options: {
+    usePane: true,
+    // portal
   },
 
-  addHooks: function () {
-    if (!this._map) return;
-    WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.updateLinkList();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
-    this._displayDialog();
-  },
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-  },
-
-  _displayDialog: function () {
-    const buttons = {};
-    buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
-    };
-
-    this._dialog = window.dialog({
-      title: this._portal.displayName + wX("LINKS2"),
-      html: this._table.table,
-      width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-linklist",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
-      id: window.plugin.wasabee.static.dialogNames.linkList,
-    });
-    this._dialog.dialog("option", "buttons", buttons);
-  },
-
-  setup: function (UNUSED, portal) {
-    this._portal = portal;
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     this._table = new Sortable();
@@ -70,22 +29,22 @@ const LinkListDialog = WDialog.extend({
       {
         name: "Order",
         value: (link) => link.throwOrderPos,
-        // , sort: (a, b) => { return a - b; }
-        // , format: (cell, value, obj) => { console.log(value, obj); cell.textContent = value; }
       },
       {
         name: "From",
         value: (link) => operation.getPortal(link.fromPortalId),
-        sortValue: (b) => b.name,
+        sortValue: (portal) => portal.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
+        format: (cell, portal) =>
+          cell.appendChild(portal.displayFormat(operation)),
       },
       {
         name: "To",
         value: (link) => operation.getPortal(link.toPortalId),
-        sortValue: (b) => b.name,
+        sortValue: (portal) => portal.name,
         sort: (a, b) => a.localeCompare(b),
-        format: (cell, data) => cell.appendChild(data.displayFormat(operation)),
+        format: (cell, portal) =>
+          cell.appendChild(portal.displayFormat(operation)),
       },
       {
         name: "Length",
@@ -117,8 +76,10 @@ const LinkListDialog = WDialog.extend({
             comment.textContent = window.escapeHtmlSpecialChars(data);
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const scd = new SetCommentDialog(window.map);
-              scd.setup(link, operation);
+              const scd = new SetCommentDialog({
+                target: link,
+                operation: operation,
+              });
               scd.enable();
             });
           }
@@ -127,13 +88,11 @@ const LinkListDialog = WDialog.extend({
       },
       {
         name: "Assigned To",
-        value: (link) => {
+        value: async (link) => {
           if (link.assignedTo != null && link.assignedTo != "") {
-            const agent = WasabeeAgent.cacheGet(link.assignedTo);
+            const agent = await WasabeeAgent.get(link.assignedTo);
             if (agent != null) return agent.name;
-            // we can't use async here, so just request it now and it should be in cache next time
-            WasabeeAgent.waitGet(link.assignedTo);
-            return "looking up: [" + link.assignedTo + "]";
+            return "GID: [" + link.assignedTo + "]";
           }
 
           return "";
@@ -145,23 +104,21 @@ const LinkListDialog = WDialog.extend({
           if (operation.IsServerOp() && operation.IsWritableOp()) {
             L.DomEvent.on(a, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog();
-              ad.setup(link);
+              const ad = new AssignDialog({ target: link });
               ad.enable();
             });
           }
         },
         smallScreenHide: true,
       },
-      {
+      /* {
         name: "Color",
         value: (link) => link.color,
-        // sort: null,
         format: (cell, data, link) => {
           this.makeColorMenu(cell, data, link);
         },
         smallScreenHide: true,
-      },
+      }, */
       {
         name: "Reverse",
         value: (link) => link.fromPortalId,
@@ -191,22 +148,53 @@ const LinkListDialog = WDialog.extend({
       },
     ];
     this._table.sortBy = 0;
-    this._table.items = operation.getLinkListFromPortal(this._portal);
+    this._table.items = operation.getLinkListFromPortal(this.options.portal);
+  },
+
+  addHooks: function () {
+    WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
+    this._displayDialog();
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabeeUIUpdate", this.updateLinkList, this);
+  },
+
+  _displayDialog: function () {
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this.closeDialog();
+    };
+
+    this.createDialog({
+      title: this.options.portal.displayName + wX("LINKS2"),
+      html: this._table.table,
+      width: "auto",
+      dialogClass: "linklist",
+      buttons: buttons,
+      id: window.plugin.wasabee.static.dialogNames.linkList,
+    });
   },
 
   deleteLink: function (link) {
-    const con = new ConfirmDialog(window.map);
     const prompt = L.DomUtil.create("div");
     prompt.textContent = wX("CONFIRM_DELETE");
     const operation = getSelectedOperation();
     prompt.appendChild(link.displayFormat(operation));
-    con.setup("Delete Link", prompt, () => {
-      operation.removeLink(link.fromPortalId, link.toPortalId);
+    const con = new ConfirmDialog({
+      title: "Delete Link",
+      label: prompt,
+      type: "link",
+      callback: () => {
+        operation.removeLink(link.fromPortalId, link.toPortalId);
+      },
     });
     con.enable();
   },
 
-  makeColorMenu: function (list, data, link) {
+  /* makeColorMenu: function (list, data, link) {
     const operation = getSelectedOperation();
     const colorSection = L.DomUtil.create("div", null, list);
     const linkColor = L.DomUtil.create("select", null, colorSection);
@@ -223,7 +211,7 @@ const LinkListDialog = WDialog.extend({
 
     // TODO: picker here
     // custom color
-    if (WasabeeOp.newColors(data) == data) {
+    if (newColors(data) == data) {
       const option = L.DomUtil.create("option");
       option.value = data;
       option.selected = true;
@@ -238,16 +226,16 @@ const LinkListDialog = WDialog.extend({
       },
       false
     );
-  },
+  }, */
 
   updateLinkList: function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;
     if (this._opID == operation.ID) {
-      this._table.items = operation.getLinkListFromPortal(this._portal);
+      this._table.items = operation.getLinkListFromPortal(this.options.portal);
     } else {
       // the selected operation changed, just bail
-      this._dialog.dialog("close");
+      this.closeDialog();
     }
   },
 });

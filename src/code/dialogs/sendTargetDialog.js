@@ -5,7 +5,6 @@ import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
 import { targetPromise } from "../server";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
 const SendTargetDialog = WDialog.extend({
@@ -13,64 +12,52 @@ const SendTargetDialog = WDialog.extend({
     TYPE: "sendTargetDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = SendTargetDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: SendTargetDialog.TYPE });
+  options: {
+    // target
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: this._name,
+    this._html = L.DomUtil.create("div", null);
+    this._setup();
+
+    this.createDialog({
+      title: wX("SEND TARGET AGENT"),
       html: this._html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-sendtarget",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "sendtarget",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.assign,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target) {
-    this._dialog = null;
-    this._target = target;
-    this._html = L.DomUtil.create("div", null);
+  _setup: async function () {
     const divtitle = L.DomUtil.create("div", "desc", this._html);
-    const menu = await this._getAgentMenu(target.assignedTo);
-    this._name = wX("SEND TARGET AGENT");
+    const menu = await this._getAgentMenu(this.options.target.assignedTo);
     this._targettype = "ad hoc target";
 
     const operation = getSelectedOperation();
 
-    if (target instanceof WasabeeMarker) {
-      const portal = operation.getPortal(target.portalId);
-      this._targettype = target.type;
+    if (this.options.target instanceof WasabeeMarker) {
+      const portal = operation.getPortal(this.options.target.portalId);
+      this._targettype = this.options.target.type;
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
     }
 
-    if (target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(target.portalId);
+    if (this.options.target instanceof WasabeeAnchor) {
+      const portal = operation.getPortal(this.options.target.portalId);
       this._targettype = "anchor";
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
@@ -103,10 +90,10 @@ const SendTargetDialog = WDialog.extend({
 
     menu.addEventListener("change", async (ev) => {
       L.DomEvent.stop(ev);
-      const portal = operation.getPortal(this._target.portalId);
+      const portal = operation.getPortal(this.options.target.portalId);
       try {
         await targetPromise(menu.value, portal, this._targettype);
-        this._dialog.dialog("close");
+        this.closeDialog();
         alert(wX("TARGET SENT"));
       } catch (e) {
         console.error(e);
@@ -118,8 +105,9 @@ const SendTargetDialog = WDialog.extend({
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.waitGet(t.teamid, 5 * 60);
-        for (const a of tt.agents) {
+        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const agents = tt.getAgents();
+        for (const a of agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
             option = L.DomUtil.create("option");

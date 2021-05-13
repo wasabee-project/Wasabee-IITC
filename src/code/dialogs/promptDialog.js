@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // generic prompt screen
 
@@ -9,70 +8,73 @@ const PromptDialog = WDialog.extend({
     TYPE: "promptDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = PromptDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE"); // should never be displayed
-    this._label = wX("NO_LABEL"); // should never be displayed
-    this.placeholder = "";
-    this.current = "";
-    postToFirebase({ id: "analytics", action: PromptDialog.TYPE });
+  options: {
+    title: wX("NO_TITLE"), // should never be displayed
+    label: wX("NO_LABEL"), // should never be displayed
+    placeholder: "",
+    current: "",
+    suggestions: [],
+    // callback
+    // cancelCallback
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.map.fire("wasabeeUIUpdate", { reason: "PromptDialogClose" }, false);
   },
 
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (this._callback) this._callback();
-      this._dialog.dialog("close");
+      if (this.options.callback) this.options.callback();
+      this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
-      if (this._cancelCallback) this._cancelCallback();
-      this._dialog.dialog("close");
+      if (this.options.cancelCallback) this.options.cancelCallback();
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: this._title,
+    this.createDialog({
+      title: this.options.title,
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-prompt",
-      closeCallback: () => {
-        window.runHooks("wasabeeUIUpdate");
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "prompt",
+      buttons: buttons,
     });
-    this._dialog.dialog("option", "buttons", buttons);
-  },
-
-  setup: function (title, label, callback, cancelCallback) {
-    this._title = title;
-    this._label = label;
-    if (callback) this._callback = callback;
-    if (cancelCallback) this._cancelCallback = cancelCallback;
   },
 
   _buildContent: function () {
     const content = L.DomUtil.create("div", "container");
-    if (typeof this._label == "string") {
+    if (typeof this.options.label == "string") {
       const label = L.DomUtil.create("label", null, content);
-      label.textContent = this._label;
+      label.textContent = this.options.label;
     } else {
-      content.appendChild(this._label);
+      content.appendChild(this.options.label);
     }
     this.inputField = L.DomUtil.create("input", null, content);
     this.inputField.id = "inputField";
-    this.inputField.placeholder = this.placeholder;
-    this.inputField.value = this.current;
+    this.inputField.placeholder = this.options.placeholder;
+    this.inputField.value = this.options.current;
+
+    if (this.options.suggestions) {
+      const datalist = L.DomUtil.create("datalist", null, content);
+      datalist.id = "wasabee-prompt-suggestions";
+      for (const entry of this.options.suggestions) {
+        const option = L.DomUtil.create("option", null, datalist);
+        if (typeof entry === "string") {
+          option.value = entry;
+        } else {
+          option.textContent = entry.text;
+          option.value = entry.value;
+        }
+      }
+      this.inputField.setAttribute("list", "wasabee-prompt-suggestions");
+    }
     return content;
   },
 });

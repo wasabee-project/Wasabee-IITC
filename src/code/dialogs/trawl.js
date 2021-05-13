@@ -2,20 +2,11 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
-// why trust my own math when someone else has done the work?
-import VLatLon from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-vincenty";
-// import { datums } from "../../lib/geodesy-2.2.1/latlon-ellipsoidal-datum";
-import { postToFirebase } from "../firebaseSupport";
+import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 
 const TrawlDialog = WDialog.extend({
   statics: {
     TYPE: "trawl",
-  },
-
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this.type = TrawlDialog.TYPE;
-    postToFirebase({ id: "analytics", action: TrawlDialog.TYPE });
   },
 
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
@@ -26,6 +17,9 @@ const TrawlDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+
+    if (window.plugin.wasabee.tileTrawlQueue)
+      delete window.plugin.wasabee.tileTrawlQueue;
   },
 
   _displayTrawlerDialog: function (tiles) {
@@ -34,7 +28,7 @@ const TrawlDialog = WDialog.extend({
     warning.textContent = wX("TRAWLING", tiles);
     const stat = L.DomUtil.create("div", null, container);
     this.remaining = L.DomUtil.create("span", null, stat);
-    this.remaining.textContent = wX("TRAWL_REMAINING", tiles);
+    this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
 
     // same as dialogs/settings.js
     const trawlTitle = L.DomUtil.create("label", null, container);
@@ -59,38 +53,26 @@ const TrawlDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._trawlerDialog.dialog("close");
+      this.closeDialog("close");
     };
 
-    this._trawlerDialog = window.dialog({
+    this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-trawl",
-      closeCallback: () => {
-        if (window.plugin.wasabee.tileTrawlQueue)
-          delete window.plugin.wasabee.tileTrawlQueue;
-        this.disable();
-        delete this._trawlerDialog;
-      },
+      dialogClass: "trawl",
+      buttons: buttons,
       // id: window.plugin.wasabee.static.dialogNames.trawl
     });
-    this._trawlerDialog.dialog("option", "buttons", buttons);
   },
 
   _updateTrawlerDialog: function (tiles) {
     if (this && this.remaining)
-      this.remaining.textContent = wX("TRAWL_REMAINING", tiles);
+      this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
   },
 
   // define our work in _displayDialog
   _displayDialog: function () {
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode != "design") {
-      console.log("switching to design mode for trawl");
-      localStorage[window.plugin.wasabee.static.constants.MODE_KEY] = "design";
-    }
-
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
@@ -122,8 +104,8 @@ const TrawlDialog = WDialog.extend({
       const points = this._getTrawlPoints();
       this._pointTileDataRequest(points, 13);
       const tiles = window.plugin.wasabee.tileTrawlQueue.size;
+      this.closeDialog();
       this._displayTrawlerDialog(tiles);
-      this._dialog.dialog("close");
     });
 
     const crazyWarning = L.DomUtil.create("h4", null, container);
@@ -136,26 +118,22 @@ const TrawlDialog = WDialog.extend({
       if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
-      this._dialog.dialog("close");
+      this.closeDialog();
     });
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("TRAWL TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-trawl",
-      closeCallback: () => {
-        // this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "trawl",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.trawl,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _getTrawlPoints: function () {

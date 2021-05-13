@@ -1,7 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // export screen
 const ExportDialog = WDialog.extend({
@@ -9,27 +8,16 @@ const ExportDialog = WDialog.extend({
     TYPE: "exportDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = ExportDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ExportDialog.TYPE });
-  },
-
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("DRAW TOOLS FORMAT")] = () => {
       this._drawToolsFormat(operation);
@@ -38,18 +26,14 @@ const ExportDialog = WDialog.extend({
       this._bookmarkFormat(operation);
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("EXPORT") + operation.name,
       html: this._buildContent(operation),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-export",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "export",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.exportDialog,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _buildContent: function (operation) {
@@ -57,7 +41,7 @@ const ExportDialog = WDialog.extend({
     const textArea = L.DomUtil.create("textarea", null, mainContent);
     textArea.id = "wasabee-dialog-export-textarea";
     operation.cleanAll();
-    textArea.value = JSON.stringify(operation);
+    textArea.value = operation.toExport();
     return mainContent;
   },
 

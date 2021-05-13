@@ -1,4 +1,3 @@
-import { getSelectedOperation } from "./selectedOp";
 import addButtons from "./addButtons";
 
 const Wasabee = window.plugin.wasabee;
@@ -6,9 +5,11 @@ const Wasabee = window.plugin.wasabee;
 // the skins probably aren't loaded by the time W's init is called
 export function initSkin() {
   Wasabee.skin = {};
+  Wasabee.skin.defaultOperationColor = Wasabee.static.defaultOperationColor;
   Wasabee.skin.layerTypes = new Map(Wasabee.static.layerTypes);
   Wasabee.skin.linkStyle = Wasabee.static.linkStyle;
   Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
+  Wasabee.skin.backgroundLinkStyle = Wasabee.static.backgroundLinkStyle;
   Wasabee.skin.anchorTemplate = Wasabee.static.anchorTemplate;
   Wasabee.skin.strings = Object.assign({}, Wasabee.static.strings);
 
@@ -55,8 +56,6 @@ function resetCSS() {
 export function changeSkin(names) {
   if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
 
-  const op = getSelectedOperation();
-
   if (names.length == 0) {
     delete localStorage[Wasabee.static.constants.SKIN_KEY];
   }
@@ -91,6 +90,8 @@ export function changeSkin(names) {
       addCSS(k, skin.CSS[k]);
     }
 
+    if (skin.defaultOperationColor)
+      Wasabee.skin.defaultOperationColor = skin.defaultOperationColor;
     if (skin.layerTypes)
       for (const [k, v] of skin.layerTypes) Wasabee.skin.layerTypes.set(k, v);
     if (skin.linkStyle) Wasabee.skin.linkStyle = skin.linkStyle;
@@ -106,8 +107,8 @@ export function changeSkin(names) {
     window.plugin.wasabee.static.constants.SKIN_KEY
   ] = JSON.stringify(validNames);
 
-  addButtons(op);
-  window.runHooks("wasabeeUIUpdate", "skin change");
+  addButtons();
+  window.map.fire("wasabeeUIUpdate", { reason: "skin change" }, false);
   return true;
 }
 

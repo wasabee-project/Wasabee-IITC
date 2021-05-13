@@ -36,33 +36,153 @@ export const WTooltip = L.Class.extend({
   },
 });
 
+// Android pane
+export const WPane = L.Handler.extend({
+  options: {
+    paneId: "wasabee",
+    paneName: "Wasabee",
+    default: null,
+  },
+
+  initialize: function (options) {
+    L.setOptions(this, options);
+    if (window.useAndroidPanes())
+      android.addPane(this.options.paneId, this.options.paneName);
+    window.addHook("paneChanged", (pane) => {
+      if (pane === this.options.paneId) this.enable();
+      else this.disable();
+    });
+    this._container = L.DomUtil.create(
+      "div",
+      "wasabee-pane hidden",
+      document.body
+    );
+    window.map.on("wasabee:paneset", (data) => {
+      if (data.pane !== this.options.paneId) return;
+      if (this._dialog) this._dialog.closeDialog();
+      this._dialog = data.dialog;
+      this._container.textContent = "";
+      this._container.appendChild(this._dialog._container);
+      window.show(data.pane);
+    });
+    window.map.on("wasabee:paneclear", (data) => {
+      if (data.pane !== this.options.paneId) return;
+      if (this._dialog === data.dialog) delete this._dialog;
+    });
+  },
+
+  addHooks: function () {
+    this._container.classList.remove("hidden");
+    if (!this._dialog && this.options.default) {
+      const defaultDialog = this.options.default();
+      defaultDialog.enable();
+    }
+  },
+
+  removeHooks: function () {
+    this._container.classList.add("hidden");
+  },
+});
+
 export const WDialog = L.Handler.extend({
-  initialize: function (map = window.map, options) {
-    if (this.type === undefined) this.type = "Unextended Wasabee Dialog";
-    this._map = map;
-    this._container = map._container;
-    this.options = {};
-    L.Util.extend(this.options, options);
-    this._enabled = false;
-    this._smallScreen = this._isMobile();
-    this._dialog = null;
-    // look for operation in options, if not set, get it
+  statics: {
+    TYPE: "Unextended Wasabee Dialog",
+  },
+
+  options: {
+    usePane: false,
+    paneId: "wasabee",
+  },
+
+  initialize: function (options) {
+    L.setOptions(this, options);
     // determine large or small screen dialog sizes
-  },
-
-  enable: function () {
-    if (this._enabled) return;
-    L.Handler.prototype.enable.call(this);
-  },
-
-  disable: function () {
-    if (!this._enabled) return;
-    L.Handler.prototype.disable.call(this);
+    this._smallScreen = this._isMobile();
+    window.map.fire("wdialog", this);
+    this.options.usePane =
+      this.options.usePane &&
+      window.isSmartphone() &&
+      localStorage[window.plugin.wasabee.static.constants.USE_PANES] === "true";
   },
 
   addHooks: function () {},
 
   removeHooks: function () {},
+
+  createDialog: function (options) {
+    this.options.title = options.title;
+    options.dialogClass =
+      "wasabee-dialog wasabee-dialog-" + options.dialogClass;
+    if (this._smallScreen) options.dialogClass += " wasabee-small-screen";
+    if (this.options.usePane) {
+      this._container = L.DomUtil.create("div", options.dialogClass);
+      if (options.id) this._container.id = options.id;
+
+      this._header = L.DomUtil.create("div", "header", this._container);
+      if (options.title) this._header.textContent = options.title;
+
+      this._content = L.DomUtil.create("div", "content", this._container);
+      if (options.html) this._content.appendChild(options.html);
+
+      this._buttons = L.DomUtil.create("div", "buttonset", this._container);
+      if (options.buttons) {
+        if (!(options.buttons instanceof Array)) {
+          options.buttons = Object.entries(options.buttons).map(([k, v]) => ({
+            text: k,
+            click: v,
+          }));
+        }
+        for (const entry of options.buttons) {
+          const button = L.DomUtil.create("button", null, this._buttons);
+          button.textContent = entry.text;
+          L.DomEvent.on(button, "click", entry.click);
+        }
+      }
+      window.map.fire("wasabee:paneset", {
+        pane: this.options.paneId,
+        dialog: this,
+      });
+    } else {
+      if (!options.closeCallback) {
+        options.closeCallback = () => {
+          this.disable();
+          delete this._dialog;
+        };
+      }
+      this._dialog = window.dialog(options);
+      // swap in our buttons, replacing the defaults
+      if (options.buttons)
+        this._dialog.dialog("option", "buttons", options.buttons);
+    }
+  },
+
+  setTitle: function (title) {
+    if (this._dialog) this._dialog.dialog("option", "title", title);
+    else if (this._header) this._header.textContent = title;
+  },
+
+  setContent: function (content) {
+    if (this._dialog) this._dialog.html(content);
+    else if (this._container) {
+      this._content.textContent = "";
+      this._content.appendChild(content);
+    }
+  },
+
+  closeDialog: function () {
+    if (this._dialog) {
+      this._dialog.dialog("close");
+      delete this._dialog;
+    } else if (this._container) {
+      window.map.fire("wasabee:paneclear", {
+        pane: this.options.paneId,
+        dialog: this,
+      });
+      this.disable();
+      delete this._container;
+      window.show("map");
+    }
+  },
 
   _isMobile: function () {
     // return true;
@@ -70,6 +190,43 @@ export const WDialog = L.Handler.extend({
     if (window.plugin.userLocation) return true;
     return false;
   },
+});
+
+// the wrapper class for the buttons
+// pass in the WButtons as a Map in options.buttons
+export const ButtonsControl = L.Control.extend({
+  // options: { position: "topleft", },
+
+  // From L.Control: onAdd is called when this is added to window.map
+  onAdd: function () {
+    // allow the buttons to call this ButtonsControl...
+    for (const b of this.options.buttons.values()) {
+      b.setControl(this);
+    }
+
+    const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
+    outerDiv.appendChild(this.options.container);
+
+    return outerDiv;
+  },
+
+  // called when wasabeeUIUpdate fires
+  update: function () {
+    for (const b of this.options.buttons.values()) {
+      b.Wupdate();
+    }
+  },
+
+  // called by a WButton when it is enabled
+  disableAllExcept: function (name) {
+    for (const [n, b] of this.options.buttons) {
+      if (n != name) b.disable();
+    }
+  },
+
+  // we could add logic for adding new buttons, removing existing, etc
+  // but there is not need at the moment since hiding/showing seems
+  // to work fine
 });
 
 export const WButton = L.Class.extend({
@@ -82,8 +239,9 @@ export const WButton = L.Class.extend({
   title: "Unset",
 
   // make sure all these bases are covered in your button
+  // XXX this initializer is not used by any buttons
   initialize: function (map, container) {
-    console.log("Wbutton init");
+    console.log("WButton init");
     if (!map) map = window.map;
     this._map = map;
 
@@ -91,6 +249,7 @@ export const WButton = L.Class.extend({
     this.title = "Unextended WButton";
     this._container = container;
     this.handler = this._toggleActions;
+    // this.actionsContainer == the sub menu items created by the individual buttons
 
     this.button = this._createButton({
       container: container,
@@ -111,6 +270,10 @@ export const WButton = L.Class.extend({
     }
   },
 
+  setControl: function (control) {
+    this.control = control;
+  },
+
   disable: function () {
     if (!this._enabled) return;
     this._enabled = false;
@@ -121,14 +284,10 @@ export const WButton = L.Class.extend({
 
   enable: function () {
     if (this._enabled) return;
+    if (this.control) this.control.disableAllExcept(this.type);
     this._enabled = true;
     if (this.actionsContainer) {
       this.actionsContainer.style.display = "block";
-    }
-    // disable all the others
-    for (const m in window.plugin.wasabee.buttons._modes) {
-      if (window.plugin.wasabee.buttons._modes[m].type != this.type)
-        window.plugin.wasabee.buttons._modes[m].disable();
     }
   },
 
@@ -190,7 +349,7 @@ export const WButton = L.Class.extend({
   },
 
   _disposeButton: function (button, callback) {
-    console.log("Wbutton _disposeButton");
+    console.log("WButton _disposeButton");
     L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
       .off(button, "mousedown", L.DomEvent.stopPropagation)
       .off(button, "dblclick", L.DomEvent.stopPropagation)

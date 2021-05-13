@@ -5,7 +5,6 @@ import { greatCircleArcIntersect } from "../crosslinks";
 import WasabeeLink from "../link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OnionfieldDialog = WDialog.extend({
   statics: {
@@ -13,23 +12,11 @@ const OnionfieldDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
-    // requires newer leaflet, poke user to upgrade their IITC
-    if (!this._map.distance) {
-      alert("Requires IITC 0.30.1 or newer");
-      return;
-    }
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_ONION_PORTALS");
@@ -82,34 +69,28 @@ const OnionfieldDialog = WDialog.extend({
     });
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: "Onion/Rose",
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-onion",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "onion",
+      buttons: buttons,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = OnionfieldDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = "Onion/Rose";
     this.label = "Onion/Rose";
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: OnionfieldDialog.TYPE });
   },
 
   onion: function () {
@@ -119,22 +100,38 @@ const OnionfieldDialog = WDialog.extend({
       alert("no anchor selected");
       return;
     }
-    this._colors = new Array();
-    for (const [k, c] of window.plugin.wasabee.skin.layerTypes) {
-      this._colors.push(k);
-      this._trash = c;
-    }
+    this._colors = [
+      "#f80c12",
+      "#ee1100",
+      "#ff3311",
+      "#ff4422",
+      "#ff6644",
+      "#ff9933",
+      "#feae2d",
+      "#ccbb33",
+      "#d0c310",
+      "#aacc22",
+      "#69d025",
+      "#22ccaa",
+      "#12bdb9",
+      "#11aabb",
+      "#4444dd",
+      "#3311bb",
+      "#3b0cbd",
+      "#442299",
+    ];
     this._colorIterator = 0;
     this._color = this._colors[this._colorIterator];
     const allPortals = getAllPortalsOnScreen(this._operation);
+
+    // batch mode isn't strictly necessary since we are loading the links in one operation, but portals are added during the recursion
+    this._operation.startBatchMode();
 
     // add the anchor to the operation, needed to check for crosslinks
     this._operation.addPortal(this._anchor);
     // start digging for onions
     const onion = this._recurser(allPortals, [], this._anchor);
 
-    // batch mode isn't strictly necessary since we are loading the links in one operation
-    this._operation.startBatchMode();
     // add all the found links at once
     // this is a minor abuse of the _operation object since we aren't using the  operation.addLink() method to add links
     this._operation.links.push(...onion);
@@ -175,7 +172,7 @@ const OnionfieldDialog = WDialog.extend({
         continue;
       }
 
-      const pDist = this._map.distance(one.latLng, p.latLng);
+      const pDist = window.map.distance(one.latLng, p.latLng);
       m.set(pDist, p);
     }
     // sort by distance
@@ -326,9 +323,9 @@ const OnionfieldDialog = WDialog.extend({
   // angle a<bc in radians
   _angle: function (a, b, c) {
     // this formua finds b, swap a&b for our purposes
-    const A = this._map.project(b.latLng);
-    const B = this._map.project(a.latLng);
-    const C = this._map.project(c.latLng);
+    const A = window.map.project(b.latLng);
+    const B = window.map.project(a.latLng);
+    const C = window.map.project(c.latLng);
 
     const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
     const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));

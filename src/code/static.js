@@ -5,6 +5,9 @@ W.static = {
   CSS: {
     main: require("./css/wasabee.css"),
     autodraws: require("./css/autodraws.css"),
+    toolbar: require("./css/toolbar.css"),
+    panes: require("./css/panes.css"),
+    smallScreen: require("./css/smallscreen.css"),
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
     iitcfix: require("./css/iitcfix.css"),
@@ -33,6 +36,8 @@ W.static = {
     madrid: "wasabee-madrid",
     autodraws: "wasabee-autodraws",
     starburst: "wasabee-starburst",
+    savelinks: "wasabee-savelinks",
+    settings: "wasabee-settings",
   },
   constants: {
     SELECTED_OP_KEY: "wasabee-selected-op",
@@ -55,10 +60,13 @@ W.static = {
     LAST_MARKER_KEY: "wasabee-last-marker-type",
     AUTO_LOAD_FAKED: "wasabee-autoload-faked",
     TRAWL_SKIP_STEPS: "wasabee-trawl-skip",
+    USE_PANES: "wasabee-use-panes",
+    SKIP_CONFIRM: "wasabee-skip-confirm",
     OAUTH_CLIENT_ID:
       "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
     SERVER_BASE_KEY: "wasabee-server",
     SERVER_BASE_DEFAULT: "https://am.wasabee.rocks",
+    REBASE_UPDATE_KEY: "wasabee-rebase-on-update",
     MARKER_TYPE_CAPTURE: "CapturePortalMarker",
     MARKER_TYPE_DECAY: "LetDecayPortalAlert",
     MARKER_TYPE_EXCLUDE: "ExcludeMarker",
@@ -82,6 +90,11 @@ W.static = {
       interactive: false,
     },
   },
+  publicServers: [
+    { name: "Americas", url: "https://am.wasabee.rocks", short: "🇺🇸" },
+    { name: "Europe", url: "https://eu.wasabee.rocks", short: "🇪🇺" },
+    { name: "Asia/Pacific", url: "https://ap.wasabee.rocks", short: "AP" },
+  ],
 };
 
 W.static.strings = {}; // empty object, fill it below
@@ -109,6 +122,8 @@ W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_EXCLUDE,
 ]);
 
+W.static.defaultOperationColor = "orange";
+
 W.static.linkStyle = {
   dashArray: [5, 5, 1, 5],
   assignedDashArray: [4, 2, 1],
@@ -121,6 +136,14 @@ W.static.selfBlockStyle = {
   dashArray: [1, 5],
   opacity: 4,
   weight: 3,
+};
+
+W.static.backgroundLinkStyle = {
+  dashArray: [8, 5],
+  opacity: 0.4,
+  weight: 2,
+  color: "green",
+  interactive: false,
 };
 
 W.static.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");

@@ -1,3 +1,4 @@
+import { ButtonsControl } from "./leafletClasses";
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
@@ -5,63 +6,51 @@ import OpButton from "./buttons/opButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
-import { getSelectedOperation } from "./selectedOp";
 
 /* This function adds the plugin buttons on the left side of the screen */
-export function addButtons(selectedOp) {
-  selectedOp = selectedOp || getSelectedOperation();
-
+export function addButtons() {
   if (window.plugin.wasabee.buttons) {
-    console.log("replacing buttons");
+    console.warn("replacing buttons");
+    window.map.off(
+      "wasabeeUIUpdate",
+      window.plugin.wasabee.buttons.update,
+      window.plugin.wasabee.buttons
+    );
     window.map.removeControl(window.plugin.wasabee.buttons);
     delete window.plugin.wasabee.buttons;
   }
 
-  const ButtonsControl = L.Control.extend({
-    options: {
-      position: "topleft",
-    },
-    onAdd: function (map) {
-      const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
-      this._container = L.DomUtil.create("div", "leaflet-bar", outerDiv);
-      this._modes = {};
-
-      const wb = new WasabeeButton(map, this._container);
-      this._modes[wb.type] = wb;
-      const ob = new OpButton(map, this._container);
-      this._modes[ob.type] = ob;
-      const qb = new QuickdrawButton(map, this._container);
-      this._modes[qb.type] = qb;
-      const lb = new LinkButton(map, this._container);
-      this._modes[lb.type] = lb;
-      const mb = new MarkerButton(map, this._container);
-      this._modes[mb.type] = mb;
-      const sb = new SyncButton(map, this._container);
-      this._modes[sb.type] = sb;
-      const ub = new UploadButton(map, this._container);
-      this._modes[ub.type] = ub;
-      return outerDiv;
-    },
-
-    update: function (operation) {
-      for (const id in window.plugin.wasabee.buttons._modes) {
-        window.plugin.wasabee.buttons._modes[id].Wupdate(
-          window.plugin.wasabee.buttons._container,
-          operation
-        );
-      }
-    },
-  });
-
-  if (typeof window.plugin.wasabee.buttons === "undefined") {
-    window.plugin.wasabee.buttons = new ButtonsControl();
-    window.map.addControl(window.plugin.wasabee.buttons);
+  const options = {};
+  // XXX next refactor pass, don't require a container to be passed in, get the formatting on ButtonsControl.onAdd()
+  options.container = L.DomUtil.create("ul", "leaflet-bar");
+  options.position = "topleft";
+  options.buttons = new Map();
+  for (const Constructor of [
+    WasabeeButton,
+    OpButton,
+    QuickdrawButton,
+    LinkButton,
+    MarkerButton,
+    SyncButton,
+    UploadButton,
+  ]) {
+    const item = L.DomUtil.create("li", null, options.container);
+    const button = new Constructor(window.map, item);
+    options.buttons.set(button.type, button);
   }
 
-  // this should not be run multiple times...
-  window.addHook("wasabeeUIUpdate", window.plugin.wasabee.buttons.update);
+  window.plugin.wasabee.buttons = new ButtonsControl(options);
+  window.map.addControl(window.plugin.wasabee.buttons);
 
-  window.plugin.wasabee.buttons.update(selectedOp);
+  // start off with a fresh update
+  window.plugin.wasabee.buttons.update();
+
+  // listen for UI changes, update buttons that need it
+  window.map.on(
+    "wasabeeUIUpdate",
+    window.plugin.wasabee.buttons.update,
+    window.plugin.wasabee.buttons
+  );
 }
 
 export default addButtons;

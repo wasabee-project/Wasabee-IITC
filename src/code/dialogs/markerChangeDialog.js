@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { getSelectedOperation } from "../selectedOp";
 
 const MarkerChangeDialog = WDialog.extend({
@@ -8,31 +7,20 @@ const MarkerChangeDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = MarkerChangeDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: MarkerChangeDialog.TYPE });
+  options: {
+    // marker
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
-  setup: function (target) {
-    this._marker = target;
   },
 
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const content = L.DomUtil.create("div", "content");
 
-    const portal = operation.getPortal(this._marker.portalId);
+    const portal = operation.getPortal(this.options.marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
     portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
@@ -44,9 +32,9 @@ const MarkerChangeDialog = WDialog.extend({
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
-      if (markers.has(k) && k != this._marker.type) o.disabled = true;
+      if (markers.has(k) && k != this.options.marker.type) o.disabled = true;
     }
-    this._type.value = this._marker.type;
+    this._type.value = this.options.marker.type;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -54,25 +42,25 @@ const MarkerChangeDialog = WDialog.extend({
         window.plugin.wasabee.static.markerTypes.has(this._type.value) &&
         !markers.has(this._type.value)
       ) {
-        operation.removeMarker(this._marker);
-        operation.addMarker(this._type.value, portal, this._marker.comment);
+        operation.removeMarker(this.options.marker);
+        operation.addMarker(
+          this._type.value,
+          portal,
+          this.options.marker.comment
+        );
       }
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("SET_MARKER_TYPE_TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-markerchange",
+      dialogClass: "markerchange",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       id: window.plugin.wasabee.static.dialogNames.markerButton,
     });
   },

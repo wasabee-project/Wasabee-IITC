@@ -1,4 +1,3 @@
-import WasabeeOp from "./operation";
 import colorString from "color-string";
 
 //** This function generates a unique ID for an object */
@@ -10,9 +9,30 @@ export function generateId(len = 40) {
   }).join("");
 }
 
+export function newColors(incoming) {
+  switch (incoming) {
+    case "groupa":
+      return "orange";
+    case "groupb":
+      return "yellow";
+    case "groupc":
+      return "lime";
+    case "groupd":
+      return "purple";
+    case "groupe":
+      return "teal";
+    case "groupf":
+      return "fuchsia";
+    case "main":
+      return "red";
+    default:
+      return incoming;
+  }
+}
+
 export function convertColorToHex(color, on_error = "#000000") {
   try {
-    return colorString.to.hex(colorString.get.rgb(WasabeeOp.newColors(color)));
+    return colorString.to.hex(colorString.get.rgb(newColors(color)));
   } catch {
     return on_error;
   }

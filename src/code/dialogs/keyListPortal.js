@@ -1,82 +1,69 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import WasabeeAgent from "../agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const KeyListPortal = WDialog.extend({
   statics: {
     TYPE: "keyListPortal",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = KeyListPortal.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: KeyListPortal.TYPE });
+  options: {
+    // portalID
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.keyListUpdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.keyListUpdate, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
-  },
-
-  setup: function (portalID) {
-    this._portalID = portalID;
-    const op = getSelectedOperation();
-    this._opID = op.ID;
-    this._portal = op.getPortal(portalID);
-    this._sortable = this.getSortable();
+    window.map.off("wasabeeUIUpdate", this.keyListUpdate, this);
   },
 
   _displayDialog: function () {
-    if (!this._portalID) {
+    if (!this.options.portalID) {
       this.disable();
       return;
     }
 
-    const op = getSelectedOperation();
-    if (this._opID != op.ID) {
-      console.log("this._opID != op.ID");
-    }
+    this._sortable = this.getSortable();
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: wX("PORTAL KEY LIST", this._portal.displayName),
-      html: this.getListDialogContent(op, this._portalID),
+    const op = getSelectedOperation();
+    const portal = op.getPortal(this.options.portalID);
+
+    this.createDialog({
+      title: wX("PORTAL KEY LIST", { portalName: portal.displayName }),
+      html: this.getListDialogContent(this.options.portalID),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-keylistportal",
-      closeCallback: () => {
-        delete this._dialog;
-        this.disable();
-      },
+      dialogClass: "keylistportal",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.keyListPortal,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   keyListUpdate: function () {
-    const operation = getSelectedOperation();
-    if (operation.ID != this._opID) {
-      this._dialog.dialog("close"); // op changed, bail
+    // handle operation changes gracefully
+    const op = getSelectedOperation();
+    const portal = op.getPortal(this.options.portalID);
+    if (portal == null) {
+      // needs wX
+      this.setTitle("unknown portal");
+      this.setContent("selected operation changed");
+      return;
     }
-    const table = this.getListDialogContent(operation, this._portalID);
-    this._dialog.html(table);
+
+    const table = this.getListDialogContent(this.options.portalID);
+    this.setContent(table);
+    this.setTitle(wX("PORTAL KEY LIST", { portalName: portal.displayName }));
   },
 
   getSortable: function () {
@@ -87,15 +74,13 @@ const KeyListPortal = WDialog.extend({
         value: (key) => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
-          const agent = await WasabeeAgent.waitGet(key.gid);
+          const agent = await WasabeeAgent.get(key.gid);
           cell.textContent = agent.name;
         },
       },
       {
         name: wX("ON_HAND"),
         value: (key) => key.onhand,
-        // sort: (a, b) => a - b,
-        // format: (cell, value) => { cell.textContent = value; }
       },
       {
         name: wX("CAPSULE"),
@@ -111,7 +96,8 @@ const KeyListPortal = WDialog.extend({
     return sortable;
   },
 
-  getListDialogContent: function (operation, portalID) {
+  getListDialogContent: function (portalID) {
+    const operation = getSelectedOperation();
     this._sortable.items = operation.keysonhand.filter(function (k) {
       return k.portalId == portalID;
     });

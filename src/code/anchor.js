@@ -82,9 +82,11 @@ export default class WasabeeAnchor {
     pcLink.href = "#";
     L.DomEvent.on(pcLink, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new SetCommentDialog();
-      cd.setup(this._portal, operation);
-      cd.enable();
+      const scd = new SetCommentDialog({
+        target: this._portal,
+        operation: operation,
+      });
+      scd.enable();
       marker.closePopup();
     });
     if (this._portal.hardness) {
@@ -98,12 +100,20 @@ export default class WasabeeAnchor {
       phLink.href = "#";
       L.DomEvent.on(phLink, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(this._portal, operation);
-        cd.enable();
+        const scd = new SetCommentDialog({
+          target: this._portal,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }
+
+    const requiredKeys = L.DomUtil.create("div", "desc", content);
+    const onHand = operation.KeysOnHandForPortal(this._portal.id);
+    const required = operation.KeysRequiredForPortal(this._portal.id);
+    requiredKeys.textContent = "Keys: " + onHand + " / " + required;
+
     const buttonSet = L.DomUtil.create(
       "div",
       "wasabee-marker-buttonset",
@@ -113,8 +123,7 @@ export default class WasabeeAnchor {
     linksButton.textContent = wX("LINKS");
     L.DomEvent.on(linksButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const lld = new LinkListDialog();
-      lld.setup(operation, this._portal);
+      const lld = new LinkListDialog({ portal: this._portal });
       lld.enable();
       marker.closePopup();
     });
@@ -138,35 +147,51 @@ export default class WasabeeAnchor {
     L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
-      window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-          this._portal.lat +
-          "," +
-          this._portal.lng
-      );
+      // use intent on android
+      if (
+        typeof window.android !== "undefined" &&
+        window.android &&
+        window.android.intentPosLink
+      ) {
+        window.android.intentPosLink(
+          +this._portal.lat,
+          +this._portal.lng,
+          window.map.getZoom(),
+          this.name,
+          true
+        );
+      } else {
+        window.open(
+          "https://www.google.com/maps/search/?api=1&query=" +
+            this._portal.lat +
+            "," +
+            this._portal.lng
+        );
+      }
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("button", null, buttonSet);
-      assignButton.textContent = wX("ASSIGN OUTBOUND");
-      L.DomEvent.on(assignButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const ad = new AssignDialog();
-        ad.setup(this, operation);
-        ad.enable();
-        marker.closePopup();
-      });
+      if (operation.IsWritableOp()) {
+        const assignButton = L.DomUtil.create("button", null, buttonSet);
+        assignButton.textContent = wX("ASSIGN OUTBOUND");
+        L.DomEvent.on(assignButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const ad = new AssignDialog({ target: this });
+          ad.enable();
+          marker.closePopup();
+        });
+      }
 
-      // needs wX
-      const sendButton = L.DomUtil.create("button", null, buttonSet);
-      sendButton.textContent = wX("SEND TARGET");
-      L.DomEvent.on(sendButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const std = new SendTargetDialog();
-        std.setup(this, operation);
-        std.enable();
-        marker.closePopup();
-      });
+      if (operation.IsOnCurrentServer()) {
+        const sendButton = L.DomUtil.create("button", null, buttonSet);
+        sendButton.textContent = wX("SEND TARGET");
+        L.DomEvent.on(sendButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const std = new SendTargetDialog({ target: this });
+          std.enable();
+          marker.closePopup();
+        });
+      }
     }
 
     return content;

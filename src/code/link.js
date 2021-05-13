@@ -1,24 +1,20 @@
-import { generateId } from "./auxiliar";
+import { generateId, convertColorToHex, newColors } from "./auxiliar";
 import { getSelectedOperation } from "./selectedOp";
 import wX from "./wX";
-import WasabeeOp from "./operation";
-import WasabeeMe from "./me";
 import AssignDialog from "./dialogs/assignDialog";
-// for named color
-import { convertColorToHex } from "./auxiliar";
 import { addToColorList } from "./skin";
 
 export default class WasabeeLink {
   constructor(obj) {
-    this.ID = generateId();
+    this.ID = obj.ID ? obj.ID : generateId();
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
     this.description = obj.description ? obj.description : null;
     this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    this.throwOrderPos = obj.throwOrderPos ? obj.throwOrderPos : 0;
+    this.throwOrderPos = obj.throwOrderPos ? Number(obj.throwOrderPos) : 0;
     this.color = obj.color ? obj.color : "main";
-    this.completed = obj.completed ? obj.completed : false;
-    this.zone = obj.zone ? obj.zone : 1;
+    this.completed = obj.completed ? !!obj.completed : false;
+    this.zone = obj.zone ? Number(obj.zone) : 1;
   }
 
   // build object to serialize
@@ -29,9 +25,9 @@ export default class WasabeeLink {
       toPortalId: this.toPortalId,
       description: this.description,
       assignedTo: this.assignedTo,
-      throwOrderPos: this.throwOrderPos,
+      throwOrderPos: Number(this.throwOrderPos),
       color: this.color,
-      completed: this.completed,
+      completed: !!this.completed, // !! forces a boolean value
       zone: Number(this.zone),
     };
   }
@@ -87,14 +83,14 @@ export default class WasabeeLink {
       console.log("unable to get source portal");
       return null;
     }
-    returnArray.push(new L.LatLng(fromPortal.lat, fromPortal.lng));
+    returnArray.push(fromPortal.latLng);
 
     const toPortal = operation.getPortal(this.toPortalId);
     if (!toPortal || !toPortal.lat) {
       console.log("unable to get destination portal");
       return null;
     }
-    returnArray.push(new L.LatLng(toPortal.lat, toPortal.lng));
+    returnArray.push(toPortal.latLng);
 
     return returnArray;
   }
@@ -141,8 +137,9 @@ export default class WasabeeLink {
 
   getColor(operation) {
     // 0.17 -- use the old names internally no matter what we are sent
-    let color = WasabeeOp.oldColors(this.color);
+    let color = this.color;
     if (color == "main") color = operation.color;
+    color = newColors(color);
     if (window.plugin.wasabee.skin.layerTypes.has(color))
       color = window.plugin.wasabee.skin.layerTypes.get(color).color;
     return color;
@@ -214,13 +211,12 @@ export default class WasabeeLink {
       L.DomEvent.stop(ev);
       operation.reverseLink(this.fromPortalId, this.toPortalId);
     });
-    if (operation.IsServerOp() && WasabeeMe.isLoggedIn()) {
+    if (operation.IsServerOp() && operation.IsWritableOp()) {
       const assignButton = L.DomUtil.create("button", null, div);
       assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const ad = new AssignDialog();
-        ad.setup(this, operation);
+        const ad = new AssignDialog({ target: this });
         ad.enable();
       });
     }

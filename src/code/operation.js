@@ -3,14 +3,13 @@ import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
-import { generateId } from "./auxiliar";
+import { generateId, newColors } from "./auxiliar";
 import { GetWasabeeServer } from "./server";
 import { addOperation, getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
-// this should be in statics.js
-const DEFAULT_OPERATION_COLOR = "groupa";
+const Wasabee = window.plugin.wasabee;
 
 export default class WasabeeOp {
   constructor(obj) {
@@ -29,8 +28,8 @@ export default class WasabeeOp {
     this.anchors = obj.anchors ? obj.anchors : Array();
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
-    this.color = obj.color ? obj.color : DEFAULT_OPERATION_COLOR;
-    this.color = WasabeeOp.oldColors(this.color); // for 0.17, use old colors
+    this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
+    this.color = newColors(this.color);
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
@@ -39,8 +38,17 @@ export default class WasabeeOp {
     this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
+    // this.modified = obj.modified ? obj.modified : null;
+    this.referencetime = obj.referencetime ? obj.referencetime : null;
+
+    this.lasteditid = obj.lasteditid ? obj.lasteditid : null;
+    this.remoteChanged = !!obj.remoteChanged;
 
     this.server = this.fetched ? obj.server : null;
+
+    this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
+
+    this.background = !!obj.background;
 
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
@@ -56,12 +64,15 @@ export default class WasabeeOp {
     this.cleanPortalList();
   }
 
-  static load(opID) {
+  static async load(opID) {
     try {
-      const raw = localStorage[opID];
-      if (raw == null) throw new Error("invalid operation ID");
+      const raw = await window.plugin.wasabee.idb.get("operations", opID);
+      if (raw == null)
+        //throw new Error("invalid operation ID");
+        return null;
       const op = new WasabeeOp(raw);
       if (op == null) throw new Error("corrupted operation");
+      console.debug(op);
       return op;
     } catch (e) {
       console.error(e);
@@ -69,40 +80,100 @@ export default class WasabeeOp {
     return null;
   }
 
-  store() {
+  static async delete(opID) {
+    delete localStorage[opID]; // leave for now
+    await window.plugin.wasabee.idb.delete("operations", opID);
+  }
+
+  static async migrate(opID) {
+    // skip ones already completed
+    const have = await window.plugin.wasabee.idb.get("operations", opID);
+    if (have != null) {
+      delete localStorage[opID]; // active now
+      return;
+    }
+
+    try {
+      const raw = localStorage[opID];
+      if (raw == null) throw new Error("invalid operation ID");
+      const obj = JSON.parse(raw);
+      const op = new WasabeeOp(obj);
+      if (op == null) throw new Error("corrupted operation");
+      console.debug(op);
+      await op.store();
+      delete localStorage[opID]; // active now
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // writes to localStorage with all data included
+  async store() {
+    // console.debug("storing ", this.ID);
     this.stored = Date.now();
-    localStorage[this.ID] = JSON.stringify(this);
-    addOperation(this.ID);
+    const json = this.toJSON();
+
+    // include things not required by the server but necessary for local storage
+    json.server = this.server;
+    json.fetchedOp = this.fetchedOp;
+    json.lasteditid = this.lasteditid;
+    json.remoteChanged = this.remoteChanged;
+    json.fetched = this.fetched;
+    json.stored = this.stored;
+    json.localchanged = this.localchanged;
+    json.blockers = this.blockers;
+    json.keysonhand = this.keysonhand;
+    json.teamlist = this.teamlist;
+    json.background = this.background;
+
+    // store to localStorage -- for now
+    // localStorage[this.ID] = JSON.stringify(json); // deactivated now
+
+    // store to idb
+    try {
+      await window.plugin.wasabee.idb.put("operations", json);
+    } catch (e) {
+      console.error(e);
+    }
+
+    // manage the list of known operations, can be removed in 0.20
+    await addOperation(this.ID);
 
     // some debug info to trace race condition
     const s = getSelectedOperation();
     if (s && s.ID == this.ID && s != this)
-      console.trace("store current OP from a different obj");
+      console.trace(
+        "store current OP from a different obj",
+        s.ID,
+        s.name,
+        this.ID,
+        this.name
+      );
   }
 
-  // build object to serialize
+  // build object to serialize, shallow copy, local-only values excluded
   toJSON() {
     return {
       ID: this.ID,
       name: this.name,
       creator: this.creator,
-      opportals: Array.from(this._idToOpportals.values()),
+      opportals: Array.from(this._idToOpportals.values()), // includes blocker portals
       anchors: this.anchors,
       links: this.links,
       markers: this.markers,
       color: this.color,
       comment: this.comment,
-      teamlist: this.teamlist,
-      fetched: this.fetched,
-      stored: this.stored,
-      localchanged: this.localchanged,
-      blockers: this.blockers,
-      keysonhand: this.keysonhand,
-      mode: this.mode,
       zones: this.zones,
-      // ignored by the server but useful for localStorage
-      server: this.server,
+      referencetime: this.referencetime,
     };
+  }
+
+  // JSON with everything optional removed -- inception grade logic here
+  toExport() {
+    // round-trip through JSON.stringify to ensure a deep copy
+    const o = new WasabeeOp(JSON.stringify(this));
+    o.cleanPortalList(); // remove portals which are only relevant to blockers
+    return JSON.stringify(o);
   }
 
   // read only (for inspection)
@@ -164,8 +235,6 @@ export default class WasabeeOp {
       }
 
       for (const id of toRemove) this._idToOpportals.delete(id);
-
-      //this.opportals = Array.from(this._idToOpportals.values());
     }
 
     this._dirtyCoordsTable = false;
@@ -173,14 +242,13 @@ export default class WasabeeOp {
 
   getColor() {
     if (this.color == null) {
-      return DEFAULT_OPERATION_COLOR;
+      return Wasabee.skin.defaultOperationColor;
     } else {
       return this.color;
     }
   }
 
   containsPortal(portal) {
-    console.assert(portal && portal.id, "containsPortal w/o args");
     return this._idToOpportals.has(portal.id);
   }
 
@@ -235,16 +303,20 @@ export default class WasabeeOp {
     return markers;
   }
 
-  getLink(portal1, portal2) {
+  getLinkByPortalIDs(portalId1, portalId2) {
     for (const l of this.links) {
       if (
-        (l.fromPortalId == portal1.id && l.toPortalId == portal2.id) ||
-        (l.fromPortalId == portal2.id && l.toPortalId == portal1.id)
+        (l.fromPortalId == portalId1 && l.toPortalId == portalId2) ||
+        (l.fromPortalId == portalId2 && l.toPortalId == portalId1)
       ) {
         return l;
       }
     }
     return null;
+  }
+
+  getLink(portal1, portal2) {
+    return this.getLinkByPortalIDs(portal1.id, portal2.id);
   }
 
   getLinkListFromPortal(portal) {
@@ -262,7 +334,7 @@ export default class WasabeeOp {
 
   removeAnchor(portalId) {
     console.debug("removing anchor");
-    console.debug(this.links);
+    // console.debug(this.links);
     this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
@@ -272,7 +344,7 @@ export default class WasabeeOp {
       );
     });
 
-    console.debug(this.links);
+    // console.debug(this.links);
 
     this.cleanAnchorList();
     this.cleanPortalList();
@@ -338,7 +410,16 @@ export default class WasabeeOp {
   setLinkOrder(linkID, order) {
     for (const v of this.links) {
       if (v.ID == linkID) {
-        v.opOrder = order;
+        v.opOrder = Number(order);
+      }
+    }
+    this.update(true);
+  }
+
+  setMarkerOrder(markerID, order) {
+    for (const v of this.markers) {
+      if (v.ID == markerID) {
+        v.opOrder = Number(order);
       }
     }
     this.update(true);
@@ -392,7 +473,6 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.cleanCaches();
-    this.store();
   }
 
   cleanCaches() {
@@ -430,6 +510,32 @@ export default class WasabeeOp {
       newPortals.set(b.toPortalId, this._idToOpportals.get(b.toPortalId));
     }
 
+    // sanitize OP if it get corrupt by my code elsewhere...
+    const missingPortal = new Set();
+    let corrupt =
+      this.links.length + this.markers.length + this.blockers.length;
+    for (const [id, v] of newPortals) {
+      if (v === undefined) {
+        this.links = this.links.filter(
+          (l) => l.fromPortalId != id && l.toPortalId != id
+        );
+        this.markers = this.markers.filter((m) => m.portalId != id);
+        this.blockers = this.blockers.filter(
+          (b) => b.fromPortalId != id && b.toPortalId != id
+        );
+        missingPortal.add(id);
+      }
+    }
+    corrupt -= this.links.length + this.markers.length + this.blockers.length;
+    if (missingPortal.size > 0) {
+      // leave some trace
+      console.trace("op corruption: missing portals");
+      alert(
+        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers/blockers. Please check your OP and report to the devs.`
+      );
+      this.cleanAnchorList();
+      for (const id of missingPortal) newPortals.delete(id);
+    }
     this._idToOpportals = newPortals;
     this.buildCoordsLookupTable();
   }
@@ -477,6 +583,30 @@ export default class WasabeeOp {
     const old = this.getPortal(portal.id);
     if (old) {
       if (!portal.faked) {
+        if (portal.lat !== old.lat || portal.lng !== old.lng) {
+          // portal has moved, so we create a fake portal to replace this
+          console.warn(
+            "portal %s has moved, replacing by a fake at old location",
+            old.id
+          );
+          const fake = WasabeePortal.fake(old.lat, old.lng, null, old.name);
+          // and swap the old with the fake
+          this._coordsToOpportals.delete(old.lat + "/" + old.lng); // prevent dirty
+          this._addPortal(fake);
+          this._swapPortal(old, fake);
+          // re-attribute markers
+          for (const m of this.markers) {
+            if (m.portalId == old.id) m.portalId = fake.id;
+          }
+          // remove blockers on the old portal
+          this.blockers = this.blockers.filter(
+            (b) => b.fromPortalId != old.id && b.toPortalId != old.id
+          );
+          this._idToOpportals.delete(old.id);
+          // add the new portal so any data related to the real portal (keys) still works
+          this._addPortal(portal);
+          return true;
+        }
         if (old.name == portal.name) return false;
         old.name = portal.name;
         return true;
@@ -513,7 +643,8 @@ export default class WasabeeOp {
     return false;
   }
 
-  addLink(fromPortal, toPortal, description, order, replace = false) {
+  // options: {description,order,color,replace}
+  addLink(fromPortal, toPortal, options = {}) {
     console.assert(fromPortal && toPortal, "missing portal for link");
     if (fromPortal.id === toPortal.id) {
       console.debug(
@@ -528,25 +659,24 @@ export default class WasabeeOp {
     const existingLink = this.getLink(fromPortal, toPortal);
 
     const link =
-      existingLink && replace
+      existingLink && options.replace
         ? existingLink
         : new WasabeeLink(
             {
               fromPortalId: fromPortal.id,
               toPortalId: toPortal.id,
-              description: description,
-              throwOrderPos: order,
             },
             this
           );
-    link.description = description;
-    if (order) link.opOrder = order;
+    if (options.description) link.description = options.description;
+    if (options.order) link.opOrder = options.order;
+    if (options.color) link.color = options.color;
 
     if (!existingLink) {
       this.links.push(link);
       this.update(true);
       this.runCrosslinks();
-    } else if (replace) {
+    } else if (options.replace) {
       this.update(true);
       this.runCrosslinks();
     } else {
@@ -573,8 +703,6 @@ export default class WasabeeOp {
     this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-      // don't update, anchors are bound to links
-      //this.update(true);
     }
   }
 
@@ -597,7 +725,7 @@ export default class WasabeeOp {
     if (!this.containsBlocker(link)) {
       this.blockers.push(link);
       // this.update(false); // can trigger a redraw-storm, just skip
-      this.store();
+      // this.store(); // do not await, let it happen in the background -- ideally now blockers should not be part of the op json, but stored independently in indexeddb
     }
   }
 
@@ -658,21 +786,14 @@ export default class WasabeeOp {
 
   swapPortal(originalPortal, newPortal) {
     this._addPortal(newPortal);
-
-    //this.opportals = Array.from(this._idToOpportals.values());
-
     this._swapPortal(originalPortal, newPortal);
     this.update(true);
     this.runCrosslinks();
   }
 
-  addMarker(markerType, portal, comment) {
+  // XXX move comment to options in 0.20
+  addMarker(markerType, portal, comment, options) {
     if (!portal) return;
-    const destructMarkerTypes = [
-      window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
-      window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
-      window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
-    ];
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
@@ -682,10 +803,19 @@ export default class WasabeeOp {
         portalId: portal.id,
         comment: comment,
       });
+      if (options && options.zone) marker.zone = options.zone;
+      if (options && options.assign && options.assign != 0)
+        marker.assign(options.assign);
       this.markers.push(marker);
+
       this.update(true);
 
-      // only need this for virus/destroy
+      // only need this for virus/destroy/decay -- this should be in the marker class
+      const destructMarkerTypes = [
+        window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
+        window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
+      ];
       if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
     }
   }
@@ -742,13 +872,13 @@ export default class WasabeeOp {
       this.localchanged = true;
     }
 
-    this.store();
-    window.runHooks("wasabeeUIUpdate", "op update");
+    this.store(); // no await, let it happen in the background unless we see races
+    window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
   }
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.runHooks("wasabeeCrosslinks");
+    window.map.fire("wasabeeCrosslinks", { reason: "op runCrosslinks" }, false);
   }
 
   startBatchMode() {
@@ -765,11 +895,7 @@ export default class WasabeeOp {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
-      if (l instanceof WasabeeLink) {
-        tmpLinks.push(l);
-      } else {
-        tmpLinks.push(new WasabeeLink(l, this));
-      }
+      tmpLinks.push(new WasabeeLink(l, this));
     }
     return tmpLinks;
   }
@@ -778,11 +904,7 @@ export default class WasabeeOp {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
-      if (l instanceof WasabeeLink) {
-        tmpLinks.push(l);
-      } else {
-        tmpLinks.push(new WasabeeLink(l, this));
-      }
+      tmpLinks.push(new WasabeeLink(l, this));
     }
     return tmpLinks;
   }
@@ -792,11 +914,7 @@ export default class WasabeeOp {
     if (!markers || markers.length == 0) return tmpMarkers;
     if (markers) {
       for (const m of markers) {
-        if (m instanceof WasabeeMarker) {
-          tmpMarkers.push(m);
-        } else {
-          tmpMarkers.push(new WasabeeMarker(m));
-        }
+        tmpMarkers.push(new WasabeeMarker(m));
       }
     }
     return tmpMarkers;
@@ -819,7 +937,7 @@ export default class WasabeeOp {
   convertZonesToObjs(zones) {
     if (!zones || zones.length == 0) {
       // if not set, use the defaults
-      const primary = new WasabeeZone(
+      return [
         { id: 1, name: "Primary" },
         { id: 2, name: "Alpha" },
         { id: 3, name: "Beta" },
@@ -828,9 +946,8 @@ export default class WasabeeOp {
         { id: 6, name: "Epsilon" },
         { id: 7, name: "Zeta" },
         { id: 8, name: "Eta" },
-        { id: 9, name: "Theta" }
-      );
-      return new Array(primary);
+        { id: 9, name: "Theta" },
+      ].map((obj) => new WasabeeZone(obj));
     }
     const tmpZones = Array();
     for (const z of zones) {
@@ -862,13 +979,14 @@ export default class WasabeeOp {
     return L.latLngBounds(min, max);
   }
 
+  // is the op writable to the current server
   IsWritableOp() {
     // not from the server, must be writable
     if (!this.IsServerOp()) return true;
-    // if logged on a different server from the one used for the op, not writable
-    if (!this.IsOnCurrentServer()) return false;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
+    // if logged on a different server from the one used for the op, not writable
+    if (!this.IsOnCurrentServer()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
@@ -923,7 +1041,7 @@ export default class WasabeeOp {
 
   IsOwnedOp() {
     if (!this.IsServerOp()) return true;
-    if (!WasabeeMe.isLoggedIn()) return false;
+    if (!WasabeeMe.isLoggedIn()) return true;
 
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
@@ -974,6 +1092,18 @@ export default class WasabeeOp {
     this.update(false);
   }
 
+  KeysOnHandForPortal(portalId) {
+    let i = 0;
+    for (const k of this.keysonhand) if (k.portalId == portalId) i += k.onhand;
+    return i;
+  }
+
+  KeysRequiredForPortal(portalId) {
+    let i = 0;
+    for (const l of this.links) if (l.toPortalId == portalId) i++;
+    return i;
+  }
+
   zoneName(zoneID) {
     if (zoneID == "0")
       // All zone
@@ -982,55 +1112,6 @@ export default class WasabeeOp {
       if (z.id == zoneID) return z.name;
     }
     return zoneID;
-  }
-
-  // for 0.18, if we see the new, we change to the old
-  // for 0.19 we will change from old-to-new...
-  static oldColors(incoming) {
-    switch (incoming) {
-      case "orange":
-        return "groupa";
-      case "yellow":
-        return "groupb";
-      case "lime":
-        return "groupc";
-      case "purple":
-        return "groupd";
-      case "teal":
-        return "groupe";
-      case "fuchsia":
-        return "groupf";
-      case "red":
-        return "main";
-      case "blue":
-        return "main";
-      case "green":
-        return "groupc";
-      default:
-        return incoming;
-    }
-  }
-
-  // not used in 0.18, will be default in 0.19
-  static newColors(incoming) {
-    switch (incoming) {
-      case "groupa":
-        return "orange";
-      case "groupb":
-        return "yellow";
-      case "groupc":
-        return "lime";
-      case "groupd":
-        return "purple";
-      case "groupe":
-        return "teal";
-      case "groupf":
-        return "fuchsia";
-      case "main":
-        return "red";
-      default:
-        return incoming;
-    }
   }
 
   // a wrapper to set WasabeePortal or WasabeeLink zone and update
@@ -1072,7 +1153,324 @@ export default class WasabeeOp {
       ids.add(z.id);
     }
     const newid = Math.max(...ids) + 1;
-    this.zones.push({ id: newid, name: newid });
+    this.zones.push(new WasabeeZone({ id: newid, name: newid }));
     this.update(true);
+    return newid;
+  }
+
+  changes(origin) {
+    const changes = {
+      addition: new Array(),
+      edition: new Array(),
+      deletion: new Array(),
+    };
+    // empty op if old OP (or local OP)
+    const oldOp = new WasabeeOp(origin ? origin : this.fetchedOp || {});
+    const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
+    const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
+
+    const newLinks = new Map(this.links.map((l) => [l.ID, l]));
+    const newMarkers = new Map(this.markers.map((m) => [m.ID, m]));
+
+    // Note: teams/keyonhand are atomic
+    if (oldOp.name != this.name) changes.name = this.name;
+    if (oldOp.color != this.color) changes.color = this.color;
+    if (oldOp.comment != this.comment) changes.comment = this.comment;
+    // blockers: ignored by the server, handle them later
+    // zones: handle them later
+
+    for (const [id, p] of this._idToOpportals) {
+      if (oldOp._idToOpportals.has(id)) {
+        const oldPortal = oldOp._idToOpportals.get(id);
+        const fields = ["comment", "hardness"];
+        const diff = fields
+          .filter((k) => oldPortal[k] != p[k])
+          .map((k) => [k, oldPortal[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "portal", portal: p, diff: diff });
+      }
+    }
+
+    for (const [id, l] of oldLinks) {
+      if (!newLinks.has(id)) {
+        changes.deletion.push({ type: "link", link: l, id: id });
+      }
+    }
+    for (const l of this.links) {
+      if (!oldLinks.has(l.ID)) {
+        changes.addition.push({ type: "link", link: l });
+      } else {
+        const oldLink = oldLinks.get(l.ID);
+        const fields = [
+          "fromPortalId",
+          "toPortalId",
+          "assignedTo",
+          "description",
+          "throwOrderPos",
+          "color",
+          "completed",
+          "zone",
+        ];
+        const diff = fields
+          .filter((k) => oldLink[k] != l[k])
+          .map((k) => [k, oldLink[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "link", link: l, diff: diff });
+      }
+    }
+
+    for (const [id, m] of oldMarkers) {
+      if (!newMarkers.has(id)) {
+        changes.deletion.push({ type: "marker", marker: m, id: id });
+      }
+    }
+    for (const m of this.markers) {
+      if (!oldMarkers.has(m.ID)) {
+        changes.addition.push({ type: "marker", marker: m });
+      } else {
+        const oldMarker = oldMarkers.get(m.ID);
+        const fields = [
+          "type",
+          "comment",
+          "assignedTo",
+          "state",
+          "order",
+          "zone",
+        ];
+        const diff = fields
+          .filter((k) => oldMarker[k] != m[k])
+          .map((k) => [k, oldMarker[k]]);
+        if (diff.length > 0)
+          changes.edition.push({ type: "marker", marker: m, diff: diff });
+      }
+    }
+
+    return changes;
+  }
+
+  checkChanges() {
+    if (this.localchanged) {
+      const changes = this.changes();
+      if (
+        changes.addition.length +
+          changes.edition.length +
+          changes.deletion.length ==
+        0
+      )
+        this.localchanged = false;
+    }
+    return this.localchanged;
+  }
+
+  // assume that `this` is a server OP (no blockers, teams/keys are correct)
+  applyChanges(changes, op) {
+    const summary = {
+      compatibility: {
+        ok: true,
+        rewrite: {
+          link: 0,
+          marker: 0,
+        },
+      },
+      addition: {
+        link: 0,
+        marker: 0,
+        zone: 0,
+        ignored: 0,
+      },
+      deletion: {
+        link: 0,
+        marker: 0,
+      },
+      edition: {
+        portal: 0,
+        link: 0,
+        marker: 0,
+        assignment: 0,
+        duplicate: 0,
+        singlePortalLink: 0,
+        removed: 0,
+      },
+    };
+
+    // merge portals
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+
+    // add missing zones
+    {
+      const ids = new Set();
+      for (const z of this.zones) {
+        ids.add(z.id);
+      }
+      for (const z of op.zones)
+        if (!ids.has(z.id)) {
+          op.zones.push(z);
+          summary.addition.zone += 1;
+        }
+    }
+
+    // try to detect 0.18 ops with inconsistent IDs
+    {
+      const ids = new Set();
+      for (const l of this.links) {
+        ids.add(l.ID);
+      }
+      for (const m of this.markers) {
+        ids.add(m.ID);
+      }
+      let foundCollision = false;
+      for (const d of changes.deletion) {
+        if (d.type == "link" || d.type == "marker")
+          if (ids.has(d.id)) {
+            foundCollision = true;
+            break;
+          }
+      }
+      if (!foundCollision && op.links.some((l) => ids.has(l.ID)))
+        foundCollision = true;
+      if (!foundCollision && op.markers.some((m) => ids.has(m.ID)))
+        foundCollision = true;
+
+      // foundCollision: either there is a collision in IDs, or everything fine
+      if (!foundCollision) {
+        // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`
+        // we need to use the server IDs so everyone use the same IDs
+        // this will occur with old client editing the ops, and old ops with always parallel writers (none is sync; bound to disappear)
+        summary.compatibility.ok = false;
+        for (const d of changes.deletion) {
+          if (d.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              d.link.fromPortalId,
+              d.link.toPortalId
+            );
+            if (link) {
+              d.id = link.ID;
+              summary.compatibility.rewrite.link += 1;
+            }
+          }
+          if (d.type == "marker") {
+            const marker = this.getPortalMarkers(d.marker.portalId).get(
+              d.marker.type
+            );
+            if (marker) {
+              d.id = marker.ID;
+              summary.compatibility.rewrite.marker += 1;
+            }
+          }
+        }
+        for (const e of changes.edition) {
+          if (e.type == "link") {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link) {
+              e.id = link.ID;
+              summary.compatibility.rewrite.link += 1;
+            }
+          }
+          if (e.type == "marker") {
+            const marker = this.getPortalMarkers(e.marker.portalId).get(
+              e.marker.type
+            );
+            if (marker) {
+              e.id = marker.ID;
+              summary.compatibility.rewrite.marker += 1;
+            }
+          }
+        }
+      }
+    }
+
+    for (const d of changes.deletion) {
+      if (d.type == "link") {
+        const links = this.links.filter((l) => l.ID != d.id);
+        summary.deletion.link += this.links.length - links.length;
+        this.links = links;
+      } else if (d.type == "marker") {
+        const markers = this.markers.filter((m) => m.ID != d.id);
+        summary.deletion.marker += this.markers.length - markers.length;
+        this.markers = markers;
+      }
+    }
+    // links/markers absent from `this` are not added back
+    for (const e of changes.edition) {
+      if (e.type == "portal") {
+        const portal = this.getPortal(e.portal.id);
+        for (const kv of e.diff) portal[kv[0]] = e.portal[kv[0]];
+        summary.edition.portal += 1;
+      } else if (e.type == "link") {
+        let found = false;
+        for (const l of this.links) {
+          if (l.ID == e.link.ID) {
+            const link = this.getLinkByPortalIDs(
+              e.link.fromPortalId,
+              e.link.toPortalId
+            );
+            if (link && link != l) {
+              // remove the link if leading to a duplicate
+              // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
+              this.links = this.links.filter((l) => l.ID != e.link.ID);
+              summary.edition.duplicate += 1;
+            } else {
+              for (const kv of e.diff) l[kv[0]] = e.link[kv[0]];
+              if (l.fromPortalId == l.toPortalId) {
+                this.links = this.links.filter((link) => link.ID != l.ID);
+                summary.edition.singlePortalLink += 1;
+              } else {
+                summary.edition.link += 1;
+                if (e.diff.some((kv) => kv[0] == "assignedTo"))
+                  summary.edition.assignment += 1;
+              }
+            }
+            found = true;
+            break;
+          }
+        }
+        if (!found) summary.edition.removed += 1;
+      } else if (e.type == "marker") {
+        let found = false;
+        for (const m of this.markers) {
+          if (m.ID == e.marker.ID) {
+            const markers = this.getPortalMarkers(e.marker.portalId);
+            const marker = markers.get(e.marker.type);
+            if (marker && marker != m) {
+              // remove the marker if leading to a duplicate
+              this.markers = this.markers.filter((m) => m.ID != e.marker.ID);
+              summary.edition.duplicate += 1;
+            } else {
+              for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
+              summary.edition.marker += 1;
+              if (e.diff.some((kv) => kv[0] == "assignedTo"))
+                summary.edition.assignment += 1;
+            }
+            found = true;
+            break;
+          }
+        }
+        if (!found) summary.edition.removed += 1;
+      }
+    }
+    // `this` takes over `changes` for additions
+    for (const a of changes.addition) {
+      if (a.type == "portal") {
+        // already done
+      } else if (a.type == "link") {
+        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
+          this.links.push(a.link);
+          summary.addition.link += 1;
+        } else summary.addition.ignored += 1;
+      } else if (a.type == "marker") {
+        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
+          this.markers.push(a.marker);
+          summary.addition.marker += 1;
+        } else summary.addition.ignored += 1;
+      }
+    }
+    return summary;
   }
 }

@@ -1,4 +1,3 @@
-import store from "../lib/store";
 import WasabeeOp from "./operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
@@ -15,67 +14,69 @@ export function getSelectedOperation() {
   return window.plugin.wasabee._selectedOp;
 }
 
-export function initSelectedOperation() {
+export async function initSelectedOperation() {
   if (window.plugin.wasabee._selectedOp == null) {
     const toLoad = getRestoreOpID();
     if (toLoad == null) {
-      loadNewDefaultOp();
+      await loadNewDefaultOp();
     } else {
       // verify it exists before trying to load
-      let tmp = getOperationByID(toLoad);
+      let tmp = await WasabeeOp.load(toLoad);
       if (tmp == null) {
         console.log(
           "most recently loaded up not present in local store, starting with new default op"
         );
-        loadNewDefaultOp();
+        await loadNewDefaultOp();
       } else {
-        makeSelectedOperation(toLoad);
+        await makeSelectedOperation(toLoad);
       }
     }
   }
   return window.plugin.wasabee._selectedOp;
 }
 
-export function changeOpIfNeeded() {
+export async function changeOpIfNeeded() {
   const selectedOp = getSelectedOperation();
-  const ops = opsList();
+  const ops = await opsList();
   if (!ops.includes(selectedOp.ID)) {
-    if (ops.length == 0) loadNewDefaultOp();
-    else makeSelectedOperation(ops[ops.length - 1]);
+    if (ops.length == 0) await loadNewDefaultOp();
+    else await makeSelectedOperation(ops[ops.length - 1]);
   }
   return window.plugin.wasabee._selectedOp;
 }
 
 // create a new op and set it as selected
-export function loadNewDefaultOp() {
+export async function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
     creator: PLAYER.nickname,
-    name: wX("DEFAULT OP NAME", new Date().toGMTString()),
+    name: wX("DEFAULT OP NAME", { date: new Date().toGMTString() }),
   });
-  newOp.store();
-  const op = makeSelectedOperation(newOp.ID);
-  return op;
+  await newOp.store();
+  await makeSelectedOperation(newOp.ID);
+  return window.plugin.wasabee._selectedOp;
 }
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-export function makeSelectedOperation(opID) {
+export async function makeSelectedOperation(opID) {
   // _selectedOp is null at first load (or page reload), should never be after that
+  let previousID;
   if (window.plugin.wasabee._selectedOp != null) {
+    previousID = window.plugin.wasabee._selectedOp.ID;
     if (opID == window.plugin.wasabee._selectedOp.ID) {
       console.log(
         "makeSelectedOperation called on the current op; replacing with version from local store. not saving live changes first"
       );
     } else {
       // should not be necessary now, but still safe
-      if (opsList().includes(window.plugin.wasabee._selectedOp.ID))
-        window.plugin.wasabee._selectedOp.store();
+      const ol = await opsList();
+      if (ol.includes(window.plugin.wasabee._selectedOp.ID))
+        await window.plugin.wasabee._selectedOp.store();
     }
   }
 
-  // get the op from localStorage
-  // in 0.19 this becomes WasabeeOp.load(opID);
-  const op = getOperationByID(opID);
+  // get the op from indexeddb/localStorage
+  const op = await WasabeeOp.load(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
     alert("attempted to load invalid opID");
@@ -85,61 +86,50 @@ export function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  window.runHooks("wasabeeUIUpdate", "makeSelectedOperation");
-  window.runHooks("wasabeeCrosslinks");
-  return window.plugin.wasabee._selectedOp;
-}
-
-// use this to pull an op from local store by ID
-// in 0.19 this entire function goes away;
-export function getOperationByID(opID) {
-  try {
-    const newfmt = localStorage[opID];
-    if (newfmt == undefined) return null;
-    const raw = JSON.parse(newfmt);
-    const op = new WasabeeOp(raw);
-    if (op.ID) return op;
-  } catch (e) {
-    console.error(e);
-  }
-  return oldOpFormat(opID);
-}
-
-function oldOpFormat(opID) {
-  console.log("trying old format");
-  try {
-    const oldfmt = store.get(opID);
-    const raw = JSON.parse(oldfmt);
-    const op = new WasabeeOp(raw);
-    if (op != null && op.ID) {
-      op.store();
-      return op;
-    }
-  } catch (e) {
-    console.error(e);
-  }
-  return null;
+  window.map.fire(
+    "wasabeeUIUpdate",
+    { reason: "makeSelectedOperation" },
+    false
+  );
+  window.map.fire(
+    "wasabeeCrosslinks",
+    { reason: "makeSelectedOperation" },
+    false
+  );
+  if (previousID !== opID)
+    window.map.fire("wasabee:op:select", {
+      previous: previousID,
+      current: opID,
+    });
+  // return window.plugin.wasabee._selectedOp;
 }
 
 // called when loaded for the first time or when all ops are purged
-function initOps() {
-  const newop = loadNewDefaultOp();
-  resetOps(); // deletes everything including newop
+async function initOps() {
+  const newop = await loadNewDefaultOp();
+  await resetOps(); // deletes everything including newop
   newop.update(); // re-saves newop
 }
 
 //*** This function creates an op list if one doesn't exist and sets the op list for the plugin
-export function setupLocalStorage() {
+export async function setupLocalStorage() {
   // make sure we have at least one op
-  let ops = opsList();
+  let ops = await opsList();
   if (ops == undefined || ops.length == 0) {
-    initOps();
-    ops = opsList();
+    await initOps();
+    ops = await opsList();
   }
+
+  const migrations = Array();
+  for (const opID of ops) {
+    migrations.push(WasabeeOp.migrate(opID));
+  }
+  // no need to see the results, just wait until all are done
+  await Promise.allSettled(migrations);
 
   // if the restore ID is not set, set it to the first thing we find
   let rID = getRestoreOpID();
-  if (rID == null) {
+  if (rID == null || rID == undefined) {
     rID = ops[0]; // ops cannot be empty due to previous block
     setRestoreOpID(rID);
   }
@@ -152,34 +142,43 @@ function storeOpsList(ops) {
 }
 
 //** This function removes an operation from the main list */
-export function removeOperation(opID) {
-  const ops = opsList().filter((ID) => ID != opID);
+export async function removeOperation(opID) {
+  const ol = await opsList();
+  const ops = ol.filter((ID) => ID != opID);
   storeOpsList(ops);
-  delete localStorage[opID];
+  await WasabeeOp.delete(opID);
+  window.map.fire("wasabee:op:delete", opID);
 }
 
 //** This function adds an operation to the main list */
-export function addOperation(opID) {
-  const ops = opsList();
+export async function addOperation(opID) {
+  const ops = await opsList();
   if (!ops.includes(opID)) ops.push(opID);
   storeOpsList(ops);
+  window.map.fire("wasabee:op:add", opID);
 }
 
 //** This function shows an operation to the main list */
 export function showOperation(opID) {
-  const hiddenOps = hiddenOpsList().filter((ID) => ID != opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  const hiddenOps = hiddenOpsList();
+  if (hiddenOps.includes(opID)) {
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps.filter((ID) => ID != opID));
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: true });
+  }
 }
 
 //** This function hides an operation to the main list */
 export function hideOperation(opID) {
   const hiddenOps = hiddenOpsList();
-  if (!hiddenOps.includes(opID)) hiddenOps.push(opID);
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-  ] = JSON.stringify(hiddenOps);
+  if (!hiddenOps.includes(opID)) {
+    hiddenOps.push(opID);
+    localStorage[
+      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
+    ] = JSON.stringify(hiddenOps);
+    window.map.fire("wasabee:op:showhide", { opID: opID, show: false });
+  }
 }
 
 export function resetHiddenOps() {
@@ -188,10 +187,10 @@ export function resetHiddenOps() {
 }
 
 //*** This function resets the local op list
-export function resetOps() {
-  const ops = opsList();
+export async function resetOps() {
+  const ops = await opsList();
   for (const opID of ops) {
-    removeOperation(opID);
+    await removeOperation(opID); // promise.all...
   }
 }
 
@@ -205,11 +204,29 @@ export function hiddenOpsList() {
   }
 }
 
-export function opsList(hidden = true) {
+export async function setOpBackground(opID, background) {
+  const sop = getSelectedOperation();
+  const op = sop.ID === opID ? sop : await WasabeeOp.load(opID);
+  if (op.background == background) return;
+  op.background = background;
+  await op.store();
+  window.map.fire("wasabee:op:background", {
+    opID: opID,
+    background: background,
+  });
+}
+
+export async function opsList(hidden = true) {
+  // after 0.19, remove the list and just query the idb keys
+
   const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
   if (raw) {
     try {
       const ops = JSON.parse(raw);
+      const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
+      for (const k of fromIdb) {
+        if (!ops.includes(k)) ops.push(k);
+      }
       if (!hidden) {
         const hiddenOps = hiddenOpsList();
         return ops.filter((o) => !hiddenOps.includes(o));
@@ -217,37 +234,21 @@ export function opsList(hidden = true) {
       return ops;
     } catch (e) {
       console.error(e);
-      //falback to old listing
     }
   }
-
-  // <0.18 migration
-  const list = oldOpsList();
-  storeOpsList(list);
-  return list;
+  return new Array();
 }
 
-// to remove on 0.19
-function oldOpsList() {
-  const out = new Array();
-
-  for (const key in localStorage) {
-    if (key.length == 40) out.push(key);
-    // after 0.18
-    // if (key.length) == 40 && localStorage[key].includes(`"ID":`)) out.push(key);
-  }
-
-  return out;
-}
-
-export function duplicateOperation(opID) {
+export async function duplicateOperation(opID) {
   let op = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;
-    op.store();
+    await op.store();
   } else {
-    op = getOperationByID(opID);
+    op = await WasabeeOp.load(opID);
   }
+
+  // XXX op.toExport() might be helpful here
 
   op.ID = generateId();
   op.name = op.name + " " + new Date().toGMTString();
@@ -256,15 +257,15 @@ export function duplicateOperation(opID) {
   op.fetched = null;
   op.keysonhand = new Array();
   op.cleanAll();
-  op.store();
+  await op.store();
   return op;
 }
 
 // this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
-export function removeNonOwnedOps() {
-  for (const opID of opsList()) {
-    const op = getOperationByID(opID);
-    if (!op || !op.IsOwnedOp()) removeOperation(opID);
+export async function removeNonOwnedOps() {
+  for (const opID of await opsList()) {
+    const op = await WasabeeOp.load(opID);
+    if (!op || !op.IsOwnedOp()) await removeOperation(opID);
   }
-  changeOpIfNeeded();
+  await changeOpIfNeeded();
 }

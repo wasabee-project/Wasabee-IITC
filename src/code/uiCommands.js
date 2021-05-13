@@ -1,6 +1,7 @@
-// import WasabeeOp from "./operation";
+import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
+import MergeDialog from "./dialogs/mergeDialog";
 import WasabeeMe from "./me";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
@@ -9,7 +10,6 @@ import {
   getSelectedOperation,
   makeSelectedOperation,
   opsList,
-  getOperationByID,
   removeOperation,
   changeOpIfNeeded,
   duplicateOperation,
@@ -34,77 +34,89 @@ export function swapPortal(operation, portal) {
     return;
   }
 
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("SWAP PROMPT");
   pr.appendChild(portal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
   pr.appendChild(selectedPortal.displayFormat());
   L.DomUtil.create("span", null, pr).textContent = "?";
-  con.setup(wX("SWAP TITLE"), pr, () => {
-    operation.swapPortal(portal, selectedPortal);
+  const con = new ConfirmDialog({
+    title: wX("SWAP TITLE"),
+    label: pr,
+    type: "anchor",
+    callback: () => {
+      operation.swapPortal(portal, selectedPortal);
+    },
   });
   con.enable();
 }
 
 export function deletePortal(operation, portal) {
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
   pr.appendChild(portal.displayFormat());
-  con.setup(wX("DELETE ANCHOR TITLE"), pr, () => {
-    operation.removeAnchor(portal.id);
+  const con = new ConfirmDialog({
+    title: wX("DELETE ANCHOR TITLE"),
+    label: pr,
+    type: "anchor",
+    callback: () => {
+      operation.removeAnchor(portal.id);
+    },
   });
   con.enable();
 }
 
 export function deleteMarker(operation, marker, portal) {
-  const con = new ConfirmDialog();
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
   pr.appendChild(portal.displayFormat());
-  con.setup(wX("DELETE MARKER TITLE"), pr, () => {
-    operation.removeMarker(marker);
+  const con = new ConfirmDialog({
+    title: wX("DELETE MARKER TITLE"),
+    label: pr,
+    type: "marker",
+    callback: () => {
+      operation.removeMarker(marker);
+    },
   });
   con.enable();
 }
 
 export function clearAllItems(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear: ${operation.name}`,
-    `Do you want to reset ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog({
+    title: `Clear: ${operation.name}`,
+    label: `Do you want to reset ${operation.name}?`,
+    type: "operation",
+    callback: () => {
       operation.clearAllItems();
-      window.runHooks("wasabeeCrosslinks");
-    }
-  );
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+    },
+  });
   con.enable();
 }
 
 export function clearAllLinks(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear Links: ${operation.name}`,
-    `Do you want to remove all links from ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog({
+    title: `Clear Links: ${operation.name}`,
+    label: `Do you want to remove all links from ${operation.name}?`,
+    type: "operation",
+    callback: () => {
       operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks");
-    }
-  );
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+    },
+  });
   con.enable();
 }
 
 export function clearAllMarkers(operation) {
-  const con = new ConfirmDialog();
-  con.setup(
-    `Clear Markers: ${operation.name}`,
-    `Do you want to remove all markers from ${operation.name}?`,
-    () => {
+  const con = new ConfirmDialog({
+    title: `Clear Markers: ${operation.name}`,
+    label: `Do you want to remove all markers from ${operation.name}?`,
+    type: "operation",
+    callback: () => {
       operation.clearAllMarkers();
-      window.runHooks("wasabeeCrosslinks");
-    }
-  );
+      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+    },
+  });
   con.enable();
 }
 
@@ -216,15 +228,14 @@ export function sendLocation() {
 }
 
 export function getAllPortalsOnScreen(operation) {
-  const bounds = window.clampLatLngBounds(window.map.getBounds());
+  const bounds = window.map.getBounds();
   const x = [];
   for (const portal in window.portals) {
-    if (_isOnScreen(window.portals[portal].getLatLng(), bounds)) {
+    if (bounds.contains(window.portals[portal].getLatLng())) {
       if (
-        _hasMarker(
+        operation.containsMarkerByID(
           window.portals[portal].options.guid,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE,
-          operation
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
         )
       )
         continue;
@@ -235,24 +246,39 @@ export function getAllPortalsOnScreen(operation) {
   return x;
 }
 
-// const _isOnScreen = function (ll, bounds) {
-function _isOnScreen(ll, bounds) {
-  return (
-    ll.lat < bounds._northEast.lat &&
-    ll.lng < bounds._northEast.lng &&
-    ll.lat > bounds._southWest.lat &&
-    ll.lng > bounds._southWest.lng
-  );
-}
+export function getAllPortalsLinked(operation, originPortal) {
+  const x = [];
+  for (const link in window.links) {
+    const p = window.links[link];
 
-function _hasMarker(portalid, markerType, operation) {
-  if (operation.markers.length == 0) return false;
-  for (const m of operation.markers) {
-    if (m.portalId == portalid && m.type == markerType) {
-      return true;
+    const linkPortal1 = new WasabeePortal({
+      id: p.options.data.oGuid,
+      lat: (p.options.data.oLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.oLngE6 / 1e6).toFixed(6),
+      name: p.options.data.oGuid,
+      comment: "in",
+    });
+
+    const linkPortal2 = new WasabeePortal({
+      id: p.options.data.dGuid,
+      lat: (p.options.data.dLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.dLngE6 / 1e6).toFixed(6),
+      name: p.options.data.dGuid,
+      comment: "out",
+    });
+
+    if (operation.containsLinkFromTo(linkPortal1, linkPortal2)) {
+      continue;
+    }
+    if (linkPortal1.id === originPortal.id) {
+      x.push(linkPortal2);
+    }
+    if (linkPortal2.id === originPortal.id) {
+      x.push(linkPortal1);
     }
   }
-  return false;
+  // console.log(x);
+  return x;
 }
 
 // this is the test point used in several auto-draws
@@ -317,7 +343,7 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.runHooks("wasabeeUIUpdate", "blockerAutomark");
+    window.map.fire("wasabeeUIUpdate", { reason: "blockerAutomark" }, false);
     return;
   }
 
@@ -363,20 +389,21 @@ export async function fullSync() {
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner
+    const ol = await opsList();
     const serverOps = new Set(
-      opsList()
-        .map(getOperationByID)
+      ol
+        .map(await WasabeeOp.load)
         .filter((op) => op)
         .filter((op) => op.server == server && !opsID.has(op.ID))
     );
     for (const op of serverOps) {
       // if owned, duplicate the OP
       if (op.IsOwnedOp()) {
-        const newop = duplicateOperation(op.ID);
+        const newop = await duplicateOperation(op.ID);
         newop.name = op.name;
-        newop.store();
+        await newop.store();
       }
-      removeOperation(op.ID);
+      await removeOperation(op.ID);
     }
     if (serverOps.size > 0)
       console.log(
@@ -388,18 +415,83 @@ export async function fullSync() {
       promises.push(opPromise(opID));
     }
     const ops = await Promise.all(promises);
-    for (const newop of ops) newop.store();
+    for (const newop of ops) {
+      const localOp = await WasabeeOp.load(newop.ID);
+      if (!localOp || !localOp.localchanged) await newop.store();
+      else if (localOp.lasteditid != newop.lasteditid) {
+        const op = localOp.ID != so.ID ? localOp : so;
+        // check if there are really local changes
+        // XXX: this may be too long to do
+        if (!op.checkChanges()) {
+          await newop.store();
+        } else {
+          // partial update on fields the server is always right
+          // XXX: do we need zone for teamlist consistency ?
+          op.teamlist = newop.teamlist;
+          op.remoteChanged = true;
+          await op.store();
+
+          // In case of selected op, suggest merge to the user
+          if (so === op) {
+            const con = new MergeDialog({
+              opOwn: so,
+              opRemote: newop,
+            });
+            con.enable();
+          }
+        }
+      }
+    }
 
     // replace current op by the server version if any
-    if (ops.some((op) => op.ID == so.ID)) makeSelectedOperation(so.ID);
+    if (ops.some((op) => op.ID == so.ID)) await makeSelectedOperation(so.ID);
     // change op if the current does not exist anymore
-    else if (!opsList().includes(so.ID)) changeOpIfNeeded();
+    else if (!ol.includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
-    else window.runHooks("wasabeeUIUpdate");
+    else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
 
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
     new AuthDialog().enable();
   }
+}
+
+export async function syncOp(opID) {
+  const localOp = WasabeeOp.load(opID);
+  const remoteOp = await opPromise(opID);
+  if (remoteOp.lasteditid != localOp.lasteditid) {
+    if (!localOp.localchanged) {
+      await remoteOp.store();
+    } else {
+      const con = new MergeDialog({
+        opOwn: localOp,
+        opRemote: remoteOp,
+      });
+      con.enable();
+    }
+  }
+}
+
+export function deleteLocalOp(opname, opid) {
+  const con = new ConfirmDialog({
+    title: wX("REM_LOC_CP", { opName: opname }),
+    label: wX("YESNO_DEL", { opName: opname }),
+    type: "operation",
+    callback: async () => {
+      await removeOperation(opid);
+      const newop = await changeOpIfNeeded();
+      const mbr = newop.mbr;
+      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+        window.map.fitBounds(mbr);
+      }
+    },
+  });
+  con.enable();
+}
+
+export async function resetCaches() {
+  await window.plugin.wasabee.idb.clear("agents");
+  await window.plugin.wasabee.idb.clear("teams");
+  await window.plugin.wasabee.idb.clear("defensivekeys");
 }

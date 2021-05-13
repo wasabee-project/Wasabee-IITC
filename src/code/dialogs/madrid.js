@@ -8,7 +8,6 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
-import { postToFirebase } from "../firebaseSupport";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -18,10 +17,7 @@ const MadridDialog = MultimaxDialog.extend({
   },
 
   // addHooks inherited from MultimaxDialog
-  // removeHooks inherited from MultimaxDialog
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -59,20 +55,18 @@ const MadridDialog = MultimaxDialog.extend({
     setOneButton.textContent = wX("SET");
     this._setOneDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetOne) {
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
+      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetOne.length,
+      });
     } else {
       this._setOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(this._operation);
+      this._portalSetOne = getAllPortalsOnScreen(getSelectedOperation());
       // XXX this is not enough, need to cache them in case IITC purges them
-      this._setOneDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetOne.length
-      );
+      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetOne.length,
+      });
     });
 
     const anchorTwoLabel = L.DomUtil.create("label", null, container);
@@ -108,20 +102,18 @@ const MadridDialog = MultimaxDialog.extend({
     setTwoButton.textContent = wX("SET");
     this._setTwoDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetTwo) {
-      this._setTwoDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetTwo.length
-      );
+      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetTwo.length,
+      });
     } else {
       this._setTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(this._operation);
+      this._portalSetTwo = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
-      this._setTwoDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetTwo.length
-      );
+      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetTwo.length,
+      });
     });
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
@@ -135,20 +127,18 @@ const MadridDialog = MultimaxDialog.extend({
     setThreeButton.textContent = wX("SET");
     this._setThreeDisplay = L.DomUtil.create("span", null, container);
     if (this._portalSetThree) {
-      this._setThreeDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetThree.length
-      );
+      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetThree.length,
+      });
     } else {
       this._setThreeDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(this._operation);
+      this._portalSetThree = getAllPortalsOnScreen(getSelectedOperation());
       // XXX cache
-      this._setThreeDisplay.textContent = wX(
-        "PORTAL_COUNT",
-        this._portalSetThree.length
-      );
+      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSetThree.length,
+      });
     });
 
     //Add backlinks after all the rest is set up
@@ -158,6 +148,13 @@ const MadridDialog = MultimaxDialog.extend({
     this._flcheck = L.DomUtil.create("input", null, container);
     this._flcheck.type = "checkbox";
     this._flcheck.id = "wasabee-madrid-backlink";
+
+    const balancedLabel = L.DomUtil.create("label", null, container);
+    balancedLabel.textContent = "Balanced";
+    balancedLabel.htmlFor = "wasabee-madrid-balanced";
+    this._balancedcheck = L.DomUtil.create("input", null, container);
+    this._balancedcheck.type = "checkbox";
+    this._balancedcheck.id = "wasabee-madrid-balanced";
 
     const newLine = L.DomUtil.create("label", "newline", container);
     const dividerBeforeDraw = L.DomUtil.create("span", null, container);
@@ -171,45 +168,158 @@ const MadridDialog = MultimaxDialog.extend({
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
-      const total = this.doMadrid.call(this);
+      this._operation = getSelectedOperation();
+      const total = this._balancedcheck.checked
+        ? this.doBalancedMadrid.call(this)
+        : this.doMadrid.call(this);
       alert(`Madrid found ${total} layers`);
-      // this._dialog.dialog("close");
+      // this.closeDialog();
     });
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("MADRID_TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-madrid",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "madrid",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.madrid,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = MadridDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = wX("MADRID");
     this.label = wX("MADRID");
-    this._operation = getSelectedOperation();
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = testPortal();
-    postToFirebase({ id: "analytics", action: MadridDialog.TYPE });
+  },
+
+  getSpine: function (pOne, pTwo, portals) {
+    const portalsMap = new Map(portals.map((p) => [p.id, p]));
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+    const sequence = this.longestSequence(poset, null, (a, b) =>
+      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+    );
+
+    return sequence.map((id) => portalsMap.get(id));
+  },
+
+  doBalancedMadrid: function () {
+    // Calculate the multimax
+    if (
+      !this._anchorOne ||
+      !this._anchorTwo ||
+      !this._portalSetOne ||
+      !this._portalSetTwo ||
+      !this._portalSetThree
+    ) {
+      alert(wX("INVALID REQUEST"));
+      return 0;
+    }
+
+    // the set 1 must contain anchor 1 (first back link)
+    if (this._portalSetOne.find((p) => this._anchorOne.id == p.id) == undefined)
+      this._portalSetOne.push(this._anchorOne);
+    // the set 2 must contain anchor 2 (first back link)
+    if (this._portalSetTwo.find((p) => this._anchorTwo.id == p.id) == undefined)
+      this._portalSetTwo.push(this._anchorTwo);
+
+    const spineThree = this.getSpine(
+      this._anchorOne,
+      this._anchorTwo,
+      this._portalSetThree
+    );
+    const lastThree = spineThree[spineThree.length - 1];
+
+    const spineOne = this.getSpine(
+      this._anchorTwo,
+      lastThree,
+      this._portalSetOne.filter(
+        (p) =>
+          this._anchorOne.id == p.id ||
+          this.fieldCoversPortal(this._anchorTwo, lastThree, p, this._anchorOne)
+      )
+    );
+    const lastOne = spineOne[spineOne.length - 1];
+
+    const spineTwo = this.getSpine(
+      lastThree,
+      lastOne,
+      this._portalSetTwo.filter(
+        (p) =>
+          this._anchorTwo.id == p.id ||
+          this.fieldCoversPortal(lastThree, lastOne, p, this._anchorTwo)
+      )
+    );
+    // const lastTwo = spineTwo[spineTwo.length - 1];
+
+    const spines = [spineOne, spineTwo, spineThree];
+    const step = spines.map((s) => 1 / s.length);
+
+    this._operation.startBatchMode();
+
+    // ignore order + direction
+    this._operation.addLink(spines[0][0], spines[1][0], {
+      description: "inner field",
+    });
+    this._operation.addLink(spines[1][0], spines[2][0], {
+      description: "inner field",
+    });
+    this._operation.addLink(spines[2][0], spines[0][0], {
+      description: "inner field",
+    });
+
+    const indices = [1, 1, 1];
+
+    while (indices.some((v, i) => v < spines[i].length)) {
+      let spineOrder = [0, 1, 2].sort(
+        (a, b) => indices[a] * step[a] - indices[b] * step[b]
+      );
+      let p = spines[spineOrder[0]][indices[spineOrder[0]]];
+      let pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
+      let pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
+      let pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
+
+      // hackish, I have no proof of this working in all cases
+      for (
+        let i = 0;
+        (!p || !this.fieldCoversPortal(p, pTwo, pThree, pOne)) && i < 3;
+        i++
+      ) {
+        this._operation.setPortalComment(pOne, "point of disbalance");
+
+        spineOrder = [spineOrder[1], spineOrder[2], spineOrder[0]];
+        p = spines[spineOrder[0]][indices[spineOrder[0]]];
+        pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
+        pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
+        pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
+      }
+      if (!this.fieldCoversPortal(p, pTwo, pThree, pOne))
+        console.log("well, this doesn't work here...");
+      const toTwo = this._operation.addLink(p, pTwo, { description: "link" });
+      const toThree = this._operation.addLink(p, pThree, {
+        description: "link",
+      });
+      toTwo.zone = spineOrder[0] + 1;
+      toThree.zone = spineOrder[0] + 1;
+
+      indices[spineOrder[0]] += 1;
+    }
+
+    this._operation.endBatchMode();
+
+    return indices[0] + indices[1] + indices[2] - 2;
   },
 
   // fieldCoversPortal inherited from MultimaxDialog
@@ -228,7 +338,10 @@ const MadridDialog = MultimaxDialog.extend({
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(this._anchorOne, this._anchorTwo, "madrid base", 1);
+    this._operation.addLink(this._anchorOne, this._anchorTwo, {
+      description: "madrid base",
+      order: 1,
+    });
 
     let len = 0;
     const [len1, order1, last1] = this.MM(

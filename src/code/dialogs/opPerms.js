@@ -1,53 +1,35 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeTeam from "../team";
 import WasabeeMe from "../me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OpPermList = WDialog.extend({
   statics: {
     TYPE: "opPermList",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = OpPermList.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OpPermList.TYPE });
-  },
-
   addHooks: async function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const operation = getSelectedOperation();
-    this._opID = operation.ID;
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
       this._me = null;
     }
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
 
     this._displayDialog();
   },
 
   removeHooks: function () {
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
     WDialog.prototype.removeHooks.call(this);
   },
 
   update: async function () {
     const operation = getSelectedOperation();
-    if (this._opID != operation.ID) {
-      this._opID = operation.ID;
-      console.warn("operation changed while perm dialog open");
-    }
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
@@ -58,14 +40,10 @@ const OpPermList = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const operation = getSelectedOperation();
 
     this.buildTable(operation);
-
     this._html = L.DomUtil.create("div", null);
-
     this._html.appendChild(this._table.table);
     if (this._me && operation.IsOwnedOp()) {
       const already = new Set();
@@ -115,21 +93,17 @@ const OpPermList = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: wX("PERMS", operation.name),
+    this.createDialog({
+      title: wX("PERMS", { opName: operation.name }),
       html: this._html,
       height: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-perms",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "perms",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   buildTable: function (operation) {
@@ -137,9 +111,9 @@ const OpPermList = WDialog.extend({
     this._table.fields = [
       {
         name: wX("TEAM"),
-        value: (perm) => {
+        value: async (perm) => {
           // try the team cache first
-          const t = WasabeeTeam.cacheGet(perm.teamid);
+          const t = await WasabeeTeam.get(perm.teamid);
           if (t) return t.name;
           // check the "me" list
           if (this._me) {
@@ -171,15 +145,16 @@ const OpPermList = WDialog.extend({
       this._table.fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
-        sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
-          const link = L.DomUtil.create("a", null, cell);
-          link.href = "#";
-          link.textContent = value;
-          L.DomEvent.on(link, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
-          });
+          if (operation.IsOwnedOp()) {
+            const link = L.DomUtil.create("a", null, cell);
+            link.href = "#";
+            link.textContent = value;
+            L.DomEvent.on(link, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
+            });
+          }
         },
       });
     }
@@ -193,19 +168,22 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
+    if (!operation.IsOwnedOp()) return;
+
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
-        console.warn("not adding duplicate permission");
-        window.runHooks("wasabeeUIUpdate");
+        console.debug("not adding duplicate permission");
+        window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
         return;
       }
     }
+
     try {
       await addPermPromise(operation.ID, teamID, role, zone);
       // add locally for display
       operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
-      operation.store();
-      window.runHooks("wasabeeUIUpdate");
+      await operation.store();
+      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
       alert(e.toString());
@@ -218,6 +196,8 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
+    if (!operation.IsOwnedOp()) return;
+
     try {
       await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);
       const n = new Array();
@@ -226,11 +206,11 @@ const OpPermList = WDialog.extend({
           n.push(p);
       }
       operation.teamlist = n;
-      operation.store();
-      window.runHooks("wasabeeUIUpdate");
+      await operation.store();
+      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      alert(e);
     }
   },
 });

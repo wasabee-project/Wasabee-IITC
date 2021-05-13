@@ -3,3 +3,4 @@ releases
 dist
 .vscode
 packages-lock.json
+.idea/

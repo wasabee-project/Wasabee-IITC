@@ -8,27 +8,29 @@ import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
 import { getSelectedOperation } from "./selectedOp";
 
+const STATE_UNASSIGNED = "pending";
+const STATE_ASSIGNED = "assigned";
+const STATE_ACKNOWLEDGED = "acknowledged";
+const STATE_COMPLETED = "completed";
+
 export default class WasabeeMarker {
   constructor(obj) {
-    this.ID = generateId();
+    this.ID = obj.ID ? obj.ID : generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
-    this.comment = obj.comment ? obj.comment : "";
+    this.comment = obj.comment ? obj.comment : ""; // why "" and not null? This isn't go
     this.completedBy = obj.completedBy ? obj.completedBy : "";
-    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
-    this.order = obj.order ? obj.order : 0;
-    this.zone = obj.zone ? obj.zone : 1;
+    this.order = obj.order ? Number(obj.order) : 0;
+    this.zone = obj.zone ? Number(obj.zone) : 1;
 
-    // some constants
-    this.STATE_UNASSIGNED = "pending";
-    this.STATE_ASSIGNED = "assigned";
-    this.STATE_ACKNOWLEDGED = "acknowledged";
-    this.STATE_COMPLETED = "completed";
-
-    // validation happens in the setter, setting up this._state
-    this.state = obj.state;
+    this.assign(obj.assignedTo); // WAS this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    // if ._state then it came from indexeddb, otherwise from server/localStorage
+    if (obj._state) {
+      this.state = obj._state;
+    } else this.state = obj.state ? obj.state : null;
   }
 
+  // not called when pushing to indexeddb, but used when sending to server
   toJSON() {
     return {
       ID: this.ID,
@@ -38,7 +40,7 @@ export default class WasabeeMarker {
       state: this._state, // no need to validate here
       completedBy: this.completedBy,
       assignedTo: this.assignedTo,
-      order: this.order,
+      order: Number(this.order),
       zone: Number(this.zone),
     };
   }
@@ -53,46 +55,45 @@ export default class WasabeeMarker {
 
   assign(gid) {
     if (!gid || gid == "") {
-      this._state = this.STATE_UNASSIGNED;
+      this._state = STATE_UNASSIGNED;
       this.assignedTo = "";
       return;
     }
 
     this.assignedTo = gid;
-    this._state = this.STATE_ASSIGNED;
+    this._state = STATE_ASSIGNED;
     return;
   }
 
   set state(state) {
-    // sanitize state
-    if (
-      state != this.STATE_UNASSIGNED &&
-      state != this.STATE_ASSIGNED &&
-      state != this.STATE_ACKNOWLEDGED &&
-      state != this.STATE_COMPLETED
-    )
-      state = this.STATE_UNASSIGNED;
-    // if setting to "pending", clear assignments
-    if (state == this.STATE_UNASSIGNED) this.assignedTo = null;
-    // if setting to assigned or acknowledged and there is no assignment, set to "pending". A task _can_ be completed w/o being assigned
-    if (
-      (state == this.STATE_ASSIGNED || state == this.STATE_ACKNOWLEDGED) &&
-      (!this.assignedTo || this.assignedTo == "")
-    ) {
-      state = this.STATE_UNASSIGNED;
+    switch (state) {
+      case STATE_UNASSIGNED:
+        this.assignedTo = null;
+        this._state = STATE_UNASSIGNED;
+        break;
+      case STATE_ASSIGNED: // fall-through
+      case STATE_ACKNOWLEDGED:
+        if (!this.assignedTo || this.assignedTo == "") {
+          this._state = STATE_UNASSIGNED;
+          break;
+        }
+        this._state = state;
+        break;
+      case STATE_COMPLETED:
+        this._state = STATE_COMPLETED;
+        break;
+      default:
+        this._state = STATE_UNASSIGNED;
+        break;
     }
-    this._state = state;
   }
 
   get state() {
     return this._state;
   }
 
-  async popupContent(marker) {
-    const operation = getSelectedOperation();
-    if (operation == null) {
-      console.log("null op in marker?");
-    }
+  async popupContent(marker, operation) {
+    if (!operation) operation = getSelectedOperation();
 
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {
@@ -111,15 +112,17 @@ export default class WasabeeMarker {
     );
     if (this.state != "completed" && this.assignedTo) {
       try {
-        const a = await WasabeeAgent.waitGet(this.assignedTo);
+        const a = await WasabeeAgent.get(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        assignment.appendChild(a.formatDisplay());
+        assignment.appendChild(await a.formatDisplay());
       } catch (err) {
         console.error(err);
       }
     }
     if (this.state == "completed" && this.completedBy) {
-      assignment.innerHTML = wX("COMPLETED BY", this.completedBy);
+      assignment.innerHTML = wX("COMPLETED BY", {
+        agentName: this.completedBy,
+      });
     }
 
     const buttonSet = L.DomUtil.create(
@@ -136,37 +139,54 @@ export default class WasabeeMarker {
     });
 
     if (operation.IsServerOp()) {
-      const assignButton = L.DomUtil.create("button", null, buttonSet);
-      assignButton.textContent = wX("ASSIGN");
-      L.DomEvent.on(assignButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const ad = new AssignDialog();
-        ad.setup(this, operation);
-        ad.enable();
-        marker.closePopup();
-      });
+      if (operation.IsWritableOp()) {
+        const assignButton = L.DomUtil.create("button", null, buttonSet);
+        assignButton.textContent = wX("ASSIGN");
+        L.DomEvent.on(assignButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const ad = new AssignDialog({ target: this });
+          ad.enable();
+          marker.closePopup();
+        });
+      }
 
-      const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
-      sendTargetButton.textContent = wX("SEND TARGET");
-      L.DomEvent.on(sendTargetButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const std = new SendTargetDialog();
-        std.setup(this);
-        std.enable();
-        marker.closePopup();
-      });
+      if (operation.IsOnCurrentServer()) {
+        const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
+        sendTargetButton.textContent = wX("SEND TARGET");
+        L.DomEvent.on(sendTargetButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const std = new SendTargetDialog({ target: this });
+          std.enable();
+          marker.closePopup();
+        });
+      }
     }
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
     L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       marker.closePopup();
-      window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-          portal.lat +
-          "," +
-          portal.lng
-      );
+      // use intent on android
+      if (
+        typeof window.android !== "undefined" &&
+        window.android &&
+        window.android.intentPosLink
+      ) {
+        window.android.intentPosLink(
+          +portal.lat,
+          +portal.lng,
+          window.map.getZoom(),
+          portal.name,
+          true
+        );
+      } else {
+        window.open(
+          "https://www.google.com/maps/search/?api=1&query=" +
+            portal.lat +
+            "," +
+            portal.lng
+        );
+      }
     });
 
     return content;
@@ -182,8 +202,7 @@ export default class WasabeeMarker {
     kind.href = "#";
     L.DomEvent.on(kind, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const ch = new MarkerChangeDialog();
-      ch.setup(this);
+      const ch = new MarkerChangeDialog({ marker: this });
       ch.enable();
       marker.closePopup();
     });
@@ -197,9 +216,11 @@ export default class WasabeeMarker {
       comment.textContent = this.comment;
       L.DomEvent.on(comment, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const com = new SetCommentDialog();
-        com.setup(this, operation);
-        com.enable();
+        const scd = new SetCommentDialog({
+          target: this,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }
@@ -209,9 +230,11 @@ export default class WasabeeMarker {
     cl.href = "#";
     L.DomEvent.on(cl, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const cd = new SetCommentDialog();
-      cd.setup(portal, operation);
-      cd.enable();
+      const scd = new SetCommentDialog({
+        target: portal,
+        operation: operation,
+      });
+      scd.enable();
       marker.closePopup();
     });
     if (portal.hardness) {
@@ -225,9 +248,11 @@ export default class WasabeeMarker {
       hl.href = "#";
       L.DomEvent.on(hl, "click", (ev) => {
         L.DomEvent.stop(ev);
-        const cd = new SetCommentDialog();
-        cd.setup(portal, operation);
-        cd.enable();
+        const scd = new SetCommentDialog({
+          target: portal,
+          operation: operation,
+        });
+        scd.enable();
         marker.closePopup();
       });
     }

@@ -1,17 +1,26 @@
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
-import { drawMap, drawAgents } from "./mapDrawing";
+import {
+  drawMap,
+  drawAgents,
+  drawBackgroundOps,
+  drawBackgroundOp,
+} from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
-import { initFirebase } from "./firebaseSupport";
+import { initFirebase, postToFirebase } from "./firebaseSupport";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
+import { WPane } from "./leafletClasses";
+import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
+import WasabeeOp from "./operation";
+import { openDB } from "idb";
 const Wasabee = window.plugin.wasabee;
 
-window.plugin.wasabee.init = () => {
+window.plugin.wasabee.init = async () => {
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -26,19 +35,17 @@ window.plugin.wasabee.init = () => {
     return;
   }
 
+  await initIdb();
   Wasabee._selectedOp = null; // the in-memory working op;
-  Wasabee.teams = new Map();
-  Wasabee._agentCache = new Map();
-  Wasabee.onlineAgents = new Map();
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
 
+  initSkin();
   // can this be moved to the auth dialog?
   initGoogleAPI();
-  setupLocalStorage();
-  initSelectedOperation();
+  await setupLocalStorage();
+  await initSelectedOperation();
   initServer();
-  initSkin();
 
   const skins = [];
   const ss = localStorage[Wasabee.static.constants.SKIN_KEY];
@@ -49,9 +56,12 @@ window.plugin.wasabee.init = () => {
     skins.push(ss);
   }
   if (skins.length > 0) {
-    window.addHook("iitcLoaded", () => {
-      changeSkin(skins);
-    });
+    if (window.iitcLoaded) changeSkin(skins);
+    else {
+      window.addHook("iitcLoaded", () => {
+        changeSkin(skins);
+      });
+    }
   }
 
   Wasabee.portalLayerGroup = new L.LayerGroup();
@@ -62,6 +72,13 @@ window.plugin.wasabee.init = () => {
   window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
+
+  Wasabee.backgroundOpsGroup = new L.LayerGroup();
+  window.addLayerGroup(
+    "Wasabee Background Ops",
+    Wasabee.backgroundOpsGroup,
+    true
+  );
 
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
@@ -76,17 +93,33 @@ window.plugin.wasabee.init = () => {
     });
   });
 
-  // custom hook for updating our UI
-  window.addHook("wasabeeUIUpdate", (caller) => {
-    if (caller != null) console.debug("ui update", caller);
-    drawMap();
+  window.map.on("wasabeeUIUpdate", drawMap);
+
+  window.addResumeFunction(() => {
+    window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
+    sendLocation();
   });
 
-  // IITC-CE, not 0.26
-  if (window.addResumeFunction) {
-    window.addResumeFunction(() => {
-      window.runHooks("wasabeeUIUpdate", "resume");
-      sendLocation();
+  window.map.on("wasabee:op:select", () => {
+    drawBackgroundOps();
+  });
+  window.map.on("wasabee:op:background", (data) => {
+    if (data.background) {
+      if (Wasabee._selectedOp && Wasabee._selectedOp.ID !== data.opID)
+        WasabeeOp.load(data.opID).then(drawBackgroundOp);
+    } else {
+      drawBackgroundOps();
+    }
+  });
+
+  // Android panes
+  const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
+  if (window.isSmartphone() && usePanes) {
+    /* eslint-disable no-new */
+    new WPane({
+      paneId: "wasabee",
+      paneName: "Wasabee",
+      default: () => new OperationChecklist(),
     });
   }
 
@@ -97,7 +130,10 @@ window.plugin.wasabee.init = () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.runHooks("wasabeeUIUpdate", "layeradd");
+      window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
+    }
+    if (obj.layer === Wasabee.backgroundOpsGroup) {
+      drawBackgroundOps();
     }
   });
 
@@ -123,14 +159,17 @@ window.plugin.wasabee.init = () => {
   }
 
   // setup UI elements
-  addButtons(Wasabee._selectedOp);
+  addButtons();
   setupToolbox();
 
   // draw the UI with the op data for the first time
-  window.runHooks("wasabeeUIUpdate", "startup");
+  window.map.fire("wasabeeUIUpdate", { reason: "startup" }, false);
 
   // run crosslinks
-  window.runHooks("wasabeeCrosslinks");
+  window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
+
+  // draw background ops
+  drawBackgroundOps();
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not
@@ -140,8 +179,12 @@ window.plugin.wasabee.init = () => {
     WasabeeMe.waitGet(true);
 
     // load Wasabee-Defense keys if logged in
-    window.runHooks("wasabeeDkeys");
+    window.map.fire("wasabeeDkeys", { reason: "startup" }, false);
   }
+
+  window.map.on("wdialog", (dialog) => {
+    postToFirebase({ id: "analytics", action: dialog.constructor.TYPE });
+  });
 };
 
 // this can be moved to auth dialog, no need to init it for people who never log in
@@ -170,4 +213,41 @@ function initGoogleAPI() {
   (document.body || document.head || document.documentElement).appendChild(
     script
   );
+}
+
+async function initIdb() {
+  const version = 2;
+
+  // XXX audit these to make sure all the various indexes are used
+  Wasabee.idb = await openDB("wasabee", version, {
+    upgrade(db, oldVersion, newVersion, tx) {
+      if (oldVersion < 1) {
+        const agents = db.createObjectStore("agents", { keyPath: "id" });
+        agents.createIndex("date", "date"); // last location change
+        agents.createIndex("fetched", "fetched"); // last pull from server
+        const teams = db.createObjectStore("teams", { keyPath: "id" });
+        teams.createIndex("fetched", "fetched"); // last pull from server
+
+        // do not set an implied key, explicitly set GID/PortalID on insert
+        // XXX we can do this with a keyPath https://stackoverflow.com/questions/33852508/how-to-create-an-indexeddb-composite-key
+        // const defensivekeys = db.createObjectStore("defensivekeys");
+        const defensivekeys = db.createObjectStore("defensivekeys", {
+          keyPath: ["GID", "PortalID"],
+        });
+        defensivekeys.createIndex("PortalID", "PortalID");
+        defensivekeys.createIndex("Count", "Count"); // To be used to remove 0-count entries
+        // defensivekeys.createIndex("pk", ["GID", "PortalID"], { unique: true });
+      }
+      if (oldVersion < 2) {
+        const ops = db.createObjectStore("operations", { keyPath: "ID" });
+        ops.createIndex("fetched", "fetched");
+        ops.createIndex("server", "server");
+      }
+      /* if (oldVersion < 3) {
+        const teams = tx.objectStore("teams");
+        teams.createIndex("_agents", "_agents[].id");
+      } */
+      console.debug(newVersion, tx);
+    },
+  });
 }

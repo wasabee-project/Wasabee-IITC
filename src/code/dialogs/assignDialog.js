@@ -4,70 +4,54 @@ import WasabeeMarker from "../marker";
 import WasabeeAnchor from "../anchor";
 import WasabeeMe from "../me";
 import WasabeeTeam from "../team";
-import {
-  assignLinkPromise,
-  assignMarkerPromise,
-  updateOpPromise,
-  opPromise,
-} from "../server";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
-import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
+import { getSelectedOperation } from "../selectedOp";
 
 const AssignDialog = WDialog.extend({
   statics: {
     TYPE: "assignDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = AssignDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: AssignDialog.TYPE });
+  options: {
+    // target,
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    // create container then setup asynchronously
+    this._html = L.DomUtil.create("div", "container");
+    this._setup();
+
+    this.createDialog({
       title: this._name,
       html: this._html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-assign",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "assign",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.assign,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  setup: async function (target) {
+  _setup: async function () {
+    const target = this.options.target;
     const operation = getSelectedOperation();
-    this._opID = operation.ID;
-    this._dialog = null;
     this._targetID = target.ID;
-    this._html = L.DomUtil.create("div", null);
     const divtitle = L.DomUtil.create("div", "desc", this._html);
     const menu = await this._getAgentMenu(target.assignedTo);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      this._name = wX("ASSIGN LINK PROMPT", portal.displayName);
+      this._name = wX("ASSIGN LINK PROMPT", { portalName: portal.displayName });
       divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK ASSIGNMENT");
@@ -77,7 +61,9 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
-      this._name = wX("ASSIGN MARKER PROMPT", portal.displayName);
+      this._name = wX("ASSIGN MARKER PROMPT", {
+        portalName: portal.displayName,
+      });
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER ASSIGNMENT");
@@ -87,7 +73,9 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeAnchor) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
-      this._name = wX("ASSIGN OUTBOUND PROMPT", portal.displayName);
+      this._name = wX("ASSIGN OUTBOUND PROMPT", {
+        portalName: portal.displayName,
+      });
       divtitle.appendChild(portal.displayFormat(this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("ANCHOR ASSIGNMENT");
@@ -115,24 +103,18 @@ const AssignDialog = WDialog.extend({
     option.textContent = wX("UNASSIGNED");
     const alreadyAdded = new Array();
 
-    const mode = localStorage[window.plugin.wasabee.static.constants.MODE_KEY];
-    if (mode == "active") {
-      menu.addEventListener("change", (value) => {
-        this.activeAssign(value); // async, but no need to await
-      });
-    } else {
-      menu.addEventListener("change", (value) => {
-        this.designAssign(value);
-      });
-    }
+    menu.addEventListener("change", (value) => {
+      this.localAssign(value);
+    });
 
     const me = await WasabeeMe.waitGet();
     for (const t of getSelectedOperation().teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.waitGet(t.teamid, 5 * 60);
-        for (const a of tt.agents) {
+        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const agents = tt.getAgents();
+        for (const a of agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
             option = L.DomUtil.create("option");
@@ -150,7 +132,7 @@ const AssignDialog = WDialog.extend({
     return container;
   },
 
-  designAssign: function (value) {
+  localAssign: function (value) {
     const operation = getSelectedOperation();
     if (this._type == "Marker") {
       operation.assignMarker(this._targetID, value.srcElement.value);
@@ -167,76 +149,6 @@ const AssignDialog = WDialog.extend({
           operation.assignLink(l.ID, value.srcElement.value);
         }
       }
-    }
-  },
-
-  activeAssign: async function (value) {
-    const operation = getSelectedOperation();
-    // if operation.localchanged...
-    try {
-      console.debug("pushing op to server");
-      await updateOpPromise(operation);
-      console.debug("update pushed");
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-
-    if (this._type == "Marker") {
-      try {
-        await assignMarkerPromise(
-          operation.ID,
-          this._targetID,
-          value.srcElement.value
-        );
-        console.debug("assignment processed by server");
-        // operation.assignMarker(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.error(e);
-        operation.assignMarker(this._targetID, value.srcElement.value);
-        throw e;
-      }
-    }
-    if (this._type == "Link") {
-      try {
-        await assignLinkPromise(
-          operation.ID,
-          this._targetID,
-          value.srcElement.value
-        );
-        console.debug("assignment processed by server");
-        // operation.assignLink(this._targetID, value.srcElement.value);
-      } catch (e) {
-        console.error(e);
-        operation.assignLink(this._targetID, value.srcElement.value);
-        throw e;
-      }
-    }
-    if (this._type == "Anchor") {
-      const links = operation.getLinkListFromPortal(
-        operation.getPortal(this._targetID)
-      );
-      for (const l of links) {
-        try {
-          await assignLinkPromise(operation.ID, l.ID, value.srcElement.value);
-          console.debug("assignment processed by server");
-          // operation.assignLink(l.ID, value.srcElement.value);
-        } catch (e) {
-          console.error(e);
-          operation.assignLink(l.ID, value.srcElement.value);
-          throw e;
-        }
-      }
-    }
-
-    try {
-      console.debug("refreshing local copy of op from server");
-      const updated = await opPromise(operation.ID);
-      updated.store();
-      makeSelectedOperation(updated.ID);
-    } catch (e) {
-      console.error(e);
-      throw e;
     }
   },
 });

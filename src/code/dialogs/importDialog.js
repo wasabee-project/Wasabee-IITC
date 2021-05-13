@@ -3,22 +3,15 @@ import WasabeePortal from "../portal";
 import { WDialog } from "../leafletClasses";
 import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { makeSelectedOperation } from "../selectedOp";
+import PromptDialog from "./promptDialog";
 
 const ImportDialog = WDialog.extend({
   statics: {
     TYPE: "importDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = ImportDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: ImportDialog.TYPE });
-  },
-
   addHooks: function () {
-    if (!this._map) return;
     this._autoload = false;
     if (
       localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ===
@@ -32,11 +25,12 @@ const ImportDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+
+    window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
+    window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", null);
     container.style.width = "420px";
 
@@ -56,26 +50,24 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("GET DT")] = () => {
       this.drawToolsFormat();
     };
+    // wX
+    buttons["Fill from URL"] = () => {
+      this.fillFromURL();
+    };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("IMP_WAS_OP"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-import",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-        window.runHooks("wasabeeUIUpdate");
-        window.runHooks("wasabeeCrosslinks");
-      },
+      dialogClass: "import",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.importDialog,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   drawToolsFormat() {
@@ -87,8 +79,27 @@ const ImportDialog = WDialog.extend({
     }
   },
 
-  importTextareaAsOp() {
-    const string = this._textarea.value;
+  fillFromURL() {
+    // todo: wX
+    const prompt = new PromptDialog({
+      title: "Fill from URL",
+      label: "URL",
+      callback: async () => {
+        try {
+          const url = new URL(prompt.inputField.value.trim());
+          const rq = await fetch(url, { mode: "cors" });
+          this._textarea.value = await rq.text();
+        } catch (e) {
+          alert("Unable to fetch data from the given url.");
+          return;
+        }
+      },
+    });
+    prompt.enable();
+  },
+
+  async importTextareaAsOp() {
+    let string = this._textarea.value;
     if (
       string.match(
         new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
@@ -106,13 +117,13 @@ const ImportDialog = WDialog.extend({
       if (this._namefield.value) {
         newop.name = this._namefield.value;
       } else {
-        newop.name = wX("IMPORT_OP_TITLE", new Date().toGMTString());
+        newop.name = wX("IMPORT_OP_TITLE", { date: new Date().toGMTString() });
       }
 
       // needs to be saved, but not update UI
-      newop.store();
+      await newop.store();
       // this updates the UI and runs crosslinks
-      makeSelectedOperation(newop.ID);
+      await makeSelectedOperation(newop.ID);
       // open the checklist to get a pass at loading portals
       // although that is now off-by-default, at least let the user
       // see which portals need attention
@@ -120,7 +131,7 @@ const ImportDialog = WDialog.extend({
       checklist.enable();
       // zoom to it
       // OR use pointTileDataRequest to try to load faked portals?
-      this._map.fitBounds(newop.mbr);
+      window.map.fitBounds(newop.mbr);
 
       return;
     }
@@ -129,9 +140,9 @@ const ImportDialog = WDialog.extend({
     try {
       const data = JSON.parse(string);
       const importedOp = new WasabeeOp(data);
-      importedOp.store();
-      makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP_SUCCESS", importedOp.name));
+      await importedOp.store();
+      await makeSelectedOperation(importedOp.ID);
+      alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);
       alert(wX("IMP_NOPE"));

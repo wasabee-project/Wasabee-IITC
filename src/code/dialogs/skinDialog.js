@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import { changeSkin } from "../skin";
 import Sortable from "sortablejs";
 
@@ -9,10 +8,8 @@ const SkinDialog = WDialog.extend({
     TYPE: "skinDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = SkinDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: SkinDialog.TYPE });
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
     this._skinSet = new Set(
@@ -21,16 +18,9 @@ const SkinDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
-  update: function () {},
 
   _buildContent() {
     const container = L.DomUtil.create("div", "content");
@@ -39,7 +29,9 @@ const SkinDialog = WDialog.extend({
     desc.textContent = wX("SKINS_DESCRIPTION");
 
     const skinsAvailable = L.DomUtil.create("div", "desc", container);
-    skinsAvailable.textContent = wX("SKINS_AVAILABLE", this._skinSet.size);
+    skinsAvailable.textContent = wX("SKINS_AVAILABLE", {
+      count: this._skinSet.size,
+    });
 
     const leftList = L.DomUtil.create("ol", "left skin-list", container);
     const rightList = L.DomUtil.create("ul", "right skin-list", container);
@@ -85,15 +77,11 @@ const SkinDialog = WDialog.extend({
   _displayDialog: function () {
     const content = this._buildContent();
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("SKINS_MANAGE_TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-skin",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "skin",
       id: window.plugin.wasabee.static.dialogNames.skinDialog,
     });
   },
