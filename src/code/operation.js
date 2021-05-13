@@ -72,7 +72,6 @@ export default class WasabeeOp {
         return null;
       const op = new WasabeeOp(raw);
       if (op == null) throw new Error("corrupted operation");
-      console.debug(op);
       return op;
     } catch (e) {
       console.error(e);
@@ -99,7 +98,6 @@ export default class WasabeeOp {
       const obj = JSON.parse(raw);
       const op = new WasabeeOp(obj);
       if (op == null) throw new Error("corrupted operation");
-      console.debug(op);
       await op.store();
       delete localStorage[opID]; // active now
     } catch (e) {
@@ -109,7 +107,6 @@ export default class WasabeeOp {
 
   // writes to localStorage with all data included
   async store() {
-    // console.debug("storing ", this.ID);
     this.stored = Date.now();
     const json = this.toJSON();
 
@@ -333,8 +330,6 @@ export default class WasabeeOp {
   }
 
   removeAnchor(portalId) {
-    console.debug("removing anchor");
-    // console.debug(this.links);
     this.anchors = this.anchors.filter(function (anchor) {
       return anchor !== portalId;
     });
@@ -343,8 +338,6 @@ export default class WasabeeOp {
         listLink.fromPortalId !== portalId && listLink.toPortalId !== portalId
       );
     });
-
-    // console.debug(this.links);
 
     this.cleanAnchorList();
     this.cleanPortalList();

@@ -88,12 +88,12 @@ export default class WasabeeAgent {
 
     // if the cached version is newer, do not update
     if (cached.fetched >= this.fetched) {
-      console.debug("incoming is older, not updating cache");
+      // console.debug("incoming is older, not updating cache");
       return;
     }
     // note the new fetched time
     cached.fetched = this.fetched;
-    console.debug("updating cache");
+    // console.debug("updating cache");
 
     // update location only if known
     if (this.lat != 0 && this.lng != 0) {
@@ -136,16 +136,16 @@ export default class WasabeeAgent {
     if (cached && cached.fetched > Date.now() - 1000 * maxAgeSeconds) {
       const a = new WasabeeAgent(cached);
       a.cached = true;
-      console.debug("returning from cache", a);
+      // console.debug("returning from cache", a);
       return a;
     }
 
     if (!WasabeeMe.isLoggedIn()) {
-      console.debug("not logged in, giving up");
+      // console.debug("not logged in, giving up");
       return null;
     }
 
-    console.debug("pulling server for new agent data (no team)");
+    // console.debug("pulling server for new agent data (no team)");
     try {
       const result = await agentPromise(gid);
       return new WasabeeAgent(result);

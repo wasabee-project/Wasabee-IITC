@@ -6,6 +6,7 @@ import SendTargetDialog from "./dialogs/sendTargetDialog";
 import wX from "./wX";
 import SetCommentDialog from "./dialogs/setCommentDialog";
 import MarkerChangeDialog from "./dialogs/markerChangeDialog";
+import StateDialog from "./dialogs/stateDialog";
 import { getSelectedOperation } from "./selectedOp";
 
 const STATE_UNASSIGNED = "pending";
@@ -157,6 +158,15 @@ export default class WasabeeMarker {
           L.DomEvent.stop(ev);
           const std = new SendTargetDialog({ target: this });
           std.enable();
+          marker.closePopup();
+        });
+
+        const stateButton = L.DomUtil.create("button", null, buttonSet);
+        stateButton.textContent = wX("MARKER STATE");
+        L.DomEvent.on(stateButton, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const sd = new StateDialog({ target: this, opID: operation.ID });
+          sd.enable();
           marker.closePopup();
         });
       }

@@ -10,7 +10,7 @@ const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
 export function drawMap(ev) {
-  console.debug(ev);
+  // console.debug(ev);
   const operation = getSelectedOperation();
   updateAnchors(operation);
   updateMarkers(operation);
