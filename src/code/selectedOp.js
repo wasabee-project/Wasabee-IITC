@@ -136,9 +136,8 @@ export async function setupLocalStorage() {
 }
 
 function storeOpsList(ops) {
-  localStorage[
-    window.plugin.wasabee.static.constants.OPS_LIST_KEY
-  ] = JSON.stringify(ops);
+  localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY] =
+    JSON.stringify(ops);
 }
 
 //** This function removes an operation from the main list */
@@ -162,9 +161,8 @@ export async function addOperation(opID) {
 export function showOperation(opID) {
   const hiddenOps = hiddenOpsList();
   if (hiddenOps.includes(opID)) {
-    localStorage[
-      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-    ] = JSON.stringify(hiddenOps.filter((ID) => ID != opID));
+    localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY] =
+      JSON.stringify(hiddenOps.filter((ID) => ID != opID));
     window.map.fire("wasabee:op:showhide", { opID: opID, show: true });
   }
 }
@@ -174,9 +172,8 @@ export function hideOperation(opID) {
   const hiddenOps = hiddenOpsList();
   if (!hiddenOps.includes(opID)) {
     hiddenOps.push(opID);
-    localStorage[
-      window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY
-    ] = JSON.stringify(hiddenOps);
+    localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY] =
+      JSON.stringify(hiddenOps);
     window.map.fire("wasabee:op:showhide", { opID: opID, show: false });
   }
 }

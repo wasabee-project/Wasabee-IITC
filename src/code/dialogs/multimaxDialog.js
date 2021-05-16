@@ -44,9 +44,8 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorOneButton, "click", () => {
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-        ] = JSON.stringify(this._anchorOne);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+          JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
         this._anchorOneDisplay.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -71,9 +70,8 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(anchorTwoButton, "click", () => {
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
-        ] = JSON.stringify(this._anchorTwo);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
+          JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
         this._anchorTwoDisplay.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)

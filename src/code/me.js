@@ -53,9 +53,8 @@ export default class WasabeeMe {
   }
 
   store() {
-    localStorage[Wasabee.static.constants.AGENT_INFO_KEY] = JSON.stringify(
-      this
-    );
+    localStorage[Wasabee.static.constants.AGENT_INFO_KEY] =
+      JSON.stringify(this);
   }
 
   remove() {

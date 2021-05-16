@@ -123,9 +123,8 @@ const OpSettingDialog = WDialog.extend({
     }
 
     if (writable) {
-      L.DomUtil.create("label", null, topSet).textContent = wX(
-        "REFERENCE_TIME"
-      );
+      L.DomUtil.create("label", null, topSet).textContent =
+        wX("REFERENCE_TIME");
       const rtInput = L.DomUtil.create("input", null, topSet);
       rtInput.size = 30;
       rtInput.placeholder = "Sun, 21 Oct 2018 12:16:24 GMT";

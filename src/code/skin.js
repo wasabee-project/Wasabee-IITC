@@ -103,9 +103,8 @@ export function changeSkin(names) {
   initOpsColor();
   initAnchorIcon();
 
-  localStorage[
-    window.plugin.wasabee.static.constants.SKIN_KEY
-  ] = JSON.stringify(validNames);
+  localStorage[window.plugin.wasabee.static.constants.SKIN_KEY] =
+    JSON.stringify(validNames);
 
   addButtons();
   window.map.fire("wasabeeUIUpdate", { reason: "skin change" }, false);

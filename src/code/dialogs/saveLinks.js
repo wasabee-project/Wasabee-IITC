@@ -42,9 +42,8 @@ const SaveLinksDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor = WasabeePortal.getSelected();
       if (this._anchor) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-        ] = JSON.stringify(this._anchor);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+          JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
           this._anchor.displayFormat(this._smallScreen)

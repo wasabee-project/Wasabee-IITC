@@ -288,9 +288,8 @@ const QuickDrawControl = L.Handler.extend({
       // this._throwOrder = this._operation.nextOrder;
       this._anchor1 = selectedPortal;
       this._tooltip.updateContent(this._getTooltipText());
-      localStorage[
-        window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-      ] = JSON.stringify(this._anchor1);
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+        JSON.stringify(this._anchor1);
 
       this._guideA = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
@@ -308,9 +307,8 @@ const QuickDrawControl = L.Handler.extend({
         color: this._nextDrawnLinksColor,
       });
       this._tooltip.updateContent(this._getTooltipText());
-      localStorage[
-        window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
-      ] = JSON.stringify(this._anchor2);
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
+        JSON.stringify(this._anchor2);
       this._guideB = L.geodesicPolyline(
         [selectedPortal.latLng, selectedPortal.latLng],
         guideStyle

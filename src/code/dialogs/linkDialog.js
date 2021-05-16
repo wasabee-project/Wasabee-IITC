@@ -45,9 +45,8 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._source = WasabeePortal.getSelected();
       if (this._source) {
-        localStorage[
-          window.plugin.wasabee.static.constants.LINK_SOURCE_KEY
-        ] = JSON.stringify(this._source);
+        localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY] =
+          JSON.stringify(this._source);
         this._sourceDisplay.textContent = "";
         this._sourceDisplay.appendChild(
           this._source.displayFormat(this._smallScreen)
@@ -73,9 +72,8 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor1 = WasabeePortal.getSelected();
       if (this._anchor1) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-        ] = JSON.stringify(this._anchor1);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+          JSON.stringify(this._anchor1);
         this._anchor1Display.textContent = "";
         this._anchor1Display.appendChild(
           this._anchor1.displayFormat(this._smallScreen)
@@ -115,9 +113,8 @@ const LinkDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchor2 = WasabeePortal.getSelected();
       if (this._anchor2) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
-        ] = JSON.stringify(this._anchor2);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
+          JSON.stringify(this._anchor2);
         this._anchor2Display.textContent = "";
         this._anchor2Display.appendChild(
           this._anchor2.displayFormat(this._smallScreen)

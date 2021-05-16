@@ -47,9 +47,8 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorOne = WasabeePortal.getSelected();
       if (this._anchorOne) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
-        ] = JSON.stringify(this._anchorOne);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+          JSON.stringify(this._anchorOne);
         this._anchorDisplayOne.textContent = "";
         this._anchorDisplayOne.appendChild(
           this._anchorOne.displayFormat(this._smallScreen)
@@ -75,9 +74,8 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorTwo = WasabeePortal.getSelected();
       if (this._anchorTwo) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
-        ] = JSON.stringify(this._anchorTwo);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
+          JSON.stringify(this._anchorTwo);
         this._anchorDisplayTwo.textContent = "";
         this._anchorDisplayTwo.appendChild(
           this._anchorTwo.displayFormat(this._smallScreen)
@@ -103,9 +101,8 @@ const HomogeneousDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this._anchorThree = WasabeePortal.getSelected();
       if (this._anchorThree) {
-        localStorage[
-          window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY
-        ] = JSON.stringify(this._anchorThree);
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY] =
+          JSON.stringify(this._anchorThree);
         this._anchorDisplayThree.textContent = "";
         this._anchorDisplayThree.appendChild(
           this._anchorThree.displayFormat(this._smallScreen)
@@ -654,28 +651,31 @@ const HomogeneousDialog = WDialog.extend({
     this._operation.addLink(two, one, {
       description: "Outer 1",
       order: (depthValue * (depthValue - 1)) / 2 + depthValue + 1,
-      color: this._colors[
-        ((depthValue * (depthValue - 1)) / 2 + depthValue + 1) %
-          this._colors.length
-      ],
+      color:
+        this._colors[
+          ((depthValue * (depthValue - 1)) / 2 + depthValue + 1) %
+            this._colors.length
+        ],
       replace: true,
     });
     this._operation.addLink(three, one, {
       description: "Outer 2",
       order: (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
-      color: this._colors[
-        ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
-          this._colors.length
-      ],
+      color:
+        this._colors[
+          ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+            this._colors.length
+        ],
       replace: true,
     });
     this._operation.addLink(three, two, {
       description: "Outer 3",
       order: (depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2,
-      color: this._colors[
-        ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
-          this._colors.length
-      ],
+      color:
+        this._colors[
+          ((depthValue * (depthValue - 1)) / 2 + 2 * depthValue + 2) %
+            this._colors.length
+        ],
       replace: true,
     });
     draw(1, tree);

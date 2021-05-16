@@ -146,9 +146,8 @@ export function listenForPortalDetails(e) {
 // see listenForPortalDetails above
 export function getPortalDetails(guid) {
   if (Array.isArray(guid)) {
-    window.plugin.wasabee.portalDetailQueue = window.plugin.wasabee.portalDetailQueue.concat(
-      guid
-    );
+    window.plugin.wasabee.portalDetailQueue =
+      window.plugin.wasabee.portalDetailQueue.concat(guid);
   } else {
     window.plugin.wasabee.portalDetailQueue.push(guid);
   }

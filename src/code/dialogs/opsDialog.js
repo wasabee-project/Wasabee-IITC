@@ -54,9 +54,8 @@ const OpsDialog = WDialog.extend({
         localStorage[
           window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
         ] !== "false";
-      localStorage[
-        window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
-      ] = !showHiddenOps;
+      localStorage[window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS] =
+        !showHiddenOps;
       this.update();
     };
     buttons[wX("CLOSE")] = () => {

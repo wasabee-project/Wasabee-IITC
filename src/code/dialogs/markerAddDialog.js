@@ -139,9 +139,8 @@ const MarkerAddDialog = WDialog.extend({
       options
     );
     await this.update();
-    localStorage[
-      window.plugin.wasabee.static.constants.LAST_MARKER_KEY
-    ] = selectedType;
+    localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
+      selectedType;
   },
 
   _getAgentMenu: async function (menu) {
