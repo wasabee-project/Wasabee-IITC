@@ -67,11 +67,6 @@ export async function drawWasabeeDkeys() {
         return;
 
       for (const n of list.DefensiveKeys) {
-        // remove in 0.20
-        if (!n.Name) {
-          console.log("old format WD key, ignoring", n);
-          continue;
-        }
         try {
           await window.plugin.wasabee.idb.put("defensivekeys", n);
         } catch (e) {
@@ -106,12 +101,6 @@ function drawMarker(dk) {
     window.plugin.wasabee.defensiveLayers.removeLayer(
       window.plugin.wasabee.defensiveLayers[dk.PortalID]
     );
-
-  // should never be triggered now; remove in 0.20
-  if (!dk.Name) {
-    console.debug("skipping old format", dk);
-    return;
-  }
 
   const marker = L.marker([dk.Lat, dk.Lng], {
     title: dk.Name,

@@ -43,11 +43,11 @@ const MarkerChangeDialog = WDialog.extend({
         !markers.has(this._type.value)
       ) {
         operation.removeMarker(this.options.marker);
-        operation.addMarker(
-          this._type.value,
-          portal,
-          this.options.marker.comment
-        );
+        operation.addMarker(this._type.value, portal, {
+          zone: this.options.marker.zone,
+          comment: this.options.marker.comment,
+          assign: this.options.marker.assign,
+        });
       }
       this.closeDialog();
     };

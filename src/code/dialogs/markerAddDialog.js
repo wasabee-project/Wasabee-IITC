@@ -132,12 +132,7 @@ const MarkerAddDialog = WDialog.extend({
     };
 
     // XXX remove comment from args in 0.20
-    operation.addMarker(
-      selectedType,
-      WasabeePortal.getSelected(),
-      comment,
-      options
-    );
+    operation.addMarker(selectedType, WasabeePortal.getSelected(), options);
     await this.update();
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;

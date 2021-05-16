@@ -133,9 +133,6 @@ export default class WasabeeOp {
       console.error(e);
     }
 
-    // manage the list of known operations, can be removed in 0.20
-    await addOperation(this.ID);
-
     // some debug info to trace race condition
     const s = getSelectedOperation();
     if (s && s.ID == this.ID && s != this)
@@ -784,8 +781,7 @@ export default class WasabeeOp {
     this.runCrosslinks();
   }
 
-  // XXX move comment to options in 0.20
-  addMarker(markerType, portal, comment, options) {
+  addMarker(markerType, portal, options) {
     if (!portal) return;
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
@@ -794,8 +790,8 @@ export default class WasabeeOp {
       const marker = new WasabeeMarker({
         type: markerType,
         portalId: portal.id,
-        comment: comment,
       });
+      if (options && options.comment) marker.comment = options.comment;
       if (options && options.zone) marker.zone = options.zone;
       if (options && options.assign && options.assign != 0)
         marker.assign(options.assign);
