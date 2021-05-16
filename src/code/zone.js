@@ -1,10 +1,13 @@
 export default class WasabeeZone {
   constructor(obj) {
-    this.id = obj.id;
+    this.id = Number(obj.id);
     this.name = obj.name;
   }
 
   toJSON() {
-    return this;
+    return {
+      id: Number(this.id),
+      name: `${this.name}`,
+    };
   }
 }

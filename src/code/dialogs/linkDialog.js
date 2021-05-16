@@ -2,16 +2,14 @@ import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const LinkDialog = WDialog.extend({
   statics: {
     TYPE: "linkDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = LinkDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
 
     let p =
       localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
@@ -20,22 +18,15 @@ const LinkDialog = WDialog.extend({
     if (p) this._anchor1 = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchor2 = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: LinkDialog.TYPE });
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    this._operation = getSelectedOperation();
+    // this._operation = getSelectedOperation();
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
-    if (!this._map) return;
     const container = L.DomUtil.create("div", "container");
 
     const sourceLabel = L.DomUtil.create("label", null, container);
@@ -98,12 +89,11 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(anchor1AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor1) {
-        this._operation.addLink(
-          this._source,
-          this._anchor1,
-          this._desc.value,
-          this._operation.nextOrder
-        );
+        const operation = getSelectedOperation();
+        operation.addLink(this._source, this._anchor1, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       } else {
         alert("Select both Source and Anchor 1");
       }
@@ -141,12 +131,11 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(anchor2AddButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (this._source && this._anchor2) {
-        this._operation.addLink(
-          this._source,
-          this._anchor2,
-          this._desc.value,
-          this._operation.nextOrder
-        );
+        const operation = getSelectedOperation();
+        operation.addLink(this._source, this._anchor2, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       } else {
         alert(wX("SEL_SRC_ANC2"));
       }
@@ -158,21 +147,18 @@ const LinkDialog = WDialog.extend({
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (!this._source) alert(wX("SEL_SRC_PORT"));
+      const operation = getSelectedOperation();
       if (this._anchor1) {
-        this._operation.addLink(
-          this._source,
-          this._anchor1,
-          this._desc.value,
-          this._operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor1, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       }
       if (this._anchor2) {
-        this._operation.addLink(
-          this._source,
-          this._anchor2,
-          this._desc.value,
-          this._operation.nextOrder
-        );
+        operation.addLink(this._source, this._anchor2, {
+          description: this._desc.value,
+          order: operation.nextOrder,
+        });
       }
     });
     this._desc = L.DomUtil.create("input", "desc", container);
@@ -180,21 +166,17 @@ const LinkDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("ADD_LINKS"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-link",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "link",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.linkDialogButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 });
 

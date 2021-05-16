@@ -11,6 +11,7 @@ import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
 import { postToFirebase } from "../firebaseSupport";
+import { resetCaches } from "../uiCommands";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -41,7 +42,7 @@ const WasabeeButton = WButton.extend({
       text: wX("LOG IN"),
       callback: () => {
         this.disable();
-        const ad = new AuthDialog(this._map);
+        const ad = new AuthDialog();
         ad.enable();
       },
       context: this,
@@ -52,7 +53,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new TeamListDialog(this._map);
+        const wd = new TeamListDialog();
         wd.enable();
       },
       context: this,
@@ -67,7 +68,7 @@ const WasabeeButton = WButton.extend({
         try {
           // if not actually logged in, this removes ALL server ops
           // but this button _should_ not be visible in that case
-          removeNonOwnedOps();
+          await removeNonOwnedOps();
           await logoutPromise();
         } catch (e) {
           console.error(e);
@@ -84,7 +85,7 @@ const WasabeeButton = WButton.extend({
       text: wX("TEAMS BUTTON"),
       callback: () => {
         this.disable();
-        const wd = new TeamListDialog(this._map);
+        const wd = new TeamListDialog();
         wd.enable();
       },
       context: this,
@@ -96,7 +97,7 @@ const WasabeeButton = WButton.extend({
         text: wX("OPS BUTTON"),
         callback: () => {
           this.disable();
-          const od = new OpsDialog(map);
+          const od = new OpsDialog();
           od.enable();
         },
         context: this,
@@ -106,7 +107,7 @@ const WasabeeButton = WButton.extend({
         text: wX("NEWOP BUTTON"),
         callback: () => {
           this.disable();
-          const nb = new NewopDialog(this._map);
+          const nb = new NewopDialog();
           nb.enable();
         },
         context: this,
@@ -116,10 +117,15 @@ const WasabeeButton = WButton.extend({
         text: wX("CLEAROPS BUTTON"),
         callback: () => {
           this.disable();
-          const con = new ConfirmDialog(this._map);
-          con.setup(wX("CLEAROPS BUTTON TITLE"), wX("CLEAROPS PROMPT"), () => {
-            resetOps();
-            setupLocalStorage();
+          const con = new ConfirmDialog({
+            title: wX("CLEAROPS BUTTON TITLE"),
+            label: wX("CLEAROPS PROMPT"),
+            type: "operation",
+            callback: async () => {
+              await resetCaches();
+              await resetOps();
+              await setupLocalStorage();
+            },
           });
           con.enable();
         },
@@ -157,7 +163,7 @@ const WasabeeButton = WButton.extend({
     this.actionsContainer = this._getActions();
     this._container.appendChild(this.actionsContainer);
     // check login state and update if necessary
-    this.Wupdate(); // takes container and operation, not needed here
+    this.Wupdate();
   },
 
   _getActions: function () {

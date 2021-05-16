@@ -3,7 +3,6 @@ import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const StarburstDialog = WDialog.extend({
   statics: {
@@ -11,18 +10,11 @@ const StarburstDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
-    if (!this._map) return;
-
     //Instructions
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
@@ -74,35 +66,27 @@ const StarburstDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("STARBURST TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-starburst",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "starburst",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.starburst,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = StarburstDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    this.title = wX("STARBURST");
-    this.label = wX("STARBURST TITLE");
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     const p =
       localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchor = new WasabeePortal(p);
-    postToFirebase({ id: "analytics", action: StarburstDialog.TYPE });
   },
 
   starburst: function () {
@@ -116,7 +100,7 @@ const StarburstDialog = WDialog.extend({
     operation.startBatchMode();
     for (const p of getAllPortalsOnScreen(operation)) {
       if (p.id == this._anchor.id) continue;
-      operation.addLink(p, this._anchor, "auto starburst");
+      operation.addLink(p, this._anchor, { description: "auto starburst" });
     }
     operation.endBatchMode();
   },

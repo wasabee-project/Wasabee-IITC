@@ -1,13 +1,16 @@
 import WasabeeMe from "./me";
 import WasabeeAnchor from "./anchor";
 import WasabeeTeam from "./team";
+import WasabeeAgent from "./agent";
 import WasabeeOp from "./operation";
-import { getSelectedOperation } from "./selectedOp";
+import { newColors } from "./auxiliar";
+import { getSelectedOperation, opsList } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
 //** This function draws things on the layers */
-export function drawMap() {
+export function drawMap(ev) {
+  // console.debug(ev);
   const operation = getSelectedOperation();
   updateAnchors(operation);
   updateMarkers(operation);
@@ -47,8 +50,8 @@ function updateMarkers(op) {
   }
 
   // remove any that were not processed
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v of layerMap.values()) {
+    // for (const v of layerMap) {
     Wasabee.markerLayerGroup.removeLayer(v);
   }
 }
@@ -105,6 +108,36 @@ function resetLinks(operation) {
   }
 }
 
+export async function drawBackgroundOps(opIDs) {
+  if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
+  Wasabee.backgroundOpsGroup.clearLayers();
+
+  const sop = getSelectedOperation().ID;
+  if (opIDs === undefined) opIDs = await opsList();
+
+  for (const opID of opIDs) {
+    if (opID === sop) continue;
+    const op = await WasabeeOp.load(opID);
+    if (op.background) drawBackgroundOp(op);
+  }
+}
+
+export function drawBackgroundOp(operation, layerGroup, style) {
+  if (!operation) return;
+  if (!operation.links || operation.links.length == 0) return;
+
+  if (!layerGroup) layerGroup = Wasabee.backgroundOpsGroup;
+  if (!style) style = Wasabee.skin.backgroundLinkStyle;
+
+  for (const link of operation.links) {
+    const latLngs = link.getLatLngs(operation);
+    if (!latLngs) continue;
+
+    const newlink = new L.GeodesicPolyline(latLngs, style);
+    newlink.addTo(layerGroup);
+  }
+}
+
 /** reset links is consistently 1ms faster than update, and is far safer */
 /*
 function updateLinks(operation) {
@@ -136,8 +169,7 @@ function updateLinks(operation) {
     }
   }
 
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v of layerMap.values()) {
     Wasabee.linkLayerGroup.removeLayer(v);
   }
 }; */
@@ -197,27 +229,21 @@ function addLink(wlink, operation) {
 /** this function fetches and displays agent location */
 export async function drawAgents() {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-
-  if (!WasabeeMe.isLoggedIn()) {
-    return;
-  }
+  if (!WasabeeMe.isLoggedIn()) return;
 
   const layerMap = agentLayerMap();
 
   let doneAgents = new Array();
-  const me = await WasabeeMe.waitGet();
+  const me = await WasabeeMe.waitGet(); // cache hold-time age is 24 hours... not too frequent
   for (const t of me.Teams) {
-    const freshlyDone = await drawSingleTeam(t, layerMap, doneAgents);
+    const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
     doneAgents = doneAgents.concat(freshlyDone);
   }
 
   // remove those not found in this fetch
-  // there is probably a cute filter one-liner to do this
-  for (const d of doneAgents) {
-    layerMap.delete(d.id);
-  }
+  for (const d of doneAgents) layerMap.delete(d);
   for (const agent in layerMap) {
-    console.log("removing stale agent", agent);
+    // console.debug("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 }
@@ -230,78 +256,111 @@ function agentLayerMap() {
   return layerMap;
 }
 
-// use layerMap and alreadyDone to reduce processing when using this in a loop, otherwise leave them unset
-export async function drawSingleTeam(
-  t,
-  layerMap = agentLayerMap(),
-  alreadyDone = new Array()
-) {
+// use alreadyDone to reduce processing when using this in a loop, otherwise leave it unset
+export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
   const done = new Array();
-
-  // only display enabled teams
-  if (t.State != "On") return done;
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return done; // yes, === false, undefined == true
+  if (alreadyDone === undefined) alreadyDone = new Array();
+  if (layerMap === undefined) layerMap = agentLayerMap();
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await WasabeeTeam.waitGet(t.ID, 15);
+    const team = await WasabeeTeam.get(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
-    for (const agent of team.agents) {
-      if (!layerMap.has(agent.id) && !alreadyDone.includes(agent.id)) {
-        // new, add to map
-        done.push(agent.id);
-        if (agent.lat && agent.lng) {
-          const marker = L.marker(agent.latLng, {
-            title: agent.name,
-            icon: L.icon({
-              iconUrl: agent.pic,
-              shadowUrl: null,
-              iconSize: L.point(41, 41),
-              iconAnchor: L.point(25, 41),
-              popupAnchor: L.point(-1, -48),
-            }),
-            id: agent.id,
-          });
+    // we don't need to draw if pulled from cache
+    if (team.cached === true) return done;
 
-          window.registerMarkerForOMS(marker);
-          marker.bindPopup("Loading...", {
-            className: "wasabee-popup",
-            closeButton: false,
-          });
-          // marker.off("click", agent.openPopup, agent);
-          marker.on(
-            "click spiderfiedclick",
-            (ev) => {
-              L.DomEvent.stop(ev);
-              if (marker.isPopupOpen && marker.isPopupOpen()) return;
-              const a = window.plugin.wasabee._agentCache.get(agent.id);
-              marker.setPopupContent(a.getPopup());
-              if (marker._popup._wrapper)
-                marker._popup._wrapper.classList.add("wasabee-popup");
-              marker.update();
-              marker.openPopup();
-            },
-            marker
-          );
-          marker.addTo(Wasabee.agentLayerGroup);
-        }
-      } else {
-        // just move existing if not already moved
-        if (!alreadyDone.includes(agent.id)) {
-          const a = layerMap.get(agent.id);
-          const al = Wasabee.agentLayerGroup.getLayer(a);
-          if (agent.lat && agent.lng) {
-            al.setLatLng(agent.latLng);
-            done.push(agent.id);
-            al.update();
-          }
-        }
-      }
+    const agents = team.getAgents();
+    for (const agent of agents) {
+      if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
+        done.push(agent.id);
     }
   } catch (err) {
     console.error(err);
   }
+  // report the icons successfully drawn to the caller, drawAgents uses this to remove stale icons
   return done;
+}
+
+export async function drawSingleAgent(gid) {
+  if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
+  const agent = await WasabeeAgent.get(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
+  if (agent != null) _drawAgent(agent);
+}
+
+// returns true if drawn, false if ignored
+function _drawAgent(agent, layerMap = agentLayerMap()) {
+  if (!agent.id || !agent.lat || !agent.lng) {
+    return false;
+  }
+
+  const zoom = window.map.getZoom();
+  if (!layerMap.has(agent.id)) {
+    // new, add to map
+    const marker = L.marker(agent.latLng, {
+      title: agent.name,
+      icon: L.divIcon({
+        className: "wasabee-agent-icon",
+        iconSize: agent.iconSize(zoom),
+        iconAnchor: agent.iconAnchor(zoom),
+        popupAnchor: L.point(0, -70),
+        html: agent.icon(zoom),
+      }),
+      id: agent.id,
+      zoom: zoom,
+    });
+
+    window.registerMarkerForOMS(marker);
+    marker.bindPopup("Loading...", {
+      className: "wasabee-popup",
+      closeButton: false,
+    });
+    // marker.off("click", agent.openPopup, agent);
+    marker.on(
+      "click spiderfiedclick",
+      async (ev) => {
+        L.DomEvent.stop(ev);
+        if (marker.isPopupOpen && marker.isPopupOpen()) return;
+        const a = await WasabeeAgent.get(agent.id);
+        marker.setPopupContent(await a.getPopup());
+        if (marker._popup._wrapper)
+          marker._popup._wrapper.classList.add("wasabee-popup");
+        marker.update();
+        marker.openPopup();
+      },
+      marker
+    );
+    marker.addTo(Wasabee.agentLayerGroup);
+  } else {
+    // move existing icons, if they actually moved
+    const a = layerMap.get(agent.id);
+    const al = Wasabee.agentLayerGroup.getLayer(a);
+    // if the location is different...
+    const ll = al.getLatLng();
+    if (agent.lat != ll.lat || agent.lng != ll.lng) {
+      // console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
+      al.setLatLng(agent.latLng);
+      al.update();
+    }
+
+    // if the zoom factor changed, refresh the icon
+    if (zoom != al.options.zoom) {
+      // console.debug("changing icon zoom: ", zoom, al.options.zoom);
+      al.setIcon(
+        L.divIcon({
+          className: "wasabee-agent-icon",
+          iconSize: agent.iconSize(zoom),
+          iconAnchor: agent.iconAnchor(zoom),
+          popupAnchor: L.point(0, -70),
+          html: agent.icon(zoom),
+        })
+      );
+      al.options.zoom = zoom;
+      al.update();
+    }
+  }
+  return true;
 }
 
 function updateAnchors(op) {
@@ -329,9 +388,7 @@ function updateAnchors(op) {
     }
   }
 
-  // XXX use "in" instead of "of" and the first value
-  // eslint-disable-next-line
-  for (const [k, v] of layerMap) {
+  for (const v of layerMap.values()) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
 }
@@ -340,9 +397,9 @@ function updateAnchors(op) {
 function addAnchorToMap(portalId) {
   const operation = getSelectedOperation();
   const anchor = new WasabeeAnchor(portalId, operation);
-  // use WasabeeOp.newColors(anchor.color) for 0.19
+  // use newColors(anchor.color) for 0.19
   let layer = anchor.color;
-  if (WasabeeOp.newColors(layer) == layer) layer = "custom";
+  if (newColors(layer) == layer) layer = "custom";
   let marker;
   if (layer != "custom") {
     marker = L.marker(anchor.latLng, {

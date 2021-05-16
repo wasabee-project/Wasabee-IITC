@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeeAgent from "../agent";
 import WasabeeLink from "../link";
 import WasabeeMarker from "../marker";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
@@ -13,34 +13,25 @@ import {
   loadFaked,
 } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeMe from "../me";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
     TYPE: "operationChecklist",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = OperationChecklistDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OperationChecklistDialog.TYPE });
+  options: {
+    usePane: true,
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    const context = this;
-    const operation = getSelectedOperation();
-    // this._opID = operation.ID;
-    // magic context incantation to make "this" work...
-    this._UIUpdateHook = () => {
-      context.checklistUpdate();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.checklistUpdate, this);
+
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
+
+    const operation = getSelectedOperation();
     loadFaked(operation);
 
     this._displayDialog();
@@ -48,46 +39,49 @@ const OperationChecklistDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.checklistUpdate, this);
+
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
     this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("LOAD PORTALS")] = () => {
-      loadFaked(operation, true); // force
+      loadFaked(getSelectedOperation(), true); // force
+    };
+    buttons["Count fields"] = () => {
+      this.countFields(getSelectedOperation(), true);
     };
 
-    this._dialog = window.dialog({
-      title: wX("OP_CHECKLIST", operation.name),
+    await this.sortable.done;
+
+    this.createDialog({
+      title: wX("OP_CHECKLIST", { opName: operation.name }),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
-      closeCallback: () => {
-        this.disable();
-        delete this._listDialogData;
-      },
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.operationChecklist,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  checklistUpdate: function () {
+  checklistUpdate: async function () {
     const operation = getSelectedOperation();
-    this._dialog.dialog("option", "title", wX("OP_CHECKLIST", operation.name));
+    this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
-    this._dialog.html(this.sortable.table);
+    await this.sortable.done;
+    this.setContent(this.sortable.table);
   },
 
   getListDialogContent: function (operation, sortBy, sortAsc) {
@@ -106,10 +100,11 @@ const OperationChecklistDialog = WDialog.extend({
           oif.size = 3;
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
-            thing.opOrder = oif.value;
-            // since we are changing the values in the (thing)
-            // let the op know it has changed (save/redraw);
-            operation.update(); // OK - necessary
+            if (thing instanceof WasabeeLink) {
+              operation.setLinkOrder(thing.ID, oif.value);
+            } else {
+              operation.setMarkerOrder(thing.ID, oif.value);
+            }
           });
           cell.appendChild(oif);
         },
@@ -122,12 +117,11 @@ const OperationChecklistDialog = WDialog.extend({
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, thing) => {
           if (thing instanceof WasabeeLink) {
-            cell.appendChild(thing.displayFormat(operation, this._smallScreen));
+            cell.appendChild(thing.displayFormat(operation));
+            if (this._smallScreen) cell.colSpan = 2;
           } else {
             cell.appendChild(
-              operation
-                .getPortal(thing.portalId)
-                .displayFormat(this._smallScreen)
+              operation.getPortal(thing.portalId).displayFormat()
             );
           }
         },
@@ -138,7 +132,7 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing instanceof WasabeeLink) {
             return "Link";
           } else {
-            // push this shit in to the marker class
+            // push this shit into the marker class
             return wX(thing.type);
           }
         },
@@ -148,11 +142,12 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing.type) L.DomUtil.addClass(span, thing.type);
           span.textContent = value;
 
-          if (thing instanceof WasabeeMarker) {
+          if (thing instanceof WasabeeLink) {
+            if (this._smallScreen) cell.style.display = "none";
+          } else if (thing instanceof WasabeeMarker) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ch = new MarkerChangeDialog();
-              ch.setup(thing);
+              const ch = new MarkerChangeDialog({ marker: thing });
               ch.enable();
             });
           }
@@ -161,7 +156,7 @@ const OperationChecklistDialog = WDialog.extend({
       {
         name: "Zone",
         value: (thing) => thing.zone,
-        sort: (a, b) => a.localeCompare(b),
+        sort: (a, b) => a - b,
         format: (cell, value, thing) => {
           const z = L.DomUtil.create("select", null, cell);
           for (const zone of operation.zones) {
@@ -169,11 +164,11 @@ const OperationChecklistDialog = WDialog.extend({
             o.textContent = zone.name;
             o.value = zone.id;
             if (zone.id == thing.zone) o.selected = true;
-            L.DomEvent.on(z, "change", (ev) => {
-              L.DomEvent.stop(ev);
-              operation.setZone(thing, z.value);
-            });
           }
+          L.DomEvent.on(z, "change", (ev) => {
+            L.DomEvent.stop(ev);
+            operation.setZone(thing, z.value);
+          });
         },
         smallScreenHide: true,
       },
@@ -187,8 +182,10 @@ const OperationChecklistDialog = WDialog.extend({
           comment.textContent = value;
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const scd = new SetCommentDialog(window.map);
-            scd.setup(thing, operation);
+            const scd = new SetCommentDialog({
+              target: thing,
+              operation: operation,
+            });
             scd.enable();
           });
         },
@@ -196,13 +193,11 @@ const OperationChecklistDialog = WDialog.extend({
       },
       {
         name: wX("ASS_TO"),
-        value: (thing) => {
+        value: async (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            const agent = WasabeeAgent.cacheGet(thing.assignedTo);
+            const agent = await WasabeeAgent.get(thing.assignedTo);
             if (agent != null) return agent.name;
-            // we can't use async here, so just request it now and it should be in cache next time
-            WasabeeAgent.waitGet(thing.assignedTo);
-            return "looking up: [" + thing.assignedTo + "]";
+            return "GID: [" + thing.assignedTo + "]";
           }
           return ". . .";
         },
@@ -211,12 +206,11 @@ const OperationChecklistDialog = WDialog.extend({
           const assigned = L.DomUtil.create("a", null, cell);
           assigned.textContent = value;
           // do not use agent.formatDisplay since that links and overwrites the assign event
-          if (WasabeeMe.isLoggedIn()) {
+          if (operation.IsServerOp() && operation.IsWritableOp()) {
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const ad = new AssignDialog();
-              ad.setup(thing);
+              const ad = new AssignDialog({ target: thing });
               ad.enable();
             });
           }
@@ -233,15 +227,17 @@ const OperationChecklistDialog = WDialog.extend({
           a.textContent = wX(value);
           L.DomEvent.on(cell, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const sd = new StateDialog();
-            sd.setup(thing, operation.ID);
+            const sd = new StateDialog({
+              target: thing,
+              opID: operation.ID,
+            });
             sd.enable();
           });
         },
         smallScreenHide: true,
       },
       {
-        name: "Commands",
+        name: this._smallScreen ? "Cmds" : "Commands",
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
@@ -273,9 +269,82 @@ const OperationChecklistDialog = WDialog.extend({
       },
     ];
     content.sortBy = sortBy;
-    content.sortAsc = !sortAsc; // I don't know why this flips
+    content.sortAsc = sortAsc;
     content.items = allThings;
     return content;
+  },
+
+  countFields: function (operation, doAlert) {
+    const links = Array.from(operation.links);
+    links.sort((a, b) => a.opOrder - b.opOrder);
+
+    let fieldCount = 0;
+    let emptyCount = 0;
+
+    // maps a portal id to its linked portals
+    const portalLinks = new Map();
+    const emptyFieldLinks = [];
+    for (const link of links) {
+      if (!portalLinks.has(link.fromPortalId))
+        portalLinks.set(link.fromPortalId, new Set());
+      if (!portalLinks.has(link.toPortalId))
+        portalLinks.set(link.toPortalId, new Set());
+      const a = portalLinks.get(link.fromPortalId);
+      const b = portalLinks.get(link.toPortalId);
+
+      // common neighbors portal
+      const intersect = new Set();
+      for (const p of a) if (b.has(p)) intersect.add(p);
+
+      // update the mapping
+      a.add(link.toPortalId);
+      b.add(link.fromPortalId);
+
+      // ignore link with order 0
+      if (link.opOrder > 0) {
+        // the link closes at least one field
+        const p1 = operation.getPortal(link.fromPortalId);
+        const p2 = operation.getPortal(link.toPortalId);
+        const positive = [];
+        const negative = [];
+        // ignore earth curvature (todo: use it)
+        for (const pid of intersect) {
+          const p = operation.getPortal(pid);
+          const det =
+            (p1.lat - p2.lat) * (p.lng - p2.lng) -
+            (p1.lng - p2.lng) * (p.lat - p2.lat);
+          if (det > 0) positive.push(p);
+          else negative.push(p);
+        }
+        if (positive.length) fieldCount += 1;
+        if (negative.length) fieldCount += 1;
+        // if the link closes multiple fields on the same side of the link, we have empty fields.
+        if (positive.length > 1 || negative.length > 1) {
+          let count = 0;
+          if (positive.length > 1) count += positive.length - 1;
+          if (negative.length > 1) count += negative.length - 1;
+          emptyFieldLinks.push([link, count]);
+          emptyCount += count;
+        }
+      }
+    }
+    if (doAlert) {
+      if (emptyFieldLinks.length > 0) {
+        const container = L.DomUtil.create("div", "field-count");
+        const header = L.DomUtil.create("div", null, container);
+        header.textContent = `Found ${fieldCount} fields and ${emptyCount} empty field(s) on ${emptyFieldLinks.length} link(s)`;
+        const content = L.DomUtil.create("ul", null, container);
+        for (const [link, c] of emptyFieldLinks) {
+          const li = L.DomUtil.create("li", "empty-field-link", content);
+          li.textContent = c;
+          li.appendChild(link.displayFormat(operation));
+        }
+        alert(container, true);
+      } else {
+        alert(`Found ${fieldCount} fields and no empty fields.`);
+      }
+    }
+    return { field: fieldCount, empty: emptyCount };
   },
 });
 

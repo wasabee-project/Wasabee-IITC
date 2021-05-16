@@ -19,18 +19,14 @@ export default class WasabeePortal {
     // check window.portals[id].options.data for updated name ?
     this.name = obj.name;
 
-    if (typeof obj.lat == "number") {
-      this.lat = obj.lat.toFixed(6);
-    } else {
-      this.lat = obj.lat;
-    }
-    if (typeof obj.lng == "number") {
-      this.lng = obj.lng.toFixed(6);
-    } else {
-      this.lng = obj.lng;
-    }
-    this.comment = obj.comment;
-    this.hardness = obj.hardness;
+    // make sure we are using 6-digits precision "number"
+    this.lat = (+obj.lat).toFixed(6);
+    this.lng = (+obj.lng).toFixed(6);
+
+    this.comment = obj.comment ? obj.comment : "";
+    this.hardness = obj.hardness ? obj.hardness : "";
+
+    this._latLng = new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
   }
 
   // build object to serialize
@@ -73,13 +69,7 @@ export default class WasabeePortal {
   }
 
   get latLng() {
-    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
-  }
-
-  // easy compat with IITC's format -- just here for safety as we use more WP
-  get _latlng() {
-    console.trace("calling WasabeePortal._latlng() compat");
-    return new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+    return this._latLng;
   }
 
   get team() {
@@ -89,8 +79,8 @@ export default class WasabeePortal {
   }
 
   get displayName() {
-    if (this.pureFaked) return wX("FAKED", this.id);
-    if (this.loading) return wX("LOADING1", this.id);
+    if (this.pureFaked) return wX("FAKED", { portalId: this.id });
+    if (this.loading) return wX("LOADING1", { portalGuid: this.id });
     return this.name;
   }
 

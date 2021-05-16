@@ -4,173 +4,131 @@ import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
+// from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
+const d2r = Math.PI / 180;
+
+function toCartesian(lat, lng) {
+  lat *= d2r;
+  lng *= d2r;
+  var o = Math.cos(lat);
+  return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
+}
+
+function cross(t, n) {
+  return [
+    t[1] * n[2] - t[2] * n[1],
+    t[2] * n[0] - t[0] * n[2],
+    t[0] * n[1] - t[1] * n[0],
+  ];
+}
+
+function dot(t, n) {
+  return t[0] * n[0] + t[1] * n[1] + t[2] * n[2];
+}
+
+function equals(a, b) {
+  return a.lat === b.lat && a.lng === b.lng;
+}
+
+// take L.LatLng
+// note: cache cos/sin calls in the object, in order to be efficient, try using same LatLng objects across calls, like using latLng from WasabeePortal attached to an op
+export function greatCircleArcIntersectByLatLngs(a0, a1, b0, b1) {
+  // 0) quick checks
+  // zero length line
+  if (equals(a0, a1)) return false;
+  if (equals(b0, b1)) return false;
+
+  // lines have a common point
+  if (equals(a0, b0) || equals(a0, b1)) return false;
+  if (equals(a1, b0) || equals(a1, b1)) return false;
+
+  // check for 'horizontal' overlap in longitude
+  if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) return false;
+  if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
+
+  // a) convert into 3D coordinates on a unit sphere & cache into latLng object
+  const ca0 = (a0._cartesian = a0._cartesian
+    ? a0._cartesian
+    : toCartesian(a0.lat, a0.lng));
+  const ca1 = (a1._cartesian = a1._cartesian
+    ? a1._cartesian
+    : toCartesian(a1.lat, a1.lng));
+  const cb0 = (b0._cartesian = b0._cartesian
+    ? b0._cartesian
+    : toCartesian(b0.lat, b0.lng));
+  const cb1 = (b1._cartesian = b1._cartesian
+    ? b1._cartesian
+    : toCartesian(b1.lat, b1.lng));
+
+  // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
+  // find the intersetion line
+
+  // b1) build plane normals for
+  const da = cross(ca0, ca1);
+  const db = cross(cb0, cb1);
+
+  // prepare for d) build 90° rotated vectors
+  const da0 = cross(da, ca0);
+  const da1 = cross(da, ca1);
+  const db0 = cross(db, cb0);
+  const db1 = cross(db, cb1);
+
+  // b2) intersetion line
+  const p = cross(da, db);
+
+  // c) special case when both planes are equal
+  // = both lines are on the same greatarc. test if they overlap
+  const len2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
+  if (len2 < 1e-30) {
+    /* === 0 */ // b0 inside a0-a1 ?
+    const s1 = dot(cb0, da0);
+    const d1 = dot(cb0, da1);
+    if ((s1 < 0 && d1 > 0) || (s1 > 0 && d1 < 0)) return true;
+    // b1 inside a0-a1 ?
+    const s2 = dot(cb1, da0);
+    const d2 = dot(cb1, da1);
+    if ((s2 < 0 && d2 > 0) || (s2 > 0 && d2 < 0)) return true;
+    // a inside b0-b1 ?
+    const s3 = dot(ca0, db0);
+    const d3 = dot(ca0, db1);
+    if ((s3 < 0 && d3 > 0) || (s3 > 0 && d3 < 0)) return true;
+    return false;
+  }
+
+  // d) at this point we have two possible collision points
+  //    p or -p  (in 3D space)
+
+  // e) angel to point
+  //    since da,db is rotated: dot<0 => left, dot>0 => right of P
+  const s = dot(p, da0);
+  const d = dot(p, da1);
+  const l = dot(p, db0);
+  const f = dot(p, db1);
+
+  // is on side a (P)
+  if (s > 0 && 0 > d && l > 0 && 0 > f) {
+    return true;
+  }
+
+  // is on side b (-P)
+  if (0 > s && d > 0 && 0 > l && f > 0) {
+    return true;
+  }
+
+  return false;
+}
+
 // takes WasabeeLink or L.geodesicPolyline format
 export function greatCircleArcIntersect(existing, drawn) {
-  // based on the formula at http://williams.best.vwh.net/avform.htm#Int
-
-  // method:
-  // check to ensure no line segment is zero length - if so, cannot cross
-  // check to see if either of the lines start/end at the same point. if so, then they cannot cross
-  // check to see if the line segments overlap in longitude. if not, no crossing
-  // if overlap, clip each line to the overlapping longitudes, then see if latitudes cross
-
-  // anti-meridian handling. this code will not sensibly handle a case where one point is
-  // close to -180 degrees and the other +180 degrees. unwrap coordinates in this case, so one point
-  // is beyond +-180 degrees. this is already true in IITC
-  // FIXME? if the two lines have been 'unwrapped' differently - one positive, one negative - it will fail
-
-  //Dimand: Lets fix the date line issue.
-  //always work in the eastern hemisphere. so += 360
-
   const eLL = existing.getLatLngs();
   const dLL = drawn.getLatLngs();
+
   const a0 = eLL[0];
   const a1 = eLL[1];
   const b0 = dLL[0];
   const b1 = dLL[1];
 
-  // zero length line tests
-  if (a0.lat == a1.lat && a0.lng == a1.lng) {
-    return false;
-  }
-  if (b0.lat == b1.lat && b0.lng == b1.lng) {
-    return false;
-  }
-
-  // lines have a common point
-  if (a0.lat == b0.lat && a0.lng == b0.lng) {
-    return false;
-  }
-  if (a0.lat == b1.lat && a0.lng == b1.lng) {
-    return false;
-  }
-  if (a1.lat == b0.lat && a1.lng == b0.lng) {
-    return false;
-  }
-  if (a1.lat == b1.lat && a1.lng == b1.lng) {
-    return false;
-  }
-
-  // a0.lng<=-90 && a1.lng>=90 dosent suffice... a link from -70 to 179 still crosses
-  //if a0.lng-a1.lng >180 or <-180 there is a cross!
-  let aCross = false;
-  let bCross = false;
-  //this is the real link
-  if (a0.lng - a1.lng < -180 || a0.lng - a1.lng > 180) {
-    //we have a dateline cross
-    //console.log('DateLine Cross!');
-    //move everything in the eastern hemisphere to the extended eastern one
-    aCross = true;
-    if (a0.lng < 0) {
-      a0.lng += 360;
-    }
-    if (a1.lng < 0) {
-      a1.lng += 360;
-    }
-  }
-  //this is the arc
-  if (b0.lng - b1.lng < -180 || b0.lng - b1.lng > 180) {
-    //console.log('DateLine Cross!');
-    bCross = true;
-    if (b0.lng < 0) {
-      b0.lng += 360;
-    }
-    if (b1.lng < 0) {
-      b1.lng += 360;
-    }
-  }
-  //now corrected both a and b for date line crosses.
-  //now if link is entirely in the west we need to move it to the east.
-  if (bCross && aCross) {
-    //both got moved. all should be good.
-    //do nothing
-  } else if (aCross) {
-    //now we need to move any links in the west of the main one
-    if (Math.max(b0.lng, b1.lng) < Math.min(a0.lng, a1.lng)) {
-      //console.log('arc shift');
-      b0.lng += 360;
-      b1.lng += 360;
-    }
-  } else if (bCross) {
-    //now we need to move any links in the west of the main one
-    if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) {
-      //console.log('link shift');
-      a0.lng += 360;
-      a1.lng += 360;
-      //console.log(a0);
-      //console.log(a1);
-      //console.log(b0);
-      //console.log(b1);
-    }
-  }
-
-  // check for 'horizontal' overlap in longitude
-  if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) {
-    return false;
-  }
-  if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) {
-    return false;
-  }
-
-  // ok, our two lines have some horizontal overlap in longitude
-  // 1. calculate the overlapping min/max longitude
-  // 2. calculate each line latitude at each point
-  // 3. if latitudes change place between overlapping range, the lines cross
-  // class to hold the pre-calculated maths for a geodesic line
-
-  // calculate the longitude of the overlapping region
-  const leftLng = Math.max(Math.min(a0.lng, a1.lng), Math.min(b0.lng, b1.lng));
-  const rightLng = Math.min(Math.max(a0.lng, a1.lng), Math.max(b0.lng, b1.lng));
-  //console.log(leftLng);
-  //console.log(rightLng);
-
-  // calculate the latitudes for each line at left + right longitudes
-  // NOTE: need a special case for meridians - as GeodesicLine.latAtLng method is invalid in that case
-  let aLeftLat, aRightLat;
-  if (a0.lng == a1.lng) {
-    // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
-    aLeftLat = a0.lat;
-    aRightLat = a1.lat;
-  } else {
-    let aGeo = existing._crosslinksGL;
-    if (!aGeo) {
-      aGeo = new GeodesicLine(a0, a1);
-      existing._crosslinksGL = aGeo;
-    }
-    aLeftLat = aGeo.latAtLng(leftLng);
-    aRightLat = aGeo.latAtLng(rightLng);
-  }
-
-  let bLeftLat, bRightLat;
-  if (b0.lng == b1.lng) {
-    // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
-    bLeftLat = b0.lat;
-    bRightLat = b1.lat;
-  } else {
-    let bGeo = drawn._crosslinksGL;
-    if (!bGeo) {
-      bGeo = new GeodesicLine(b0, b1);
-      drawn._crosslinksGL = bGeo;
-    }
-    bLeftLat = bGeo.latAtLng(leftLng);
-    bRightLat = bGeo.latAtLng(rightLng);
-  }
-  //console.log(aLeftLat);
-  //console.log(aRightLat);
-  //console.log(bLeftLat);
-  //console.log(bRightLat);
-  // if both a are less or greater than both b, then lines do not cross
-
-  if (aLeftLat < bLeftLat && aRightLat < bRightLat) {
-    return false;
-  }
-  if (aLeftLat > bLeftLat && aRightLat > bRightLat) {
-    return false;
-  }
-
-  // latitudes cross between left and right - so geodesic lines cross
-  //console.log('Xlink!');
-  return true;
+  return greatCircleArcIntersectByLatLngs(a0, a1, b0, b1);
 }
 
 function testPolyLine(wasabeeLink, realLink, operation) {
@@ -275,11 +233,9 @@ function* realLinks() {
 }
 
 export function checkAllLinks() {
+  if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
+
   const operation = getSelectedOperation();
-  if (operation == null) {
-    console.log("crosslinks run, no op loaded?");
-    return;
-  }
 
   window.plugin.wasabee.crossLinkLayers.clearLayers();
   window.plugin.wasabee._crosslinkCache.clear();
@@ -294,7 +250,7 @@ export function checkAllLinks() {
   for (const l of operation.links) {
     testSelfBlock(l, operation);
   }
-  window.runHooks("wasabeeCrosslinksDone");
+  window.map.fire("wasabeeCrosslinksDone");
 }
 
 function onLinkAdded(data) {
@@ -314,10 +270,7 @@ function onMapDataRefreshEnd() {
 }
 
 export function initCrossLinks() {
-  window.addHook("wasabeeCrosslinks", () => {
-    checkAllLinks();
-  });
-
+  window.map.on("wasabeeCrosslinks", checkAllLinks);
   window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
   window.plugin.wasabee._crosslinkCache = new Map();
   window.addLayerGroup(

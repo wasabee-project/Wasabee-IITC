@@ -1,33 +1,25 @@
 import { WDialog } from "../leafletClasses";
-import Sortable from "../../lib/sortable";
+import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../me";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 const KeysList = WDialog.extend({
   statics: {
     TYPE: "keysList",
   },
 
-  initialize: function (map = window.map, options) {
-    WDialog.prototype.initialize.call(this, map, options);
-    this.type = KeysList.TYPE;
-    postToFirebase({ id: "analytics", action: KeysList.TYPE });
+  options: {
+    usePane: true,
   },
 
   addHooks: async function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.on("wasabeeUIUpdate", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
@@ -38,50 +30,52 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: wX("KEY_LIST2", operation.name),
-      html: this.getListDialogContent(operation).table,
+    this.createDialog({
+      title: wX("KEY_LIST2", { opName: operation.name }),
+      html: this.getListDialogContent(operation, 0, false).table,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-keyslist",
-      closeCallback: () => {
-        delete this._dialog;
-        this.disable();
-      },
+      dialogClass: "keyslist",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.keysList,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  update: function () {
+  update: async function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("operation changed");
 
-    this._dialog.dialog("option", "title", wX("KEY_LIST", operation.name));
-    const table = this.getListDialogContent(operation).table;
-    this._dialog.html(table);
+    // update me if needed
+    if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
+    else this._me = null;
+
+    this.setTitle(wX("KEY_LIST2", { opName: operation.name }));
+    const table = this.getListDialogContent(
+      operation,
+      this.sortable.sortBy,
+      this.sortable.sortAsc
+    ).table;
+    this.setContent(table);
   },
 
-  getListDialogContent: function (operation) {
-    const sortable = new Sortable();
+  getListDialogContent: function (operation, sortBy, sortAsc) {
+    this.sortable = new Sortable();
     const always = [
       {
         name: wX("PORTAL"),
         value: (key) => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          cell.appendChild(
-            operation.getPortal(key.id).displayFormat(this._smallScreen)
-          );
+          cell.appendChild(operation.getPortal(key.id).displayFormat());
         },
       },
       {
@@ -121,7 +115,7 @@ const KeysList = WDialog.extend({
     let gid = "no-user";
     if (this._me) {
       gid = this._me.GoogleID;
-      sortable.fields = always.concat([
+      this.sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
           value: (key) => parseInt(key.iHave, 10),
@@ -131,7 +125,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.IsServerOp())
+              if (operation.IsServerOp() && operation.IsOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
@@ -147,7 +141,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.IsServerOp())
+              if (operation.IsServerOp() && operation.IsOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });
@@ -156,7 +150,7 @@ const KeysList = WDialog.extend({
         },
       ]);
     } else {
-      sortable.fields = always;
+      this.sortable.fields = always;
     }
 
     const keys = new Array();
@@ -216,14 +210,14 @@ const KeysList = WDialog.extend({
       keys.push(k);
     }
 
-    sortable.sortBy = 0;
-    sortable.items = keys;
-    return sortable;
+    this.sortable.sortBy = sortBy;
+    this.sortable.sortAsc = sortAsc;
+    this.sortable.items = keys;
+    return this.sortable;
   },
 
   showKeyByPortal: function (e) {
-    const klp = new KeyListPortal();
-    klp.setup(e.srcElement.name);
+    const klp = new KeyListPortal({ portalID: e.srcElement.name });
     klp.enable();
   },
 });

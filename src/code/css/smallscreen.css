@@ -1,0 +1,60 @@
+/* align verticaly button subactions */
+.leaflet-touch .wasabee-actions li {
+  display: block;
+  border-bottom: 1px solid transparent;
+}
+
+.leaflet-touch li.wasabee-subactions a {
+  min-width: 50px;
+  width: unset !important;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* ellipsis for portal names */
+
+.wasabee-dialog-checklist.wasabee-small-screen .ui-dialog-content,
+.wasabee-dialog-blockerlist.wasabee-small-screen .ui-dialog-content {
+  padding: 0;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen  .wasabee-table td:first-child input {
+  width: 3em;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen  .wasabee-table td:nth-child(3) span {
+  display: inline-block;
+  width: 5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-column-gap: 2px;
+  align-items: center;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal {
+  display: inline-block;
+  vertical-align: bottom;
+  width: calc(100vw - 13em - 24px);
+}
+
+.wasabee-dialog-blockerlist.wasabee-small-screen .wasabee-table a.wasabee-portal {
+  display: inline-block;
+  width: 40vw;
+  vertical-align: bottom;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

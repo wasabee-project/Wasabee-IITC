@@ -48,6 +48,7 @@
   },
   "globals": {
     "L": "readonly",
-    "PLAYER": "readonly"
+    "PLAYER": "readonly",
+    "android": "readonly"
   }
 }

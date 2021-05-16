@@ -7,8 +7,7 @@ import {
   testPortal,
   clearAllLinks,
 } from "../uiCommands";
-import { greatCircleArcIntersect } from "../crosslinks";
-import { postToFirebase } from "../firebaseSupport";
+import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -18,18 +17,11 @@ const MultimaxDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-  },
-
   _displayDialog: function () {
-    if (!this._map) return;
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -104,46 +96,40 @@ const MultimaxDialog = WDialog.extend({
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
       alert(`Multimax found ${total} layers`);
-      // this._dialog.dialog("close");
+      // this.closeDialog();
     });
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
     buttons[wX("CLEAR LINKS")] = () => {
       clearAllLinks(getSelectedOperation());
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("MULTI_M_TITLE"),
       html: container,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-multimax",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "multimax",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.multimaxButton,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = MultimaxDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.title = wX("MULTI_M");
     this.label = wX("MULTI_M");
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
-    this._urp = testPortal();
-    postToFirebase({ id: "analytics", action: MultimaxDialog.TYPE });
+    this._urp = L.latLng(testPortal());
   },
 
   /*
-  Calculate, given two anchors and a set of portals, the best posible sequence of nested fields.
+  Calculate, given two anchors and a set of portals, the deepest sequence of nested fields.
   */
   MM: function (
     pOne,
@@ -153,13 +139,19 @@ const MultimaxDialog = WDialog.extend({
     base = true,
     commentPrefix = "multimax "
   ) {
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-    const sequence = this.longestSequence(poset);
-
     const portalsMap = new Map(portals.map((p) => [p.id, p]));
 
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+
+    const sequence = this.longestSequence(poset, null, (a, b) =>
+      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+    );
+
     if (base)
-      this._operation.addLink(pOne, pTwo, commentPrefix + "base", ++order);
+      this._operation.addLink(pOne, pTwo, {
+        description: commentPrefix + "base",
+        oder: ++order,
+      });
 
     if (!Array.isArray(sequence) || !sequence.length) {
       // alert("No layers found");
@@ -174,10 +166,19 @@ const MultimaxDialog = WDialog.extend({
         console.log("skipping: " + node);
         continue;
       }
-      this._operation.addLink(p, pOne, commentPrefix + "link", ++order);
-      this._operation.addLink(p, pTwo, commentPrefix + "link", ++order);
+      this._operation.addLink(p, pOne, {
+        description: commentPrefix + "link",
+        order: ++order,
+      });
+      this._operation.addLink(p, pTwo, {
+        description: commentPrefix + "link",
+        order: ++order,
+      });
       if (this._flcheck.checked && prev) {
-        this._operation.addLink(p, prev, commentPrefix + "back link", ++order);
+        this._operation.addLink(p, prev, {
+          description: commentPrefix + "back link",
+          order: ++order,
+        });
       }
       prev = p;
     }
@@ -208,19 +209,15 @@ const MultimaxDialog = WDialog.extend({
   },
 
   fieldCoversPortal: function (a, b, c, p) {
-    const unreachableMapPoint = this._urp;
-
-    // greatCircleArcIntersect now takes either WasabeeLink or window.link format
-    // needs link.getLatLngs(); and to be an object we can cache in
-    const urp = L.polyline([unreachableMapPoint, p.latLng]);
-    const lab = L.polyline([a.latLng, b.latLng]);
-    const lac = L.polyline([a.latLng, c.latLng]);
-    const lbc = L.polyline([c.latLng, b.latLng]);
+    const urp = this._urp;
 
     let crossings = 0;
-    if (greatCircleArcIntersect(urp, lab)) crossings++;
-    if (greatCircleArcIntersect(urp, lac)) crossings++;
-    if (greatCircleArcIntersect(urp, lbc)) crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, b.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, c.latLng))
+      crossings++;
+    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, b.latLng, c.latLng))
+      crossings++;
     return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is impossible
   },
 
@@ -228,96 +225,106 @@ const MultimaxDialog = WDialog.extend({
   // note: a portal always covers itself
   buildPOSet: function (anchor1, anchor2, visible) {
     const poset = new Map();
-    for (const i of visible) {
-      poset.set(
-        i.id,
-        visible
-          .filter((j) => {
-            return j == i || this.fieldCoversPortal(anchor1, anchor2, i, j);
-          })
-          .map((j) => j.id)
-      );
-    }
-    return poset;
-  },
 
-  // build a map that shows which and how many portals are covering each possible field by guid
-  // note: a portal is always covered by itself
-  buildRevPOSet: function (anchor1, anchor2, visible) {
-    const poset = new Map();
     for (const i of visible) {
-      poset.set(
-        i.id,
-        visible
-          .filter((j) => {
-            return j == i || this.fieldCoversPortal(anchor1, anchor2, j, i);
-          })
-          .map((j) => j.id)
-      );
-    }
-    return poset;
-  },
-
-  /* not working properly */
-  buildPOSetFaster: function (a, b, visible) {
-    const poset = new Map();
-    for (const i of visible) {
-      const iCovers = new Array();
+      const result = [];
       for (const j of visible) {
-        // console.log(iCovers);
-        if (iCovers.includes(j.id)) {
-          // we've already found this one
-          // console.log("saved some searching");
-          continue;
-        }
-        if (j.id == i.id) {
-          // iCovers.push(j.options.guid);
-          continue;
-        }
-        if (this.fieldCoversPortal(a, b, i, j)) {
-          iCovers.push(j.id);
-          if (poset.has(j.id)) {
-            // if a-b-i covers j, a-b-i will also cover anything a-b-j covers
-            // console.log("found savings");
-            for (const n of poset.get(j.id)) {
-              if (!iCovers.includes(j.id)) iCovers.push(n);
-            }
+        if (i === j) result.push(j.id);
+        else if (this.fieldCoversPortal(anchor1, anchor2, i, j))
+          result.push(j.id);
+      }
+      poset.set(i.id, result);
+    }
+
+    return poset;
+  },
+
+  // given a poset, compute the maximal paths from all elements
+  // the result contains a map that gives for any element the next ones and the list of the elements
+  // that have the longest paths
+  longestSequencesPoset: function (poset) {
+    const alreadyCalculatedChildren = new Map();
+    const preds_from = (c) => {
+      if (alreadyCalculatedChildren.get(c) === undefined) {
+        const res = {
+          children: [],
+          length: 1,
+          number: 1,
+        };
+        for (const id of poset.get(c).filter((i) => i !== c)) {
+          const val = preds_from(id);
+          if (val.length + 1 > res.length) {
+            res.length = val.length + 1;
+            res.children = [];
+            res.number = 0;
+          }
+          if (val.length + 1 == res.length) {
+            res.children.push(id);
+            res.number += val.number;
           }
         }
+        alreadyCalculatedChildren.set(c, res);
       }
-      poset.set(i.id, iCovers);
-    }
-    return poset;
+      return alreadyCalculatedChildren.get(c);
+    };
+
+    poset.set("__start__", Array.from(poset.keys()));
+    return {
+      maxima: preds_from("__start__").children,
+      poset: alreadyCalculatedChildren,
+      number: preds_from("__start__").number,
+    };
   },
 
   // given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
+  // that minimizes the flight distance
   // notes:
   // - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
   // - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
   //   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
   //   (inner to outer)
-  longestSequence: function (poset, start) {
+  longestSequence: function (poset, start, dist) {
+    const maximalPaths = this.longestSequencesPoset(poset);
     const alreadyCalculatedSequences = new Map();
+    if (!dist) dist = () => 0;
     const sequence_from = (c) => {
       if (alreadyCalculatedSequences.get(c) === undefined) {
-        let sequence = Array.from(
-          poset
-            .get(c)
-            .filter((i) => i !== c)
+        const mP = maximalPaths.poset.get(c);
+        if (mP.length == 1)
+          alreadyCalculatedSequences.set(c, { seq: [c], dist: 0 });
+        else {
+          const best = mP.children
             .map(sequence_from)
-            .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), [])
-        );
-        sequence.push(c);
-        alreadyCalculatedSequences.set(c, sequence);
+            .reduce((S1, S2) =>
+              S1.dist + dist(c, S1.seq[S1.seq.length - 1]) <
+              S2.dist + dist(c, S2.seq[S2.seq.length - 1])
+                ? S1
+                : S2
+            );
+          const res = {
+            seq: Array.from(best.seq),
+            dist: best.dist,
+          };
+          res.dist += dist(res.seq[res.seq.length - 1], c);
+          res.seq.push(c);
+          alreadyCalculatedSequences.set(c, res);
+        }
       }
       return alreadyCalculatedSequences.get(c);
     };
 
-    if (start) return sequence_from(start);
+    if (start) {
+      console.debug(
+        maximalPaths.poset.get(start).number,
+        "possible paths from the given start"
+      );
+      return sequence_from(start).seq;
+    }
 
-    return Array.from(poset.keys())
+    console.debug(maximalPaths.number, "possible paths");
+    return maximalPaths.maxima
       .map(sequence_from)
-      .reduce((S1, S2) => (S1.length > S2.length ? S1 : S2), []);
+      .reduce((S1, S2) => (S1.dist < S2.dist ? S1 : S2)).seq;
   },
 });
 

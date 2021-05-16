@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 
 // generic confirmation screen w/ ok and cancel buttons
 
@@ -9,23 +8,37 @@ const ConfirmDialog = WDialog.extend({
     TYPE: "confirmDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = ConfirmDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    this._title = wX("NO_TITLE");
-    this._label = wX("NO_LABEL");
-    postToFirebase({ id: "analytics", action: ConfirmDialog.TYPE });
+  options: {
+    title: wX("NO_TITLE"),
+    label: wX("NO_LABEL"),
+    // type (agent anchor link marker zone operation team)
+    // callback,
+    // cancelCallback
+  },
+
+  _skippable: function () {
+    const level =
+      localStorage[window.plugin.wasabee.static.constants.SKIP_CONFIRM];
+    if (level === "always") return true;
+    if (level === "entity") {
+      switch (this.options.type) {
+        case "anchor":
+        case "link":
+        case "marker":
+        case "zone":
+        case "agent":
+          return true;
+        // no default
+      }
+    }
+    return false;
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
-    if (
-      localStorage[window.plugin.wasabee.static.constants.EXPERT_MODE_KEY] ==
-      "true"
-    ) {
-      console.log("expert mode: skipping dialog display");
-      if (this._callback) this._callback();
+    if (this._skippable()) {
+      console.log("skipping dialog display");
+      if (this.options.callback) this.options.callback();
     } else {
       this._displayDialog();
     }
@@ -33,49 +46,36 @@ const ConfirmDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.runHooks("wasabeeUIUpdate");
+    window.map.fire("wasabeeUIUpdate", { reason: "confirmDialog" }, false);
   },
 
   _displayDialog: function () {
-    if (!this._map) return;
-
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (this._callback) this._callback();
-      this._dialog.dialog("close");
+      if (this.options.callback) this.options.callback();
+      this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
-      if (this._cancelCallback) this._cancelCallback();
-      this._dialog.dialog("close");
+      if (this.options.cancelCallback) this.options.cancelCallback();
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
-      title: this._title,
+    this.createDialog({
+      title: this.options.title,
       html: this._buildContent(),
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-confirm",
+      dialogClass: "confirm",
       buttons: buttons,
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
       // id: window.plugin.wasabee.static.dialogNames.XXX
     });
   },
 
-  setup: function (title, label, callback, cancelCallback) {
-    this._title = title;
-    this._label = label;
-    if (callback) this._callback = callback;
-    if (cancelCallback) this._cancelCallback = cancelCallback;
-  },
-
   _buildContent: function () {
     const content = L.DomUtil.create("div", "title");
-    if (typeof this._label == "string") {
-      content.textContent = this._label;
+    if (typeof this.options.label == "string") {
+      content.textContent = this.options.label;
     } else {
-      content.appendChild(this._label);
+      content.appendChild(this.options.label);
     }
     return content;
   },

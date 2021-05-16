@@ -1,212 +1,167 @@
+import WasabeeOp from "../operation";
 import { WDialog } from "../leafletClasses";
-import ConfirmDialog from "./confirmDialog";
 import {
   getSelectedOperation,
-  getOperationByID,
   makeSelectedOperation,
   opsList,
-  removeOperation,
   resetHiddenOps,
   hiddenOpsList,
   showOperation,
   hideOperation,
-  changeOpIfNeeded,
+  setOpBackground,
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
+import { syncOp, deleteLocalOp } from "../uiCommands";
+import Sortable from "../sortable";
 
 const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog",
   },
 
-  initialize: function (map = window.map, options) {
-    this.type = OpsDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
-    postToFirebase({ id: "analytics", action: OpsDialog.TYPE });
+  options: {
+    usePane: true,
   },
 
   addHooks: function () {
-    if (!this._map) return;
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
-
-    const context = this;
-    this._UIUpdateHook = () => {
-      context.update();
-    };
-    window.addHook("wasabeeUIUpdate", this._UIUpdateHook);
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.removeHook("wasabeeUIUpdate", this._UIUpdateHook);
+    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:op:delete", this.update, this);
   },
 
-  _displayDialog: function () {
-    this.makeContent(getSelectedOperation());
+  _displayDialog: async function () {
+    this.initSortable();
+    await this.updateSortable(0, false);
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
-    };
+    // wX
     buttons["Unhide all OPs"] = () => {
       resetHiddenOps();
       this.update();
     };
-
-    this._dialog = window.dialog({
-      title: wX("OPERATIONS"),
-      html: this._content,
-      height: "auto",
-      width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-ops",
-      closeCallback: () => {
-        this.disable();
-        delete this._content;
-        delete this._dialog;
-      },
-      id: window.plugin.wasabee.static.dialogNames.opsList,
-    });
-    this._dialog.dialog("option", "buttons", buttons);
-  },
-
-  update: function () {
-    if (this._enabled && this._dialog && this._dialog.html) {
-      this.makeContent(getSelectedOperation());
-      this._dialog.html(this._content);
-    }
-  },
-
-  makeContent: function (selectedOp) {
-    const container = L.DomUtil.create("div", "container");
-    const opTable = L.DomUtil.create(
-      "tbody",
-      "",
-      L.DomUtil.create("table", "wasabee-table", container)
-    );
-
-    const showHiddenOps =
+    buttons["Toggle Show/Hide"] = () => {
+      const showHiddenOps =
+        localStorage[
+          window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
+        ] !== "false";
       localStorage[
         window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
-      ] !== "false";
+      ] = !showHiddenOps;
+      this.update();
+    };
+    buttons[wX("CLOSE")] = () => {
+      this.closeDialog();
+    };
 
-    const ol = opsList(showHiddenOps);
-    const data = new Map();
-    data.set("", []);
-    for (const opID of ol) {
-      const tmpOp = getOperationByID(opID);
-      if (!tmpOp) continue;
-      const server = tmpOp.server || "";
-      if (!data.has(server)) data.set(server, []);
-      data.get(server).push({
-        id: opID,
-        name: tmpOp.name,
-        localchanged: tmpOp.localchanged,
-        local: tmpOp.fetched === null,
-        owner: tmpOp.creator,
-        perm: tmpOp.getPermission(),
-      });
+    this.createDialog({
+      title: wX("OPERATIONS"),
+      html: this.sortable.table,
+      height: "auto",
+      width: "auto",
+      dialogClass: "ops",
+      buttons: buttons,
+      id: window.plugin.wasabee.static.dialogNames.opsList,
+    });
+  },
+
+  update: async function () {
+    if (this._enabled) {
+      await this.updateSortable(this.sortable.sortBy, this.sortable.sortAsc);
+      // this.setContent(this.sortable.table);
     }
-    const hiddenOps = hiddenOpsList();
+  },
 
-    for (const server of [...data.keys()].sort()) {
-      const ops = data
-        .get(server)
-        .sort((a, b) =>
-          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-        );
-      const serverRow = L.DomUtil.create("tr", "servername", opTable);
-      const serverTh = L.DomUtil.create("th", "", serverRow);
-      serverTh.colSpan = 5;
-      serverTh.textContent = server;
-
-      const isLocal = server == "";
-      if (isLocal) {
-        serverTh.textContent = "Local";
-        serverTh.colSpan = 1;
-        const hideOps = L.DomUtil.create("th", "show-hidden-ops", serverRow);
-        hideOps.colSpan = 4;
-        const label = L.DomUtil.create("label", null, hideOps);
-        label.htmlFor = "show-hidden-ops";
-        label.textContent = "Show hidden OPs";
-        const checkbox = L.DomUtil.create("input", null, hideOps);
-        checkbox.id = "show-hidden-ops";
-        checkbox.type = "checkbox";
-        checkbox.checked = showHiddenOps;
-        L.DomEvent.on(checkbox, "change", (ev) => {
-          L.DomEvent.stop(ev);
-          localStorage[
-            window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
-          ] = checkbox.checked;
-          this.update();
-        });
-      }
-
-      for (const op of ops) {
-        const opRow = L.DomUtil.create("tr", "op", opTable);
-        {
-          const opName = L.DomUtil.create("td", "opname", opRow);
-          const link = L.DomUtil.create("a", "", opName);
+  initSortable: function () {
+    const content = new Sortable();
+    content.fields = [
+      {
+        name: "S",
+        value: (op) => op.server,
+        // sort: (a, b) => a - b,
+        format: (cell, value, op) => {
+          cell.textContent = op.server;
+        },
+      },
+      {
+        name: "Name",
+        value: (op) => op.name,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value, op) => {
+          const link = L.DomUtil.create("a", "", cell);
           link.href = "#";
           link.textContent = op.name;
-          if (op.id == selectedOp.ID) link.classList.add("enl");
-          L.DomEvent.on(link, "click", (ev) => {
+          if (!op.local) {
+            link.title = `Last fetched: ${op.fetched}\n`;
+            if (op.localchanged) link.title += "Local has changed\n";
+            if (op.remotechanged) link.title += "Remote has changed";
+          }
+          if (op.id == getSelectedOperation().ID) link.classList.add("enl");
+          L.DomEvent.on(link, "click", async (ev) => {
             L.DomEvent.stop(ev);
-            const newop = makeSelectedOperation(op.id);
+            await makeSelectedOperation(op.id);
+            const newop = getSelectedOperation();
             const mbr = newop.mbr;
             if (
               mbr &&
               isFinite(mbr._southWest.lat) &&
               isFinite(mbr._northEast.lat)
             ) {
-              this._map.fitBounds(mbr);
+              window.map.fitBounds(mbr);
             }
           });
-        }
-        {
-          const opStatus = L.DomUtil.create("td", "opstatus", opRow);
-          const status = L.DomUtil.create("span", "", opStatus);
+        },
+      },
+      {
+        name: "",
+        value: (op) =>
+          1 * op.local + 2 * op.localchanged + 4 * op.remotechanged,
+        // sort: (a, b) => a - b,
+        format: (cell, value, op) => {
+          const status = L.DomUtil.create("span", "", cell);
           status.textContent = "";
           if (!op.local) {
-            if (isLocal) {
-              status.textContent = "!";
+            if (op.localchanged) {
+              status.textContent = "☀";
+              status.style.color = "green";
+              status.title = "Local changes";
+            }
+            if (op.remotechanged) {
+              status.textContent = "⛅";
               status.style.color = "red";
-            } else if (op.localchanged) {
-              status.textContent = "*";
-              status.style.color = "red";
+              status.title = "Local&remote changes";
             }
           }
-        }
-        {
-          const opOwner = L.DomUtil.create("td", "opowner", opRow);
-          const agent = WasabeeAgent.cacheGet(op.owner);
-          if (agent != null) opOwner.appendChild(agent.formatDisplay());
-          else if (op.local) opOwner.append(window.PLAYER.nickname);
-          else {
-            const placeholder = L.DomUtil.create("div", "", opOwner);
-            if (WasabeeMe.isLoggedIn()) {
-              placeholder.textContent = "looking up: [" + op.owner + "]";
-              WasabeeAgent.waitGet(op.owner).then((agent) => {
-                placeholder.remove();
-                opOwner.appendChild(agent.formatDisplay());
-              });
-            } else {
-              // it is the local agent anyway
-              placeholder.textContent = "";
-            }
-          }
-        }
-        {
-          const opPerm = L.DomUtil.create("td", "opperm", opRow);
+        },
+      },
+      {
+        name: "Owner",
+        value: (op) => op.owner,
+        sort: (a, b) => a.localeCompare(b),
+        format: (cell, value, op) => {
+          cell.classList.add("opowner");
+          if (!op.currentserver) cell.append(op.owner);
+          else cell.appendChild(op.ownerDisplay);
+        },
+      },
+      {
+        name: "P",
+        value: (op) => op.perm,
+        format: (cell, value, op) => {
           let text = wX("ASSIGNED_ONLY_SHORT");
           if (op.perm == "read") text = wX("READ_SHORT");
           else if (op.perm == "write") text = wX("WRITE_SHORT");
-          if (op.id == selectedOp.ID) {
-            const perm = L.DomUtil.create("a", "", opPerm);
+          if (op.id == getSelectedOperation().ID) {
+            const perm = L.DomUtil.create("a", "", cell);
             perm.textContent = text;
             L.DomEvent.on(perm, "click", (ev) => {
               L.DomEvent.stop(ev);
@@ -214,58 +169,139 @@ const OpsDialog = WDialog.extend({
               opl.enable();
             });
           } else {
-            const perm = L.DomUtil.create("span", "", opPerm);
+            const perm = L.DomUtil.create("span", "", cell);
             perm.textContent = text;
           }
-        }
-        {
-          const actions = L.DomUtil.create("td", "actions", opRow);
-
-          // hide
-          const hide = L.DomUtil.create("a", "", actions);
-          const hidden = hiddenOps.includes(op.id);
-          hide.href = "#";
-          hide.textContent = hidden ? "☽" : "👀";
-          hide.title = (hidden ? "Show " : "Hide ") + op.name;
-          L.DomEvent.on(hide, "click", (ev) => {
+        },
+      },
+      {
+        name: "Bg",
+        value: () => null,
+        sort: null,
+        format: (cell, value, op) => {
+          // background
+          const background = L.DomUtil.create("input", null, cell);
+          background.type = "checkbox";
+          background.checked = op.background;
+          // wX
+          background.title = op.background
+            ? "Disable background"
+            : "Show in background";
+          L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
-            if (hidden) showOperation(op.id);
-            else hideOperation(op.id);
-            this.update();
+            const background = ev.target;
+            // wX
+            background.title = background.checked
+              ? "Disable background"
+              : "Show in background";
+            setOpBackground(op.id, background.checked);
           });
-
+        },
+      },
+      {
+        name: "Cmds",
+        value: () => null,
+        sort: null,
+        className: "actions",
+        format: (cell, value, op) => {
           // delete locally
-          const deleteLocaly = L.DomUtil.create("a", "", actions);
+          const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
           deleteLocaly.textContent = "🗑️";
-          deleteLocaly.title = wX("REM_LOC_CP", op.name);
+          deleteLocaly.title = wX("REM_LOC_CP", { opName: op.name });
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
-            // this should be moved to uiCommands
-            const con = new ConfirmDialog(window.map);
-            con.setup(
-              wX("REM_LOC_CP", op.name),
-              wX("YESNO_DEL", op.name),
-              () => {
-                removeOperation(op.id);
-                const newop = changeOpIfNeeded();
-                const mbr = newop.mbr;
-                if (
-                  mbr &&
-                  isFinite(mbr._southWest.lat) &&
-                  isFinite(mbr._northEast.lat)
-                ) {
-                  this._map.fitBounds(mbr);
-                }
-              }
-            );
-            con.enable();
+            deleteLocalOp(op.name, op.id);
           });
-        }
-      }
-    }
 
-    this._content = container;
+          if (op.currentserver) {
+            // download op
+            const download = L.DomUtil.create("a", "", cell);
+            download.href = "#";
+            download.textContent = "↻";
+            download.title = "Download " + op.name;
+            L.DomEvent.on(download, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              syncOp(op.id);
+            });
+          }
+        },
+      },
+      {
+        name: "V",
+        value: () => null,
+        sort: null,
+        className: "visibility",
+        format: (cell, value, op) => {
+          // show in the list
+          const show = L.DomUtil.create("input", null, cell);
+          show.type = "checkbox";
+          show.checked = !op.hidden;
+          L.DomEvent.on(show, "change", (ev) => {
+            L.DomEvent.stop(ev);
+            if (show.checked) showOperation(op.id);
+            else hideOperation(op.id);
+          });
+        },
+      },
+    ];
+    this.sortable = content;
+  },
+
+  updateSortable: async function (sortBy, sortAsc) {
+    if (!this.sortable) return;
+    // collapse markers and links into one array.
+    const showHiddenOps =
+      localStorage[
+        window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
+      ] !== "false";
+
+    const ol = await opsList(showHiddenOps);
+    const currentOps = this.sortable.items.map((o) => o.id);
+    const olSorted = currentOps
+      .filter((id) => ol.includes(id))
+      .concat(ol.filter((id) => !currentOps.includes(id)));
+    const hiddenOps = hiddenOpsList();
+    const ops = [];
+    for (const opID of olSorted) {
+      const tmpOp = await WasabeeOp.load(opID);
+      if (!tmpOp) continue;
+      const sum = {
+        id: opID,
+        name: tmpOp.name,
+        localchanged: tmpOp.localchanged,
+        remotechanged: tmpOp.remoteChanged,
+        fetched: tmpOp.fetched,
+        local: tmpOp.fetched === null,
+        perm: tmpOp.getPermission(),
+        hidden: hiddenOps.includes(opID),
+        currentserver:
+          tmpOp.fetched !== null &&
+          WasabeeMe.isLoggedIn() &&
+          tmpOp.IsOnCurrentServer(),
+        server: "",
+        background: tmpOp.background,
+      };
+      if (sum.currentserver) {
+        const agent = await WasabeeAgent.get(tmpOp.creator);
+        sum.owner = agent.name;
+        sum.ownerDisplay = await agent.formatDisplay();
+      } else {
+        sum.owner = window.PLAYER.nickname;
+      }
+
+      for (const server of window.plugin.wasabee.static.publicServers) {
+        if (server.url === tmpOp.server) sum.server = server.short;
+      }
+      ops.push(sum);
+    }
+    this.sortable.sortBy = sortBy;
+    this.sortable.sortAsc = sortAsc;
+    this.sortable.items = ops;
+    await this.sortable.done;
+
+    if (showHiddenOps) this.sortable.table.classList.remove("hideOps");
+    else this.sortable.table.classList.add("hideOps");
   },
 });
 

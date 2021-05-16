@@ -6,17 +6,28 @@ import { postToFirebase } from "../firebaseSupport";
 
 const QuickdrawButton = WButton.extend({
   statics: {
-    TYPE: "quickdrawButton",
+    TYPE: "QuickdrawButton",
   },
 
-  initialize: function (map, container) {
-    if (!map) map = window.map;
+  initialize: function (map = window.map, container) {
     this._map = map;
 
     this.title = wX("QD TITLE");
-    this.handler = new QuickDrawControl(map);
+    this.handler = new QuickDrawControl(map, { button: this });
     this._container = container;
     this.type = QuickdrawButton.TYPE;
+
+    this.picker = null;
+    this.picker = L.DomUtil.create("input", "", this.button);
+    this.picker.type = "color";
+    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
+    this.picker.style.display = "none";
+    this.picker.setAttribute("list", "wasabee-colors-datalist");
+
+    L.DomEvent.on(this.picker, "change", (ev) => {
+      this.handler._nextDrawnLinksColor = ev.target.value;
+      this.picker.value = ev.target.value;
+    });
 
     this.button = this._createButton({
       title: this.title,
@@ -26,6 +37,24 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     });
 
+    this._changeColorSubAction = {
+      title: wX("QD BUTTON CHANGE COLOR"),
+      text: wX("QD CHANGE COLOR"),
+      callback: () => {
+        this.picker.click();
+      },
+      context: null,
+    };
+
+    this._toggleModeSubAction = {
+      title: wX("QD BUTTON TOGGLE MODE"),
+      text: wX("QD TOGGLE MODE"),
+      callback: () => {
+        this.handler._toggleMode();
+      },
+      context: null,
+    };
+
     this._endSubAction = {
       title: wX("QD BUTTON END"),
       text: wX("QD END"),
@@ -33,103 +62,116 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     };
 
-    this.actionsContainer = this._createSubActions([this._endSubAction]);
-    // this should be automaticly detected
-    this.actionsContainer.style.top = "52px";
+    this.actionsContainer = this._createSubActions([
+      this._toggleModeSubAction,
+      this._changeColorSubAction,
+      this._endSubAction,
+    ]);
     this._container.appendChild(this.actionsContainer);
   },
 
-  // Wupdate: function(container) { }
+  enable: function () {
+    WButton.prototype.enable.call(this);
+    this.button.classList.add("active");
+  },
+
+  disable: function () {
+    WButton.prototype.disable.call(this);
+    if (this.handler._enabled) this.handler.disable.call(this.handler);
+    this.button.classList.remove("active");
+  },
 });
 
 const QuickDrawControl = L.Handler.extend({
   initialize: function (map = window.map, options) {
     this._map = map;
     this._container = map._container;
-    this.type = "QuickDrawControl";
-    this.buttonName = "quickdrawButton";
-    this._drawMode = "quickdraw";
+
     L.Handler.prototype.initialize.call(this, map, options);
-    L.Util.extend(this.options, options);
+    this.options = options;
+    // L.Util.extend(this.options, options);
+
+    this.type = "QuickDrawControl";
+    this._drawMode = "quickdraw";
   },
 
   enable: function () {
-    console.log("qd enable called");
     if (this._enabled) {
       this.disable();
       return;
     }
     L.Handler.prototype.enable.call(this);
-    window.plugin.wasabee.buttons._modes[this.buttonName].enable();
-    window.plugin.wasabee.buttons._modes[this.buttonName].button.classList.add(
-      "active"
-    );
+    this.options.button.enable();
     postToFirebase({ id: "analytics", action: "quickdrawStart" });
   },
 
   disable: function () {
-    console.log("qd disable called");
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-    window.plugin.wasabee.buttons._modes[this.buttonName].disable();
-    window.plugin.wasabee.buttons._modes[
-      this.buttonName
-    ].button.classList.remove("active");
+    this.options.button.disable();
     postToFirebase({ id: "analytics", action: "quickdrawEnd" });
   },
 
   addHooks: function () {
-    console.log("qd addHooks called");
     if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
 
     this._operation = getSelectedOperation();
+    this._nextDrawnLinksColor = this._operation.color;
+    this._opID = this._operation.ID;
+    this._anchor = null;
     this._anchor1 = null;
     this._anchor2 = null;
     this._previous = null;
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
-    // IITC hook format for IITC event
+    this._firstSelect = true;
+
+    const context = this;
     this._portalClickedHook = (data) => {
-      QuickDrawControl.prototype._portalClicked.call(this, data);
+      context._portalClicked(data);
     };
     window.addHook("portalSelected", this._portalClickedHook);
+
     // Leaflet format for leaflet DOM event
+    this._map.on("wasabeeUIUpdate", this._uiupdate, this);
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
-    // this._map.on("click", this._clickHook, this);
-  },
-
-  _clickHook: function (e) {
-    console.log("click detected");
-    console.log(e);
   },
 
   removeHooks: function () {
-    console.log("qd removeHooks called");
-    if (!this._map) return;
     if (this._guideLayerGroup) {
       window.removeLayerGroup(this._guideLayerGroup);
-      delete this._guideLayerGroup;
+      this._guideLayerGroup = null;
     }
-    if (this._operation) delete this._operation;
-    if (this._anchor1) delete this._anchor1;
-    if (this._anchor2) delete this._anchor2;
-    if (this._previous) delete this._previous;
-    if (this._guideA) delete this._guideA;
-    if (this._guideB) delete this._guideB;
+
+    this._anchor = null;
+    this._anchor1 = null;
+    this._anchor2 = null;
+    this._previous = null;
+    this._guideA = null;
+    this._guideB = null;
 
     L.DomUtil.enableTextSelection();
     this._tooltip.dispose();
     this._tooltip = null;
 
     window.removeHook("portalSelected", this._portalClickedHook);
+    this._map.off("wasabeeUIUpdate", this._uiupdate, this);
     this._map.off("keyup", this._keyUpListener, this);
     this._map.off("mousemove", this._onMouseMove, this);
-    // this._map.off("click", this._clickHook, this);
+  },
+
+  _uiupdate: function () {
+    if (!this._enabled) return;
+
+    if (getSelectedOperation().ID != this._opID) {
+      console.log("operation changed mid-quickdraw - disabling");
+      this.disable();
+    }
   },
 
   _keyUpListener: function (e) {
@@ -150,7 +192,7 @@ const QuickDrawControl = L.Handler.extend({
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
-      window.runHooks("wasabeeCrosslinks", this._operation);
+      window.map.fire("wasabeeCrosslinks", { reason: "qd keyup X" }, false);
     }
   },
 
@@ -170,7 +212,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _guideLayerToggle: function () {
-    console.log("toggle guide layer");
     if (!this._guideLayerGroup) {
       this._guideLayerGroup = new L.LayerGroup();
       window.addLayerGroup(
@@ -183,16 +224,20 @@ const QuickDrawControl = L.Handler.extend({
       window.Render.prototype.bringPortalsToFront();
     } else {
       window.removeLayerGroup(this._guideLayerGroup);
-      delete this._guideLayerGroup;
       this._guideLayerGroup = null;
     }
   },
 
   _getTooltipText: function () {
-    if (this._drawMode == "quickdraw") {
+    if (this._drawMode === "quickdraw") {
       if (!this._anchor1) return { text: wX("QDSTART") };
       if (!this._anchor2) return { text: wX("QDNEXT") };
       return { text: wX("QDCONT") };
+    }
+    if (this._drawMode === "star") {
+      // XXX wX this
+      if (!this._anchor) return { text: "Select the star anchor" };
+      return { text: "Select a portal" };
     }
     // must be in single-link mode
     // XXX wX this
@@ -202,21 +247,33 @@ const QuickDrawControl = L.Handler.extend({
 
   _portalClicked: function (data) {
     // console.log(data);
-    if (data.selectedPortalGuid == data.unselectedPortalGuid) {
-      console.log("same portal clicked");
-      // return;
+    if (
+      data.selectedPortalGuid == data.unselectedPortalGuid &&
+      !this._firstSelect
+    ) {
+      console.log("ignoring duplicate click");
+      return;
     }
+
+    // portal unselect
+    if (!data.selectedPortalGuid) return;
+
+    this._firstSelect = false;
 
     // const selectedPortal = WasabeePortal.getSelected();
     // this way saves a small step
     const selectedPortal = WasabeePortal.get(data.selectedPortalGuid);
     if (!selectedPortal) {
       // XXX wX this
-      this._tooltip.updateContent("Portal data not loaded, please try again");
+      this._tooltip.updateContent({
+        text: "Portal data not loaded, please try again",
+      });
       return;
     }
     if (this._drawMode == "quickdraw") {
       this._portalClickedQD(selectedPortal);
+    } else if (this._drawMode == "star") {
+      this._portalClickedStar(selectedPortal);
     } else {
       this._portalClickedSingle(selectedPortal);
     }
@@ -245,12 +302,11 @@ const QuickDrawControl = L.Handler.extend({
     if (!this._anchor2) {
       if (selectedPortal.id === this._anchor1.id) return;
       this._anchor2 = selectedPortal;
-      this._operation.addLink(
-        this._anchor1,
-        this._anchor2,
-        wX("QDBASE"),
-        this._operation.nextOrder
-      );
+      this._operation.addLink(this._anchor1, this._anchor2, {
+        description: wX("QDBASE"),
+        order: this._operation.nextOrder,
+        color: this._nextDrawnLinksColor,
+      });
       this._tooltip.updateContent(this._getTooltipText());
       localStorage[
         window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
@@ -263,32 +319,35 @@ const QuickDrawControl = L.Handler.extend({
       return;
     }
 
-    this._operation.addLink(
-      selectedPortal,
-      this._anchor1,
-      null,
-      this._operation.nextOrder
-    );
-    this._operation.addLink(
-      selectedPortal,
-      this._anchor2,
-      null,
-      this._operation.nextOrder
-    );
+    this._operation.addLink(selectedPortal, this._anchor1, {
+      order: this._operation.nextOrder,
+      color: this._nextDrawnLinksColor,
+    });
+    this._operation.addLink(selectedPortal, this._anchor2, {
+      order: this._operation.nextOrder,
+      color: this._nextDrawnLinksColor,
+    });
     this._tooltip.updateContent(this._getTooltipText());
   },
 
   _toggleMode: function () {
     // changing mode resets all the things
-    if (this._anchor1) delete this._anchor1;
-    if (this._anchor2) delete this._anchor2;
-    if (this._previous) delete this._anchor2;
-    if (this._guideA) delete this._guideA;
-    if (this._guideB) delete this._guideB;
+    this._anchor = null;
+    this._anchor1 = null;
+    this._anchor2 = null;
+    this._previous = null;
+    this._guideA = null;
+    this._guideB = null;
+    if (this._guideLayerGroup) this._guideLayerGroup.clearLayers();
+
+    this._firstSelect = true;
 
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");
       this._drawMode = "singlelink";
+    } else if (this._drawMode == "singlelink") {
+      console.log("switching to star");
+      this._drawMode = "star";
     } else {
       console.log("switching to layers");
       this._drawMode = "quickdraw";
@@ -297,21 +356,16 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _portalClickedSingle: function (selectedPortal) {
-    // console.log("portal clicked", selectedPortal);
     // IITC sending 2 portalClicked for 1 mouse click
     if (this._previous && this._previous.id == selectedPortal.id) {
-      // this.disable();
       return;
     }
 
-    // not the first portal in the chain, draw a link
     if (this._previous) {
-      this._operation.addLink(
-        this._previous,
-        selectedPortal,
-        null,
-        this._throwOrder++
-      );
+      this._operation.addLink(this._previous, selectedPortal, {
+        order: this._throwOrder++,
+        color: this._nextDrawnLinksColor,
+      });
     }
 
     // all portals, including the first
@@ -319,12 +373,40 @@ const QuickDrawControl = L.Handler.extend({
       window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
     guideStyle.anchorLL = selectedPortal.latLng;
 
+    if (this._guideA) this._guideA.remove();
     this._guideA = L.geodesicPolyline(
       [selectedPortal.latLng, selectedPortal.latLng],
       guideStyle
     );
     if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
     this._previous = selectedPortal;
+    this._tooltip.updateContent(this._getTooltipText());
+  },
+
+  _portalClickedStar: function (selectedPortal) {
+    // IITC sending 2 portalClicked for 1 mouse click
+    if (this._anchor && this._anchor.id == selectedPortal.id) {
+      return;
+    }
+
+    if (this._anchor) {
+      this._operation.addLink(selectedPortal, this._anchor, {
+        order: this._throwOrder++,
+        color: this._nextDrawnLinksColor,
+      });
+    } else this._anchor = selectedPortal;
+
+    // all portals, including the first
+    const guideStyle =
+      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
+    guideStyle.anchorLL = this._anchor.latLng;
+
+    if (this._guideA) this._guideA.remove();
+    this._guideA = L.geodesicPolyline(
+      [this._anchor.latLng, selectedPortal.latLng],
+      guideStyle
+    );
+    if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
     this._tooltip.updateContent(this._getTooltipText());
   },
 });

@@ -1,12 +1,12 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import MultimaxButtonControl from "../dialogs/multimaxDialog";
+import MultimaxDialog from "../dialogs/multimaxDialog";
 import FanfieldDialog from "../dialogs/fanfield";
 import StarburstDialog from "../dialogs/starburst";
+import SaveLinksDialog from "../dialogs/saveLinks";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
 import MadridDialog from "../dialogs/madrid";
-import { postToFirebase } from "../firebaseSupport";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({
@@ -15,62 +15,66 @@ const AutodrawsDialog = WDialog.extend({
     TYPE: "autodraws",
   },
 
-  initialize: function (map = window.map, options) {
-    postToFirebase({ id: "analytics", action: AutodrawsDialog.TYPE });
-    this._map = map;
+  initialize: function (options) {
+    WDialog.prototype.initialize.call(this, options);
     this.menuItems = [
       {
         text: wX("MM"),
         callback: () => {
-          this._dialog.dialog("close");
-          const mm = new MultimaxButtonControl(this._map);
+          this.closeDialog();
+          const mm = new MultimaxDialog();
           mm.enable();
         },
       },
       {
         text: wX("MAX"),
         callback: () => {
-          this._dialog.dialog("close");
-          const ff = new FanfieldDialog(this._map);
+          this.closeDialog();
+          const ff = new FanfieldDialog();
           ff.enable();
         },
       },
       {
         text: wX("STARBURST"),
         callback: () => {
-          this._dialog.dialog("close");
-          const sb = new StarburstDialog(this._map);
+          this.closeDialog();
+          const sb = new StarburstDialog();
           sb.enable();
         },
       },
       {
         text: wX("ONION_WAS_TAKEN"),
         callback: () => {
-          this._dialog.dialog("close");
-          const o = new OnionfieldDialog(this._map);
+          this.closeDialog();
+          const o = new OnionfieldDialog();
           o.enable();
         },
       },
       {
         text: wX("HG"),
         callback: () => {
-          this._dialog.dialog("close");
-          const h = new HomogeneousDialog(this._map);
+          this.closeDialog();
+          const h = new HomogeneousDialog();
           h.enable();
         },
       },
       {
         text: wX("MADRID_WAS_TAKEN"),
         callback: () => {
-          this._dialog.dialog("close");
-          const m = new MadridDialog(this._map);
+          this.closeDialog();
+          const m = new MadridDialog();
           m.enable();
         },
       },
+      {
+        text: wX("SAVELINKS"),
+        callback: () => {
+          this._dialog.dialog("close");
+          const sl = new SaveLinksDialog();
+          sl.enable();
+        },
+      },
     ];
-
-    this.type = AutodrawsDialog.TYPE;
-    WDialog.prototype.initialize.call(this, map, options);
   },
 
   addHooks: function () {
@@ -80,10 +84,6 @@ const AutodrawsDialog = WDialog.extend({
     } else {
       this._displayDialog();
     }
-  },
-
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
   },
 
   _displayDialog: function () {
@@ -101,21 +101,17 @@ const AutodrawsDialog = WDialog.extend({
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this._dialog.dialog("close");
+      this.closeDialog();
     };
 
-    this._dialog = window.dialog({
+    this.createDialog({
       title: wX("AUTODRAWS"),
       html: html,
       width: "auto",
-      dialogClass: "wasabee-dialog wasabee-dialog-autodraws",
-      closeCallback: () => {
-        this.disable();
-        delete this._dialog;
-      },
+      dialogClass: "autodraws",
+      buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.autodraws,
     });
-    this._dialog.dialog("option", "buttons", buttons);
   },
 
   _displaySmallDialog: function () {
