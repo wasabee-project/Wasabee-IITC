@@ -30,8 +30,8 @@ const AuthDialog = WDialog.extend({
     )
       sendLocation();
     this.randomTip();
-    window.map.fire("wasabeeUIUpdate", { reason: "authDialog" }, false);
-    window.map.fire("wasabeeDkeys", { reason: "authDialog" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "authDialog" }, false);
+    window.map.fire("wasabee:defensivekeys", { reason: "authDialog" }, false);
   },
 
   randomTip: function () {

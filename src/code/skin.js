@@ -107,7 +107,7 @@ export function changeSkin(names) {
     JSON.stringify(validNames);
 
   addButtons();
-  window.map.fire("wasabeeUIUpdate", { reason: "skin change" }, false);
+  window.map.fire("wasabee:uiupdate", { reason: "skin change" }, false);
   return true;
 }
 

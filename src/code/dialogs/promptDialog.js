@@ -25,7 +25,7 @@ const PromptDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.fire("wasabeeUIUpdate", { reason: "PromptDialogClose" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "PromptDialogClose" }, false);
   },
 
   _displayDialog: function () {

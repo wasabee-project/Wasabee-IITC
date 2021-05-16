@@ -21,8 +21,8 @@ const BlockerList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.blockerlistUpdate, this);
-    window.map.on("wasabeeCrosslinksDone", this.blockerlistUpdate, this);
+    window.map.on("wasabee:uiupdate", this.blockerlistUpdate, this);
+    window.map.on("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
@@ -31,8 +31,8 @@ const BlockerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.blockerlistUpdate, this);
-    window.map.off("wasabeeCrosslinksDone", this.blockerlistUpdate, this);
+    window.map.off("wasabee:uiupdate", this.blockerlistUpdate, this);
+    window.map.off("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
@@ -45,7 +45,7 @@ const BlockerList = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog();
-      window.map.fire("wasabeeUIUpdate", { reason: "blockerlist" }, false);
+      window.map.fire("wasabee:uiupdate", { reason: "blockerlist" }, false);
     };
     buttons[wX("AUTOMARK")] = () => {
       const operation = getSelectedOperation();
@@ -56,7 +56,7 @@ const BlockerList = WDialog.extend({
       operation.blockers = new Array();
       this.blockerlistUpdate();
       operation.update(false); // blockers do not need to be sent to server
-      window.map.fire("wasabeeCrosslinks", { reason: "blockerlist" }, false);
+      window.map.fire("wasabee:crosslinks", { reason: "blockerlist" }, false);
     };
     buttons[wX("LOAD PORTALS")] = () => {
       const operation = getSelectedOperation();
@@ -83,7 +83,7 @@ const BlockerList = WDialog.extend({
     });
   },
 
-  // when the wasabeeUIUpdate hook is called from anywhere, update the display data here
+  // when the wasabee:uiupdate hook is called from anywhere, update the display data here
   blockerlistUpdate: function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;

@@ -93,10 +93,10 @@ window.plugin.wasabee.init = async () => {
     });
   });
 
-  window.map.on("wasabeeUIUpdate", drawMap);
+  window.map.on("wasabee:uiupdate", drawMap);
 
   window.addResumeFunction(() => {
-    window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "resume" }, false);
     sendLocation();
   });
 
@@ -130,7 +130,7 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
+      window.map.fire("wasabee:uiupdate", { reason: "layeradd" }, false);
     }
     if (obj.layer === Wasabee.backgroundOpsGroup) {
       drawBackgroundOps();
@@ -163,10 +163,10 @@ window.plugin.wasabee.init = async () => {
   setupToolbox();
 
   // draw the UI with the op data for the first time
-  window.map.fire("wasabeeUIUpdate", { reason: "startup" }, false);
+  window.map.fire("wasabee:uiupdate", { reason: "startup" }, false);
 
   // run crosslinks
-  window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
+  window.map.fire("wasabee:crosslinks", { reason: "startup" }, false);
 
   // draw background ops
   drawBackgroundOps();

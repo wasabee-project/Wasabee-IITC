@@ -87,12 +87,12 @@ export async function makeSelectedOperation(opID) {
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
   window.map.fire(
-    "wasabeeUIUpdate",
+    "wasabee:uiupdate",
     { reason: "makeSelectedOperation" },
     false
   );
   window.map.fire(
-    "wasabeeCrosslinks",
+    "wasabee:crosslinks",
     { reason: "makeSelectedOperation" },
     false
   );

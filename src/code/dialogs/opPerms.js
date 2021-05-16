@@ -18,13 +18,13 @@ const OpPermList = WDialog.extend({
     } else {
       this._me = null;
     }
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate", this.update, this);
 
     this._displayDialog();
   },
 
   removeHooks: function () {
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate", this.update, this);
     WDialog.prototype.removeHooks.call(this);
   },
 
@@ -87,7 +87,7 @@ const OpPermList = WDialog.extend({
       L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
         this.addPerm(teamMenu.value, permMenu.value, +zoneMenu.value); // async, but no need to await
-        // addPerm calls wasabeeUIUpdate, which redraws the screen
+        // addPerm calls wasabee:uiupdate, which redraws the screen
       });
     }
 
@@ -152,7 +152,7 @@ const OpPermList = WDialog.extend({
             link.textContent = value;
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              this.delPerm(obj); // calls wasabeeUIUpdate -- async but no need to await
+              this.delPerm(obj); // calls wasabee:uiupdate -- async but no need to await
             });
           }
         },
@@ -173,7 +173,7 @@ const OpPermList = WDialog.extend({
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
         console.debug("not adding duplicate permission");
-        window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
+        window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
         return;
       }
     }
@@ -183,7 +183,7 @@ const OpPermList = WDialog.extend({
       // add locally for display
       operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
       await operation.store();
-      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
+      window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
       alert(e.toString());
@@ -207,7 +207,7 @@ const OpPermList = WDialog.extend({
       }
       operation.teamlist = n;
       await operation.store();
-      window.map.fire("wasabeeUIUpdate", { reason: "opPerms" }, false);
+      window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
     } catch (e) {
       console.error(e);
       alert(e);

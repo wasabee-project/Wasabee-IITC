@@ -23,13 +23,13 @@ const TeamListDialog = WDialog.extend({
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet(true);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate", this.update, this);
   },
 
   update: async function () {
@@ -68,7 +68,7 @@ const TeamListDialog = WDialog.extend({
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
             window.map.fire(
-              "wasabeeDkeys",
+              "wasabee:defensivekeys",
               { reason: "teamListDialog" },
               false
             );
@@ -87,7 +87,7 @@ const TeamListDialog = WDialog.extend({
           link.onclick = () => {
             this.toggleShareWD(obj.ID, curshare);
             window.map.fire(
-              "wasabeeDkeys",
+              "wasabee:defensivekeys",
               { reason: "teamListDialog" },
               false
             );
@@ -106,7 +106,7 @@ const TeamListDialog = WDialog.extend({
           link.onclick = () => {
             this.toggleLoadWD(obj.ID, curload);
             window.map.fire(
-              "wasabeeDkeys",
+              "wasabee:defensivekeys",
               { reason: "teamListDialog" },
               false
             );
@@ -133,7 +133,7 @@ const TeamListDialog = WDialog.extend({
                     await leaveTeamPromise(obj.ID);
                     await WasabeeMe.waitGet(true);
                     window.map.fire(
-                      "wasabeeDkeys",
+                      "wasabee:defensivekeys",
                       { reason: "teamListDialog" },
                       false
                     );

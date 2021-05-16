@@ -17,7 +17,7 @@ const SettingsDialog = WDialog.extend({
   addHooks: function () {
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate", this.update, this);
     // put any per-open setup here
     // this is the call to actually do our work
     if (this._smallScreen) {
@@ -29,7 +29,7 @@ const SettingsDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate", this.update, this);
   },
 
   update: function () {
@@ -88,7 +88,7 @@ const SettingsDialog = WDialog.extend({
       () => {
         addButtons();
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "settings dialog" },
           false
         );
