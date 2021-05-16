@@ -867,7 +867,11 @@ export default class WasabeeOp {
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.map.fire("wasabee:crosslinks", { reason: "op runCrosslinks" }, false);
+    window.map.fire(
+      "wasabee:crosslinks",
+      { reason: "op runCrosslinks" },
+      false
+    );
   }
 
   startBatchMode() {
