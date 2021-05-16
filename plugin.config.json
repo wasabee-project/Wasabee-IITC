@@ -17,7 +17,7 @@
             "category": "Draw",
             "include": "https://intel.ingress.com/*",
             "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-            "version": "0.19.BUILDDATE",
+            "version": "0.20.BUILDDATE",
 	    "grant": "none"
         }
     },
