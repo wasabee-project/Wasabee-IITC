@@ -22,7 +22,7 @@ const MarkerList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-    window.map.on("wasabeeUIUpdate", this.markerListUpdate, this);
+    window.map.on("wasabee:uiupdate", this.markerListUpdate, this);
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
@@ -30,7 +30,7 @@ const MarkerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.markerListUpdate, this);
+    window.map.off("wasabee:uiupdate", this.markerListUpdate, this);
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },

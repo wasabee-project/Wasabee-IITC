@@ -125,7 +125,7 @@ export default class WasabeeMe {
         alert(e.toString());
         me = null;
       }
-      window.map.fire("wasabeeUIUpdate", { reason: "me waitGet" }, false);
+      window.map.fire("wasabee:uiupdate", { reason: "me waitGet" }, false);
     }
     return me;
   }
@@ -143,7 +143,7 @@ export default class WasabeeMe {
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
-    window.map.fire("wasabeeUIUpdate", { reason: "me purge" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "me purge" }, false);
   }
 
   teamJoined(teamID) {

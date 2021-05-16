@@ -29,13 +29,13 @@ const ManageTeamDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate", this.update, this);
   },
 
   _setupTable: function () {
