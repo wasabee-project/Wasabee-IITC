@@ -75,7 +75,7 @@ const ManageTeamDialog = WDialog.extend({
                       squadDialog.inputField.value
                     );
                     window.map.fire(
-                      "wasabeeUIUpdate",
+                      "wasabee:uiupdate",
                       { reason: "manageTeamDialog" },
                       false
                     );
@@ -117,7 +117,7 @@ const ManageTeamDialog = WDialog.extend({
                   console.error(e);
                 }
                 window.map.fire(
-                  "wasabeeUIUpdate",
+                  "wasabee:uiupdate",
                   { reason: "manageTeamDialog" },
                   false
                 );
@@ -175,7 +175,7 @@ const ManageTeamDialog = WDialog.extend({
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
         alert(wX("ADD_SUCC_INSTR"));
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "manageTeamDialog" },
           false
         );
@@ -199,7 +199,7 @@ const ManageTeamDialog = WDialog.extend({
         alert(`renamed to ${renameField.value}`);
         this.options.team.Name = renameField.value; // for display
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "manageTeamDialog" },
           false
         );
@@ -235,7 +235,7 @@ const ManageTeamDialog = WDialog.extend({
         this.options.team.RocksComm = rockscommField.value; // for display
         this.options.team.RocksKey = rocksapiField.value; // for display
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "manageTeamDialog" },
           false
         );
@@ -260,7 +260,7 @@ const ManageTeamDialog = WDialog.extend({
         await deleteJoinLinkPromise(this.options.team.ID);
         this.options.team.JoinLinkToken = "";
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "manageTeamDialog" },
           false
         );
@@ -275,7 +275,7 @@ const ManageTeamDialog = WDialog.extend({
         const j = JSON.parse(response);
         this.options.team.JoinLinkToken = j.Key;
         window.map.fire(
-          "wasabeeUIUpdate",
+          "wasabee:uiupdate",
           { reason: "manageTeamDialog" },
           false
         );
