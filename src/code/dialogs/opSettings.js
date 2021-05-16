@@ -80,7 +80,7 @@ const OpSettingDialog = WDialog.extend({
           so.name = input.value;
           so.localchanged = true;
           await so.store();
-          window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
+          window.map.fire("wasabee:uiupdate", { reason: "opSetting" }, false);
         }
       });
     } else {
@@ -102,7 +102,7 @@ const OpSettingDialog = WDialog.extend({
         so.localchanged = true;
         await so.store();
         addToColorList(picker.value);
-        window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
+        window.map.fire("wasabee:uiupdate", { reason: "opSetting" }, false);
       });
     }
 
