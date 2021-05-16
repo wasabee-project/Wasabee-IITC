@@ -73,10 +73,12 @@ window.plugin.wasabee.init = async () => {
   Wasabee.linkLayerGroup = new L.LayerGroup();
   Wasabee.markerLayerGroup = new L.LayerGroup();
   Wasabee.agentLayerGroup = new L.LayerGroup();
+  Wasabee.zoneLayerGroup = new L.LayerGroup();
   window.addLayerGroup("Wasabee Draw Portals", Wasabee.portalLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
+  window.addLayerGroup("Wasabee Zones", Wasabee.zoneLayerGroup, true);
 
   Wasabee.backgroundOpsGroup = new L.LayerGroup();
   window.addLayerGroup(
@@ -150,7 +152,8 @@ window.plugin.wasabee.init = async () => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
-      obj.layer === Wasabee.markerLayerGroup
+      obj.layer === Wasabee.markerLayerGroup ||
+      obj.layer === Wasabee.zoneLayerGroup
     ) {
       drawMap();
     }
@@ -163,7 +166,8 @@ window.plugin.wasabee.init = async () => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
-      obj.layer === Wasabee.markerLayerGroup
+      obj.layer === Wasabee.markerLayerGroup ||
+      obj.layer === Wasabee.zoneLayerGroup
     ) {
       obj.layer.clearLayers();
     }
