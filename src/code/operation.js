@@ -866,12 +866,12 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "op update" }, false);
   }
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.map.fire("wasabeeCrosslinks", { reason: "op runCrosslinks" }, false);
+    window.map.fire("wasabee:crosslinks", { reason: "op runCrosslinks" }, false);
   }
 
   startBatchMode() {

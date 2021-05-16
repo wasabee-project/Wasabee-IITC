@@ -26,8 +26,8 @@ const ImportDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
 
-    window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
-    window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "import" }, false);
+    window.map.fire("wasabee:crosslinks", { reason: "import" }, false);
   },
 
   _displayDialog: function () {

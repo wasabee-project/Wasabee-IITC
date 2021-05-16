@@ -45,12 +45,12 @@ const NewopDialog = WDialog.extend({
             await newop.store();
             await makeSelectedOperation(newop.ID);
             window.map.fire(
-              "wasabeeUIUpdate",
+              "wasabee:uiupdate",
               { reason: "NewopDialog" },
               false
             );
             window.map.fire(
-              "wasabeeCrosslinks",
+              "wasabee:crosslinks",
               { reason: "NewopDialog" },
               false
             );

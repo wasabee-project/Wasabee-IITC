@@ -88,7 +88,7 @@ export function clearAllItems(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllItems();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks", { reason: "clearAllItems" }, false);
     },
   });
   con.enable();
@@ -101,7 +101,7 @@ export function clearAllLinks(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllLinks();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks", { reason: "clearAllItems" }, false);
     },
   });
   con.enable();
@@ -114,7 +114,7 @@ export function clearAllMarkers(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllMarkers();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks", { reason: "clearAllItems" }, false);
     },
   });
   con.enable();
@@ -342,7 +342,7 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.map.fire("wasabeeUIUpdate", { reason: "blockerAutomark" }, false);
+    window.map.fire("wasabee:uiupdate", { reason: "blockerAutomark" }, false);
     return;
   }
 
@@ -447,7 +447,7 @@ export async function fullSync() {
     // change op if the current does not exist anymore
     else if (!ol.includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
-    else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
+    else window.map.fire("wasabee:uiupdate", { reason: "full sync" }, false);
 
     alert(wX("SYNC DONE"));
   } catch (e) {
