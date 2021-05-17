@@ -199,8 +199,8 @@ gulp.task(
 );
 
 // eslint-fix too
-// gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
-gulp.task("format", gulp.series(["prettier"]));
+gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
+// gulp.task("format", gulp.series(["prettier"]));
 
 gulp.task(
   "build-dev",
