@@ -82,7 +82,7 @@ window.plugin.wasabee.init = async () => {
 
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
-    drawAgents(Wasabee._selectedOp);
+    window.map.fire("wasabee:uiupdate:agentlocations");
   });
 
   window.addHook("portalDetailsUpdated", (e) => {
@@ -93,10 +93,21 @@ window.plugin.wasabee.init = async () => {
     });
   });
 
-  window.map.on("wasabee:uiupdate", drawMap);
+  // XXX until we can make the necessary changes, fire all three
+  window.map.on("wasabee:uiupdate", (d) => {
+    window.map.fire("wasabee:uiupdate:buttons");
+    window.map.fire("wasabee:uiupdate:agentlocations");
+    window.map.fire("wasabee:uiupdate:mapdata", d);
+  });
 
+  window.map.on("wasabee:uiupdate:mapdata", drawMap);
+  window.map.on("wasabee:uiupdate:agentlocations", drawAgents);
+
+  // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
-    window.map.fire("wasabee:uiupdate", { reason: "resume" }, false);
+    window.map.fire("wasabee:uiupdate:buttons");
+    window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
+    window.map.fire("wasabee:uiupdate:agentlocations");
     sendLocation();
   });
 
@@ -111,6 +122,8 @@ window.plugin.wasabee.init = async () => {
       drawBackgroundOps();
     }
   });
+
+  window.map.on("wasabee:ui:buttonreset", addButtons);
 
   // Android panes
   const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
@@ -130,7 +143,12 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      window.map.fire("wasabee:uiupdate", { reason: "layeradd" }, false);
+      // just mapdata layers
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "layeradd" },
+        false
+      );
     }
     if (obj.layer === Wasabee.backgroundOpsGroup) {
       drawBackgroundOps();
@@ -159,11 +177,12 @@ window.plugin.wasabee.init = async () => {
   }
 
   // setup UI elements
-  addButtons();
+  window.map.fire("wasabee:ui:buttonreset");
   setupToolbox();
 
-  // draw the UI with the op data for the first time
-  window.map.fire("wasabee:uiupdate", { reason: "startup" }, false);
+  // draw the UI with the op data for the first time -- buttons are fresh, no need to update
+  window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
+  window.map.fire("wasabee:uiupdate:agentlocations");
 
   // run crosslinks
   window.map.fire("wasabee:crosslinks", { reason: "startup" }, false);
@@ -179,7 +198,7 @@ window.plugin.wasabee.init = async () => {
     WasabeeMe.waitGet(true);
 
     // load Wasabee-Defense keys if logged in
-    window.map.fire("wasabeeDkeys", { reason: "startup" }, false);
+    window.map.fire("wasabee:defensivekeys", { reason: "startup" }, false);
   }
 
   window.map.on("wdialog", (dialog) => {

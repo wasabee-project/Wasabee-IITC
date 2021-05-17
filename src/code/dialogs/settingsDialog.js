@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
@@ -86,7 +85,7 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.LANGUAGE_KEY,
       strings,
       () => {
-        addButtons();
+        window.map.fire("wasabee:ui:buttonreset");
         window.map.fire(
           "wasabee:uiupdate",
           { reason: "settings dialog" },

@@ -5,7 +5,7 @@ import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId, newColors } from "./auxiliar";
 import { GetWasabeeServer } from "./server";
-import { addOperation, getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
