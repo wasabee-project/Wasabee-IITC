@@ -14,6 +14,8 @@ export function drawMap() {
   updateAnchors(operation);
   updateMarkers(operation);
   resetLinks(operation);
+  // XXX do not do this here, make a special hook for it, this won't change often
+  resetZones(operation);
 }
 
 // updates all existing markers, adding any that need to be added, removing any that need to be removed
@@ -131,6 +133,14 @@ export function drawBackgroundOp(operation, layerGroup, style) {
 
     const newlink = new L.GeodesicPolyline(latLngs, style);
     newlink.addTo(layerGroup);
+  }
+}
+
+function resetZones(op) {
+  // remove all zones
+  for (const z of op.zones) {
+    console.log(z);
+    // create a new polygon, defined by z.points, in order
   }
 }
 

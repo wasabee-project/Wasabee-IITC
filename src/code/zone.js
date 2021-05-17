@@ -6,7 +6,7 @@ export default class WasabeeZone {
     this.points = [];
 
     if (obj.points) {
-      for (p of obj.points) {
+      for (const p of obj.points) {
         this.points.push(new zonePoint(p));
       }
     }
@@ -17,7 +17,7 @@ export default class WasabeeZone {
       id: Number(this.id),
       name: `${this.name}`,
       color: this.color,
-      points: points,
+      points: this.points,
     };
   }
 }
