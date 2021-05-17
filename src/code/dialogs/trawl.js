@@ -29,6 +29,8 @@ const TrawlerDialog = WDialog.extend({
 
     if (window.plugin.wasabee.tileTrawlQueue)
       delete window.plugin.wasabee.tileTrawlQueue;
+
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 
   _update: function (tiles) {
@@ -322,7 +324,8 @@ const TrawlDialog = WDialog.extend({
   },
 
   _bulkLoad: function (latlngs, mapZoom) {
-    window.addHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
+    this._mapRefreshHook = this.bulkLoadDone.bind(this);
+    window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
 
     if (latlngs.length == 0) return;
     const mdr = window.mapDataRequest;
@@ -369,7 +372,7 @@ const TrawlDialog = WDialog.extend({
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
     alert("bulk data load done");
-    window.removeHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 });
 
