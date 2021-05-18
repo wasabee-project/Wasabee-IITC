@@ -137,7 +137,7 @@ const QuickDrawControl = L.Handler.extend({
     window.addHook("portalSelected", this._portalClickedHook);
 
     // Leaflet format for leaflet DOM event
-    this._map.on("wasabee:uiupdate", this._uiupdate, this);
+    this._map.on("wasabee:uiupdate:mapdata", this._uiupdate, this);
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
   },
@@ -160,7 +160,7 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip = null;
 
     window.removeHook("portalSelected", this._portalClickedHook);
-    this._map.off("wasabee:uiupdate", this._uiupdate, this);
+    this._map.off("wasabee:uiupdate:mapdata", this._uiupdate, this);
     this._map.off("keyup", this._keyUpListener, this);
     this._map.off("mousemove", this._onMouseMove, this);
   },

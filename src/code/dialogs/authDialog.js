@@ -30,7 +30,11 @@ const AuthDialog = WDialog.extend({
     )
       sendLocation();
     this.randomTip();
-    window.map.fire("wasabee:uiupdate", { reason: "authDialog" }, false);
+    window.map.fire(
+      "wasabee:uiupdate:mapdata",
+      { reason: "authDialog" },
+      false
+    );
     window.map.fire("wasabee:defensivekeys", { reason: "authDialog" }, false);
   },
 

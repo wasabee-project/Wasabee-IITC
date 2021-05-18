@@ -26,7 +26,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate", this.checklistUpdate, this);
+    window.map.on("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
@@ -39,7 +39,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate", this.checklistUpdate, this);
+    window.map.off("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);

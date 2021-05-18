@@ -23,13 +23,13 @@ const TeamListDialog = WDialog.extend({
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
     this._me = await WasabeeMe.waitGet(true);
-    window.map.on("wasabee:uiupdate", this.update, this);
+    window.map.on("wasabee:uiupdate:teamdata", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate", this.update, this);
+    window.map.off("wasabee:uiupdate:teamdata", this.update, this);
   },
 
   update: async function () {

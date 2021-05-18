@@ -95,6 +95,8 @@ window.plugin.wasabee.init = async () => {
 
   // XXX until we can make the necessary changes, fire all three
   window.map.on("wasabee:uiupdate", (d) => {
+    console.trace();
+    console.log("old uiupdate called -- redrawing everything");
     window.map.fire("wasabee:uiupdate:buttons");
     window.map.fire("wasabee:uiupdate:agentlocations");
     window.map.fire("wasabee:uiupdate:mapdata", d);

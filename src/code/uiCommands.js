@@ -342,7 +342,11 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.map.fire("wasabee:uiupdate", { reason: "blockerAutomark" }, false);
+    window.map.fire(
+      "wasabee:uiupdate:mapdata",
+      { reason: "blockerAutomark" },
+      false
+    );
     return;
   }
 
@@ -447,7 +451,13 @@ export async function fullSync() {
     // change op if the current does not exist anymore
     else if (!ol.includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
-    else window.map.fire("wasabee:uiupdate", { reason: "full sync" }, false);
+    // XXX do we need a specific call for "op list update"?
+    else
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "full sync" },
+        false
+      );
 
     alert(wX("SYNC DONE"));
   } catch (e) {

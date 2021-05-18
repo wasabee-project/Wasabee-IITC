@@ -5,20 +5,14 @@ import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
 
-// This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
-  // not strictly necessary, but good style
   statics: {
     TYPE: "settings",
   },
 
-  // WDialog is a leaflet L.Handler, which takes add/removeHooks
   addHooks: function () {
-    // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate", this.update, this);
-    // put any per-open setup here
-    // this is the call to actually do our work
+    window.map.on("wasabee:uiupdate:settings", this.update, this);
     if (this._smallScreen) {
       this._displaySmallDialog();
     } else {
@@ -28,7 +22,7 @@ const SettingsDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate", this.update, this);
+    window.map.off("wasabee:uiupdate:settings", this.update, this);
   },
 
   update: function () {
@@ -86,8 +80,11 @@ const SettingsDialog = WDialog.extend({
       strings,
       () => {
         window.map.fire("wasabee:ui:buttonreset");
+        window.map.fire("wasabee:uiupdate:settings");
+        window.map.fire("wasabee:uiupdate:agentlocations");
+        window.map.fire("wasabee:uiupdate:teamdata");
         window.map.fire(
-          "wasabee:uiupdate",
+          "wasabee:uiupdate:mapdata",
           { reason: "settings dialog" },
           false
         );

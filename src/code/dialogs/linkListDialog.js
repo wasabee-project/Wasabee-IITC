@@ -153,13 +153,13 @@ const LinkListDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate", this.updateLinkList, this);
+    window.map.on("wasabee:uiupdate:mapdata", this.updateLinkList, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate", this.updateLinkList, this);
+    window.map.off("wasabee:uiupdate:mapdata", this.updateLinkList, this);
   },
 
   _displayDialog: function () {

@@ -21,7 +21,7 @@ const BlockerList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate", this.blockerlistUpdate, this);
+    window.map.on("wasabee:uiupdate:mapdata", this.blockerlistUpdate, this);
     window.map.on("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
@@ -31,7 +31,7 @@ const BlockerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate", this.blockerlistUpdate, this);
+    window.map.off("wasabee:uiupdate:mapdata", this.blockerlistUpdate, this);
     window.map.off("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
@@ -45,7 +45,11 @@ const BlockerList = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog();
-      window.map.fire("wasabee:uiupdate", { reason: "blockerlist" }, false);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "blockerlist" },
+        false
+      );
     };
     buttons[wX("AUTOMARK")] = () => {
       const operation = getSelectedOperation();
@@ -83,7 +87,7 @@ const BlockerList = WDialog.extend({
     });
   },
 
-  // when the wasabee:uiupdate hook is called from anywhere, update the display data here
+  // when the wasabee:uiupdate:mapdata hook is called from anywhere, update the display data here
   blockerlistUpdate: function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;

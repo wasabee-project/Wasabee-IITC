@@ -45,7 +45,7 @@ const NewopDialog = WDialog.extend({
             await newop.store();
             await makeSelectedOperation(newop.ID);
             window.map.fire(
-              "wasabee:uiupdate",
+              "wasabee:uiupdate:mapdata",
               { reason: "NewopDialog" },
               false
             );
