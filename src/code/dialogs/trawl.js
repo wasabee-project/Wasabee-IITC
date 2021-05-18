@@ -4,14 +4,23 @@ import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 
-const TrawlDialog = WDialog.extend({
+const TrawlerDialog = WDialog.extend({
   statics: {
-    TYPE: "trawl",
+    TYPE: "trawler",
   },
 
-  // WDialog is a leaflet L.Handler, which takes add/removeHooks
+  options: {
+    points: [],
+    zoom: 13,
+    automark: false,
+  },
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+
+    this._mapRefreshHook = this.tileRequestNext.bind(this);
+
+    this._pointTileDataRequest(this.options.points, this.options.zoom);
     this._displayDialog();
   },
 
@@ -20,9 +29,18 @@ const TrawlDialog = WDialog.extend({
 
     if (window.plugin.wasabee.tileTrawlQueue)
       delete window.plugin.wasabee.tileTrawlQueue;
+
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 
-  _displayTrawlerDialog: function (tiles) {
+  _update: function (tiles) {
+    if (this && this.remaining)
+      this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
+  },
+
+  _buildContent: function () {
+    const tiles = window.plugin.wasabee.tileTrawlQueue.size;
+
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
     warning.textContent = wX("TRAWLING", tiles);
@@ -51,6 +69,12 @@ const TrawlDialog = WDialog.extend({
         trawlSelect.value;
     });
 
+    return container;
+  },
+
+  _displayDialog: function () {
+    const content = this._buildContent();
+
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog("close");
@@ -58,7 +82,7 @@ const TrawlDialog = WDialog.extend({
 
     this.createDialog({
       title: wX("TRAWL TITLE"),
-      html: container,
+      html: content,
       width: "auto",
       dialogClass: "trawl",
       buttons: buttons,
@@ -66,9 +90,114 @@ const TrawlDialog = WDialog.extend({
     });
   },
 
-  _updateTrawlerDialog: function (tiles) {
-    if (this && this.remaining)
-      this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
+  // converts lat/lon points to tile names, gets center points of each tile, starts the map moves
+  _pointTileDataRequest: function (latlngs, mapZoom = 13) {
+    if (!localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS])
+      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] = 0;
+
+    if (window.plugin.wasabee.tileTrawlQueue) {
+      console.log("pointTileDataRequest already running");
+      return;
+    }
+
+    if (latlngs.length == 0) return;
+    const dataZoom = window.getDataZoomForMapZoom(mapZoom);
+    const tileParams = window.getMapZoomTileParameters(dataZoom);
+
+    window.mapDataRequest.setStatus("trawling", undefined, -1);
+
+    window.plugin.wasabee.tileTrawlQueue = new Map();
+    for (const ll of latlngs) {
+      // figure out which thile this point is in
+      const x = window.latToTile(ll.lat, tileParams);
+      const y = window.lngToTile(ll.lng, tileParams);
+      // why the hell is this swapped?
+      const tileID = window.pointToTileId(tileParams, y, x);
+      // center point of the tile
+      const tilePoint = L.latLng([
+        Number(window.tileToLat(x, tileParams).toFixed(6)),
+        Number(window.tileToLng(y, tileParams).toFixed(6)),
+      ]);
+      // map so no duplicate tiles are requested
+      window.plugin.wasabee.tileTrawlQueue.set(
+        tileID,
+        JSON.stringify(tilePoint)
+      );
+    }
+
+    // setup listener
+    window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
+    // dive in
+    window.map.setZoom(mapZoom);
+    // this is async
+    this.tileRequestNext();
+  },
+
+  tileRequestNext: function () {
+    if (!window.plugin.wasabee.tileTrawlQueue) {
+      window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
+      return;
+    }
+
+    // first things, remove any from the list we already know about
+    for (const cached of Object.keys(window.mapDataRequest.cache._cache)) {
+      if (window.plugin.wasabee.tileTrawlQueue.has(cached)) {
+        window.plugin.wasabee.tileTrawlQueue.delete(cached);
+      }
+    }
+
+    // look at the remaining
+    const tiles = window.plugin.wasabee.tileTrawlQueue.keys();
+
+    let toSkip = Number(
+      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
+    );
+
+    let current = tiles.next().value;
+
+    // probably not needed now
+    while (current && window.mapDataRequest.cache.get(current)) {
+      console.log("removing in cache check 2", current);
+      window.plugin.wasabee.tileTrawlQueue.delete(current);
+      current = tiles.next().value;
+      if (toSkip > 0) toSkip--;
+    }
+
+    // skip the number requested by the user, helpful for large screens
+    while (current && toSkip > 0) {
+      window.plugin.wasabee.tileTrawlQueue.delete(current);
+      current = tiles.next().value;
+      toSkip--;
+    }
+
+    if (current) {
+      const point = JSON.parse(
+        window.plugin.wasabee.tileTrawlQueue.get(current)
+      );
+      window.plugin.wasabee.tileTrawlQueue.delete(current);
+      window.map.panTo(point, { duration: 0.25, animate: true });
+      this._update(window.plugin.wasabee.tileTrawlQueue.size);
+      return;
+    }
+
+    // fell off the end without moving the map, must be done
+    delete window.plugin.wasabee.tileTrawlQueue;
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
+    if (this.options.automark) blockerAutomark(getSelectedOperation());
+    this.closeDialog();
+    alert("trawl done");
+  },
+});
+
+const TrawlDialog = WDialog.extend({
+  statics: {
+    TYPE: "trawl",
+  },
+
+  // WDialog is a leaflet L.Handler, which takes add/removeHooks
+  addHooks: function () {
+    WDialog.prototype.addHooks.call(this);
+    this._displayDialog();
   },
 
   // define our work in _displayDialog
@@ -102,10 +231,13 @@ const TrawlDialog = WDialog.extend({
       if (clearMarkers.checked == true) this._clearMarkers();
       op.blockers = Array();
       const points = this._getTrawlPoints();
-      this._pointTileDataRequest(points, 13);
-      const tiles = window.plugin.wasabee.tileTrawlQueue.size;
+      const td = new TrawlerDialog({
+        points: points,
+        zoom: 13,
+        automark: this.automark.checked,
+      });
+      td.enable();
       this.closeDialog();
-      this._displayTrawlerDialog(tiles);
     });
 
     const crazyWarning = L.DomUtil.create("h4", null, container);
@@ -177,107 +309,6 @@ const TrawlDialog = WDialog.extend({
     return points;
   },
 
-  // converts lat/lon points to tile names, gets center points of each tile, starts the map moves
-  _pointTileDataRequest: function (latlngs, mapZoom = 13) {
-    if (!localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS])
-      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS] = 0;
-
-    if (window.plugin.wasabee.tileTrawlQueue) {
-      console.log("pointTileDataRequest already running");
-      return;
-    }
-
-    if (latlngs.length == 0) return;
-    const dataZoom = window.getDataZoomForMapZoom(mapZoom);
-    const tileParams = window.getMapZoomTileParameters(dataZoom);
-
-    window.mapDataRequest.setStatus("trawling", undefined, -1);
-
-    window.plugin.wasabee.tileTrawlQueue = new Map();
-    for (const ll of latlngs) {
-      // figure out which thile this point is in
-      const x = window.latToTile(ll.lat, tileParams);
-      const y = window.lngToTile(ll.lng, tileParams);
-      // why the hell is this swapped?
-      const tileID = window.pointToTileId(tileParams, y, x);
-      // center point of the tile
-      const tilePoint = L.latLng([
-        Number(window.tileToLat(x, tileParams).toFixed(6)),
-        Number(window.tileToLng(y, tileParams).toFixed(6)),
-      ]);
-      // map so no duplicate tiles are requested
-      window.plugin.wasabee.tileTrawlQueue.set(
-        tileID,
-        JSON.stringify(tilePoint)
-      );
-    }
-
-    // setup listener
-    window.addHook("mapDataRefreshEnd", () => this.tileRequestNext.call(this));
-    // dive in
-    window.map.setZoom(mapZoom);
-    // this is async
-    this.tileRequestNext();
-  },
-
-  tileRequestNext: function () {
-    if (!window.plugin.wasabee.tileTrawlQueue) {
-      window.removeHook("mapDataRefreshEnd", () =>
-        this.tileRequestNext.call(this)
-      );
-      return;
-    }
-
-    // first things, remove any from the list we already know about
-    for (const cached of Object.keys(window.mapDataRequest.cache._cache)) {
-      if (window.plugin.wasabee.tileTrawlQueue.has(cached)) {
-        window.plugin.wasabee.tileTrawlQueue.delete(cached);
-      }
-    }
-
-    // look at the remaining
-    const tiles = window.plugin.wasabee.tileTrawlQueue.keys();
-
-    let toSkip = Number(
-      localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
-    );
-
-    let current = tiles.next().value;
-
-    // probably not needed now
-    while (current && window.mapDataRequest.cache.get(current)) {
-      console.log("removing in cache check 2", current);
-      window.plugin.wasabee.tileTrawlQueue.delete(current);
-      current = tiles.next().value;
-      if (toSkip > 0) toSkip--;
-    }
-
-    // skip the number requested by the user, helpful for large screens
-    while (current && toSkip > 0) {
-      window.plugin.wasabee.tileTrawlQueue.delete(current);
-      current = tiles.next().value;
-      toSkip--;
-    }
-
-    if (current) {
-      const point = JSON.parse(
-        window.plugin.wasabee.tileTrawlQueue.get(current)
-      );
-      window.plugin.wasabee.tileTrawlQueue.delete(current);
-      window.map.panTo(point, { duration: 0.25, animate: true });
-      this._updateTrawlerDialog(window.plugin.wasabee.tileTrawlQueue.size);
-      return;
-    }
-
-    // fell off the end without moving the map, must be done
-    delete window.plugin.wasabee.tileTrawlQueue;
-    window.removeHook("mapDataRefreshEnd", () =>
-      this.tileRequestNext.call(this)
-    );
-    if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
-    alert("trawl done");
-  },
-
   _clearMarkers: function () {
     const operation = getSelectedOperation();
 
@@ -293,7 +324,8 @@ const TrawlDialog = WDialog.extend({
   },
 
   _bulkLoad: function (latlngs, mapZoom) {
-    window.addHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
+    this._mapRefreshHook = this.bulkLoadDone.bind(this);
+    window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
 
     if (latlngs.length == 0) return;
     const mdr = window.mapDataRequest;
@@ -340,7 +372,7 @@ const TrawlDialog = WDialog.extend({
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
     alert("bulk data load done");
-    window.removeHook("mapDataRefreshEnd", () => this.bulkLoadDone.call(this));
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 });
 
