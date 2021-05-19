@@ -189,6 +189,11 @@ const LinkListDialog = WDialog.extend({
       type: "link",
       callback: () => {
         operation.removeLink(link.fromPortalId, link.toPortalId);
+        window.map.fire(
+          "wasabee:uiupdate:mapdata",
+          { reason: "deleteLink" },
+          false
+        );
       },
     });
     con.enable();

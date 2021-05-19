@@ -85,6 +85,7 @@ const ManageTeamDialog = WDialog.extend({
                 } else {
                   alert(wX("INPUT_SQUAD_NAME"));
                 }
+                window.map.fire("wasabee:uiupdate:teamdata");
               },
               current: value,
               placeholder: "boots",
@@ -277,6 +278,7 @@ const ManageTeamDialog = WDialog.extend({
             console.error(e);
             alert(e.toString());
           }
+          window.map.fire("wasabee:uiupdate:teamdata");
         },
       });
       cd.enable();

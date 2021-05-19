@@ -221,6 +221,7 @@ const OpSettingDialog = WDialog.extend({
           ) {
             window.map.fitBounds(mbr);
           }
+          // changeOpIfNeeded fires all the required UI events
         },
       });
       con.enable();

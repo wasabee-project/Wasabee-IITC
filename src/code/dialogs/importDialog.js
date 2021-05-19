@@ -25,9 +25,6 @@ const ImportDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "import" }, false);
-    window.map.fire("wasabee:crosslinks", { reason: "import" }, false);
   },
 
   _displayDialog: function () {
@@ -50,6 +47,8 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
+      window.map.fire("wasabee:uiupdate:mapdata", { reason: "import" }, false);
+      window.map.fire("wasabee:crosslinks", { reason: "import" }, false);
       this.closeDialog();
     };
     buttons[wX("GET DT")] = () => {
