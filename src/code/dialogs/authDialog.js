@@ -173,6 +173,7 @@ const AuthDialog = WDialog.extend({
             this._server.textContent = GetWasabeeServer();
             WasabeeMe.purge();
           }
+          window.map.fire("wasabee:uiupdate:buttons");
         },
         placeholder: GetWasabeeServer(),
       });
@@ -205,6 +206,7 @@ const AuthDialog = WDialog.extend({
               alert(e.toString());
             }
           }
+          window.map.fire("wasabee:uiupdate:buttons");
         },
         placeholder: "smurf-tears-4twn",
       });

@@ -25,23 +25,18 @@ const PromptDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    // could be either -- maybe more
-    window.map.fire("wasabee:uiupdate:teamdata");
-    window.map.fire(
-      "wasabee:uiupdate:mapdata",
-      { reason: "PromptDialogClose" },
-      false
-    );
   },
 
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
       if (this.options.callback) this.options.callback();
+      // callback must fire appropriate ui update events
       this.closeDialog();
     };
     buttons[wX("CANCEL")] = () => {
       if (this.options.cancelCallback) this.options.cancelCallback();
+      // cancelCallback must fire appropriate ui update events
       this.closeDialog();
     };
 

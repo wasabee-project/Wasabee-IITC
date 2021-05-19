@@ -79,6 +79,7 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.LANGUAGE_KEY,
       strings,
       () => {
+        // update everything -- if for no other reason than to provide a means for users to force-update everything
         window.map.fire("wasabee:ui:buttonreset");
         window.map.fire("wasabee:uiupdate:settings");
         window.map.fire("wasabee:uiupdate:agentlocations");
@@ -198,6 +199,9 @@ const SettingsDialog = WDialog.extend({
         if (serverDialog.inputField.value) {
           SetWasabeeServer(serverDialog.inputField.value);
           WasabeeMe.purge();
+          window.map.fire("wasabee:uiupdate:buttons");
+          window.map.fire("wasabee:uiupdate:teamdata");
+          window.map.fire("wasabee:uiupdate:agentlocations");
         }
       },
       placeholder: GetWasabeeServer(),

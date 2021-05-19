@@ -74,7 +74,6 @@ const ManageTeamDialog = WDialog.extend({
                       this.options.team.ID,
                       squadDialog.inputField.value
                     );
-                    window.map.fire("wasabee:uiupdate:teamdata");
                     alert(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );

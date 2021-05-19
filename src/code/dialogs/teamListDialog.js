@@ -189,11 +189,12 @@ const TeamListDialog = WDialog.extend({
           try {
             await newTeamPromise(newname);
             alert(wX("TEAM_CREATED", { teamName: newname }));
-            await WasabeeMe.waitGet(true); // triggers UIUpdate
+            await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
             alert(e.toString());
           }
+          window.map.fire("wasabee:uiupdate:teamdata");
         },
         current: wX("NEW_TEAM_NAME"),
         placeholder: wX("AMAZ_TEAM_NAME"),
