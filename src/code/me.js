@@ -125,12 +125,10 @@ export default class WasabeeMe {
         alert(e.toString());
         me = null;
       }
-      window.map.fire(
-        "wasabee:uiupdate:buttons",
-        { reason: "me waitGet" },
-        false
-      );
     }
+    // take care of this in the caller
+    // window.map.fire("wasabee:uiupdate:buttons");
+    // window.map.fire("wasabee:uiupdate:teamdata");
     return me;
   }
 
@@ -147,7 +145,9 @@ export default class WasabeeMe {
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
-    window.map.fire("wasabee:uiupdate:buttons", { reason: "me purge" }, false);
+    // take care of this in the caller
+    // window.map.fire("wasabee:uiupdate:buttons");
+    // window.map.fire("wasabee:uiupdate:teamdata");
   }
 
   teamJoined(teamID) {
