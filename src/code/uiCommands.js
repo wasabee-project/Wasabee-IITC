@@ -492,10 +492,12 @@ export async function fullSync() {
         { reason: "full sync" },
         false
       );
+    window.map.fire("wasabee:uiupdate:teamdata"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
+    window.map.fire("wasabee:uiupdate:buttons"); // revert to logged-out view
     new AuthDialog().enable();
   }
 }

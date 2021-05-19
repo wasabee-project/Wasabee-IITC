@@ -196,8 +196,8 @@ window.plugin.wasabee.init = async () => {
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
-    // this updates the UI
     WasabeeMe.waitGet(true);
+    window.map.fire("wasabee:uiupdate:buttons");
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys", { reason: "startup" }, false);
