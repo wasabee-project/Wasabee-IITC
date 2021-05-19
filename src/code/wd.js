@@ -14,11 +14,11 @@ export function initWasabeeD() {
   );
 
   // hook called in init.js after load
-  window.map.on("wasabeeDkeys", drawWasabeeDkeys);
+  window.map.on("wasabee:defensivekeys", drawWasabeeDkeys);
 
   window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.defensiveLayers) {
-      window.map.fire("wasabeeDkeys", { reason: "init D" }, false);
+      window.map.fire("wasabee:defensivekeys", { reason: "init D" }, false);
     }
   });
 

@@ -24,13 +24,13 @@ const OpSettingDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
   },
 
   _displayDialog: function () {
@@ -80,7 +80,11 @@ const OpSettingDialog = WDialog.extend({
           so.name = input.value;
           so.localchanged = true;
           await so.store();
-          window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
+          window.map.fire(
+            "wasabee:uiupdate:mapdata",
+            { reason: "opSetting" },
+            false
+          );
         }
       });
     } else {
@@ -102,7 +106,11 @@ const OpSettingDialog = WDialog.extend({
         so.localchanged = true;
         await so.store();
         addToColorList(picker.value);
-        window.map.fire("wasabeeUIUpdate", { reason: "opSetting" }, false);
+        window.map.fire(
+          "wasabee:uiupdate:mapdata",
+          { reason: "opSetting" },
+          false
+        );
       });
     }
 
@@ -213,6 +221,7 @@ const OpSettingDialog = WDialog.extend({
           ) {
             window.map.fitBounds(mbr);
           }
+          // changeOpIfNeeded fires all the required UI events
         },
       });
       con.enable();

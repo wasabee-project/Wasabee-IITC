@@ -30,8 +30,6 @@ const AuthDialog = WDialog.extend({
     )
       sendLocation();
     this.randomTip();
-    window.map.fire("wasabeeUIUpdate", { reason: "authDialog" }, false);
-    window.map.fire("wasabeeDkeys", { reason: "authDialog" }, false);
   },
 
   randomTip: function () {
@@ -149,6 +147,8 @@ const AuthDialog = WDialog.extend({
           console.error(e);
           alert(e.toString());
         }
+        window.map.fire("wasabee:uiupdate:buttons");
+        window.map.fire("wasabee:defensivekeys");
       });
     }
 
@@ -169,6 +169,8 @@ const AuthDialog = WDialog.extend({
             this._server.textContent = GetWasabeeServer();
             WasabeeMe.purge();
           }
+          window.map.fire("wasabee:uiupdate:buttons");
+          window.map.fire("wasabee:defensivekeys");
         },
         placeholder: GetWasabeeServer(),
       });
@@ -201,6 +203,8 @@ const AuthDialog = WDialog.extend({
               alert(e.toString());
             }
           }
+          window.map.fire("wasabee:uiupdate:buttons");
+          window.map.fire("wasabee:defensivekeys");
         },
         placeholder: "smurf-tears-4twn",
       });
@@ -261,7 +265,7 @@ const AuthDialog = WDialog.extend({
               const newme = new WasabeeMe(r);
               newme.store();
               this.closeDialog();
-              fullSync();
+              fullSync(); // draws map and teams
               setIntelID(
                 window.PLAYER.nickname,
                 window.PLAYER.team,
@@ -284,6 +288,7 @@ const AuthDialog = WDialog.extend({
           console.log(err);
           alert(err);
         }
+        window.map.fire("wasabee:uiupdate:buttons");
         return;
       }
       try {
@@ -291,7 +296,7 @@ const AuthDialog = WDialog.extend({
         const newme = new WasabeeMe(r);
         newme.store();
         this.closeDialog();
-        fullSync();
+        fullSync(); // draws map and teams
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
         setIntelID(
           window.PLAYER.nickname,
@@ -304,6 +309,7 @@ const AuthDialog = WDialog.extend({
         alert(e.toString());
         this.closeDialog();
       }
+      window.map.fire("wasabee:uiupdate:buttons");
     });
   },
 

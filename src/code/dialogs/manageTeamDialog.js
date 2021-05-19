@@ -29,13 +29,13 @@ const ManageTeamDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:uiupdate:teamdata", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate:teamdata", this.update, this);
   },
 
   _setupTable: function () {
@@ -74,11 +74,6 @@ const ManageTeamDialog = WDialog.extend({
                       this.options.team.ID,
                       squadDialog.inputField.value
                     );
-                    window.map.fire(
-                      "wasabeeUIUpdate",
-                      { reason: "manageTeamDialog" },
-                      false
-                    );
                     alert(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
@@ -89,6 +84,7 @@ const ManageTeamDialog = WDialog.extend({
                 } else {
                   alert(wX("INPUT_SQUAD_NAME"));
                 }
+                window.map.fire("wasabee:uiupdate:teamdata");
               },
               current: value,
               placeholder: "boots",
@@ -116,11 +112,7 @@ const ManageTeamDialog = WDialog.extend({
                 } catch (e) {
                   console.error(e);
                 }
-                window.map.fire(
-                  "wasabeeUIUpdate",
-                  { reason: "manageTeamDialog" },
-                  false
-                );
+                window.map.fire("wasabee:uiupdate:teamdata");
               },
             });
             con.enable();
@@ -174,11 +166,7 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
         alert(wX("ADD_SUCC_INSTR"));
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "manageTeamDialog" },
-          false
-        );
+        window.map.fire("wasabee:uiupdate:teamdata");
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -198,11 +186,7 @@ const ManageTeamDialog = WDialog.extend({
         await renameTeamPromise(this.options.team.ID, renameField.value);
         alert(`renamed to ${renameField.value}`);
         this.options.team.Name = renameField.value; // for display
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "manageTeamDialog" },
-          false
-        );
+        window.map.fire("wasabee:uiupdate:teamdata");
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -234,11 +218,7 @@ const ManageTeamDialog = WDialog.extend({
         alert("updated rocks info");
         this.options.team.RocksComm = rockscommField.value; // for display
         this.options.team.RocksKey = rocksapiField.value; // for display
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "manageTeamDialog" },
-          false
-        );
+        window.map.fire("wasabee:uiupdate:teamdata");
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -259,11 +239,7 @@ const ManageTeamDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         await deleteJoinLinkPromise(this.options.team.ID);
         this.options.team.JoinLinkToken = "";
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "manageTeamDialog" },
-          false
-        );
+        window.map.fire("wasabee:uiupdate:teamdata");
       });
     } else {
       L.DomUtil.create("span", null, container).textContent = "not set";
@@ -274,11 +250,7 @@ const ManageTeamDialog = WDialog.extend({
         const response = await createJoinLinkPromise(this.options.team.ID);
         const j = JSON.parse(response);
         this.options.team.JoinLinkToken = j.Key;
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "manageTeamDialog" },
-          false
-        );
+        window.map.fire("wasabee:uiupdate:teamdata");
       });
     }
 
@@ -305,6 +277,7 @@ const ManageTeamDialog = WDialog.extend({
             console.error(e);
             alert(e.toString());
           }
+          window.map.fire("wasabee:uiupdate:teamdata");
         },
       });
       cd.enable();

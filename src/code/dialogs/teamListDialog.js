@@ -22,19 +22,19 @@ const TeamListDialog = WDialog.extend({
 
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet(true);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    this._me = await WasabeeMe.waitGet(true); // no cache
+    window.map.on("wasabee:uiupdate:teamdata", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:uiupdate:teamdata", this.update, this);
   },
 
   update: async function () {
     if (!this._enabled) return;
-    this._me = await WasabeeMe.waitGet();
+    this._me = await WasabeeMe.waitGet(); // cache is fine -- this can probably be removed
     this.setContent(this._buildContent());
   },
 
@@ -67,11 +67,7 @@ const TeamListDialog = WDialog.extend({
           if (curstate == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleTeam(obj.ID, curstate);
-            window.map.fire(
-              "wasabeeDkeys",
-              { reason: "teamListDialog" },
-              false
-            );
+            window.map.fire("wasabee:uiupdate:teamdata");
           };
         },
       },
@@ -86,11 +82,8 @@ const TeamListDialog = WDialog.extend({
           if (curshare == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleShareWD(obj.ID, curshare);
-            window.map.fire(
-              "wasabeeDkeys",
-              { reason: "teamListDialog" },
-              false
-            );
+            window.map.fire("wasabee:uiupdate:teamdata");
+            window.map.fire("wasabee:defensivekeys");
           };
         },
       },
@@ -105,11 +98,8 @@ const TeamListDialog = WDialog.extend({
           if (curload == "On") L.DomUtil.addClass(link, "enl");
           link.onclick = () => {
             this.toggleLoadWD(obj.ID, curload);
-            window.map.fire(
-              "wasabeeDkeys",
-              { reason: "teamListDialog" },
-              false
-            );
+            window.map.fire("wasabee:uiupdate:teamdata");
+            window.map.fire("wasabee:defensivekeys");
           };
         },
       },
@@ -131,12 +121,9 @@ const TeamListDialog = WDialog.extend({
                 callback: async () => {
                   try {
                     await leaveTeamPromise(obj.ID);
-                    await WasabeeMe.waitGet(true);
-                    window.map.fire(
-                      "wasabeeDkeys",
-                      { reason: "teamListDialog" },
-                      false
-                    );
+                    this._me = await WasabeeMe.waitGet(true);
+                    window.map.fire("wasabee:uiupdate:teamdata");
+                    window.map.fire("wasabee:defensivekeys");
                   } catch (e) {
                     console.error(e);
                   }
@@ -189,11 +176,12 @@ const TeamListDialog = WDialog.extend({
           try {
             await newTeamPromise(newname);
             alert(wX("TEAM_CREATED", { teamName: newname }));
-            await WasabeeMe.waitGet(true); // triggers UIUpdate
+            this._me = await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
             alert(e.toString());
           }
+          window.map.fire("wasabee:uiupdate:teamdata");
         },
         current: wX("NEW_TEAM_NAME"),
         placeholder: wX("AMAZ_TEAM_NAME"),
@@ -216,7 +204,7 @@ const TeamListDialog = WDialog.extend({
     if (currentState == "Off") newState = "On";
     try {
       await SetTeamState(teamID, newState);
-      await WasabeeMe.waitGet(true);
+      this._me = await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
       alert(e.toString());

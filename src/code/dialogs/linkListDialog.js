@@ -153,13 +153,13 @@ const LinkListDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.updateLinkList, this);
+    window.map.on("wasabee:uiupdate:mapdata", this.updateLinkList, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.updateLinkList, this);
+    window.map.off("wasabee:uiupdate:mapdata", this.updateLinkList, this);
   },
 
   _displayDialog: function () {
@@ -189,6 +189,11 @@ const LinkListDialog = WDialog.extend({
       type: "link",
       callback: () => {
         operation.removeLink(link.fromPortalId, link.toPortalId);
+        window.map.fire(
+          "wasabee:uiupdate:mapdata",
+          { reason: "deleteLink" },
+          false
+        );
       },
     });
     con.enable();

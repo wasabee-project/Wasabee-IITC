@@ -5,7 +5,7 @@ import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId, newColors } from "./auxiliar";
 import { GetWasabeeServer } from "./server";
-import { addOperation, getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
@@ -862,12 +862,16 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
+    window.map.fire("wasabee:uiupdate:mapdata", { reason: "op update" }, false);
   }
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.map.fire("wasabeeCrosslinks", { reason: "op runCrosslinks" }, false);
+    window.map.fire(
+      "wasabee:crosslinks",
+      { reason: "op runCrosslinks" },
+      false
+    );
   }
 
   startBatchMode() {

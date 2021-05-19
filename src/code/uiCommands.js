@@ -46,6 +46,11 @@ export function swapPortal(operation, portal) {
     type: "anchor",
     callback: () => {
       operation.swapPortal(portal, selectedPortal);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "swapPortal" },
+        false
+      );
     },
   });
   con.enable();
@@ -61,6 +66,11 @@ export function deletePortal(operation, portal) {
     type: "anchor",
     callback: () => {
       operation.removeAnchor(portal.id);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "deletePortal" },
+        false
+      );
     },
   });
   con.enable();
@@ -76,6 +86,11 @@ export function deleteMarker(operation, marker, portal) {
     type: "marker",
     callback: () => {
       operation.removeMarker(marker);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "deleteMarker" },
+        false
+      );
     },
   });
   con.enable();
@@ -88,7 +103,12 @@ export function clearAllItems(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllItems();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "clearAllItems" },
+        false
+      );
+      window.map.fire("wasabee:crosslinks", { reason: "clearAllItems" }, false);
     },
   });
   con.enable();
@@ -101,7 +121,12 @@ export function clearAllLinks(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllLinks();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "clearAllLinks" },
+        false
+      );
+      window.map.fire("wasabee:crosslinks", { reason: "clearAllLinks" }, false);
     },
   });
   con.enable();
@@ -114,7 +139,16 @@ export function clearAllMarkers(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllMarkers();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "clearAllMarkers" },
+        false
+      );
+      window.map.fire(
+        "wasabee:crosslinks",
+        { reason: "clearAllMarkers" },
+        false
+      );
     },
   });
   con.enable();
@@ -342,7 +376,11 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.map.fire("wasabeeUIUpdate", { reason: "blockerAutomark" }, false);
+    window.map.fire(
+      "wasabee:uiupdate:mapdata",
+      { reason: "blockerAutomark" },
+      false
+    );
     return;
   }
 
@@ -447,11 +485,19 @@ export async function fullSync() {
     // change op if the current does not exist anymore
     else if (!ol.includes(so.ID)) await changeOpIfNeeded();
     // update UI to reflect new ops list
-    else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
+    // XXX do we need a specific call for "op list update"?
+    else
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "full sync" },
+        false
+      );
+    window.map.fire("wasabee:uiupdate:teamdata"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
+    window.map.fire("wasabee:uiupdate:buttons"); // revert to logged-out view
     new AuthDialog().enable();
   }
 }
@@ -479,7 +525,7 @@ export function deleteLocalOp(opname, opid) {
     type: "operation",
     callback: async () => {
       await removeOperation(opid);
-      const newop = await changeOpIfNeeded();
+      const newop = await changeOpIfNeeded(); // fires ui events
       const mbr = newop.mbr;
       if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
         window.map.fitBounds(mbr);

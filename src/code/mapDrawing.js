@@ -23,9 +23,6 @@ function updateMarkers(op) {
     return;
   }
 
-  // this seems to wrongly assume one marker per portal -- or something
-  // XXX TODO find why markers duplicate if too many on one portal
-
   // get a list of every currently drawn marker
   const layerMap = new Map();
   for (const l of Wasabee.markerLayerGroup.getLayers()) {
@@ -44,7 +41,7 @@ function updateMarkers(op) {
       }
       layerMap.delete(m.ID);
     } else {
-      addMarker(m);
+      addMarker(m, op);
     }
   }
 
@@ -56,8 +53,7 @@ function updateMarkers(op) {
 }
 
 /** This function adds a Markers to the target layer group */
-function addMarker(target) {
-  const operation = getSelectedOperation();
+function addMarker(target, operation) {
   const targetPortal = operation.getPortal(target.portalId);
   const marker = L.marker(targetPortal.latLng, {
     title: targetPortal.name,
@@ -383,7 +379,7 @@ function updateAnchors(op) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      addAnchorToMap(a);
+      addAnchorToMap(a, op);
     }
   }
 
@@ -393,8 +389,7 @@ function updateAnchors(op) {
 }
 
 /** This function adds a portal to the portal layer group */
-function addAnchorToMap(portalId) {
-  const operation = getSelectedOperation();
+function addAnchorToMap(portalId, operation) {
   const anchor = new WasabeeAnchor(portalId, operation);
   // use newColors(anchor.color) for 0.19
   let layer = anchor.color;

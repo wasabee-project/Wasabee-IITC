@@ -210,7 +210,7 @@ export const ButtonsControl = L.Control.extend({
     return outerDiv;
   },
 
-  // called when wasabeeUIUpdate fires
+  // called when wasabee:uiupdate:buttons fires
   update: function () {
     for (const b of this.options.buttons.values()) {
       b.Wupdate();
