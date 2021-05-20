@@ -227,7 +227,7 @@
   "SWAP TITLE": "Intercambiar Portales",
   "SWAP WITH": "con",
   "SYNC": "Descargar Operaciones Disponibles",
-  "SYNC DONE": "Descarga Completa",
+  "SYNC DONE": "Descarga Completa <br> <a href='https://github.com/wasabee-project/Wasabee-IITC/wiki/Tips' target='_new'>Haga clic AQUÍ para obtener sugerencias, consejos y documentación.</a>",
   "TARDEST_DIFF": "Los portales objetivo y de destino deben ser diferentes.",
   "TEAMS BUTTON": "Equipos",
   "TEAMS BUTTON TITLE": "Listar Equipos Wasabee",
