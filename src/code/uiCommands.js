@@ -51,6 +51,7 @@ export function swapPortal(operation, portal) {
         { reason: "swapPortal" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
     },
   });
   con.enable();
@@ -71,6 +72,7 @@ export function deletePortal(operation, portal) {
         { reason: "deletePortal" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
     },
   });
   con.enable();
@@ -91,6 +93,7 @@ export function deleteMarker(operation, marker, portal) {
         { reason: "deleteMarker" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
     },
   });
   con.enable();
@@ -108,6 +111,7 @@ export function clearAllItems(operation) {
         { reason: "clearAllItems" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
       window.map.fire("wasabee:crosslinks", { reason: "clearAllItems" }, false);
     },
   });
@@ -126,6 +130,7 @@ export function clearAllLinks(operation) {
         { reason: "clearAllLinks" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
       window.map.fire("wasabee:crosslinks", { reason: "clearAllLinks" }, false);
     },
   });
@@ -144,6 +149,7 @@ export function clearAllMarkers(operation) {
         { reason: "clearAllMarkers" },
         false
       );
+      window.map.fire("wasabee:uiupdate:buttons");
       window.map.fire(
         "wasabee:crosslinks",
         { reason: "clearAllMarkers" },
@@ -381,6 +387,7 @@ export function blockerAutomark(operation, first = true) {
       { reason: "blockerAutomark" },
       false
     );
+    window.map.fire("wasabee:uiupdate:buttons");
     return;
   }
 
