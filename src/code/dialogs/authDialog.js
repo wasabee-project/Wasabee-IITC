@@ -32,16 +32,7 @@ const AuthDialog = WDialog.extend({
     this.randomTip();
   },
 
-  randomTip: function () {
-    const lang = getLanguage();
-    if (!window.plugin.wasabee.static.tips[lang]) return;
-    const tips = window.plugin.wasabee.static.tips[lang];
-    const keys = Object.keys(tips);
-    // XXX use prompt dialog?
-    alert(tips[keys[(keys.length * Math.random()) << 0]]);
-  },
-
-  _displayDialog: function () {
+    _displayDialog: function () {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
       alert(wX("AUTH INCOMPAT"));
