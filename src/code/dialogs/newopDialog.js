@@ -49,11 +49,7 @@ const NewopDialog = WDialog.extend({
               { reason: "NewopDialog" },
               false
             );
-            window.map.fire(
-              "wasabee:crosslinks",
-              { reason: "NewopDialog" },
-              false
-            );
+            window.map.fire("wasabee:crosslinks");
           } else {
             alert(wX("OP_NAME_UNSET"));
           }

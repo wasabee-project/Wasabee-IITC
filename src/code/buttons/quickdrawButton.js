@@ -198,7 +198,7 @@ const QuickDrawControl = L.Handler.extend({
         false
       );
       window.map.fire("wasabee:uiupdate:buttons");
-      window.map.fire("wasabee:crosslinks", { reason: "qd keyup X" }, false);
+      window.map.fire("wasabee:crosslinks");
     }
   },
 

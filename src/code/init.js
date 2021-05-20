@@ -187,7 +187,7 @@ window.plugin.wasabee.init = async () => {
   window.map.fire("wasabee:uiupdate:agentlocations");
 
   // run crosslinks
-  window.map.fire("wasabee:crosslinks", { reason: "startup" }, false);
+  window.map.fire("wasabee:crosslinks");
 
   // draw background ops
   drawBackgroundOps();
