@@ -73,6 +73,7 @@ export function deletePortal(operation, portal) {
         false
       );
       window.map.fire("wasabee:uiupdate:buttons");
+      // window.map.fire("wasabee:crosslinks", { reason: "deletePortal" }, false); -- no point
     },
   });
   con.enable();
@@ -94,6 +95,7 @@ export function deleteMarker(operation, marker, portal) {
         false
       );
       window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:crosslinks", { reason: "deleteMarker" }, false);
     },
   });
   con.enable();
