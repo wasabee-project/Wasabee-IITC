@@ -163,8 +163,8 @@ gulp.task("eslint", (cb) => {
   cb();
 });
 
-gulp.task("eslint-fix", (cb) => {
-  gulp
+gulp.task("eslint-fix", () => {
+  return gulp
     .src([
       "**/*.js",
       "!node_modules/**",
@@ -176,7 +176,6 @@ gulp.task("eslint-fix", (cb) => {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
     .pipe(gulp.dest("."));
-  cb();
 });
 
 gulp.task("prettier", () => {
