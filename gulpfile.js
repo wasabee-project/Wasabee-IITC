@@ -191,14 +191,13 @@ gulp.task("prettier", () => {
     .pipe(gulp.dest("."));
 });
 
-// eslint at the end to catch unused variables, etc
 gulp.task(
   "build",
-  gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"])
+  gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin"])
 );
 
-// eslint-fix too
-gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
+// eslint-fix already formats the file
+gulp.task("format", gulp.series(["eslint-fix"]));
 // gulp.task("format", gulp.series(["prettier"]));
 
 gulp.task(
