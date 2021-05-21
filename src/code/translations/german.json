@@ -78,7 +78,7 @@
   "EXPORT OP TITLE": "Exportiere aktuelle Operation ",
   "EXPORT OP": "Exportiere Op",
   "SYNC": "Download verfügbarer Operationen",
-  "SYNC DONE": "Download abgeschlossen <br> <a href='https://github.com/wasabee-project/Wasabee-IITC/wiki/Tips' target='_new'>Klicken Sie HIER für Hinweise, Tipps und Dokumentation.</a>",
+  "SYNC DONE": "Download abgeschlossen <br> <a href='https://github.com/wasabee-project/Wasabee-IITC/wiki' target='_new'>Klicken Sie HIER für Hinweise, Tipps und Dokumentation.</a>",
   "UPLOAD BUTTON HOVER": "UPLOAD {opName} (aktuell nicht auf dem Server)",
   "UPDATE HOVER NOT CHANGED": "{opName} lokal nicht verändert",
   "UPDATE HOVER": "UPDATE {opName} auf dem Server",
