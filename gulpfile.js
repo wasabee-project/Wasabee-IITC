@@ -11,7 +11,6 @@ const eslint = require("gulp-eslint");
 const del = require("del");
 const webpack = require("webpack");
 const PluginError = require("plugin-error");
-const log = require("fancy-log");
 const prettier = require("gulp-prettier");
 
 const ensureDirectoryExistence = (filePath) => {
@@ -102,16 +101,26 @@ gulp.task("webpack", (callback) => {
     // webpackConfig.optimization.minimize = true;
   }
   webpack(webpackConfig, function (err, stats) {
-    log(
-      "[webpack]",
+    if (err) {
+      throw new PluginError({ plugin: "webpack", message: err });
+    }
+
+    if (stats.hasErrors()) {
+      throw new PluginError({
+        plugin: "webpack",
+        message: stats.toString({
+          // output options
+          colors: true,
+        }),
+      });
+    }
+
+    console.log(
       stats.toString({
         // output options
+        colors: true,
       })
     );
-
-    if (err) {
-      throw new PluginError("webpack", err);
-    }
 
     callback();
   });
