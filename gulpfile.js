@@ -174,8 +174,8 @@ gulp.task("eslint-fix", () => {
     ])
     .pipe(eslint({ fix: true }))
     .pipe(eslint.format())
-    .pipe(eslint.failAfterError())
-    .pipe(gulp.dest("."));
+    .pipe(gulp.dest("."))
+    .pipe(eslint.failAfterError());
 });
 
 gulp.task("prettier", () => {
