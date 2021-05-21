@@ -70,16 +70,16 @@ gulp.task("buildheaders", (cb) => {
   // XXX just append to the version rather than overwriting a fixed string now
   const gbd = () => {
     const d = new Date();
-    let bd = d.getFullYear();
-    let t = ("0" + (d.getMonth() + 1)).substr(-2);
+    let bd = d.getUTCFullYear();
+    let t = ("0" + (d.getUTCMonth() + 1)).substr(-2);
     bd += t;
-    t = ("0" + d.getDate()).substr(-2);
+    t = ("0" + d.getUTCDate()).substr(-2);
     bd += t;
-    t = ("0" + d.getHours()).substr(-2);
+    t = ("0" + d.getUTCHours()).substr(-2);
     bd += t;
-    t = ("0" + d.getMinutes()).substr(-2);
+    t = ("0" + d.getUTCMinutes()).substr(-2);
     bd += t;
-    t = ("0" + d.getSeconds()).substr(-2);
+    t = ("0" + d.getUTCSeconds()).substr(-2);
     bd += t;
     return bd;
   };
