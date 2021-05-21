@@ -136,7 +136,7 @@ const QuickDrawControl = L.Handler.extend({
     };
     window.addHook("portalSelected", this._portalClickedHook);
 
-    this._map.on("wasabee:uiupdate:mapdata", this._uiupdate, this);
+    this._map.on("wasabee:op:select", this._opchange, this);
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
   },
