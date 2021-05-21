@@ -8,7 +8,6 @@ import {
 } from "../server";
 import PromptDialog from "./promptDialog";
 import { sendLocation, fullSync } from "../uiCommands";
-import { wX, getLanguage } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 
