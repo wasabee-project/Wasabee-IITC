@@ -29,7 +29,6 @@ const AuthDialog = WDialog.extend({
       "true"
     )
       sendLocation();
-    this.randomTip();
   },
 
     _displayDialog: function () {
