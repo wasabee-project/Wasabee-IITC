@@ -325,7 +325,7 @@
   "SWAP TITLE": "Déplacer le portail",
   "SWAP WITH": " par ",
   "SWAP": "Déplacer",
-  "SYNC DONE": "Téléchargement terminé",
+  "SYNC DONE": "Téléchargement terminé <br> <a href='https://github.com/wasabee-project/Wasabee-IITC/wiki' target='_new'>Cliquez ICI pour obtenir des conseils, des astuces et de la documentation.</a>",
   "SYNC": "Telecharger les opérations disponibles",
   "TARDEST_DIFF": "La source et la cible doivent etre differentes.",
   "TARGET SENT": "Cible transmise",

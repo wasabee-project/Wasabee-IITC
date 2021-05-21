@@ -104,7 +104,6 @@ W.static.strings.English = require("./translations/english.json");
 W.static.strings.Italiano = require("./translations/italian.json");
 W.static.strings.Tagalog = require("./translations/filipino.json");
 W.static.strings.French = require("./translations/french.json");
-W.static.tips = require("./translations/tips.json");
 
 W.static.markerTypes = new Set([
   W.static.constants.MARKER_TYPE_CAPTURE,

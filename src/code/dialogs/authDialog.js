@@ -8,7 +8,7 @@ import {
 } from "../server";
 import PromptDialog from "./promptDialog";
 import { sendLocation, fullSync } from "../uiCommands";
-import { wX, getLanguage } from "../wX";
+import { wX } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../me";
 
@@ -29,16 +29,6 @@ const AuthDialog = WDialog.extend({
       "true"
     )
       sendLocation();
-    this.randomTip();
-  },
-
-  randomTip: function () {
-    const lang = getLanguage();
-    if (!window.plugin.wasabee.static.tips[lang]) return;
-    const tips = window.plugin.wasabee.static.tips[lang];
-    const keys = Object.keys(tips);
-    // XXX use prompt dialog?
-    alert(tips[keys[(keys.length * Math.random()) << 0]]);
   },
 
   _displayDialog: function () {
