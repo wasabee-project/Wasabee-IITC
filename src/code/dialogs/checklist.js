@@ -31,9 +31,6 @@ const OperationChecklistDialog = WDialog.extend({
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
 
-    const operation = getSelectedOperation();
-    loadFaked(operation);
-
     this._displayDialog();
   },
 
@@ -47,7 +44,13 @@ const OperationChecklistDialog = WDialog.extend({
 
   _displayDialog: async function () {
     const operation = getSelectedOperation();
-    this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
+    loadFaked(operation);
+    this.sortable = this.getListDialogContent(
+      operation,
+      operation.links.concat(operation.markers),
+      0,
+      false
+    ); // defaults to sorting by op order
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -77,6 +80,7 @@ const OperationChecklistDialog = WDialog.extend({
     this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
+      operation.links.concat(operation.markers),
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
@@ -84,12 +88,8 @@ const OperationChecklistDialog = WDialog.extend({
     this.setContent(this.sortable.table);
   },
 
-  getListDialogContent: function (operation, sortBy, sortAsc) {
-    // collapse markers and links into one array.
-    const allThings = operation.links.concat(operation.markers);
-
-    const content = new Sortable();
-    content.fields = [
+  getFields: function (operation) {
+    return [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
         value: (thing) => thing.opOrder,
@@ -268,9 +268,14 @@ const OperationChecklistDialog = WDialog.extend({
         },
       },
     ];
+  },
+
+  getListDialogContent: function (operation, items, sortBy, sortAsc) {
+    const content = new Sortable();
+    content.fields = this.getFields(operation);
     content.sortBy = sortBy;
     content.sortAsc = sortAsc;
-    content.items = allThings;
+    content.items = items;
     return content;
   },
 
