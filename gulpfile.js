@@ -11,7 +11,6 @@ const eslint = require("gulp-eslint");
 const del = require("del");
 const webpack = require("webpack");
 const PluginError = require("plugin-error");
-const log = require("fancy-log");
 const prettier = require("gulp-prettier");
 
 const ensureDirectoryExistence = (filePath) => {
@@ -70,16 +69,16 @@ gulp.task("buildheaders", (cb) => {
   // XXX just append to the version rather than overwriting a fixed string now
   const gbd = () => {
     const d = new Date();
-    let bd = d.getFullYear();
-    let t = ("0" + (d.getMonth() + 1)).substr(-2);
+    let bd = d.getUTCFullYear();
+    let t = ("0" + (d.getUTCMonth() + 1)).substr(-2);
     bd += t;
-    t = ("0" + d.getDate()).substr(-2);
+    t = ("0" + d.getUTCDate()).substr(-2);
     bd += t;
-    t = ("0" + d.getHours()).substr(-2);
+    t = ("0" + d.getUTCHours()).substr(-2);
     bd += t;
-    t = ("0" + d.getMinutes()).substr(-2);
+    t = ("0" + d.getUTCMinutes()).substr(-2);
     bd += t;
-    t = ("0" + d.getSeconds()).substr(-2);
+    t = ("0" + d.getUTCSeconds()).substr(-2);
     bd += t;
     return bd;
   };
@@ -102,16 +101,26 @@ gulp.task("webpack", (callback) => {
     // webpackConfig.optimization.minimize = true;
   }
   webpack(webpackConfig, function (err, stats) {
-    log(
-      "[webpack]",
+    if (err) {
+      throw new PluginError({ plugin: "webpack", message: err });
+    }
+
+    if (stats.hasErrors()) {
+      throw new PluginError({
+        plugin: "webpack",
+        message: stats.toString({
+          // output options
+          colors: true,
+        }),
+      });
+    }
+
+    console.log(
       stats.toString({
         // output options
+        colors: true,
       })
     );
-
-    if (err) {
-      throw new PluginError("webpack", err);
-    }
 
     callback();
   });
@@ -163,8 +172,8 @@ gulp.task("eslint", (cb) => {
   cb();
 });
 
-gulp.task("eslint-fix", (cb) => {
-  gulp
+gulp.task("eslint-fix", () => {
+  return gulp
     .src([
       "**/*.js",
       "!node_modules/**",
@@ -174,9 +183,8 @@ gulp.task("eslint-fix", (cb) => {
     ])
     .pipe(eslint({ fix: true }))
     .pipe(eslint.format())
-    .pipe(eslint.failAfterError())
-    .pipe(gulp.dest("."));
-  cb();
+    .pipe(gulp.dest("."))
+    .pipe(eslint.failAfterError());
 });
 
 gulp.task("prettier", () => {
@@ -192,14 +200,13 @@ gulp.task("prettier", () => {
     .pipe(gulp.dest("."));
 });
 
-// eslint at the end to catch unused variables, etc
 gulp.task(
   "build",
-  gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin", "eslint"])
+  gulp.series(["buildheaders", "buildmeta", "webpack", "buildplugin"])
 );
 
-// eslint-fix too
-gulp.task("format", gulp.series(["prettier", "eslint-fix"]));
+// eslint-fix already formats the file
+gulp.task("format", gulp.series(["eslint-fix"]));
 // gulp.task("format", gulp.series(["prettier"]));
 
 gulp.task(
