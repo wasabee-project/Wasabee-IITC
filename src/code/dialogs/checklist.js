@@ -88,9 +88,8 @@ const OperationChecklistDialog = WDialog.extend({
     this.setContent(this.sortable.table);
   },
 
-  getListDialogContent: function (operation, items, sortBy, sortAsc) {
-    const content = new Sortable();
-    content.fields = [
+  getFields: function (operation) {
+    return [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
         value: (thing) => thing.opOrder,
@@ -269,6 +268,11 @@ const OperationChecklistDialog = WDialog.extend({
         },
       },
     ];
+  },
+
+  getListDialogContent: function (operation, items, sortBy, sortAsc) {
+    const content = new Sortable();
+    content.fields = this.getFields(operation);
     content.sortBy = sortBy;
     content.sortAsc = sortAsc;
     content.items = items;
