@@ -72,8 +72,10 @@
   background-color: #3c9;
 }
 
+/* align verticaly button subactions */
 .wasabee-actions li {
-  display: inline-block;
+  display: block;
+  border-bottom: 1px solid transparent;
 }
 .wasabee-subactions li {
   vertical-align: middle;
@@ -82,9 +84,10 @@
   background-color: rgba(30, 130, 76, 0.66);
   padding-left: 8px;
   padding-right: 8px;
-  width: auto;
   border-left: 1px solid #aaa;
   color: #fff;
+  min-width: 50px;
+  width: auto;
 }
 .wasabee-subactions a:hover {
   background-color: #a0a098;
