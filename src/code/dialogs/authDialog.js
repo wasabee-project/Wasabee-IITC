@@ -31,7 +31,7 @@ const AuthDialog = WDialog.extend({
       sendLocation();
   },
 
-    _displayDialog: function () {
+  _displayDialog: function () {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
       alert(wX("AUTH INCOMPAT"));
