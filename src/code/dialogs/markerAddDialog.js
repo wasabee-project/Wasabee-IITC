@@ -94,7 +94,7 @@ const MarkerAddDialog = WDialog.extend({
     await this.update();
 
     const addMarkerButton = L.DomUtil.create("button", null, content);
-    addMarkerButton.textContent = wX("ADD_MARKER2");
+    addMarkerButton.textContent = wX("ADD");
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
