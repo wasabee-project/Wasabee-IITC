@@ -589,6 +589,8 @@
 .wasabee-dialog-markeradd div.content {
   display: grid;
   grid-template-columns: repeat(2, auto);
+  row-gap: 4px;
+  column-gap: 4px;
 }
 
 .wasabee-dialog-markeradd div.portal {
@@ -596,7 +598,7 @@
 }
 
 .wasabee-dialog-markeradd div.content button {
-  grid-column: 2;
+  grid-column: 1 / span 2;
   border-radius: 35px;
   border-style: groove;
   padding: 4px;
@@ -604,6 +606,10 @@
   cursor: pointer;
   text-align: center;
   text-decoration: underline;
+}
+
+.wasabee-dialog-markeradd div.content input {
+  grid-column: 1 / span 2;
 }
 
 .wasabee-dialog-markerlist {
