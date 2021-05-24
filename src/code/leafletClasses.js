@@ -299,6 +299,7 @@ export const WButton = L.Class.extend({
     );
 
     if (options.text) link.innerHTML = options.text;
+    if (options.html) link.appendChild(options.html);
 
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);
@@ -323,6 +324,7 @@ export const WButton = L.Class.extend({
       this._createButton({
         title: b.title,
         text: b.text,
+        html: b.html,
         buttonImage: b.img,
         container: li,
         callback: b.callback,

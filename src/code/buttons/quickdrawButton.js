@@ -17,18 +17,6 @@ const QuickdrawButton = WButton.extend({
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
-    this.picker = null;
-    this.picker = L.DomUtil.create("input", "", this.button);
-    this.picker.type = "color";
-    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
-    this.picker.style.display = "none";
-    this.picker.setAttribute("list", "wasabee-colors-datalist");
-
-    L.DomEvent.on(this.picker, "change", (ev) => {
-      this.handler._nextDrawnLinksColor = ev.target.value;
-      this.picker.value = ev.target.value;
-    });
-
     this.button = this._createButton({
       title: this.title,
       container: container,
@@ -37,9 +25,19 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     });
 
+    this.picker = L.DomUtil.create("input", "hidden-color-picker");
+    this.picker.type = "color";
+    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
+    this.picker.setAttribute("list", "wasabee-colors-datalist");
+
+    L.DomEvent.on(this.picker, "change", (ev) => {
+      this.handler._nextDrawnLinksColor = ev.target.value;
+    });
+
     this._changeColorSubAction = {
       title: wX("QD BUTTON CHANGE COLOR"),
       text: wX("QD CHANGE COLOR"),
+      html: this.picker,
       callback: () => {
         this.picker.click();
       },
