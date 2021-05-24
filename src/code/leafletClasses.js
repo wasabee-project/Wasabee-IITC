@@ -297,7 +297,7 @@ export const WButton = L.Class.extend({
       options.className || "",
       options.container
     );
-    link.href = "#";
+
     if (options.text) link.innerHTML = options.text;
 
     if (options.buttonImage) {
@@ -310,63 +310,14 @@ export const WButton = L.Class.extend({
       link.title = options.title;
     }
 
-    if (this._isTouch()) {
-      L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
-        .on(link, "touchstart", L.DomEvent.preventDefault)
-        .on(link, "touchstart", this.touchstart, options.context)
-        .on(link, "touchend", this.touchend, options.context)
-        .on(link, "touchmove", this.touchmove, options.context);
-    } else {
-      L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
-        .on(link, "mousedown", L.DomEvent.stopPropagation)
-        .on(link, "dblclick", L.DomEvent.stopPropagation)
-        .on(link, "click", L.DomEvent.preventDefault)
-        .on(link, "click", options.callback, options.context);
-    }
+    L.DomEvent.disableClickPropagation(link);
+    L.DomEvent.on(link, "click", options.callback, options.context);
 
     return link;
   },
 
-  _touches: null,
-
-  touchstart: function (ev) {
-    this._touches = ev.changedTouches[0].target.id;
-    console.log("first touch", this._touches);
-    if (!this._enabled) this.enable();
-  },
-
-  touchend: function (ev) {
-    this._touches = ev.changedTouches[0].target.id;
-    console.log("last touch target", this._touches);
-    if (this._enabled) this.disable();
-  },
-
-  touchmove: function (ev) {
-    if (ev.changedTouches[0].target.id != this._touches) {
-      this._touches = ev.changedTouches[0].target.id;
-      console.log("new touch target", this._touches);
-    }
-  },
-
-  _disposeButton: function (button, callback) {
-    console.log("WButton _disposeButton");
-    L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
-      .off(button, "mousedown", L.DomEvent.stopPropagation)
-      .off(button, "dblclick", L.DomEvent.stopPropagation)
-      .off(button, "click", L.DomEvent.preventDefault)
-      .off(button, "touchstart", L.DomEvent.preventDefault)
-      .off(button, "touchend", L.DomEvent.preventDefault)
-      .off(button, "click", callback);
-  },
-
   _createSubActions: function (buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
-    L.DomEvent.on(container, "touchenter", (ev) => {
-      console.log("touchenter", ev);
-    });
-    L.DomEvent.on(container, "touchleave", (ev) => {
-      console.log("touchleave", ev);
-    });
     for (const b of buttons) {
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
@@ -378,21 +329,7 @@ export const WButton = L.Class.extend({
         context: b.context,
         className: "wasabee-subactions",
       });
-      L.DomEvent.on(li, "touchenter", (ev) => {
-        console.log("touchenter", ev);
-      });
-      L.DomEvent.on(li, "touchleave", (ev) => {
-        console.log("touchleave", ev);
-      });
     }
     return container;
-  },
-
-  _isTouch: function () {
-    /* console.log("mobile", L.Browser.mobile);
-    console.log("touch", L.Browser.touch);
-    console.log("userLocation", window.plugin.userLocation); */
-    // if (L.Browser.mobile && L.Browser.touch) return true;
-    return false;
   },
 });
