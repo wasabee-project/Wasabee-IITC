@@ -11,11 +11,6 @@ import UploadButton from "./buttons/uploadButton";
 export function addButtons() {
   if (window.plugin.wasabee.buttons) {
     console.warn("replacing buttons");
-    window.map.off(
-      "wasabee:uiupdate:buttons",
-      window.plugin.wasabee.buttons.update,
-      window.plugin.wasabee.buttons
-    );
     window.map.removeControl(window.plugin.wasabee.buttons);
     delete window.plugin.wasabee.buttons;
   }
@@ -44,13 +39,6 @@ export function addButtons() {
 
   // start off with a fresh update
   window.plugin.wasabee.buttons.update();
-
-  // listen for UI changes, update buttons that need it
-  window.map.on(
-    "wasabee:uiupdate:buttons",
-    window.plugin.wasabee.buttons.update,
-    window.plugin.wasabee.buttons
-  );
 }
 
 export default addButtons;

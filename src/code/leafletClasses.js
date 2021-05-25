@@ -207,7 +207,13 @@ export const ButtonsControl = L.Control.extend({
     const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
     outerDiv.appendChild(this.options.container);
 
+    window.map.on("wasabee:uiupdate:buttons", this.update, this);
+
     return outerDiv;
+  },
+
+  onRemove: function () {
+    window.map.off("wasabee:uiupdate:buttons", this.update, this);
   },
 
   // called when wasabee:uiupdate:buttons fires
