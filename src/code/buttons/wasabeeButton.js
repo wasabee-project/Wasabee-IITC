@@ -74,9 +74,8 @@ const WasabeeButton = WButton.extend({
           console.error(e);
           alert(e.toString());
         }
-        WasabeeMe.purge(); // does not run the UI updates for us
+        WasabeeMe.purge();
         window.map.fire("wasabee:uiupdate:buttons");
-        window.map.fire("wasabee:uiupdate:teamdata");
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
       },
       context: this,
