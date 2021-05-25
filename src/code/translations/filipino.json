@@ -4,14 +4,12 @@
   "ABOUT WASABEE-IITC": "Tungkol sa Wasabee-IITC",
   "ABOUT_WASABEE": "Tungkol sa Wasabee",
   "acknowledged": "Natanggap",
-  "ADD LINK TITLE": "Magdagdag ng Links Dialog",
+  "ADD LINK TITLE": "Magdagdag ng Links",
   "ADD_LINKS": "Magdagdag ng Link",
-  "ADD MARKER TITLE": "Magdagdag ng Markers Dialog",
-  "ADD_MARKER2": "Magdagdag ng Markers",
+  "ADD MARKER TITLE": "Magdagdag ng Markers",
   "ADD_AGENT": "Magdagdag ng Agent: ",
   "ADD_BL": "Magdagdag ng Back Links: ",
   "ADD_BUTTON_LINKS": "Sabay-sabay idagdag ang lahat ng link",
-  "ADD_LINKS": "Magdagdag ng Links",
   "ADD_MARKER": "Magdagdag ng Marker",
   "ADD_NEW_OP": "Magdagdag ng Bagong Op",
   "ADD_SUCC_INSTR": "Matagumpay na naidagdag, kailangan paganahin ng mga miyembro ng pangkat sa Wasabee website bago it lumabas sa listahan nila",
@@ -298,5 +296,6 @@
   "WRITE": "isulat",
   "WSERVER": "Server: {url}",
   "YES": "Oo",
-  "YESNO_DEL": "Sigurado ka na gusto mo burahin ang {opName}?"
+  "YESNO_DEL": "Sigurado ka na gusto mo burahin ang {opName}?",
+  "ZONE": "Zoned"
 }
