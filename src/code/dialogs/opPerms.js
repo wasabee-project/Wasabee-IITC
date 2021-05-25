@@ -173,7 +173,6 @@ const OpPermList = WDialog.extend({
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
         console.debug("not adding duplicate permission");
-        window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
         return;
       }
     }
