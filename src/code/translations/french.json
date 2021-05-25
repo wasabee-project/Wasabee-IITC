@@ -381,6 +381,7 @@
   "assigned": "Assigné",
   "completed": "Accompli",
   "pending": "En attente",
+  "ZONE": "Zone",
   "smallScreen": {
     "ADD_LINKS": "+ Liens",
     "ADD_MARKER": "+ Marqueur",

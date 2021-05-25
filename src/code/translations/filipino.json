@@ -296,5 +296,6 @@
   "WRITE": "isulat",
   "WSERVER": "Server: {url}",
   "YES": "Oo",
-  "YESNO_DEL": "Sigurado ka na gusto mo burahin ang {opName}?"
+  "YESNO_DEL": "Sigurado ka na gusto mo burahin ang {opName}?",
+  "ZONE": "Zoned"
 }

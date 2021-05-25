@@ -381,6 +381,7 @@
   "ONION": "Disegna",
   "SELECT_ONION_PORTALS": "Strati creati da dentro a fuori. Zooma sul centro e seleziona il portale di inizio, poi zooma indietro sull'area.",
   "MAX_SPLITS": "Più Split possibili",
+  "ZONE": "Area",
   "smallScreen": {
     "LOG IN": "Log In",
     "LOG_OUT": "Log Out",
