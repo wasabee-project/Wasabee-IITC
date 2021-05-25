@@ -422,6 +422,7 @@
     "FAN_FIELD3": "Fan",
     "FANFIELD": "Draw",
     "FANFIELD2": "Draw Fan Field",
-    "MAX": "Fan"
+    "MAX": "Fan",
+    "ZONE": "Zone"
   }
 }

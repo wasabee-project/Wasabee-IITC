@@ -321,6 +321,7 @@
     "FAN_FIELD3": "Fan",
     "FANFIELD": "Dibujar",
     "FANFIELD2": "Dibujar Fan Field",
-    "MAX": "Fan"
+    "MAX": "Fan",
+    "ZONE": "Zona"
   }
 }

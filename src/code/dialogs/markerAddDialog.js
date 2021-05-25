@@ -85,17 +85,17 @@ const MarkerAddDialog = WDialog.extend({
     const content = L.DomUtil.create("div", "content");
     this._portal = L.DomUtil.create("div", "portal", content);
 
-    L.DomUtil.create("label", null, content).textContent = "Type";
+    L.DomUtil.create("label", null, content).textContent = wX("TYPE");
     this._type = L.DomUtil.create("select", null, content);
 
-    L.DomUtil.create("label", null, content).textContent = "Zone";
+    L.DomUtil.create("label", null, content).textContent = wX("ZONE");
     this._zones = L.DomUtil.create("select", null, content);
 
-    L.DomUtil.create("label", null, content).textContent = "Agent";
+    L.DomUtil.create("label", null, content).textContent = wX("AGENT");
     this._assign = L.DomUtil.create("select", null, content);
 
     this._comment = L.DomUtil.create("input", null, content);
-    this._comment.placeholder = "Input comment";
+    this._comment.placeholder = wX("SET_COMMENT");
 
     await this.update();
 
