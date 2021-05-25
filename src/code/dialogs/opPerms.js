@@ -18,13 +18,13 @@ const OpPermList = WDialog.extend({
     } else {
       this._me = null;
     }
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
 
     this._displayDialog();
   },
 
   removeHooks: function () {
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     WDialog.prototype.removeHooks.call(this);
   },
 

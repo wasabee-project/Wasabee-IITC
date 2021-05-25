@@ -15,13 +15,21 @@ const KeyListPortal = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.keyListUpdate, this);
+    window.map.on(
+      "wasabee:op:select wasabee:op:change",
+      this.keyListUpdate,
+      this
+    );
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.keyListUpdate, this);
+    window.map.off(
+      "wasabee:op:select wasabee:op:change",
+      this.keyListUpdate,
+      this
+    );
   },
 
   _displayDialog: function () {

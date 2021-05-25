@@ -10,7 +10,7 @@ const ZoneDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
     if (this._smallScreen) {
       this._displaySmallDialog();
@@ -21,7 +21,7 @@ const ZoneDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:change wasabee:op:select", this.update, this);
   },
 
   update: function () {
@@ -75,8 +75,6 @@ const ZoneDialog = WDialog.extend({
       L.DomEvent.on(nameinput, "change", (ev) => {
         L.DomEvent.stop(ev);
         getSelectedOperation().renameZone(z.id, nameinput.value);
-        window.map.fire("wasabee:uiupdate:mapdata");
-        window.map.fire("wasabee:op:change");
       });
       const commandcell = L.DomUtil.create("td", null, tr);
 
@@ -97,8 +95,6 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.on(del, "click", (ev) => {
           L.DomEvent.stop(ev);
           getSelectedOperation().removeZone(z.id);
-          window.map.fire("wasabee:uiupdate:mapdata");
-          window.map.fire("wasabee:op:change");
         });
       }
     }
@@ -109,8 +105,6 @@ const ZoneDialog = WDialog.extend({
     L.DomEvent.on(add, "click", (ev) => {
       L.DomEvent.stop(ev);
       getSelectedOperation().addZone();
-      window.map.fire("wasabee:uiupdate:mapdata");
-      window.map.fire("wasabee:op:change");
     });
 
     return container;

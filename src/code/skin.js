@@ -104,8 +104,7 @@ export function changeSkin(names) {
   localStorage[window.plugin.wasabee.static.constants.SKIN_KEY] =
     JSON.stringify(validNames);
 
-  window.map.fire("wasabee:ui:buttonreset");
-  window.map.fire("wasabee:uiupdate:mapdata", { reason: "skin change" }, false); // needed for markers/link style
+  window.map.fire("wasabee:ui:skin");
   return true;
 }
 

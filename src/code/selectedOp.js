@@ -86,17 +86,15 @@ export async function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  window.map.fire(
-    "wasabee:uiupdate:mapdata",
-    { reason: "makeSelectedOperation" },
-    false
-  );
-  window.map.fire("wasabee:crosslinks");
-  if (previousID !== opID)
+  if (previousID !== opID) {
     window.map.fire("wasabee:op:select", {
       previous: previousID,
       current: opID,
     });
+  } else {
+    window.map.fire("wasabee:op:change");
+  }
+  window.map.fire("wasabee:crosslinks");
   // return window.plugin.wasabee._selectedOp;
 }
 

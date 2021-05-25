@@ -107,7 +107,8 @@ window.plugin.wasabee.init = async () => {
     window.map.fire("wasabee:uiupdate:mapdata", d);
   });
 
-  window.map.on("wasabee:uiupdate:mapdata", drawMap);
+  window.map.on("wasabee:op:change", drawMap);
+  window.map.on("wasabee:op:select", drawMap);
   window.map.on("wasabee:uiupdate:agentlocations", drawAgents);
 
   // when the UI is woken from sleep on many devices
@@ -150,12 +151,7 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      // just mapdata layers
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "layeradd" },
-        false
-      );
+      drawMap();
     }
     if (obj.layer === Wasabee.backgroundOpsGroup) {
       drawBackgroundOps();
@@ -187,8 +183,10 @@ window.plugin.wasabee.init = async () => {
   window.map.fire("wasabee:ui:buttonreset");
   setupToolbox();
 
+  window.map.on("wasabee:ui:lang wasabee:ui:skin", addButtons);
+
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
-  window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
+  //window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
   window.map.fire("wasabee:uiupdate:agentlocations");
 
   // run crosslinks

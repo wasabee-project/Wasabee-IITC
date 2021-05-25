@@ -80,15 +80,7 @@ const SettingsDialog = WDialog.extend({
       strings,
       () => {
         // update everything -- if for no other reason than to provide a means for users to force-update everything
-        window.map.fire("wasabee:ui:buttonreset");
-        window.map.fire("wasabee:uiupdate:settings");
-        window.map.fire("wasabee:uiupdate:agentlocations");
-        window.map.fire("wasabee:uiupdate:teamdata");
-        window.map.fire(
-          "wasabee:uiupdate:mapdata",
-          { reason: "settings dialog" },
-          false
-        );
+        window.map.fire("wasabee:ui:lang");
       }
     );
 

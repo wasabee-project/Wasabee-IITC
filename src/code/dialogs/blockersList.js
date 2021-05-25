@@ -21,7 +21,11 @@ const BlockerList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.blockerlistUpdate, this);
+    window.map.on(
+      "wasabee:op:select wasabee:op:change",
+      this.blockerlistUpdate,
+      this
+    );
     window.map.on("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
@@ -31,7 +35,11 @@ const BlockerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.blockerlistUpdate, this);
+    window.map.off(
+      "wasabee:op:select wasabee:op:change",
+      this.blockerlistUpdate,
+      this
+    );
     window.map.off("wasabee:crosslinks:done", this.blockerlistUpdate, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);

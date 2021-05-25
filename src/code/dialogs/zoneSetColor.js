@@ -43,11 +43,7 @@ const ZoneSetColorDialog = WDialog.extend({
       }
       await so.store();
       addToColorList(picker.value);
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "ZonzeSetColorDialog" },
-        false
-      );
+      window.map.fire("wasabee:op:change");
     });
 
     return container;

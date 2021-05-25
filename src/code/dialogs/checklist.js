@@ -26,7 +26,11 @@ const OperationChecklistDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
+    window.map.on(
+      "wasabee:op:select wasabee:op:change",
+      this.checklistUpdate,
+      this
+    );
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
@@ -36,7 +40,11 @@ const OperationChecklistDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
+    window.map.off(
+      "wasabee:op:select wasabee:op:change",
+      this.checklistUpdate,
+      this
+    );
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
@@ -169,8 +177,6 @@ const OperationChecklistDialog = WDialog.extend({
           L.DomEvent.on(z, "change", (ev) => {
             L.DomEvent.stop(ev);
             operation.setZone(thing, z.value);
-            window.map.fire("wasabee:uiupdate:mapdata");
-            window.map.fire("wasabee:op:change");
           });
         },
         smallScreenHide: true,
@@ -250,8 +256,6 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);
-              window.map.fire("wasabee:uiupdate:mapdata");
-              window.map.fire("wasabee:op:change");
             });
 
             const del = L.DomUtil.create("a", null, cell);
@@ -260,8 +264,6 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeLink(obj.fromPortalId, obj.toPortalId);
-              window.map.fire("wasabee:uiupdate:mapdata");
-              window.map.fire("wasabee:op:change");
             });
           } else {
             const del = L.DomUtil.create("a", null, cell);
@@ -270,8 +272,6 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeMarker(obj);
-              window.map.fire("wasabee:uiupdate:mapdata");
-              window.map.fire("wasabee:op:change");
             });
           }
         },

@@ -46,12 +46,6 @@ export function swapPortal(operation, portal) {
     type: "anchor",
     callback: () => {
       operation.swapPortal(portal, selectedPortal);
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "swapPortal" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
     },
   });
   con.enable();
@@ -67,12 +61,6 @@ export function deletePortal(operation, portal) {
     type: "anchor",
     callback: () => {
       operation.removeAnchor(portal.id);
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "deletePortal" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
       // window.map.fire("wasabee:crosslinks"); -- only needed if we also reset the cache first
     },
   });
@@ -89,12 +77,6 @@ export function deleteMarker(operation, marker, portal) {
     type: "marker",
     callback: () => {
       operation.removeMarker(marker);
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "deleteMarker" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -108,12 +90,6 @@ export function clearAllItems(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllItems();
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "clearAllItems" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -127,12 +103,6 @@ export function clearAllLinks(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllLinks();
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "clearAllLinks" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -146,12 +116,6 @@ export function clearAllMarkers(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllMarkers();
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "clearAllMarkers" },
-        false
-      );
-      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -380,12 +344,6 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.map.fire(
-      "wasabee:uiupdate:mapdata",
-      { reason: "blockerAutomark" },
-      false
-    );
-    window.map.fire("wasabee:op:change");
     return;
   }
 
@@ -509,8 +467,7 @@ export async function fullSync() {
     }
 
     // update UI to reflect new ops list
-    // XXX do we need a specific call for "op list update"?
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "full sync" }, false);
+    window.map.fire("wasabee:fullsync");
     window.map.fire("wasabee:uiupdate:teamdata"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));

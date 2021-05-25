@@ -150,8 +150,6 @@ const AssignDialog = WDialog.extend({
         }
       }
     }
-    window.map.fire("wasabee:uiupdate:mapdata");
-    window.map.fire("wasabee:op:change");
   },
 });
 

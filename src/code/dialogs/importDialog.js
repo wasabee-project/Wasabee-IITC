@@ -48,7 +48,6 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
-      window.map.fire("wasabee:uiupdate:mapdata", { reason: "import" }, false);
       window.map.fire("wasabee:crosslinks");
       this.closeDialog();
     };

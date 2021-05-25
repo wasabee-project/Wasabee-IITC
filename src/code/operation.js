@@ -862,7 +862,8 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "op update" }, false);
+    //window.map.fire("wasabee:uiupdate:mapdata", { reason: "op update" }, false);
+    window.map.fire("wasabee:op:change");
   }
 
   runCrosslinks() {

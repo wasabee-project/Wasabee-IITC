@@ -28,14 +28,14 @@ const OpsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.off("wasabee:op:delete", this.update, this);
   },
 
