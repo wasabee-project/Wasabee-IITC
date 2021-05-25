@@ -199,7 +199,6 @@ const SettingsDialog = WDialog.extend({
         if (serverDialog.inputField.value) {
           SetWasabeeServer(serverDialog.inputField.value);
           WasabeeMe.purge();
-          window.map.fire("wasabee:uiupdate:buttons");
           window.map.fire("wasabee:uiupdate:teamdata");
           window.map.fire("wasabee:uiupdate:agentlocations");
         }

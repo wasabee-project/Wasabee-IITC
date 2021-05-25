@@ -76,7 +76,7 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         getSelectedOperation().renameZone(z.id, nameinput.value);
         window.map.fire("wasabee:uiupdate:mapdata");
-        window.map.fire("wasabee:uiupdate:buttons");
+        window.map.fire("wasabee:op:change");
       });
       const commandcell = L.DomUtil.create("td", null, tr);
 
@@ -98,7 +98,7 @@ const ZoneDialog = WDialog.extend({
           L.DomEvent.stop(ev);
           getSelectedOperation().removeZone(z.id);
           window.map.fire("wasabee:uiupdate:mapdata");
-          window.map.fire("wasabee:uiupdate:buttons");
+          window.map.fire("wasabee:op:change");
         });
       }
     }
@@ -110,7 +110,7 @@ const ZoneDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       getSelectedOperation().addZone();
       window.map.fire("wasabee:uiupdate:mapdata");
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
     });
 
     return container;

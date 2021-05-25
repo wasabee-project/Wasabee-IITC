@@ -57,6 +57,8 @@ const UploadButton = WButton.extend({
         }
       },
     });
+
+    window.map.on("wasabee:op:select wasabee:op:change", this.Wupdate, this);
   },
 
   Wupdate: function () {

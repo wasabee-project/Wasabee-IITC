@@ -91,7 +91,6 @@ export async function makeSelectedOperation(opID) {
     { reason: "makeSelectedOperation" },
     false
   );
-  window.map.fire("wasabee:uiupdate:buttons");
   window.map.fire("wasabee:crosslinks");
   if (previousID !== opID)
     window.map.fire("wasabee:op:select", {

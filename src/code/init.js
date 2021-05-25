@@ -202,7 +202,6 @@ window.plugin.wasabee.init = async () => {
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
     WasabeeMe.waitGet(true);
-    window.map.fire("wasabee:uiupdate:buttons");
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys", { reason: "startup" }, false);

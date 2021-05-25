@@ -51,7 +51,7 @@ export function swapPortal(operation, portal) {
         { reason: "swapPortal" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
     },
   });
   con.enable();
@@ -72,7 +72,7 @@ export function deletePortal(operation, portal) {
         { reason: "deletePortal" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
       // window.map.fire("wasabee:crosslinks"); -- only needed if we also reset the cache first
     },
   });
@@ -94,7 +94,7 @@ export function deleteMarker(operation, marker, portal) {
         { reason: "deleteMarker" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -113,7 +113,7 @@ export function clearAllItems(operation) {
         { reason: "clearAllItems" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -132,7 +132,7 @@ export function clearAllLinks(operation) {
         { reason: "clearAllLinks" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -151,7 +151,7 @@ export function clearAllMarkers(operation) {
         { reason: "clearAllMarkers" },
         false
       );
-      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:op:change");
       window.map.fire("wasabee:crosslinks");
     },
   });
@@ -385,7 +385,7 @@ export function blockerAutomark(operation, first = true) {
       { reason: "blockerAutomark" },
       false
     );
-    window.map.fire("wasabee:uiupdate:buttons");
+    window.map.fire("wasabee:op:change");
     return;
   }
 
@@ -516,7 +516,6 @@ export async function fullSync() {
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
-    window.map.fire("wasabee:uiupdate:buttons"); // revert to logged-out view
     new AuthDialog().enable();
   }
 }

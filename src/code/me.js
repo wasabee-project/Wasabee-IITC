@@ -144,6 +144,8 @@ export default class WasabeeMe {
     const teamos = tr.objectStore("teams");
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
+
+    window.map.fire("wasabee:logout");
   }
 
   teamJoined(teamID) {

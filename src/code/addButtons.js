@@ -10,9 +10,10 @@ import UploadButton from "./buttons/uploadButton";
 /* This function adds the plugin buttons on the left side of the screen */
 export function addButtons() {
   if (window.plugin.wasabee.buttons) {
-    console.warn("replacing buttons");
-    window.map.removeControl(window.plugin.wasabee.buttons);
-    delete window.plugin.wasabee.buttons;
+    // console.warn("replacing buttons");
+    // window.map.removeControl(window.plugin.wasabee.buttons);
+    // delete window.plugin.wasabee.buttons;
+    return;
   }
 
   const options = {};
