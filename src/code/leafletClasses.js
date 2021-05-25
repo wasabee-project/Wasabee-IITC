@@ -105,9 +105,17 @@ export const WDialog = L.Handler.extend({
       localStorage[window.plugin.wasabee.static.constants.USE_PANES] === "true";
   },
 
-  addHooks: function () {},
+  addHooks: function () {
+    window.map.on("wasabee:ui:skin", this.update, this);
+    window.map.on("wasabee:ui:lang", this.update, this);
+  },
 
-  removeHooks: function () {},
+  removeHooks: function () {
+    window.map.off("wasabee:ui:skin", this.update, this);
+    window.map.off("wasabee:ui:lang", this.update, this);
+  },
+
+  update: function () {},
 
   createDialog: function (options) {
     this.options.title = options.title;
