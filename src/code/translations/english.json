@@ -397,6 +397,7 @@
   "ONION": "Draw",
   "SELECT_ONION_PORTALS": "Layers build from the inside out. Zoom in to center and select starting portal, then zoom out to area.",
   "MAX_SPLITS": "Max Splits",
+  "ZONE": "Zone",
   "smallScreen": {
     "LOG IN": "Log In",
     "LOG_OUT": "Log Out",
@@ -422,7 +423,6 @@
     "FAN_FIELD3": "Fan",
     "FANFIELD": "Draw",
     "FANFIELD2": "Draw Fan Field",
-    "MAX": "Fan",
-    "ZONE": "Zone"
+    "MAX": "Fan"
   }
 }
