@@ -37,6 +37,8 @@ const OpPermList = WDialog.extend({
 
     this.buildTable(operation);
     this._html.firstChild.replaceWith(this._table.table);
+
+    this.setTitle(wX("PERMS", { opName: operation.name }));
   },
 
   _displayDialog: function () {
@@ -182,7 +184,7 @@ const OpPermList = WDialog.extend({
       // add locally for display
       operation.teamlist.push({ teamid: teamID, role: role, zone: zone });
       await operation.store();
-      window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
+      window.map.fire("wasabee:op:change");
     } catch (e) {
       console.error(e);
       alert(e.toString());
@@ -206,7 +208,7 @@ const OpPermList = WDialog.extend({
       }
       operation.teamlist = n;
       await operation.store();
-      window.map.fire("wasabee:uiupdate", { reason: "opPerms" }, false);
+      window.map.fire("wasabee:op:change");
     } catch (e) {
       console.error(e);
       alert(e);

@@ -54,6 +54,7 @@ const OpSettingDialog = WDialog.extend({
 
   update: function () {
     if (this._enabled) {
+      this.setTitle(wX("OP_SETTINGS_TITLE"));
       const content = this.makeContent();
       this.setContent(content);
     }

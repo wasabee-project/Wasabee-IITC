@@ -21,12 +21,8 @@ const BlockerList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on(
-      "wasabee:op:select wasabee:op:change",
-      this.blockerlistUpdate,
-      this
-    );
-    window.map.on("wasabee:crosslinks:done", this.blockerlistUpdate, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:crosslinks:done", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
@@ -35,12 +31,8 @@ const BlockerList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off(
-      "wasabee:op:select wasabee:op:change",
-      this.blockerlistUpdate,
-      this
-    );
-    window.map.off("wasabee:crosslinks:done", this.blockerlistUpdate, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:crosslinks:done", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
@@ -62,7 +54,7 @@ const BlockerList = WDialog.extend({
     buttons[wX("RESET")] = () => {
       const operation = getSelectedOperation();
       operation.blockers = new Array();
-      this.blockerlistUpdate();
+      this.update();
       operation.update(false); // blockers do not need to be sent to server
       window.map.fire("wasabee:crosslinks", { reason: "blockerlist" }, false);
     };
@@ -92,7 +84,7 @@ const BlockerList = WDialog.extend({
   },
 
   // when the wasabee:uiupdate:mapdata hook is called from anywhere, update the display data here
-  blockerlistUpdate: function () {
+  update: function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;
     this.sortable = this._getListDialogContent(

@@ -15,21 +15,13 @@ const KeyListPortal = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on(
-      "wasabee:op:select wasabee:op:change",
-      this.keyListUpdate,
-      this
-    );
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off(
-      "wasabee:op:select wasabee:op:change",
-      this.keyListUpdate,
-      this
-    );
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   },
 
   _displayDialog: function () {
@@ -58,7 +50,7 @@ const KeyListPortal = WDialog.extend({
     });
   },
 
-  keyListUpdate: function () {
+  update: function () {
     // handle operation changes gracefully
     const op = getSelectedOperation();
     const portal = op.getPortal(this.options.portalID);
