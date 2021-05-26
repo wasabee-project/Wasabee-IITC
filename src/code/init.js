@@ -87,7 +87,7 @@ window.plugin.wasabee.init = async () => {
 
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
-    window.map.fire("wasabee:uiupdate:agentlocations");
+    window.map.fire("wasabee:agentlocations");
   });
 
   window.addHook("portalDetailsUpdated", (e) => {
@@ -103,19 +103,20 @@ window.plugin.wasabee.init = async () => {
     console.trace();
     console.log("old uiupdate called -- redrawing everything");
     window.map.fire("wasabee:uiupdate:buttons");
-    window.map.fire("wasabee:uiupdate:agentlocations");
+    window.map.fire("wasabee:agentlocations");
     window.map.fire("wasabee:uiupdate:mapdata", d);
   });
 
   window.map.on("wasabee:op:change", drawMap);
   window.map.on("wasabee:op:select", drawMap);
-  window.map.on("wasabee:uiupdate:agentlocations", drawAgents);
+  window.map.on("wasabee:agentlocations", drawAgents);
+  window.map.on("wasabee:logout", drawAgents);
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
     window.map.fire("wasabee:uiupdate:buttons");
     window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
-    window.map.fire("wasabee:uiupdate:agentlocations");
+    window.map.fire("wasabee:agentlocations");
     sendLocation();
   });
 
@@ -187,7 +188,7 @@ window.plugin.wasabee.init = async () => {
 
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
   //window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
-  window.map.fire("wasabee:uiupdate:agentlocations");
+  window.map.fire("wasabee:agentlocations");
 
   // run crosslinks
   window.map.fire("wasabee:crosslinks");
