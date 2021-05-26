@@ -468,7 +468,7 @@ export async function fullSync() {
 
     // update UI to reflect new ops list
     window.map.fire("wasabee:fullsync");
-    window.map.fire("wasabee:uiupdate:teamdata"); // if any team dialogs are open
+    window.map.fire("wasabee:teams"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));
   } catch (e) {
