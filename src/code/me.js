@@ -77,6 +77,7 @@ export default class WasabeeMe {
       return true;
     }
     WasabeeMe.purge();
+    window.map.fire("wasabee:uiupdate:buttons");
     return false;
   }
 
@@ -94,6 +95,7 @@ export default class WasabeeMe {
       me.fetched < WasabeeMe.maxCacheAge()
     ) {
       WasabeeMe.purge();
+      window.map.fire("wasabee:uiupdate:buttons");
       return null;
     }
 
@@ -121,14 +123,12 @@ export default class WasabeeMe {
         me = newme;
       } catch (e) {
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         console.error(e);
         alert(e.toString());
         me = null;
       }
     }
-    // take care of this in the caller
-    // window.map.fire("wasabee:uiupdate:buttons");
-    // window.map.fire("wasabee:uiupdate:teamdata");
     return me;
   }
 
@@ -144,10 +144,6 @@ export default class WasabeeMe {
     const teamos = tr.objectStore("teams");
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
-
-    // take care of this in the caller
-    // window.map.fire("wasabee:uiupdate:buttons");
-    // window.map.fire("wasabee:uiupdate:teamdata");
   }
 
   teamJoined(teamID) {

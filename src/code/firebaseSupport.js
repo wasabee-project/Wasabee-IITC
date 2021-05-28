@@ -124,5 +124,8 @@ export function postToFirebase(message) {
   )
     return; */
 
+  message.app_name = "Wasabee-IITC";
+  message.app_version = window.plugin.wasabee.info.version;
+
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 }

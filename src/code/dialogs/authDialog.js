@@ -170,6 +170,7 @@ const AuthDialog = WDialog.extend({
             WasabeeMe.purge();
           }
           window.map.fire("wasabee:uiupdate:buttons");
+          window.map.fire("wasabee:uiupdate:teamdata");
           window.map.fire("wasabee:defensivekeys");
         },
         placeholder: GetWasabeeServer(),

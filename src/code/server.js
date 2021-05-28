@@ -76,6 +76,7 @@ export async function updateOpPromise(operation) {
       // break;
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -157,6 +158,7 @@ export async function opPromise(opID) {
         return Promise.resolve(localop);
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         raw = await response.json();
         return Promise.reject(wX("NOT LOGGED IN", { error: raw.error }));
       case 403:
@@ -439,6 +441,7 @@ async function genericPut(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -494,6 +497,7 @@ async function genericPost(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -549,6 +553,7 @@ async function genericDelete(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -602,6 +607,7 @@ async function genericGet(url) {
         }
       case 401:
         WasabeeMe.purge();
+        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
