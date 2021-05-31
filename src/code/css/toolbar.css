@@ -105,54 +105,6 @@
   text-align: center;
 }
 
-/*non-iOS device wider screens*/
-@media screen and (min-width: 1001px) and (max-width: 1280px) {
-  .wasabee-subactions a {
-    width: 60px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 3px;
-    padding-right: 3px;
-  }
-}
-
-/*non-iOS device small screens*/
-@media screen and (min-width: 401px) and (max-width: 1000px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 2px;
-    padding-right: 2px;
-  }
-}
-
-/*iOS device screens larger than 400 but not tablet sized */
-@media screen and (min-device-width: 401) and (max-device-width: 1000px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-}
-
-/*iOS screens smaller than 400px*/
-@media screen and (max-device-width: 400px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 2px;
-    padding-right: 2px;
-  }
-}
-
 .wasabee-toolbar-wasabee {
   background-image: url(../images/toolbar_wasabeebutton_out.svg)
 }
