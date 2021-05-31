@@ -105,15 +105,6 @@ window.plugin.wasabee.init = async () => {
   }
   window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
 
-  // XXX until we can make the necessary changes, fire all three
-  window.map.on("wasabee:uiupdate", (d) => {
-    console.trace();
-    console.log("old uiupdate called -- redrawing everything");
-    window.map.fire("wasabee:uiupdate:buttons");
-    window.map.fire("wasabee:agentlocations");
-    window.map.fire("wasabee:uiupdate:mapdata", d);
-  });
-
   window.map.on("wasabee:op:change", drawMap);
   window.map.on("wasabee:op:select", drawMap);
   window.map.on("wasabee:agentlocations", drawAgents);
@@ -121,10 +112,6 @@ window.plugin.wasabee.init = async () => {
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
-    // nothing changed
-    // window.map.fire("wasabee:uiupdate:buttons");
-    // window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
-
     // check if still logged in
     if (WasabeeMe.isLoggedIn()) {
       // refresh agent locations
@@ -144,8 +131,6 @@ window.plugin.wasabee.init = async () => {
       drawBackgroundOps();
     }
   });
-
-  window.map.on("wasabee:ui:buttonreset", addButtons);
 
   // Android panes
   const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
@@ -194,13 +179,12 @@ window.plugin.wasabee.init = async () => {
   }
 
   // setup UI elements
-  window.map.fire("wasabee:ui:buttonreset");
+  addButtons();
   setupToolbox();
 
   window.map.on("wasabee:ui:lang wasabee:ui:skin", addButtons);
 
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
-  //window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
   window.map.fire("wasabee:agentlocations");
 
   // run crosslinks

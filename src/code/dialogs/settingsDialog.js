@@ -12,7 +12,6 @@ const SettingsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:settings", this.update, this);
     if (this._smallScreen) {
       this._displaySmallDialog();
     } else {
@@ -22,7 +21,6 @@ const SettingsDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:settings", this.update, this);
   },
 
   update: function () {

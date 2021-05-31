@@ -45,7 +45,6 @@ const BlockerList = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog();
-      // window.map.fire( "wasabee:uiupdate:mapdata", { reason: "blockerlist" }, false);
     };
     buttons[wX("AUTOMARK")] = () => {
       const operation = getSelectedOperation();

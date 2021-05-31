@@ -77,7 +77,6 @@ export default class WasabeeMe {
       return true;
     }
     WasabeeMe.purge();
-    window.map.fire("wasabee:uiupdate:buttons");
     return false;
   }
 
@@ -95,7 +94,6 @@ export default class WasabeeMe {
       me.fetched < WasabeeMe.maxCacheAge()
     ) {
       WasabeeMe.purge();
-      window.map.fire("wasabee:uiupdate:buttons");
       return null;
     }
 
@@ -123,7 +121,6 @@ export default class WasabeeMe {
         me = newme;
       } catch (e) {
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         console.error(e);
         alert(e.toString());
         me = null;

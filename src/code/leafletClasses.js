@@ -215,8 +215,6 @@ export const ButtonsControl = L.Control.extend({
     const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
     outerDiv.appendChild(this.options.container);
 
-    window.map.on("wasabee:uiupdate:buttons", this.update, this);
-
     window.map.on("wasabee:login wasabee:logout", this.update, this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
 
@@ -227,7 +225,6 @@ export const ButtonsControl = L.Control.extend({
     this.disableAllExcept();
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.off("wasabee:login wasabee:logout", this.update, this);
-    window.map.off("wasabee:uiupdate:buttons", this.update, this);
   },
 
   // called on skin, lang, login/logout and op change/select
