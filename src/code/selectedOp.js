@@ -129,26 +129,10 @@ export async function setupLocalStorage() {
   }
 }
 
-function storeOpsList(ops) {
-  localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY] =
-    JSON.stringify(ops);
-}
-
 //** This function removes an operation from the main list */
 export async function removeOperation(opID) {
-  const ol = await opsList();
-  const ops = ol.filter((ID) => ID != opID);
-  storeOpsList(ops);
   await WasabeeOp.delete(opID);
   window.map.fire("wasabee:op:delete", opID);
-}
-
-//** This function adds an operation to the main list */
-export async function addOperation(opID) {
-  const ops = await opsList();
-  if (!ops.includes(opID)) ops.push(opID);
-  storeOpsList(ops);
-  window.map.fire("wasabee:op:add", opID);
 }
 
 //** This function shows an operation to the main list */

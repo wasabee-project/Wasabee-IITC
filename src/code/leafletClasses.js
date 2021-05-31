@@ -57,7 +57,7 @@ export const WPane = L.Handler.extend({
       "wasabee-pane hidden",
       document.body
     );
-    window.map.on("wasabee:paneset", (data) => {
+    window.map.on("wasabee:pane:set", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog) this._dialog.closeDialog();
       this._dialog = data.dialog;
@@ -65,7 +65,7 @@ export const WPane = L.Handler.extend({
       this._container.appendChild(this._dialog._container);
       window.show(data.pane);
     });
-    window.map.on("wasabee:paneclear", (data) => {
+    window.map.on("wasabee:pane:clear", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog === data.dialog) delete this._dialog;
     });
@@ -146,7 +146,7 @@ export const WDialog = L.Handler.extend({
           L.DomEvent.on(button, "click", entry.click);
         }
       }
-      window.map.fire("wasabee:paneset", {
+      window.map.fire("wasabee:pane:set", {
         pane: this.options.paneId,
         dialog: this,
       });
@@ -182,7 +182,7 @@ export const WDialog = L.Handler.extend({
       this._dialog.dialog("close");
       delete this._dialog;
     } else if (this._container) {
-      window.map.fire("wasabee:paneclear", {
+      window.map.fire("wasabee:pane:clear", {
         pane: this.options.paneId,
         dialog: this,
       });
