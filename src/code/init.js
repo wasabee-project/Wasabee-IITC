@@ -98,6 +98,13 @@ window.plugin.wasabee.init = async () => {
     });
   });
 
+  // use our own hook on portal click
+  // note: do not build WasabeePortal here, we only need one for QD
+  function propagateClick(e) {
+    window.map.fire("wasabee:portal:click", e.target);
+  }
+  window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
+
   // XXX until we can make the necessary changes, fire all three
   window.map.on("wasabee:uiupdate", (d) => {
     console.trace();

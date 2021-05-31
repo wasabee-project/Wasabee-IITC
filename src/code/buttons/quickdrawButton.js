@@ -111,7 +111,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
@@ -126,17 +125,10 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
-    this._firstSelect = true;
-
-    const context = this;
-    this._portalClickedHook = (data) => {
-      context._portalClicked(data);
-    };
-    window.addHook("portalSelected", this._portalClickedHook);
-
-    this._map.on("wasabee:op:select", this._opchange, this);
-    this._map.on("keyup", this._keyUpListener, this);
-    this._map.on("mousemove", this._onMouseMove, this);
+    window.map.on("wasabee:portal:click", this._portalClicked, this);
+    window.map.on("wasabee:op:select", this._opchange, this);
+    window.map.on("keyup", this._keyUpListener, this);
+    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -156,10 +148,10 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.dispose();
     this._tooltip = null;
 
-    window.removeHook("portalSelected", this._portalClickedHook);
-    this._map.off("wasabee:op:select", this._opchange, this);
-    this._map.off("keyup", this._keyUpListener, this);
-    this._map.off("mousemove", this._onMouseMove, this);
+    window.map.off("wasabee:portal:click", this._portalClicked, this);
+    window.map.off("wasabee:op:select", this._opchange, this);
+    window.map.off("keyup", this._keyUpListener, this);
+    window.map.off("mousemove", this._onMouseMove, this);
   },
 
   _opchange: function () {
@@ -243,24 +235,8 @@ const QuickDrawControl = L.Handler.extend({
     return { text: "Click next portal" };
   },
 
-  _portalClicked: function (data) {
-    // console.log(data);
-    if (
-      data.selectedPortalGuid == data.unselectedPortalGuid &&
-      !this._firstSelect
-    ) {
-      console.log("ignoring duplicate click");
-      return;
-    }
-
-    // portal unselect
-    if (!data.selectedPortalGuid) return;
-
-    this._firstSelect = false;
-
-    // const selectedPortal = WasabeePortal.getSelected();
-    // this way saves a small step
-    const selectedPortal = WasabeePortal.get(data.selectedPortalGuid);
+  _portalClicked: function (portal) {
+    const selectedPortal = WasabeePortal.fromIITC(portal);
     if (!selectedPortal) {
       // XXX wX this
       this._tooltip.updateContent({
@@ -335,8 +311,6 @@ const QuickDrawControl = L.Handler.extend({
     this._guideA = null;
     this._guideB = null;
     if (this._guideLayerGroup) this._guideLayerGroup.clearLayers();
-
-    this._firstSelect = true;
 
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");
