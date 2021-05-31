@@ -204,12 +204,16 @@ export default class WasabeeLink {
     L.DomEvent.on(del, "click", (ev) => {
       L.DomEvent.stop(ev);
       operation.removeLink(this.fromPortalId, this.toPortalId);
+      window.map.fire("wasabee:uiupdate:mapdata");
+      window.map.fire("wasabee:uiupdate:buttons");
     });
     const rev = L.DomUtil.create("button", null, div);
     rev.textContent = wX("REVERSE");
     L.DomEvent.on(rev, "click", (ev) => {
       L.DomEvent.stop(ev);
       operation.reverseLink(this.fromPortalId, this.toPortalId);
+      window.map.fire("wasabee:uiupdate:mapdata");
+      window.map.fire("wasabee:uiupdate:buttons");
     });
     if (operation.IsServerOp() && operation.IsWritableOp()) {
       const assignButton = L.DomUtil.create("button", null, div);

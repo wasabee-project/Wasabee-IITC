@@ -136,7 +136,7 @@ const QuickDrawControl = L.Handler.extend({
     };
     window.addHook("portalSelected", this._portalClickedHook);
 
-    this._map.on("wasabee:uiupdate:mapdata", this._uiupdate, this);
+    this._map.on("wasabee:op:select", this._opchange, this);
     this._map.on("keyup", this._keyUpListener, this);
     this._map.on("mousemove", this._onMouseMove, this);
   },
@@ -192,7 +192,13 @@ const QuickDrawControl = L.Handler.extend({
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
-      window.map.fire("wasabee:crosslinks", { reason: "qd keyup X" }, false);
+      window.map.fire(
+        "wasabee:uiupdate:mapdata",
+        { reason: "qd keyup X" },
+        false
+      );
+      window.map.fire("wasabee:uiupdate:buttons");
+      window.map.fire("wasabee:crosslinks");
     }
   },
 
@@ -277,6 +283,8 @@ const QuickDrawControl = L.Handler.extend({
     } else {
       this._portalClickedSingle(selectedPortal);
     }
+    window.map.fire("wasabee:uiupdate:buttons");
+    window.map.fire("wasabee:uiupdate:mapdata");
   },
 
   _portalClickedQD: function (selectedPortal) {

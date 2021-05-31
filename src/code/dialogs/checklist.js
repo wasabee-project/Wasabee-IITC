@@ -105,6 +105,7 @@ const OperationChecklistDialog = WDialog.extend({
             } else {
               operation.setMarkerOrder(thing.ID, oif.value);
             }
+            window.map.fire("wasabee:uiupdate:buttons");
           });
           cell.appendChild(oif);
         },
@@ -168,6 +169,8 @@ const OperationChecklistDialog = WDialog.extend({
           L.DomEvent.on(z, "change", (ev) => {
             L.DomEvent.stop(ev);
             operation.setZone(thing, z.value);
+            window.map.fire("wasabee:uiupdate:mapdata");
+            window.map.fire("wasabee:uiupdate:buttons");
           });
         },
         smallScreenHide: true,
@@ -247,6 +250,8 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);
+              window.map.fire("wasabee:uiupdate:mapdata");
+              window.map.fire("wasabee:uiupdate:buttons");
             });
 
             const del = L.DomUtil.create("a", null, cell);
@@ -255,6 +260,8 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeLink(obj.fromPortalId, obj.toPortalId);
+              window.map.fire("wasabee:uiupdate:mapdata");
+              window.map.fire("wasabee:uiupdate:buttons");
             });
           } else {
             const del = L.DomUtil.create("a", null, cell);
@@ -263,6 +270,8 @@ const OperationChecklistDialog = WDialog.extend({
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeMarker(obj);
+              window.map.fire("wasabee:uiupdate:mapdata");
+              window.map.fire("wasabee:uiupdate:buttons");
             });
           }
         },
