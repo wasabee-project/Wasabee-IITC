@@ -121,10 +121,16 @@ window.plugin.wasabee.init = async () => {
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
-    window.map.fire("wasabee:uiupdate:buttons");
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
-    window.map.fire("wasabee:agentlocations");
-    sendLocation();
+    // nothing changed
+    // window.map.fire("wasabee:uiupdate:buttons");
+    // window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
+
+    // check if still logged in
+    if (WasabeeMe.isLoggedIn()) {
+      // refresh agent locations
+      window.map.fire("wasabee:agentlocations");
+      sendLocation();
+    }
   });
 
   window.map.on("wasabee:op:select", () => {
