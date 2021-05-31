@@ -89,7 +89,7 @@ const OpPermList = WDialog.extend({
       L.DomEvent.on(ab, "click", (ev) => {
         L.DomEvent.stop(ev);
         this.addPerm(teamMenu.value, permMenu.value, +zoneMenu.value); // async, but no need to await
-        // addPerm calls wasabee:uiupdate, which redraws the screen
+        // addPerm calls wasabee:op:change, which redraws the screen
       });
     }
 
@@ -154,7 +154,7 @@ const OpPermList = WDialog.extend({
             link.textContent = value;
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
-              this.delPerm(obj); // calls wasabee:uiupdate -- async but no need to await
+              this.delPerm(obj); // calls wasabee:op:change -- async but no need to await
             });
           }
         },

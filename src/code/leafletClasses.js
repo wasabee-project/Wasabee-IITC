@@ -230,7 +230,7 @@ export const ButtonsControl = L.Control.extend({
     window.map.off("wasabee:uiupdate:buttons", this.update, this);
   },
 
-  // called when wasabee:uiupdate:buttons fires
+  // called on skin, lang, login/logout and op change/select
   update: function () {
     for (const b of this.options.buttons.values()) {
       b.Wupdate();

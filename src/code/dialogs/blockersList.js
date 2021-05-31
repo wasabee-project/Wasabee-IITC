@@ -83,7 +83,7 @@ const BlockerList = WDialog.extend({
     });
   },
 
-  // when the wasabee:uiupdate:mapdata hook is called from anywhere, update the display data here
+  // when op changed or crosslink ended
   update: function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;
