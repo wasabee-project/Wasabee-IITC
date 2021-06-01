@@ -105,7 +105,6 @@ const OperationChecklistDialog = WDialog.extend({
             } else {
               operation.setMarkerOrder(thing.ID, oif.value);
             }
-            window.map.fire("wasabee:op:change");
           });
           cell.appendChild(oif);
         },
