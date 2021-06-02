@@ -138,9 +138,29 @@ export function drawBackgroundOp(operation, layerGroup, style) {
 
 function resetZones(op) {
   // remove all zones
+  Wasabee.zoneLayerGroup.clearLayers();
+
+  if (!op.zones || op.zones.length == 0) return;
+
   for (const z of op.zones) {
+    if (z.points.length < 3) {
+      console.log("zone points not a polygon, igoring", z);
+      continue;
+    }
+    z.points.sort((a, b) => {
+      return a.position - b.position;
+    });
     console.log(z);
-    // create a new polygon, defined by z.points, in order
+    const polygon = L.polygon(z.points, {
+      color: z.color,
+      shapeOptions: {
+        stroke: false,
+        opacity: 0.7,
+        fill: true,
+        clickable: false,
+      },
+    });
+    polygon.addTo(Wasabee.zoneLayerGroup);
   }
 }
 
