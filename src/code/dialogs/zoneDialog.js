@@ -1,7 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+import { addToColorList } from "../skin";
 import ZoneSetColorDialog from "./zoneSetColor";
+import { convertColorToHex } from "../auxiliar";
 
 const ZoneDialog = WDialog.extend({
   statics: {
@@ -62,6 +64,7 @@ const ZoneDialog = WDialog.extend({
     const hr = L.DomUtil.create("tr", null, tbody);
     L.DomUtil.create("th", null, hr).textContent = "ID";
     L.DomUtil.create("th", null, hr).textContent = "Name";
+    L.DomUtil.create("th", null, hr).textContent = "Color";
     L.DomUtil.create("th", null, hr).textContent = "Commands";
 
     for (const z of op.zones) {
@@ -72,6 +75,23 @@ const ZoneDialog = WDialog.extend({
       const nameinput = L.DomUtil.create("input", null, namecell);
       nameinput.type = "text";
       nameinput.value = z.name;
+
+      const colorcell = L.DomUtil.create("td", null, tr);
+      const picker = L.DomUtil.create("input", "picker", colorcell);
+      picker.type = "color";
+      picker.value = convertColorToHex(z.color);
+      picker.setAttribute("list", "wasabee-colors-datalist");
+
+      L.DomEvent.on(picker, "change", async (ev) => {
+        L.DomEvent.stop(ev);
+        z.color = picker.value;
+        await op.update();
+        addToColorList(picker.value);
+        // XXX fire buttons and zones, not map data
+        window.map.fire("wasabee:uiupdate:mapdata");
+        window.map.fire("wasabee:uiupdate:buttons");
+      });
+
       L.DomEvent.on(nameinput, "change", (ev) => {
         L.DomEvent.stop(ev);
         getSelectedOperation().renameZone(z.id, nameinput.value);
