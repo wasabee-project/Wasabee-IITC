@@ -474,6 +474,7 @@ export async function fullSync() {
   } catch (e) {
     console.error(e);
     new AuthDialog().enable();
+    alert("You are not logged in.");
   }
 }
 

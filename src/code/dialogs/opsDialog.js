@@ -30,6 +30,7 @@ const OpsDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.on("wasabee:fullsync", this.update, this);
+    window.map.on("wasabee:logout", this.update, this);
     window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
@@ -38,6 +39,7 @@ const OpsDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.off("wasabee:fullsync", this.update, this);
+    window.map.off("wasabee:logout", this.update, this);
     window.map.off("wasabee:op:delete", this.update, this);
   },
 
@@ -250,6 +252,8 @@ const OpsDialog = WDialog.extend({
         window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
       ] !== "false";
 
+    const me = WasabeeMe.cacheGet();
+
     const ol = await opsList(showHiddenOps);
     const currentOps = this.sortable.items.map((o) => o.id);
     const olSorted = currentOps
@@ -270,9 +274,7 @@ const OpsDialog = WDialog.extend({
         perm: tmpOp.getPermission(),
         hidden: hiddenOps.includes(opID),
         currentserver:
-          tmpOp.fetched !== null &&
-          WasabeeMe.isLoggedIn() &&
-          tmpOp.IsOnCurrentServer(),
+          tmpOp.fetched !== null && me && tmpOp.IsOnCurrentServer(),
         server: "",
         background: tmpOp.background,
       };

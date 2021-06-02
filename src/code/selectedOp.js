@@ -164,9 +164,8 @@ export function resetHiddenOps() {
 //*** This function resets the local op list
 export async function resetOps() {
   const ops = await opsList();
-  for (const opID of ops) {
-    await removeOperation(opID); // promise.all...
-  }
+  // don't fire event here
+  await Promise.all(ops.map(WasabeeOp.delete));
 }
 
 export function hiddenOpsList() {
@@ -240,7 +239,8 @@ export async function duplicateOperation(opID) {
 export async function removeNonOwnedOps() {
   for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
-    if (!op || !op.IsOwnedOp()) await removeOperation(opID);
+    // don't fire event here
+    if (!op || !op.IsOwnedOp()) await WasabeeOp.delete(opID);
   }
   await changeOpIfNeeded();
 }
