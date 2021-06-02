@@ -192,25 +192,23 @@ export async function setOpBackground(opID, background) {
 
 export async function opsList(hidden = true) {
   // after 0.19, remove the list and just query the idb keys
-
-  const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
-  if (raw) {
-    try {
-      const ops = JSON.parse(raw);
-      const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
-      for (const k of fromIdb) {
-        if (!ops.includes(k)) ops.push(k);
-      }
-      if (!hidden) {
-        const hiddenOps = hiddenOpsList();
-        return ops.filter((o) => !hiddenOps.includes(o));
-      }
-      return ops;
-    } catch (e) {
-      console.error(e);
-    }
+  let ops = [];
+  try {
+    const raw =
+      localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
+    ops = JSON.parse(raw);
+  } catch {
+    //
   }
-  return new Array();
+  const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
+  for (const k of fromIdb) {
+    if (!ops.includes(k)) ops.push(k);
+  }
+  if (!hidden) {
+    const hiddenOps = hiddenOpsList();
+    return ops.filter((o) => !hiddenOps.includes(o));
+  }
+  return ops;
 }
 
 export async function duplicateOperation(opID) {
