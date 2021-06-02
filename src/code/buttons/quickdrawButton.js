@@ -9,11 +9,9 @@ const QuickdrawButton = WButton.extend({
     TYPE: "QuickdrawButton",
   },
 
-  initialize: function (map = window.map, container) {
-    this._map = map;
-
+  initialize: function (container) {
     this.title = wX("QD TITLE");
-    this.handler = new QuickDrawControl(map, { button: this });
+    this.handler = new QuickDrawControl({ button: this });
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
@@ -34,6 +32,23 @@ const QuickdrawButton = WButton.extend({
       this.handler._nextDrawnLinksColor = ev.target.value;
     });
 
+    this.actionsContainer = this._createSubActions(this.getSubActions());
+
+    this._container.appendChild(this.actionsContainer);
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("QD TITLE");
+      const newSubActions = this._createSubActions(this.getSubActions());
+      this._container.replaceChild(newSubActions, this.actionsContainer);
+      newSubActions.style.display = this.actionsContainer.style.display;
+      this.actionsContainer = newSubActions;
+
+      if (this.handler._enabled)
+        this.handler._tooltip.updateContent(this.handler._getTooltipText());
+    });
+  },
+
+  getSubActions: function () {
     this._changeColorSubAction = {
       title: wX("QD BUTTON CHANGE COLOR"),
       text: wX("QD CHANGE COLOR"),
@@ -60,12 +75,11 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     };
 
-    this.actionsContainer = this._createSubActions([
+    return [
       this._toggleModeSubAction,
       this._changeColorSubAction,
       this._endSubAction,
-    ]);
-    this._container.appendChild(this.actionsContainer);
+    ];
   },
 
   enable: function () {
@@ -81,11 +95,10 @@ const QuickdrawButton = WButton.extend({
 });
 
 const QuickDrawControl = L.Handler.extend({
-  initialize: function (map = window.map, options) {
-    this._map = map;
-    this._container = map._container;
+  initialize: function (options) {
+    this._container = window.map._container;
 
-    L.Handler.prototype.initialize.call(this, map, options);
+    L.Handler.prototype.initialize.call(this, window.map, options);
     this.options = options;
     // L.Util.extend(this.options, options);
 

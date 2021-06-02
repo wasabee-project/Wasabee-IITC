@@ -182,8 +182,6 @@ window.plugin.wasabee.init = async () => {
   addButtons();
   setupToolbox();
 
-  window.map.on("wasabee:ui:lang wasabee:ui:skin", addButtons);
-
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
   window.map.fire("wasabee:agentlocations");
 

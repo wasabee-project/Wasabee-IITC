@@ -222,7 +222,6 @@ export const ButtonsControl = L.Control.extend({
   },
 
   onRemove: function () {
-    this.disableAllExcept();
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.off("wasabee:login wasabee:logout", this.update, this);
   },
@@ -230,7 +229,7 @@ export const ButtonsControl = L.Control.extend({
   // called on skin, lang, login/logout and op change/select
   update: function () {
     for (const b of this.options.buttons.values()) {
-      b.Wupdate();
+      b.update();
     }
   },
 
@@ -257,10 +256,8 @@ export const WButton = L.Class.extend({
 
   // make sure all these bases are covered in your button
   // XXX this initializer is not used by any buttons
-  initialize: function (map, container) {
+  initialize: function (container) {
     console.log("WButton init");
-    if (!map) map = window.map;
-    this._map = map;
 
     this.type = WButton.TYPE;
     this.title = "Unextended WButton";
@@ -277,7 +274,7 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function () {},
+  update: function () {},
 
   _toggleActions: function () {
     if (this._enabled) {

@@ -8,33 +8,46 @@ const SyncButton = WButton.extend({
     TYPE: "syncButton",
   },
 
-  Wupdate: function () {
+  update: function () {
     const loggedIn = WasabeeMe.isLoggedIn();
     if (loggedIn) {
-      this._syncbutton.style.display = "block";
+      this.button.style.display = "block";
     } else {
-      this._syncbutton.style.display = "none";
+      this.button.style.display = "none";
     }
   },
 
-  initialize: function (map, container) {
-    if (!map) map = window.map;
-    this._map = map;
-
+  initialize: function (container) {
     this.type = SyncButton.TYPE;
     // this.handler = null; // no handler since we do it all in this.Wupdate()
     this.title = wX("SYNC");
 
-    this._syncbutton = this._createButton({
+    this.button = this._createButton({
       container: container,
       className: "wasabee-toolbar-sync",
       context: this,
       title: this.title,
-      callback: fullSync,
+      callback: async () => {
+        this.button.classList.add("loading");
+        await fullSync();
+        this.button.classList.remove("loading");
+      },
+    });
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("SYNC");
+    });
+
+    window.map.on("wasabee:fullsync", () => {
+      this.button.classList.remove("loading");
+    });
+
+    window.map.on("wasabee:login", () => {
+      this.button.classList.add("loading");
     });
 
     // hide or show depeneding on logged in state
-    this.Wupdate(); // container & operation not needed
+    this.update(); // container & operation not needed
   },
 });
 

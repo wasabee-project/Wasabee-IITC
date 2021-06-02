@@ -15,9 +15,7 @@ const UploadButton = WButton.extend({
     TYPE: "uploadButton",
   },
 
-  initialize: function (map = window.map, container) {
-    this._map = map;
-
+  initialize: function (container) {
     this.type = UploadButton.TYPE;
     // this.handler = null;
     const operation = getSelectedOperation();
@@ -41,7 +39,7 @@ const UploadButton = WButton.extend({
           // switch to the new version in local store -- uploadOpPromise stores it
           await makeSelectedOperation(r.ID);
           alert(wX("UPLOADED"));
-          this.Wupdate();
+          this.update();
           // this._invisible();
         } catch (e) {
           // not triggered this in a while...
@@ -49,7 +47,7 @@ const UploadButton = WButton.extend({
           try {
             await updateOpPromise(operation);
             alert(wX("UPDATED"));
-            this.Wupdate();
+            this.update();
           } catch (e) {
             console.error(e);
             alert(`Upload + Update Failed: ${e.toString()}`);
@@ -57,9 +55,11 @@ const UploadButton = WButton.extend({
         }
       },
     });
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", this.update, this);
   },
 
-  Wupdate: function () {
+  update: function () {
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
       this.title = wX("NOT LOGGED IN SHORT");
@@ -195,7 +195,7 @@ const UploadButton = WButton.extend({
           if (operation != getSelectedOperation())
             await makeSelectedOperation(operation.ID);
           alert(wX("UPDATED"));
-          this.Wupdate();
+          this.update();
         } else {
           // need rebase or force
           if (!rebaseOnUpdate) {
