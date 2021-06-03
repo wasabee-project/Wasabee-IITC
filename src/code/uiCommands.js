@@ -413,7 +413,8 @@ export async function fullSync() {
         // if selected op, we reload the local duplicate
         if (op.ID === so.ID) reloadOpID = newop.ID;
       }
-      await removeOperation(op.ID);
+      // skip hook (not needed)
+      await WasabeeOp.delete(op.ID);
     }
     if (serverOps.length > 0)
       console.log(
