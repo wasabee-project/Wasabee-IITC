@@ -105,6 +105,8 @@ window.plugin.wasabee.init = async () => {
   }
   window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
 
+  window.map.on("wasabee:ui:skin", drawMap);
+
   window.map.on("wasabee:op:change", drawMap);
   window.map.on("wasabee:op:select", drawMap);
   window.map.on("wasabee:agentlocations", drawAgents);
