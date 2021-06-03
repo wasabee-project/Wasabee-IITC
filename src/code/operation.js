@@ -931,15 +931,8 @@ export default class WasabeeOp {
     if (!zones || zones.length == 0) {
       // if not set, use the defaults
       return [
-        { id: 1, name: "Primary" },
-        { id: 2, name: "Alpha" },
-        { id: 3, name: "Beta" },
-        { id: 4, name: "Gamma" },
-        { id: 5, name: "Delta" },
-        { id: 6, name: "Epsilon" },
-        { id: 7, name: "Zeta" },
-        { id: 8, name: "Eta" },
-        { id: 9, name: "Theta" },
+        { id: 1, name: "Primary", color: "purple" },
+        { id: 2, name: "Secondary", color: "yellow" },
       ].map((obj) => new WasabeeZone(obj));
     }
     const tmpZones = Array();
@@ -1127,6 +1120,15 @@ export default class WasabeeOp {
     this.zones = this.zones.filter((z) => {
       return z.id != zoneID;
     });
+    this.update(true);
+  }
+
+  removeZonePoints(zoneID) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points = [];
+      }
+    }
     this.update(true);
   }
 

@@ -117,6 +117,25 @@ const ZoneDialog = WDialog.extend({
           getSelectedOperation().removeZone(z.id);
         });
       }
+      if (z.points.length == 0) {
+        const addPoints = L.DomUtil.create("a", null, commandcell);
+        addPoints.textContent = " +"; // pick a symbol
+        addPoints.href = "#";
+        L.DomEvent.on(addPoints, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          // start polygon draw handler
+        });
+      } else {
+        const delPoints = L.DomUtil.create("a", null, commandcell);
+        delPoints.textContent = " X"; // pick a symbol
+        delPoints.href = "#";
+        L.DomEvent.on(delPoints, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          getSelectedOperation().removeZonePoints(z.id);
+          window.map.fire("wasabee:uiupdate:mapdata");
+          window.map.fire("wasabee:uiupdate:buttons");
+        });
+      }
     }
 
     const add = L.DomUtil.create("a", null, container);
