@@ -430,8 +430,10 @@ export async function fullSync() {
       .map((p) => p.value);
     for (const newop of ops) {
       const localOp = await WasabeeOp.load(newop.ID);
-      if (!localOp || !localOp.localchanged) await newop.store();
-      else if (localOp.lasteditid != newop.lasteditid) {
+      if (!localOp || !localOp.localchanged) {
+        await newop.store();
+        if (newop.ID === so.ID) reloadOpID = so.ID;
+      } else if (localOp.lasteditid != newop.lasteditid) {
         // if selected op, use current selected op object
         const op = localOp.ID != so.ID ? localOp : so;
         // check if there are really local changes
