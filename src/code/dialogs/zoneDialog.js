@@ -83,14 +83,11 @@ const ZoneDialog = WDialog.extend({
       picker.value = convertColorToHex(z.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
 
-      L.DomEvent.on(picker, "change", async (ev) => {
+      L.DomEvent.on(picker, "change", (ev) => {
         L.DomEvent.stop(ev);
         z.color = picker.value;
-        await op.update();
+        op.update();
         addToColorList(picker.value);
-        // XXX fire buttons and zones, not map data
-        window.map.fire("wasabee:uiupdate:mapdata");
-        window.map.fire("wasabee:uiupdate:buttons");
       });
 
       L.DomEvent.on(nameinput, "change", (ev) => {
@@ -135,8 +132,6 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.on(delPoints, "click", (ev) => {
           L.DomEvent.stop(ev);
           getSelectedOperation().removeZonePoints(z.id);
-          window.map.fire("wasabee:uiupdate:mapdata");
-          window.map.fire("wasabee:uiupdate:buttons");
         });
       }
     }

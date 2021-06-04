@@ -14,7 +14,6 @@ export function drawMap() {
   updateAnchors(operation);
   updateMarkers(operation);
   resetLinks(operation);
-  // XXX do not do this here, make a special hook for it, this won't change often
   resetZones(operation);
 }
 
@@ -136,13 +135,12 @@ export function drawBackgroundOp(operation, layerGroup, style) {
   }
 }
 
-function resetZones(op) {
-  // remove all zones
+function resetZones(operation) {
   Wasabee.zoneLayerGroup.clearLayers();
 
-  if (!op.zones || op.zones.length == 0) return;
+  if (!operation.zones || operation.zones.length == 0) return;
 
-  for (const z of op.zones) {
+  for (const z of operation.zones) {
     if (z.points.length == 1) {
       L.marker(z.points[0], { color: z.color }).addTo(Wasabee.zoneLayerGroup);
       continue;
