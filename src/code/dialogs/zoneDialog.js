@@ -1,4 +1,4 @@
-import { WDialog } from "../leafletClasses";
+import { WDialog, WTooltip } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
@@ -19,6 +19,7 @@ const ZoneDialog = WDialog.extend({
     } else {
       this._displayDialog();
     }
+    this.ZonedrawHandler = new ZonedrawHandler(window.map, {});
   },
 
   removeHooks: function () {
@@ -124,6 +125,8 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.on(addPoints, "click", (ev) => {
           L.DomEvent.stop(ev);
           // start polygon draw handler
+          this.ZonedrawHandler.zoneID = z.id;
+          this.ZonedrawHandler.enable();
         });
       } else {
         const delPoints = L.DomUtil.create("a", null, commandcell);
@@ -151,3 +154,87 @@ const ZoneDialog = WDialog.extend({
 });
 
 export default ZoneDialog;
+
+const ZonedrawHandler = L.Handler.extend({
+  initialize: function (map = window.map, options) {
+    this.zoneID = 0;
+
+    L.Handler.prototype.initialize.call(this, map, options);
+    this.options = options;
+
+    this.type = "ZonedrawHandler";
+  },
+
+  enable: function () {
+    if (this._enabled || this.zoneID == 0) {
+      this.disable();
+      return;
+    }
+    L.Handler.prototype.enable.call(this);
+    // postToFirebase({ id: "analytics", action: "zonedrawStart" });
+  },
+
+  disable: function () {
+    if (!this._enabled) return;
+    L.Handler.prototype.disable.call(this);
+    // postToFirebase({ id: "analytics", action: "zonedrawEnd" });
+  },
+
+  addHooks: function () {
+    L.DomUtil.disableTextSelection();
+
+    this._tooltip = new WTooltip(window.map);
+
+    this._opID = getSelectedOperation().ID;
+    this._tooltip.updateContent(this._getTooltipText());
+
+    window.map.on("click", this._click, this);
+    window.map.on("wasabee:op:select", this._opchange, this);
+    window.map.on("keyup", this._keyUpListener, this);
+    window.map.on("mousemove", this._onMouseMove, this);
+  },
+
+  removeHooks: function () {
+    L.DomUtil.enableTextSelection();
+    this._tooltip.dispose();
+    this._tooltip = null;
+
+    window.map.off("wasabee:op:select", this._opchange, this);
+    window.map.off("keyup", this._keyUpListener, this);
+    window.map.off("mousemove", this._onMouseMove, this);
+  },
+
+  _opchange: function () {
+    // postToFirebase({ id: "analytics", action: "zonedrawOpchange" });
+    if (!this._enabled) return;
+
+    if (getSelectedOperation().ID != this._opID) {
+      console.log("operation changed mid-zonedraw - disabling");
+      this.disable();
+    }
+  },
+
+  _keyUpListener: function (e) {
+    if (!this._enabled) return;
+
+    // [esc]
+    if (e.originalEvent.keyCode === 27) {
+      this.disable();
+    }
+  },
+
+  _click: function (e) {
+    getSelectedOperation().addZonePoint(this.zoneID, e.latlng);
+  },
+
+  _onMouseMove: function (e) {
+    if (e.latlng) {
+      this._tooltip.updatePosition(e.latlng);
+    }
+    L.DomEvent.preventDefault(e.originalEvent);
+  },
+
+  _getTooltipText: function () {
+    return { text: "Click to set the zone boundaries" };
+  },
+});

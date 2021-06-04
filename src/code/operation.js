@@ -1153,6 +1153,20 @@ export default class WasabeeOp {
     return newid;
   }
 
+  addZonePoint(zoneID, latlng) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points.push({
+          lat: latlng.lat,
+          lng: latlng.lng,
+          position: z.points.length,
+        });
+        break;
+      }
+    }
+    this.update(true);
+  }
+
   changes(origin) {
     const changes = {
       addition: new Array(),

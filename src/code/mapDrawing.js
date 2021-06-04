@@ -143,15 +143,18 @@ function resetZones(op) {
   if (!op.zones || op.zones.length == 0) return;
 
   for (const z of op.zones) {
-    if (z.points.length < 3) {
-      console.log("zone points not a polygon, igoring", z);
+    if (z.points.length == 1) {
+      L.marker(z.points[0], { color: z.color }).addTo(Wasabee.zoneLayerGroup);
+      continue;
+    }
+    if (z.points.length == 2) {
+      L.polyline(z.points, { color: z.color }).addTo(Wasabee.zoneLayerGroup);
       continue;
     }
     z.points.sort((a, b) => {
       return a.position - b.position;
     });
-    console.log(z);
-    const polygon = L.polygon(z.points, {
+    L.polygon(z.points, {
       color: z.color,
       shapeOptions: {
         stroke: false,
@@ -159,8 +162,7 @@ function resetZones(op) {
         fill: true,
         clickable: false,
       },
-    });
-    polygon.addTo(Wasabee.zoneLayerGroup);
+    }).addTo(Wasabee.zoneLayerGroup);
   }
 }
 
