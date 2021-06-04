@@ -19,7 +19,7 @@ const KeysList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
@@ -30,7 +30,7 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   },
 
   _displayDialog: function () {

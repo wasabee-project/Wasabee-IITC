@@ -137,7 +137,7 @@ export default class WasabeeOp {
     const s = getSelectedOperation();
     if (s && s.ID == this.ID && s != this)
       console.trace(
-        "store current OP from a different obj",
+        "store current OP from a different obj, this *should* be followed by makeSelectedOperation",
         s.ID,
         s.name,
         this.ID,
@@ -862,7 +862,7 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "op update" }, false);
+    window.map.fire("wasabee:op:change");
   }
 
   runCrosslinks() {

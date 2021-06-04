@@ -8,48 +8,56 @@ const LinkButton = WButton.extend({
     TYPE: "LinkButton",
   },
 
-  initialize: function (map = window.map, container) {
-    this._map = map;
-
+  initialize: function (container) {
     this.type = LinkButton.TYPE;
     this.title = wX("LINKS BUTTON TITLE");
     this.handler = this._toggleActions;
     this._container = container;
 
-    const context = this;
-
     this.button = this._createButton({
       container: this._container,
       className: "wasabee-toolbar-link",
       callback: this._toggleActions,
-      context: context,
+      context: this,
       title: this.title,
     });
 
-    this.actionsContainer = this._createSubActions([
+    this.actionsContainer = this._createSubActions(this.getSubActions());
+
+    this._container.appendChild(this.actionsContainer);
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("LINKS BUTTON TITLE");
+      const newSubActions = this._createSubActions(this.getSubActions());
+      this._container.replaceChild(newSubActions, this.actionsContainer);
+      newSubActions.style.display = this.actionsContainer.style.display;
+      this.actionsContainer = newSubActions;
+    });
+  },
+
+  getSubActions: function () {
+    return [
       {
         title: wX("ADD LINK TITLE"),
         text: wX("ADD_LINKS"),
         callback: () => {
           this.disable();
-          const ld = new LinkDialog(map);
+          const ld = new LinkDialog();
           ld.enable();
         },
-        context: context,
+        context: this,
       },
       {
         title: wX("AUTO_DRAWS"),
         text: wX("AUTO_DRAWS"),
         callback: () => {
           this.disable();
-          const a = new AutodrawsDialog(map);
+          const a = new AutodrawsDialog();
           a.enable();
         },
-        context: context,
+        context: this,
       },
-    ]);
-
-    this._container.appendChild(this.actionsContainer);
+    ];
   },
 
   // enable: // default is good

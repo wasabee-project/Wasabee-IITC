@@ -11,79 +11,86 @@ const OpButton = WButton.extend({
     TYPE: "opButton",
   },
 
-  initialize: function (map, container) {
-    if (!map) map = window.map;
-    this._map = map;
-
+  initialize: function (container) {
     this.type = OpButton.TYPE;
     this.title = wX("OP_BUTTON");
     this.handler = this._toggleActions;
     this._container = container;
 
-    const context = this;
-
     this.button = this._createButton({
       container: this._container,
       className: "wasabee-toolbar-op",
       callback: this._toggleActions,
-      context: context,
+      context: this,
       title: this.title,
     });
 
-    this.actionsContainer = this._createSubActions([
+    this.actionsContainer = this._createSubActions(this.getSubActions());
+
+    this._container.appendChild(this.actionsContainer);
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("OP_BUTTON");
+      const newSubActions = this._createSubActions(this.getSubActions());
+      this._container.replaceChild(newSubActions, this.actionsContainer);
+      newSubActions.style.display = this.actionsContainer.style.display;
+      this.actionsContainer = newSubActions;
+    });
+  },
+
+  getSubActions: function () {
+    return [
       {
         title: wX("OP_SETTINGS_TITLE"),
         text: wX("OP_SETTINGS_BUTTON"),
         callback: () => {
           this.disable();
-          const od = new OpSettings(map);
+          const od = new OpSettings();
           od.enable();
         },
-        context: context,
+        context: this,
       },
       {
         title: wX("CHECKLIST BUTTON TITLE"),
         text: wX("CHECKLIST BUTTON"),
         callback: () => {
           this.disable();
-          const cl = new OperationChecklistDialog(map);
+          const cl = new OperationChecklistDialog();
           cl.enable();
         },
-        context: context,
+        context: this,
       },
       {
         title: wX("BLOCKER LIST TITLE"),
         text: wX("BLOCKER TITLE"),
         callback: () => {
           this.disable();
-          const bl = new BlockersList(map);
+          const bl = new BlockersList();
           bl.enable();
         },
-        context: context,
+        context: this,
       },
       {
         title: wX("KEYS"),
         text: wX("KEYS"),
         callback: () => {
           this.disable();
-          const kl = new KeysList(map);
+          const kl = new KeysList();
           kl.enable();
         },
-        context: context,
+        context: this,
       },
       {
         title: wX("EXPORT OP TITLE"),
         text: wX("EXPORT OP"),
         callback: () => {
           this.disable();
-          const ed = new ExportDialog(map);
+          const ed = new ExportDialog();
           ed.enable();
         },
-        context: context,
+        context: this,
       },
-    ]);
-
-    this._container.appendChild(this.actionsContainer);
+    ];
   },
 
   // enable: // default is good

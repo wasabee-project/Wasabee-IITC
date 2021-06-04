@@ -44,12 +44,6 @@ const ConfirmDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    // let the callbacks do their own updates
-    // window.map.fire("wasabee:uiupdate:mapdata", { reason: "confirmDialog" }, false);
-  },
-
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {

@@ -37,7 +37,7 @@ const MarkerList = OperationChecklistDialog.extend({
     });
   },
 
-  checklistUpdate: async function () {
+  update: async function () {
     const operation = getSelectedOperation();
     this.setTitle(wX("MARKER_LIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(

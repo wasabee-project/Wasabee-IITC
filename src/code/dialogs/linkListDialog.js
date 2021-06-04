@@ -67,7 +67,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     });
   },
 
-  checklistUpdate: async function () {
+  update: async function () {
     const operation = getSelectedOperation();
     this.sortable = this.getListDialogContent(
       operation,
@@ -77,6 +77,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     );
     await this.sortable.done;
     this.setContent(this.sortable.table);
+    this.setTitle(this.options.portal.displayName + wX("LINKS2"));
   },
 });
 

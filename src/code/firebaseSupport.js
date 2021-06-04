@@ -60,11 +60,7 @@ export function initFirebase() {
         break;
       case "Login":
         console.debug("server reported teammate login: ", event.data.data.gid);
-        window.map.fire(
-          "wasabee:uiupdate:agentlocations",
-          { reason: "onlineAgent" },
-          false
-        );
+        window.map.fire("wasabee:agentlocations");
         break;
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {

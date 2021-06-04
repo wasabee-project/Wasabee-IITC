@@ -87,7 +87,7 @@ window.plugin.wasabee.init = async () => {
 
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
-    window.map.fire("wasabee:uiupdate:agentlocations");
+    window.map.fire("wasabee:agentlocations");
   });
 
   window.addHook("portalDetailsUpdated", (e) => {
@@ -98,24 +98,28 @@ window.plugin.wasabee.init = async () => {
     });
   });
 
-  // XXX until we can make the necessary changes, fire all three
-  window.map.on("wasabee:uiupdate", (d) => {
-    console.trace();
-    console.log("old uiupdate called -- redrawing everything");
-    window.map.fire("wasabee:uiupdate:buttons");
-    window.map.fire("wasabee:uiupdate:agentlocations");
-    window.map.fire("wasabee:uiupdate:mapdata", d);
-  });
+  // use our own hook on portal click
+  // note: do not build WasabeePortal here, we only need one for QD
+  function propagateClick(e) {
+    window.map.fire("wasabee:portal:click", e.target);
+  }
+  window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
 
-  window.map.on("wasabee:uiupdate:mapdata", drawMap);
-  window.map.on("wasabee:uiupdate:agentlocations", drawAgents);
+  window.map.on("wasabee:ui:skin", drawMap);
+
+  window.map.on("wasabee:op:change", drawMap);
+  window.map.on("wasabee:op:select", drawMap);
+  window.map.on("wasabee:agentlocations", drawAgents);
+  window.map.on("wasabee:logout", drawAgents);
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
-    window.map.fire("wasabee:uiupdate:buttons");
-    window.map.fire("wasabee:uiupdate:mapdata", { reason: "resume" }, false);
-    window.map.fire("wasabee:uiupdate:agentlocations");
-    sendLocation();
+    // check if still logged in
+    if (WasabeeMe.isLoggedIn()) {
+      // refresh agent locations
+      window.map.fire("wasabee:agentlocations");
+      sendLocation();
+    }
   });
 
   window.map.on("wasabee:op:select", () => {
@@ -129,8 +133,6 @@ window.plugin.wasabee.init = async () => {
       drawBackgroundOps();
     }
   });
-
-  window.map.on("wasabee:ui:buttonreset", addButtons);
 
   // Android panes
   const usePanes = localStorage[Wasabee.static.constants.USE_PANES] === "true";
@@ -150,12 +152,7 @@ window.plugin.wasabee.init = async () => {
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup
     ) {
-      // just mapdata layers
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "layeradd" },
-        false
-      );
+      drawMap();
     }
     if (obj.layer === Wasabee.backgroundOpsGroup) {
       drawBackgroundOps();
@@ -184,25 +181,24 @@ window.plugin.wasabee.init = async () => {
   }
 
   // setup UI elements
-  window.map.fire("wasabee:ui:buttonreset");
+  addButtons();
   setupToolbox();
 
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
-  window.map.fire("wasabee:uiupdate:mapdata", { reason: "startup" }, false);
-  window.map.fire("wasabee:uiupdate:agentlocations");
+  window.map.fire("wasabee:agentlocations");
+
+  // initial draw
+  drawMap();
+  drawBackgroundOps();
 
   // run crosslinks
   window.map.fire("wasabee:crosslinks");
-
-  // draw background ops
-  drawBackgroundOps();
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
     WasabeeMe.waitGet(true);
-    window.map.fire("wasabee:uiupdate:buttons");
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys", { reason: "startup" }, false);

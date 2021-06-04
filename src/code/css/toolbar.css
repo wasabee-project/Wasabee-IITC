@@ -129,6 +129,10 @@
   /*background-image: url(../images/toolbar_sync.png)*/
   background-image: url(../images/toolbar_download.svg)
 }
+.wasabee-toolbar-sync.loading {
+  background-image: url(../images/loading.gif)
+}
+
 /*.wasabee-toolbar-download {
   background-image: url(../images/toolbar_download.png)
 }*/

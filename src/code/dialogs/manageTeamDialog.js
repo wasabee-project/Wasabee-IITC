@@ -29,13 +29,15 @@ const ManageTeamDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:teamdata", this.update, this);
+    window.map.on("wasabee:team:update", this.update, this);
+    window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:teamdata", this.update, this);
+    window.map.off("wasabee:team:update", this.update, this);
+    window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
   _setupTable: function () {
@@ -84,7 +86,7 @@ const ManageTeamDialog = WDialog.extend({
                 } else {
                   alert(wX("INPUT_SQUAD_NAME"));
                 }
-                window.map.fire("wasabee:uiupdate:teamdata");
+                this.update();
               },
               current: value,
               placeholder: "boots",
@@ -112,7 +114,7 @@ const ManageTeamDialog = WDialog.extend({
                 } catch (e) {
                   console.error(e);
                 }
-                window.map.fire("wasabee:uiupdate:teamdata");
+                window.map.fire("wasabee:team:update");
               },
             });
             con.enable();
@@ -166,7 +168,7 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
         alert(wX("ADD_SUCC_INSTR"));
-        window.map.fire("wasabee:uiupdate:teamdata");
+        window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -186,7 +188,7 @@ const ManageTeamDialog = WDialog.extend({
         await renameTeamPromise(this.options.team.ID, renameField.value);
         alert(`renamed to ${renameField.value}`);
         this.options.team.Name = renameField.value; // for display
-        window.map.fire("wasabee:uiupdate:teamdata");
+        window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -218,7 +220,7 @@ const ManageTeamDialog = WDialog.extend({
         alert("updated rocks info");
         this.options.team.RocksComm = rockscommField.value; // for display
         this.options.team.RocksKey = rocksapiField.value; // for display
-        window.map.fire("wasabee:uiupdate:teamdata");
+        this.update();
       } catch (e) {
         console.error(e);
         alert(e.toString());
@@ -239,7 +241,7 @@ const ManageTeamDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         await deleteJoinLinkPromise(this.options.team.ID);
         this.options.team.JoinLinkToken = "";
-        window.map.fire("wasabee:uiupdate:teamdata");
+        this.update();
       });
     } else {
       L.DomUtil.create("span", null, container).textContent = "not set";
@@ -250,7 +252,7 @@ const ManageTeamDialog = WDialog.extend({
         const response = await createJoinLinkPromise(this.options.team.ID);
         const j = JSON.parse(response);
         this.options.team.JoinLinkToken = j.Key;
-        window.map.fire("wasabee:uiupdate:teamdata");
+        this.update();
       });
     }
 
@@ -277,7 +279,7 @@ const ManageTeamDialog = WDialog.extend({
             console.error(e);
             alert(e.toString());
           }
-          window.map.fire("wasabee:uiupdate:teamdata");
+          window.map.fire("wasabee:teams");
         },
       });
       cd.enable();

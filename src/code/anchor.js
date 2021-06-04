@@ -132,7 +132,6 @@ export default class WasabeeAnchor {
     L.DomEvent.on(swapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       swapPortal(operation, this._portal);
-      window.map.fire("wasabee:uiupdate:mapdata"); // so lists update
       marker.closePopup();
     });
     const deleteButton = L.DomUtil.create("button", null, buttonSet);
@@ -140,7 +139,6 @@ export default class WasabeeAnchor {
     L.DomEvent.on(deleteButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       deletePortal(operation, this._portal);
-      window.map.fire("wasabee:uiupdate:mapdata");
       marker.closePopup();
     });
 

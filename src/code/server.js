@@ -76,7 +76,6 @@ export async function updateOpPromise(operation) {
       // break;
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -158,7 +157,6 @@ export async function opPromise(opID) {
         return Promise.resolve(localop);
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         raw = await response.json();
         return Promise.reject(wX("NOT LOGGED IN", { error: raw.error }));
       case 403:
@@ -191,14 +189,8 @@ export async function opPromise(opID) {
 
 // returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
 // use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
-export async function mePromise() {
-  try {
-    const response = await genericGet("/me?json=y");
-    return response;
-  } catch (e) {
-    console.error(e);
-    return e;
-  }
+export function mePromise() {
+  return genericGet("/me?json=y");
 }
 
 // returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
@@ -441,7 +433,6 @@ async function genericPut(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -497,7 +488,6 @@ async function genericPost(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -553,7 +543,6 @@ async function genericDelete(url, formData, contentType) {
       // break;
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));
@@ -607,7 +596,6 @@ async function genericGet(url) {
         }
       case 401:
         WasabeeMe.purge();
-        window.map.fire("wasabee:uiupdate:buttons");
         try {
           const err = await response.json();
           return Promise.reject(wX("NOT LOGGED IN", { error: err.error }));

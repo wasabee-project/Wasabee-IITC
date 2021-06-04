@@ -57,7 +57,7 @@ export const WPane = L.Handler.extend({
       "wasabee-pane hidden",
       document.body
     );
-    window.map.on("wasabee:paneset", (data) => {
+    window.map.on("wasabee:pane:set", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog) this._dialog.closeDialog();
       this._dialog = data.dialog;
@@ -65,7 +65,7 @@ export const WPane = L.Handler.extend({
       this._container.appendChild(this._dialog._container);
       window.show(data.pane);
     });
-    window.map.on("wasabee:paneclear", (data) => {
+    window.map.on("wasabee:pane:clear", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog === data.dialog) delete this._dialog;
     });
@@ -105,9 +105,17 @@ export const WDialog = L.Handler.extend({
       localStorage[window.plugin.wasabee.static.constants.USE_PANES] === "true";
   },
 
-  addHooks: function () {},
+  addHooks: function () {
+    window.map.on("wasabee:ui:skin", this.update, this);
+    window.map.on("wasabee:ui:lang", this.update, this);
+  },
 
-  removeHooks: function () {},
+  removeHooks: function () {
+    window.map.off("wasabee:ui:skin", this.update, this);
+    window.map.off("wasabee:ui:lang", this.update, this);
+  },
+
+  update: function () {},
 
   createDialog: function (options) {
     this.options.title = options.title;
@@ -138,7 +146,7 @@ export const WDialog = L.Handler.extend({
           L.DomEvent.on(button, "click", entry.click);
         }
       }
-      window.map.fire("wasabee:paneset", {
+      window.map.fire("wasabee:pane:set", {
         pane: this.options.paneId,
         dialog: this,
       });
@@ -174,7 +182,7 @@ export const WDialog = L.Handler.extend({
       this._dialog.dialog("close");
       delete this._dialog;
     } else if (this._container) {
-      window.map.fire("wasabee:paneclear", {
+      window.map.fire("wasabee:pane:clear", {
         pane: this.options.paneId,
         dialog: this,
       });
@@ -207,13 +215,21 @@ export const ButtonsControl = L.Control.extend({
     const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
     outerDiv.appendChild(this.options.container);
 
+    window.map.on("wasabee:login wasabee:logout", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+
     return outerDiv;
   },
 
-  // called when wasabee:uiupdate:buttons fires
+  onRemove: function () {
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:login wasabee:logout", this.update, this);
+  },
+
+  // called on skin, lang, login/logout and op change/select
   update: function () {
     for (const b of this.options.buttons.values()) {
-      b.Wupdate();
+      b.update();
     }
   },
 
@@ -240,10 +256,8 @@ export const WButton = L.Class.extend({
 
   // make sure all these bases are covered in your button
   // XXX this initializer is not used by any buttons
-  initialize: function (map, container) {
+  initialize: function (container) {
     console.log("WButton init");
-    if (!map) map = window.map;
-    this._map = map;
 
     this.type = WButton.TYPE;
     this.title = "Unextended WButton";
@@ -260,7 +274,7 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function () {},
+  update: function () {},
 
   _toggleActions: function () {
     if (this._enabled) {
