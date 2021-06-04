@@ -2,23 +2,24 @@
     "headers": {
         "prod": {
             "downloadURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.user.js",
-            "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js"
+            "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js",
+            "version": "0.20.BUILDDATE"
         },
         "dev": {
             "downloadURL": "https://am.wasabee.rocks/static/dev/wasabee.user.js",
-            "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js"
+            "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js",
+            "version": "0.20.BUILDDATE-dev"
         },
         "common": {
             "id": "Wasabee.user.js",
             "name": "IITC plugin: Wasabee Draw Tools",
-	    "namespace": "https://wasabee.rocks/",
+            "namespace": "https://wasabee.rocks/",
             "description": "Wasabee is not for dating.",
             "author": "Wasabee Project Team",
             "category": "Draw",
             "include": "https://intel.ingress.com/*",
             "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-            "version": "0.20.BUILDDATE",
-	    "grant": "none"
+            "grant": "none"
         }
     },
     "releaseFolder": {

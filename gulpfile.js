@@ -53,13 +53,15 @@ gulp.task("buildheaders", (cb) => {
     let newline = l;
     for (const k of Object.keys(cfg.headers.common)) {
       if (l.indexOf(`@${k} `) == 3) {
-        newline = `// @${k} 	 ${cfg.headers.common[k]}`;
+        const key = k.padEnd(13);
+        newline = `// @${key} ${cfg.headers.common[k]}`;
         break;
       }
     }
     for (const k of Object.keys(cfg.headers[status.mode])) {
       if (l.indexOf(`@${k} `) == 3) {
-        newline = `// @${k} 	 ${cfg.headers[status.mode][k]}`;
+        const key = k.padEnd(13);
+        newline = `// @${key} ${cfg.headers[status.mode][k]}`;
         break;
       }
     }
