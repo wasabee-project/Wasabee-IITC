@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
-import { clearAllItems } from "../uiCommands";
+import { clearAllItems, zoomToOperation } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
 import ZoneDialog from "./zoneDialog";
 import {
@@ -213,14 +213,7 @@ const OpSettingDialog = WDialog.extend({
           }
           await removeOperation(so.ID);
           const newop = await changeOpIfNeeded();
-          const mbr = newop.mbr;
-          if (
-            mbr &&
-            isFinite(mbr._southWest.lat) &&
-            isFinite(mbr._northEast.lat)
-          ) {
-            window.map.fitBounds(mbr);
-          }
+          zoomToOperation(newop);
           // changeOpIfNeeded fires all the required UI events
         },
       });

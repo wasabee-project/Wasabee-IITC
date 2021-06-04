@@ -421,6 +421,14 @@ export function blockerAutomark(operation, first = true) {
   if (first) operation.endBatchMode();
 }
 
+export function zoomToOperation(operation) {
+  if (!operation) return;
+  const mbr = operation.mbr;
+  if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+    window.map.fitBounds(mbr);
+  }
+}
+
 export async function fullSync() {
   const so = getSelectedOperation();
   const server = GetWasabeeServer();
@@ -531,10 +539,7 @@ export function deleteLocalOp(opname, opid) {
     callback: async () => {
       await removeOperation(opid);
       const newop = await changeOpIfNeeded(); // fires ui events
-      const mbr = newop.mbr;
-      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
-        window.map.fitBounds(mbr);
-      }
+      zoomToOperation(newop);
     },
   });
   con.enable();

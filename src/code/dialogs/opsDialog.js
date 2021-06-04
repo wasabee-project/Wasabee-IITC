@@ -14,7 +14,7 @@ import OpPermList from "./opPerms";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
-import { syncOp, deleteLocalOp } from "../uiCommands";
+import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
 const OpsDialog = WDialog.extend({
@@ -109,14 +109,7 @@ const OpsDialog = WDialog.extend({
             L.DomEvent.stop(ev);
             await makeSelectedOperation(op.id);
             const newop = getSelectedOperation();
-            const mbr = newop.mbr;
-            if (
-              mbr &&
-              isFinite(mbr._southWest.lat) &&
-              isFinite(mbr._northEast.lat)
-            ) {
-              window.map.fitBounds(mbr);
-            }
+            zoomToOperation(newop);
           });
         },
       },
