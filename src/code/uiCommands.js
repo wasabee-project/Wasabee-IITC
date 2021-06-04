@@ -456,7 +456,9 @@ export async function fullSync() {
     for (const opID of opsID) {
       promises.push(opPromise(opID));
     }
-    const ops = await Promise.all(promises);
+    const ops = (await Promise.allSettled(promises))
+      .filter((p) => p.status === "fulfilled")
+      .map((p) => p.value);
     for (const newop of ops) {
       const localOp = await WasabeeOp.load(newop.ID);
       if (!localOp || !localOp.localchanged) await newop.store();
