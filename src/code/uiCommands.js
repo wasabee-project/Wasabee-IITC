@@ -421,36 +421,46 @@ export function blockerAutomark(operation, first = true) {
   if (first) operation.endBatchMode();
 }
 
+export function zoomToOperation(operation) {
+  if (!operation) return;
+  const mbr = operation.mbr;
+  if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+    window.map.fitBounds(mbr);
+  }
+}
+
 export async function fullSync() {
   const so = getSelectedOperation();
   const server = GetWasabeeServer();
 
   try {
+    let reloadOpID = null;
     const me = await WasabeeMe.waitGet(true);
     const promises = new Array();
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner
     const ol = await opsList();
-    const serverOps = new Set(
-      ol
-        .map(await WasabeeOp.load)
-        .filter((op) => op)
-        .filter((op) => op.server == server && !opsID.has(op.ID))
-    );
+    const serverOps = new Array();
+    for (const opID of ol) {
+      const op = await WasabeeOp.load(opID);
+      if (op && op.server === server && !opsID.has(op.ID)) serverOps.push(op);
+    }
     for (const op of serverOps) {
       // if owned, duplicate the OP
       if (op.IsOwnedOp()) {
         const newop = await duplicateOperation(op.ID);
         newop.name = op.name;
         await newop.store();
+        // if selected op, we reload the local duplicate
+        if (op.ID === so.ID) reloadOpID = newop.ID;
       }
       await removeOperation(op.ID);
     }
-    if (serverOps.size > 0)
+    if (serverOps.length > 0)
       console.log(
         "remove",
-        Array.from(serverOps).map((op) => op.ID)
+        serverOps.map((op) => op.ID)
       );
 
     for (const opID of opsID) {
@@ -463,11 +473,14 @@ export async function fullSync() {
       const localOp = await WasabeeOp.load(newop.ID);
       if (!localOp || !localOp.localchanged) await newop.store();
       else if (localOp.lasteditid != newop.lasteditid) {
+        // if selected op, use current selected op object
         const op = localOp.ID != so.ID ? localOp : so;
         // check if there are really local changes
         // XXX: this may be too long to do
         if (!op.checkChanges()) {
           await newop.store();
+          // if selected op, reload from the new op
+          if (op === so) reloadOpID = so.ID;
         } else {
           // partial update on fields the server is always right
           // XXX: do we need zone for teamlist consistency ?
@@ -488,17 +501,16 @@ export async function fullSync() {
     }
 
     // replace current op by the server version if any
-    if (ops.some((op) => op.ID == so.ID)) await makeSelectedOperation(so.ID);
+    if (reloadOpID) await makeSelectedOperation(reloadOpID);
     // change op if the current does not exist anymore
-    else if (!ol.includes(so.ID)) await changeOpIfNeeded();
+    else {
+      const op = await changeOpIfNeeded();
+      if (op !== so) zoomToOperation(op);
+    }
+
     // update UI to reflect new ops list
     // XXX do we need a specific call for "op list update"?
-    else
-      window.map.fire(
-        "wasabee:uiupdate:mapdata",
-        { reason: "full sync" },
-        false
-      );
+    window.map.fire("wasabee:uiupdate:mapdata", { reason: "full sync" }, false);
     window.map.fire("wasabee:uiupdate:teamdata"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));
@@ -533,10 +545,7 @@ export function deleteLocalOp(opname, opid) {
     callback: async () => {
       await removeOperation(opid);
       const newop = await changeOpIfNeeded(); // fires ui events
-      const mbr = newop.mbr;
-      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
-        window.map.fitBounds(mbr);
-      }
+      zoomToOperation(newop);
     },
   });
   con.enable();

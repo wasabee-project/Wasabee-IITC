@@ -5,6 +5,7 @@ import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
+import { zoomToOperation } from "../uiCommands";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -131,7 +132,7 @@ const ImportDialog = WDialog.extend({
       checklist.enable();
       // zoom to it
       // OR use pointTileDataRequest to try to load faked portals?
-      window.map.fitBounds(newop.mbr);
+      zoomToOperation(newop);
 
       return;
     }
