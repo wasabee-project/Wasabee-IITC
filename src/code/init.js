@@ -18,9 +18,14 @@ import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import { openDB } from "idb";
+import polyfill from "./polyfill";
+
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = async () => {
+  // polyfill
+  polyfill();
+
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
