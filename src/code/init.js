@@ -79,6 +79,7 @@ window.plugin.wasabee.init = async () => {
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
   window.addLayerGroup("Wasabee Zones", Wasabee.zoneLayerGroup, true);
+  Wasabee.zoneLayerGroup.setZIndex(300);
 
   Wasabee.backgroundOpsGroup = new L.LayerGroup();
   window.addLayerGroup(
