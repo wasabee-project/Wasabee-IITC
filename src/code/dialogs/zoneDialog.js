@@ -41,6 +41,18 @@ const ZoneDialog = WDialog.extend({
       this.closeDialog();
     };
 
+    buttons[wX("ADD_ZONE")] = () => {
+      getSelectedOperation().addZone();
+    };
+
+    buttons[wX("SET_MARKERS_ZONES")] = () => {
+      this.setMarkersToZones();
+    };
+
+    buttons[wX("SET_LINKS_ZONES")] = () => {
+      this.setLinksToZones();
+    };
+
     this.createDialog({
       title: "Zones",
       html: html,
@@ -145,7 +157,7 @@ const ZoneDialog = WDialog.extend({
       }
     }
 
-    const add = L.DomUtil.create("a", null, container);
+    /* const add = L.DomUtil.create("a", null, container);
     add.href = "#";
     add.textContent = "add zone";
     L.DomEvent.on(add, "click", (ev) => {
@@ -160,6 +172,7 @@ const ZoneDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       this.setMarkersToZones();
     });
+    */
 
     return container;
   },
@@ -171,49 +184,22 @@ const ZoneDialog = WDialog.extend({
     for (const m of op.markers) {
       const ll = op.getPortal(m.portalId).latLng;
 
-      const zone = this.determineZone(ll, op);
+      const zone = op.determineZone(ll);
       op.setZone(m, zone);
     }
     op.endBatchMode();
   },
 
-  determineZone: function (latlng, op) {
-    // sort first, lowest ID wins if a marker is in 2 overlapping zones
-    op.zones.sort((a, b) => {
-      return a.id - b.id;
-    });
-    for (const z of op.zones) {
-      z.points.sort((a, b) => {
-        return a.position - b.position;
-      });
-      console.log(z.points);
-      if (this.inZone(latlng, z.points)) return z.id;
+  setLinksToZones: function () {
+    const op = getSelectedOperation();
+
+    op.startBatchMode();
+    for (const l of op.links) {
+      const ll = op.getPortal(l.fromPortalId).latLng;
+      const zone = op.determineZone(ll);
+      op.setZone(l, zone);
     }
-    // default to primary zone
-    return 1;
-  },
-
-  //ray casting algo
-  inZone: function (latlng, points) {
-    let inside = false;
-
-    console.log(latlng);
-
-    const x = latlng.lat,
-      y = latlng.lng;
-
-    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-      const xi = points[i].lat,
-        yi = points[i].lng;
-      const xj = points[j].lat,
-        yj = points[j].lng;
-
-      const intersect =
-        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
-    }
-
-    return inside;
+    op.endBatchMode();
   },
 });
 

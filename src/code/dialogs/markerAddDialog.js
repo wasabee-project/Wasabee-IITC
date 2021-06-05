@@ -36,7 +36,7 @@ const MarkerAddDialog = WDialog.extend({
     zoneAll.textContent = "All"; // wX this
     for (const z of getSelectedOperation().zones) {
       const o = L.DomUtil.create("option", null, this._zones);
-      o.value = z.ID;
+      o.value = z.id;
       o.textContent = z.name;
     }
 
@@ -52,9 +52,14 @@ const MarkerAddDialog = WDialog.extend({
         this._selectedPortal.displayFormat(this._smallScreen)
       );
 
+      this._zones.value = getSelectedOperation().determineZone(
+        this._selectedPortal.latLng
+      );
+
       const markers = getSelectedOperation().getPortalMarkers(
         this._selectedPortal
       );
+
       let defaultType =
         window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
       if (
