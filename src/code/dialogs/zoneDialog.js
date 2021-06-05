@@ -11,6 +11,7 @@ const ZoneDialog = WDialog.extend({
   },
 
   addHooks: function () {
+    this.ZonedrawHandler = new ZonedrawHandler(window.map, {});
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
@@ -19,12 +20,12 @@ const ZoneDialog = WDialog.extend({
     } else {
       this._displayDialog();
     }
-    this.ZonedrawHandler = new ZonedrawHandler(window.map, {});
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:change wasabee:op:select", this.update, this);
+    this.ZonedrawHandler.disable();
   },
 
   update: function () {
@@ -117,21 +118,29 @@ const ZoneDialog = WDialog.extend({
       }
       if (z.points.length == 0) {
         const addPoints = L.DomUtil.create("a", null, commandcell);
-        addPoints.textContent = " +"; // pick a symbol
+        addPoints.textContent = " 🖍";
         addPoints.href = "#";
         L.DomEvent.on(addPoints, "click", (ev) => {
           L.DomEvent.stop(ev);
-          // start polygon draw handler
           this.ZonedrawHandler.zoneID = z.id;
           this.ZonedrawHandler.enable();
         });
       } else {
         const delPoints = L.DomUtil.create("a", null, commandcell);
-        delPoints.textContent = " X"; // pick a symbol
+        delPoints.textContent = " 🧽";
         delPoints.href = "#";
         L.DomEvent.on(delPoints, "click", (ev) => {
           L.DomEvent.stop(ev);
           getSelectedOperation().removeZonePoints(z.id);
+        });
+      }
+      if (this.ZonedrawHandler && this.ZonedrawHandler._enabled) {
+        const stopDrawing = L.DomUtil.create("a", null, commandcell);
+        stopDrawing.href = "#";
+        stopDrawing.textcontent = " 🛑";
+        L.DomEvent.on(stopDrawing, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          this.ZonedrawHandler.disable();
         });
       }
     }
@@ -144,7 +153,67 @@ const ZoneDialog = WDialog.extend({
       getSelectedOperation().addZone();
     });
 
+    const assign = L.DomUtil.create("a", null, container);
+    assign.href = "#";
+    assign.textContent = "set markers to zones";
+    L.DomEvent.on(assign, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this.setMarkersToZones();
+    });
+
     return container;
+  },
+
+  setMarkersToZones: function () {
+    const op = getSelectedOperation();
+
+    op.startBatchMode();
+    for (const m of op.markers) {
+      const ll = op.getPortal(m.portalId).latLng;
+
+      const zone = this.determineZone(ll, op);
+      op.setZone(m, zone);
+    }
+    op.endBatchMode();
+  },
+
+  determineZone: function (latlng, op) {
+    // sort first, lowest ID wins if a marker is in 2 overlapping zones
+    op.zones.sort((a, b) => {
+      return a.id - b.id;
+    });
+    for (const z of op.zones) {
+      z.points.sort((a, b) => {
+        return a.position - b.position;
+      });
+      console.log(z.points);
+      if (this.inZone(latlng, z.points)) return z.id;
+    }
+    // default to primary zone
+    return 1;
+  },
+
+  //ray casting algo
+  inZone: function (latlng, points) {
+    let inside = false;
+
+    console.log(latlng);
+
+    const x = latlng.lat,
+      y = latlng.lng;
+
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const xi = points[i].lat,
+        yi = points[i].lng;
+      const xj = points[j].lat,
+        yj = points[j].lng;
+
+      const intersect =
+        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
   },
 });
 
@@ -153,6 +222,7 @@ export default ZoneDialog;
 const ZonedrawHandler = L.Handler.extend({
   initialize: function (map = window.map, options) {
     this.zoneID = 0;
+    this._enabled = false;
 
     L.Handler.prototype.initialize.call(this, map, options);
     this.options = options;
@@ -194,6 +264,7 @@ const ZonedrawHandler = L.Handler.extend({
     this._tooltip.dispose();
     this._tooltip = null;
 
+    window.map.off("click", this._click, this);
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
     window.map.off("mousemove", this._onMouseMove, this);
