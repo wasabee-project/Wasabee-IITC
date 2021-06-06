@@ -366,7 +366,8 @@ export function blockerAutomark(operation, first = true) {
   if (wportal.team == "E") {
     type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
   }
-  operation.addMarker(type, wportal, { comment: "auto-marked" });
+  const zone = operation.determineZone(wportal.latLng);
+  operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
 
   // remove nodes from blocker list
   operation.blockers = operation.blockers.filter((b) => {
