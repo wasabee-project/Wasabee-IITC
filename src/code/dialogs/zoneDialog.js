@@ -154,6 +154,7 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.on(stopDrawing, "click", (ev) => {
           L.DomEvent.stop(ev);
           this.ZonedrawHandler.disable();
+          this.update();
         });
       }
     }
@@ -185,7 +186,6 @@ const ZonedrawHandler = L.Handler.extend({
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
     this.setZIndex();
-    window.map.fire("wasabee:op:change");
   },
 
   setZIndex: function () {
