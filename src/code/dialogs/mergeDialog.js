@@ -12,8 +12,10 @@ const MergeDialog = WDialog.extend({
   },
 
   options: {
+    // title
     // opOwn
     // opRemote
+    // updateCallback
   },
 
   addHooks: function () {
@@ -28,17 +30,26 @@ const MergeDialog = WDialog.extend({
     this._layer.remove();
   },
 
-  doRebase: async function () {
+  rebase: async function () {
     await this._opRebase.store();
     if (getSelectedOperation().ID == this._opRebase.ID)
       await makeSelectedOperation(this._opRebase.ID);
+    if (this.options.updateCallback)
+      this.options.updateCallback(this._opRebase);
     this.closeDialog();
   },
 
-  doReplace: async function () {
+  useServer: async function () {
     await this.options.opRemote.store();
     if (getSelectedOperation().ID == this.options.opRemote.ID)
       await makeSelectedOperation(this.options.opRemote.ID);
+    this.closeDialog();
+  },
+
+  useLocal: function () {
+    // nothing to do except upload
+    if (this.options.updateCallback)
+      this.options.updateCallback(this.options.opOwn);
     this.closeDialog();
   },
 
@@ -61,7 +72,7 @@ const MergeDialog = WDialog.extend({
       remoteChanges.deletion.length === 0 &&
       summary.edition.singlePortalLink === 0
     ) {
-      this.doRebase();
+      this.rebase();
       return;
     }
 
@@ -103,18 +114,22 @@ const MergeDialog = WDialog.extend({
     const buttons = [];
     buttons.push({
       text: wX("MERGE_REBASE"),
-      click: () => this.doRebase(),
+      click: () => this.rebase(),
     });
     buttons.push({
       text: wX("MERGE_REPLACE"),
-      click: () => this.doReplace(),
+      click: () => this.useServer(),
+    });
+    buttons.push({
+      text: wX("MERGE_LOCAL"),
+      click: () => this.useLocal(),
     });
     buttons.push({
       text: wX("CANCEL"),
       click: () => this.closeDialog(),
     });
     this.createDialog({
-      title: wX("MERGE_TITLE"),
+      title: this.options.title || wX("MERGE_TITLE"),
       html: content,
       width: "auto",
       dialogClass: "merge",
