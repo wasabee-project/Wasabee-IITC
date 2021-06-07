@@ -1489,32 +1489,9 @@ export default class WasabeeOp {
       return a.id - b.id;
     });
     for (const z of this.zones) {
-      z.points.sort((a, b) => {
-        return a.position - b.position;
-      });
-      if (this.inPolygon(latlng, z.points)) return z.id;
+      if (z.contains(latlng)) return z.id;
     }
     // default to primary zone
     return 1;
-  }
-
-  //ray casting algo
-  inPolygon(latlng, points) {
-    let inside = false;
-    const x = latlng.lat,
-      y = latlng.lng;
-
-    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-      const xi = points[i].lat,
-        yi = points[i].lng;
-      const xj = points[j].lat,
-        yj = points[j].lng;
-
-      const intersect =
-        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
-    }
-
-    return inside;
   }
 }

@@ -11,6 +11,8 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
+  setMarkersToZones,
+  setLinksToZones,
 } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -61,6 +63,12 @@ const OperationChecklistDialog = WDialog.extend({
     };
     buttons["Count fields"] = () => {
       this.countFields(getSelectedOperation(), true);
+    };
+    buttons[wX("SET_MARKERS_ZONES")] = () => {
+      setMarkersToZones();
+    };
+    buttons[wX("SET_LINKS_ZONES")] = () => {
+      setLinksToZones();
     };
 
     await this.sortable.done;

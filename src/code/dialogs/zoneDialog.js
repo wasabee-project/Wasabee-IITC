@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
 import ZoneSetColorDialog from "./zoneSetColor";
 import { convertColorToHex } from "../auxiliar";
+import { setMarkersToZones, setLinksToZones } from "../uiCommands";
 
 const ZoneDialog = WDialog.extend({
   statics: {
@@ -46,11 +47,11 @@ const ZoneDialog = WDialog.extend({
     };
 
     buttons[wX("SET_MARKERS_ZONES")] = () => {
-      this.setMarkersToZones();
+      setMarkersToZones();
     };
 
     buttons[wX("SET_LINKS_ZONES")] = () => {
-      this.setLinksToZones();
+      setLinksToZones();
     };
 
     this.createDialog({
@@ -146,10 +147,10 @@ const ZoneDialog = WDialog.extend({
           getSelectedOperation().removeZonePoints(z.id);
         });
       }
-      if (this.ZonedrawHandler && this.ZonedrawHandler._enabled) {
+      if (this.ZonedrawHandler && this.ZonedrawHandler.enabled()) {
         const stopDrawing = L.DomUtil.create("a", null, commandcell);
         stopDrawing.href = "#";
-        stopDrawing.textcontent = " 🛑";
+        stopDrawing.textContent = " 🛑";
         L.DomEvent.on(stopDrawing, "click", (ev) => {
           L.DomEvent.stop(ev);
           this.ZonedrawHandler.disable();
@@ -157,49 +158,7 @@ const ZoneDialog = WDialog.extend({
       }
     }
 
-    /* const add = L.DomUtil.create("a", null, container);
-    add.href = "#";
-    add.textContent = "add zone";
-    L.DomEvent.on(add, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      getSelectedOperation().addZone();
-    });
-
-    const assign = L.DomUtil.create("a", null, container);
-    assign.href = "#";
-    assign.textContent = "set markers to zones";
-    L.DomEvent.on(assign, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this.setMarkersToZones();
-    });
-    */
-
     return container;
-  },
-
-  setMarkersToZones: function () {
-    const op = getSelectedOperation();
-
-    op.startBatchMode();
-    for (const m of op.markers) {
-      const ll = op.getPortal(m.portalId).latLng;
-
-      const zone = op.determineZone(ll);
-      op.setZone(m, zone);
-    }
-    op.endBatchMode();
-  },
-
-  setLinksToZones: function () {
-    const op = getSelectedOperation();
-
-    op.startBatchMode();
-    for (const l of op.links) {
-      const ll = op.getPortal(l.fromPortalId).latLng;
-      const zone = op.determineZone(ll);
-      op.setZone(l, zone);
-    }
-    op.endBatchMode();
   },
 });
 
@@ -208,11 +167,9 @@ export default ZoneDialog;
 const ZonedrawHandler = L.Handler.extend({
   initialize: function (map = window.map, options) {
     this.zoneID = 0;
-    this._enabled = false;
+    // this._enabled = false;
 
     L.Handler.prototype.initialize.call(this, map, options);
-    this.options = options;
-
     this.type = "ZonedrawHandler";
   },
 
@@ -222,13 +179,18 @@ const ZonedrawHandler = L.Handler.extend({
       return;
     }
     L.Handler.prototype.enable.call(this);
-    // postToFirebase({ id: "analytics", action: "zonedrawStart" });
   },
 
   disable: function () {
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-    // postToFirebase({ id: "analytics", action: "zonedrawEnd" });
+    this.setZIndex();
+    window.map.fire("wasabee:op:change");
+  },
+
+  setZIndex: function () {
+    window.plugin.wasabee.zoneLayerGroup.setZIndex(300);
+    // adjust each polygon?
   },
 
   addHooks: function () {
@@ -257,7 +219,6 @@ const ZonedrawHandler = L.Handler.extend({
   },
 
   _opchange: function () {
-    // postToFirebase({ id: "analytics", action: "zonedrawOpchange" });
     if (!this._enabled) return;
 
     if (getSelectedOperation().ID != this._opID) {
