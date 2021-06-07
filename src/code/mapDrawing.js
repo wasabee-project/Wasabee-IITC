@@ -158,7 +158,7 @@ function resetZones(operation) {
         stroke: false,
         opacity: 0.7,
         fill: true,
-        clickable: false,
+        interactive: false,
       },
     }).addTo(Wasabee.zoneLayerGroup);
   }
