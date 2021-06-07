@@ -227,6 +227,7 @@ const ZonedrawHandler = L.Handler.extend({
     // [esc]
     if (e.originalEvent.keyCode === 27) {
       this.disable();
+      window.map.fire("wasabee:op:change");
     }
   },
 
