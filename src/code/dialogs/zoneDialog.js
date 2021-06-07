@@ -185,12 +185,6 @@ const ZonedrawHandler = L.Handler.extend({
   disable: function () {
     if (!this._enabled) return;
     L.Handler.prototype.disable.call(this);
-    this.setZIndex();
-  },
-
-  setZIndex: function () {
-    window.plugin.wasabee.zoneLayerGroup.setZIndex(300);
-    // adjust each polygon?
   },
 
   addHooks: function () {

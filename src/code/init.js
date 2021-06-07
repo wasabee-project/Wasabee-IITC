@@ -73,13 +73,13 @@ window.plugin.wasabee.init = async () => {
   Wasabee.linkLayerGroup = new L.LayerGroup();
   Wasabee.markerLayerGroup = new L.LayerGroup();
   Wasabee.agentLayerGroup = new L.LayerGroup();
-  Wasabee.zoneLayerGroup = new L.LayerGroup();
+  Wasabee.zoneLayerGroup = new L.FeatureGroup();
   window.addLayerGroup("Wasabee Draw Portals", Wasabee.portalLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
   window.addLayerGroup("Wasabee Zones", Wasabee.zoneLayerGroup, true);
-  Wasabee.zoneLayerGroup.setZIndex(300);
+  Wasabee.zoneLayerGroup.bringToBack();
 
   Wasabee.backgroundOpsGroup = new L.LayerGroup();
   window.addLayerGroup(

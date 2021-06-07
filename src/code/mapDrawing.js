@@ -162,6 +162,7 @@ function resetZones(operation) {
       },
     }).addTo(Wasabee.zoneLayerGroup);
   }
+  Wasabee.zoneLayerGroup.bringToBack();
 }
 
 // draw a single link
