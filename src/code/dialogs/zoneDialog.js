@@ -10,7 +10,7 @@ const ZoneDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
     if (this._smallScreen) {
       this._displaySmallDialog();
@@ -21,7 +21,7 @@ const ZoneDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:change wasabee:op:select", this.update, this);
   },
 
   update: function () {

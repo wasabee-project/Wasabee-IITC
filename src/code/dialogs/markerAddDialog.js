@@ -13,8 +13,8 @@ const MarkerAddDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._pch = (portal) => {
-      context.update(portal);
+    this._pch = () => {
+      context.update();
     };
     window.addHook("portalSelected", this._pch);
 
@@ -77,6 +77,8 @@ const MarkerAddDialog = WDialog.extend({
     } else {
       this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
+
+    this.setTitle(wX("ADD MARKER TITLE"));
   },
 
   _displayDialog: async function () {

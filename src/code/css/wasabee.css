@@ -878,3 +878,13 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 .wasabee-dialog-merge .details .wasabee-table code {
   display: block;
 }
+
+/* color pickers */
+.hidden-color-picker {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

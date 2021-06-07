@@ -5,6 +5,7 @@ import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
+import { zoomToOperation } from "../uiCommands";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -47,8 +48,7 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
-      window.map.fire("wasabee:uiupdate:mapdata", { reason: "import" }, false);
-      window.map.fire("wasabee:crosslinks", { reason: "import" }, false);
+      window.map.fire("wasabee:crosslinks");
       this.closeDialog();
     };
     buttons[wX("GET DT")] = () => {
@@ -130,7 +130,7 @@ const ImportDialog = WDialog.extend({
       checklist.enable();
       // zoom to it
       // OR use pointTileDataRequest to try to load faked portals?
-      window.map.fitBounds(newop.mbr);
+      zoomToOperation(newop);
 
       return;
     }

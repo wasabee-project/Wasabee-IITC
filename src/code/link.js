@@ -108,10 +108,9 @@ export default class WasabeeLink {
     );
     const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
     arrow.style.color = this.getColor(operation);
-    const picker = L.DomUtil.create("input", "", arrow);
+    const picker = L.DomUtil.create("input", "hidden-color-picker", arrow);
     picker.type = "color";
     picker.value = convertColorToHex(this.getColor(operation));
-    picker.style.display = "none";
     picker.setAttribute("list", "wasabee-colors-datalist");
 
     L.DomEvent.on(arrow, "click", () => {

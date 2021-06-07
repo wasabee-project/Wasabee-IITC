@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
-import { clearAllItems } from "../uiCommands";
+import { clearAllItems, zoomToOperation } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
 import ZoneDialog from "./zoneDialog";
 import {
@@ -24,13 +24,13 @@ const OpSettingDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   },
 
   _displayDialog: function () {
@@ -54,6 +54,7 @@ const OpSettingDialog = WDialog.extend({
 
   update: function () {
     if (this._enabled) {
+      this.setTitle(wX("OP_SETTINGS_TITLE"));
       const content = this.makeContent();
       this.setContent(content);
     }
@@ -80,11 +81,7 @@ const OpSettingDialog = WDialog.extend({
           so.name = input.value;
           so.localchanged = true;
           await so.store();
-          window.map.fire(
-            "wasabee:uiupdate:mapdata",
-            { reason: "opSetting" },
-            false
-          );
+          window.map.fire("wasabee:op:change");
         }
       });
     } else {
@@ -106,11 +103,7 @@ const OpSettingDialog = WDialog.extend({
         so.localchanged = true;
         await so.store();
         addToColorList(picker.value);
-        window.map.fire(
-          "wasabee:uiupdate:mapdata",
-          { reason: "opSetting" },
-          false
-        );
+        window.map.fire("wasabee:op:change");
       });
     }
 
@@ -124,6 +117,7 @@ const OpSettingDialog = WDialog.extend({
         so.comment = commentInput.value;
         so.localchanged = true;
         await so.store();
+        window.map.fire("wasabee:op:change");
       });
     } else {
       const commentDisplay = L.DomUtil.create("p", "comment", topSet);
@@ -147,6 +141,7 @@ const OpSettingDialog = WDialog.extend({
           rtInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
           so.localchanged = true;
           await so.store();
+          window.map.fire("wasabee:op:change");
         } catch (e) {
           console.log(e);
           alert("Invalid date format");
@@ -213,14 +208,7 @@ const OpSettingDialog = WDialog.extend({
           }
           await removeOperation(so.ID);
           const newop = await changeOpIfNeeded();
-          const mbr = newop.mbr;
-          if (
-            mbr &&
-            isFinite(mbr._southWest.lat) &&
-            isFinite(mbr._northEast.lat)
-          ) {
-            window.map.fitBounds(mbr);
-          }
+          zoomToOperation(newop);
           // changeOpIfNeeded fires all the required UI events
         },
       });

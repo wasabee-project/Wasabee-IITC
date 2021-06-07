@@ -26,7 +26,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
@@ -36,7 +36,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabee:uiupdate:mapdata", this.checklistUpdate, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
@@ -75,7 +75,7 @@ const OperationChecklistDialog = WDialog.extend({
     });
   },
 
-  checklistUpdate: async function () {
+  update: async function () {
     const operation = getSelectedOperation();
     this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(

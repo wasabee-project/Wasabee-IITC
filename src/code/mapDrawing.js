@@ -8,7 +8,7 @@ import { getSelectedOperation, opsList } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;
 
-//** This function draws things on the layers */
+// draws all anchors, markers, and links
 export function drawMap() {
   const operation = getSelectedOperation();
   updateAnchors(operation);
@@ -16,6 +16,7 @@ export function drawMap() {
   resetLinks(operation);
 }
 
+// updates all existing markers, adding any that need to be added, removing any that need to be removed
 function updateMarkers(op) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Markers") === false) return; // yes, === false, undefined == true
   if (!op.markers || op.markers.length == 0) {
@@ -52,7 +53,7 @@ function updateMarkers(op) {
   }
 }
 
-/** This function adds a Markers to the target layer group */
+// adds a new marker
 function addMarker(target, operation) {
   const targetPortal = operation.getPortal(target.portalId);
   const marker = L.marker(targetPortal.latLng, {
@@ -91,7 +92,7 @@ function addMarker(target, operation) {
   marker.addTo(Wasabee.markerLayerGroup);
 }
 
-/** reset links is consistently 1ms faster than update, and is far safer */
+// resetting is consistently 1ms faster than trying to update
 function resetLinks(operation) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
   Wasabee.linkLayerGroup.clearLayers();
@@ -133,43 +134,7 @@ export function drawBackgroundOp(operation, layerGroup, style) {
   }
 }
 
-/** reset links is consistently 1ms faster than update, and is far safer */
-/*
-function updateLinks(operation) {
-  if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
-  if (!operation.links || operation.links.length == 0) {
-    Wasabee.linkLayerGroup.clearLayers();
-    return;
-  }
-
-  const layerMap = new Map();
-  for (const l of Wasabee.linkLayerGroup.getLayers()) {
-    layerMap.set(l.options.id, l._leaflet_id);
-  }
-
-  for (const l of operation.links) {
-    if (layerMap.has(l.ID)) {
-      const ll = Wasabee.linkLayerGroup.getLayer(layerMap.get(l.ID));
-      if (
-        l.color != ll.options.Wcolor ||
-        l.fromPortalId != ll.options.fm ||
-        l.toPortalId != ll.options.to
-      ) {
-        Wasabee.linkLayerGroup.removeLayer(ll);
-        addLink(l, operation);
-      }
-      layerMap.delete(l.ID);
-    } else {
-      addLink(l, operation);
-    }
-  }
-
-  for (const v of layerMap.values()) {
-    Wasabee.linkLayerGroup.removeLayer(v);
-  }
-}; */
-
-/** This function adds a link to the link layer group */
+// draw a single link
 function addLink(wlink, operation) {
   const latLngs = wlink.getLatLngs(operation);
   if (!latLngs) {
@@ -189,11 +154,6 @@ function addLink(wlink, operation) {
   if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
 
   const newlink = new L.GeodesicPolyline(latLngs, style);
-  // these are used for updateLink and can be removed if we get rid of it
-  /* newlink.options.id = wlink.ID;
-  newlink.options.fm = wlink.fromPortalId;
-  newlink.options.to = wlink.toPortalId;
-  newlink.options.Wcolor = wlink.color; */
 
   newlink.bindPopup("loading...", {
     className: "wasabee-popup",
@@ -215,13 +175,12 @@ function addLink(wlink, operation) {
   );
   newlink.addTo(Wasabee.linkLayerGroup);
 
-  // XXX
   // setText only works on polylines, not geodesic ones.
   // newlink.on("mouseover", () => { console.log(newlink); // newlink.setText("  ►  ", { repeat: true, attributes: { fill: "red" } }); });
   // newlink.on("mouseout", () => { newlink.setText(null); });
 }
 
-/** this function fetches and displays agent location */
+// fetch and draw agent locations
 export async function drawAgents() {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
   if (!WasabeeMe.isLoggedIn()) return;
@@ -238,11 +197,12 @@ export async function drawAgents() {
   // remove those not found in this fetch
   for (const d of doneAgents) layerMap.delete(d);
   for (const agent in layerMap) {
-    // console.debug("removing stale agent", agent);
+    console.debug("removing stale agent", agent);
     Wasabee.agentLayerGroup.removeLayer(agent);
   }
 }
 
+// map agent GID to leaflet layer ID
 function agentLayerMap() {
   const layerMap = new Map();
   for (const agent of Wasabee.agentLayerGroup.getLayers()) {
@@ -278,6 +238,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
   return done;
 }
 
+// draws a single agent -- can be triggered by firebase
 export async function drawSingleAgent(gid) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
   const agent = await WasabeeAgent.get(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
@@ -358,6 +319,7 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
   return true;
 }
 
+// update all anchors, adding missing and removing unneeded
 function updateAnchors(op) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Portals") === false) return; // yes, === false, undefined == true
   if (!op.anchors || op.anchors.length == 0) {
@@ -388,7 +350,7 @@ function updateAnchors(op) {
   }
 }
 
-/** This function adds a portal to the portal layer group */
+// adds a single anchor to the map
 function addAnchorToMap(portalId, operation) {
   const anchor = new WasabeeAnchor(portalId, operation);
   // use newColors(anchor.color) for 0.19

@@ -44,16 +44,6 @@ const NewopDialog = WDialog.extend({
             });
             await newop.store();
             await makeSelectedOperation(newop.ID);
-            window.map.fire(
-              "wasabee:uiupdate:mapdata",
-              { reason: "NewopDialog" },
-              false
-            );
-            window.map.fire(
-              "wasabee:crosslinks",
-              { reason: "NewopDialog" },
-              false
-            );
           } else {
             alert(wX("OP_NAME_UNSET"));
           }

@@ -31,6 +31,15 @@ const AuthDialog = WDialog.extend({
       sendLocation();
   },
 
+  _successLogin: async function (me) {
+    const newme = me ? new WasabeeMe(me) : await WasabeeMe.waitGet(true);
+    newme.store();
+    window.map.fire("wasabee:login");
+    this.closeDialog();
+    fullSync();
+    setIntelID(window.PLAYER.nickname, window.PLAYER.team, newme.querytoken); // no need to await
+  },
+
   _displayDialog: function () {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
@@ -123,21 +132,12 @@ const AuthDialog = WDialog.extend({
       L.DomEvent.on(postwebviewButton, "click", async (ev) => {
         L.DomEvent.stop(ev);
         try {
-          const newme = await WasabeeMe.waitGet(true);
-          newme.store();
-          this.closeDialog();
-          fullSync();
-          setIntelID(
-            window.PLAYER.nickname,
-            window.PLAYER.team,
-            newme.querytoken
-          ); // no need to await
+          await this._successLogin();
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
           console.error(e);
           alert(e.toString());
         }
-        window.map.fire("wasabee:uiupdate:buttons");
         window.map.fire("wasabee:defensivekeys");
       });
     }
@@ -159,7 +159,6 @@ const AuthDialog = WDialog.extend({
             this._server.textContent = GetWasabeeServer();
             WasabeeMe.purge();
           }
-          window.map.fire("wasabee:uiupdate:buttons");
           window.map.fire("wasabee:defensivekeys");
         },
         placeholder: GetWasabeeServer(),
@@ -178,22 +177,13 @@ const AuthDialog = WDialog.extend({
           if (ottDialog.inputField.value) {
             try {
               await oneTimeToken(ottDialog.inputField.value);
-              const newme = await WasabeeMe.waitGet(true);
-              newme.store();
-              this.closeDialog();
-              fullSync();
-              setIntelID(
-                window.PLAYER.nickname,
-                window.PLAYER.team,
-                newme.querytoken
-              ); // no need to await
+              await this._successLogin();
               postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
             } catch (e) {
               console.error(e);
               alert(e.toString());
             }
           }
-          window.map.fire("wasabee:uiupdate:buttons");
           window.map.fire("wasabee:defensivekeys");
         },
         placeholder: "smurf-tears-4twn",
@@ -252,15 +242,7 @@ const AuthDialog = WDialog.extend({
             }
             try {
               const r = await SendAccessTokenAsync(responseSelect.access_token);
-              const newme = new WasabeeMe(r);
-              newme.store();
-              this.closeDialog();
-              fullSync(); // draws map and teams
-              setIntelID(
-                window.PLAYER.nickname,
-                window.PLAYER.team,
-                newme.querytoken
-              ); // no need to await
+              await this._successLogin(r);
               postToFirebase({
                 id: "wasabeeLogin",
                 method: "gsapiAuth (immediate_failed)",
@@ -278,28 +260,18 @@ const AuthDialog = WDialog.extend({
           console.log(err);
           alert(err);
         }
-        window.map.fire("wasabee:uiupdate:buttons");
         return;
       }
       try {
         const r = await SendAccessTokenAsync(response.access_token);
-        const newme = new WasabeeMe(r);
-        newme.store();
-        this.closeDialog();
-        fullSync(); // draws map and teams
+        await this._successLogin(r);
         postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
-        setIntelID(
-          window.PLAYER.nickname,
-          window.PLAYER.team,
-          newme.querytoken
-        ); // no need to await
       } catch (e) {
         postToFirebase({ id: "exception", error: e.toString() });
         console.error(e);
         alert(e.toString());
         this.closeDialog();
       }
-      window.map.fire("wasabee:uiupdate:buttons");
     });
   },
 
@@ -322,16 +294,8 @@ const AuthDialog = WDialog.extend({
         }
         try {
           const r = await SendAccessTokenAsync(response.access_token);
-          const newme = new WasabeeMe(r);
-          newme.store();
-          this.closeDialog();
-          fullSync();
+          await this._successLogin(r);
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
-          setIntelID(
-            window.PLAYER.nickname,
-            window.PLAYER.team,
-            newme.querytoken
-          ); // no need to await
         } catch (e) {
           console.error(e);
           alert(`send access token failed (gsapiAuthChoose): ${e.toString()}`);

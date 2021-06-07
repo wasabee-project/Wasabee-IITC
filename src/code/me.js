@@ -61,18 +61,21 @@ export default class WasabeeMe {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
   }
 
-  static isLoggedIn() {
+  static localGet() {
     const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
-    if (!lsme || typeof lsme !== "string") {
+    if (typeof lsme == "string") {
+      return new WasabeeMe(lsme); // do not store
+    }
+    return null;
+  }
+
+  static isLoggedIn() {
+    const me = WasabeeMe.localGet();
+
+    if (!me) {
       return false;
     }
-    let me = null;
-    try {
-      me = JSON.parse(lsme);
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
+
     if (me.fetched > WasabeeMe.maxCacheAge()) {
       return true;
     }
@@ -82,17 +85,13 @@ export default class WasabeeMe {
 
   // for when you need a cached value or nothing -- in critical code paths
   static cacheGet() {
-    let me = null;
-    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    const me = WasabeeMe.localGet();
 
-    if (typeof lsme == "string") {
-      me = new WasabeeMe(lsme); // do not store
+    if (!me) {
+      return null;
     }
-    if (
-      me === null ||
-      me.fetched == undefined ||
-      me.fetched < WasabeeMe.maxCacheAge()
-    ) {
+
+    if (me.fetched == undefined || me.fetched < WasabeeMe.maxCacheAge()) {
       WasabeeMe.purge();
       return null;
     }
@@ -102,12 +101,8 @@ export default class WasabeeMe {
 
   // use waitGet with "force == true" if you want a fresh value now
   static async waitGet(force) {
-    let me = null;
-    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    let me = WasabeeMe.localGet();
 
-    if (typeof lsme == "string") {
-      me = new WasabeeMe(lsme); // do not store
-    }
     if (
       me === null ||
       me.fetched == undefined ||
@@ -122,13 +117,10 @@ export default class WasabeeMe {
       } catch (e) {
         WasabeeMe.purge();
         console.error(e);
-        alert(e.toString());
+        // alert(e.toString());
         me = null;
       }
     }
-    // take care of this in the caller
-    // window.map.fire("wasabee:uiupdate:buttons");
-    // window.map.fire("wasabee:uiupdate:teamdata");
     return me;
   }
 
@@ -145,9 +137,7 @@ export default class WasabeeMe {
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
-    // take care of this in the caller
-    // window.map.fire("wasabee:uiupdate:buttons");
-    // window.map.fire("wasabee:uiupdate:teamdata");
+    window.map.fire("wasabee:logout");
   }
 
   teamJoined(teamID) {
