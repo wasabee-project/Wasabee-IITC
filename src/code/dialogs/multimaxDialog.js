@@ -18,10 +18,66 @@ const MultimaxDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:op:select", this.closeDialog, this);
+    window.map.on("wasabee:op:change", this._updatePortalSet, this);
+    this._mapRefreshHook = this._updatePortalSet.bind(this);
+    window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
+
+    this._portalSet = new Set();
+    this._portalArray = [];
+    this._portalSetId = "all";
+
     this._displayDialog();
+    this._updatePortalSet();
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:op:select", this.closeDialog, this);
+    window.map.off("wasabee:op:change", this._updatePortalSet, this);
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
+  },
+
+  _updatePortalSet: function () {
+    if (this._portalSetId === "all") {
+      const portals = getAllPortalsOnScreen(this._operation);
+      this._portalArray = [];
+      for (const portal of portals) {
+        this._portalArray.push(portal);
+      }
+    } else if (this._portalSetId === "keys") {
+      const keys = this._operation.markers.filter(
+        (m) => m.type === window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
+      );
+      this._portalArray = [];
+      for (const marker of keys) {
+        this._portalArray.push(this._operation.getPortal(marker.portalId));
+      }
+    } else {
+      const zone = this._operation.getZone(this._portalSetId);
+      if (!zone) return; //failsafe
+      const portals = getAllPortalsOnScreen(this._operation);
+      for (const portal of portals) {
+        if (zone.contains(portal.latLng)) {
+          if (!this._portalSet.has(portal.id)) {
+            this._portalSet.add(portal.id);
+            this._portalArray.push(portal);
+          }
+        }
+      }
+    }
+    if (this._portalArray.length) {
+      this._spineSetDisplay.textContent = wX("PORTAL_COUNT", {
+        count: this._portalArray.length,
+      });
+    } else {
+      this._spineSetDisplay.textContent = wX("NOT_SET");
+    }
   },
 
   _displayDialog: function () {
+    this._operation = getSelectedOperation();
+
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -79,6 +135,35 @@ const MultimaxDialog = WDialog.extend({
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
       }
+    });
+
+    const spineSetLabel = L.DomUtil.create("label", null, container);
+    spineSetLabel.textContent = "Spine region";
+    const spineSetSelect = L.DomUtil.create("select", null, container);
+    this._spineSetDisplay = L.DomUtil.create("span", null, container);
+    this._spineSetDisplay.textContent = wX("NOT_SET");
+    {
+      const o = L.DomUtil.create("option", null, spineSetSelect);
+      o.textContent = "All visible portals";
+      o.value = "all";
+      o.selected = true;
+    }
+    {
+      const o = L.DomUtil.create("option", null, spineSetSelect);
+      o.textContent = "All Key Portals";
+      o.value = "keys";
+    }
+    for (const zone of this._operation.zones) {
+      const o = L.DomUtil.create("option", null, spineSetSelect);
+      o.textContent = zone.name;
+      o.value = zone.id;
+    }
+    L.DomEvent.on(spineSetSelect, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      this._portalSet = new Set();
+      this._portalArray = [];
+      this._portalSetId = spineSetSelect.value;
+      this._updatePortalSet();
     });
 
     const fllabel = L.DomUtil.create("label", null, container);
@@ -186,11 +271,10 @@ const MultimaxDialog = WDialog.extend({
 
   doMultimax: function () {
     // this._operation is OK here
-    this._operation = getSelectedOperation();
-    const portals = getAllPortalsOnScreen(this._operation);
+    const portals = this._portalArray;
 
     // Calculate the multimax
-    if (!this._anchorOne || !this._anchorTwo || !portals) {
+    if (!this._anchorOne || !this._anchorTwo || !portals.length) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }
