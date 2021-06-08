@@ -366,7 +366,8 @@ export function blockerAutomark(operation, first = true) {
   if (wportal.team == "E") {
     type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
   }
-  operation.addMarker(type, wportal, { comment: "auto-marked" });
+  const zone = operation.determineZone(wportal.latLng);
+  operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
 
   // remove nodes from blocker list
   operation.blockers = operation.blockers.filter((b) => {
@@ -515,4 +516,29 @@ export async function resetCaches() {
   await window.plugin.wasabee.idb.clear("agents");
   await window.plugin.wasabee.idb.clear("teams");
   await window.plugin.wasabee.idb.clear("defensivekeys");
+}
+
+export function setMarkersToZones() {
+  const op = getSelectedOperation();
+
+  op.startBatchMode();
+  for (const m of op.markers) {
+    const ll = op.getPortal(m.portalId).latLng;
+
+    const zone = op.determineZone(ll);
+    op.setZone(m, zone);
+  }
+  op.endBatchMode();
+}
+
+export function setLinksToZones() {
+  const op = getSelectedOperation();
+
+  op.startBatchMode();
+  for (const l of op.links) {
+    const ll = op.getPortal(l.fromPortalId).latLng;
+    const zone = op.determineZone(ll);
+    op.setZone(l, zone);
+  }
+  op.endBatchMode();
 }
