@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeePortal from "../model/portal";
+import WasabeeMarker from "../model/marker";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import {
@@ -22,7 +23,77 @@ const MultimaxDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:op:select", this.closeDialog, this);
+    window.map.on("wasabee:op:change", this._opChange, this);
+    this._mapRefreshHook = this._updatePortalSet.bind(this);
+    window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
+
+    this._operation = getSelectedOperation();
+
     this._displayDialog();
+    this._updatePortalSet();
+  },
+
+  removeHooks: function () {
+    WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:op:select", this.closeDialog, this);
+    window.map.off("wasabee:op:change", this._opChange, this);
+    window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
+  },
+
+  _opChange: function () {
+    this._operation = getSelectedOperation();
+    this._updatePortalSet();
+  },
+
+  _initPortalSet: function (setKey, zone, keys) {
+    const portalSet = this._portalSets[setKey];
+    portalSet.zone = zone;
+    portalSet.keys = keys;
+    portalSet.portals = [];
+  },
+
+  _updatePortalSet: function () {
+    for (const setKey in this._portalSets) {
+      const portalSet = this._portalSets[setKey];
+      if (portalSet.keys) {
+        const keys = this._operation.markers.filter(
+          (m) => m.type === WasabeeMarker.constants.MARKER_TYPE_KEY
+        );
+        portalSet.portals = keys.map((m) =>
+          this._operation.getPortal(m.portalId)
+        );
+
+        if (portalSet.zone) {
+          const zone = this._operation.getZone(portalSet.zone);
+          if (zone) {
+            //failsafe
+            portalSet.portals = portalSet.portals.filter((p) =>
+              zone.contains(p.latLng)
+            );
+          }
+        }
+      } else {
+        const portals = getAllPortalsOnScreen(this._operation);
+        if (portalSet.zone == 0) portalSet.portals = portals;
+        else {
+          const ids = new Set(portalSet.portals.map((p) => p.id));
+          for (const p of portals) {
+            if (!ids.has(p.id)) portalSet.portals.push(p);
+          }
+          const zone = this._operation.getZone(portalSet.zone);
+          if (zone) {
+            // filter all, if zone shape changed
+            portalSet.portals = portalSet.portals.filter((p) =>
+              zone.contains(p.latLng)
+            );
+          }
+        }
+      }
+      portalSet.display.textContent = wX("PORTAL_COUNT", {
+        count: portalSet.portals.length,
+      });
+    }
   },
 
   _addSetPortal: function (text, thisKey, container, storageKey) {
@@ -64,6 +135,55 @@ const MultimaxDialog = WDialog.extend({
     this[thisKey].checked = defaultValue;
   },
 
+  _addSelectSet: function (text, setKey, container, defaultValue) {
+    const label = L.DomUtil.create("label", null, container);
+    label.textContent = text;
+    const select = L.DomUtil.create("select", null, container);
+    const display = L.DomUtil.create("span", null, container);
+    display.textContent = wX("NOT_SET");
+    {
+      const o = L.DomUtil.create("option", null, select);
+      o.textContent = "All visible portals";
+      o.value = "all";
+      o.selected = defaultValue == o.value;
+    }
+    {
+      const o = L.DomUtil.create("option", null, select);
+      o.textContent = "All Key Portals";
+      o.value = "keys";
+      o.selected = defaultValue == o.value;
+    }
+    for (const zone of this._operation.zones) {
+      const o = L.DomUtil.create("option", null, select);
+      o.textContent = zone.name;
+      o.value = zone.id;
+      o.selected = defaultValue == o.value;
+    }
+    for (const zone of this._operation.zones) {
+      const o = L.DomUtil.create("option", null, select);
+      o.textContent = "Keys in " + zone.name;
+      o.value = "keys" + zone.id;
+      o.selected = defaultValue == o.value;
+    }
+    L.DomEvent.on(select, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      const keys = select.value.slice(0, 4) === "keys";
+      const zone =
+        select.value === "all" || select.value === "keys"
+          ? 0
+          : +(keys ? select.value.slice(4) : select.value);
+      this._initPortalSet(setKey, zone, keys);
+      this._updatePortalSet();
+    });
+
+    this._portalSets[setKey] = {
+      portals: [],
+      zone: 0,
+      keys: false,
+      display: display,
+    };
+  },
+
   _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
@@ -99,6 +219,8 @@ const MultimaxDialog = WDialog.extend({
       container,
       true
     );
+
+    this._addSelectSet("Spine region", "spine", container, "all");
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
@@ -140,6 +262,7 @@ const MultimaxDialog = WDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = L.latLng(testPortal());
+    this._portalSets = {};
   },
 
   getSpine: function (pOne, pTwo, portals) {
@@ -216,11 +339,10 @@ const MultimaxDialog = WDialog.extend({
 
   doMultimax: function () {
     // this._operation is OK here
-    this._operation = getSelectedOperation();
-    const portals = getAllPortalsOnScreen(this._operation);
+    const portals = this._portalSets.spine.portals;
 
     // Calculate the multimax
-    if (!this._anchorOne || !this._anchorTwo || !portals) {
+    if (!this._anchorOne || !this._anchorTwo || !portals.length) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }
