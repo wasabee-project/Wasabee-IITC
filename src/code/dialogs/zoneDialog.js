@@ -12,7 +12,7 @@ const ZoneDialog = WDialog.extend({
   },
 
   addHooks: function () {
-    this.ZonedrawHandler = new ZonedrawHandler(window.map, {});
+    this.ZonedrawHandler = new ZonedrawHandler(window.map, { parent: this });
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
