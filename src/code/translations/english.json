@@ -83,7 +83,7 @@
   "CLEAR MARKERS": "Clear Markers",
   "CLEAROPS BUTTON": "Clear Data",
   "CLEAROPS BUTTON TITLE": "Clear Data",
-  "CLEAROPS PROMPT": "Remove all Wasabee data from this device.",
+  "CLEAROPS PROMPT": "Clear all local OPS. Ops will be restored at next download.",
   "CLOSE": "Close",
   "COMPLETED": "Completed",
   "COMPLETED BY": "Completed by {agentName}",
