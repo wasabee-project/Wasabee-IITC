@@ -183,11 +183,6 @@ const ZonedrawHandler = L.Handler.extend({
     L.Handler.prototype.enable.call(this);
   },
 
-  disable: function () {
-    if (!this._enabled) return;
-    L.Handler.prototype.disable.call(this);
-  },
-
   addHooks: function () {
     L.DomUtil.disableTextSelection();
 
