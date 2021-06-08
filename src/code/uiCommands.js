@@ -231,6 +231,7 @@ export function sendLocation() {
 export function getAllPortalsOnScreen(operation) {
   const bounds = window.map.getBounds();
   const x = [];
+  const xIDs = new Set();
   for (const portal in window.portals) {
     if (bounds.contains(window.portals[portal].getLatLng())) {
       if (
@@ -241,7 +242,22 @@ export function getAllPortalsOnScreen(operation) {
       )
         continue;
       const wp = WasabeePortal.fromIITC(window.portals[portal]);
-      if (wp) x.push(wp);
+      if (wp) {
+        x.push(wp);
+        xIDs.add(wp.id);
+      }
+    }
+  }
+  for (const portal of operation.opportals) {
+    if (bounds.contains(portal.latLng)) {
+      if (
+        operation.containsMarkerByID(
+          portal.id,
+          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        )
+      )
+        continue;
+      if (!xIDs.has(portal.id)) x.push(portal);
     }
   }
   return x;
