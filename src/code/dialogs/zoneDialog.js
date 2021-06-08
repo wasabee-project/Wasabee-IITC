@@ -239,6 +239,6 @@ const ZonedrawHandler = L.Handler.extend({
   },
 
   _getTooltipText: function () {
-    return { text: "Click to set the zone boundaries" };
+    return { text: wX("ZONE_DRAW") };
   },
 });

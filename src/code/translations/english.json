@@ -400,6 +400,7 @@
   "SELECT_ONION_PORTALS": "Layers build from the inside out. Zoom in to center and select starting portal, then zoom out to area.",
   "MAX_SPLITS": "Max Splits",
   "ZONE": "Zone",
+  "ZONE_DRAW": "Click to set the zone boundaries",
   "smallScreen": {
     "LOG IN": "Log In",
     "LOG_OUT": "Log Out",
