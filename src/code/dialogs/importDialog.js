@@ -70,7 +70,9 @@ const ImportDialog = WDialog.extend({
   },
 
   drawToolsFormat() {
-    const dtitems = localStorage["plugin-draw-tools-layer"];
+    const dtitems = window.plugin.drawTools
+      ? localStorage[window.plugin.drawTools.KEY_STORAGE]
+      : undefined;
     if (dtitems) {
       this._textarea.value = dtitems;
     } else {

@@ -931,15 +931,8 @@ export default class WasabeeOp {
     if (!zones || zones.length == 0) {
       // if not set, use the defaults
       return [
-        { id: 1, name: "Primary" },
-        { id: 2, name: "Alpha" },
-        { id: 3, name: "Beta" },
-        { id: 4, name: "Gamma" },
-        { id: 5, name: "Delta" },
-        { id: 6, name: "Epsilon" },
-        { id: 7, name: "Zeta" },
-        { id: 8, name: "Eta" },
-        { id: 9, name: "Theta" },
+        { id: 1, name: "Primary", color: "purple" },
+        { id: 2, name: "Secondary", color: "yellow" },
       ].map((obj) => new WasabeeZone(obj));
     }
     const tmpZones = Array();
@@ -1130,6 +1123,15 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  removeZonePoints(zoneID) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points = [];
+      }
+    }
+    this.update(true);
+  }
+
   renameZone(zoneID, name) {
     for (const z of this.zones) {
       if (z.id == zoneID) {
@@ -1149,6 +1151,20 @@ export default class WasabeeOp {
     this.zones.push(new WasabeeZone({ id: newid, name: newid }));
     this.update(true);
     return newid;
+  }
+
+  addZonePoint(zoneID, latlng) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points.push({
+          lat: latlng.lat,
+          lng: latlng.lng,
+          position: z.points.length,
+        });
+        break;
+      }
+    }
+    this.update(true);
   }
 
   changes(origin) {
@@ -1465,5 +1481,17 @@ export default class WasabeeOp {
       }
     }
     return summary;
+  }
+
+  determineZone(latlng) {
+    // sort first, lowest ID wins if a marker is in 2 overlapping zones
+    this.zones.sort((a, b) => {
+      return a.id - b.id;
+    });
+    for (const z of this.zones) {
+      if (z.contains(latlng)) return z.id;
+    }
+    // default to primary zone
+    return 1;
   }
 }

@@ -14,6 +14,7 @@ export function drawMap() {
   updateAnchors(operation);
   updateMarkers(operation);
   resetLinks(operation);
+  resetZones(operation);
 }
 
 // updates all existing markers, adding any that need to be added, removing any that need to be removed
@@ -132,6 +133,36 @@ export function drawBackgroundOp(operation, layerGroup, style) {
     const newlink = new L.GeodesicPolyline(latLngs, style);
     newlink.addTo(layerGroup);
   }
+}
+
+function resetZones(operation) {
+  Wasabee.zoneLayerGroup.clearLayers();
+
+  if (!operation.zones || operation.zones.length == 0) return;
+
+  for (const z of operation.zones) {
+    if (z.points.length == 1) {
+      L.marker(z.points[0], { color: z.color }).addTo(Wasabee.zoneLayerGroup);
+      continue;
+    }
+    if (z.points.length == 2) {
+      L.polyline(z.points, { color: z.color }).addTo(Wasabee.zoneLayerGroup);
+      continue;
+    }
+    z.points.sort((a, b) => {
+      return a.position - b.position;
+    });
+    L.polygon(z.points, {
+      color: z.color,
+      shapeOptions: {
+        stroke: false,
+        opacity: 0.7,
+        fill: true,
+        interactive: false,
+      },
+    }).addTo(Wasabee.zoneLayerGroup);
+  }
+  Wasabee.zoneLayerGroup.bringToBack();
 }
 
 // draw a single link
