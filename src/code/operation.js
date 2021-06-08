@@ -1090,6 +1090,13 @@ export default class WasabeeOp {
     return i;
   }
 
+  getZone(zoneID) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) return z;
+    }
+    return null;
+  }
+
   zoneName(zoneID) {
     if (zoneID == "0")
       // All zone
