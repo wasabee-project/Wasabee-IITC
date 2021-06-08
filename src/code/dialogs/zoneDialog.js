@@ -170,7 +170,8 @@ const ZonedrawHandler = L.Handler.extend({
     this.zoneID = 0;
     // this._enabled = false;
 
-    L.Handler.prototype.initialize.call(this, map, options);
+    L.Handler.prototype.initialize.call(this, map);
+    this._parent = options.parent;
     this.type = "ZonedrawHandler";
   },
 
