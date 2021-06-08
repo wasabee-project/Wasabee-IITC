@@ -312,7 +312,7 @@
   "SETTINGS": "Wasabee Settings",
   "SKINS_AVAILABLE": "There are {count} available skins.",
   "SKINS_BUTTON": "Configure Skins",
-  "SKINS_DESCRIPTION": "Manage the available skins by moving them into the left column. The lower in the column the higher the priority for the UI.",
+  "SKINS_DESCRIPTION": "Available skin packs are located in the right columns. Move skins you wish to use to the left columns.",
   "SKINS_MANAGE_TITLE": "Manage skins",
   "SKIP_CONFIRM": "Skip confirmation",
   "SKIP_CONFIRM_NEVER": "Always ask",
