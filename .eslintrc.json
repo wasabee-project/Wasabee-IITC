@@ -15,6 +15,7 @@
     "es2020": true
   },
   "rules": {
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
     "no-console": "off",
     "lines-between-class-members": ["error", "always"],
     "no-template-curly-in-string": 1,
