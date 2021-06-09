@@ -22,13 +22,13 @@ const MadridDialog = MultimaxDialog.extend({
     portalSet.select = L.DomUtil.create("select", null, container);
     {
       const o = L.DomUtil.create("option", null, portalSet.select);
-      o.textContent = "All visible portals";
+      o.textContent = wX("MM_SET_ALL_PORTALS");
       o.value = "all";
       o.selected = true;
     }
     {
       const o = L.DomUtil.create("option", null, portalSet.select);
-      o.textContent = "All Key Portals";
+      o.textContent = wX("MM_SET_ALL_KEYS");
       o.value = "keys";
     }
     for (const zone of this._operation.zones) {

@@ -147,13 +147,13 @@ const MultimaxDialog = WDialog.extend({
     this._spineSetDisplay.textContent = wX("NOT_SET");
     {
       const o = L.DomUtil.create("option", null, spineSetSelect);
-      o.textContent = "All visible portals";
+      o.textContent = wX("MM_SET_ALL_PORTALS");
       o.value = "all";
       o.selected = true;
     }
     {
       const o = L.DomUtil.create("option", null, spineSetSelect);
-      o.textContent = "All Key Portals";
+      o.textContent = wX("MM_SET_ALL_KEYS");
       o.value = "keys";
     }
     for (const zone of this._operation.zones) {
@@ -289,8 +289,9 @@ const MultimaxDialog = WDialog.extend({
     this._operation.startBatchMode();
 
     console.log("starting multimax");
+    console.time("multimax");
     const length = this.MM(this._anchorOne, this._anchorTwo, portals)[0];
-    console.log("multimax done");
+    console.timeEnd("multimax");
 
     this._operation.endBatchMode(); // save and run crosslinks
 

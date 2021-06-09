@@ -196,6 +196,8 @@
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": " ({minutes} minutes ago)",
   "MM": "Multimax",
+  "MM_SET_ALL_PORTALS": "All visible portals",
+  "MM_SET_ALL_KEYS": "All key portals",
   "MY_CAP_ID": "My Capsule ID",
   "MY_COUNT": "My Count",
   "MULTIMAX": "Multimax!",
