@@ -22,14 +22,12 @@ const MultimaxDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabee:op:select", this.closeDialog, this);
-    window.map.on("wasabee:op:change", this._updatePortalSet, this);
+    window.map.on("wasabee:op:change", this._opChange, this);
     this._mapRefreshHook = this._updatePortalSet.bind(this);
     window.addHook("mapDataRefreshEnd", this._mapRefreshHook);
 
-    this._portalSet = new Set();
-    this._portalArray = [];
-    this._portalSetId = "all";
+    this._operation = getSelectedOperation();
+    window.map.on("wasabee:op:select", this.closeDialog, this);
 
     this._displayDialog();
     this._updatePortalSet();
@@ -38,8 +36,15 @@ const MultimaxDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:select", this.closeDialog, this);
-    window.map.off("wasabee:op:change", this._updatePortalSet, this);
+    window.map.off("wasabee:op:change", this._opChange, this);
     window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
+  },
+
+  _opChange: function () {
+    // get the current op object (needed if the server version replaces the local)
+    this._operation = getSelectedOperation();
+
+    this._updatePortalSet();
   },
 
   _updatePortalSet: function () {
@@ -80,8 +85,6 @@ const MultimaxDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    this._operation = getSelectedOperation();
-
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -213,6 +216,10 @@ const MultimaxDialog = WDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = L.latLng(testPortal());
+
+    this._portalSet = new Set();
+    this._portalArray = [];
+    this._portalSetId = "all";
   },
 
   /*
