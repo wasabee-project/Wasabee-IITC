@@ -134,7 +134,7 @@
   "HG": "Homogeneous Field",
   "H-GEN_INST": "Set portals for the outside layer. Choose number of splits. Click draw",
   "HOURS": " ({hours} hours ago)",
-  "HOW_TO_VIDS": "<h3>How-To Videos:</h3><div class='desc'><a href='https://www.youtube.com/playlist?list=PLyku9nmtwrADKQM9_EZk7NYbZXVOrBhXa'>Wasabee Playlist</a></div>",
+  "HOW_TO_VIDS": "<h3>How-To Videos:</h3><div class='desc'><a href='https://www.youtube.com/playlist?list=PLyku9nmtwrADKQM9_EZk7NYbZXVOrBhXa' target=\"_blank\>Wasabee Playlist</a></div>",
   "IMP_COMP": "Import Complete. Found ",
   "IMP_DT_OP": "Imported Drawtools Op: ",
   "IMPORT_OP": "Import Operation",
