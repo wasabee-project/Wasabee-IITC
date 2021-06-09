@@ -95,6 +95,10 @@
   grid-column: 1 / 4;
 }
 
+.wasabee-dialog-madrid button.loading {
+  box-shadow: 0 0 4px;
+}
+
 .wasabee-dialog-starburst .desc2 {
   color: lightgrey;
 }
