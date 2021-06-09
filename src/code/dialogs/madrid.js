@@ -41,6 +41,12 @@ const MadridDialog = MultimaxDialog.extend({
     portalSet.button.textContent = wX("SET");
     L.DomEvent.on(portalSet.button, "click", (ev) => {
       L.DomEvent.stop(ev);
+      if (this._currentSet === n && portalSet.type === portalSet.select.value) {
+        // disable
+        portalSet.button.classList.remove("loading");
+        this._currentSet = -1;
+        return;
+      }
       if (portalSet.type !== portalSet.select.value) {
         portalSet.portals.splice(0);
         portalSet.guids.clear();
