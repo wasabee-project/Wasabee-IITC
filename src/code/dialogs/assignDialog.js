@@ -104,7 +104,7 @@ const AssignDialog = WDialog.extend({
     const alreadyAdded = new Array();
 
     menu.addEventListener("change", (value) => {
-      this.localAssign(value);
+      this._assign(value);
     });
 
     const me = await WasabeeMe.waitGet();
@@ -132,7 +132,7 @@ const AssignDialog = WDialog.extend({
     return container;
   },
 
-  localAssign: function (value) {
+  _assign: function (value) {
     const operation = getSelectedOperation();
     if (this._type == "Marker") {
       operation.assignMarker(this._targetID, value.srcElement.value);

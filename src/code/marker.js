@@ -23,6 +23,7 @@ export default class WasabeeMarker {
     this.completedBy = obj.completedBy ? obj.completedBy : "";
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
+    this.changed = !!obj.changed; // let the server know to send announcements
 
     this.assign(obj.assignedTo); // WAS this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
     // if ._state then it came from indexeddb, otherwise from server/localStorage
@@ -43,6 +44,7 @@ export default class WasabeeMarker {
       assignedTo: this.assignedTo,
       order: Number(this.order),
       zone: Number(this.zone),
+      changed: !!this.changed,
     };
   }
 
@@ -79,9 +81,11 @@ export default class WasabeeMarker {
           break;
         }
         this._state = state;
+        this.changed = true;
         break;
       case STATE_COMPLETED:
         this._state = STATE_COMPLETED;
+        this.changed = true;
         break;
       default:
         this._state = STATE_UNASSIGNED;

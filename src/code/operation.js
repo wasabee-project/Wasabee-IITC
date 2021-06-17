@@ -822,6 +822,7 @@ export default class WasabeeOp {
     for (const v of this.links) {
       if (v.ID == id) {
         v.assignedTo = gid;
+        v.changed = true;
         this.update(true);
       }
     }

@@ -15,6 +15,7 @@ export default class WasabeeLink {
     this.color = obj.color ? obj.color : "main";
     this.completed = obj.completed ? !!obj.completed : false;
     this.zone = obj.zone ? Number(obj.zone) : 1;
+    this.changed == !!obj.changed;
   }
 
   // build object to serialize
@@ -29,6 +30,7 @@ export default class WasabeeLink {
       color: this.color,
       completed: !!this.completed, // !! forces a boolean value
       zone: Number(this.zone),
+      changed: !!this.changed,
     };
   }
 
