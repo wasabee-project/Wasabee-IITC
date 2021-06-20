@@ -20,7 +20,7 @@ export default class WasabeeMarker {
     this.portalId = obj.portalId;
     this.type = obj.type;
     this.comment = obj.comment ? obj.comment : ""; // why "" and not null? This isn't go
-    this.completedBy = obj.completedBy ? obj.completedBy : "";
+    this.completedID = obj.completedID ? obj.completedID : "";
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
 
@@ -39,7 +39,7 @@ export default class WasabeeMarker {
       type: this.type,
       comment: this.comment,
       state: this._state, // no need to validate here
-      completedBy: this.completedBy,
+      completedID: this.completedBID,
       assignedTo: this.assignedTo,
       order: Number(this.order),
       zone: Number(this.zone),
@@ -120,10 +120,15 @@ export default class WasabeeMarker {
         console.error(err);
       }
     }
-    if (this.state == "completed" && this.completedBy) {
-      assignment.innerHTML = wX("COMPLETED BY", {
-        agentName: this.completedBy,
-      });
+    if (this.state == "completed" && this.completedID) {
+      try {
+        const a = await WasabeeAgent.get(this.completedID);
+        assignment.innerHTML = wX("COMPLETED BY", {
+          agentName: a.name,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     const buttonSet = L.DomUtil.create(
