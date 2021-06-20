@@ -12,6 +12,8 @@ import {
   removeOperation,
   loadNewDefaultOp,
 } from "./selectedOp";
+import { updateLocalOp } from "./uiCommands";
+import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
@@ -65,9 +67,10 @@ export function initFirebase() {
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
           try {
+            const localop = await WasabeeOp.load(event.data.data.opID);
             const refreshed = await opPromise(event.data.data.opID);
-            refreshed.store();
-            if (refreshed.ID == operation.ID) {
+            const reloadSOp = await updateLocalOp(localop, refreshed);
+            if (reloadSOp) {
               console.log(
                 "firebase trigger reload of current op: ",
                 event.data.data
