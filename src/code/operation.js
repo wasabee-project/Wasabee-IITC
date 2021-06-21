@@ -1271,6 +1271,14 @@ export default class WasabeeOp {
     return this.localchanged;
   }
 
+  mergeBlockers(op) {
+    // merge portals
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+  }
+
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {

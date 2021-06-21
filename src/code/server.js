@@ -22,6 +22,8 @@ export async function uploadOpPromise() {
   const newme = new WasabeeMe(response);
   newme.store();
   const newop = await opPromise(operation.ID);
+  // merge blockers and related portals
+  newop.mergeBlockers(operation);
   newop.localchanged = false;
   await newop.store();
   return newop;

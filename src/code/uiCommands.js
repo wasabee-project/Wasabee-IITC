@@ -391,6 +391,8 @@ export function zoomToOperation(operation) {
 export async function updateLocalOp(local, remote) {
   const so = getSelectedOperation();
   if (!local || !local.localchanged) {
+    // merge blockers and related portals
+    if (local) remote.mergeBlockers(local);
     await remote.store();
     return remote.ID === so.ID;
   } else if (local.lasteditid != remote.lasteditid) {
@@ -399,6 +401,8 @@ export async function updateLocalOp(local, remote) {
     // check if there are really local changes
     // XXX: this may be too long to do
     if (!op.checkChanges()) {
+      // merge blockers and related portals
+      remote.mergeBlockers(op);
       await remote.store();
       // if selected op, reload from the new op
       return op === so;
@@ -490,10 +494,12 @@ export async function fullSync() {
 }
 
 export async function syncOp(opID) {
-  const localOp = WasabeeOp.load(opID);
+  const localOp = await WasabeeOp.load(opID);
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
     if (!localOp.localchanged) {
+      // merge blockers and related portals
+      remoteOp.mergeBlockers(localOp);
       await remoteOp.store();
     } else {
       const con = new MergeDialog({
