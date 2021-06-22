@@ -786,7 +786,8 @@ export default class WasabeeOp {
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
-      this.addPortal(portal);
+      // save a trip to update()
+      this._addPortal(portal);
       const marker = new WasabeeMarker({
         type: markerType,
         portalId: portal.id,
