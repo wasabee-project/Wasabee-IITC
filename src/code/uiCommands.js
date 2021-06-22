@@ -390,39 +390,42 @@ export function zoomToOperation(operation) {
 
 export async function updateLocalOp(local, remote) {
   const so = getSelectedOperation();
-  if (!local || !local.localchanged) {
-    // merge blockers and related portals
-    if (local) remote.mergeBlockers(local);
+  if (!local) {
     await remote.store();
-    return remote.ID === so.ID;
-  } else if (local.lasteditid != remote.lasteditid) {
-    // if selected op, use current selected op object
-    const op = local.ID != so.ID ? local : so;
-    // check if there are really local changes
-    // XXX: this may be too long to do
-    if (!op.checkChanges()) {
-      // merge blockers and related portals
-      remote.mergeBlockers(op);
-      await remote.store();
-      // if selected op, reload from the new op
-      return op === so;
-    } else {
-      // partial update on fields the server is always right
-      // XXX: do we need zone for teamlist consistency ?
-      op.teamlist = remote.teamlist;
-      op.remoteChanged = true;
-      await op.store();
-
-      // In case of selected op, suggest merge to the user
-      if (so === op) {
-        const con = new MergeDialog({
-          opOwn: so,
-          opRemote: remote,
-        });
-        con.enable();
-      }
-    }
+    return false;
   }
+  if (local.lasteditid == remote.lasteditid) {
+    // nothing to do
+    return false;
+  }
+
+  // if selected op, use current selected op object
+  const op = local.ID != so.ID ? local : so;
+
+  // no changes
+  if (!op.checkChanges()) {
+    // merge blockers and related portals
+    remote.mergeBlockers(op);
+    await remote.store();
+    // if selected op, reload from the new op
+    return remote.ID === so.ID;
+  }
+
+  // partial update on fields the server is always right
+  // XXX: do we need zone for teamlist consistency ?
+  op.teamlist = remote.teamlist;
+  op.remoteChanged = true;
+  await op.store();
+
+  // In case of selected op, suggest merge to the user
+  if (so === op) {
+    const con = new MergeDialog({
+      opOwn: so,
+      opRemote: remote,
+    });
+    con.enable();
+  }
+
   return false;
 }
 
