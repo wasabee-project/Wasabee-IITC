@@ -2,7 +2,7 @@ export default class WasabeeZone {
   constructor(obj) {
     this.id = Number(obj.id);
     this.name = obj.name;
-    this.color = obj.color ? obj.color : "00ff00";
+    this.color = obj.color ? obj.color : "#00ff00";
     this.points = [];
 
     if (obj.points) {
