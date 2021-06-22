@@ -67,6 +67,11 @@ export function initFirebase() {
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
           try {
+            // update the list to avoid race from slow network
+            window.plugin.wasabee._updateList.set(
+              event.data.data.updateID,
+              Date.now()
+            );
             const localop = await WasabeeOp.load(event.data.data.opID);
             const refreshed = await opPromise(event.data.data.opID);
             const reloadSOp = await updateLocalOp(localop, refreshed);
