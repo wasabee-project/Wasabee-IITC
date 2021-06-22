@@ -241,9 +241,5 @@
   "SEL_SB_ANCHOR": "Wähle einen Anker, Zomme in das Areal und füge es zum Starburst hinzu.",
   "REMOVE_TEAM_CONFIRM_TITLE": "Entferne Team {teamName}",
   "REMOVE_TEAM_CONFIRM_LABEL": "Möchtest du {teamName} permanent vom Server entfernen?",
-  "WASABEE_MODE_LABEL": "Modus",
-  "WASABEE_MODE_BATTLE": "Kampf",
-  "WASABEE_MODE_DESIGN": "Planung",
-  "WASABEE_MODE_DESC": "Im Planungsmodus veränderungen müssen manuell zum Server hinzugefügt werden. Änderungen werden nicht an die Agenten weitergegeben. Änderungen in der IITC überschreiben die bisherigen werte. Im Kampfmodus werden änderungen direkt an den Server, sowie die Agenten (via. Telegram, wenn verfügbar) weitergeleitet. Die akuten änderungen haben eine höhere Priorität als die IITC daten.",
   "ZONE": "Zoniert"
 }
