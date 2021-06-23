@@ -953,10 +953,17 @@ export default class WasabeeOp {
     if (this._idToOpportals.size == 0) return null;
     const lats = [];
     const lngs = [];
-    for (const a of this._idToOpportals.values()) {
-      lats.push(a.lat);
-      lngs.push(a.lng);
+    for (const a of this.anchors) {
+      const portal = this.getPortal(a);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
     }
+    for (const m of this.markers) {
+      const portal = this.getPortal(m.portalId);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
+    }
+    if (!lats.length) return null;
     const minlat = Math.min.apply(null, lats);
     const maxlat = Math.max.apply(null, lats);
     const minlng = Math.min.apply(null, lngs);
