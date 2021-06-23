@@ -155,7 +155,7 @@
   "LINK STATE": "Definir estado del link",
   "LINKS BUTTON TITLE": "Links",
   "LINKS": "Links",
-  "LINKS2": "Links",
+  "LINKS2": "{portalName} : Links ({outgoing}↑/{incoming}↓)",
   "LOAD PORTALS": "Load Portals",
   "LOADING": "[cargando]",
   "LOADING1": "Cargando: [{portalGuid}]",

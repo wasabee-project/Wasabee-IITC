@@ -45,12 +45,13 @@ const LinkListDialog = OperationChecklistDialog.extend({
   _displayDialog: function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
-    this.sortable = this.getListDialogContent(
-      operation,
-      operation.getLinkListFromPortal(this.options.portal),
-      0,
-      false
-    ); // defaults to sorting by op order
+    const links = operation.getLinkListFromPortal(this.options.portal);
+    const fromCount = links.filter(
+      (l) => l.fromPortalId == this.options.portal.id
+    ).length;
+    const toCount = links.length - fromCount;
+
+    this.sortable = this.getListDialogContent(operation, links, 0, false); // defaults to sorting by op order
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -58,7 +59,11 @@ const LinkListDialog = OperationChecklistDialog.extend({
     };
 
     this.createDialog({
-      title: this.options.portal.displayName + wX("LINKS2"),
+      title: wX("LINKS2", {
+        portalName: this.options.portal.displayName,
+        outgoing: fromCount,
+        incoming: toCount,
+      }),
       html: this.sortable.table,
       width: "auto",
       dialogClass: "linklist",
@@ -69,15 +74,26 @@ const LinkListDialog = OperationChecklistDialog.extend({
 
   update: async function () {
     const operation = getSelectedOperation();
+    const links = operation.getLinkListFromPortal(this.options.portal);
+    const fromCount = links.filter(
+      (l) => l.fromPortalId == this.options.portal.id
+    ).length;
+    const toCount = links.length - fromCount;
     this.sortable = this.getListDialogContent(
       operation,
-      operation.getLinkListFromPortal(this.options.portal),
+      links,
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
     await this.sortable.done;
     this.setContent(this.sortable.table);
-    this.setTitle(this.options.portal.displayName + wX("LINKS2"));
+    this.setTitle(
+      wX("LINKS2", {
+        portalName: this.options.portal.displayName,
+        outgoing: fromCount,
+        incoming: toCount,
+      })
+    );
   },
 });
 

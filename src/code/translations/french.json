@@ -155,7 +155,7 @@
   "LINK STATE": "Statut",
   "LINKS BUTTON TITLE": "Liens",
   "LINKS": "Liens",
-  "LINKS2": ": Liens",
+  "LINKS2": "{portalName} : Liens ({outgoing}↑/{incoming}↓)",
   "LOAD PORTALS": "Charger les portails",
   "LOADING": "[chargement]",
   "LOADING1": "Chargement: {portalGuid}",
