@@ -147,7 +147,7 @@ const UploadButton = WButton.extend({
               title: wX("UPDATE_CONFLICT_TITLE"),
               opOwn: getSelectedOperation(),
               opRemote: lastOp,
-              uploadCallback: (op) => this.doUpdate(op),
+              updateCallback: (op) => this.doUpdate(op, true),
             });
             md.enable();
           }

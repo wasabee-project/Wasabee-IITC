@@ -189,7 +189,8 @@ const MergeDialog = WDialog.extend({
       for (const item of list)
         L.DomUtil.create("li", null, rebaseList).textContent = item;
     } else {
-      rebaseMessage.textContent = "The local changes don't alter the server version.";
+      rebaseMessage.textContent =
+        "The local changes don't alter the server version.";
     }
 
     return rebaseMessage;
