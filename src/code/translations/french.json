@@ -124,7 +124,7 @@
   "H-GEN_INST": "Choisissez les 3 portails du field englobant, le nombre de couches et cliquez sur Draw.",
   "HF_DEEP_SEARCH": "Recherche exhaustive",
   "HF_DRAW_BUTTON": "Draw",
-
+  "HF_DRAW_DEEP_BUTTON": "Draw with deep recursion",
   "HF_REDRAW_BUTTON": "Re-Draw",
   "HG": "Field homogène",
   "HOURS": "(il y a {hours} heures)",
