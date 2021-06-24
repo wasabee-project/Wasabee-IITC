@@ -1287,6 +1287,21 @@ export default class WasabeeOp {
     for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
   }
 
+  mergeZones(op) {
+    const ids = new Set();
+    let count = 0;
+    for (const z of this.zones) {
+      ids.add(z.id);
+    }
+    for (const z of op.zones) {
+      if (!ids.has(z.id)) {
+        this.zones.push(z);
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {
@@ -1318,25 +1333,11 @@ export default class WasabeeOp {
       },
     };
 
-    // merge portals
-    for (const p of op.opportals) {
-      this._addPortal(p);
-    }
-
-    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+    // merge *portals* and blockers
+    this.mergeBlockers(op);
 
     // add missing zones
-    {
-      const ids = new Set();
-      for (const z of this.zones) {
-        ids.add(z.id);
-      }
-      for (const z of op.zones)
-        if (!ids.has(z.id)) {
-          this.zones.push(z);
-          summary.addition.zone += 1;
-        }
-    }
+    summary.addition.zone = this.mergeZones(op);
 
     // try to detect 0.18 ops with inconsistent IDs
     {

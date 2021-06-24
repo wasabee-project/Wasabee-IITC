@@ -412,8 +412,8 @@ export async function updateLocalOp(local, remote) {
   }
 
   // partial update on fields the server is always right
-  // XXX: do we need zone for teamlist consistency ?
   op.teamlist = remote.teamlist;
+  op.mergeZones(remote);
   op.remoteChanged = true;
   await op.store();
 
