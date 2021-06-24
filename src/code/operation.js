@@ -798,14 +798,22 @@ export default class WasabeeOp {
         marker.assign(options.assign);
       this.markers.push(marker);
 
-      this.update(true);
-
       // only need this for virus/destroy/decay -- this should be in the marker class
       const destructMarkerTypes = [
         window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
         window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
         window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
       ];
+      if (destructMarkerTypes.includes(markerType)) {
+        // remove related blockers
+        this.blockers = this.blockers.filter(
+          (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
+        );
+      }
+
+      this.update(true);
+      // run crosslink to update the layer
+      // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
       if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
     }
   }
