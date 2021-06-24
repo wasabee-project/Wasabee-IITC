@@ -1333,7 +1333,7 @@ export default class WasabeeOp {
       }
       for (const z of op.zones)
         if (!ids.has(z.id)) {
-          op.zones.push(z);
+          this.zones.push(z);
           summary.addition.zone += 1;
         }
     }
