@@ -177,28 +177,26 @@ export default class WasabeeAnchor {
       }
     });
 
-    if (operation.isServerOp() && operation.isOnCurrentServer()) {
-      if (canWrite) {
-        const assignButton = L.DomUtil.create("button", null, buttonSet);
-        assignButton.textContent = wX("ASSIGN OUTBOUND");
-        L.DomEvent.on(assignButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const ad = new AssignDialog({ target: this });
-          ad.enable();
-          marker.closePopup();
-        });
-      }
+    if (operation.canWriteServer()) {
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN OUTBOUND");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog({ target: this });
+        ad.enable();
+        marker.closePopup();
+      });
+    }
 
-      if (operation.isOnCurrentServer()) {
-        const sendButton = L.DomUtil.create("button", null, buttonSet);
-        sendButton.textContent = wX("SEND TARGET");
-        L.DomEvent.on(sendButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const std = new SendTargetDialog({ target: this });
-          std.enable();
-          marker.closePopup();
-        });
-      }
+    if (operation.isOnCurrentServer()) {
+      const sendButton = L.DomUtil.create("button", null, buttonSet);
+      sendButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog({ target: this });
+        std.enable();
+        marker.closePopup();
+      });
     }
 
     return content;

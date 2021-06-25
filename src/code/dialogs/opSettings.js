@@ -194,7 +194,6 @@ const OpSettingDialog = WDialog.extend({
         callback: async () => {
           if (
             WasabeeMe.isLoggedIn() &&
-            so.isServerOp() &&
             so.isOwnedOp() &&
             so.isOnCurrentServer()
           ) {

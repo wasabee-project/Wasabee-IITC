@@ -125,7 +125,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isServerOp() && operation.isOnCurrentServer())
+              if (operation.isOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
@@ -141,7 +141,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isServerOp() && operation.isOnCurrentServer())
+              if (operation.isOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });

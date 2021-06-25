@@ -982,10 +982,10 @@ export default class WasabeeOp {
   }
 
   // is the op writable to the *current server*
-  // for assignment, team permission
+  // for assignment, team permission, update
   canWriteServer() {
-    // not from the server, must be writable
-    if (!this.isServerOp()) return true;
+    // not from the server, not writable to server
+    if (!this.isServerOp()) return false;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if logged on a different server from the one used for the op, not writable
@@ -1038,8 +1038,7 @@ export default class WasabeeOp {
   }
 
   isOnCurrentServer() {
-    // assume yes if .server is not defined yet (<0.19)
-    return !this.server || this.server == GetWasabeeServer();
+    return this.isServerOp() && this.server == GetWasabeeServer();
   }
 
   isServerOp() {

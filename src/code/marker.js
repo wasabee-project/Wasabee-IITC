@@ -145,42 +145,41 @@ export default class WasabeeMarker {
         deleteMarker(operation, this, portal);
         marker.closePopup();
       });
-
-      if (operation.isServerOp() && operation.isOnCurrentServer()) {
-        const assignButton = L.DomUtil.create("button", null, buttonSet);
-        assignButton.textContent = wX("ASSIGN");
-        L.DomEvent.on(assignButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const ad = new AssignDialog({ target: this });
-          ad.enable();
-          marker.closePopup();
-        });
-      }
     }
 
-    if (operation.isServerOp()) {
-      if (operation.isOnCurrentServer()) {
-        const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
-        sendTargetButton.textContent = wX("SEND TARGET");
-        L.DomEvent.on(sendTargetButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const std = new SendTargetDialog({ target: this });
-          std.enable();
-          marker.closePopup();
-        });
-      }
-
-      if (canWrite) {
-        const stateButton = L.DomUtil.create("button", null, buttonSet);
-        stateButton.textContent = wX("MARKER STATE");
-        L.DomEvent.on(stateButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const sd = new StateDialog({ target: this, opID: operation.ID });
-          sd.enable();
-          marker.closePopup();
-        });
-      }
+    if (operation.canWriteServer()) {
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog({ target: this });
+        ad.enable();
+        marker.closePopup();
+      });
     }
+
+    if (canWrite) {
+      const stateButton = L.DomUtil.create("button", null, buttonSet);
+      stateButton.textContent = wX("MARKER STATE");
+      L.DomEvent.on(stateButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const sd = new StateDialog({ target: this, opID: operation.ID });
+        sd.enable();
+        marker.closePopup();
+      });
+    }
+
+    if (operation.isOnCurrentServer()) {
+      const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
+      sendTargetButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendTargetButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog({ target: this });
+        std.enable();
+        marker.closePopup();
+      });
+    }
+
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
     L.DomEvent.on(gmapButton, "click", (ev) => {

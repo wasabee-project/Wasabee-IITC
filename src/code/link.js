@@ -212,15 +212,16 @@ export default class WasabeeLink {
         L.DomEvent.stop(ev);
         operation.reverseLink(this.fromPortalId, this.toPortalId);
       });
-      if (operation.isServerOp() && operation.isOnCurrentServer()) {
-        const assignButton = L.DomUtil.create("button", null, div);
-        assignButton.textContent = wX("ASSIGN");
-        L.DomEvent.on(assignButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const ad = new AssignDialog({ target: this });
-          ad.enable();
-        });
-      }
+    }
+
+    if (operation.canWriteServer()) {
+      const assignButton = L.DomUtil.create("button", null, div);
+      assignButton.textContent = wX("ASSIGN");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog({ target: this });
+        ad.enable();
+      });
     }
     return div;
   }
