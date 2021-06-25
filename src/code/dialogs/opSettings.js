@@ -65,7 +65,7 @@ const OpSettingDialog = WDialog.extend({
     const content = L.DomUtil.create("div");
     const topSet = L.DomUtil.create("div", "topset", content);
 
-    const writable = selectedOp.getPermission() == "write";
+    const writable = selectedOp.canWrite();
 
     L.DomUtil.create("label", null, topSet).textContent = wX("OPER_NAME");
     const nameDisplay = L.DomUtil.create("div", null, topSet);

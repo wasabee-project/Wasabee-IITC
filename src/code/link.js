@@ -112,7 +112,7 @@ export default class WasabeeLink {
     picker.type = "color";
     picker.value = convertColorToHex(this.getColor(operation));
     picker.setAttribute("list", "wasabee-colors-datalist");
-    picker.disabled = operation.getPermission() !== "write";
+    picker.disabled = !operation.canWrite();
 
     L.DomEvent.on(arrow, "click", () => {
       picker.click();
@@ -199,7 +199,7 @@ export default class WasabeeLink {
     if (this.description)
       L.DomUtil.create("div", "enl", div).textContent = this.description;
     L.DomUtil.create("div", "enl", div).textContent = "# " + this.throwOrderPos;
-    if (operation.getPermission() === "write") {
+    if (operation.canWrite()) {
       const del = L.DomUtil.create("button", null, div);
       del.textContent = wX("DELETE_LINK");
       L.DomEvent.on(del, "click", (ev) => {

@@ -41,7 +41,7 @@ const MarkerButton = WButton.extend({
   getSubActions: function () {
     const subActions = [];
     const op = getSelectedOperation();
-    if (op.getPermission() === "write")
+    if (op.canWrite())
       subActions.push({
         title: wX("ADD MARKER TITLE"),
         text: wX("ADD_MARKER"),

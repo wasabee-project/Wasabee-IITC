@@ -1009,6 +1009,7 @@ export default class WasabeeOp {
     return false;
   }
 
+  // suitable for any change except assignments, op perms
   canWrite() {
     return this.getPermission() === "write";
   }

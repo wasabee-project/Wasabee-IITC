@@ -43,18 +43,15 @@ const ZoneDialog = WDialog.extend({
     };
 
     buttons[wX("ADD_ZONE")] = () => {
-      if (getSelectedOperation().getPermission() !== "write") return;
-      getSelectedOperation().addZone();
+      if (getSelectedOperation().canWrite()) getSelectedOperation().addZone();
     };
 
     buttons[wX("SET_MARKERS_ZONES")] = () => {
-      if (getSelectedOperation().getPermission() !== "write") return;
-      setMarkersToZones();
+      if (getSelectedOperation().canWrite()) setMarkersToZones();
     };
 
     buttons[wX("SET_LINKS_ZONES")] = () => {
-      if (getSelectedOperation().getPermission() !== "write") return;
-      setLinksToZones();
+      if (getSelectedOperation().canWrite()) setLinksToZones();
     };
 
     this.createDialog({

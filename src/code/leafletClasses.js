@@ -132,7 +132,7 @@ export const WDialog = L.Handler.extend({
     if (this.needWritePermission) {
       // avoid import loop
       const op = window.plugin.wasabee._selectedOp;
-      if (!op || op.getPermission() !== "write") {
+      if (!op || !op.canWrite()) {
         if (this._dialog) this.closeDialog();
       }
     }
@@ -142,7 +142,7 @@ export const WDialog = L.Handler.extend({
     if (this.needWritePermission) {
       // avoid import loop
       const op = window.plugin.wasabee._selectedOp;
-      if (!op || op.getPermission() !== "write") {
+      if (!op || !op.canWrite()) {
         return;
       }
     }
@@ -313,7 +313,7 @@ export const WButton = L.Class.extend({
   update: function () {
     if (!this.button || !this.needWritePermission) return;
     const op = window.plugin.wasabee._selectedOp;
-    if (op && op.getPermission() === "write") {
+    if (op && op.canWrite()) {
       this.button.style.display = "block";
     } else {
       this.button.style.display = "none";

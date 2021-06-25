@@ -95,7 +95,7 @@ export default class WasabeeMarker {
 
   async popupContent(marker, operation) {
     if (!operation) operation = getSelectedOperation();
-    const canWrite = operation.getPermission() === "write";
+    const canWrite = operation.canWrite();
 
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {

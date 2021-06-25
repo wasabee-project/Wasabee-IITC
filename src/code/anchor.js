@@ -61,7 +61,7 @@ export default class WasabeeAnchor {
   popupContent(marker) {
     // just log for now, if we see it, then we can figure out what is really going on
     const operation = getSelectedOperation();
-    const canWrite = operation.getPermission() === "write";
+    const canWrite = operation.canWrite();
     if (operation == null) {
       console.log("null op for anchor?");
     }

@@ -97,7 +97,7 @@ const OperationChecklistDialog = WDialog.extend({
   },
 
   getFields: function (operation) {
-    const canWrite = operation.getPermission() === "write";
+    const canWrite = operation.canWrite();
     const columns = [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
