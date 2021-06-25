@@ -239,7 +239,7 @@ export async function removeNonOwnedOps() {
   for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
     // don't fire event here
-    if (!op || !op.IsOwnedOp()) await WasabeeOp.delete(opID);
+    if (!op || !op.isOwnedOp()) await WasabeeOp.delete(opID);
   }
   await changeOpIfNeeded();
 }

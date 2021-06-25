@@ -35,7 +35,7 @@ const OpPermList = WDialog.extend({
       this._me = await WasabeeMe.waitGet();
     }
 
-    if (!operation.IsServerOp()) this.closeDialog();
+    if (!operation.isServerOp()) this.closeDialog();
 
     this.buildTable(operation);
     this._html.firstChild.replaceWith(this._table.table);
@@ -49,7 +49,7 @@ const OpPermList = WDialog.extend({
     this.buildTable(operation);
     this._html = L.DomUtil.create("div", null);
     this._html.appendChild(this._table.table);
-    if (this._me && operation.IsOwnedOp() && operation.IsOnCurrentServer()) {
+    if (this._me && operation.isOwnedOp() && operation.isOnCurrentServer()) {
       const already = new Set();
       for (const a of operation.teamlist) already.add(a.teamid);
 
@@ -150,7 +150,7 @@ const OpPermList = WDialog.extend({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
         format: (cell, value, obj) => {
-          if (operation.IsOwnedOp()) {
+          if (operation.isOwnedOp()) {
             const link = L.DomUtil.create("a", null, cell);
             link.href = "#";
             link.textContent = value;
@@ -172,7 +172,7 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
-    if (!operation.IsOwnedOp()) return;
+    if (!operation.isOwnedOp()) return;
 
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
@@ -199,7 +199,7 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
-    if (!operation.IsOwnedOp()) return;
+    if (!operation.isOwnedOp()) return;
 
     try {
       await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);

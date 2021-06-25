@@ -274,7 +274,7 @@ const OpsDialog = WDialog.extend({
         perm: tmpOp.getPermission(),
         hidden: hiddenOps.includes(opID),
         currentserver:
-          tmpOp.fetched !== null && me && tmpOp.IsOnCurrentServer(),
+          tmpOp.fetched !== null && me && tmpOp.isOnCurrentServer(),
         server: "",
         background: tmpOp.background,
       };

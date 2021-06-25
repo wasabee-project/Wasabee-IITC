@@ -448,7 +448,7 @@ export async function fullSync() {
     }
     for (const op of serverOps) {
       // if owned, duplicate the OP
-      if (op.IsOwnedOp()) {
+      if (op.isOwnedOp()) {
         const newop = await duplicateOperation(op.ID);
         newop.name = op.name;
         await newop.store();

@@ -146,7 +146,7 @@ export default class WasabeeMarker {
         marker.closePopup();
       });
 
-      if (operation.IsServerOp() && operation.IsOnCurrentServer()) {
+      if (operation.isServerOp() && operation.isOnCurrentServer()) {
         const assignButton = L.DomUtil.create("button", null, buttonSet);
         assignButton.textContent = wX("ASSIGN");
         L.DomEvent.on(assignButton, "click", (ev) => {
@@ -158,8 +158,8 @@ export default class WasabeeMarker {
       }
     }
 
-    if (operation.IsServerOp()) {
-      if (operation.IsOnCurrentServer()) {
+    if (operation.isServerOp()) {
+      if (operation.isOnCurrentServer()) {
         const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
         sendTargetButton.textContent = wX("SEND TARGET");
         L.DomEvent.on(sendTargetButton, "click", (ev) => {

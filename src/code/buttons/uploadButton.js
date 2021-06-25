@@ -32,7 +32,7 @@ const UploadButton = WButton.extend({
       context: this,
       callback: async () => {
         const operation = await getSelectedOperation();
-        if (operation.IsServerOp()) {
+        if (operation.isServerOp()) {
           await this.doUpdate(operation);
           return;
         }
@@ -71,7 +71,7 @@ const UploadButton = WButton.extend({
     }
 
     const operation = getSelectedOperation();
-    if (!operation.IsServerOp()) {
+    if (!operation.isServerOp()) {
       this._visible();
       this.title = wX("UPLOAD BUTTON HOVER", { opName: operation.name });
       this.button.title = this.title;
@@ -119,7 +119,7 @@ const UploadButton = WButton.extend({
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
       "true";
-    if (operation.IsServerOp()) {
+    if (operation.isServerOp()) {
       try {
         if (force) delete operation.lasteditid;
         const success = await updateOpPromise(operation);

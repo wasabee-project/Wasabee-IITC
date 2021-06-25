@@ -212,7 +212,7 @@ export default class WasabeeLink {
         L.DomEvent.stop(ev);
         operation.reverseLink(this.fromPortalId, this.toPortalId);
       });
-      if (operation.IsServerOp() && operation.IsOnCurrentServer()) {
+      if (operation.isServerOp() && operation.isOnCurrentServer()) {
         const assignButton = L.DomUtil.create("button", null, div);
         assignButton.textContent = wX("ASSIGN");
         L.DomEvent.on(assignButton, "click", (ev) => {

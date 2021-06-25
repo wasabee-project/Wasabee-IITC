@@ -982,13 +982,14 @@ export default class WasabeeOp {
   }
 
   // is the op writable to the *current server*
+  // for assignment, team permission
   canWriteServer() {
     // not from the server, must be writable
-    if (!this.IsServerOp()) return true;
+    if (!this.isServerOp()) return true;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if logged on a different server from the one used for the op, not writable
-    if (!this.IsOnCurrentServer()) return false;
+    if (!this.isOnCurrentServer()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
@@ -1008,13 +1009,17 @@ export default class WasabeeOp {
     return false;
   }
 
+  canWrite() {
+    return this.getPermission() === "write";
+  }
+
   getPermission() {
     // not from the server, must be writable
-    if (!this.IsServerOp()) return "write";
+    if (!this.isServerOp()) return "write";
     // if it is a server op and not logged in, the user is the owner
     if (!WasabeeMe.isLoggedIn()) return "write";
     // if logged on a different server from the one used for the op, the user is the owner
-    if (!this.IsOnCurrentServer()) return "write";
+    if (!this.isOnCurrentServer()) return "write";
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return "read"; // fail safe
@@ -1031,18 +1036,18 @@ export default class WasabeeOp {
     return "assignonly";
   }
 
-  IsOnCurrentServer() {
+  isOnCurrentServer() {
     // assume yes if .server is not defined yet (<0.19)
     return !this.server || this.server == GetWasabeeServer();
   }
 
-  IsServerOp() {
+  isServerOp() {
     if (this.fetched) return true;
     return false;
   }
 
-  IsOwnedOp() {
-    if (!this.IsServerOp()) return true;
+  isOwnedOp() {
+    if (!this.isServerOp()) return true;
     if (!WasabeeMe.isLoggedIn()) return true;
 
     const me = WasabeeMe.cacheGet();

@@ -177,7 +177,7 @@ export default class WasabeeAnchor {
       }
     });
 
-    if (operation.IsServerOp() && operation.IsOnCurrentServer()) {
+    if (operation.isServerOp() && operation.isOnCurrentServer()) {
       if (canWrite) {
         const assignButton = L.DomUtil.create("button", null, buttonSet);
         assignButton.textContent = wX("ASSIGN OUTBOUND");
@@ -189,7 +189,7 @@ export default class WasabeeAnchor {
         });
       }
 
-      if (operation.IsOnCurrentServer()) {
+      if (operation.isOnCurrentServer()) {
         const sendButton = L.DomUtil.create("button", null, buttonSet);
         sendButton.textContent = wX("SEND TARGET");
         L.DomEvent.on(sendButton, "click", (ev) => {

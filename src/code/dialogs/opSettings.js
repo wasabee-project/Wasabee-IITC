@@ -168,11 +168,11 @@ const OpSettingDialog = WDialog.extend({
 
     const deleteDiv = L.DomUtil.create("div", null, buttonSection);
     const deleteButton = L.DomUtil.create("button", null, deleteDiv);
-    if (selectedOp.IsServerOp()) {
+    if (selectedOp.isServerOp()) {
       if (
         WasabeeMe.isLoggedIn() &&
-        selectedOp.IsOwnedOp() &&
-        selectedOp.IsOnCurrentServer()
+        selectedOp.isOwnedOp() &&
+        selectedOp.isOnCurrentServer()
       )
         deleteButton.textContent =
           wX("DELETE_OP", { opName: selectedOp.name }) + wX("LOCFRMSER");
@@ -194,9 +194,9 @@ const OpSettingDialog = WDialog.extend({
         callback: async () => {
           if (
             WasabeeMe.isLoggedIn() &&
-            so.IsServerOp() &&
-            so.IsOwnedOp() &&
-            so.IsOnCurrentServer()
+            so.isServerOp() &&
+            so.isOwnedOp() &&
+            so.isOnCurrentServer()
           ) {
             try {
               await deleteOpPromise(so.ID);
@@ -215,7 +215,7 @@ const OpSettingDialog = WDialog.extend({
       con.enable();
     });
 
-    if (selectedOp.IsServerOp()) {
+    if (selectedOp.isServerOp()) {
       const permsDiv = L.DomUtil.create("div", null, buttonSection);
       const permsButton = L.DomUtil.create("button", null, permsDiv);
       permsButton.textContent = wX("OP_PERMS");
