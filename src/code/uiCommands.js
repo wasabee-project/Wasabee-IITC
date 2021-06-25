@@ -388,6 +388,47 @@ export function zoomToOperation(operation) {
   }
 }
 
+export async function updateLocalOp(local, remote) {
+  const so = getSelectedOperation();
+  if (!local) {
+    await remote.store();
+    return false;
+  }
+  if (local.lasteditid == remote.lasteditid) {
+    // nothing to do
+    return false;
+  }
+
+  // if selected op, use current selected op object
+  const op = local.ID != so.ID ? local : so;
+
+  // no changes
+  if (!op.checkChanges()) {
+    // merge blockers and related portals
+    remote.mergeBlockers(op);
+    await remote.store();
+    // if selected op, reload from the new op
+    return remote.ID === so.ID;
+  }
+
+  // partial update on fields the server is always right
+  op.teamlist = remote.teamlist;
+  op.mergeZones(remote);
+  op.remoteChanged = true;
+  await op.store();
+
+  // In case of selected op, suggest merge to the user
+  if (so === op) {
+    const con = new MergeDialog({
+      opOwn: so,
+      opRemote: remote,
+    });
+    con.enable();
+  }
+
+  return false;
+}
+
 export async function fullSync() {
   const so = getSelectedOperation();
   const server = GetWasabeeServer();
@@ -431,35 +472,8 @@ export async function fullSync() {
       .map((p) => p.value);
     for (const newop of ops) {
       const localOp = await WasabeeOp.load(newop.ID);
-      if (!localOp || !localOp.localchanged) {
-        await newop.store();
-        if (newop.ID === so.ID) reloadOpID = so.ID;
-      } else if (localOp.lasteditid != newop.lasteditid) {
-        // if selected op, use current selected op object
-        const op = localOp.ID != so.ID ? localOp : so;
-        // check if there are really local changes
-        // XXX: this may be too long to do
-        if (!op.checkChanges()) {
-          await newop.store();
-          // if selected op, reload from the new op
-          if (op === so) reloadOpID = so.ID;
-        } else {
-          // partial update on fields the server is always right
-          // XXX: do we need zone for teamlist consistency ?
-          op.teamlist = newop.teamlist;
-          op.remoteChanged = true;
-          await op.store();
-
-          // In case of selected op, suggest merge to the user
-          if (so === op) {
-            const con = new MergeDialog({
-              opOwn: so,
-              opRemote: newop,
-            });
-            con.enable();
-          }
-        }
-      }
+      const reloadSO = await updateLocalOp(localOp, newop);
+      if (reloadSO) reloadOpID = so.ID;
     }
 
     // replace current op by the server version if any
@@ -483,10 +497,12 @@ export async function fullSync() {
 }
 
 export async function syncOp(opID) {
-  const localOp = WasabeeOp.load(opID);
+  const localOp = await WasabeeOp.load(opID);
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
     if (!localOp.localchanged) {
+      // merge blockers and related portals
+      remoteOp.mergeBlockers(localOp);
       await remoteOp.store();
     } else {
       const con = new MergeDialog({

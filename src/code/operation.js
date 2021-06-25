@@ -786,7 +786,8 @@ export default class WasabeeOp {
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
-      this.addPortal(portal);
+      // save a trip to update()
+      this._addPortal(portal);
       const marker = new WasabeeMarker({
         type: markerType,
         portalId: portal.id,
@@ -797,14 +798,22 @@ export default class WasabeeOp {
         marker.assign(options.assign);
       this.markers.push(marker);
 
-      this.update(true);
-
       // only need this for virus/destroy/decay -- this should be in the marker class
       const destructMarkerTypes = [
         window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
         window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
         window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
       ];
+      if (destructMarkerTypes.includes(markerType)) {
+        // remove related blockers
+        this.blockers = this.blockers.filter(
+          (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
+        );
+      }
+
+      this.update(true);
+      // run crosslink to update the layer
+      // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
       if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
     }
   }
@@ -952,10 +961,17 @@ export default class WasabeeOp {
     if (this._idToOpportals.size == 0) return null;
     const lats = [];
     const lngs = [];
-    for (const a of this._idToOpportals.values()) {
-      lats.push(a.lat);
-      lngs.push(a.lng);
+    for (const a of this.anchors) {
+      const portal = this.getPortal(a);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
     }
+    for (const m of this.markers) {
+      const portal = this.getPortal(m.portalId);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
+    }
+    if (!lats.length) return null;
     const minlat = Math.min.apply(null, lats);
     const maxlat = Math.max.apply(null, lats);
     const minlng = Math.min.apply(null, lngs);
@@ -1271,6 +1287,29 @@ export default class WasabeeOp {
     return this.localchanged;
   }
 
+  mergeBlockers(op) {
+    // merge portals
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+  }
+
+  mergeZones(op) {
+    const ids = new Set();
+    let count = 0;
+    for (const z of this.zones) {
+      ids.add(z.id);
+    }
+    for (const z of op.zones) {
+      if (!ids.has(z.id)) {
+        this.zones.push(z);
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {
@@ -1302,25 +1341,11 @@ export default class WasabeeOp {
       },
     };
 
-    // merge portals
-    for (const p of op.opportals) {
-      this._addPortal(p);
-    }
-
-    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+    // merge *portals* and blockers
+    this.mergeBlockers(op);
 
     // add missing zones
-    {
-      const ids = new Set();
-      for (const z of this.zones) {
-        ids.add(z.id);
-      }
-      for (const z of op.zones)
-        if (!ids.has(z.id)) {
-          op.zones.push(z);
-          summary.addition.zone += 1;
-        }
-    }
+    summary.addition.zone = this.mergeZones(op);
 
     // try to detect 0.18 ops with inconsistent IDs
     {

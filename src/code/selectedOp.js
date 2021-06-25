@@ -197,6 +197,7 @@ export async function opsList(hidden = true) {
     const raw =
       localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
     ops = JSON.parse(raw);
+    ops = ops.filter((id) => localStorage[id]);
   } catch {
     //
   }
