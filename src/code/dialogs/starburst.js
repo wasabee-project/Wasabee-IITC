@@ -9,6 +9,8 @@ const StarburstDialog = WDialog.extend({
     TYPE: "StarburstDialog",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

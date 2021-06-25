@@ -43,14 +43,17 @@ const ZoneDialog = WDialog.extend({
     };
 
     buttons[wX("ADD_ZONE")] = () => {
+      if (getSelectedOperation().getPermission() !== "write") return;
       getSelectedOperation().addZone();
     };
 
     buttons[wX("SET_MARKERS_ZONES")] = () => {
+      if (getSelectedOperation().getPermission() !== "write") return;
       setMarkersToZones();
     };
 
     buttons[wX("SET_LINKS_ZONES")] = () => {
+      if (getSelectedOperation().getPermission() !== "write") return;
       setLinksToZones();
     };
 
@@ -70,6 +73,7 @@ const ZoneDialog = WDialog.extend({
 
   buildList: function () {
     const op = getSelectedOperation();
+    const canWrite = op.getPermission() === "write";
     const container = L.DomUtil.create("div", null, null);
     const tbody = L.DomUtil.create(
       "tbody",
@@ -80,7 +84,7 @@ const ZoneDialog = WDialog.extend({
     L.DomUtil.create("th", null, hr).textContent = "ID";
     L.DomUtil.create("th", null, hr).textContent = "Name";
     L.DomUtil.create("th", null, hr).textContent = "Color";
-    L.DomUtil.create("th", null, hr).textContent = "Commands";
+    if (canWrite) L.DomUtil.create("th", null, hr).textContent = "Commands";
 
     for (const z of op.zones) {
       const tr = L.DomUtil.create("tr", null, tbody);
@@ -96,6 +100,7 @@ const ZoneDialog = WDialog.extend({
       picker.type = "color";
       picker.value = convertColorToHex(z.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
+      picker.disabled = !canWrite;
 
       L.DomEvent.on(picker, "change", (ev) => {
         L.DomEvent.stop(ev);
@@ -108,54 +113,57 @@ const ZoneDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         getSelectedOperation().renameZone(z.id, nameinput.value);
       });
-      const commandcell = L.DomUtil.create("td", null, tr);
 
-      const color = L.DomUtil.create("a", null, commandcell);
-      color.textContent = "🖌";
-      color.href = "#";
-      L.DomEvent.on(color, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const zoneSetColorDialog = new ZoneSetColorDialog({
-          zone: z,
-        });
-        zoneSetColorDialog.enable();
-      });
-      if (z.id != 1) {
-        const del = L.DomUtil.create("a", null, commandcell);
-        del.textContent = "🗑";
-        del.href = "#";
-        L.DomEvent.on(del, "click", (ev) => {
+      if (canWrite) {
+        const commandcell = L.DomUtil.create("td", null, tr);
+
+        const color = L.DomUtil.create("a", null, commandcell);
+        color.textContent = "🖌";
+        color.href = "#";
+        L.DomEvent.on(color, "click", (ev) => {
           L.DomEvent.stop(ev);
-          getSelectedOperation().removeZone(z.id);
+          const zoneSetColorDialog = new ZoneSetColorDialog({
+            zone: z,
+          });
+          zoneSetColorDialog.enable();
         });
-      }
-      if (z.points.length == 0) {
-        const addPoints = L.DomUtil.create("a", null, commandcell);
-        addPoints.textContent = " 🖍";
-        addPoints.href = "#";
-        L.DomEvent.on(addPoints, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          this.ZonedrawHandler.zoneID = z.id;
-          this.ZonedrawHandler.enable();
-        });
-      } else {
-        const delPoints = L.DomUtil.create("a", null, commandcell);
-        delPoints.textContent = " 🧽";
-        delPoints.href = "#";
-        L.DomEvent.on(delPoints, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          getSelectedOperation().removeZonePoints(z.id);
-        });
-      }
-      if (this.ZonedrawHandler && this.ZonedrawHandler.enabled()) {
-        const stopDrawing = L.DomUtil.create("a", null, commandcell);
-        stopDrawing.href = "#";
-        stopDrawing.textContent = " 🛑";
-        L.DomEvent.on(stopDrawing, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          this.ZonedrawHandler.disable();
-          this.update();
-        });
+        if (z.id != 1) {
+          const del = L.DomUtil.create("a", null, commandcell);
+          del.textContent = "🗑";
+          del.href = "#";
+          L.DomEvent.on(del, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            getSelectedOperation().removeZone(z.id);
+          });
+        }
+        if (z.points.length == 0) {
+          const addPoints = L.DomUtil.create("a", null, commandcell);
+          addPoints.textContent = " 🖍";
+          addPoints.href = "#";
+          L.DomEvent.on(addPoints, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            this.ZonedrawHandler.zoneID = z.id;
+            this.ZonedrawHandler.enable();
+          });
+        } else {
+          const delPoints = L.DomUtil.create("a", null, commandcell);
+          delPoints.textContent = " 🧽";
+          delPoints.href = "#";
+          L.DomEvent.on(delPoints, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            getSelectedOperation().removeZonePoints(z.id);
+          });
+        }
+        if (this.ZonedrawHandler && this.ZonedrawHandler.enabled()) {
+          const stopDrawing = L.DomUtil.create("a", null, commandcell);
+          stopDrawing.href = "#";
+          stopDrawing.textContent = " 🛑";
+          L.DomEvent.on(stopDrawing, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            this.ZonedrawHandler.disable();
+            this.update();
+          });
+        }
       }
     }
 

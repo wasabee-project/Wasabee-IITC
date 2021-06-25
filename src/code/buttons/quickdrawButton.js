@@ -9,6 +9,8 @@ const QuickdrawButton = WButton.extend({
     TYPE: "QuickdrawButton",
   },
 
+  needWritePermission: true,
+
   initialize: function (container) {
     this.title = wX("QD TITLE");
     this.handler = new QuickDrawControl({ button: this });
@@ -46,6 +48,8 @@ const QuickdrawButton = WButton.extend({
       if (this.handler._enabled)
         this.handler._tooltip.updateContent(this.handler._getTooltipText());
     });
+
+    this.update();
   },
 
   getSubActions: function () {

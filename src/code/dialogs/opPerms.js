@@ -143,7 +143,7 @@ const OpPermList = WDialog.extend({
       },
     ];
 
-    if (WasabeeMe.isLoggedIn()) {
+    if (WasabeeMe.isLoggedIn() && operation.IsOwnedOp()) {
       this._table.fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),

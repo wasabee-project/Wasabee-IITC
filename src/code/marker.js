@@ -95,6 +95,7 @@ export default class WasabeeMarker {
 
   async popupContent(marker, operation) {
     if (!operation) operation = getSelectedOperation();
+    const canWrite = operation.getPermission() === "write";
 
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {
@@ -136,16 +137,16 @@ export default class WasabeeMarker {
       "wasabee-marker-buttonset",
       content
     );
-    const deleteButton = L.DomUtil.create("button", null, buttonSet);
-    deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      deleteMarker(operation, this, portal);
-      marker.closePopup();
-    });
+    if (canWrite) {
+      const deleteButton = L.DomUtil.create("button", null, buttonSet);
+      deleteButton.textContent = wX("DELETE_ANCHOR");
+      L.DomEvent.on(deleteButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        deleteMarker(operation, this, portal);
+        marker.closePopup();
+      });
 
-    if (operation.IsServerOp()) {
-      if (operation.IsWritableOp()) {
+      if (operation.IsServerOp() && operation.IsOnCurrentServer()) {
         const assignButton = L.DomUtil.create("button", null, buttonSet);
         assignButton.textContent = wX("ASSIGN");
         L.DomEvent.on(assignButton, "click", (ev) => {
@@ -155,7 +156,9 @@ export default class WasabeeMarker {
           marker.closePopup();
         });
       }
+    }
 
+    if (operation.IsServerOp()) {
       if (operation.IsOnCurrentServer()) {
         const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
         sendTargetButton.textContent = wX("SEND TARGET");
@@ -165,7 +168,9 @@ export default class WasabeeMarker {
           std.enable();
           marker.closePopup();
         });
+      }
 
+      if (canWrite) {
         const stateButton = L.DomUtil.create("button", null, buttonSet);
         stateButton.textContent = wX("MARKER STATE");
         L.DomEvent.on(stateButton, "click", (ev) => {

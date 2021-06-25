@@ -1,6 +1,7 @@
 import { WButton } from "../leafletClasses";
 import MarkerAddDialog from "../dialogs/markerAddDialog";
 import MarkerList from "../dialogs/markerList";
+import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 const MarkerButton = WButton.extend({
@@ -26,18 +27,22 @@ const MarkerButton = WButton.extend({
 
     this._container.appendChild(this.actionsContainer);
 
-    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
-      this.button.title = wX("MARKERS BUTTON TITLE");
-      const newSubActions = this._createSubActions(this.getSubActions());
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
-    });
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", this.update, this);
+  },
+
+  update: function () {
+    this.button.title = wX("MARKERS BUTTON TITLE");
+    const newSubActions = this._createSubActions(this.getSubActions());
+    this._container.replaceChild(newSubActions, this.actionsContainer);
+    newSubActions.style.display = this.actionsContainer.style.display;
+    this.actionsContainer = newSubActions;
   },
 
   getSubActions: function () {
-    return [
-      {
+    const subActions = [];
+    const op = getSelectedOperation();
+    if (op.getPermission() === "write")
+      subActions.push({
         title: wX("ADD MARKER TITLE"),
         text: wX("ADD_MARKER"),
         callback: () => {
@@ -46,18 +51,18 @@ const MarkerButton = WButton.extend({
           md.enable();
         },
         context: this,
+      });
+    subActions.push({
+      title: wX("MARKER LIST TITLE"),
+      text: wX("MARKER LIST"),
+      callback: () => {
+        this.disable();
+        const ml = new MarkerList();
+        ml.enable();
       },
-      {
-        title: wX("MARKER LIST TITLE"),
-        text: wX("MARKER LIST"),
-        callback: () => {
-          this.disable();
-          const ml = new MarkerList();
-          ml.enable();
-        },
-        context: this,
-      },
-    ];
+      context: this,
+    });
+    return subActions;
   },
 
   // enable: // default is good

@@ -8,6 +8,8 @@ const LinkDialog = WDialog.extend({
     TYPE: "linkDialog",
   },
 
+  needWritePermission: true,
+
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
 

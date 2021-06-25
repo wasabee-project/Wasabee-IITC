@@ -15,6 +15,8 @@ const HomogeneousDialog = WDialog.extend({
     TYPE: "HomogeneousDialog",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);

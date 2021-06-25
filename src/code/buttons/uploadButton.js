@@ -16,6 +16,8 @@ const UploadButton = WButton.extend({
     TYPE: "uploadButton",
   },
 
+  needWritePermission: true,
+
   initialize: function (container) {
     this.type = UploadButton.TYPE;
     // this.handler = null;

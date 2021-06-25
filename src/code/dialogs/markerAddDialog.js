@@ -10,6 +10,8 @@ const MarkerAddDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const context = this;

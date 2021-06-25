@@ -7,6 +7,8 @@ const ZoneSetColorDialog = WDialog.extend({
     TYPE: "zoneSetColorDialog",
   },
 
+  needWritePermission: true,
+
   options: {
     // zone
   },
