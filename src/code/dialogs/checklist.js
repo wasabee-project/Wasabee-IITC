@@ -219,7 +219,7 @@ const OperationChecklistDialog = WDialog.extend({
           const assigned = L.DomUtil.create("a", null, cell);
           assigned.textContent = value;
           // do not use agent.formatDisplay since that links and overwrites the assign event
-          if (operation.IsServerOp() && operation.IsWritableOp()) {
+          if (operation.IsServerOp() && operation.canWriteServer()) {
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);

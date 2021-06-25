@@ -78,7 +78,7 @@ const UploadButton = WButton.extend({
       return;
     }
 
-    if (!operation.IsWritableOp()) {
+    if (!operation.canWriteServer()) {
       this._invisible();
       this.title = wX("UPDATE PERM DENIED");
       this.button.title = this.title;
