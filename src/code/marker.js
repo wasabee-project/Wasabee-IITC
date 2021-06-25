@@ -116,7 +116,8 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.get(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        assignment.appendChild(await a.formatDisplay());
+        if (a) assignment.appendChild(await a.formatDisplay());
+        else assignment.textContent += " " + this.assignedTo;
       } catch (err) {
         console.error(err);
       }
@@ -125,7 +126,7 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.get(this.completedID);
         assignment.innerHTML = wX("COMPLETED BY", {
-          agentName: a.name,
+          agentName: a ? a.name : this.completedID,
         });
       } catch (e) {
         console.error(e);
