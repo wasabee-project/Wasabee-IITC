@@ -35,6 +35,8 @@ const OpPermList = WDialog.extend({
       this._me = await WasabeeMe.waitGet();
     }
 
+    if (!operation.IsServerOp()) this.closeDialog();
+
     this.buildTable(operation);
     this._html.firstChild.replaceWith(this._table.table);
 
@@ -47,7 +49,7 @@ const OpPermList = WDialog.extend({
     this.buildTable(operation);
     this._html = L.DomUtil.create("div", null);
     this._html.appendChild(this._table.table);
-    if (this._me && operation.IsOwnedOp()) {
+    if (this._me && operation.IsOwnedOp() && operation.IsOnCurrentServer()) {
       const already = new Set();
       for (const a of operation.teamlist) already.add(a.teamid);
 
@@ -143,7 +145,7 @@ const OpPermList = WDialog.extend({
       },
     ];
 
-    if (WasabeeMe.isLoggedIn() && operation.IsOwnedOp()) {
+    if (operation.canWriteServer()) {
       this._table.fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
