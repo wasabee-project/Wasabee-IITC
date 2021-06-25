@@ -133,7 +133,7 @@ export const WDialog = L.Handler.extend({
       // avoid import loop
       const op = window.plugin.wasabee._selectedOp;
       if (!op || op.getPermission() !== "write") {
-        if (this._dialog) this._dialog.dialog("close");
+        if (this._dialog) this.closeDialog();
       }
     }
   },
