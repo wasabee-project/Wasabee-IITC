@@ -57,7 +57,6 @@ const AboutDialog = WDialog.extend({
       width: "auto",
       dialogClass: "about",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
 

@@ -43,7 +43,6 @@ const TeamMembershipList = WDialog.extend({
       width: "auto",
       dialogClass: "teamlist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
 

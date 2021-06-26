@@ -666,7 +666,9 @@
 }
 .wasabee-dialog-checklist {
 }
-.wasabee-dialog-perms {
+.wasabee-dialog-perms .add-perm {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
 }
 .wasabee-dialog-prompt {
 }

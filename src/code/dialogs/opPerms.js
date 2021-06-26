@@ -57,7 +57,6 @@ const OpPermList = WDialog.extend({
       height: "auto",
       dialogClass: "perms",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
 
@@ -69,7 +68,7 @@ const OpPermList = WDialog.extend({
       const already = new Set();
       for (const a of operation.teamlist) already.add(a.teamid);
 
-      const addArea = L.DomUtil.create("div", null, html);
+      const addArea = L.DomUtil.create("div", "add-perm", html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
         // if (already.has(t.ID)) continue;
@@ -116,7 +115,7 @@ const OpPermList = WDialog.extend({
 
   buildTable: function (operation) {
     const sortable = new Sortable();
-    sortable.fields = [
+    const fields = [
       {
         name: wX("TEAM"),
         value: async (perm) => {
@@ -151,23 +150,23 @@ const OpPermList = WDialog.extend({
       },
     ];
 
-    if (operation.canWriteServer()) {
-      sortable.fields.push({
+    if (operation.isOwnedOp()) {
+      fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
         format: (cell, value, obj) => {
-          if (operation.isOwnedOp()) {
-            const link = L.DomUtil.create("a", null, cell);
-            link.href = "#";
-            link.textContent = value;
-            L.DomEvent.on(link, "click", (ev) => {
-              L.DomEvent.stop(ev);
-              this.delPerm(obj); // calls wasabee:op:change -- async but no need to await
-            });
-          }
+          const link = L.DomUtil.create("a", null, cell);
+          link.href = "#";
+          link.textContent = value;
+          L.DomEvent.on(link, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            this.delPerm(obj); // calls wasabee:op:change -- async but no need to await
+          });
         },
       });
     }
+
+    sortable.fields = fields;
     sortable.sortBy = 0;
     sortable.items = operation.teamlist;
 
