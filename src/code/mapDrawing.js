@@ -7,6 +7,7 @@ import { newColors } from "./auxiliar";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
 import LinkUI from "./ui/link";
+import AnchorUI from "./ui/anchor";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -440,7 +441,7 @@ function addAnchorToMap(portalId, operation) {
     (ev) => {
       L.DomEvent.stop(ev);
       if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      const content = anchor.popupContent(marker);
+      const content = AnchorUI.popupContent(anchor, marker);
       marker.setPopupContent(content);
       if (marker._popup._wrapper)
         marker._popup._wrapper.classList.add("wasabee-popup");
