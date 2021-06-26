@@ -6,6 +6,8 @@ import WasabeeOp from "./model/operation";
 import { newColors } from "./auxiliar";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
+import LinkUI from "./ui/link";
+
 const Wasabee = window.plugin.wasabee;
 
 // draws all anchors, markers, and links
@@ -201,7 +203,7 @@ function addLink(wlink, operation) {
       L.DomEvent.stop(ev);
       if (ev.target._popup._wrapper)
         ev.target._popup._wrapper.classList.add("wasabee-popup");
-      const div = wlink.getPopup(operation);
+      const div = LinkUI.getPopup(wlink, operation);
       ev.target.setPopupContent(div);
       ev.target.openPopup(ev.latlng);
       return true;

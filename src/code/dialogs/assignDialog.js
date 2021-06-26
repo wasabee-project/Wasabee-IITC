@@ -8,6 +8,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
 import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -58,7 +59,9 @@ const AssignDialog = WDialog.extend({
       this._name = wX("ASSIGN LINK PROMPT", {
         portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
+      divtitle.appendChild(
+        LinkUI.displayFormat(target, operation, this._smallScreen)
+      );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK ASSIGNMENT");
       menu.prepend(t);

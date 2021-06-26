@@ -5,6 +5,7 @@ import WasabeeMarker from "../model/marker";
 import wX from "../wX";
 
 import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 export const SetCommentDialog = WDialog.extend({
   statics: {
@@ -83,7 +84,8 @@ export const SetCommentDialog = WDialog.extend({
     if (this.commentType == "link") {
       desc.textContent = wX("SET_LINK_COMMENT");
       desc.appendChild(
-        this.options.target.displayFormat(
+        LinkUI.displayFormat(
+          this.options.target,
           this.options.operation,
           this._smallScreen
         )

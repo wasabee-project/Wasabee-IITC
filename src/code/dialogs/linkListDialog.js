@@ -4,6 +4,7 @@ import { loadFaked } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 
 import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const LinkListDialog = OperationChecklistDialog.extend({
   statics: {
@@ -36,7 +37,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
         title: wX("MIN_SRC_PORT_LVL"),
         value: (link) => link.length(operation),
         format: (cell, data, link) => {
-          cell.appendChild(link.minLevel(operation));
+          cell.appendChild(LinkUI.minLevel(link, operation));
         },
         smallScreenHide: true,
       },

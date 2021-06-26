@@ -5,6 +5,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
 import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -59,7 +60,7 @@ const StateDialog = WDialog.extend({
       this._type = "Link";
       this._name = wX("LINK STATE PROMPT", portal.name);
       divtitle.appendChild(
-        this.options.target.displayFormat(operation, this._smallScreen)
+        LinkUI.displayFormat(this.options.target, operation, this._smallScreen)
       );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK STATE");
