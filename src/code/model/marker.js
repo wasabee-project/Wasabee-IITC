@@ -10,6 +10,7 @@ import StateDialog from "../dialogs/stateDialog";
 import { getSelectedOperation } from "../selectedOp";
 
 import PortalUI from "../ui/portal";
+import AgentUI from "../ui/agent";
 
 const STATE_UNASSIGNED = "pending";
 const STATE_ASSIGNED = "assigned";
@@ -118,7 +119,7 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.get(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        if (a) assignment.appendChild(await a.formatDisplay());
+        if (a) assignment.appendChild(await AgentUI.formatDisplay(a));
         else assignment.textContent += " " + this.assignedTo;
       } catch (err) {
         console.error(err);

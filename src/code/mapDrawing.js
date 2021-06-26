@@ -8,6 +8,7 @@ import { getSelectedOperation, opsList } from "./selectedOp";
 
 import LinkUI from "./ui/link";
 import AnchorUI from "./ui/anchor";
+import AgentUI from "./ui/agent";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -296,10 +297,10 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
       title: agent.name,
       icon: L.divIcon({
         className: "wasabee-agent-icon",
-        iconSize: agent.iconSize(zoom),
-        iconAnchor: agent.iconAnchor(zoom),
+        iconSize: AgentUI.iconSize(zoom),
+        iconAnchor: AgentUI.iconAnchor(zoom),
         popupAnchor: L.point(0, -70),
-        html: agent.icon(zoom),
+        html: AgentUI.icon(agent, zoom),
       }),
       id: agent.id,
       zoom: zoom,
@@ -317,7 +318,7 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
         L.DomEvent.stop(ev);
         if (marker.isPopupOpen && marker.isPopupOpen()) return;
         const a = await WasabeeAgent.get(agent.id);
-        marker.setPopupContent(await a.getPopup());
+        marker.setPopupContent(await AgentUI.getPopup(a));
         if (marker._popup._wrapper)
           marker._popup._wrapper.classList.add("wasabee-popup");
         marker.update();
@@ -344,10 +345,10 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
       al.setIcon(
         L.divIcon({
           className: "wasabee-agent-icon",
-          iconSize: agent.iconSize(zoom),
-          iconAnchor: agent.iconAnchor(zoom),
+          iconSize: AgentUI.iconSize(zoom),
+          iconAnchor: AgentUI.iconAnchor(zoom),
           popupAnchor: L.point(0, -70),
-          html: agent.icon(zoom),
+          html: AgentUI.icon(agent, zoom),
         })
       );
       al.options.zoom = zoom;

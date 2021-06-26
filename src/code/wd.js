@@ -4,6 +4,8 @@ import WasabeeAgent from "./model/agent";
 import wX from "./wX";
 // import { getPortalDetails } from "./uiCommands";
 
+import AgentUI from "./ui/agent";
+
 // setup function
 export function initWasabeeD() {
   window.plugin.wasabee.defensiveLayers = new L.LayerGroup();
@@ -153,7 +155,7 @@ async function getMarkerPopup(PortalID) {
     const a = await WasabeeAgent.get(dk.GID);
     const li = L.DomUtil.create("li", null, ul);
     if (a) {
-      li.appendChild(await a.formatDisplay());
+      li.appendChild(await AgentUI.formatDisplay(a));
     } else {
       const fake = L.DomUtil.create("span", null, li);
       fake.textContent = wX("LOADING");

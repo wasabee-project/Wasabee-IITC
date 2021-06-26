@@ -3,6 +3,8 @@ import Sortable from "../sortable";
 import WasabeeAgent from "../model/agent";
 import wX from "../wX";
 
+import AgentUI from "../ui/agent";
+
 const OnlineAgentList = WDialog.extend({
   statics: {
     TYPE: "OnlineAgentList",
@@ -46,7 +48,7 @@ const OnlineAgentList = WDialog.extend({
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, agent) =>
-          cell.appendChild(await agent.formatDisplay(0)),
+          cell.appendChild(await AgentUI.formatDisplay(agent)),
       },
       {
         name: "Last Seen",

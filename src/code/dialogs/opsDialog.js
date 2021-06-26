@@ -17,6 +17,8 @@ import WasabeeAgent from "../model/agent";
 import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
+import AgentUI from "../ui/agent";
+
 const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog",
@@ -280,7 +282,7 @@ const OpsDialog = WDialog.extend({
       if (sum.currentserver) {
         const agent = await WasabeeAgent.get(tmpOp.creator);
         sum.owner = agent.name;
-        sum.ownerDisplay = await agent.formatDisplay();
+        sum.ownerDisplay = await AgentUI.formatDisplay(agent);
       } else {
         sum.owner = window.PLAYER.nickname;
       }
