@@ -9,6 +9,8 @@ export const SetCommentDialog = WDialog.extend({
     TYPE: "setCommentDialog",
   },
 
+  needWritePermission: true,
+
   options: {
     // target
     // operation

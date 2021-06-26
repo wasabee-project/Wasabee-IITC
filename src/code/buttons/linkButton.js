@@ -8,6 +8,8 @@ const LinkButton = WButton.extend({
     TYPE: "LinkButton",
   },
 
+  needWritePermission: true,
+
   initialize: function (container) {
     this.type = LinkButton.TYPE;
     this.title = wX("LINKS BUTTON TITLE");

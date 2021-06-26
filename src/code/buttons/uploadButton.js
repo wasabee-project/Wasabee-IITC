@@ -16,6 +16,8 @@ const UploadButton = WButton.extend({
     TYPE: "uploadButton",
   },
 
+  needWritePermission: true,
+
   initialize: function (container) {
     this.type = UploadButton.TYPE;
     // this.handler = null;
@@ -30,7 +32,7 @@ const UploadButton = WButton.extend({
       context: this,
       callback: async () => {
         const operation = await getSelectedOperation();
-        if (operation.IsServerOp()) {
+        if (operation.isServerOp()) {
           await this.doUpdate(operation);
           return;
         }
@@ -69,14 +71,14 @@ const UploadButton = WButton.extend({
     }
 
     const operation = getSelectedOperation();
-    if (!operation.IsServerOp()) {
+    if (!operation.isServerOp()) {
       this._visible();
       this.title = wX("UPLOAD BUTTON HOVER", { opName: operation.name });
       this.button.title = this.title;
       return;
     }
 
-    if (!operation.IsWritableOp()) {
+    if (!operation.canWriteServer()) {
       this._invisible();
       this.title = wX("UPDATE PERM DENIED");
       this.button.title = this.title;
@@ -117,7 +119,7 @@ const UploadButton = WButton.extend({
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
       "true";
-    if (operation.IsServerOp()) {
+    if (operation.isServerOp()) {
       try {
         if (force) delete operation.lasteditid;
         const success = await updateOpPromise(operation);

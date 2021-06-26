@@ -89,6 +89,8 @@ export const WDialog = L.Handler.extend({
     TYPE: "Unextended Wasabee Dialog",
   },
 
+  needWritePermission: false,
+
   options: {
     usePane: false,
     paneId: "wasabee",
@@ -108,11 +110,43 @@ export const WDialog = L.Handler.extend({
   addHooks: function () {
     window.map.on("wasabee:ui:skin", this.update, this);
     window.map.on("wasabee:ui:lang", this.update, this);
+    // don't use child method
+    window.map.on(
+      "wasabee:op:change wasabee:op:select",
+      WDialog.prototype.onOpChange,
+      this
+    );
   },
 
   removeHooks: function () {
     window.map.off("wasabee:ui:skin", this.update, this);
     window.map.off("wasabee:ui:lang", this.update, this);
+    window.map.off(
+      "wasabee:op:change wasabee:op:select",
+      WDialog.prototype.onOpChange,
+      this
+    );
+  },
+
+  onOpChange: function () {
+    if (this.needWritePermission) {
+      // avoid import loop
+      const op = window.plugin.wasabee._selectedOp;
+      if (!op || !op.canWrite()) {
+        if (this._dialog) this.closeDialog();
+      }
+    }
+  },
+
+  enable: function () {
+    if (this.needWritePermission) {
+      // avoid import loop
+      const op = window.plugin.wasabee._selectedOp;
+      if (!op || !op.canWrite()) {
+        return;
+      }
+    }
+    L.Handler.prototype.enable.call(this);
   },
 
   update: function () {},
@@ -254,6 +288,8 @@ export const WButton = L.Class.extend({
   _enabled: false,
   title: "Unset",
 
+  needWritePermission: false,
+
   // make sure all these bases are covered in your button
   // XXX this initializer is not used by any buttons
   initialize: function (container) {
@@ -274,7 +310,15 @@ export const WButton = L.Class.extend({
     });
   },
 
-  update: function () {},
+  update: function () {
+    if (!this.button || !this.needWritePermission) return;
+    const op = window.plugin.wasabee._selectedOp;
+    if (op && op.canWrite()) {
+      this.button.style.display = "block";
+    } else {
+      this.button.style.display = "none";
+    }
+  },
 
   _toggleActions: function () {
     if (this._enabled) {

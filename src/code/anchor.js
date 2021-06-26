@@ -61,6 +61,7 @@ export default class WasabeeAnchor {
   popupContent(marker) {
     // just log for now, if we see it, then we can figure out what is really going on
     const operation = getSelectedOperation();
+    const canWrite = operation.canWrite();
     if (operation == null) {
       console.log("null op for anchor?");
     }
@@ -79,26 +80,9 @@ export default class WasabeeAnchor {
     );
     const pcLink = L.DomUtil.create("a", null, portalComment);
     pcLink.textContent = this._portal.comment || wX("SET_PORTAL_COMMENT");
-    pcLink.href = "#";
-    L.DomEvent.on(pcLink, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const scd = new SetCommentDialog({
-        target: this._portal,
-        operation: operation,
-      });
-      scd.enable();
-      marker.closePopup();
-    });
-    if (this._portal.hardness) {
-      const portalHardness = L.DomUtil.create(
-        "div",
-        "wasabee-portal-hardness",
-        content
-      );
-      const phLink = L.DomUtil.create("a", null, portalHardness);
-      phLink.textContent = this._portal.hardness;
-      phLink.href = "#";
-      L.DomEvent.on(phLink, "click", (ev) => {
+    if (canWrite) {
+      pcLink.href = "#";
+      L.DomEvent.on(pcLink, "click", (ev) => {
         L.DomEvent.stop(ev);
         const scd = new SetCommentDialog({
           target: this._portal,
@@ -107,6 +91,27 @@ export default class WasabeeAnchor {
         scd.enable();
         marker.closePopup();
       });
+    }
+    if (this._portal.hardness) {
+      const portalHardness = L.DomUtil.create(
+        "div",
+        "wasabee-portal-hardness",
+        content
+      );
+      const phLink = L.DomUtil.create("a", null, portalHardness);
+      phLink.textContent = this._portal.hardness;
+      if (canWrite) {
+        phLink.href = "#";
+        L.DomEvent.on(phLink, "click", (ev) => {
+          L.DomEvent.stop(ev);
+          const scd = new SetCommentDialog({
+            target: this._portal,
+            operation: operation,
+          });
+          scd.enable();
+          marker.closePopup();
+        });
+      }
     }
 
     const requiredKeys = L.DomUtil.create("div", "desc", content);
@@ -127,20 +132,22 @@ export default class WasabeeAnchor {
       lld.enable();
       marker.closePopup();
     });
-    const swapButton = L.DomUtil.create("button", null, buttonSet);
-    swapButton.textContent = wX("SWAP");
-    L.DomEvent.on(swapButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      swapPortal(operation, this._portal);
-      marker.closePopup();
-    });
-    const deleteButton = L.DomUtil.create("button", null, buttonSet);
-    deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      deletePortal(operation, this._portal);
-      marker.closePopup();
-    });
+    if (canWrite) {
+      const swapButton = L.DomUtil.create("button", null, buttonSet);
+      swapButton.textContent = wX("SWAP");
+      L.DomEvent.on(swapButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        swapPortal(operation, this._portal);
+        marker.closePopup();
+      });
+      const deleteButton = L.DomUtil.create("button", null, buttonSet);
+      deleteButton.textContent = wX("DELETE_ANCHOR");
+      L.DomEvent.on(deleteButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        deletePortal(operation, this._portal);
+        marker.closePopup();
+      });
+    }
 
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
@@ -170,28 +177,26 @@ export default class WasabeeAnchor {
       }
     });
 
-    if (operation.IsServerOp()) {
-      if (operation.IsWritableOp()) {
-        const assignButton = L.DomUtil.create("button", null, buttonSet);
-        assignButton.textContent = wX("ASSIGN OUTBOUND");
-        L.DomEvent.on(assignButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const ad = new AssignDialog({ target: this });
-          ad.enable();
-          marker.closePopup();
-        });
-      }
+    if (operation.canWriteServer()) {
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN OUTBOUND");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog({ target: this });
+        ad.enable();
+        marker.closePopup();
+      });
+    }
 
-      if (operation.IsOnCurrentServer()) {
-        const sendButton = L.DomUtil.create("button", null, buttonSet);
-        sendButton.textContent = wX("SEND TARGET");
-        L.DomEvent.on(sendButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const std = new SendTargetDialog({ target: this });
-          std.enable();
-          marker.closePopup();
-        });
-      }
+    if (operation.isOnCurrentServer()) {
+      const sendButton = L.DomUtil.create("button", null, buttonSet);
+      sendButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog({ target: this });
+        std.enable();
+        marker.closePopup();
+      });
     }
 
     return content;

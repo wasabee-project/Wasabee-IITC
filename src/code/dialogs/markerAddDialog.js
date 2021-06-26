@@ -10,6 +10,8 @@ const MarkerAddDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const context = this;
@@ -155,10 +157,13 @@ const MarkerAddDialog = WDialog.extend({
     let option = menu.appendChild(L.DomUtil.create("option", null));
     option.value = "";
     option.textContent = wX("UNASSIGNED");
-    const alreadyAdded = new Set();
 
+    const operation = getSelectedOperation();
+    if (!operation.isOnCurrentServer()) return;
+
+    const alreadyAdded = new Set();
     const me = await WasabeeMe.waitGet();
-    for (const t of getSelectedOperation().teamlist) {
+    for (const t of operation.teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached

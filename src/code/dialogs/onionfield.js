@@ -11,6 +11,8 @@ const OnionfieldDialog = WDialog.extend({
     TYPE: "OnionDialog",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

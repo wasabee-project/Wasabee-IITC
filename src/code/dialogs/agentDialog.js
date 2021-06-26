@@ -48,7 +48,6 @@ const AgentDialog = WDialog.extend({
       width: "auto",
       dialogClass: "agent",
       buttons: buttons,
-      // id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
 

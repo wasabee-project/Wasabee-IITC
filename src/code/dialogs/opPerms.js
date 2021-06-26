@@ -35,23 +35,40 @@ const OpPermList = WDialog.extend({
       this._me = await WasabeeMe.waitGet();
     }
 
-    this.buildTable(operation);
-    this._html.firstChild.replaceWith(this._table.table);
+    if (!operation.isServerOp()) this.closeDialog();
 
+    this.setContent(this.buildHTML(operation));
     this.setTitle(wX("PERMS", { opName: operation.name }));
   },
 
   _displayDialog: function () {
     const operation = getSelectedOperation();
 
-    this.buildTable(operation);
-    this._html = L.DomUtil.create("div", null);
-    this._html.appendChild(this._table.table);
-    if (this._me && operation.IsOwnedOp()) {
+    const html = this.buildHTML(operation);
+
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this.closeDialog();
+    };
+
+    this.createDialog({
+      title: wX("PERMS", { opName: operation.name }),
+      html: html,
+      height: "auto",
+      dialogClass: "perms",
+      buttons: buttons,
+    });
+  },
+
+  buildHTML: function (operation) {
+    const html = L.DomUtil.create("div");
+    html.appendChild(this.buildTable(operation));
+
+    if (this._me && operation.isOwnedOp() && operation.isOnCurrentServer()) {
       const already = new Set();
       for (const a of operation.teamlist) already.add(a.teamid);
 
-      const addArea = L.DomUtil.create("div", null, this._html);
+      const addArea = L.DomUtil.create("div", "add-perm", html);
       const teamMenu = L.DomUtil.create("select", null, addArea);
       for (const t of this._me.Teams) {
         // if (already.has(t.ID)) continue;
@@ -93,34 +110,24 @@ const OpPermList = WDialog.extend({
       });
     }
 
-    const buttons = {};
-    buttons[wX("OK")] = () => {
-      this.closeDialog();
-    };
-
-    this.createDialog({
-      title: wX("PERMS", { opName: operation.name }),
-      html: this._html,
-      height: "auto",
-      dialogClass: "perms",
-      buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
-    });
+    return html;
   },
 
   buildTable: function (operation) {
-    this._table = new Sortable();
-    this._table.fields = [
+    const sortable = new Sortable();
+    const fields = [
       {
         name: wX("TEAM"),
         value: async (perm) => {
-          // try the team cache first
-          const t = await WasabeeTeam.get(perm.teamid);
-          if (t) return t.name;
-          // check the "me" list
-          if (this._me) {
-            for (const mt of this._me.Teams) {
-              if (mt.ID == perm.teamid) return mt.Name;
+          if (this._me && operation.isOnCurrentServer()) {
+            // try the team cache first
+            const t = await WasabeeTeam.get(perm.teamid);
+            if (t) return t.name;
+            // check the "me" list
+            if (this._me) {
+              for (const mt of this._me.Teams) {
+                if (mt.ID == perm.teamid) return mt.Name;
+              }
             }
           }
           // default to the id
@@ -143,25 +150,27 @@ const OpPermList = WDialog.extend({
       },
     ];
 
-    if (WasabeeMe.isLoggedIn()) {
-      this._table.fields.push({
+    if (operation.isOwnedOp()) {
+      fields.push({
         name: wX("REMOVE"),
         value: () => wX("REMOVE"),
         format: (cell, value, obj) => {
-          if (operation.IsOwnedOp()) {
-            const link = L.DomUtil.create("a", null, cell);
-            link.href = "#";
-            link.textContent = value;
-            L.DomEvent.on(link, "click", (ev) => {
-              L.DomEvent.stop(ev);
-              this.delPerm(obj); // calls wasabee:op:change -- async but no need to await
-            });
-          }
+          const link = L.DomUtil.create("a", null, cell);
+          link.href = "#";
+          link.textContent = value;
+          L.DomEvent.on(link, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            this.delPerm(obj); // calls wasabee:op:change -- async but no need to await
+          });
         },
       });
     }
-    this._table.sortBy = 0;
-    this._table.items = operation.teamlist;
+
+    sortable.fields = fields;
+    sortable.sortBy = 0;
+    sortable.items = operation.teamlist;
+
+    return sortable.table;
   },
 
   addPerm: async function (teamID, role, zone) {
@@ -170,7 +179,7 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
-    if (!operation.IsOwnedOp()) return;
+    if (!operation.isOwnedOp()) return;
 
     for (const p of operation.teamlist) {
       if (p.teamid == teamID && p.role == role && p.zone == zone) {
@@ -197,7 +206,7 @@ const OpPermList = WDialog.extend({
       return;
     }
     const operation = getSelectedOperation();
-    if (!operation.IsOwnedOp()) return;
+    if (!operation.isOwnedOp()) return;
 
     try {
       await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);

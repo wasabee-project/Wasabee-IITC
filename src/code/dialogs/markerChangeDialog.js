@@ -7,6 +7,8 @@ const MarkerChangeDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
+  needWritePermission: true,
+
   options: {
     // marker
   },
