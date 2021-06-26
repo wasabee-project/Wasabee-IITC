@@ -1,10 +1,9 @@
 import WasabeePortal from "./model/portal";
 import WasabeeLink from "./model/link";
+import WasabeeMarker from "./model/marker";
 import { getSelectedOperation } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
-
-const Wasabee = window.plugin.wasabee;
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
@@ -141,9 +140,9 @@ function testPolyLine(wasabeeLink, realLink, operation) {
 
     for (const marker of operation.markers) {
       if (
-        marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
-        marker.type == Wasabee.static.constants.MARKER_TYPE_VIRUS ||
-        marker.type == Wasabee.static.constants.MARKER_TYPE_DECAY
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS ||
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_DECAY
       ) {
         if (
           marker.portalId == realLink.options.data.dGuid ||

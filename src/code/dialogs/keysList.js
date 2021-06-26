@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
 import WasabeeMe from "../model/me";
+import WasabeeMarker from "../model/marker";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -186,9 +187,7 @@ const KeysList = WDialog.extend({
     }
 
     for (const p of operation.markers.filter(function (marker) {
-      return (
-        marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
-      );
+      return marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY;
     })) {
       const k = {};
       k.id = p.portalId;

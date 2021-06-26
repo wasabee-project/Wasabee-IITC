@@ -9,8 +9,6 @@ import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import db from "../db";
 
-import { constants } from "../static";
-
 export default class WasabeeOp extends Evented {
   constructor(obj) {
     super();
@@ -808,9 +806,9 @@ export default class WasabeeOp extends Evented {
 
     // only need this for virus/destroy/decay -- this should be in the marker class
     const destructMarkerTypes = [
-      constants.MARKER_TYPE_DECAY,
-      constants.MARKER_TYPE_DESTROY,
-      constants.MARKER_TYPE_VIRUS,
+      WasabeeMarker.constants.MARKER_TYPE_DECAY,
+      WasabeeMarker.constants.MARKER_TYPE_DESTROY,
+      WasabeeMarker.constants.MARKER_TYPE_VIRUS,
     ];
     if (destructMarkerTypes.includes(markerType)) {
       // remove related blockers

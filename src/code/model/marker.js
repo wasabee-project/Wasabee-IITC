@@ -1,11 +1,38 @@
 import { generateId } from "../auxiliar";
 
+const markers = {
+  MARKER_TYPE_CAPTURE: "CapturePortalMarker",
+  MARKER_TYPE_DECAY: "LetDecayPortalAlert",
+  MARKER_TYPE_EXCLUDE: "ExcludeMarker",
+  MARKER_TYPE_DESTROY: "DestroyPortalAlert",
+  MARKER_TYPE_FARM: "FarmPortalMarker",
+  MARKER_TYPE_GOTO: "GotoPortalMarker",
+  MARKER_TYPE_KEY: "GetKeyPortalMarker",
+  MARKER_TYPE_LINK: "CreateLinkAlert",
+  MARKER_TYPE_MEETAGENT: "MeetAgentPortalMarker",
+  MARKER_TYPE_OTHER: "OtherPortalAlert",
+  MARKER_TYPE_RECHARGE: "RechargePortalAlert",
+  MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
+  MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
+};
+
+const markerTypes = new Set(Object.values(markers));
+
 const STATE_UNASSIGNED = "pending";
 const STATE_ASSIGNED = "assigned";
 const STATE_ACKNOWLEDGED = "acknowledged";
 const STATE_COMPLETED = "completed";
 
 export default class WasabeeMarker {
+  // static properties is not supported by eslint yet
+  static get markerTypes() {
+    return markerTypes;
+  }
+
+  static get constants() {
+    return markers;
+  }
+
   constructor(obj) {
     this.ID = obj.ID ? obj.ID : generateId();
     this.portalId = obj.portalId;

@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../model/me";
 import WasabeeTeam from "../model/team";
+import WasabeeMarker from "../model/marker";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
@@ -74,7 +75,7 @@ const MarkerAddDialog = WDialog.extend({
       }
       defaultType = markers.has(defaultType) ? null : defaultType;
 
-      for (const k of window.plugin.wasabee.static.markerTypes) {
+      for (const k of WasabeeMarker.markerTypes) {
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
         o.textContent = wX(k);
@@ -114,7 +115,7 @@ const MarkerAddDialog = WDialog.extend({
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      if (window.plugin.wasabee.static.markerTypes.has(this._type.value))
+      if (WasabeeMarker.markerTypes.has(this._type.value))
         this._addMarker(
           this._type.value,
           this._comment.value,

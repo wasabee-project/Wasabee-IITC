@@ -67,19 +67,6 @@ W.static = {
     SERVER_BASE_KEY: "wasabee-server",
     SERVER_BASE_DEFAULT: "https://am.wasabee.rocks",
     REBASE_UPDATE_KEY: "wasabee-rebase-on-update",
-    MARKER_TYPE_CAPTURE: "CapturePortalMarker",
-    MARKER_TYPE_DECAY: "LetDecayPortalAlert",
-    MARKER_TYPE_EXCLUDE: "ExcludeMarker",
-    MARKER_TYPE_DESTROY: "DestroyPortalAlert",
-    MARKER_TYPE_FARM: "FarmPortalMarker",
-    MARKER_TYPE_GOTO: "GotoPortalMarker",
-    MARKER_TYPE_KEY: "GetKeyPortalMarker",
-    MARKER_TYPE_LINK: "CreateLinkAlert",
-    MARKER_TYPE_MEETAGENT: "MeetAgentPortalMarker",
-    MARKER_TYPE_OTHER: "OtherPortalAlert",
-    MARKER_TYPE_RECHARGE: "RechargePortalAlert",
-    MARKER_TYPE_UPGRADE: "UpgradePortalAlert",
-    MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
     DEFAULT_MARKER_TYPE: "DestroyPortalAlert",
     QUICKDRAW_GUIDE_STYLE: {
       color: "#0f0",
@@ -104,22 +91,6 @@ W.static.strings.English = require("./translations/english.json");
 W.static.strings.Italiano = require("./translations/italian.json");
 W.static.strings.Tagalog = require("./translations/filipino.json");
 W.static.strings.French = require("./translations/french.json");
-
-W.static.markerTypes = new Set([
-  W.static.constants.MARKER_TYPE_CAPTURE,
-  W.static.constants.MARKER_TYPE_DECAY,
-  W.static.constants.MARKER_TYPE_DESTROY,
-  W.static.constants.MARKER_TYPE_FARM,
-  W.static.constants.MARKER_TYPE_GOTO,
-  W.static.constants.MARKER_TYPE_KEY,
-  W.static.constants.MARKER_TYPE_LINK,
-  W.static.constants.MARKER_TYPE_MEETAGENT,
-  W.static.constants.MARKER_TYPE_OTHER,
-  W.static.constants.MARKER_TYPE_RECHARGE,
-  W.static.constants.MARKER_TYPE_UPGRADE,
-  W.static.constants.MARKER_TYPE_VIRUS,
-  W.static.constants.MARKER_TYPE_EXCLUDE,
-]);
 
 W.static.defaultOperationColor = "orange";
 

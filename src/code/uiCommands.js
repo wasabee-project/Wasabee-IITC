@@ -1,5 +1,6 @@
 import WasabeeOp from "./model/operation";
 import WasabeePortal from "./model/portal";
+import WasabeeMarker from "./model/marker";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import MergeDialog from "./dialogs/mergeDialog";
 import WasabeeMe from "./model/me";
@@ -238,7 +239,7 @@ export function getAllPortalsOnScreen(operation) {
       if (
         operation.containsMarkerByID(
           window.portals[portal].options.guid,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+          WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
         )
       )
         continue;
@@ -324,14 +325,14 @@ export function blockerAutomark(operation, first = true) {
     if (
       !operation.containsMarkerByID(
         b.fromPortalId,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
       portals.push(b.fromPortalId);
     if (
       !operation.containsMarkerByID(
         b.toPortalId,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
       portals.push(b.toPortalId);
@@ -364,9 +365,9 @@ export function blockerAutomark(operation, first = true) {
   // console.log(wportal);
 
   // add marker
-  let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
+  let type = WasabeeMarker.constants.MARKER_TYPE_DESTROY;
   if (wportal.team == "E") {
-    type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
+    type = WasabeeMarker.constants.MARKER_TYPE_VIRUS;
   }
   const zone = operation.determineZone(wportal.latLng);
   operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
