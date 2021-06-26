@@ -1,8 +1,8 @@
-import { generateId, convertColorToHex, newColors } from "./auxiliar";
-import { getSelectedOperation } from "./selectedOp";
-import wX from "./wX";
-import AssignDialog from "./dialogs/assignDialog";
-import { addToColorList } from "./skin";
+import { generateId, convertColorToHex, newColors } from "../auxiliar";
+import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
+import AssignDialog from "../dialogs/assignDialog";
+import { addToColorList } from "../skin";
 
 export default class WasabeeLink {
   constructor(obj) {

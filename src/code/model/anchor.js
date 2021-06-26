@@ -1,10 +1,10 @@
-import { swapPortal, deletePortal } from "./uiCommands";
-import { getSelectedOperation } from "./selectedOp";
-import AssignDialog from "./dialogs/assignDialog";
-import SendTargetDialog from "./dialogs/sendTargetDialog";
-import SetCommentDialog from "./dialogs/setCommentDialog";
-import LinkListDialog from "./dialogs/linkListDialog";
-import wX from "./wX";
+import { swapPortal, deletePortal } from "../uiCommands";
+import { getSelectedOperation } from "../selectedOp";
+import AssignDialog from "../dialogs/assignDialog";
+import SendTargetDialog from "../dialogs/sendTargetDialog";
+import SetCommentDialog from "../dialogs/setCommentDialog";
+import LinkListDialog from "../dialogs/linkListDialog";
+import wX from "../wX";
 
 // this class is for the popups, and for assign menu
 export default class WasabeeAnchor {

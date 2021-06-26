@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../agent";
-import WasabeeOp from "../operation";
+import WasabeeAgent from "../model/agent";
+import WasabeeOp from "../model/operation";
 import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import { drawBackgroundOp } from "../mapDrawing";

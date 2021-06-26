@@ -1,13 +1,13 @@
-import { generateId } from "./auxiliar";
-import { deleteMarker } from "./uiCommands";
+import { generateId } from "../auxiliar";
+import { deleteMarker } from "../uiCommands";
 import WasabeeAgent from "./agent";
-import AssignDialog from "./dialogs/assignDialog";
-import SendTargetDialog from "./dialogs/sendTargetDialog";
-import wX from "./wX";
-import SetCommentDialog from "./dialogs/setCommentDialog";
-import MarkerChangeDialog from "./dialogs/markerChangeDialog";
-import StateDialog from "./dialogs/stateDialog";
-import { getSelectedOperation } from "./selectedOp";
+import AssignDialog from "../dialogs/assignDialog";
+import SendTargetDialog from "../dialogs/sendTargetDialog";
+import wX from "../wX";
+import SetCommentDialog from "../dialogs/setCommentDialog";
+import MarkerChangeDialog from "../dialogs/markerChangeDialog";
+import StateDialog from "../dialogs/stateDialog";
+import { getSelectedOperation } from "../selectedOp";
 
 const STATE_UNASSIGNED = "pending";
 const STATE_ASSIGNED = "assigned";

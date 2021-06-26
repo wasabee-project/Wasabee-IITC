@@ -1,6 +1,6 @@
 import WasabeeAgent from "./agent";
 import WasabeeMe from "./me";
-import { teamPromise } from "./server";
+import { teamPromise } from "../server";
 
 export default class WasabeeTeam {
   constructor(data) {

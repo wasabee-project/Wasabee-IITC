@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeLink from "../link";
-import WasabeeMarker from "../marker";
+import WasabeePortal from "../model/portal";
+import WasabeeLink from "../model/link";
+import WasabeeMarker from "../model/marker";
 import wX from "../wX";
 
 export const SetCommentDialog = WDialog.extend({

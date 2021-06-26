@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeePortal from "../model/portal";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 

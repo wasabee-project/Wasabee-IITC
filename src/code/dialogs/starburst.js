@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
+import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";

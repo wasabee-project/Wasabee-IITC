@@ -15,8 +15,8 @@ import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
-import WasabeeMe from "./me";
-import WasabeeOp from "./operation";
+import WasabeeMe from "./model/me";
+import WasabeeOp from "./model/operation";
 import { openDB } from "idb";
 import polyfill from "./polyfill";
 

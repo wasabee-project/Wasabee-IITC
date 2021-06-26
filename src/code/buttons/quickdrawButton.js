@@ -1,6 +1,6 @@
 import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
-import WasabeePortal from "../portal";
+import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebaseSupport";
 

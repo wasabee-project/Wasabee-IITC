@@ -3,11 +3,11 @@ import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
-import { generateId, newColors } from "./auxiliar";
-import { GetWasabeeServer } from "./server";
-import { getSelectedOperation } from "./selectedOp";
+import { generateId, newColors } from "../auxiliar";
+import { GetWasabeeServer } from "../server";
+import { getSelectedOperation } from "../selectedOp";
 
-import wX from "./wX";
+import wX from "../wX";
 
 const Wasabee = window.plugin.wasabee;
 

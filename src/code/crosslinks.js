@@ -1,5 +1,5 @@
-import WasabeePortal from "./portal";
-import WasabeeLink from "./link";
+import WasabeePortal from "./model/portal";
+import WasabeeLink from "./model/link";
 import { getSelectedOperation } from "./selectedOp";
 
 const Wasabee = window.plugin.wasabee;

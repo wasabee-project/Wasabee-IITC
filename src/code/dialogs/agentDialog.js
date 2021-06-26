@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../agent";
+import WasabeeAgent from "../model/agent";
 
 const AgentDialog = WDialog.extend({
   statics: {

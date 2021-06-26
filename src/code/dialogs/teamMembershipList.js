@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeTeam from "../team";
+import WasabeeTeam from "../model/team";
 import wX from "../wX";
 
 const TeamMembershipList = WDialog.extend({

@@ -1,4 +1,4 @@
-import WasabeeOp from "./operation";
+import WasabeeOp from "./model/operation";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 

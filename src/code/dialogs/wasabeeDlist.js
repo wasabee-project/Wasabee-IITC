@@ -1,8 +1,8 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import wX from "../wX";
-import WasabeeMe from "../me";
-import WasabeePortal from "../portal";
+import WasabeeMe from "../model/me";
+import WasabeePortal from "../model/portal";
 import { getAgentWasabeeDkeys } from "../wd";
 
 const WasabeeDList = WDialog.extend({

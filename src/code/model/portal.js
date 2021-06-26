@@ -1,5 +1,5 @@
-import { generateId } from "./auxiliar";
-import wX from "./wX";
+import { generateId } from "../auxiliar";
+import wX from "../wX";
 
 export default class WasabeePortal {
   constructor(obj) {

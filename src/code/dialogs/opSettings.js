@@ -13,7 +13,7 @@ import {
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import { addToColorList } from "../skin";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 
 import { convertColorToHex } from "../auxiliar";
 

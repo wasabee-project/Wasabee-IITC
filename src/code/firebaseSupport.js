@@ -13,8 +13,8 @@ import {
   loadNewDefaultOp,
 } from "./selectedOp";
 import { updateLocalOp } from "./uiCommands";
-import WasabeeOp from "./operation";
-import WasabeePortal from "./portal";
+import WasabeeOp from "./model/operation";
+import WasabeePortal from "./model/portal";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 

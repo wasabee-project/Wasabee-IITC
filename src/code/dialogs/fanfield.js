@@ -1,8 +1,8 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
+import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
-import WasabeeLink from "../link";
+import WasabeeLink from "../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 

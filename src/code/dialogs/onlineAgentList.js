@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeAgent from "../agent";
+import WasabeeAgent from "../model/agent";
 import wX from "../wX";
 
 const OnlineAgentList = WDialog.extend({

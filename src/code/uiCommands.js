@@ -1,8 +1,8 @@
-import WasabeeOp from "./operation";
-import WasabeePortal from "./portal";
+import WasabeeOp from "./model/operation";
+import WasabeePortal from "./model/portal";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import MergeDialog from "./dialogs/mergeDialog";
-import WasabeeMe from "./me";
+import WasabeeMe from "./model/me";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
 import AuthDialog from "./dialogs/authDialog";

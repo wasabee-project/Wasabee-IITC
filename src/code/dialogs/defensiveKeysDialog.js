@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeMe from "../me";
+import WasabeePortal from "../model/portal";
+import WasabeeMe from "../model/me";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";

@@ -1,6 +1,6 @@
-import WasabeeMe from "./me";
+import WasabeeMe from "./model/me";
 import { dKeylistPromise } from "./server";
-import WasabeeAgent from "./agent";
+import WasabeeAgent from "./model/agent";
 import wX from "./wX";
 // import { getPortalDetails } from "./uiCommands";
 

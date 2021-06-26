@@ -1,8 +1,8 @@
-import WasabeeMe from "./me";
-import WasabeeAnchor from "./anchor";
-import WasabeeTeam from "./team";
-import WasabeeAgent from "./agent";
-import WasabeeOp from "./operation";
+import WasabeeMe from "./model/me";
+import WasabeeAnchor from "./model/anchor";
+import WasabeeTeam from "./model/team";
+import WasabeeAgent from "./model/agent";
+import WasabeeOp from "./model/operation";
 import { newColors } from "./auxiliar";
 import { getSelectedOperation, opsList } from "./selectedOp";
 

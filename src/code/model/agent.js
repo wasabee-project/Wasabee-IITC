@@ -1,9 +1,9 @@
 import WasabeePortal from "./portal";
-import ConfirmDialog from "./dialogs/confirmDialog";
-import AgentDialog from "./dialogs/agentDialog";
-import { agentPromise, targetPromise, routePromise } from "./server";
-import { getSelectedOperation } from "./selectedOp";
-import wX from "./wX";
+import ConfirmDialog from "../dialogs/confirmDialog";
+import AgentDialog from "../dialogs/agentDialog";
+import { agentPromise, targetPromise, routePromise } from "../server";
+import { getSelectedOperation } from "../selectedOp";
+import wX from "../wX";
 import WasabeeMe from "./me";
 import WasabeeTeam from "./team";
 

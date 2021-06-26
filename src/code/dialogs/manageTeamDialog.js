@@ -10,8 +10,8 @@ import {
   deleteJoinLinkPromise,
   createJoinLinkPromise,
 } from "../server";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";

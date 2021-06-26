@@ -1,8 +1,8 @@
-import WasabeeMe from "./me";
-import WasabeeOp from "./operation";
+import WasabeeMe from "./model/me";
+import WasabeeOp from "./model/operation";
 import { getSelectedOperation, removeOperation } from "./selectedOp";
 import wX from "./wX";
-import WasabeeMarker from "./marker";
+import WasabeeMarker from "./model/marker";
 
 export default function () {
   return GetWasabeeServer();

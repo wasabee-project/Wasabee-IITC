@@ -1,4 +1,4 @@
-import { mePromise } from "./server";
+import { mePromise } from "../server";
 
 const Wasabee = window.plugin.wasabee;
 
