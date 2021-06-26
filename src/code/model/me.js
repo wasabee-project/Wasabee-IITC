@@ -1,4 +1,5 @@
 import { mePromise } from "../server";
+import db from "../db";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -128,7 +129,7 @@ export default class WasabeeMe {
     delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
     delete localStorage["sentToServer"]; // resend firebase token on login
 
-    const tr = window.plugin.wasabee.idb.transaction(
+    const tr = (await db).transaction(
       ["agents", "teams", "defensivekeys"],
       "readwrite"
     );

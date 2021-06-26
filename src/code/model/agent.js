@@ -1,6 +1,7 @@
 import { agentPromise } from "../server";
 import WasabeeMe from "./me";
 import WasabeeTeam from "./team";
+import db from "../db";
 
 export default class WasabeeAgent {
   constructor(obj) {
@@ -67,14 +68,14 @@ export default class WasabeeAgent {
 
   async _updateCache() {
     // load anything currently cached
-    const cached = await window.plugin.wasabee.idb.get("agents", this.id);
+    const cached = await (await db).get("agents", this.id);
 
     // nothing already in the cache, just dump this in and call it good
     // will contain the extras, but that's fine for now
     if (cached == null) {
       // console.debug("not cached, adding");
       try {
-        await window.plugin.wasabee.idb.put("agents", this);
+        await (await db).put("agents", this);
       } catch (e) {
         console.error(e);
       }
@@ -114,7 +115,7 @@ export default class WasabeeAgent {
     delete cached.state;
 
     try {
-      await window.plugin.wasabee.idb.put("agents", cached);
+      await (await db).put("agents", cached);
     } catch (e) {
       console.error(e);
     }
@@ -127,7 +128,7 @@ export default class WasabeeAgent {
 
   // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
   static async get(gid, maxAgeSeconds = 86400) {
-    const cached = await window.plugin.wasabee.idb.get("agents", gid);
+    const cached = await (await db).get("agents", gid);
     if (cached && cached.fetched > Date.now() - 1000 * maxAgeSeconds) {
       const a = new WasabeeAgent(cached);
       a.cached = true;

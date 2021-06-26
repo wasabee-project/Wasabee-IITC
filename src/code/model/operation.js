@@ -6,6 +6,7 @@ import WasabeeZone from "./zone";
 import { generateId, newColors } from "../auxiliar";
 import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
+import db from "../db";
 
 import wX from "../wX";
 
@@ -66,7 +67,7 @@ export default class WasabeeOp {
 
   static async load(opID) {
     try {
-      const raw = await window.plugin.wasabee.idb.get("operations", opID);
+      const raw = await (await db).get("operations", opID);
       if (raw == null)
         //throw new Error("invalid operation ID");
         return null;
@@ -81,12 +82,12 @@ export default class WasabeeOp {
 
   static async delete(opID) {
     delete localStorage[opID]; // leave for now
-    await window.plugin.wasabee.idb.delete("operations", opID);
+    await (await db).delete("operations", opID);
   }
 
   static async migrate(opID) {
     // skip ones already completed
-    const have = await window.plugin.wasabee.idb.get("operations", opID);
+    const have = await (await db).get("operations", opID);
     if (have != null) {
       delete localStorage[opID]; // active now
       return;
@@ -128,7 +129,7 @@ export default class WasabeeOp {
 
     // store to idb
     try {
-      await window.plugin.wasabee.idb.put("operations", json);
+      await (await db).put("operations", json);
     } catch (e) {
       console.error(e);
     }
