@@ -10,8 +10,6 @@ import db from "../db";
 
 import { constants } from "../static";
 
-import wX from "../wX";
-
 export default class WasabeeOp {
   constructor(obj) {
     if (typeof obj == "string") {
@@ -792,40 +790,38 @@ export default class WasabeeOp {
   }
 
   addMarker(markerType, portal, options) {
-    if (!portal) return;
-    if (this.containsMarker(portal, markerType)) {
-      alert(wX("ALREADY_HAS_MARKER"));
-    } else {
-      // save a trip to update()
-      this._addPortal(portal);
-      const marker = new WasabeeMarker({
-        type: markerType,
-        portalId: portal.id,
-      });
-      if (options && options.comment) marker.comment = options.comment;
-      if (options && options.zone) marker.zone = options.zone;
-      if (options && options.assign && options.assign != 0)
-        marker.assign(options.assign);
-      this.markers.push(marker);
+    if (!portal) return false;
+    if (this.containsMarker(portal, markerType)) return false;
+    // save a trip to update()
+    this._addPortal(portal);
+    const marker = new WasabeeMarker({
+      type: markerType,
+      portalId: portal.id,
+    });
+    if (options && options.comment) marker.comment = options.comment;
+    if (options && options.zone) marker.zone = options.zone;
+    if (options && options.assign && options.assign != 0)
+      marker.assign(options.assign);
+    this.markers.push(marker);
 
-      // only need this for virus/destroy/decay -- this should be in the marker class
-      const destructMarkerTypes = [
-        constants.MARKER_TYPE_DECAY,
-        constants.MARKER_TYPE_DESTROY,
-        constants.MARKER_TYPE_VIRUS,
-      ];
-      if (destructMarkerTypes.includes(markerType)) {
-        // remove related blockers
-        this.blockers = this.blockers.filter(
-          (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
-        );
-      }
-
-      this.update(true);
-      // run crosslink to update the layer
-      // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
-      if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
+    // only need this for virus/destroy/decay -- this should be in the marker class
+    const destructMarkerTypes = [
+      constants.MARKER_TYPE_DECAY,
+      constants.MARKER_TYPE_DESTROY,
+      constants.MARKER_TYPE_VIRUS,
+    ];
+    if (destructMarkerTypes.includes(markerType)) {
+      // remove related blockers
+      this.blockers = this.blockers.filter(
+        (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
+      );
     }
+
+    this.update(true);
+    // run crosslink to update the layer
+    // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
+    if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
+    return true;
   }
 
   assignMarker(id, gid) {
