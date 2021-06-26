@@ -80,7 +80,13 @@ export async function makeSelectedOperation(opID) {
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
     alert("attempted to load invalid opID");
+    return;
   }
+
+  // remove old listeners ? old object should never .store
+  op.on("update", () => window.map.fire("wasabee:op:change"));
+  op.on("blockers", () => window.map.fire("wasabee:crosslinks"));
+
   // the only place we should change the selected op.
   delete window.plugin.wasabee._selectedOp;
   window.plugin.wasabee._selectedOp = op;
