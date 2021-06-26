@@ -9,6 +9,8 @@ import {
 } from "../uiCommands";
 import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
 
+import PortalUI from "../ui/portal";
+
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
 const MultimaxDialog = WDialog.extend({
@@ -38,19 +40,19 @@ const MultimaxDialog = WDialog.extend({
     this._anchorOneDisplay = L.DomUtil.create("span", null, container);
     if (this._anchorOne) {
       this._anchorOneDisplay.appendChild(
-        this._anchorOne.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchorOne, this._smallScreen)
       );
     } else {
       this._anchorOneDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorOneButton, "click", () => {
-      this._anchorOne = WasabeePortal.getSelected();
+      this._anchorOne = PortalUI.getSelected();
       if (this._anchorOne) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
           JSON.stringify(this._anchorOne);
         this._anchorOneDisplay.textContent = "";
         this._anchorOneDisplay.appendChild(
-          this._anchorOne.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchorOne, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -64,19 +66,19 @@ const MultimaxDialog = WDialog.extend({
     this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
     if (this._anchorTwo) {
       this._anchorTwoDisplay.appendChild(
-        this._anchorTwo.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
       );
     } else {
       this._anchorTwoDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorTwoButton, "click", () => {
-      this._anchorTwo = WasabeePortal.getSelected();
+      this._anchorTwo = PortalUI.getSelected();
       if (this._anchorTwo) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
           JSON.stringify(this._anchorTwo);
         this._anchorTwoDisplay.textContent = "";
         this._anchorTwoDisplay.appendChild(
-          this._anchorTwo.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));

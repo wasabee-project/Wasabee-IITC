@@ -6,6 +6,8 @@ import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import { drawBackgroundOp } from "../mapDrawing";
 
+import PortalUI from "../ui/portal";
+
 const MergeDialog = WDialog.extend({
   statics: {
     TYPE: "mergeDialog",
@@ -231,10 +233,10 @@ const MergeDialog = WDialog.extend({
           if (e.data.type === "link") {
             cell.appendChild(e.data.link.displayFormat(op));
           } else if (e.data.type === "portal") {
-            cell.appendChild(e.data.portal.displayFormat());
+            cell.appendChild(PortalUI.displayFormat(e.data.portal));
           } else if (e.data.type === "marker") {
             const portal = op.getPortal(e.data.marker.portalId);
-            cell.appendChild(portal.displayFormat());
+            cell.appendChild(PortalUI.displayFormat(portal));
           } else {
             cell.textContent = value;
           }

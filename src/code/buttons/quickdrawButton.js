@@ -1,8 +1,9 @@
 import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
-import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebaseSupport";
+
+import PortalUI from "../ui/portal";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -253,7 +254,7 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _portalClicked: function (portal) {
-    const selectedPortal = WasabeePortal.fromIITC(portal);
+    const selectedPortal = PortalUI.fromIITC(portal);
     if (!selectedPortal) {
       // XXX wX this
       this._tooltip.updateContent({

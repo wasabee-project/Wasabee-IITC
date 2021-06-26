@@ -3,6 +3,8 @@ import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const LinkDialog = WDialog.extend({
   statics: {
     TYPE: "linkDialog",
@@ -38,20 +40,20 @@ const LinkDialog = WDialog.extend({
     this._sourceDisplay = L.DomUtil.create("span", "portal", container);
     if (this._source) {
       this._sourceDisplay.appendChild(
-        this._source.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._source, this._smallScreen)
       );
     } else {
       this._sourceDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(sourceButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._source = WasabeePortal.getSelected();
+      this._source = PortalUI.getSelected();
       if (this._source) {
         localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY] =
           JSON.stringify(this._source);
         this._sourceDisplay.textContent = "";
         this._sourceDisplay.appendChild(
-          this._source.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._source, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -65,20 +67,20 @@ const LinkDialog = WDialog.extend({
     this._anchor1Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor1) {
       this._anchor1Display.appendChild(
-        this._anchor1.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchor1, this._smallScreen)
       );
     } else {
       this._anchor1Display.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchor1Button, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchor1 = WasabeePortal.getSelected();
+      this._anchor1 = PortalUI.getSelected();
       if (this._anchor1) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
           JSON.stringify(this._anchor1);
         this._anchor1Display.textContent = "";
         this._anchor1Display.appendChild(
-          this._anchor1.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchor1, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -106,20 +108,20 @@ const LinkDialog = WDialog.extend({
     this._anchor2Display = L.DomUtil.create("span", "portal", container);
     if (this._anchor2) {
       this._anchor2Display.appendChild(
-        this._anchor2.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchor2, this._smallScreen)
       );
     } else {
       this._anchor2Display.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchor2Button, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchor2 = WasabeePortal.getSelected();
+      this._anchor2 = PortalUI.getSelected();
       if (this._anchor2) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
           JSON.stringify(this._anchor2);
         this._anchor2Display.textContent = "";
         this._anchor2Display.appendChild(
-          this._anchor2.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchor2, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));

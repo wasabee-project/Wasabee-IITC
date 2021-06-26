@@ -1,10 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
 import WasabeeMe from "../model/me";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
 import { getAgentPortalWasabeeDkeys } from "../wd";
+
+import PortalUI from "../ui/portal";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -28,11 +29,11 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _portalClickedHook: async function () {
-    this._selectedPortal = WasabeePortal.getSelected();
+    this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.appendChild(
-        this._selectedPortal.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
       );
       const mine = await getAgentPortalWasabeeDkeys(
         this._me.GoogleID,

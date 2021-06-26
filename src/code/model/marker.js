@@ -9,6 +9,8 @@ import MarkerChangeDialog from "../dialogs/markerChangeDialog";
 import StateDialog from "../dialogs/stateDialog";
 import { getSelectedOperation } from "../selectedOp";
 
+import PortalUI from "../ui/portal";
+
 const STATE_UNASSIGNED = "pending";
 const STATE_ASSIGNED = "assigned";
 const STATE_ACKNOWLEDGED = "acknowledged";
@@ -217,7 +219,7 @@ export default class WasabeeMarker {
     const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
     L.DomUtil.addClass(kind, this.type);
     kind.textContent = wX(this.type);
-    title.appendChild(portal.displayFormat());
+    title.appendChild(PortalUI.displayFormat(portal));
 
     kind.href = "#";
     L.DomEvent.on(kind, "click", (ev) => {

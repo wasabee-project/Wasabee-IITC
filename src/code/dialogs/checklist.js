@@ -17,6 +17,8 @@ import {
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const OperationChecklistDialog = WDialog.extend({
   statics: {
     TYPE: "operationChecklist",
@@ -131,7 +133,7 @@ const OperationChecklistDialog = WDialog.extend({
             if (this._smallScreen) cell.colSpan = 2;
           } else {
             cell.appendChild(
-              operation.getPortal(thing.portalId).displayFormat()
+              PortalUI.displayFormat(operation.getPortal(thing.portalId))
             );
           }
         },

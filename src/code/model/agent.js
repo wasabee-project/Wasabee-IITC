@@ -1,4 +1,3 @@
-import WasabeePortal from "./portal";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import AgentDialog from "../dialogs/agentDialog";
 import { agentPromise, targetPromise, routePromise } from "../server";
@@ -6,6 +5,8 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import WasabeeMe from "./me";
 import WasabeeTeam from "./team";
+
+import PortalUI from "../ui/portal";
 
 export default class WasabeeAgent {
   constructor(obj) {
@@ -184,7 +185,7 @@ export default class WasabeeAgent {
     sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const selectedPortal = WasabeePortal.getSelected();
+      const selectedPortal = PortalUI.getSelected();
       if (!selectedPortal) {
         alert(wX("SELECT PORTAL"));
         return;
@@ -193,7 +194,7 @@ export default class WasabeeAgent {
       const d = new ConfirmDialog({
         title: wX("SEND TARGET"),
         label: wX("SEND TARGET CONFIRM", {
-          portalName: selectedPortal.displayName,
+          portalName: PortalUI.displayName(selectedPortal),
           agent: this.name,
         }),
         type: "agent",
@@ -215,7 +216,7 @@ export default class WasabeeAgent {
     requestRoute.style.display = "none"; // hide this until the server-side is ready
     L.DomEvent.on(requestRoute, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const selectedPortal = WasabeePortal.getSelected();
+      const selectedPortal = PortalUI.getSelected();
       if (!selectedPortal) {
         alert(wX("SELECT PORTAL"));
         return;
@@ -244,7 +245,7 @@ export default class WasabeeAgent {
       const a = L.DomUtil.create("li", "assignment", assignments);
       const portal = op.getPortal(m.portalId);
       a.textContent = `${m.order}: ${wX(m.type)} `;
-      a.appendChild(portal.displayFormat());
+      a.appendChild(PortalUI.displayFormat(portal));
     }
 
     return content;

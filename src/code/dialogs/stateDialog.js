@@ -4,6 +4,8 @@ import WasabeeMarker from "../model/marker";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
+import PortalUI from "../ui/portal";
+
 const StateDialog = WDialog.extend({
   statics: {
     TYPE: "stateDialog",
@@ -68,7 +70,7 @@ const StateDialog = WDialog.extend({
       const portal = operation.getPortal(this.options.target.portalId);
       this._type = "Marker";
       this._name = wX("MARKER STATE PROMPT", portal.name);
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER STATE");
       menu.prepend(t);

@@ -6,6 +6,8 @@ import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const KeysList = WDialog.extend({
   statics: {
     TYPE: "keysList",
@@ -75,7 +77,7 @@ const KeysList = WDialog.extend({
         value: (key) => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          cell.appendChild(operation.getPortal(key.id).displayFormat());
+          cell.appendChild(PortalUI.displayFormat(operation.getPortal(key.id)));
         },
       },
       {

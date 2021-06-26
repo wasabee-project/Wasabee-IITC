@@ -6,6 +6,8 @@ import SetCommentDialog from "../dialogs/setCommentDialog";
 import LinkListDialog from "../dialogs/linkListDialog";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 // this class is for the popups, and for assign menu
 export default class WasabeeAnchor {
   constructor(portalId) {
@@ -51,7 +53,7 @@ export default class WasabeeAnchor {
   }
 
   displayFormat(smallScreen = false) {
-    return this._portal.displayFormat(smallScreen);
+    return PortalUI.displayFormat(this._portal, smallScreen);
   }
 
   get latLng() {
@@ -72,7 +74,7 @@ export default class WasabeeAnchor {
     marker.className = "wasabee-anchor-popup";
     const content = L.DomUtil.create("div", null);
     const title = L.DomUtil.create("div", "desc", content);
-    title.appendChild(this._portal.displayFormat());
+    title.appendChild(PortalUI.displayFormat(this._portal));
     const portalComment = L.DomUtil.create(
       "div",
       "wasabee-portal-comment",

@@ -4,6 +4,8 @@ import wX from "../wX";
 import AssignDialog from "../dialogs/assignDialog";
 import { addToColorList } from "../skin";
 
+import PortalUI from "../ui/portal";
+
 export default class WasabeeLink {
   constructor(obj) {
     this.ID = obj.ID ? obj.ID : generateId();
@@ -104,7 +106,10 @@ export default class WasabeeLink {
   displayFormat(operation, smallScreen = false) {
     const d = L.DomUtil.create("div", null);
     d.appendChild(
-      operation.getPortal(this.fromPortalId).displayFormat(smallScreen)
+      PortalUI.displayFormat(
+        operation.getPortal(this.fromPortalId),
+        smallScreen
+      )
     );
     const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
     arrow.style.color = this.getColor(operation);
@@ -123,7 +128,7 @@ export default class WasabeeLink {
     });
 
     d.appendChild(
-      operation.getPortal(this.toPortalId).displayFormat(smallScreen)
+      PortalUI.displayFormat(operation.getPortal(this.toPortalId), smallScreen)
     );
     return d;
   }

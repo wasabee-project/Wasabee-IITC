@@ -2,6 +2,8 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
+import PortalUI from "../ui/portal";
+
 const MarkerChangeDialog = WDialog.extend({
   statics: {
     TYPE: "markerButton",
@@ -25,7 +27,9 @@ const MarkerChangeDialog = WDialog.extend({
     const portal = operation.getPortal(this.options.marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
-    portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
+    portalDisplay.appendChild(
+      PortalUI.displayFormat(portal, this._smallScreen)
+    );
 
     this._type = L.DomUtil.create("select", null, content);
 

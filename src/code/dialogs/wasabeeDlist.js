@@ -5,6 +5,8 @@ import WasabeeMe from "../model/me";
 import WasabeePortal from "../model/portal";
 import { getAgentWasabeeDkeys } from "../wd";
 
+import PortalUI from "../ui/portal";
+
 const WasabeeDList = WDialog.extend({
   statics: {
     TYPE: "wasabeeDList",
@@ -66,7 +68,7 @@ const WasabeeDList = WDialog.extend({
             lat: n.Lat,
             lng: n.Lng,
           });
-          cell.appendChild(p.displayFormat(this._smallScreen));
+          cell.appendChild(PortalUI.displayFormat(p, this._smallScreen));
         },
       },
       {

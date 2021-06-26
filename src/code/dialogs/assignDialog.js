@@ -7,6 +7,8 @@ import WasabeeTeam from "../model/team";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
+import PortalUI from "../ui/portal";
+
 const AssignDialog = WDialog.extend({
   statics: {
     TYPE: "assignDialog",
@@ -53,7 +55,9 @@ const AssignDialog = WDialog.extend({
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      this._name = wX("ASSIGN LINK PROMPT", { portalName: portal.displayName });
+      this._name = wX("ASSIGN LINK PROMPT", {
+        portalName: PortalUI.displayName(portal),
+      });
       divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK ASSIGNMENT");
@@ -64,9 +68,9 @@ const AssignDialog = WDialog.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
       this._name = wX("ASSIGN MARKER PROMPT", {
-        portalName: portal.displayName,
+        portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER ASSIGNMENT");
       menu.prepend(t);
@@ -76,9 +80,9 @@ const AssignDialog = WDialog.extend({
       const portal = operation.getPortal(target.portalId);
       this._type = "Anchor";
       this._name = wX("ASSIGN OUTBOUND PROMPT", {
-        portalName: portal.displayName,
+        portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("ANCHOR ASSIGNMENT");
       menu.prepend(t);

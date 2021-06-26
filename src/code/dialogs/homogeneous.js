@@ -10,6 +10,8 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const HomogeneousDialog = WDialog.extend({
   statics: {
     TYPE: "HomogeneousDialog",
@@ -40,20 +42,20 @@ const HomogeneousDialog = WDialog.extend({
     this._anchorDisplayOne = L.DomUtil.create("span", "portal", container);
     if (this._anchorOne) {
       this._anchorDisplayOne.appendChild(
-        this._anchorOne.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchorOne, this._smallScreen)
       );
     } else {
       this._anchorDisplayOne.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButtonOne, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchorOne = WasabeePortal.getSelected();
+      this._anchorOne = PortalUI.getSelected();
       if (this._anchorOne) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
           JSON.stringify(this._anchorOne);
         this._anchorDisplayOne.textContent = "";
         this._anchorDisplayOne.appendChild(
-          this._anchorOne.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchorOne, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -67,20 +69,20 @@ const HomogeneousDialog = WDialog.extend({
     this._anchorDisplayTwo = L.DomUtil.create("span", "portal", container);
     if (this._anchorTwo) {
       this._anchorDisplayTwo.appendChild(
-        this._anchorTwo.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
       );
     } else {
       this._anchorDisplayTwo.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButtonTwo, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchorTwo = WasabeePortal.getSelected();
+      this._anchorTwo = PortalUI.getSelected();
       if (this._anchorTwo) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
           JSON.stringify(this._anchorTwo);
         this._anchorDisplayTwo.textContent = "";
         this._anchorDisplayTwo.appendChild(
-          this._anchorTwo.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -94,20 +96,20 @@ const HomogeneousDialog = WDialog.extend({
     this._anchorDisplayThree = L.DomUtil.create("span", "portal", container);
     if (this._anchorThree) {
       this._anchorDisplayThree.appendChild(
-        this._anchorThree.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchorThree, this._smallScreen)
       );
     } else {
       this._anchorDisplayThree.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButtonThree, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchorThree = WasabeePortal.getSelected();
+      this._anchorThree = PortalUI.getSelected();
       if (this._anchorThree) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY] =
           JSON.stringify(this._anchorThree);
         this._anchorDisplayThree.textContent = "";
         this._anchorDisplayThree.appendChild(
-          this._anchorThree.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchorThree, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -486,7 +488,7 @@ const HomogeneousDialog = WDialog.extend({
           children: null,
         };
         for (const k of sorted.keys()) {
-          const wp = WasabeePortal.get(k);
+          const wp = PortalUI.get(k);
           const subregions = this._getSubregions(
             wp,
             new Array(...portalsCovered),

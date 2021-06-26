@@ -2,6 +2,8 @@ import WasabeePortal from "./model/portal";
 import WasabeeLink from "./model/link";
 import { getSelectedOperation } from "./selectedOp";
 
+import PortalUI from "./ui/portal";
+
 const Wasabee = window.plugin.wasabee;
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
@@ -180,7 +182,7 @@ function testLink(link, operation) {
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
       showCrossLink(link, operation);
-      let fromPortal = WasabeePortal.get(link.options.data.oGuid);
+      let fromPortal = PortalUI.get(link.options.data.oGuid);
       if (!fromPortal)
         fromPortal = WasabeePortal.fake(
           (link.options.data.oLatE6 / 1e6).toFixed(6),
@@ -188,7 +190,7 @@ function testLink(link, operation) {
           link.options.data.oGuid
         );
       operation._addPortal(fromPortal);
-      let toPortal = WasabeePortal.get(link.options.data.dGuid);
+      let toPortal = PortalUI.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
           (link.options.data.dLatE6 / 1e6).toFixed(6),

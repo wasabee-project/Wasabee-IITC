@@ -6,6 +6,8 @@ import WasabeeLink from "../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const OnionfieldDialog = WDialog.extend({
   statics: {
     TYPE: "OnionDialog",
@@ -35,20 +37,20 @@ const OnionfieldDialog = WDialog.extend({
     this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(
-        this._anchor.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchor, this._smallScreen)
       );
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchor = WasabeePortal.getSelected();
+      this._anchor = PortalUI.getSelected();
       if (this._anchor) {
         localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
           JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
-          this._anchor.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchor, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));

@@ -6,6 +6,8 @@ import WasabeeLink from "../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const FanfieldDialog = WDialog.extend({
   statics: {
     TYPE: "FanfieldDialog",
@@ -28,19 +30,19 @@ const FanfieldDialog = WDialog.extend({
     this._anchorDisplay = L.DomUtil.create("span", null, container);
     if (this._anchor) {
       this._anchorDisplay.appendChild(
-        this._anchor.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._anchor, this._smallScreen)
       );
     } else {
       this._anchorDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(anchorButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._anchor = WasabeePortal.getSelected();
+      this._anchor = PortalUI.getSelected();
       if (this._anchor) {
         localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
         this._anchorDisplay.textContent = "";
         this._anchorDisplay.appendChild(
-          this._anchor.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._anchor, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -54,19 +56,19 @@ const FanfieldDialog = WDialog.extend({
     this._startDisplay = L.DomUtil.create("span", null, container);
     if (this._start) {
       this._startDisplay.appendChild(
-        this._start.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._start, this._smallScreen)
       );
     } else {
       this._startDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(startButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._start = WasabeePortal.getSelected();
+      this._start = PortalUI.getSelected();
       if (this._start) {
         localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
         this._startDisplay.textContent = "";
         this._startDisplay.appendChild(
-          this._start.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._start, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));
@@ -79,18 +81,20 @@ const FanfieldDialog = WDialog.extend({
     endButton.textContent = wX("SET");
     this._endDisplay = L.DomUtil.create("span", null, container);
     if (this._end) {
-      this._endDisplay.appendChild(this._end.displayFormat(this._smallScreen));
+      this._endDisplay.appendChild(
+        PortalUI.displayFormat(this._end, this._smallScreen)
+      );
     } else {
       this._endDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(endButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._end = WasabeePortal.getSelected();
+      this._end = PortalUI.getSelected();
       if (this._end) {
         localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
         this._endDisplay.textContent = "";
         this._endDisplay.appendChild(
-          this._end.displayFormat(this._smallScreen)
+          PortalUI.displayFormat(this._end, this._smallScreen)
         );
       } else {
         alert(wX("PLEASE_SELECT_PORTAL"));

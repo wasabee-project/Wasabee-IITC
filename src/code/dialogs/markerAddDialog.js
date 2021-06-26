@@ -1,9 +1,10 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
 import WasabeeMe from "../model/me";
 import WasabeeTeam from "../model/team";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+
+import PortalUI from "../ui/portal";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -46,12 +47,12 @@ const MarkerAddDialog = WDialog.extend({
     this._assign.innerHTML = "";
     await this._getAgentMenu(this._assign);
 
-    this._selectedPortal = WasabeePortal.getSelected();
+    this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.textContent = "";
       this._portal.appendChild(
-        this._selectedPortal.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
       );
 
       this._zones.value = getSelectedOperation().determineZone(
@@ -147,7 +148,7 @@ const MarkerAddDialog = WDialog.extend({
     };
 
     // XXX remove comment from args in 0.20
-    operation.addMarker(selectedType, WasabeePortal.getSelected(), options);
+    operation.addMarker(selectedType, PortalUI.getSelected(), options);
     await this.update();
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;

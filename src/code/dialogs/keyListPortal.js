@@ -4,6 +4,8 @@ import WasabeeAgent from "../model/agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
+import PortalUI from "../ui/portal";
+
 const KeyListPortal = WDialog.extend({
   statics: {
     TYPE: "keyListPortal",
@@ -41,7 +43,9 @@ const KeyListPortal = WDialog.extend({
     const portal = op.getPortal(this.options.portalID);
 
     this.createDialog({
-      title: wX("PORTAL KEY LIST", { portalName: portal.displayName }),
+      title: wX("PORTAL KEY LIST", {
+        portalName: PortalUI.displayName(portal),
+      }),
       html: this.getListDialogContent(this.options.portalID),
       width: "auto",
       dialogClass: "keylistportal",
@@ -63,7 +67,9 @@ const KeyListPortal = WDialog.extend({
 
     const table = this.getListDialogContent(this.options.portalID);
     this.setContent(table);
-    this.setTitle(wX("PORTAL KEY LIST", { portalName: portal.displayName }));
+    this.setTitle(
+      wX("PORTAL KEY LIST", { portalName: PortalUI.displayName(portal) })
+    );
   },
 
   getSortable: function () {

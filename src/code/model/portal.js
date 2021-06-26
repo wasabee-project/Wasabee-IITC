@@ -1,5 +1,4 @@
 import { generateId } from "../auxiliar";
-import wX from "../wX";
 
 export default class WasabeePortal {
   constructor(obj) {
@@ -41,94 +40,8 @@ export default class WasabeePortal {
     };
   }
 
-  // create a wasabee portal from a IITC portal (leaflet marker)
-  static fromIITC(p) {
-    // we have all the details
-    if (p && p.options && p.options.data && p.options.guid) {
-      const data = p.options.data;
-      const id = p.options.guid;
-      if (data.title) {
-        return new WasabeePortal({
-          id: id,
-          name: data.title,
-          lat: (data.latE6 / 1e6).toFixed(6),
-          lng: (data.lngE6 / 1e6).toFixed(6),
-        });
-      }
-      // do we have enough to fake it?
-      if (data.latE6) {
-        return WasabeePortal.fake(
-          (data.latE6 / 1e6).toFixed(6),
-          (data.lngE6 / 1e6).toFixed(6),
-          id
-        );
-      }
-    }
-    // nothing to get
-    return null;
-  }
-
   get latLng() {
     return this._latLng;
-  }
-
-  get team() {
-    if (window.portals[this.id] && window.portals[this.id].options.data)
-      return window.portals[this.id].options.data.team;
-    return "";
-  }
-
-  get displayName() {
-    if (this.pureFaked) return wX("FAKED", { portalId: this.id });
-    if (this.loading) return wX("LOADING1", { portalGuid: this.id });
-    return this.name;
-  }
-
-  displayFormat(shortName = false) {
-    const pt = this.latLng;
-    const v = `${this.lat},${this.lng}`;
-    const name = this.displayName;
-    const e = L.DomUtil.create("a", "wasabee-portal");
-    if (shortName === true && this.name.length > 12) {
-      e.textContent = name.slice(0, 8) + "...";
-    } else {
-      e.textContent = name;
-    }
-
-    const team = this.team;
-    if (team == "E") {
-      e.classList.add("enl");
-    }
-    if (team == "R") {
-      e.classList.add("res");
-    }
-    if (team == "N") {
-      e.classList.add("unclaimed");
-    }
-
-    // e.title = this.name;
-    e.href = `/intel?ll=${v}&pll=${v}`;
-
-    L.DomEvent.on(e, "click", (event) => {
-      if (window.selectedPortal != this.id && this.id.length == 35)
-        window.renderPortalDetails(this.id);
-      else window.map.panTo(pt);
-      event.preventDefault();
-      return false;
-    }).on(e, "dblclick", (event) => {
-      if (window.selectedPortal != this.id && this.id.length == 35)
-        window.renderPortalDetails(this.id);
-      if (window.map.getBounds().contains(pt))
-        window.zoomToAndShowPortal(this.id, pt);
-      else window.map.panTo(pt);
-      event.preventDefault();
-      return false;
-    });
-    return e;
-  }
-
-  static get(id) {
-    return WasabeePortal.fromIITC(window.portals[id]);
   }
 
   static fake(lat, lng, id, name) {
@@ -150,11 +63,5 @@ export default class WasabeePortal {
 
   get pureFaked() {
     return this.id.length != 35;
-  }
-
-  static getSelected() {
-    return window.selectedPortal
-      ? WasabeePortal.get(window.selectedPortal)
-      : null;
   }
 }

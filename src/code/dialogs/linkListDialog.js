@@ -3,6 +3,8 @@ import wX from "../wX";
 import { loadFaked } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 
+import PortalUI from "../ui/portal";
+
 const LinkListDialog = OperationChecklistDialog.extend({
   statics: {
     TYPE: "linkListDialog",
@@ -60,7 +62,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
 
     this.createDialog({
       title: wX("LINKS2", {
-        portalName: this.options.portal.displayName,
+        portalName: PortalUI.displayName(this.options.portal),
         outgoing: fromCount,
         incoming: toCount,
       }),
@@ -89,7 +91,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     this.setContent(this.sortable.table);
     this.setTitle(
       wX("LINKS2", {
-        portalName: this.options.portal.displayName,
+        portalName: PortalUI.displayName(this.options.portal),
         outgoing: fromCount,
         incoming: toCount,
       })
