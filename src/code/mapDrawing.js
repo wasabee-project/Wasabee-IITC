@@ -1,9 +1,7 @@
 import WasabeeMe from "./model/me";
-import WasabeeAnchor from "./model/anchor";
 import WasabeeTeam from "./model/team";
 import WasabeeAgent from "./model/agent";
 import WasabeeOp from "./model/operation";
-import { newColors } from "./auxiliar";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
 import LinkUI from "./ui/link";
@@ -41,14 +39,11 @@ function updateMarkers(op) {
   for (const m of op.markers) {
     if (layerMap.has(m.ID)) {
       const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
-      if (m.state != ll.options.state) {
-        L.DomUtil.removeClass(ll._icon, `wasabee-status-${ll.options.state}`);
-        L.DomUtil.addClass(ll._icon, `wasabee-status-${m.state}`);
-        ll.options.state = m.state;
-      }
+      ll.setState(m.state);
       layerMap.delete(m.ID);
     } else {
-      addMarker(m, op);
+      const lMarker = new MarkerUI.WLMarker(m, op);
+      lMarker.addTo(Wasabee.markerLayerGroup);
     }
   }
 
@@ -57,49 +52,6 @@ function updateMarkers(op) {
     // for (const v of layerMap) {
     Wasabee.markerLayerGroup.removeLayer(v);
   }
-}
-
-// adds a new marker
-function addMarker(target, operation) {
-  const targetPortal = operation.getPortal(target.portalId);
-  const marker = L.marker(targetPortal.latLng, {
-    title: targetPortal.name,
-    id: target.ID,
-    state: target.state,
-    icon: L.divIcon({
-      className: `wasabee-marker-icon ${target.type} wasabee-status-${target.state}`,
-      shadowUrl: null,
-      iconSize: L.point(24, 40),
-      iconAnchor: L.point(12, 40),
-      popupAnchor: L.point(-1, -48),
-    }),
-  });
-
-  // register the marker for spiderfied click
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-  // marker.off("click", marker.openPopup, marker);
-  marker.on(
-    "click spiderfiedclick",
-    async function (ev) {
-      /* eslint-disable no-invalid-this */
-      L.DomEvent.stop(ev);
-      if (this.isPopupOpen()) return;
-      const sop = getSelectedOperation();
-      const target = sop.getMarker(this.options.id);
-      const c = await MarkerUI.popupContent(target, this);
-      this.setPopupContent(c);
-      this._popup._wrapper.classList.add("wasabee-popup");
-      this.update();
-      this.openPopup();
-      /* eslint-enable no-invalid-this */
-    },
-    marker
-  );
-  marker.addTo(Wasabee.markerLayerGroup);
 }
 
 // resetting is consistently 1ms faster than trying to update
@@ -291,42 +243,9 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     return false;
   }
 
-  const zoom = window.map.getZoom();
   if (!layerMap.has(agent.id)) {
     // new, add to map
-    const marker = L.marker(agent.latLng, {
-      title: agent.name,
-      icon: L.divIcon({
-        className: "wasabee-agent-icon",
-        iconSize: AgentUI.iconSize(zoom),
-        iconAnchor: AgentUI.iconAnchor(zoom),
-        popupAnchor: L.point(0, -70),
-        html: AgentUI.icon(agent, zoom),
-      }),
-      id: agent.id,
-      zoom: zoom,
-    });
-
-    window.registerMarkerForOMS(marker);
-    marker.bindPopup("Loading...", {
-      className: "wasabee-popup",
-      closeButton: false,
-    });
-    // marker.off("click", agent.openPopup, agent);
-    marker.on(
-      "click spiderfiedclick",
-      async (ev) => {
-        L.DomEvent.stop(ev);
-        if (marker.isPopupOpen && marker.isPopupOpen()) return;
-        const a = await WasabeeAgent.get(agent.id);
-        marker.setPopupContent(await AgentUI.getPopup(a));
-        if (marker._popup._wrapper)
-          marker._popup._wrapper.classList.add("wasabee-popup");
-        marker.update();
-        marker.openPopup();
-      },
-      marker
-    );
+    const marker = new AgentUI.WLAgent(agent);
     marker.addTo(Wasabee.agentLayerGroup);
   } else {
     // move existing icons, if they actually moved
@@ -337,23 +256,6 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     if (agent.lat != ll.lat || agent.lng != ll.lng) {
       // console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
       al.setLatLng(agent.latLng);
-      al.update();
-    }
-
-    // if the zoom factor changed, refresh the icon
-    if (zoom != al.options.zoom) {
-      // console.debug("changing icon zoom: ", zoom, al.options.zoom);
-      al.setIcon(
-        L.divIcon({
-          className: "wasabee-agent-icon",
-          iconSize: AgentUI.iconSize(zoom),
-          iconAnchor: AgentUI.iconAnchor(zoom),
-          popupAnchor: L.point(0, -70),
-          html: AgentUI.icon(agent, zoom),
-        })
-      );
-      al.options.zoom = zoom;
-      al.update();
     }
   }
   return true;
@@ -381,76 +283,12 @@ function updateAnchors(op) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      addAnchorToMap(a, op);
+      const lAnchor = new AnchorUI.WLAnchor(a, op);
+      lAnchor.addTo(Wasabee.portalLayerGroup);
     }
   }
 
   for (const v of layerMap.values()) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
-}
-
-// adds a single anchor to the map
-function addAnchorToMap(portalId, operation) {
-  const anchor = new WasabeeAnchor(portalId, operation);
-  // use newColors(anchor.color) for 0.19
-  let layer = anchor.color;
-  if (newColors(layer) == layer) layer = "custom";
-  let marker;
-  if (layer != "custom") {
-    marker = L.marker(anchor.latLng, {
-      title: anchor.name,
-      alt: anchor.name,
-      id: portalId,
-      color: anchor.color,
-      icon: L.divIcon({
-        className: `wasabee-anchor-icon wasabee-layer-${layer}`,
-        shadowUrl: null,
-        iconAnchor: [12, 41],
-        iconSize: [25, 41],
-        popupAnchor: [0, -35],
-      }),
-    });
-  } else {
-    const svg = L.Util.template(
-      '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
-      { color: anchor.color }
-    );
-    marker = L.marker(anchor.latLng, {
-      title: anchor.name,
-      alt: anchor.name,
-      id: portalId,
-      color: anchor.color,
-      icon: L.divIcon({
-        className: "wasabee-anchor-icon",
-        shadowUrl: null,
-        iconAnchor: [12, 41],
-        iconSize: [25, 41],
-        popupAnchor: [0, -35],
-        html: svg,
-      }),
-    });
-  }
-
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-  // marker.off("click", marker.openPopup, marker);
-  marker.on(
-    "click spiderfiedclick",
-    (ev) => {
-      L.DomEvent.stop(ev);
-      if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      const content = AnchorUI.popupContent(anchor, marker);
-      marker.setPopupContent(content);
-      if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup");
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.addTo(Wasabee.portalLayerGroup);
 }

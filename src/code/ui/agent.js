@@ -5,13 +5,7 @@ import { targetPromise, routePromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-export default {
-  formatDisplay,
-  getPopup,
-  icon,
-  iconSize,
-  iconAnchor,
-};
+import WasabeeAgent from "../model/agent";
 
 async function formatDisplay(agent, teamID = 0) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
@@ -28,83 +22,6 @@ async function formatDisplay(agent, teamID = 0) {
   });
   display.textContent = await agent.getTeamName(teamID);
   return display;
-}
-
-async function getPopup(agent) {
-  const content = L.DomUtil.create("div", "wasabee-agent-popup");
-  const title = L.DomUtil.create("div", "desc", content);
-  title.id = agent.id;
-  const fd = await formatDisplay(agent, 0);
-  title.innerHTML = fd.outerHTML + timeSinceformat(agent);
-
-  const sendTarget = L.DomUtil.create("button", null, content);
-  sendTarget.textContent = wX("SEND TARGET");
-  L.DomEvent.on(sendTarget, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const selectedPortal = PortalUI.getSelected();
-    if (!selectedPortal) {
-      alert(wX("SELECT PORTAL"));
-      return;
-    }
-
-    const d = new ConfirmDialog({
-      title: wX("SEND TARGET"),
-      label: wX("SEND TARGET CONFIRM", {
-        portalName: PortalUI.displayName(selectedPortal),
-        agent: agent.name,
-      }),
-      type: "agent",
-      callback: async () => {
-        try {
-          await targetPromise(agent.id, selectedPortal);
-          alert(wX("TARGET SENT"));
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    });
-    d.enable();
-  });
-
-  // this needs wX
-  const requestRoute = L.DomUtil.create("button", null, content);
-  requestRoute.textContent = "Send Route to Target";
-  requestRoute.style.display = "none"; // hide this until the server-side is ready
-  L.DomEvent.on(requestRoute, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const selectedPortal = PortalUI.getSelected();
-    if (!selectedPortal) {
-      alert(wX("SELECT PORTAL"));
-      return;
-    }
-
-    const d = new ConfirmDialog({
-      title: "Send Route to Target",
-      label: "Do you really want to request the route to be sent?",
-      type: "agent",
-      callback: async () => {
-        try {
-          await routePromise(agent.id, selectedPortal);
-          alert("Route Sent");
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    });
-    d.enable();
-  });
-
-  const op = getSelectedOperation();
-  const assignments = L.DomUtil.create("ul", "assignments", content);
-  for (const m of op.markers) {
-    if (m.assignedTo != agent.id) continue;
-    const a = L.DomUtil.create("li", "assignment", assignments);
-    const portal = op.getPortal(m.portalId);
-    a.textContent = `${m.order}: ${wX(m.type)} `;
-    a.appendChild(PortalUI.displayFormat(portal));
-  }
-
-  return content;
 }
 
 function timeSinceformat(agent) {
@@ -197,3 +114,141 @@ function bigIcon(agent) {
       <image x="2.5" y="2.5" width="47" height="47" href="${agent.pic}" clip-path="url(#circleView)" />`;
   return icon;
 }
+
+const WLAgent = L.Marker.extend({
+  initialize: function (agent) {
+    const zoom = window.map.getZoom();
+    L.Marker.prototype.initialize.call(this, agent.latLng, {
+      title: agent.name,
+      icon: L.divIcon({
+        className: "wasabee-agent-icon",
+        iconSize: iconSize(zoom),
+        iconAnchor: iconAnchor(zoom),
+        popupAnchor: L.point(0, -70),
+        html: icon(agent, zoom),
+      }),
+      id: agent.id,
+      agent: agent,
+      zoom: zoom,
+    });
+
+    window.registerMarkerForOMS(this);
+    this.bindPopup("Loading...", {
+      className: "wasabee-popup",
+      closeButton: false,
+    });
+    // marker.off("click", agent.openPopup, agent);
+    this.on("click spiderfiedclick", this._onClick, this);
+  },
+
+  _onClick: async function (ev) {
+    L.DomEvent.stop(ev);
+    if (this.isPopupOpen && this.isPopupOpen()) return;
+    const a = await WasabeeAgent.get(this.options.id);
+    this.options.agent = a;
+    this.setPopupContent(await this._getPopup(a));
+    if (this._popup._wrapper)
+      this._popup._wrapper.classList.add("wasabee-popup");
+    this.update();
+    this.openPopup();
+  },
+
+  update: function () {
+    const zoom = window.map.getZoom();
+    if (this.options.zoom != zoom) {
+      this.options.zoom = zoom;
+      this.setIcon(
+        L.divIcon({
+          className: "wasabee-agent-icon",
+          iconSize: iconSize(zoom),
+          iconAnchor: iconAnchor(zoom),
+          popupAnchor: L.point(0, -70),
+          html: icon(this.options.agent, zoom),
+        })
+      );
+    } else L.Marker.prototype.update.call(this);
+  },
+
+  _getPopup: async function () {
+    const agent = this.options.agent;
+    const content = L.DomUtil.create("div", "wasabee-agent-popup");
+    const title = L.DomUtil.create("div", "desc", content);
+    title.id = agent.id;
+    const fd = await formatDisplay(agent, 0);
+    title.innerHTML = fd.outerHTML + timeSinceformat(agent);
+
+    const sendTarget = L.DomUtil.create("button", null, content);
+    sendTarget.textContent = wX("SEND TARGET");
+    L.DomEvent.on(sendTarget, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const selectedPortal = PortalUI.getSelected();
+      if (!selectedPortal) {
+        alert(wX("SELECT PORTAL"));
+        return;
+      }
+
+      const d = new ConfirmDialog({
+        title: wX("SEND TARGET"),
+        label: wX("SEND TARGET CONFIRM", {
+          portalName: PortalUI.displayName(selectedPortal),
+          agent: agent.name,
+        }),
+        type: "agent",
+        callback: async () => {
+          try {
+            await targetPromise(agent.id, selectedPortal);
+            alert(wX("TARGET SENT"));
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      });
+      d.enable();
+    });
+
+    // this needs wX
+    const requestRoute = L.DomUtil.create("button", null, content);
+    requestRoute.textContent = "Send Route to Target";
+    requestRoute.style.display = "none"; // hide this until the server-side is ready
+    L.DomEvent.on(requestRoute, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const selectedPortal = PortalUI.getSelected();
+      if (!selectedPortal) {
+        alert(wX("SELECT PORTAL"));
+        return;
+      }
+
+      const d = new ConfirmDialog({
+        title: "Send Route to Target",
+        label: "Do you really want to request the route to be sent?",
+        type: "agent",
+        callback: async () => {
+          try {
+            await routePromise(agent.id, selectedPortal);
+            alert("Route Sent");
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      });
+      d.enable();
+    });
+
+    const op = getSelectedOperation();
+    const assignments = L.DomUtil.create("ul", "assignments", content);
+    for (const m of op.markers) {
+      if (m.assignedTo != agent.id) continue;
+      const a = L.DomUtil.create("li", "assignment", assignments);
+      const portal = op.getPortal(m.portalId);
+      a.textContent = `${m.order}: ${wX(m.type)} `;
+      a.appendChild(PortalUI.displayFormat(portal));
+    }
+
+    return content;
+  },
+});
+
+export default {
+  formatDisplay,
+  WLAgent,
+};

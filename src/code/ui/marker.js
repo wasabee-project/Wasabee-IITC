@@ -1,7 +1,5 @@
 import WasabeeAgent from "../model/agent";
 
-import AssignDialog from "../dialogs/assignDialog";
-import SendTargetDialog from "../dialogs/sendTargetDialog";
 import SetCommentDialog from "../dialogs/setCommentDialog";
 import MarkerChangeDialog from "../dialogs/markerChangeDialog";
 import StateDialog from "../dialogs/stateDialog";
@@ -13,189 +11,159 @@ import PortalUI from "./portal";
 
 import wX from "../wX";
 
-export default {
-  popupContent,
-};
-
-async function popupContent(marker, leafletMarker, operation) {
-  if (!operation) operation = getSelectedOperation();
-  const canWrite = operation.canWrite();
-
-  const portal = operation.getPortal(marker.portalId);
-  if (portal == null) {
-    console.log("null portal getting marker popup");
-    return (L.DomUtil.create("div", "wasabee-marker-popup").textContent =
-      "invalid portal");
-  }
-
-  const content = L.DomUtil.create("div", "wasabee-marker-popup");
-  content.appendChild(
-    getPopupBodyWithType(marker, portal, operation, leafletMarker)
-  );
-
-  const assignment = L.DomUtil.create(
-    "div",
-    "wasabee-popup-assignment",
-    content
-  );
-  if (marker.state != "completed" && marker.assignedTo) {
-    try {
-      const a = await WasabeeAgent.get(marker.assignedTo);
-      assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-      if (a) assignment.appendChild(await AgentUI.formatDisplay(a));
-      else assignment.textContent += " " + marker.assignedTo;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  if (marker.state == "completed" && marker.completedID) {
-    try {
-      const a = await WasabeeAgent.get(marker.completedID);
-      assignment.innerHTML = wX("COMPLETED BY", {
-        agentName: a ? a.name : marker.completedID,
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  const buttonSet = L.DomUtil.create(
-    "div",
-    "wasabee-marker-buttonset",
-    content
-  );
-  if (canWrite) {
-    const deleteButton = L.DomUtil.create("button", null, buttonSet);
-    deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      deleteMarker(operation, marker, portal);
-      leafletMarker.closePopup();
+const WLMarker = PortalUI.WLPortal.extend({
+  initialize: function (marker) {
+    PortalUI.WLPortal.prototype.initialize.call(this, {
+      portalId: marker.portalId,
+      id: marker.ID,
+      state: marker.state,
+      icon: L.divIcon({
+        className: `wasabee-marker-icon ${marker.type} wasabee-status-${marker.state}`,
+        shadowUrl: null,
+        iconSize: L.point(24, 40),
+        iconAnchor: L.point(12, 40),
+        popupAnchor: L.point(-1, -48),
+      }),
     });
-  }
-  if (operation.canWriteServer()) {
-    const assignButton = L.DomUtil.create("button", null, buttonSet);
-    assignButton.textContent = wX("ASSIGN");
-    L.DomEvent.on(assignButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const ad = new AssignDialog({ target: marker });
-      ad.enable();
-      leafletMarker.closePopup();
-    });
-  }
+  },
 
-  if (canWrite) {
-    const stateButton = L.DomUtil.create("button", null, buttonSet);
+  setState: function (state) {
+    if (state != this.options.state) {
+      L.DomUtil.removeClass(this._icon, `wasabee-status-${this.options.state}`);
+      L.DomUtil.addClass(this._icon, `wasabee-status-${state}`);
+      this.options.state = state;
+    }
+  },
+
+  _popupContent: function () {
+    const operation = getSelectedOperation();
+    const marker = operation.getMarker(this.options.id);
+    const portal = operation.getPortal(marker.portalId);
+
+    if (portal == null) {
+      console.log("null portal getting marker popup");
+      return (L.DomUtil.create("div", "wasabee-marker-popup").textContent =
+        "invalid portal");
+    }
+
+    const canWrite = operation.canWrite();
+
+    const content = PortalUI.WLPortal.prototype._popupContent.call(this);
+
+    const desc = L.DomUtil.create("div", "desc", content);
+    const kind = L.DomUtil.create(
+      "span",
+      `wasabee-marker-popup-kind ${marker.type}`,
+      desc
+    );
+    kind.textContent = wX(marker.type);
+    desc.appendChild(PortalUI.displayFormat(portal));
+    if (canWrite) {
+      kind.href = "#";
+      L.DomEvent.on(kind, "click", this._setMarkerType, this);
+    }
+    this._popupMarkerComment(desc, marker, canWrite);
+    this._popupPortalComments(desc, portal, canWrite);
+
+    this._popupAssignState(content, marker);
+
+    const buttonSet = L.DomUtil.create(
+      "div",
+      "wasabee-marker-buttonset",
+      content
+    );
+    if (canWrite) this._deleteButton(buttonSet, wX("DELETE_ANCHOR"));
+    if (operation.canWriteServer())
+      this._assignButton(buttonSet, wX("ASSIGN"), marker);
+    if (canWrite) this._stateButton(buttonSet, marker);
+    if (operation.isOnCurrentServer())
+      this._sendTargetButton(buttonSet, wX("SEND TARGET"), marker);
+    this._mapButton(buttonSet, wX("ANCHOR_GMAP"));
+
+    return content;
+  },
+
+  _popupMarkerComment: function (container, marker, canWrite) {
+    if (marker.comment) {
+      const comment = L.DomUtil.create(
+        "div",
+        "wasabee-marker-popup-comment",
+        container
+      );
+      comment.textContent = marker.comment;
+      if (canWrite) L.DomEvent.on(comment, "click", this._setComment, this);
+    }
+  },
+
+  _popupAssignState: async function (container, marker) {
+    const assignment = L.DomUtil.create(
+      "div",
+      "wasabee-popup-assignment",
+      container
+    );
+    if (marker.state != "completed" && marker.assignedTo) {
+      try {
+        const a = await WasabeeAgent.get(marker.assignedTo);
+        assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
+        if (a) assignment.appendChild(await AgentUI.formatDisplay(a));
+        else assignment.textContent += " " + marker.assignedTo;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (marker.state == "completed" && marker.completedID) {
+      try {
+        const a = await WasabeeAgent.get(marker.completedID);
+        assignment.innerHTML = wX("COMPLETED BY", {
+          agentName: a ? a.name : marker.completedID,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  },
+
+  _stateButton: function (container, marker) {
+    const operation = getSelectedOperation();
+    const stateButton = L.DomUtil.create("button", null, container);
     stateButton.textContent = wX("MARKER STATE");
     L.DomEvent.on(stateButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const sd = new StateDialog({ target: marker, opID: operation.ID });
       sd.enable();
-      leafletMarker.closePopup();
+      this.closePopup();
     });
-  }
+  },
 
-  if (operation.isOnCurrentServer()) {
-    const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
-    sendTargetButton.textContent = wX("SEND TARGET");
-    L.DomEvent.on(sendTargetButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const std = new SendTargetDialog({ target: marker });
-      std.enable();
-      leafletMarker.closePopup();
-    });
-  }
+  _deleteAction: function () {
+    const operation = getSelectedOperation();
+    const portal = operation.getPortal(this.options.portalId);
+    const marker = operation.getMarker(this.options.id);
+    deleteMarker(operation, marker, portal);
+  },
 
-  const gmapButton = L.DomUtil.create("button", null, buttonSet);
-  gmapButton.textContent = wX("ANCHOR_GMAP");
-  L.DomEvent.on(gmapButton, "click", (ev) => {
+  _setComment: function (ev) {
     L.DomEvent.stop(ev);
-    leafletMarker.closePopup();
-    // use intent on android
-    if (
-      typeof window.android !== "undefined" &&
-      window.android &&
-      window.android.intentPosLink
-    ) {
-      window.android.intentPosLink(
-        +portal.lat,
-        +portal.lng,
-        window.map.getZoom(),
-        portal.name,
-        true
-      );
-    } else {
-      window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-          portal.lat +
-          "," +
-          portal.lng
-      );
-    }
-  });
-
-  return content;
-}
-
-function getPopupBodyWithType(marker, portal, operation, leafletMarker) {
-  const title = L.DomUtil.create("div", "desc");
-  const kind = L.DomUtil.create("span", "wasabee-marker-popup-kind", title);
-  L.DomUtil.addClass(kind, marker.type);
-  kind.textContent = wX(marker.type);
-  title.appendChild(PortalUI.displayFormat(portal));
-
-  kind.href = "#";
-  L.DomEvent.on(kind, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const ch = new MarkerChangeDialog({ marker: marker });
-    ch.enable();
-    leafletMarker.closePopup();
-  });
-
-  if (marker.comment) {
-    const comment = L.DomUtil.create(
-      "div",
-      "wasabee-marker-popup-comment",
-      title
-    );
-    comment.textContent = marker.comment;
-    L.DomEvent.on(comment, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const scd = new SetCommentDialog({
-        target: marker,
-        operation: operation,
-      });
-      scd.enable();
-      leafletMarker.closePopup();
-    });
-  }
-  const comment = L.DomUtil.create("div", "wasabee-portal-comment", title);
-  const cl = L.DomUtil.create("a", null, comment);
-  cl.textContent = portal.comment || wX("SET_PORTAL_COMMENT");
-  cl.href = "#";
-  L.DomEvent.on(cl, "click", (ev) => {
-    L.DomEvent.stop(ev);
+    const operation = getSelectedOperation();
+    const marker = operation.getMarker(this.options.id);
     const scd = new SetCommentDialog({
-      target: portal,
+      target: marker,
       operation: operation,
     });
     scd.enable();
-    leafletMarker.closePopup();
-  });
-  if (portal.hardness) {
-    const hardness = L.DomUtil.create("div", "wasabee-portal-hardness", title);
-    const hl = L.DomUtil.create("a", null, hardness);
-    hl.textContent = portal.hardness;
-    hl.href = "#";
-    L.DomEvent.on(hl, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const scd = new SetCommentDialog({
-        target: portal,
-        operation: operation,
-      });
-      scd.enable();
-      leafletMarker.closePopup();
-    });
-  }
-  return title;
-}
+    this.closePopup();
+  },
+
+  _setMarkerType: function (ev) {
+    L.DomEvent.stop(ev);
+    const operation = getSelectedOperation();
+    const marker = operation.getMarker(this.options.id);
+    const ch = new MarkerChangeDialog({ marker: marker });
+    ch.enable();
+    this.closePopup();
+  },
+});
+
+export default {
+  WLMarker,
+};
