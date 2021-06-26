@@ -1,7 +1,7 @@
 import { mePromise } from "../server";
 import db from "../db";
 
-const Wasabee = window.plugin.wasabee;
+import { constants } from "../static";
 
 export default class WasabeeMe {
   constructor(data) {
@@ -54,16 +54,15 @@ export default class WasabeeMe {
   }
 
   store() {
-    localStorage[Wasabee.static.constants.AGENT_INFO_KEY] =
-      JSON.stringify(this);
+    localStorage[constants.AGENT_INFO_KEY] = JSON.stringify(this);
   }
 
   remove() {
-    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    delete localStorage[constants.AGENT_INFO_KEY];
   }
 
   static localGet() {
-    const lsme = localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    const lsme = localStorage[constants.AGENT_INFO_KEY];
     if (typeof lsme == "string") {
       return new WasabeeMe(lsme); // do not store
     }
@@ -126,7 +125,7 @@ export default class WasabeeMe {
   }
 
   static async purge() {
-    delete localStorage[Wasabee.static.constants.AGENT_INFO_KEY];
+    delete localStorage[constants.AGENT_INFO_KEY];
     delete localStorage["sentToServer"]; // resend firebase token on login
 
     const tr = (await db).transaction(

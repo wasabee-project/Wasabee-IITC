@@ -8,9 +8,9 @@ import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import db from "../db";
 
-import wX from "../wX";
+import { constants } from "../static";
 
-const Wasabee = window.plugin.wasabee;
+import wX from "../wX";
 
 export default class WasabeeOp {
   constructor(obj) {
@@ -29,7 +29,7 @@ export default class WasabeeOp {
     this.anchors = obj.anchors ? obj.anchors : Array();
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
-    this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
+    this.color = obj.color ? obj.color : "main";
     this.color = newColors(this.color);
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
@@ -237,7 +237,7 @@ export default class WasabeeOp {
 
   getColor() {
     if (this.color == null) {
-      return Wasabee.skin.defaultOperationColor;
+      return "main";
     } else {
       return this.color;
     }
@@ -810,9 +810,9 @@ export default class WasabeeOp {
 
       // only need this for virus/destroy/decay -- this should be in the marker class
       const destructMarkerTypes = [
-        window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
+        constants.MARKER_TYPE_DECAY,
+        constants.MARKER_TYPE_DESTROY,
+        constants.MARKER_TYPE_VIRUS,
       ];
       if (destructMarkerTypes.includes(markerType)) {
         // remove related blockers

@@ -206,3 +206,5 @@ W.static.layerTypes = new Map([
     },
   ],
 ]);
+
+export const constants = W.static.constants;
