@@ -670,6 +670,9 @@
   display: grid;
   grid-template-columns: repeat(4, auto);
 }
+.wasabee-dialog-perms .add-perm select {
+  width: 100%;
+}
 .wasabee-dialog-prompt {
 }
 .wasabee-dialog-prompt div.container {
