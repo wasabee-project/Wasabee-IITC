@@ -24,7 +24,7 @@ const SendTargetDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      this.closeDialog();
+      this._sendTarget();
     };
 
     this._html = L.DomUtil.create("div", null);
@@ -88,16 +88,8 @@ const SendTargetDialog = WDialog.extend({
 
     const operation = getSelectedOperation();
 
-    menu.addEventListener("change", async (ev) => {
-      L.DomEvent.stop(ev);
-      const portal = operation.getPortal(this.options.target.portalId);
-      try {
-        await targetPromise(menu.value, portal, this._targettype);
-        this.closeDialog();
-        alert(wX("TARGET SENT"));
-      } catch (e) {
-        console.error(e);
-      }
+    menu.addEventListener("change", () => {
+      this._value = menu.value;
     });
 
     const me = await WasabeeMe.waitGet();
@@ -123,6 +115,21 @@ const SendTargetDialog = WDialog.extend({
     }
 
     return container;
+  },
+
+  _sendTarget: function () {
+    if (!this._value) {
+      this.closeDialog();
+      return;
+    }
+    const operation = getSelectedOperation();
+    const portal = operation.getPortal(this.options.target.portalId);
+    targetPromise(this._value, portal, this._targettype)
+      .then(() => {
+        alert(wX("TARGET SENT"));
+        this.closeDialog();
+      })
+      .catch((e) => alert(e));
   },
 });
 
