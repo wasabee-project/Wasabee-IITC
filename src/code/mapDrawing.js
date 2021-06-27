@@ -79,14 +79,18 @@ function addMarker(target, operation) {
   // marker.off("click", marker.openPopup, marker);
   marker.on(
     "click spiderfiedclick",
-    async (ev) => {
+    async function (ev) {
+      /* eslint-disable no-invalid-this */
       L.DomEvent.stop(ev);
-      if (marker.isPopupOpen()) return;
-      const c = await target.popupContent(marker);
-      marker.setPopupContent(c);
-      marker._popup._wrapper.classList.add("wasabee-popup");
-      marker.update();
-      marker.openPopup();
+      if (this.isPopupOpen()) return;
+      const sop = getSelectedOperation();
+      const target = sop.getMarker(this.options.id);
+      const c = await target.popupContent(this);
+      this.setPopupContent(c);
+      this._popup._wrapper.classList.add("wasabee-popup");
+      this.update();
+      this.openPopup();
+      /* eslint-enable no-invalid-this */
     },
     marker
   );
