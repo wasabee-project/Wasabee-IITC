@@ -133,24 +133,10 @@ const WLAgent = L.Marker.extend({
     });
 
     window.registerMarkerForOMS(this);
-    this.bindPopup("Loading...", {
+    this.bindPopup((layer) => layer._getPopup(), {
       className: "wasabee-popup",
       closeButton: false,
     });
-    // marker.off("click", agent.openPopup, agent);
-    this.on("click spiderfiedclick", this._onClick, this);
-  },
-
-  _onClick: async function (ev) {
-    L.DomEvent.stop(ev);
-    if (this.isPopupOpen && this.isPopupOpen()) return;
-    const a = await WasabeeAgent.get(this.options.id);
-    this.options.agent = a;
-    this.setPopupContent(await this._getPopup(a));
-    if (this._popup._wrapper)
-      this._popup._wrapper.classList.add("wasabee-popup");
-    this.update();
-    this.openPopup();
   },
 
   update: function () {
@@ -169,13 +155,18 @@ const WLAgent = L.Marker.extend({
     } else L.Marker.prototype.update.call(this);
   },
 
-  _getPopup: async function () {
+  _getPopup: function () {
     const agent = this.options.agent;
     const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = agent.id;
-    const fd = await formatDisplay(agent, 0);
-    title.innerHTML = fd.outerHTML + timeSinceformat(agent);
+    title.textContent = agent.name;
+
+    WasabeeAgent.get(this.options.id)
+      .then(formatDisplay)
+      .then((fd) => {
+        title.innerHTML = fd.outerHTML + timeSinceformat(agent);
+      });
 
     const sendTarget = L.DomUtil.create("button", null, content);
     sendTarget.textContent = wX("SEND TARGET");

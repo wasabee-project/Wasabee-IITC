@@ -12,6 +12,8 @@ import PortalUI from "./portal";
 import wX from "../wX";
 
 const WLMarker = PortalUI.WLPortal.extend({
+  type: "marker",
+
   initialize: function (marker) {
     PortalUI.WLPortal.prototype.initialize.call(this, {
       portalId: marker.portalId,

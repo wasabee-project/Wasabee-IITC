@@ -9,6 +9,8 @@ import WasabeeAnchor from "../model/anchor";
 import PortalUI from "./portal";
 
 const WLAnchor = PortalUI.WLPortal.extend({
+  type: "anchor",
+
   initialize: function (portalId, operation) {
     const anchor = new WasabeeAnchor(portalId, operation);
     // use newColors(anchor.color) for 0.19

@@ -97,37 +97,25 @@ function getSelected() {
 
 // common part for marker and anchors
 const WLPortal = L.Marker.extend({
+  type: "portal",
+
   initialize: function (options) {
     const operation = getSelectedOperation();
     const portal = operation.getPortal(options.portalId);
     options.title = portal.name;
     L.Marker.prototype.initialize.call(this, portal.latLng, options);
-    window.registerMarkerForOMS(this);
-  },
-
-  onAdd: function (map) {
-    L.Marker.prototype.onAdd.call(this, map);
-    this.bindPopup("loading...", {
+    this.bindPopup((layer) => layer._popupContent(), {
       className: "wasabee-popup",
       closeButton: false,
     });
-    // marker.off("click", marker.openPopup, marker);
-    this.on("click spiderfiedclick", this._onClick, this);
-  },
 
-  _onClick: function (ev) {
-    L.DomEvent.stop(ev);
-    if (this.isPopupOpen && this.isPopupOpen()) return;
-    const content = this._popupContent();
-    this.setPopupContent(content);
-    if (this._popup._wrapper)
-      this._popup._wrapper.classList.add("wasabee-popup");
-    this.update();
-    this.openPopup();
+    this.off("click", this._openPopup);
+    window.registerMarkerForOMS(this);
+    this.on("spiderfiedclick", this._openPopup);
   },
 
   _popupContent: function () {
-    const div = L.DomUtil.create("div", "wasabee-marker-popup");
+    const div = L.DomUtil.create("div", `wasabee-${this.type}-popup`);
     return div;
   },
 

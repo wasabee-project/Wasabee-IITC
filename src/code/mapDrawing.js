@@ -62,7 +62,8 @@ function resetLinks(operation) {
   if (!operation.links || operation.links.length == 0) return;
 
   for (const l of operation.links) {
-    addLink(l, operation);
+    const link = new LinkUI.WLLink(l, operation);
+    link.addTo(Wasabee.linkLayerGroup);
   }
 }
 
@@ -124,52 +125,6 @@ function resetZones(operation) {
     }).addTo(Wasabee.zoneLayerGroup);
   }
   Wasabee.zoneLayerGroup.bringToBack();
-}
-
-// draw a single link
-function addLink(wlink, operation) {
-  const latLngs = wlink.getLatLngs(operation);
-  if (!latLngs) {
-    console.log("LatLngs was null: op missing portal data?");
-    return;
-  }
-
-  const color = wlink.getColor(operation);
-
-  const style = L.extend(
-    {
-      color: color,
-    },
-    Wasabee.skin.linkStyle
-  );
-
-  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
-
-  const newlink = new L.GeodesicPolyline(latLngs, style);
-
-  newlink.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-
-  newlink.on(
-    "click",
-    (ev) => {
-      L.DomEvent.stop(ev);
-      if (ev.target._popup._wrapper)
-        ev.target._popup._wrapper.classList.add("wasabee-popup");
-      const div = LinkUI.getPopup(wlink, operation);
-      ev.target.setPopupContent(div);
-      ev.target.openPopup(ev.latlng);
-      return true;
-    },
-    newlink
-  );
-  newlink.addTo(Wasabee.linkLayerGroup);
-
-  // setText only works on polylines, not geodesic ones.
-  // newlink.on("mouseover", () => { console.log(newlink); // newlink.setText("  ►  ", { repeat: true, attributes: { fill: "red" } }); });
-  // newlink.on("mouseout", () => { newlink.setText(null); });
 }
 
 // fetch and draw agent locations
