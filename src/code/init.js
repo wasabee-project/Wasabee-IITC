@@ -206,7 +206,7 @@ window.plugin.wasabee.init = async () => {
     WasabeeMe.waitGet(true);
 
     // load Wasabee-Defense keys if logged in
-    window.map.fire("wasabee:defensivekeys", { reason: "startup" }, false);
+    window.map.fire("wasabee:defensivekeys");
   }
 
   window.map.on("wdialog", (dialog) => {

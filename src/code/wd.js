@@ -18,7 +18,7 @@ export function initWasabeeD() {
 
   window.map.on("layeradd", (obj) => {
     if (obj.layer === window.plugin.wasabee.defensiveLayers) {
-      window.map.fire("wasabee:defensivekeys", { reason: "init D" }, false);
+      window.map.fire("wasabee:defensivekeys");
     }
   });
 

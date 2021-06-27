@@ -55,7 +55,7 @@ const BlockerList = WDialog.extend({
       operation.blockers = new Array();
       this.update();
       operation.update(false); // blockers do not need to be sent to server
-      window.map.fire("wasabee:crosslinks", { reason: "blockerlist" }, false);
+      window.map.fire("wasabee:crosslinks");
     };
     buttons[wX("LOAD PORTALS")] = () => {
       const operation = getSelectedOperation();
