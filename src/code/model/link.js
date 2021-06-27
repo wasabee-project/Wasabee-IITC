@@ -1,4 +1,4 @@
-import { generateId, newColors } from "../auxiliar";
+import { generateId } from "../auxiliar";
 import { getSelectedOperation } from "../selectedOp";
 
 export default class WasabeeLink {
@@ -105,7 +105,6 @@ export default class WasabeeLink {
   getColor(operation) {
     let color = this.color;
     if (color == "main") color = operation.color;
-    color = newColors(color);
     return color;
   }
 

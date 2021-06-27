@@ -14,7 +14,7 @@ function displayFormat(link, operation, smallScreen = false) {
     PortalUI.displayFormat(operation.getPortal(link.fromPortalId), smallScreen)
   );
   const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
-  arrow.style.color = link.getColor(operation);
+  arrow.style.color = convertColorToHex(link.getColor(operation));
   const picker = L.DomUtil.create("input", "hidden-color-picker", arrow);
   picker.type = "color";
   picker.value = convertColorToHex(link.getColor(operation));
@@ -80,9 +80,12 @@ function minLevel(link, operation) {
 const WLLink = L.GeodesicPolyline.extend({
   initialize: function (link, operation) {
     const latLngs = link.getLatLngs(operation);
+    let color = link.getColor(operation);
+    if (color == "main")
+      color = window.plugin.wasabee.skin.defaultOperationColor;
     const options = L.extend(
       {
-        color: link.getColor(operation),
+        color: color,
         opID: operation.ID,
         linkID: link.ID,
       },

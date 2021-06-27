@@ -1,10 +1,7 @@
 import LinkListDialog from "../dialogs/linkListDialog";
 import { getSelectedOperation } from "../selectedOp";
 import { swapPortal, deletePortal } from "../uiCommands";
-import { newColors } from "../auxiliar";
 import wX from "../wX";
-
-import WasabeeAnchor from "../model/anchor";
 
 import PortalUI from "./portal";
 
@@ -12,31 +9,23 @@ const WLAnchor = PortalUI.WLPortal.extend({
   type: "anchor",
 
   initialize: function (portalId, operation) {
-    const anchor = new WasabeeAnchor(portalId, operation);
-    // use newColors(anchor.color) for 0.19
-    let layer = anchor.color;
-    if (newColors(layer) == layer) layer = "custom";
+    let color = operation.color;
+    if (color == "main")
+      color = window.plugin.wasabee.skin.defaultOperationColor;
     const icon = L.divIcon({
-      className:
-        layer != "custom"
-          ? `wasabee-anchor-icon wasabee-layer-${layer}`
-          : "wasabee-anchor-icon",
+      className: "wasabee-anchor-icon",
       shadowUrl: null,
       iconAnchor: [12, 41],
       iconSize: [25, 41],
       popupAnchor: [0, -35],
-      html:
-        layer != "custom"
-          ? null
-          : L.Util.template(
-              '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
-              { color: anchor.color }
-            ),
+      html: L.Util.template(
+        '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
+        { color: color }
+      ),
     });
     PortalUI.WLPortal.prototype.initialize.call(this, {
       portalId: portalId,
       id: portalId,
-      color: anchor.color,
       icon: icon,
     });
   },

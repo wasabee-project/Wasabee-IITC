@@ -4,7 +4,7 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import Evented from "./evented";
-import { generateId, newColors } from "../auxiliar";
+import { generateId } from "../auxiliar";
 import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import db from "../db";
@@ -28,7 +28,6 @@ export default class WasabeeOp extends Evented {
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : "main";
-    this.color = newColors(this.color);
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
