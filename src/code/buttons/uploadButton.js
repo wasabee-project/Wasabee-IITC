@@ -117,8 +117,8 @@ const UploadButton = WButton.extend({
   // - rebase temp op otherwise
   doUpdate: async function (operation, force = false) {
     const rebaseOnUpdate =
-      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] ===
-      "true";
+      localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] !==
+      "false";
     if (operation.isServerOp()) {
       try {
         if (force) delete operation.lasteditid;

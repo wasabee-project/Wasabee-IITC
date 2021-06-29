@@ -28,7 +28,7 @@ const SettingsDialog = WDialog.extend({
     // TODO also update the title
   },
 
-  _addCheckBox(container, label, id, storageKey, onChange) {
+  _addCheckBox(container, label, id, storageKey, onChange, defValue) {
     const title = L.DomUtil.create("label", null, container);
     title.textContent = label;
     title.htmlFor = id;
@@ -36,7 +36,8 @@ const SettingsDialog = WDialog.extend({
     check.type = "checkbox";
     check.id = id;
     const sl = localStorage[storageKey];
-    if (sl === "true") check.checked = true;
+    if (!defValue && sl === "true") check.checked = true;
+    if (defValue && sl !== "false") check.checked = true;
     L.DomEvent.on(check, "change", (ev) => {
       L.DomEvent.stop(ev);
       localStorage[storageKey] = check.checked;
@@ -125,7 +126,9 @@ const SettingsDialog = WDialog.extend({
       container,
       wX("MERGE ON UPDATE"),
       "wasabee-setting-rebase-update",
-      window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY
+      window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY,
+      null,
+      true
     );
 
     this._addCheckBox(
