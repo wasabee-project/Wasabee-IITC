@@ -123,7 +123,7 @@ const SettingsDialog = WDialog.extend({
 
     this._addCheckBox(
       container,
-      "Rebase on update (alpha, may break your op)",
+      wX("MERGE ON UPDATE"),
       "wasabee-setting-rebase-update",
       window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY
     );
@@ -152,7 +152,7 @@ const SettingsDialog = WDialog.extend({
 
     this._addSelect(
       container,
-      "Trawl Skip Tiles",
+      wX("TRAWL SKIP TILES"),
       window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
@@ -160,7 +160,7 @@ const SettingsDialog = WDialog.extend({
     if (window.isSmartphone()) {
       this._addCheckBox(
         container,
-        "Use panes (need reload)",
+        wX("USE PANES ON MOBILE"),
         "wasabee-setting-usepanes",
         window.plugin.wasabee.static.constants.USE_PANES
       );
