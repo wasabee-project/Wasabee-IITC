@@ -108,11 +108,11 @@ export default class WasabeeLink {
     );
     const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
     arrow.style.color = this.getColor(operation);
-    const picker = L.DomUtil.create("input", "", arrow);
+    const picker = L.DomUtil.create("input", "hidden-color-picker", arrow);
     picker.type = "color";
     picker.value = convertColorToHex(this.getColor(operation));
-    picker.style.display = "none";
     picker.setAttribute("list", "wasabee-colors-datalist");
+    picker.disabled = !operation.canWrite();
 
     L.DomEvent.on(arrow, "click", () => {
       picker.click();
@@ -199,19 +199,22 @@ export default class WasabeeLink {
     if (this.description)
       L.DomUtil.create("div", "enl", div).textContent = this.description;
     L.DomUtil.create("div", "enl", div).textContent = "# " + this.throwOrderPos;
-    const del = L.DomUtil.create("button", null, div);
-    del.textContent = wX("DELETE_LINK");
-    L.DomEvent.on(del, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      operation.removeLink(this.fromPortalId, this.toPortalId);
-    });
-    const rev = L.DomUtil.create("button", null, div);
-    rev.textContent = wX("REVERSE");
-    L.DomEvent.on(rev, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      operation.reverseLink(this.fromPortalId, this.toPortalId);
-    });
-    if (operation.IsServerOp() && operation.IsWritableOp()) {
+    if (operation.canWrite()) {
+      const del = L.DomUtil.create("button", null, div);
+      del.textContent = wX("DELETE_LINK");
+      L.DomEvent.on(del, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        operation.removeLink(this.fromPortalId, this.toPortalId);
+      });
+      const rev = L.DomUtil.create("button", null, div);
+      rev.textContent = wX("REVERSE");
+      L.DomEvent.on(rev, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        operation.reverseLink(this.fromPortalId, this.toPortalId);
+      });
+    }
+
+    if (operation.canWriteServer()) {
       const assignButton = L.DomUtil.create("button", null, div);
       assignButton.textContent = wX("ASSIGN");
       L.DomEvent.on(assignButton, "click", (ev) => {

@@ -5,6 +5,7 @@ import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
+import { zoomToOperation } from "../uiCommands";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -25,9 +26,6 @@ const ImportDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-
-    window.map.fire("wasabeeUIUpdate", { reason: "import" }, false);
-    window.map.fire("wasabeeCrosslinks", { reason: "import" }, false);
   },
 
   _displayDialog: function () {
@@ -50,6 +48,7 @@ const ImportDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.importTextareaAsOp();
+      window.map.fire("wasabee:crosslinks");
       this.closeDialog();
     };
     buttons[wX("GET DT")] = () => {
@@ -71,7 +70,9 @@ const ImportDialog = WDialog.extend({
   },
 
   drawToolsFormat() {
-    const dtitems = localStorage["plugin-draw-tools-layer"];
+    const dtitems = window.plugin.drawTools
+      ? localStorage[window.plugin.drawTools.KEY_STORAGE]
+      : undefined;
     if (dtitems) {
       this._textarea.value = dtitems;
     } else {
@@ -131,7 +132,7 @@ const ImportDialog = WDialog.extend({
       checklist.enable();
       // zoom to it
       // OR use pointTileDataRequest to try to load faked portals?
-      window.map.fitBounds(newop.mbr);
+      zoomToOperation(newop);
 
       return;
     }

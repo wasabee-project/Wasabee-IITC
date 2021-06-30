@@ -14,7 +14,7 @@ import OpPermList from "./opPerms";
 import wX from "../wX";
 import WasabeeMe from "../me";
 import WasabeeAgent from "../agent";
-import { syncOp, deleteLocalOp } from "../uiCommands";
+import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
 const OpsDialog = WDialog.extend({
@@ -28,14 +28,18 @@ const OpsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:fullsync", this.update, this);
+    window.map.on("wasabee:logout", this.update, this);
     window.map.on("wasabee:op:delete", this.update, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:fullsync", this.update, this);
+    window.map.off("wasabee:logout", this.update, this);
     window.map.off("wasabee:op:delete", this.update, this);
   },
 
@@ -109,14 +113,7 @@ const OpsDialog = WDialog.extend({
             L.DomEvent.stop(ev);
             await makeSelectedOperation(op.id);
             const newop = getSelectedOperation();
-            const mbr = newop.mbr;
-            if (
-              mbr &&
-              isFinite(mbr._southWest.lat) &&
-              isFinite(mbr._northEast.lat)
-            ) {
-              window.map.fitBounds(mbr);
-            }
+            zoomToOperation(newop);
           });
         },
       },
@@ -255,6 +252,8 @@ const OpsDialog = WDialog.extend({
         window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
       ] !== "false";
 
+    const me = WasabeeMe.cacheGet();
+
     const ol = await opsList(showHiddenOps);
     const currentOps = this.sortable.items.map((o) => o.id);
     const olSorted = currentOps
@@ -274,10 +273,7 @@ const OpsDialog = WDialog.extend({
         local: tmpOp.fetched === null,
         perm: tmpOp.getPermission(),
         hidden: hiddenOps.includes(opID),
-        currentserver:
-          tmpOp.fetched !== null &&
-          WasabeeMe.isLoggedIn() &&
-          tmpOp.IsOnCurrentServer(),
+        currentserver: me && tmpOp.isOnCurrentServer(),
         server: "",
         background: tmpOp.background,
       };

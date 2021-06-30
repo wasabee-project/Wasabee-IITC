@@ -10,13 +10,15 @@ const OnlineAgentList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:agentlocations", this.update, this);
+    window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:agentlocations", this.update, this);
+    window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
   _displayDialog: function () {
@@ -33,7 +35,6 @@ const OnlineAgentList = WDialog.extend({
       width: "auto",
       dialogClass: "teamlist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
     });
   },
 

@@ -1,5 +1,3 @@
-import addButtons from "./addButtons";
-
 const Wasabee = window.plugin.wasabee;
 
 // the skins probably aren't loaded by the time W's init is called
@@ -106,8 +104,7 @@ export function changeSkin(names) {
   localStorage[window.plugin.wasabee.static.constants.SKIN_KEY] =
     JSON.stringify(validNames);
 
-  addButtons();
-  window.map.fire("wasabeeUIUpdate", { reason: "skin change" }, false);
+  window.map.fire("wasabee:ui:skin");
   return true;
 }
 

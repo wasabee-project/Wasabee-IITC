@@ -112,7 +112,7 @@ const DefensiveKeysDialog = WDialog.extend({
       console.log(j);
       await dKeyPromise(j);
       alert("Registered with server");
-      window.map.fire("wasabeeDkeys", { reason: "D key dialogs" }, false);
+      window.map.fire("wasabee:defensivekeys");
     } catch (e) {
       console.error(e);
       alert(e.toString());

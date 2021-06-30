@@ -10,11 +10,13 @@ const MarkerAddDialog = WDialog.extend({
     TYPE: "markerButton",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const context = this;
-    this._pch = (portal) => {
-      context.update(portal);
+    this._pch = () => {
+      context.update();
     };
     window.addHook("portalSelected", this._pch);
 
@@ -36,7 +38,7 @@ const MarkerAddDialog = WDialog.extend({
     zoneAll.textContent = "All"; // wX this
     for (const z of getSelectedOperation().zones) {
       const o = L.DomUtil.create("option", null, this._zones);
-      o.value = z.ID;
+      o.value = z.id;
       o.textContent = z.name;
     }
 
@@ -52,9 +54,14 @@ const MarkerAddDialog = WDialog.extend({
         this._selectedPortal.displayFormat(this._smallScreen)
       );
 
+      this._zones.value = getSelectedOperation().determineZone(
+        this._selectedPortal.latLng
+      );
+
       const markers = getSelectedOperation().getPortalMarkers(
         this._selectedPortal
       );
+
       let defaultType =
         window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
       if (
@@ -77,6 +84,8 @@ const MarkerAddDialog = WDialog.extend({
     } else {
       this._portal.textContent = wX("PLEASE_SELECT_PORTAL");
     }
+
+    this.setTitle(wX("ADD MARKER TITLE"));
   },
 
   _displayDialog: async function () {
@@ -85,16 +94,22 @@ const MarkerAddDialog = WDialog.extend({
     const content = L.DomUtil.create("div", "content");
     this._portal = L.DomUtil.create("div", "portal", content);
 
+    L.DomUtil.create("label", null, content).textContent = wX("TYPE");
     this._type = L.DomUtil.create("select", null, content);
-    this._comment = L.DomUtil.create("input", null, content);
-    this._comment.placeholder = "Input comment";
 
+    L.DomUtil.create("label", null, content).textContent = wX("ZONE");
     this._zones = L.DomUtil.create("select", null, content);
+
+    L.DomUtil.create("label", null, content).textContent = wX("AGENT");
     this._assign = L.DomUtil.create("select", null, content);
+
+    this._comment = L.DomUtil.create("input", null, content);
+    this._comment.placeholder = wX("SET_COMMENT");
+
     await this.update();
 
     const addMarkerButton = L.DomUtil.create("button", null, content);
-    addMarkerButton.textContent = wX("ADD_MARKER2");
+    addMarkerButton.textContent = wX("ADD");
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
@@ -132,12 +147,7 @@ const MarkerAddDialog = WDialog.extend({
     };
 
     // XXX remove comment from args in 0.20
-    operation.addMarker(
-      selectedType,
-      WasabeePortal.getSelected(),
-      comment,
-      options
-    );
+    operation.addMarker(selectedType, WasabeePortal.getSelected(), options);
     await this.update();
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;
@@ -147,10 +157,13 @@ const MarkerAddDialog = WDialog.extend({
     let option = menu.appendChild(L.DomUtil.create("option", null));
     option.value = "";
     option.textContent = wX("UNASSIGNED");
-    const alreadyAdded = new Set();
 
+    const operation = getSelectedOperation();
+    if (!operation.isOnCurrentServer()) return;
+
+    const alreadyAdded = new Set();
     const me = await WasabeeMe.waitGet();
-    for (const t of getSelectedOperation().teamlist) {
+    for (const t of operation.teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached

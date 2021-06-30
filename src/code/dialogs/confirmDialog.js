@@ -44,11 +44,6 @@ const ConfirmDialog = WDialog.extend({
     }
   },
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
-    window.map.fire("wasabeeUIUpdate", { reason: "confirmDialog" }, false);
-  },
-
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {

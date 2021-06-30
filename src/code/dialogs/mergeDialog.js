@@ -12,8 +12,10 @@ const MergeDialog = WDialog.extend({
   },
 
   options: {
+    // title
     // opOwn
     // opRemote
+    // updateCallback
   },
 
   addHooks: function () {
@@ -28,6 +30,31 @@ const MergeDialog = WDialog.extend({
     this._layer.remove();
   },
 
+  rebase: async function () {
+    await this._opRebase.store();
+    if (getSelectedOperation().ID == this._opRebase.ID)
+      await makeSelectedOperation(this._opRebase.ID);
+    if (this.options.updateCallback)
+      this.options.updateCallback(this._opRebase);
+    this.closeDialog();
+  },
+
+  useServer: async function () {
+    // merge blockers and related portals
+    this.options.opRemote.mergeBlockers(this.options.opOwn);
+    await this.options.opRemote.store();
+    if (getSelectedOperation().ID == this.options.opRemote.ID)
+      await makeSelectedOperation(this.options.opRemote.ID);
+    this.closeDialog();
+  },
+
+  useLocal: function () {
+    // nothing to do except upload
+    if (this.options.updateCallback)
+      this.options.updateCallback(this.options.opOwn);
+    this.closeDialog();
+  },
+
   _displayDialog: function () {
     this._opRebase = new WasabeeOp(this.options.opRemote);
     const origin = new WasabeeOp(this.options.opOwn.fetchedOp);
@@ -36,6 +63,20 @@ const MergeDialog = WDialog.extend({
     this._opRebase.cleanAll();
     this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
     this._opRebase.localchanged = this.options.opOwn.localchanged;
+
+    const remoteChanges = this.options.opRemote.changes(origin);
+    const rebaseChanges = this._opRebase.changes(origin);
+
+    // if nothing was deleted on the server,
+    // and if portal swaps do not end up to 1-portal link
+    // auto merge
+    if (
+      remoteChanges.deletion.length === 0 &&
+      summary.edition.singlePortalLink === 0
+    ) {
+      this.rebase();
+      return;
+    }
 
     const style = {
       dashArray: [2, 8],
@@ -61,52 +102,36 @@ const MergeDialog = WDialog.extend({
       const div = L.DomUtil.create("div", "merge", details);
       div.innerHTML = "<span>" + wX("MERGE_CHANGES_MERGE") + "</span>";
       div.appendChild(
-        this.formatChanges(
-          this._opRebase.changes(origin),
-          origin,
-          this._opRebase
-        )
+        this.formatChanges(rebaseChanges, origin, this._opRebase)
       );
     }
     {
       const div = L.DomUtil.create("div", "server", details);
       div.innerHTML = "<span>" + wX("MERGE_CHANGES_REMOTE") + "</span>";
       div.appendChild(
-        this.formatChanges(
-          this.options.opRemote.changes(origin),
-          origin,
-          this.options.opRemote
-        )
+        this.formatChanges(remoteChanges, origin, this.options.opRemote)
       );
     }
 
     const buttons = [];
     buttons.push({
       text: wX("MERGE_REBASE"),
-      click: async () => {
-        await this._opRebase.store();
-        if (getSelectedOperation().ID == this._opRebase.ID)
-          await makeSelectedOperation(this._opRebase.ID);
-        this.closeDialog();
-      },
+      click: () => this.rebase(),
     });
     buttons.push({
       text: wX("MERGE_REPLACE"),
-      click: async () => {
-        await this.options.opRemote.store();
-        if (getSelectedOperation().ID == this.options.opRemote.ID)
-          await makeSelectedOperation(this.options.opRemote.ID);
-        this.closeDialog();
-      },
+      click: () => this.useServer(),
+    });
+    buttons.push({
+      text: wX("MERGE_LOCAL"),
+      click: () => this.useLocal(),
     });
     buttons.push({
       text: wX("CANCEL"),
-      click: () => {
-        this.closeDialog();
-      },
+      click: () => this.closeDialog(),
     });
     this.createDialog({
-      title: wX("MERGE_TITLE"),
+      title: this.options.title || wX("MERGE_TITLE"),
       html: content,
       width: "auto",
       dialogClass: "merge",
@@ -164,7 +189,8 @@ const MergeDialog = WDialog.extend({
       for (const item of list)
         L.DomUtil.create("li", null, rebaseList).textContent = item;
     } else {
-      rebaseMessage.textContent = "No local change detected...";
+      rebaseMessage.textContent =
+        "The local changes don't alter the server version.";
     }
 
     return rebaseMessage;

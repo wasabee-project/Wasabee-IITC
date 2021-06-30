@@ -19,7 +19,7 @@ const KeysList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
-    window.map.on("wasabeeUIUpdate", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = await WasabeeMe.waitGet();
     } else {
@@ -30,7 +30,7 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   },
 
   _displayDialog: function () {
@@ -125,7 +125,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.IsServerOp() && operation.IsOnCurrentServer())
+              if (operation.isOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
               operation.keyOnHand(key.id, gid, oif.value, key.capsule);
             });
@@ -141,7 +141,7 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.IsServerOp() && operation.IsOnCurrentServer())
+              if (operation.isOnCurrentServer())
                 opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
               operation.keyOnHand(key.id, gid, key.iHave, oif.value);
             });

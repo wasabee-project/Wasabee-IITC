@@ -1,25 +1,17 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import addButtons from "../addButtons";
 import WasabeeMe from "../me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
 
-// This file documents the minimum requirements of a dialog in wasabee
 const SettingsDialog = WDialog.extend({
-  // not strictly necessary, but good style
   statics: {
     TYPE: "settings",
   },
 
-  // WDialog is a leaflet L.Handler, which takes add/removeHooks
   addHooks: function () {
-    // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.update, this);
-    // put any per-open setup here
-    // this is the call to actually do our work
     if (this._smallScreen) {
       this._displaySmallDialog();
     } else {
@@ -29,7 +21,6 @@ const SettingsDialog = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.update, this);
   },
 
   update: function () {
@@ -37,7 +28,7 @@ const SettingsDialog = WDialog.extend({
     // TODO also update the title
   },
 
-  _addCheckBox(container, label, id, storageKey, onChange) {
+  _addCheckBox(container, label, id, storageKey, onChange, defValue) {
     const title = L.DomUtil.create("label", null, container);
     title.textContent = label;
     title.htmlFor = id;
@@ -45,7 +36,8 @@ const SettingsDialog = WDialog.extend({
     check.type = "checkbox";
     check.id = id;
     const sl = localStorage[storageKey];
-    if (sl === "true") check.checked = true;
+    if (!defValue && sl === "true") check.checked = true;
+    if (defValue && sl !== "false") check.checked = true;
     L.DomEvent.on(check, "change", (ev) => {
       L.DomEvent.stop(ev);
       localStorage[storageKey] = check.checked;
@@ -86,12 +78,8 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.LANGUAGE_KEY,
       strings,
       () => {
-        addButtons();
-        window.map.fire(
-          "wasabeeUIUpdate",
-          { reason: "settings dialog" },
-          false
-        );
+        // update everything -- if for no other reason than to provide a means for users to force-update everything
+        window.map.fire("wasabee:ui:lang");
       }
     );
 
@@ -136,9 +124,11 @@ const SettingsDialog = WDialog.extend({
 
     this._addCheckBox(
       container,
-      "Rebase on update (alpha, may break your op)",
+      wX("MERGE ON UPDATE"),
       "wasabee-setting-rebase-update",
-      window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY
+      window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY,
+      null,
+      true
     );
 
     this._addCheckBox(
@@ -165,7 +155,7 @@ const SettingsDialog = WDialog.extend({
 
     this._addSelect(
       container,
-      "Trawl Skip Tiles",
+      wX("TRAWL SKIP TILES"),
       window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
@@ -173,7 +163,7 @@ const SettingsDialog = WDialog.extend({
     if (window.isSmartphone()) {
       this._addCheckBox(
         container,
-        "Use panes (need reload)",
+        wX("USE PANES ON MOBILE"),
         "wasabee-setting-usepanes",
         window.plugin.wasabee.static.constants.USE_PANES
       );

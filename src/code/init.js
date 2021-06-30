@@ -18,9 +18,14 @@ import OperationChecklist from "./dialogs/checklist";
 import WasabeeMe from "./me";
 import WasabeeOp from "./operation";
 import { openDB } from "idb";
+import polyfill from "./polyfill";
+
 const Wasabee = window.plugin.wasabee;
 
 window.plugin.wasabee.init = async () => {
+  // polyfill
+  polyfill();
+
   if (Wasabee._inited) return;
   Wasabee._inited = true;
   Object.freeze(Wasabee.static);
@@ -68,10 +73,13 @@ window.plugin.wasabee.init = async () => {
   Wasabee.linkLayerGroup = new L.LayerGroup();
   Wasabee.markerLayerGroup = new L.LayerGroup();
   Wasabee.agentLayerGroup = new L.LayerGroup();
+  Wasabee.zoneLayerGroup = new L.FeatureGroup();
   window.addLayerGroup("Wasabee Draw Portals", Wasabee.portalLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Links", Wasabee.linkLayerGroup, true);
   window.addLayerGroup("Wasabee Draw Markers", Wasabee.markerLayerGroup, true);
   window.addLayerGroup("Wasabee Agents", Wasabee.agentLayerGroup, true);
+  window.addLayerGroup("Wasabee Zones", Wasabee.zoneLayerGroup, true);
+  Wasabee.zoneLayerGroup.bringToBack();
 
   Wasabee.backgroundOpsGroup = new L.LayerGroup();
   window.addLayerGroup(
@@ -82,7 +90,7 @@ window.plugin.wasabee.init = async () => {
 
   // standard hook, add our call to it
   window.addHook("mapDataRefreshStart", () => {
-    drawAgents(Wasabee._selectedOp);
+    window.map.fire("wasabee:agentlocations");
   });
 
   window.addHook("portalDetailsUpdated", (e) => {
@@ -93,11 +101,28 @@ window.plugin.wasabee.init = async () => {
     });
   });
 
-  window.map.on("wasabeeUIUpdate", drawMap);
+  // use our own hook on portal click
+  // note: do not build WasabeePortal here, we only need one for QD
+  function propagateClick(e) {
+    window.map.fire("wasabee:portal:click", e.target);
+  }
+  window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
 
+  window.map.on("wasabee:ui:skin", drawMap);
+
+  window.map.on("wasabee:op:change", drawMap);
+  window.map.on("wasabee:op:select", drawMap);
+  window.map.on("wasabee:agentlocations", drawAgents);
+  window.map.on("wasabee:logout", drawAgents);
+
+  // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {
-    window.map.fire("wasabeeUIUpdate", { reason: "resume" }, false);
-    sendLocation();
+    // check if still logged in
+    if (WasabeeMe.isLoggedIn()) {
+      // refresh agent locations
+      window.map.fire("wasabee:agentlocations");
+      sendLocation();
+    }
   });
 
   window.map.on("wasabee:op:select", () => {
@@ -128,9 +153,10 @@ window.plugin.wasabee.init = async () => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
-      obj.layer === Wasabee.markerLayerGroup
+      obj.layer === Wasabee.markerLayerGroup ||
+      obj.layer === Wasabee.zoneLayerGroup
     ) {
-      window.map.fire("wasabeeUIUpdate", { reason: "layeradd" }, false);
+      drawMap();
     }
     if (obj.layer === Wasabee.backgroundOpsGroup) {
       drawBackgroundOps();
@@ -141,7 +167,8 @@ window.plugin.wasabee.init = async () => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
-      obj.layer === Wasabee.markerLayerGroup
+      obj.layer === Wasabee.markerLayerGroup ||
+      obj.layer === Wasabee.zoneLayerGroup
     ) {
       obj.layer.clearLayers();
     }
@@ -162,24 +189,24 @@ window.plugin.wasabee.init = async () => {
   addButtons();
   setupToolbox();
 
-  // draw the UI with the op data for the first time
-  window.map.fire("wasabeeUIUpdate", { reason: "startup" }, false);
+  // draw the UI with the op data for the first time -- buttons are fresh, no need to update
+  window.map.fire("wasabee:agentlocations");
+
+  // initial draw
+  drawMap();
+  drawBackgroundOps();
 
   // run crosslinks
-  window.map.fire("wasabeeCrosslinks", { reason: "startup" }, false);
-
-  // draw background ops
-  drawBackgroundOps();
+  window.map.fire("wasabee:crosslinks");
 
   // if the browser was restarted and the cookie nuked, but localstorge[me]
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
-    // this updates the UI
     WasabeeMe.waitGet(true);
 
     // load Wasabee-Defense keys if logged in
-    window.map.fire("wasabeeDkeys", { reason: "startup" }, false);
+    window.map.fire("wasabee:defensivekeys");
   }
 
   window.map.on("wdialog", (dialog) => {

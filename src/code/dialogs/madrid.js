@@ -16,6 +16,8 @@ const MadridDialog = MultimaxDialog.extend({
     TYPE: "madridDialog",
   },
 
+  needWritePermission: true,
+
   // addHooks inherited from MultimaxDialog
   _displayDialog: function () {
     const container = L.DomUtil.create("div", "container");

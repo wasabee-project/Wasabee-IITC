@@ -15,6 +15,8 @@ const AutodrawsDialog = WDialog.extend({
     TYPE: "autodraws",
   },
 
+  needWritePermission: true,
+
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
     this.menuItems = [

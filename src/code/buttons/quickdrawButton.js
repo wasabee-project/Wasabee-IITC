@@ -9,25 +9,13 @@ const QuickdrawButton = WButton.extend({
     TYPE: "QuickdrawButton",
   },
 
-  initialize: function (map = window.map, container) {
-    this._map = map;
+  needWritePermission: true,
 
+  initialize: function (container) {
     this.title = wX("QD TITLE");
-    this.handler = new QuickDrawControl(map, { button: this });
+    this.handler = new QuickDrawControl({ button: this });
     this._container = container;
     this.type = QuickdrawButton.TYPE;
-
-    this.picker = null;
-    this.picker = L.DomUtil.create("input", "", this.button);
-    this.picker.type = "color";
-    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
-    this.picker.style.display = "none";
-    this.picker.setAttribute("list", "wasabee-colors-datalist");
-
-    L.DomEvent.on(this.picker, "change", (ev) => {
-      this.handler._nextDrawnLinksColor = ev.target.value;
-      this.picker.value = ev.target.value;
-    });
 
     this.button = this._createButton({
       title: this.title,
@@ -37,9 +25,38 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     });
 
+    this.picker = L.DomUtil.create("input", "hidden-color-picker");
+    this.picker.type = "color";
+    this.picker.value = "#000000"; // just need a default value that is not in the displayed list
+    this.picker.setAttribute("list", "wasabee-colors-datalist");
+
+    L.DomEvent.on(this.picker, "change", (ev) => {
+      this.handler._nextDrawnLinksColor = ev.target.value;
+    });
+
+    this.actionsContainer = this._createSubActions(this.getSubActions());
+
+    this._container.appendChild(this.actionsContainer);
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("QD TITLE");
+      const newSubActions = this._createSubActions(this.getSubActions());
+      this._container.replaceChild(newSubActions, this.actionsContainer);
+      newSubActions.style.display = this.actionsContainer.style.display;
+      this.actionsContainer = newSubActions;
+
+      if (this.handler._enabled)
+        this.handler._tooltip.updateContent(this.handler._getTooltipText());
+    });
+
+    this.update();
+  },
+
+  getSubActions: function () {
     this._changeColorSubAction = {
       title: wX("QD BUTTON CHANGE COLOR"),
       text: wX("QD CHANGE COLOR"),
+      html: this.picker,
       callback: () => {
         this.picker.click();
       },
@@ -62,12 +79,11 @@ const QuickdrawButton = WButton.extend({
       context: this.handler,
     };
 
-    this.actionsContainer = this._createSubActions([
+    return [
       this._toggleModeSubAction,
       this._changeColorSubAction,
       this._endSubAction,
-    ]);
-    this._container.appendChild(this.actionsContainer);
+    ];
   },
 
   enable: function () {
@@ -83,11 +99,10 @@ const QuickdrawButton = WButton.extend({
 });
 
 const QuickDrawControl = L.Handler.extend({
-  initialize: function (map = window.map, options) {
-    this._map = map;
-    this._container = map._container;
+  initialize: function (options) {
+    this._container = window.map._container;
 
-    L.Handler.prototype.initialize.call(this, map, options);
+    L.Handler.prototype.initialize.call(this, window.map, options);
     this.options = options;
     // L.Util.extend(this.options, options);
 
@@ -113,7 +128,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   addHooks: function () {
-    if (!this._map) return;
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
@@ -128,18 +142,10 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.updateContent(this._getTooltipText());
     this._throwOrder = this._operation.nextOrder;
 
-    this._firstSelect = true;
-
-    const context = this;
-    this._portalClickedHook = (data) => {
-      context._portalClicked(data);
-    };
-    window.addHook("portalSelected", this._portalClickedHook);
-
-    // Leaflet format for leaflet DOM event
-    this._map.on("wasabeeUIUpdate", this._uiupdate, this);
-    this._map.on("keyup", this._keyUpListener, this);
-    this._map.on("mousemove", this._onMouseMove, this);
+    window.map.on("wasabee:portal:click", this._portalClicked, this);
+    window.map.on("wasabee:op:select", this._opchange, this);
+    window.map.on("keyup", this._keyUpListener, this);
+    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -159,13 +165,14 @@ const QuickDrawControl = L.Handler.extend({
     this._tooltip.dispose();
     this._tooltip = null;
 
-    window.removeHook("portalSelected", this._portalClickedHook);
-    this._map.off("wasabeeUIUpdate", this._uiupdate, this);
-    this._map.off("keyup", this._keyUpListener, this);
-    this._map.off("mousemove", this._onMouseMove, this);
+    window.map.off("wasabee:portal:click", this._portalClicked, this);
+    window.map.off("wasabee:op:select", this._opchange, this);
+    window.map.off("keyup", this._keyUpListener, this);
+    window.map.off("mousemove", this._onMouseMove, this);
   },
 
-  _uiupdate: function () {
+  _opchange: function () {
+    postToFirebase({ id: "analytics", action: "quickdrawOpchange" });
     if (!this._enabled) return;
 
     if (getSelectedOperation().ID != this._opID) {
@@ -192,7 +199,7 @@ const QuickDrawControl = L.Handler.extend({
     if (e.originalEvent.key === "X") {
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
-      window.map.fire("wasabeeCrosslinks", { reason: "qd keyup X" }, false);
+      window.map.fire("wasabee:crosslinks");
     }
   },
 
@@ -245,24 +252,8 @@ const QuickDrawControl = L.Handler.extend({
     return { text: "Click next portal" };
   },
 
-  _portalClicked: function (data) {
-    // console.log(data);
-    if (
-      data.selectedPortalGuid == data.unselectedPortalGuid &&
-      !this._firstSelect
-    ) {
-      console.log("ignoring duplicate click");
-      return;
-    }
-
-    // portal unselect
-    if (!data.selectedPortalGuid) return;
-
-    this._firstSelect = false;
-
-    // const selectedPortal = WasabeePortal.getSelected();
-    // this way saves a small step
-    const selectedPortal = WasabeePortal.get(data.selectedPortalGuid);
+  _portalClicked: function (portal) {
+    const selectedPortal = WasabeePortal.fromIITC(portal);
     if (!selectedPortal) {
       // XXX wX this
       this._tooltip.updateContent({
@@ -337,8 +328,6 @@ const QuickDrawControl = L.Handler.extend({
     this._guideA = null;
     this._guideB = null;
     if (this._guideLayerGroup) this._guideLayerGroup.clearLayers();
-
-    this._firstSelect = true;
 
     if (this._drawMode == "quickdraw") {
       console.log("switching to single link");

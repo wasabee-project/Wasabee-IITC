@@ -61,6 +61,7 @@ export function deletePortal(operation, portal) {
     type: "anchor",
     callback: () => {
       operation.removeAnchor(portal.id);
+      // window.map.fire("wasabee:crosslinks"); -- only needed if we also reset the cache first
     },
   });
   con.enable();
@@ -76,6 +77,7 @@ export function deleteMarker(operation, marker, portal) {
     type: "marker",
     callback: () => {
       operation.removeMarker(marker);
+      window.map.fire("wasabee:crosslinks");
     },
   });
   con.enable();
@@ -88,7 +90,7 @@ export function clearAllItems(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllItems();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks");
     },
   });
   con.enable();
@@ -101,7 +103,7 @@ export function clearAllLinks(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllLinks();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks");
     },
   });
   con.enable();
@@ -114,7 +116,7 @@ export function clearAllMarkers(operation) {
     type: "operation",
     callback: () => {
       operation.clearAllMarkers();
-      window.map.fire("wasabeeCrosslinks", { reason: "clearAllItems" }, false);
+      window.map.fire("wasabee:crosslinks");
     },
   });
   con.enable();
@@ -342,7 +344,6 @@ export function blockerAutomark(operation, first = true) {
   // return from recursion
   if (sorted.length == 0) {
     if (first) operation.endBatchMode();
-    window.map.fire("wasabeeUIUpdate", { reason: "blockerAutomark" }, false);
     return;
   }
 
@@ -365,7 +366,8 @@ export function blockerAutomark(operation, first = true) {
   if (wportal.team == "E") {
     type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
   }
-  operation.addMarker(type, wportal, "auto-marked");
+  const zone = operation.determineZone(wportal.latLng);
+  operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
 
   // remove nodes from blocker list
   operation.blockers = operation.blockers.filter((b) => {
@@ -378,89 +380,129 @@ export function blockerAutomark(operation, first = true) {
   if (first) operation.endBatchMode();
 }
 
+export function zoomToOperation(operation) {
+  if (!operation) return;
+  const mbr = operation.mbr;
+  if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+    window.map.fitBounds(mbr);
+  }
+}
+
+export async function updateLocalOp(local, remote) {
+  const so = getSelectedOperation();
+  if (!local) {
+    await remote.store();
+    return false;
+  }
+  if (local.lasteditid == remote.lasteditid) {
+    // nothing to do
+    return false;
+  }
+
+  // if selected op, use current selected op object
+  const op = local.ID != so.ID ? local : so;
+
+  // no changes
+  if (!op.checkChanges()) {
+    // merge blockers and related portals
+    remote.mergeBlockers(op);
+    await remote.store();
+    // if selected op, reload from the new op
+    return remote.ID === so.ID;
+  }
+
+  // partial update on fields the server is always right
+  op.teamlist = remote.teamlist;
+  op.mergeZones(remote);
+  op.remoteChanged = true;
+  await op.store();
+
+  // In case of selected op, suggest merge to the user
+  if (so === op) {
+    const con = new MergeDialog({
+      opOwn: so,
+      opRemote: remote,
+    });
+    con.enable();
+  }
+
+  return false;
+}
+
 export async function fullSync() {
   const so = getSelectedOperation();
   const server = GetWasabeeServer();
 
   try {
+    let reloadOpID = null;
     const me = await WasabeeMe.waitGet(true);
     const promises = new Array();
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner
     const ol = await opsList();
-    const serverOps = new Set(
-      ol
-        .map(await WasabeeOp.load)
-        .filter((op) => op)
-        .filter((op) => op.server == server && !opsID.has(op.ID))
-    );
+    const serverOps = new Array();
+    for (const opID of ol) {
+      const op = await WasabeeOp.load(opID);
+      if (op && op.server === server && !opsID.has(op.ID)) serverOps.push(op);
+    }
     for (const op of serverOps) {
       // if owned, duplicate the OP
-      if (op.IsOwnedOp()) {
+      if (op.isOwnedOp()) {
         const newop = await duplicateOperation(op.ID);
         newop.name = op.name;
         await newop.store();
+        // if selected op, we reload the local duplicate
+        if (op.ID === so.ID) reloadOpID = newop.ID;
       }
-      await removeOperation(op.ID);
+      // skip hook (not needed)
+      await WasabeeOp.delete(op.ID);
     }
-    if (serverOps.size > 0)
+    if (serverOps.length > 0)
       console.log(
         "remove",
-        Array.from(serverOps).map((op) => op.ID)
+        serverOps.map((op) => op.ID)
       );
 
     for (const opID of opsID) {
       promises.push(opPromise(opID));
     }
-    const ops = await Promise.all(promises);
+    const ops = (await Promise.allSettled(promises))
+      .filter((p) => p.status === "fulfilled")
+      .map((p) => p.value);
     for (const newop of ops) {
       const localOp = await WasabeeOp.load(newop.ID);
-      if (!localOp || !localOp.localchanged) await newop.store();
-      else if (localOp.lasteditid != newop.lasteditid) {
-        const op = localOp.ID != so.ID ? localOp : so;
-        // check if there are really local changes
-        // XXX: this may be too long to do
-        if (!op.checkChanges()) {
-          await newop.store();
-        } else {
-          // partial update on fields the server is always right
-          // XXX: do we need zone for teamlist consistency ?
-          op.teamlist = newop.teamlist;
-          op.remoteChanged = true;
-          await op.store();
-
-          // In case of selected op, suggest merge to the user
-          if (so === op) {
-            const con = new MergeDialog({
-              opOwn: so,
-              opRemote: newop,
-            });
-            con.enable();
-          }
-        }
-      }
+      const reloadSO = await updateLocalOp(localOp, newop);
+      if (reloadSO) reloadOpID = so.ID;
     }
 
     // replace current op by the server version if any
-    if (ops.some((op) => op.ID == so.ID)) await makeSelectedOperation(so.ID);
+    if (reloadOpID) await makeSelectedOperation(reloadOpID);
     // change op if the current does not exist anymore
-    else if (!ol.includes(so.ID)) await changeOpIfNeeded();
+    else {
+      const op = await changeOpIfNeeded();
+      if (op !== so) zoomToOperation(op);
+    }
+
     // update UI to reflect new ops list
-    else window.map.fire("wasabeeUIUpdate", { reason: "full sync" }, false);
+    window.map.fire("wasabee:fullsync");
+    window.map.fire("wasabee:teams"); // if any team dialogs are open
 
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
     new AuthDialog().enable();
+    alert("You are not logged in.");
   }
 }
 
 export async function syncOp(opID) {
-  const localOp = WasabeeOp.load(opID);
+  const localOp = await WasabeeOp.load(opID);
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
     if (!localOp.localchanged) {
+      // merge blockers and related portals
+      remoteOp.mergeBlockers(localOp);
       await remoteOp.store();
     } else {
       const con = new MergeDialog({
@@ -479,11 +521,8 @@ export function deleteLocalOp(opname, opid) {
     type: "operation",
     callback: async () => {
       await removeOperation(opid);
-      const newop = await changeOpIfNeeded();
-      const mbr = newop.mbr;
-      if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
-        window.map.fitBounds(mbr);
-      }
+      const newop = await changeOpIfNeeded(); // fires ui events
+      zoomToOperation(newop);
     },
   });
   con.enable();
@@ -493,4 +532,29 @@ export async function resetCaches() {
   await window.plugin.wasabee.idb.clear("agents");
   await window.plugin.wasabee.idb.clear("teams");
   await window.plugin.wasabee.idb.clear("defensivekeys");
+}
+
+export function setMarkersToZones() {
+  const op = getSelectedOperation();
+
+  op.startBatchMode();
+  for (const m of op.markers) {
+    const ll = op.getPortal(m.portalId).latLng;
+
+    const zone = op.determineZone(ll);
+    op.setZone(m, zone);
+  }
+  op.endBatchMode();
+}
+
+export function setLinksToZones() {
+  const op = getSelectedOperation();
+
+  op.startBatchMode();
+  for (const l of op.links) {
+    const ll = op.getPortal(l.fromPortalId).latLng;
+    const zone = op.determineZone(ll);
+    op.setZone(l, zone);
+  }
+  op.endBatchMode();
 }

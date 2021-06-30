@@ -9,6 +9,8 @@ const StateDialog = WDialog.extend({
     TYPE: "stateDialog",
   },
 
+  needWritePermission: true,
+
   options: {
     // target
     // opID

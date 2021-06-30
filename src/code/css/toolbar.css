@@ -72,8 +72,10 @@
   background-color: #3c9;
 }
 
+/* align verticaly button subactions */
 .wasabee-actions li {
-  display: inline-block;
+  display: block;
+  border-bottom: 1px solid transparent;
 }
 .wasabee-subactions li {
   vertical-align: middle;
@@ -82,9 +84,10 @@
   background-color: rgba(30, 130, 76, 0.66);
   padding-left: 8px;
   padding-right: 8px;
-  width: auto;
   border-left: 1px solid #aaa;
   color: #fff;
+  min-width: 50px;
+  width: auto;
 }
 .wasabee-subactions a:hover {
   background-color: #a0a098;
@@ -100,54 +103,6 @@
 .wasabee-actions-image {
   vertical-align: middle;
   text-align: center;
-}
-
-/*non-iOS device wider screens*/
-@media screen and (min-width: 1001px) and (max-width: 1280px) {
-  .wasabee-subactions a {
-    width: 60px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 3px;
-    padding-right: 3px;
-  }
-}
-
-/*non-iOS device small screens*/
-@media screen and (min-width: 401px) and (max-width: 1000px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 2px;
-    padding-right: 2px;
-  }
-}
-
-/*iOS device screens larger than 400 but not tablet sized */
-@media screen and (min-device-width: 401) and (max-device-width: 1000px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-}
-
-/*iOS screens smaller than 400px*/
-@media screen and (max-device-width: 400px) {
-  .wasabee-subactions a {
-    width: 50px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding-left: 2px;
-    padding-right: 2px;
-  }
 }
 
 .wasabee-toolbar-wasabee {
@@ -174,6 +129,10 @@
   /*background-image: url(../images/toolbar_sync.png)*/
   background-image: url(../images/toolbar_download.svg)
 }
+.wasabee-toolbar-sync.loading {
+  background-image: url(../images/loading.gif)
+}
+
 /*.wasabee-toolbar-download {
   background-image: url(../images/toolbar_download.png)
 }*/

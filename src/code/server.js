@@ -22,6 +22,8 @@ export async function uploadOpPromise() {
   const newme = new WasabeeMe(response);
   newme.store();
   const newop = await opPromise(operation.ID);
+  // merge blockers and related portals
+  newop.mergeBlockers(operation);
   newop.localchanged = false;
   await newop.store();
   return newop;
@@ -189,14 +191,8 @@ export async function opPromise(opID) {
 
 // returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
 // use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
-export async function mePromise() {
-  try {
-    const response = await genericGet("/me?json=y");
-    return response;
-  } catch (e) {
-    console.error(e);
-    return e;
-  }
+export function mePromise() {
+  return genericGet("/me?json=y");
 }
 
 // returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()

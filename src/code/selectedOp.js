@@ -86,21 +86,15 @@ export async function makeSelectedOperation(opID) {
   window.plugin.wasabee._selectedOp = op;
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
-  window.map.fire(
-    "wasabeeUIUpdate",
-    { reason: "makeSelectedOperation" },
-    false
-  );
-  window.map.fire(
-    "wasabeeCrosslinks",
-    { reason: "makeSelectedOperation" },
-    false
-  );
-  if (previousID !== opID)
+  if (previousID !== opID) {
     window.map.fire("wasabee:op:select", {
       previous: previousID,
       current: opID,
     });
+  } else {
+    window.map.fire("wasabee:op:change");
+  }
+  window.map.fire("wasabee:crosslinks");
   // return window.plugin.wasabee._selectedOp;
 }
 
@@ -135,26 +129,10 @@ export async function setupLocalStorage() {
   }
 }
 
-function storeOpsList(ops) {
-  localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY] =
-    JSON.stringify(ops);
-}
-
 //** This function removes an operation from the main list */
 export async function removeOperation(opID) {
-  const ol = await opsList();
-  const ops = ol.filter((ID) => ID != opID);
-  storeOpsList(ops);
   await WasabeeOp.delete(opID);
   window.map.fire("wasabee:op:delete", opID);
-}
-
-//** This function adds an operation to the main list */
-export async function addOperation(opID) {
-  const ops = await opsList();
-  if (!ops.includes(opID)) ops.push(opID);
-  storeOpsList(ops);
-  window.map.fire("wasabee:op:add", opID);
 }
 
 //** This function shows an operation to the main list */
@@ -186,9 +164,8 @@ export function resetHiddenOps() {
 //*** This function resets the local op list
 export async function resetOps() {
   const ops = await opsList();
-  for (const opID of ops) {
-    await removeOperation(opID); // promise.all...
-  }
+  // don't fire event here
+  await Promise.all(ops.map(WasabeeOp.delete));
 }
 
 export function hiddenOpsList() {
@@ -215,25 +192,24 @@ export async function setOpBackground(opID, background) {
 
 export async function opsList(hidden = true) {
   // after 0.19, remove the list and just query the idb keys
-
-  const raw = localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
-  if (raw) {
-    try {
-      const ops = JSON.parse(raw);
-      const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
-      for (const k of fromIdb) {
-        if (!ops.includes(k)) ops.push(k);
-      }
-      if (!hidden) {
-        const hiddenOps = hiddenOpsList();
-        return ops.filter((o) => !hiddenOps.includes(o));
-      }
-      return ops;
-    } catch (e) {
-      console.error(e);
-    }
+  let ops = [];
+  try {
+    const raw =
+      localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
+    ops = JSON.parse(raw);
+    ops = ops.filter((id) => localStorage[id]);
+  } catch {
+    //
   }
-  return new Array();
+  const fromIdb = await window.plugin.wasabee.idb.getAllKeys("operations");
+  for (const k of fromIdb) {
+    if (!ops.includes(k)) ops.push(k);
+  }
+  if (!hidden) {
+    const hiddenOps = hiddenOpsList();
+    return ops.filter((o) => !hiddenOps.includes(o));
+  }
+  return ops;
 }
 
 export async function duplicateOperation(opID) {
@@ -262,7 +238,8 @@ export async function duplicateOperation(opID) {
 export async function removeNonOwnedOps() {
   for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
-    if (!op || !op.IsOwnedOp()) await removeOperation(opID);
+    // don't fire event here
+    if (!op || !op.isOwnedOp()) await WasabeeOp.delete(opID);
   }
   await changeOpIfNeeded();
 }

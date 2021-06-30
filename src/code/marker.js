@@ -20,7 +20,7 @@ export default class WasabeeMarker {
     this.portalId = obj.portalId;
     this.type = obj.type;
     this.comment = obj.comment ? obj.comment : ""; // why "" and not null? This isn't go
-    this.completedBy = obj.completedBy ? obj.completedBy : "";
+    this.completedID = obj.completedID ? obj.completedID : "";
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
 
@@ -39,7 +39,7 @@ export default class WasabeeMarker {
       type: this.type,
       comment: this.comment,
       state: this._state, // no need to validate here
-      completedBy: this.completedBy,
+      completedID: this.completedBID,
       assignedTo: this.assignedTo,
       order: Number(this.order),
       zone: Number(this.zone),
@@ -95,6 +95,7 @@ export default class WasabeeMarker {
 
   async popupContent(marker, operation) {
     if (!operation) operation = getSelectedOperation();
+    const canWrite = operation.canWrite();
 
     const portal = operation.getPortal(this.portalId);
     if (portal == null) {
@@ -115,15 +116,21 @@ export default class WasabeeMarker {
       try {
         const a = await WasabeeAgent.get(this.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        assignment.appendChild(await a.formatDisplay());
+        if (a) assignment.appendChild(await a.formatDisplay());
+        else assignment.textContent += " " + this.assignedTo;
       } catch (err) {
         console.error(err);
       }
     }
-    if (this.state == "completed" && this.completedBy) {
-      assignment.innerHTML = wX("COMPLETED BY", {
-        agentName: this.completedBy,
-      });
+    if (this.state == "completed" && this.completedID) {
+      try {
+        const a = await WasabeeAgent.get(this.completedID);
+        assignment.innerHTML = wX("COMPLETED BY", {
+          agentName: a ? a.name : this.completedID,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     const buttonSet = L.DomUtil.create(
@@ -131,46 +138,49 @@ export default class WasabeeMarker {
       "wasabee-marker-buttonset",
       content
     );
-    const deleteButton = L.DomUtil.create("button", null, buttonSet);
-    deleteButton.textContent = wX("DELETE_ANCHOR");
-    L.DomEvent.on(deleteButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      deleteMarker(operation, this, portal);
-      marker.closePopup();
-    });
-
-    if (operation.IsServerOp()) {
-      if (operation.IsWritableOp()) {
-        const assignButton = L.DomUtil.create("button", null, buttonSet);
-        assignButton.textContent = wX("ASSIGN");
-        L.DomEvent.on(assignButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const ad = new AssignDialog({ target: this });
-          ad.enable();
-          marker.closePopup();
-        });
-      }
-
-      if (operation.IsOnCurrentServer()) {
-        const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
-        sendTargetButton.textContent = wX("SEND TARGET");
-        L.DomEvent.on(sendTargetButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const std = new SendTargetDialog({ target: this });
-          std.enable();
-          marker.closePopup();
-        });
-
-        const stateButton = L.DomUtil.create("button", null, buttonSet);
-        stateButton.textContent = wX("MARKER STATE");
-        L.DomEvent.on(stateButton, "click", (ev) => {
-          L.DomEvent.stop(ev);
-          const sd = new StateDialog({ target: this, opID: operation.ID });
-          sd.enable();
-          marker.closePopup();
-        });
-      }
+    if (canWrite) {
+      const deleteButton = L.DomUtil.create("button", null, buttonSet);
+      deleteButton.textContent = wX("DELETE_ANCHOR");
+      L.DomEvent.on(deleteButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        deleteMarker(operation, this, portal);
+        marker.closePopup();
+      });
     }
+
+    if (operation.canWriteServer()) {
+      const assignButton = L.DomUtil.create("button", null, buttonSet);
+      assignButton.textContent = wX("ASSIGN");
+      L.DomEvent.on(assignButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const ad = new AssignDialog({ target: this });
+        ad.enable();
+        marker.closePopup();
+      });
+    }
+
+    if (canWrite) {
+      const stateButton = L.DomUtil.create("button", null, buttonSet);
+      stateButton.textContent = wX("MARKER STATE");
+      L.DomEvent.on(stateButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const sd = new StateDialog({ target: this, opID: operation.ID });
+        sd.enable();
+        marker.closePopup();
+      });
+    }
+
+    if (operation.isOnCurrentServer()) {
+      const sendTargetButton = L.DomUtil.create("button", null, buttonSet);
+      sendTargetButton.textContent = wX("SEND TARGET");
+      L.DomEvent.on(sendTargetButton, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        const std = new SendTargetDialog({ target: this });
+        std.enable();
+        marker.closePopup();
+      });
+    }
+
     const gmapButton = L.DomUtil.create("button", null, buttonSet);
     gmapButton.textContent = wX("ANCHOR_GMAP");
     L.DomEvent.on(gmapButton, "click", (ev) => {

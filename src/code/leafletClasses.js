@@ -57,7 +57,7 @@ export const WPane = L.Handler.extend({
       "wasabee-pane hidden",
       document.body
     );
-    window.map.on("wasabee:paneset", (data) => {
+    window.map.on("wasabee:pane:set", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog) this._dialog.closeDialog();
       this._dialog = data.dialog;
@@ -65,7 +65,7 @@ export const WPane = L.Handler.extend({
       this._container.appendChild(this._dialog._container);
       window.show(data.pane);
     });
-    window.map.on("wasabee:paneclear", (data) => {
+    window.map.on("wasabee:pane:clear", (data) => {
       if (data.pane !== this.options.paneId) return;
       if (this._dialog === data.dialog) delete this._dialog;
     });
@@ -89,6 +89,8 @@ export const WDialog = L.Handler.extend({
     TYPE: "Unextended Wasabee Dialog",
   },
 
+  needWritePermission: false,
+
   options: {
     usePane: false,
     paneId: "wasabee",
@@ -105,9 +107,49 @@ export const WDialog = L.Handler.extend({
       localStorage[window.plugin.wasabee.static.constants.USE_PANES] === "true";
   },
 
-  addHooks: function () {},
+  addHooks: function () {
+    window.map.on("wasabee:ui:skin", this.update, this);
+    window.map.on("wasabee:ui:lang", this.update, this);
+    // don't use child method
+    window.map.on(
+      "wasabee:op:change wasabee:op:select",
+      WDialog.prototype.onOpChange,
+      this
+    );
+  },
 
-  removeHooks: function () {},
+  removeHooks: function () {
+    window.map.off("wasabee:ui:skin", this.update, this);
+    window.map.off("wasabee:ui:lang", this.update, this);
+    window.map.off(
+      "wasabee:op:change wasabee:op:select",
+      WDialog.prototype.onOpChange,
+      this
+    );
+  },
+
+  onOpChange: function () {
+    if (this.needWritePermission) {
+      // avoid import loop
+      const op = window.plugin.wasabee._selectedOp;
+      if (!op || !op.canWrite()) {
+        if (this._dialog) this.closeDialog();
+      }
+    }
+  },
+
+  enable: function () {
+    if (this.needWritePermission) {
+      // avoid import loop
+      const op = window.plugin.wasabee._selectedOp;
+      if (!op || !op.canWrite()) {
+        return;
+      }
+    }
+    L.Handler.prototype.enable.call(this);
+  },
+
+  update: function () {},
 
   createDialog: function (options) {
     this.options.title = options.title;
@@ -138,7 +180,7 @@ export const WDialog = L.Handler.extend({
           L.DomEvent.on(button, "click", entry.click);
         }
       }
-      window.map.fire("wasabee:paneset", {
+      window.map.fire("wasabee:pane:set", {
         pane: this.options.paneId,
         dialog: this,
       });
@@ -174,7 +216,7 @@ export const WDialog = L.Handler.extend({
       this._dialog.dialog("close");
       delete this._dialog;
     } else if (this._container) {
-      window.map.fire("wasabee:paneclear", {
+      window.map.fire("wasabee:pane:clear", {
         pane: this.options.paneId,
         dialog: this,
       });
@@ -207,13 +249,21 @@ export const ButtonsControl = L.Control.extend({
     const outerDiv = L.DomUtil.create("div", "wasabee-buttons");
     outerDiv.appendChild(this.options.container);
 
+    window.map.on("wasabee:login wasabee:logout", this.update, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+
     return outerDiv;
   },
 
-  // called when wasabeeUIUpdate fires
+  onRemove: function () {
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:login wasabee:logout", this.update, this);
+  },
+
+  // called on skin, lang, login/logout and op change/select
   update: function () {
     for (const b of this.options.buttons.values()) {
-      b.Wupdate();
+      b.update();
     }
   },
 
@@ -238,12 +288,12 @@ export const WButton = L.Class.extend({
   _enabled: false,
   title: "Unset",
 
+  needWritePermission: false,
+
   // make sure all these bases are covered in your button
   // XXX this initializer is not used by any buttons
-  initialize: function (map, container) {
+  initialize: function (container) {
     console.log("WButton init");
-    if (!map) map = window.map;
-    this._map = map;
 
     this.type = WButton.TYPE;
     this.title = "Unextended WButton";
@@ -260,7 +310,15 @@ export const WButton = L.Class.extend({
     });
   },
 
-  Wupdate: function () {},
+  update: function () {
+    if (!this.button || !this.needWritePermission) return;
+    const op = window.plugin.wasabee._selectedOp;
+    if (op && op.canWrite()) {
+      this.button.style.display = "block";
+    } else {
+      this.button.style.display = "none";
+    }
+  },
 
   _toggleActions: function () {
     if (this._enabled) {
@@ -297,8 +355,9 @@ export const WButton = L.Class.extend({
       options.className || "",
       options.container
     );
-    link.href = "#";
+
     if (options.text) link.innerHTML = options.text;
+    if (options.html) link.appendChild(options.html);
 
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);
@@ -310,89 +369,27 @@ export const WButton = L.Class.extend({
       link.title = options.title;
     }
 
-    if (this._isTouch()) {
-      L.DomEvent.on(link, "touchstart", L.DomEvent.stopPropagation)
-        .on(link, "touchstart", L.DomEvent.preventDefault)
-        .on(link, "touchstart", this.touchstart, options.context)
-        .on(link, "touchend", this.touchend, options.context)
-        .on(link, "touchmove", this.touchmove, options.context);
-    } else {
-      L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
-        .on(link, "mousedown", L.DomEvent.stopPropagation)
-        .on(link, "dblclick", L.DomEvent.stopPropagation)
-        .on(link, "click", L.DomEvent.preventDefault)
-        .on(link, "click", options.callback, options.context);
-    }
+    L.DomEvent.disableClickPropagation(link);
+    L.DomEvent.on(link, "click", options.callback, options.context);
 
     return link;
   },
 
-  _touches: null,
-
-  touchstart: function (ev) {
-    this._touches = ev.changedTouches[0].target.id;
-    console.log("first touch", this._touches);
-    if (!this._enabled) this.enable();
-  },
-
-  touchend: function (ev) {
-    this._touches = ev.changedTouches[0].target.id;
-    console.log("last touch target", this._touches);
-    if (this._enabled) this.disable();
-  },
-
-  touchmove: function (ev) {
-    if (ev.changedTouches[0].target.id != this._touches) {
-      this._touches = ev.changedTouches[0].target.id;
-      console.log("new touch target", this._touches);
-    }
-  },
-
-  _disposeButton: function (button, callback) {
-    console.log("WButton _disposeButton");
-    L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
-      .off(button, "mousedown", L.DomEvent.stopPropagation)
-      .off(button, "dblclick", L.DomEvent.stopPropagation)
-      .off(button, "click", L.DomEvent.preventDefault)
-      .off(button, "touchstart", L.DomEvent.preventDefault)
-      .off(button, "touchend", L.DomEvent.preventDefault)
-      .off(button, "click", callback);
-  },
-
   _createSubActions: function (buttons) {
     const container = L.DomUtil.create("ul", "wasabee-actions");
-    L.DomEvent.on(container, "touchenter", (ev) => {
-      console.log("touchenter", ev);
-    });
-    L.DomEvent.on(container, "touchleave", (ev) => {
-      console.log("touchleave", ev);
-    });
     for (const b of buttons) {
       const li = L.DomUtil.create("li", "wasabee-subactions", container);
       this._createButton({
         title: b.title,
         text: b.text,
+        html: b.html,
         buttonImage: b.img,
         container: li,
         callback: b.callback,
         context: b.context,
         className: "wasabee-subactions",
       });
-      L.DomEvent.on(li, "touchenter", (ev) => {
-        console.log("touchenter", ev);
-      });
-      L.DomEvent.on(li, "touchleave", (ev) => {
-        console.log("touchleave", ev);
-      });
     }
     return container;
-  },
-
-  _isTouch: function () {
-    /* console.log("mobile", L.Browser.mobile);
-    console.log("touch", L.Browser.touch);
-    console.log("userLocation", window.plugin.userLocation); */
-    // if (L.Browser.mobile && L.Browser.touch) return true;
-    return false;
   },
 });

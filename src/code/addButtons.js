@@ -10,14 +10,7 @@ import UploadButton from "./buttons/uploadButton";
 /* This function adds the plugin buttons on the left side of the screen */
 export function addButtons() {
   if (window.plugin.wasabee.buttons) {
-    console.warn("replacing buttons");
-    window.map.off(
-      "wasabeeUIUpdate",
-      window.plugin.wasabee.buttons.update,
-      window.plugin.wasabee.buttons
-    );
-    window.map.removeControl(window.plugin.wasabee.buttons);
-    delete window.plugin.wasabee.buttons;
+    return;
   }
 
   const options = {};
@@ -35,7 +28,7 @@ export function addButtons() {
     UploadButton,
   ]) {
     const item = L.DomUtil.create("li", null, options.container);
-    const button = new Constructor(window.map, item);
+    const button = new Constructor(item);
     options.buttons.set(button.type, button);
   }
 
@@ -44,13 +37,6 @@ export function addButtons() {
 
   // start off with a fresh update
   window.plugin.wasabee.buttons.update();
-
-  // listen for UI changes, update buttons that need it
-  window.map.on(
-    "wasabeeUIUpdate",
-    window.plugin.wasabee.buttons.update,
-    window.plugin.wasabee.buttons
-  );
 }
 
 export default addButtons;

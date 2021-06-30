@@ -12,6 +12,8 @@ const AssignDialog = WDialog.extend({
     TYPE: "assignDialog",
   },
 
+  needWritePermission: true,
+
   options: {
     // target,
   },

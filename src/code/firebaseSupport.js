@@ -12,6 +12,8 @@ import {
   removeOperation,
   loadNewDefaultOp,
 } from "./selectedOp";
+import { updateLocalOp } from "./uiCommands";
+import WasabeeOp from "./operation";
 import WasabeePortal from "./portal";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
@@ -60,14 +62,20 @@ export function initFirebase() {
         break;
       case "Login":
         console.debug("server reported teammate login: ", event.data.data.gid);
-        window.map.fire("wasabeeUIUpdate", { reason: "onlineAgent" }, false);
+        window.map.fire("wasabee:agentlocations");
         break;
       case "Map Change":
         if (!window.plugin.wasabee._updateList.has(event.data.data.updateID)) {
           try {
+            // update the list to avoid race from slow network
+            window.plugin.wasabee._updateList.set(
+              event.data.data.updateID,
+              Date.now()
+            );
+            const localop = await WasabeeOp.load(event.data.data.opID);
             const refreshed = await opPromise(event.data.data.opID);
-            refreshed.store();
-            if (refreshed.ID == operation.ID) {
+            const reloadSOp = await updateLocalOp(localop, refreshed);
+            if (reloadSOp) {
               console.log(
                 "firebase trigger reload of current op: ",
                 event.data.data
@@ -119,6 +127,9 @@ export function postToFirebase(message) {
       "true"
   )
     return; */
+
+  message.app_name = "Wasabee-IITC";
+  message.app_version = window.plugin.wasabee.info.version;
 
   window.frames[frameID].contentWindow.postMessage(message, GetWasabeeServer());
 }

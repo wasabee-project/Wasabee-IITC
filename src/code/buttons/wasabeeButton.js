@@ -18,10 +18,7 @@ const WasabeeButton = WButton.extend({
     TYPE: "wasabeeButton",
   },
 
-  initialize: function (map, container) {
-    if (!map) map = window.map;
-    this._map = map;
-
+  initialize: function (container) {
     this.type = WasabeeButton.TYPE;
     this.title = wX("WASABEE BUTTON TITLE");
     this.handler = this._toggleActions;
@@ -37,6 +34,48 @@ const WasabeeButton = WButton.extend({
 
     this._lastLoginState = false;
 
+    this._buildActions();
+
+    // build and display as if not logged in
+    this.actionsContainer = this._getActions();
+    this._container.appendChild(this.actionsContainer);
+    // check login state and update if necessary
+
+    window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
+      this.button.title = wX("WASABEE BUTTON TITLE");
+      this._buildActions();
+      const newSubActions = this._getActions();
+      this._container.replaceChild(newSubActions, this.actionsContainer);
+      newSubActions.style.display = this.actionsContainer.style.display;
+      this.actionsContainer = newSubActions;
+    });
+
+    this.update();
+  },
+
+  _getActions: function () {
+    let tmp = [];
+    if (!this._lastLoginState) {
+      tmp = [this._loginAction];
+    } else {
+      //    tmp = [this._teamAction];
+      tmp = [this._logoutAction];
+      tmp.push(this._teamAction);
+    }
+
+    tmp = tmp.concat(this._alwaysActions);
+
+    if (this._lastLoginState) {
+      tmp = tmp.concat(this._Dactions);
+    }
+
+    // settings always at the end
+    tmp = tmp.concat(this._SettingsActions);
+
+    return this._createSubActions(tmp);
+  },
+
+  _buildActions: function () {
     this._loginAction = {
       title: wX("LOG IN"),
       text: wX("LOG IN"),
@@ -74,7 +113,7 @@ const WasabeeButton = WButton.extend({
           console.error(e);
           alert(e.toString());
         }
-        WasabeeMe.purge(); // runs UI updates for us
+        WasabeeMe.purge();
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
       },
       context: this,
@@ -158,37 +197,9 @@ const WasabeeButton = WButton.extend({
         context: this,
       },
     ];
-
-    // build and display as if not logged in
-    this.actionsContainer = this._getActions();
-    this._container.appendChild(this.actionsContainer);
-    // check login state and update if necessary
-    this.Wupdate();
   },
 
-  _getActions: function () {
-    let tmp = [];
-    if (!this._lastLoginState) {
-      tmp = [this._loginAction];
-    } else {
-      //    tmp = [this._teamAction];
-      tmp = [this._logoutAction];
-      tmp.push(this._teamAction);
-    }
-
-    tmp = tmp.concat(this._alwaysActions);
-
-    if (this._lastLoginState) {
-      tmp = tmp.concat(this._Dactions);
-    }
-
-    // settings always at the end
-    tmp = tmp.concat(this._SettingsActions);
-
-    return this._createSubActions(tmp);
-  },
-
-  Wupdate: function () {
+  update: function () {
     // takes container and operation as args, but we don't need them
     const loggedIn = WasabeeMe.isLoggedIn();
 

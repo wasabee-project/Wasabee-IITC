@@ -11,6 +11,8 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
+  setMarkersToZones,
+  setLinksToZones,
 } from "../uiCommands";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
@@ -26,20 +28,17 @@ const OperationChecklistDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    window.map.on("wasabeeUIUpdate", this.checklistUpdate, this);
+    window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
-
-    const operation = getSelectedOperation();
-    loadFaked(operation);
 
     this._displayDialog();
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
-    window.map.off("wasabeeUIUpdate", this.checklistUpdate, this);
+    window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
@@ -47,7 +46,13 @@ const OperationChecklistDialog = WDialog.extend({
 
   _displayDialog: async function () {
     const operation = getSelectedOperation();
-    this.sortable = this.getListDialogContent(operation, 0, false); // defaults to sorting by op order
+    loadFaked(operation);
+    this.sortable = this.getListDialogContent(
+      operation,
+      operation.links.concat(operation.markers),
+      0,
+      false
+    ); // defaults to sorting by op order
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -58,6 +63,12 @@ const OperationChecklistDialog = WDialog.extend({
     };
     buttons["Count fields"] = () => {
       this.countFields(getSelectedOperation(), true);
+    };
+    buttons[wX("SET_MARKERS_ZONES")] = () => {
+      setMarkersToZones();
+    };
+    buttons[wX("SET_LINKS_ZONES")] = () => {
+      setLinksToZones();
     };
 
     await this.sortable.done;
@@ -72,11 +83,12 @@ const OperationChecklistDialog = WDialog.extend({
     });
   },
 
-  checklistUpdate: async function () {
+  update: async function () {
     const operation = getSelectedOperation();
     this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
+      operation.links.concat(operation.markers),
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
@@ -84,12 +96,9 @@ const OperationChecklistDialog = WDialog.extend({
     this.setContent(this.sortable.table);
   },
 
-  getListDialogContent: function (operation, sortBy, sortAsc) {
-    // collapse markers and links into one array.
-    const allThings = operation.links.concat(operation.markers);
-
-    const content = new Sortable();
-    content.fields = [
+  getFields: function (operation) {
+    const canWrite = operation.canWrite();
+    const columns = [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
         value: (thing) => thing.opOrder,
@@ -98,6 +107,7 @@ const OperationChecklistDialog = WDialog.extend({
           const oif = L.DomUtil.create("input");
           oif.value = value;
           oif.size = 3;
+          oif.disabled = !canWrite;
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
             if (thing instanceof WasabeeLink) {
@@ -144,7 +154,7 @@ const OperationChecklistDialog = WDialog.extend({
 
           if (thing instanceof WasabeeLink) {
             if (this._smallScreen) cell.style.display = "none";
-          } else if (thing instanceof WasabeeMarker) {
+          } else if (thing instanceof WasabeeMarker && canWrite) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
               const ch = new MarkerChangeDialog({ marker: thing });
@@ -165,6 +175,7 @@ const OperationChecklistDialog = WDialog.extend({
             o.value = zone.id;
             if (zone.id == thing.zone) o.selected = true;
           }
+          z.disabled = !canWrite;
           L.DomEvent.on(z, "change", (ev) => {
             L.DomEvent.stop(ev);
             operation.setZone(thing, z.value);
@@ -180,14 +191,16 @@ const OperationChecklistDialog = WDialog.extend({
           const comment = L.DomUtil.create("a", null, cell);
           if (!value) value = ". . .";
           comment.textContent = value;
-          L.DomEvent.on(cell, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            const scd = new SetCommentDialog({
-              target: thing,
-              operation: operation,
+          if (canWrite) {
+            L.DomEvent.on(cell, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              const scd = new SetCommentDialog({
+                target: thing,
+                operation: operation,
+              });
+              scd.enable();
             });
-            scd.enable();
-          });
+          }
         },
         smallScreenHide: true,
       },
@@ -206,7 +219,7 @@ const OperationChecklistDialog = WDialog.extend({
           const assigned = L.DomUtil.create("a", null, cell);
           assigned.textContent = value;
           // do not use agent.formatDisplay since that links and overwrites the assign event
-          if (operation.IsServerOp() && operation.IsWritableOp()) {
+          if (operation.canWriteServer()) {
             // XXX should be writable op
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);
@@ -225,18 +238,23 @@ const OperationChecklistDialog = WDialog.extend({
           const a = L.DomUtil.create("a", null, cell);
           a.href = "#";
           a.textContent = wX(value);
-          L.DomEvent.on(cell, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            const sd = new StateDialog({
-              target: thing,
-              opID: operation.ID,
+          // XXX: should be possible with atomic api call
+          if (canWrite) {
+            L.DomEvent.on(cell, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              const sd = new StateDialog({
+                target: thing,
+                opID: operation.ID,
+              });
+              sd.enable();
             });
-            sd.enable();
-          });
+          }
         },
         smallScreenHide: true,
       },
-      {
+    ];
+    if (canWrite)
+      columns.push({
         name: this._smallScreen ? "Cmds" : "Commands",
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
@@ -266,11 +284,16 @@ const OperationChecklistDialog = WDialog.extend({
             });
           }
         },
-      },
-    ];
+      });
+    return columns;
+  },
+
+  getListDialogContent: function (operation, items, sortBy, sortAsc) {
+    const content = new Sortable();
+    content.fields = this.getFields(operation);
     content.sortBy = sortBy;
     content.sortAsc = sortAsc;
-    content.items = allThings;
+    content.items = items;
     return content;
   },
 

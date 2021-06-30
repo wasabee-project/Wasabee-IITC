@@ -16,6 +16,8 @@ const MultimaxDialog = WDialog.extend({
     TYPE: "multimaxDialog",
   },
 
+  needWritePermission: true,
+
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     this._displayDialog();

@@ -5,7 +5,7 @@ import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import { generateId, newColors } from "./auxiliar";
 import { GetWasabeeServer } from "./server";
-import { addOperation, getSelectedOperation } from "./selectedOp";
+import { getSelectedOperation } from "./selectedOp";
 
 import wX from "./wX";
 
@@ -133,14 +133,11 @@ export default class WasabeeOp {
       console.error(e);
     }
 
-    // manage the list of known operations, can be removed in 0.20
-    await addOperation(this.ID);
-
     // some debug info to trace race condition
     const s = getSelectedOperation();
     if (s && s.ID == this.ID && s != this)
       console.trace(
-        "store current OP from a different obj",
+        "store current OP from a different obj, this *should* be followed by makeSelectedOperation",
         s.ID,
         s.name,
         this.ID,
@@ -327,6 +324,15 @@ export default class WasabeeOp {
 
   getPortal(portalID) {
     return this._idToOpportals.get(portalID);
+  }
+
+  getMarker(markerID) {
+    for (const m of this.markers) {
+      if (m.ID == markerID) {
+        return m;
+      }
+    }
+    return null;
   }
 
   removeAnchor(portalId) {
@@ -784,24 +790,22 @@ export default class WasabeeOp {
     this.runCrosslinks();
   }
 
-  // XXX move comment to options in 0.20
-  addMarker(markerType, portal, comment, options) {
+  addMarker(markerType, portal, options) {
     if (!portal) return;
     if (this.containsMarker(portal, markerType)) {
       alert(wX("ALREADY_HAS_MARKER"));
     } else {
-      this.addPortal(portal);
+      // save a trip to update()
+      this._addPortal(portal);
       const marker = new WasabeeMarker({
         type: markerType,
         portalId: portal.id,
-        comment: comment,
       });
+      if (options && options.comment) marker.comment = options.comment;
       if (options && options.zone) marker.zone = options.zone;
       if (options && options.assign && options.assign != 0)
         marker.assign(options.assign);
       this.markers.push(marker);
-
-      this.update(true);
 
       // only need this for virus/destroy/decay -- this should be in the marker class
       const destructMarkerTypes = [
@@ -809,6 +813,16 @@ export default class WasabeeOp {
         window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
         window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
       ];
+      if (destructMarkerTypes.includes(markerType)) {
+        // remove related blockers
+        this.blockers = this.blockers.filter(
+          (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
+        );
+      }
+
+      this.update(true);
+      // run crosslink to update the layer
+      // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
       if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
     }
   }
@@ -866,12 +880,12 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabeeUIUpdate", { reason: "op update" }, false);
+    window.map.fire("wasabee:op:change");
   }
 
   runCrosslinks() {
     if (this._batchmode === true) return;
-    window.map.fire("wasabeeCrosslinks", { reason: "op runCrosslinks" }, false);
+    window.map.fire("wasabee:crosslinks");
   }
 
   startBatchMode() {
@@ -931,15 +945,8 @@ export default class WasabeeOp {
     if (!zones || zones.length == 0) {
       // if not set, use the defaults
       return [
-        { id: 1, name: "Primary" },
-        { id: 2, name: "Alpha" },
-        { id: 3, name: "Beta" },
-        { id: 4, name: "Gamma" },
-        { id: 5, name: "Delta" },
-        { id: 6, name: "Epsilon" },
-        { id: 7, name: "Zeta" },
-        { id: 8, name: "Eta" },
-        { id: 9, name: "Theta" },
+        { id: 1, name: "Primary", color: "purple" },
+        { id: 2, name: "Secondary", color: "yellow" },
       ].map((obj) => new WasabeeZone(obj));
     }
     const tmpZones = Array();
@@ -959,10 +966,17 @@ export default class WasabeeOp {
     if (this._idToOpportals.size == 0) return null;
     const lats = [];
     const lngs = [];
-    for (const a of this._idToOpportals.values()) {
-      lats.push(a.lat);
-      lngs.push(a.lng);
+    for (const a of this.anchors) {
+      const portal = this.getPortal(a);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
     }
+    for (const m of this.markers) {
+      const portal = this.getPortal(m.portalId);
+      lats.push(portal.lat);
+      lngs.push(portal.lng);
+    }
+    if (!lats.length) return null;
     const minlat = Math.min.apply(null, lats);
     const maxlat = Math.max.apply(null, lats);
     const minlng = Math.min.apply(null, lngs);
@@ -972,14 +986,15 @@ export default class WasabeeOp {
     return L.latLngBounds(min, max);
   }
 
-  // is the op writable to the current server
-  IsWritableOp() {
-    // not from the server, must be writable
-    if (!this.IsServerOp()) return true;
+  // is the op writable to the *current server*
+  // for assignment, team permission, update
+  canWriteServer() {
+    // not from the server, not writable to server
+    if (!this.isServerOp()) return false;
     // if it is a server op and not logged in, assume not writable
     if (!WasabeeMe.isLoggedIn()) return false;
     // if logged on a different server from the one used for the op, not writable
-    if (!this.IsOnCurrentServer()) return false;
+    if (!this.isOnCurrentServer()) return false;
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
@@ -999,13 +1014,18 @@ export default class WasabeeOp {
     return false;
   }
 
+  // suitable for any change except assignments, op perms
+  canWrite() {
+    return this.getPermission() === "write";
+  }
+
   getPermission() {
     // not from the server, must be writable
-    if (!this.IsServerOp()) return "write";
+    if (!this.isServerOp()) return "write";
     // if it is a server op and not logged in, the user is the owner
     if (!WasabeeMe.isLoggedIn()) return "write";
     // if logged on a different server from the one used for the op, the user is the owner
-    if (!this.IsOnCurrentServer()) return "write";
+    if (!this.isOnCurrentServer()) return "write";
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return "read"; // fail safe
@@ -1022,18 +1042,17 @@ export default class WasabeeOp {
     return "assignonly";
   }
 
-  IsOnCurrentServer() {
-    // assume yes if .server is not defined yet (<0.19)
-    return !this.server || this.server == GetWasabeeServer();
+  isOnCurrentServer() {
+    return this.isServerOp() && this.server == GetWasabeeServer();
   }
 
-  IsServerOp() {
+  isServerOp() {
     if (this.fetched) return true;
     return false;
   }
 
-  IsOwnedOp() {
-    if (!this.IsServerOp()) return true;
+  isOwnedOp() {
+    if (!this.isServerOp()) return true;
     if (!WasabeeMe.isLoggedIn()) return true;
 
     const me = WasabeeMe.cacheGet();
@@ -1130,6 +1149,15 @@ export default class WasabeeOp {
     this.update(true);
   }
 
+  removeZonePoints(zoneID) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points = [];
+      }
+    }
+    this.update(true);
+  }
+
   renameZone(zoneID, name) {
     for (const z of this.zones) {
       if (z.id == zoneID) {
@@ -1149,6 +1177,20 @@ export default class WasabeeOp {
     this.zones.push(new WasabeeZone({ id: newid, name: newid }));
     this.update(true);
     return newid;
+  }
+
+  addZonePoint(zoneID, latlng) {
+    for (const z of this.zones) {
+      if (z.id == zoneID) {
+        z.points.push({
+          lat: latlng.lat,
+          lng: latlng.lng,
+          position: z.points.length,
+        });
+        break;
+      }
+    }
+    this.update(true);
   }
 
   changes(origin) {
@@ -1255,6 +1297,29 @@ export default class WasabeeOp {
     return this.localchanged;
   }
 
+  mergeBlockers(op) {
+    // merge portals
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
+    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+  }
+
+  mergeZones(op) {
+    const ids = new Set();
+    let count = 0;
+    for (const z of this.zones) {
+      ids.add(z.id);
+    }
+    for (const z of op.zones) {
+      if (!ids.has(z.id)) {
+        this.zones.push(z);
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   // assume that `this` is a server OP (no blockers, teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {
@@ -1286,25 +1351,11 @@ export default class WasabeeOp {
       },
     };
 
-    // merge portals
-    for (const p of op.opportals) {
-      this._addPortal(p);
-    }
-
-    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
+    // merge *portals* and blockers
+    this.mergeBlockers(op);
 
     // add missing zones
-    {
-      const ids = new Set();
-      for (const z of this.zones) {
-        ids.add(z.id);
-      }
-      for (const z of op.zones)
-        if (!ids.has(z.id)) {
-          op.zones.push(z);
-          summary.addition.zone += 1;
-        }
-    }
+    summary.addition.zone = this.mergeZones(op);
 
     // try to detect 0.18 ops with inconsistent IDs
     {
@@ -1465,5 +1516,17 @@ export default class WasabeeOp {
       }
     }
     return summary;
+  }
+
+  determineZone(latlng) {
+    // sort first, lowest ID wins if a marker is in 2 overlapping zones
+    this.zones.sort((a, b) => {
+      return a.id - b.id;
+    });
+    for (const z of this.zones) {
+      if (z.contains(latlng)) return z.id;
+    }
+    // default to primary zone
+    return 1;
   }
 }
