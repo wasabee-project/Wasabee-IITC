@@ -8,6 +8,7 @@ import LinkUI from "./ui/link";
 import AnchorUI from "./ui/anchor";
 import AgentUI from "./ui/agent";
 import MarkerUI from "./ui/marker";
+import ZoneUI from "./ui/zone";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -103,26 +104,8 @@ function resetZones(operation) {
   if (!operation.zones || operation.zones.length == 0) return;
 
   for (const z of operation.zones) {
-    if (z.points.length == 1) {
-      L.marker(z.points[0], { color: z.color }).addTo(Wasabee.zoneLayerGroup);
-      continue;
-    }
-    if (z.points.length == 2) {
-      L.polyline(z.points, { color: z.color }).addTo(Wasabee.zoneLayerGroup);
-      continue;
-    }
-    z.points.sort((a, b) => {
-      return a.position - b.position;
-    });
-    L.polygon(z.points, {
-      color: z.color,
-      shapeOptions: {
-        stroke: false,
-        opacity: 0.7,
-        fill: true,
-        interactive: false,
-      },
-    }).addTo(Wasabee.zoneLayerGroup);
+    const l = new ZoneUI.WLZone(z);
+    l.addTo(Wasabee.zoneLayerGroup);
   }
   Wasabee.zoneLayerGroup.bringToBack();
 }
