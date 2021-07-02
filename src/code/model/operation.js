@@ -835,7 +835,7 @@ export default class WasabeeOp extends Evented {
   assignLink(id, gid) {
     for (const v of this.links) {
       if (v.ID == id) {
-        v.assignedTo = gid;
+        v.assign(gid);
         this.update(true);
       }
     }

@@ -37,12 +37,12 @@ export default class WasabeeMarker {
     this.ID = obj.ID ? obj.ID : generateId();
     this.portalId = obj.portalId;
     this.type = obj.type;
-    this.comment = obj.comment ? obj.comment : ""; // why "" and not null? This isn't go
-    this.completedID = obj.completedID ? obj.completedID : "";
+    this.comment = obj.comment;
+    this.completedID = obj.completedID ? obj.completedID : null;
     this.order = obj.order ? Number(obj.order) : 0;
     this.zone = obj.zone ? Number(obj.zone) : 1;
 
-    this.assign(obj.assignedTo); // WAS this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    this.assign(obj.assignedTo); // WAS this.assignedTo = obj.assignedTo ? obj.assignedTo : null;
     // if ._state then it came from indexeddb, otherwise from server/localStorage
     if (obj._state) {
       this.state = obj._state;
@@ -75,7 +75,7 @@ export default class WasabeeMarker {
   assign(gid) {
     if (!gid || gid == "") {
       this._state = STATE_UNASSIGNED;
-      this.assignedTo = "";
+      this.assignedTo = null;
       return;
     }
 

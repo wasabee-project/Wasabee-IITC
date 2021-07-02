@@ -23,11 +23,11 @@ export default class WasabeeAgent {
     this.intelname = obj.intelname;
     this.intelfaction = obj.intelfaction;
     this.level = obj.level ? Number(obj.level) : 0;
-    this.enlid = obj.enlid ? obj.enlid : 0;
+    this.enlid = obj.enlid ? obj.enlid : null;
     this.pic = obj.pic ? obj.pic : null;
-    this.Vverified = obj.Vverified ? obj.Vverified : false;
-    this.blacklisted = obj.blacklisted ? obj.blacklisted : false;
-    this.rocks = obj.rocks ? obj.rocks : false;
+    this.Vverified = !!obj.Vverified;
+    this.blacklisted = !!obj.blacklisted;
+    this.rocks = !!obj.rocks;
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
     this.date = obj.date ? obj.date : null; // last location sub, not fetched

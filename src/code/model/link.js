@@ -6,12 +6,16 @@ export default class WasabeeLink {
     this.ID = obj.ID ? obj.ID : generateId();
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
-    this.description = obj.description ? obj.description : null;
-    this.assignedTo = obj.assignedTo ? obj.assignedTo : "";
+    this.description = obj.description;
+    this.assignedTo = obj.assignedTo ? obj.assignedTo : null;
     this.throwOrderPos = obj.throwOrderPos ? Number(obj.throwOrderPos) : 0;
     this.color = obj.color ? obj.color : "main";
     this.completed = obj.completed ? !!obj.completed : false;
     this.zone = obj.zone ? Number(obj.zone) : 1;
+  }
+
+  assign(gid) {
+    this.assignedTo = gid ? gid : null;
   }
 
   // build object to serialize
