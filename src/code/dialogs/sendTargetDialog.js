@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMarker from "../model/marker";
-import WasabeeAnchor from "../model/anchor";
+import WasabeePortal from "../model/portal";
 import WasabeeMe from "../model/me";
 import WasabeeTeam from "../model/team";
 import { targetPromise } from "../server";
@@ -58,8 +58,8 @@ const SendTargetDialog = WDialog.extend({
       menu.prepend(t);
     }
 
-    if (this.options.target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(this.options.target.portalId);
+    if (this.options.target instanceof WasabeePortal) {
+      const portal = this.options.target;
       this._targettype = "anchor";
       divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);

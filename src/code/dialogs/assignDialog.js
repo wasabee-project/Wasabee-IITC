@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../model/link";
 import WasabeeMarker from "../model/marker";
-import WasabeeAnchor from "../model/anchor";
+import WasabeePortal from "../model/portal";
 import WasabeeMe from "../model/me";
 import WasabeeTeam from "../model/team";
 import wX from "../wX";
@@ -79,8 +79,8 @@ const AssignDialog = WDialog.extend({
       menu.prepend(t);
     }
 
-    if (target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(target.portalId);
+    if (target instanceof WasabeePortal) {
+      const portal = target;
       this._type = "Anchor";
       this._name = wX("ASSIGN OUTBOUND PROMPT", {
         portalName: PortalUI.displayName(portal),
