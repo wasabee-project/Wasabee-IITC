@@ -167,7 +167,6 @@ const WLPortal = L.Marker.extend({
       ad.enable();
       this.closePopup();
     });
-    return assignButton;
   },
 
   _deleteButton: function (container, text) {
@@ -189,7 +188,6 @@ const WLPortal = L.Marker.extend({
       std.enable();
       this.closePopup();
     });
-    return sendButton;
   },
 
   _mapButton: function (container, text) {
