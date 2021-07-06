@@ -39,7 +39,7 @@ export default class WasabeeMarker {
       type: this.type,
       comment: this.comment,
       state: this._state, // no need to validate here
-      completedID: this.completedBID,
+      completedID: this.completedID,
       assignedTo: this.assignedTo,
       order: Number(this.order),
       zone: Number(this.zone),
