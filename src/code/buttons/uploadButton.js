@@ -5,7 +5,7 @@ import {
   GetWasabeeServer,
   opPromise,
 } from "../server";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import MergeDialog from "../dialogs/mergeDialog";

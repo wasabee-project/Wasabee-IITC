@@ -3,16 +3,15 @@ import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
-import { generateId, newColors } from "./auxiliar";
-import { GetWasabeeServer } from "./server";
-import { getSelectedOperation } from "./selectedOp";
+import Evented from "./evented";
+import { generateId } from "../auxiliar";
+import { GetWasabeeServer } from "../server";
+import { getSelectedOperation } from "../selectedOp";
+import db from "../db";
 
-import wX from "./wX";
-
-const Wasabee = window.plugin.wasabee;
-
-export default class WasabeeOp {
+export default class WasabeeOp extends Evented {
   constructor(obj) {
+    super();
     if (typeof obj == "string") {
       try {
         obj = JSON.parse(obj);
@@ -28,8 +27,7 @@ export default class WasabeeOp {
     this.anchors = obj.anchors ? obj.anchors : Array();
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
-    this.color = obj.color ? obj.color : Wasabee.skin.defaultOperationColor;
-    this.color = newColors(this.color);
+    this.color = obj.color ? obj.color : "main";
     this.comment = obj.comment ? obj.comment : null;
     this.teamlist = obj.teamlist ? obj.teamlist : Array();
     this.fetched = obj.fetched ? obj.fetched : null;
@@ -66,7 +64,7 @@ export default class WasabeeOp {
 
   static async load(opID) {
     try {
-      const raw = await window.plugin.wasabee.idb.get("operations", opID);
+      const raw = await (await db).get("operations", opID);
       if (raw == null)
         //throw new Error("invalid operation ID");
         return null;
@@ -81,12 +79,12 @@ export default class WasabeeOp {
 
   static async delete(opID) {
     delete localStorage[opID]; // leave for now
-    await window.plugin.wasabee.idb.delete("operations", opID);
+    await (await db).delete("operations", opID);
   }
 
   static async migrate(opID) {
     // skip ones already completed
-    const have = await window.plugin.wasabee.idb.get("operations", opID);
+    const have = await (await db).get("operations", opID);
     if (have != null) {
       delete localStorage[opID]; // active now
       return;
@@ -128,7 +126,7 @@ export default class WasabeeOp {
 
     // store to idb
     try {
-      await window.plugin.wasabee.idb.put("operations", json);
+      await (await db).put("operations", json);
     } catch (e) {
       console.error(e);
     }
@@ -236,7 +234,7 @@ export default class WasabeeOp {
 
   getColor() {
     if (this.color == null) {
-      return Wasabee.skin.defaultOperationColor;
+      return "main";
     } else {
       return this.color;
     }
@@ -348,7 +346,7 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update(true);
-    this.runCrosslinks();
+    this.updateBlockers();
   }
 
   removeMarker(marker) {
@@ -357,7 +355,7 @@ export default class WasabeeOp {
     });
     this.cleanPortalList();
     this.update(true);
-    this.runCrosslinks();
+    this.updateBlockers();
   }
 
   setMarkerComment(marker, comment) {
@@ -452,7 +450,7 @@ export default class WasabeeOp {
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update(true);
-    this.runCrosslinks();
+    this.updateBlockers();
   }
 
   reverseLink(startPortalID, endPortalID) {
@@ -674,10 +672,10 @@ export default class WasabeeOp {
     if (!existingLink) {
       this.links.push(link);
       this.update(true);
-      this.runCrosslinks();
+      this.updateBlockers();
     } else if (options.replace) {
       this.update(true);
-      this.runCrosslinks();
+      this.updateBlockers();
     } else {
       console.debug(
         "Link Already Exists In Operation -> " + JSON.stringify(link)
@@ -787,44 +785,42 @@ export default class WasabeeOp {
     this._addPortal(newPortal);
     this._swapPortal(originalPortal, newPortal);
     this.update(true);
-    this.runCrosslinks();
+    this.updateBlockers();
   }
 
   addMarker(markerType, portal, options) {
-    if (!portal) return;
-    if (this.containsMarker(portal, markerType)) {
-      alert(wX("ALREADY_HAS_MARKER"));
-    } else {
-      // save a trip to update()
-      this._addPortal(portal);
-      const marker = new WasabeeMarker({
-        type: markerType,
-        portalId: portal.id,
-      });
-      if (options && options.comment) marker.comment = options.comment;
-      if (options && options.zone) marker.zone = options.zone;
-      if (options && options.assign && options.assign != 0)
-        marker.assign(options.assign);
-      this.markers.push(marker);
+    if (!portal) return false;
+    if (this.containsMarker(portal, markerType)) return false;
+    // save a trip to update()
+    this._addPortal(portal);
+    const marker = new WasabeeMarker({
+      type: markerType,
+      portalId: portal.id,
+    });
+    if (options && options.comment) marker.comment = options.comment;
+    if (options && options.zone) marker.zone = options.zone;
+    if (options && options.assign && options.assign != 0)
+      marker.assign(options.assign);
+    this.markers.push(marker);
 
-      // only need this for virus/destroy/decay -- this should be in the marker class
-      const destructMarkerTypes = [
-        window.plugin.wasabee.static.constants.MARKER_TYPE_DECAY,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS,
-      ];
-      if (destructMarkerTypes.includes(markerType)) {
-        // remove related blockers
-        this.blockers = this.blockers.filter(
-          (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
-        );
-      }
-
-      this.update(true);
-      // run crosslink to update the layer
-      // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
-      if (destructMarkerTypes.includes(markerType)) this.runCrosslinks();
+    // only need this for virus/destroy/decay -- this should be in the marker class
+    const destructMarkerTypes = [
+      WasabeeMarker.constants.MARKER_TYPE_DECAY,
+      WasabeeMarker.constants.MARKER_TYPE_DESTROY,
+      WasabeeMarker.constants.MARKER_TYPE_VIRUS,
+    ];
+    if (destructMarkerTypes.includes(markerType)) {
+      // remove related blockers
+      this.blockers = this.blockers.filter(
+        (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
+      );
     }
+
+    this.update(true);
+    // run crosslink to update the layer
+    // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
+    if (destructMarkerTypes.includes(markerType)) this.updateBlockers();
+    return true;
   }
 
   assignMarker(id, gid) {
@@ -839,7 +835,7 @@ export default class WasabeeOp {
   assignLink(id, gid) {
     for (const v of this.links) {
       if (v.ID == id) {
-        v.assignedTo = gid;
+        v.assign(gid);
         this.update(true);
       }
     }
@@ -880,12 +876,12 @@ export default class WasabeeOp {
     }
 
     this.store(); // no await, let it happen in the background unless we see races
-    window.map.fire("wasabee:op:change");
+    this.fire("update");
   }
 
-  runCrosslinks() {
+  updateBlockers() {
     if (this._batchmode === true) return;
-    window.map.fire("wasabee:crosslinks");
+    this.fire("blockers");
   }
 
   startBatchMode() {
@@ -895,7 +891,7 @@ export default class WasabeeOp {
   endBatchMode() {
     this._batchmode = false;
     this.update(true);
-    this.runCrosslinks();
+    this.updateBlockers();
   }
 
   convertLinksToObjs(links) {

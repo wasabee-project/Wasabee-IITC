@@ -10,12 +10,14 @@ import {
   deleteJoinLinkPromise,
   createJoinLinkPromise,
 } from "../server";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
+
+import AgentUI from "../ui/agent";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = WDialog.extend({
@@ -48,7 +50,9 @@ const ManageTeamDialog = WDialog.extend({
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, agent) =>
-          cell.appendChild(await agent.formatDisplay(this.options.team.id)),
+          cell.appendChild(
+            await AgentUI.formatDisplay(agent, this.options.team.id)
+          ),
       },
       {
         name: wX("TEAM STATE"),

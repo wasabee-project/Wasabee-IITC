@@ -3,6 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
+import WasabeeMarker from "../model/marker";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -315,8 +316,8 @@ const TrawlDialog = WDialog.extend({
     operation.startBatchMode();
     for (const m of operation.markers) {
       if (
-        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY ||
-        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS
+        m.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
+        m.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS
       )
         operation.removeMarker(m);
     }

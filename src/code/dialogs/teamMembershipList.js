@@ -1,7 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeTeam from "../team";
+import WasabeeTeam from "../model/team";
 import wX from "../wX";
+
+import AgentUI from "../ui/agent";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -54,7 +56,9 @@ const TeamMembershipList = WDialog.extend({
         value: (agent) => agent.name,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, agent) =>
-          cell.appendChild(await agent.formatDisplay(this.options.teamID)),
+          cell.appendChild(
+            await AgentUI.formatDisplay(agent, this.options.teamID)
+          ),
       },
       {
         name: wX("SQUAD"),

@@ -1,5 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
+import { convertColorToHex } from "../auxiliar";
 import wX from "../wX";
 
 // export screen
@@ -51,7 +52,7 @@ const ExportDialog = WDialog.extend({
     for (const link of operation.links) {
       const l = {};
       l.type = "polyline";
-      l.color = link.getColor(operation);
+      l.color = convertColorToHex(link.getColor(operation));
       l.latLngs = link.getLatLngs(operation);
       output.push(l);
     }

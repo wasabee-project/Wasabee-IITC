@@ -1,10 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../agent";
-import WasabeeOp from "../operation";
+import WasabeeAgent from "../model/agent";
+import WasabeeOp from "../model/operation";
 import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import { drawBackgroundOp } from "../mapDrawing";
+
+import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const MergeDialog = WDialog.extend({
   statics: {
@@ -229,12 +232,12 @@ const MergeDialog = WDialog.extend({
         format: async (cell, value, e) => {
           const op = e.type === "-" ? origin : operation;
           if (e.data.type === "link") {
-            cell.appendChild(e.data.link.displayFormat(op));
+            cell.appendChild(LinkUI.displayFormat(e.data.link, op));
           } else if (e.data.type === "portal") {
-            cell.appendChild(e.data.portal.displayFormat());
+            cell.appendChild(PortalUI.displayFormat(e.data.portal));
           } else if (e.data.type === "marker") {
             const portal = op.getPortal(e.data.marker.portalId);
-            cell.appendChild(portal.displayFormat());
+            cell.appendChild(PortalUI.displayFormat(portal));
           } else {
             cell.textContent = value;
           }

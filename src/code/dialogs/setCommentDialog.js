@@ -1,8 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeLink from "../link";
-import WasabeeMarker from "../marker";
+import WasabeePortal from "../model/portal";
+import WasabeeLink from "../model/link";
+import WasabeeMarker from "../model/marker";
 import wX from "../wX";
+
+import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 export const SetCommentDialog = WDialog.extend({
   statics: {
@@ -33,14 +36,14 @@ export const SetCommentDialog = WDialog.extend({
         this.options.target.portalId
       );
       this.dialogTitle = wX("SET_MCOMMENT", {
-        portalName: this.portal.displayName,
+        portalName: PortalUI.displayName(this.portal),
       });
     }
 
     if (this.options.target instanceof WasabeePortal) {
       this.commentType = "portal";
       this.dialogTitle = wX("SET_PCOMMENT", {
-        portalName: this.options.target.displayName,
+        portalName: PortalUI.displayName(this.options.target),
       });
       this.portal = this.options.target;
     }
@@ -81,7 +84,8 @@ export const SetCommentDialog = WDialog.extend({
     if (this.commentType == "link") {
       desc.textContent = wX("SET_LINK_COMMENT");
       desc.appendChild(
-        this.options.target.displayFormat(
+        LinkUI.displayFormat(
+          this.options.target,
           this.options.operation,
           this._smallScreen
         )
@@ -102,7 +106,7 @@ export const SetCommentDialog = WDialog.extend({
 
     if (this.commentType == "marker") {
       desc.textContent = wX("SET_MARKER_COMMENT");
-      desc.appendChild(this.portal.displayFormat(this.options.operation));
+      desc.appendChild(PortalUI.displayFormat(this.portal));
 
       if (this.options.target.comment)
         input.value = this.options.target.comment;
@@ -120,7 +124,7 @@ export const SetCommentDialog = WDialog.extend({
 
     if (this.commentType == "portal") {
       desc.textContent = wX("SET_PORT_COMMENT");
-      desc.appendChild(this.portal.displayFormat(this._smallScreen));
+      desc.appendChild(PortalUI.displayFormat(this.portal));
 
       if (this.portal.comment) input.value = this.portal.comment;
       input.addEventListener(

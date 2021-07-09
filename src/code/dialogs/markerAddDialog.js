@@ -1,9 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
+import WasabeeMarker from "../model/marker";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+
+import PortalUI from "../ui/portal";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -46,12 +48,12 @@ const MarkerAddDialog = WDialog.extend({
     this._assign.innerHTML = "";
     await this._getAgentMenu(this._assign);
 
-    this._selectedPortal = WasabeePortal.getSelected();
+    this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.textContent = "";
       this._portal.appendChild(
-        this._selectedPortal.displayFormat(this._smallScreen)
+        PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
       );
 
       this._zones.value = getSelectedOperation().determineZone(
@@ -73,7 +75,7 @@ const MarkerAddDialog = WDialog.extend({
       }
       defaultType = markers.has(defaultType) ? null : defaultType;
 
-      for (const k of window.plugin.wasabee.static.markerTypes) {
+      for (const k of WasabeeMarker.markerTypes) {
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
         o.textContent = wX(k);
@@ -113,7 +115,7 @@ const MarkerAddDialog = WDialog.extend({
 
     L.DomEvent.on(addMarkerButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      if (window.plugin.wasabee.static.markerTypes.has(this._type.value))
+      if (WasabeeMarker.markerTypes.has(this._type.value))
         this._addMarker(
           this._type.value,
           this._comment.value,
@@ -147,8 +149,9 @@ const MarkerAddDialog = WDialog.extend({
     };
 
     // XXX remove comment from args in 0.20
-    operation.addMarker(selectedType, WasabeePortal.getSelected(), options);
-    await this.update();
+    if (operation.addMarker(selectedType, PortalUI.getSelected(), options))
+      await this.update();
+    else alert(wX("ALREADY_HAS_MARKER"));
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;
   },

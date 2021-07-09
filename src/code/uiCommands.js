@@ -1,8 +1,9 @@
-import WasabeeOp from "./operation";
-import WasabeePortal from "./portal";
+import WasabeeOp from "./model/operation";
+import WasabeePortal from "./model/portal";
+import WasabeeMarker from "./model/marker";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import MergeDialog from "./dialogs/mergeDialog";
-import WasabeeMe from "./me";
+import WasabeeMe from "./model/me";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
 import AuthDialog from "./dialogs/authDialog";
@@ -15,6 +16,8 @@ import {
   duplicateOperation,
 } from "./selectedOp";
 
+import PortalUI from "./ui/portal";
+
 export function addPortal(operation, portal) {
   if (!portal) {
     alert(wX("SELECT PORTAL"));
@@ -24,7 +27,7 @@ export function addPortal(operation, portal) {
 }
 
 export function swapPortal(operation, portal) {
-  const selectedPortal = WasabeePortal.getSelected();
+  const selectedPortal = PortalUI.getSelected();
   if (!selectedPortal) {
     alert(wX("SELECT PORTAL"));
     return;
@@ -36,9 +39,9 @@ export function swapPortal(operation, portal) {
 
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("SWAP PROMPT");
-  pr.appendChild(portal.displayFormat());
+  pr.appendChild(PortalUI.displayFormat(portal));
   L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
-  pr.appendChild(selectedPortal.displayFormat());
+  pr.appendChild(PortalUI.displayFormat(selectedPortal));
   L.DomUtil.create("span", null, pr).textContent = "?";
   const con = new ConfirmDialog({
     title: wX("SWAP TITLE"),
@@ -54,7 +57,7 @@ export function swapPortal(operation, portal) {
 export function deletePortal(operation, portal) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
-  pr.appendChild(portal.displayFormat());
+  pr.appendChild(PortalUI.displayFormat(portal));
   const con = new ConfirmDialog({
     title: wX("DELETE ANCHOR TITLE"),
     label: pr,
@@ -70,7 +73,7 @@ export function deletePortal(operation, portal) {
 export function deleteMarker(operation, marker, portal) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
-  pr.appendChild(portal.displayFormat());
+  pr.appendChild(PortalUI.displayFormat(portal));
   const con = new ConfirmDialog({
     title: wX("DELETE MARKER TITLE"),
     label: pr,
@@ -126,7 +129,7 @@ export function listenForAddedPortals(newPortal) {
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
-  op.updatePortal(WasabeePortal.fromIITC(newPortal.portal));
+  op.updatePortal(PortalUI.fromIITC(newPortal.portal));
 }
 
 export function listenForPortalDetails(e) {
@@ -236,11 +239,11 @@ export function getAllPortalsOnScreen(operation) {
       if (
         operation.containsMarkerByID(
           window.portals[portal].options.guid,
-          window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+          WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
         )
       )
         continue;
-      const wp = WasabeePortal.fromIITC(window.portals[portal]);
+      const wp = PortalUI.fromIITC(window.portals[portal]);
       if (wp) x.push(wp);
     }
   }
@@ -322,14 +325,14 @@ export function blockerAutomark(operation, first = true) {
     if (
       !operation.containsMarkerByID(
         b.fromPortalId,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
       portals.push(b.fromPortalId);
     if (
       !operation.containsMarkerByID(
         b.toPortalId,
-        window.plugin.wasabee.static.constants.MARKER_TYPE_EXCLUDE
+        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
       portals.push(b.toPortalId);
@@ -354,7 +357,7 @@ export function blockerAutomark(operation, first = true) {
 
   // get WasabeePortal for portalId
   let wportal = operation.getPortal(portalId);
-  if (!wportal) wportal = WasabeePortal.get(portalId);
+  if (!wportal) wportal = PortalUI.get(portalId);
   if (!wportal) {
     alert(wX("AUTOMARK STOP"));
     return;
@@ -362,9 +365,9 @@ export function blockerAutomark(operation, first = true) {
   // console.log(wportal);
 
   // add marker
-  let type = window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY;
+  let type = WasabeeMarker.constants.MARKER_TYPE_DESTROY;
   if (wportal.team == "E") {
-    type = window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS;
+    type = WasabeeMarker.constants.MARKER_TYPE_VIRUS;
   }
   const zone = operation.determineZone(wportal.latLng);
   operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });

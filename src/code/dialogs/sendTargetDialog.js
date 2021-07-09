@@ -1,11 +1,13 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeMarker from "../marker";
-import WasabeeAnchor from "../anchor";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeMarker from "../model/marker";
+import WasabeePortal from "../model/portal";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import { targetPromise } from "../server";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+
+import PortalUI from "../ui/portal";
 
 const SendTargetDialog = WDialog.extend({
   statics: {
@@ -50,16 +52,16 @@ const SendTargetDialog = WDialog.extend({
     if (this.options.target instanceof WasabeeMarker) {
       const portal = operation.getPortal(this.options.target.portalId);
       this._targettype = this.options.target.type;
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
     }
 
-    if (this.options.target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(this.options.target.portalId);
+    if (this.options.target instanceof WasabeePortal) {
+      const portal = this.options.target;
       this._targettype = "anchor";
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);

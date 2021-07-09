@@ -1,8 +1,9 @@
-import WasabeePortal from "./portal";
-import WasabeeLink from "./link";
+import WasabeePortal from "./model/portal";
+import WasabeeLink from "./model/link";
+import WasabeeMarker from "./model/marker";
 import { getSelectedOperation } from "./selectedOp";
 
-const Wasabee = window.plugin.wasabee;
+import PortalUI from "./ui/portal";
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
@@ -139,9 +140,9 @@ function testPolyLine(wasabeeLink, realLink, operation) {
 
     for (const marker of operation.markers) {
       if (
-        marker.type == Wasabee.static.constants.MARKER_TYPE_DESTROY ||
-        marker.type == Wasabee.static.constants.MARKER_TYPE_VIRUS ||
-        marker.type == Wasabee.static.constants.MARKER_TYPE_DECAY
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS ||
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_DECAY
       ) {
         if (
           marker.portalId == realLink.options.data.dGuid ||
@@ -180,7 +181,7 @@ function testLink(link, operation) {
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
       showCrossLink(link, operation);
-      let fromPortal = WasabeePortal.get(link.options.data.oGuid);
+      let fromPortal = PortalUI.get(link.options.data.oGuid);
       if (!fromPortal)
         fromPortal = WasabeePortal.fake(
           (link.options.data.oLatE6 / 1e6).toFixed(6),
@@ -188,7 +189,7 @@ function testLink(link, operation) {
           link.options.data.oGuid
         );
       operation._addPortal(fromPortal);
-      let toPortal = WasabeePortal.get(link.options.data.dGuid);
+      let toPortal = PortalUI.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
           (link.options.data.dLatE6 / 1e6).toFixed(6),

@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";

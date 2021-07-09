@@ -1,5 +1,5 @@
 import { WButton } from "../leafletClasses";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import TeamListDialog from "../dialogs/teamListDialog";
 import OpsDialog from "../dialogs/opsDialog";
 import AuthDialog from "../dialogs/authDialog";

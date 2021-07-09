@@ -13,8 +13,10 @@ import {
   loadNewDefaultOp,
 } from "./selectedOp";
 import { updateLocalOp } from "./uiCommands";
-import WasabeeOp from "./operation";
-import WasabeePortal from "./portal";
+import WasabeeOp from "./model/operation";
+import WasabeePortal from "./model/portal";
+
+import PortalUI from "./ui/portal";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -107,7 +109,7 @@ export function initFirebase() {
             lng: target.Lon,
           };
           const portal = new WasabeePortal(raw);
-          const f = portal.displayFormat();
+          const f = PortalUI.displayFormat(portal);
           alert(f.outerHTML + "<br>Sent by: " + target.Sender, true);
         } catch (e) {
           console.error(e);

@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import Sortable from "../sortable";
 import {
   SetTeamState,

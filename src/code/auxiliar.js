@@ -24,7 +24,7 @@ export function newColors(incoming) {
     case "groupf":
       return "fuchsia";
     case "main":
-      return "red";
+      return window.plugin.wasabee.skin.defaultOperationColor;
     default:
       return incoming;
   }

@@ -1,10 +1,14 @@
-import WasabeeMe from "./me";
-import WasabeeAnchor from "./anchor";
-import WasabeeTeam from "./team";
-import WasabeeAgent from "./agent";
-import WasabeeOp from "./operation";
-import { newColors } from "./auxiliar";
+import WasabeeMe from "./model/me";
+import WasabeeTeam from "./model/team";
+import WasabeeAgent from "./model/agent";
+import WasabeeOp from "./model/operation";
 import { getSelectedOperation, opsList } from "./selectedOp";
+
+import LinkUI from "./ui/link";
+import AnchorUI from "./ui/anchor";
+import AgentUI from "./ui/agent";
+import MarkerUI from "./ui/marker";
+import ZoneUI from "./ui/zone";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -36,14 +40,11 @@ function updateMarkers(op) {
   for (const m of op.markers) {
     if (layerMap.has(m.ID)) {
       const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
-      if (m.state != ll.options.state) {
-        L.DomUtil.removeClass(ll._icon, `wasabee-status-${ll.options.state}`);
-        L.DomUtil.addClass(ll._icon, `wasabee-status-${m.state}`);
-        ll.options.state = m.state;
-      }
+      ll.setState(m.state);
       layerMap.delete(m.ID);
     } else {
-      addMarker(m, op);
+      const lMarker = new MarkerUI.WLMarker(m, op);
+      lMarker.addTo(Wasabee.markerLayerGroup);
     }
   }
 
@@ -54,49 +55,6 @@ function updateMarkers(op) {
   }
 }
 
-// adds a new marker
-function addMarker(target, operation) {
-  const targetPortal = operation.getPortal(target.portalId);
-  const marker = L.marker(targetPortal.latLng, {
-    title: targetPortal.name,
-    id: target.ID,
-    state: target.state,
-    icon: L.divIcon({
-      className: `wasabee-marker-icon ${target.type} wasabee-status-${target.state}`,
-      shadowUrl: null,
-      iconSize: L.point(24, 40),
-      iconAnchor: L.point(12, 40),
-      popupAnchor: L.point(-1, -48),
-    }),
-  });
-
-  // register the marker for spiderfied click
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-  // marker.off("click", marker.openPopup, marker);
-  marker.on(
-    "click spiderfiedclick",
-    async function (ev) {
-      /* eslint-disable no-invalid-this */
-      L.DomEvent.stop(ev);
-      if (this.isPopupOpen()) return;
-      const sop = getSelectedOperation();
-      const target = sop.getMarker(this.options.id);
-      const c = await target.popupContent(this);
-      this.setPopupContent(c);
-      this._popup._wrapper.classList.add("wasabee-popup");
-      this.update();
-      this.openPopup();
-      /* eslint-enable no-invalid-this */
-    },
-    marker
-  );
-  marker.addTo(Wasabee.markerLayerGroup);
-}
-
 // resetting is consistently 1ms faster than trying to update
 function resetLinks(operation) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
@@ -105,7 +63,8 @@ function resetLinks(operation) {
   if (!operation.links || operation.links.length == 0) return;
 
   for (const l of operation.links) {
-    addLink(l, operation);
+    const link = new LinkUI.WLLink(l, operation);
+    link.addTo(Wasabee.linkLayerGroup);
   }
 }
 
@@ -145,74 +104,10 @@ function resetZones(operation) {
   if (!operation.zones || operation.zones.length == 0) return;
 
   for (const z of operation.zones) {
-    if (z.points.length == 1) {
-      L.marker(z.points[0], { color: z.color }).addTo(Wasabee.zoneLayerGroup);
-      continue;
-    }
-    if (z.points.length == 2) {
-      L.polyline(z.points, { color: z.color }).addTo(Wasabee.zoneLayerGroup);
-      continue;
-    }
-    z.points.sort((a, b) => {
-      return a.position - b.position;
-    });
-    L.polygon(z.points, {
-      color: z.color,
-      shapeOptions: {
-        stroke: false,
-        opacity: 0.7,
-        fill: true,
-        interactive: false,
-      },
-    }).addTo(Wasabee.zoneLayerGroup);
+    const l = new ZoneUI.WLZone(z);
+    l.addTo(Wasabee.zoneLayerGroup);
   }
   Wasabee.zoneLayerGroup.bringToBack();
-}
-
-// draw a single link
-function addLink(wlink, operation) {
-  const latLngs = wlink.getLatLngs(operation);
-  if (!latLngs) {
-    console.log("LatLngs was null: op missing portal data?");
-    return;
-  }
-
-  const color = wlink.getColor(operation);
-
-  const style = L.extend(
-    {
-      color: color,
-    },
-    Wasabee.skin.linkStyle
-  );
-
-  if (wlink.assignedTo) style.dashArray = style.assignedDashArray;
-
-  const newlink = new L.GeodesicPolyline(latLngs, style);
-
-  newlink.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-
-  newlink.on(
-    "click",
-    (ev) => {
-      L.DomEvent.stop(ev);
-      if (ev.target._popup._wrapper)
-        ev.target._popup._wrapper.classList.add("wasabee-popup");
-      const div = wlink.getPopup(operation);
-      ev.target.setPopupContent(div);
-      ev.target.openPopup(ev.latlng);
-      return true;
-    },
-    newlink
-  );
-  newlink.addTo(Wasabee.linkLayerGroup);
-
-  // setText only works on polylines, not geodesic ones.
-  // newlink.on("mouseover", () => { console.log(newlink); // newlink.setText("  ►  ", { repeat: true, attributes: { fill: "red" } }); });
-  // newlink.on("mouseout", () => { newlink.setText(null); });
 }
 
 // fetch and draw agent locations
@@ -286,42 +181,9 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     return false;
   }
 
-  const zoom = window.map.getZoom();
   if (!layerMap.has(agent.id)) {
     // new, add to map
-    const marker = L.marker(agent.latLng, {
-      title: agent.name,
-      icon: L.divIcon({
-        className: "wasabee-agent-icon",
-        iconSize: agent.iconSize(zoom),
-        iconAnchor: agent.iconAnchor(zoom),
-        popupAnchor: L.point(0, -70),
-        html: agent.icon(zoom),
-      }),
-      id: agent.id,
-      zoom: zoom,
-    });
-
-    window.registerMarkerForOMS(marker);
-    marker.bindPopup("Loading...", {
-      className: "wasabee-popup",
-      closeButton: false,
-    });
-    // marker.off("click", agent.openPopup, agent);
-    marker.on(
-      "click spiderfiedclick",
-      async (ev) => {
-        L.DomEvent.stop(ev);
-        if (marker.isPopupOpen && marker.isPopupOpen()) return;
-        const a = await WasabeeAgent.get(agent.id);
-        marker.setPopupContent(await a.getPopup());
-        if (marker._popup._wrapper)
-          marker._popup._wrapper.classList.add("wasabee-popup");
-        marker.update();
-        marker.openPopup();
-      },
-      marker
-    );
+    const marker = new AgentUI.WLAgent(agent);
     marker.addTo(Wasabee.agentLayerGroup);
   } else {
     // move existing icons, if they actually moved
@@ -332,23 +194,6 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     if (agent.lat != ll.lat || agent.lng != ll.lng) {
       // console.debug("moving ", agent.name, agent.latLng, al.getLatLng());
       al.setLatLng(agent.latLng);
-      al.update();
-    }
-
-    // if the zoom factor changed, refresh the icon
-    if (zoom != al.options.zoom) {
-      // console.debug("changing icon zoom: ", zoom, al.options.zoom);
-      al.setIcon(
-        L.divIcon({
-          className: "wasabee-agent-icon",
-          iconSize: agent.iconSize(zoom),
-          iconAnchor: agent.iconAnchor(zoom),
-          popupAnchor: L.point(0, -70),
-          html: agent.icon(zoom),
-        })
-      );
-      al.options.zoom = zoom;
-      al.update();
     }
   }
   return true;
@@ -376,76 +221,12 @@ function updateAnchors(op) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      addAnchorToMap(a, op);
+      const lAnchor = new AnchorUI.WLAnchor(a, op);
+      lAnchor.addTo(Wasabee.portalLayerGroup);
     }
   }
 
   for (const v of layerMap.values()) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
-}
-
-// adds a single anchor to the map
-function addAnchorToMap(portalId, operation) {
-  const anchor = new WasabeeAnchor(portalId, operation);
-  // use newColors(anchor.color) for 0.19
-  let layer = anchor.color;
-  if (newColors(layer) == layer) layer = "custom";
-  let marker;
-  if (layer != "custom") {
-    marker = L.marker(anchor.latLng, {
-      title: anchor.name,
-      alt: anchor.name,
-      id: portalId,
-      color: anchor.color,
-      icon: L.divIcon({
-        className: `wasabee-anchor-icon wasabee-layer-${layer}`,
-        shadowUrl: null,
-        iconAnchor: [12, 41],
-        iconSize: [25, 41],
-        popupAnchor: [0, -35],
-      }),
-    });
-  } else {
-    const svg = L.Util.template(
-      '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
-      { color: anchor.color }
-    );
-    marker = L.marker(anchor.latLng, {
-      title: anchor.name,
-      alt: anchor.name,
-      id: portalId,
-      color: anchor.color,
-      icon: L.divIcon({
-        className: "wasabee-anchor-icon",
-        shadowUrl: null,
-        iconAnchor: [12, 41],
-        iconSize: [25, 41],
-        popupAnchor: [0, -35],
-        html: svg,
-      }),
-    });
-  }
-
-  window.registerMarkerForOMS(marker);
-  marker.bindPopup("loading...", {
-    className: "wasabee-popup",
-    closeButton: false,
-  });
-  // marker.off("click", marker.openPopup, marker);
-  marker.on(
-    "click spiderfiedclick",
-    (ev) => {
-      L.DomEvent.stop(ev);
-      if (marker.isPopupOpen && marker.isPopupOpen()) return;
-      const content = anchor.popupContent(marker);
-      marker.setPopupContent(content);
-      if (marker._popup._wrapper)
-        marker._popup._wrapper.classList.add("wasabee-popup");
-      marker.update();
-      marker.openPopup();
-    },
-    marker
-  );
-  marker.addTo(Wasabee.portalLayerGroup);
 }

@@ -1,6 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+import WasabeeMarker from "../model/marker";
+
+import PortalUI from "../ui/portal";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
@@ -25,12 +28,14 @@ const MarkerChangeDialog = WDialog.extend({
     const portal = operation.getPortal(this.options.marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
-    portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
+    portalDisplay.appendChild(
+      PortalUI.displayFormat(portal, this._smallScreen)
+    );
 
     this._type = L.DomUtil.create("select", null, content);
 
     const markers = operation.getPortalMarkers(portal);
-    for (const k of window.plugin.wasabee.static.markerTypes) {
+    for (const k of WasabeeMarker.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
@@ -41,7 +46,7 @@ const MarkerChangeDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       if (
-        window.plugin.wasabee.static.markerTypes.has(this._type.value) &&
+        WasabeeMarker.markerTypes.has(this._type.value) &&
         !markers.has(this._type.value)
       ) {
         operation.removeMarker(this.options.marker);

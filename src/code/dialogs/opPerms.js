@@ -1,8 +1,8 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeTeam from "../team";
-import WasabeeMe from "../me";
+import WasabeeTeam from "../model/team";
+import WasabeeMe from "../model/me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
 
