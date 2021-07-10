@@ -75,9 +75,7 @@ export default class WasabeeBlocker {
     }
   }
 
-  static async addBlocker(op, wlink) {
-    const fromPortal = op.getPortal(wlink.fromPortalId);
-    const toPortal = op.getPortal(wlink.toPortalId);
+  static async addBlocker(op, fromPortal, toPortal) {
     const blocker = new WasabeeBlocker({
       opID: op.ID,
       fromPortal: fromPortal,

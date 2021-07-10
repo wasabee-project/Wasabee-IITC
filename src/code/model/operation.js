@@ -685,9 +685,8 @@ export default class WasabeeOp extends Evented {
     }
   }
 
-  addBlocker(link) {
-    if (!link.fromPortalId || !link.toPortalId) return;
-    WasabeeBlocker.addBlocker(this, link);
+  addBlocker(fromPortal, toPortal) {
+    WasabeeBlocker.addBlocker(this, fromPortal, toPortal);
   }
 
   get fakedPortals() {
