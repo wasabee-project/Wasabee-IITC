@@ -228,5 +228,6 @@ export default {
   displayFormat,
   get,
   getSelected,
+  team,
   WLPortal,
 };
