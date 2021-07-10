@@ -49,12 +49,14 @@ const MarkerChangeDialog = WDialog.extend({
         WasabeeMarker.markerTypes.has(this._type.value) &&
         !markers.has(this._type.value)
       ) {
+        operation.startBatchMode();
         operation.removeMarker(this.options.marker);
         operation.addMarker(this._type.value, portal, {
           zone: this.options.marker.zone,
           comment: this.options.marker.comment,
           assign: this.options.marker.assignedTo,
         });
+        operation.endBatchMode();
       }
       this.closeDialog();
     };

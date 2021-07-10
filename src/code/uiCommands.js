@@ -1,5 +1,6 @@
 import WasabeeOp from "./model/operation";
 import WasabeePortal from "./model/portal";
+import WasabeeBlocker from "./model/blocker";
 import WasabeeMarker from "./model/marker";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import MergeDialog from "./dialogs/mergeDialog";
@@ -134,15 +135,15 @@ export function listenForAddedPortals(newPortal) {
 
 export function listenForPortalDetails(e) {
   if (!e.success) return;
+  const portal = new WasabeePortal({
+    id: e.guid,
+    name: e.details.title,
+    lat: (e.details.latE6 / 1e6).toFixed(6),
+    lng: (e.details.lngE6 / 1e6).toFixed(6),
+  });
   const op = getSelectedOperation();
-  op.updatePortal(
-    new WasabeePortal({
-      id: e.guid,
-      name: e.details.title,
-      lat: (e.details.latE6 / 1e6).toFixed(6),
-      lng: (e.details.lngE6 / 1e6).toFixed(6),
-    })
-  );
+  op.updatePortal(portal);
+  WasabeeBlocker.updatePortal(op, portal);
 }
 
 // This is what should be called to add to the queue
@@ -317,25 +318,47 @@ export function testPortal(recursed = false) {
 }
 
 // recursive function to auto-mark blockers
-export function blockerAutomark(operation, first = true) {
-  if (first) operation.startBatchMode();
+export async function blockerAutomark(operation, first = true) {
+  const blockers = await WasabeeBlocker.getAll(operation);
+  if (first) {
+    operation.startBatchMode();
+    // add blocker portals
+    for (const b of blockers) {
+      operation._addPortal(
+        new WasabeePortal({
+          id: b.from,
+          name: b.fromPortal.name,
+          lat: b.fromPortal.lat,
+          lng: b.fromPortal.lng,
+        })
+      );
+      operation._addPortal(
+        new WasabeePortal({
+          id: b.to,
+          name: b.toPortal.name,
+          lat: b.toPortal.lat,
+          lng: b.toPortal.lng,
+        })
+      );
+    }
+  }
   // build count list
   const portals = new Array();
-  for (const b of operation.blockers) {
+  for (const b of blockers) {
     if (
       !operation.containsMarkerByID(
-        b.fromPortalId,
+        b.from,
         WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
-      portals.push(b.fromPortalId);
+      portals.push(b.from);
     if (
       !operation.containsMarkerByID(
-        b.toPortalId,
+        b.to,
         WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
       )
     )
-      portals.push(b.toPortalId);
+      portals.push(b.to);
   }
   const reduced = {};
   for (const p of portals) {
@@ -373,12 +396,10 @@ export function blockerAutomark(operation, first = true) {
   operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
 
   // remove nodes from blocker list
-  operation.blockers = operation.blockers.filter((b) => {
-    if (b.fromPortalId == portalId || b.toPortalId == portalId) return false;
-    return true;
-  });
+  await WasabeeBlocker.removeBlocker(operation, portalId);
+
   // recurse
-  blockerAutomark(operation, false);
+  await blockerAutomark(operation, false);
 
   if (first) operation.endBatchMode();
 }
@@ -407,8 +428,6 @@ export async function updateLocalOp(local, remote) {
 
   // no changes
   if (!op.checkChanges()) {
-    // merge blockers and related portals
-    remote.mergeBlockers(op);
     await remote.store();
     // if selected op, reload from the new op
     return remote.ID === so.ID;
@@ -504,8 +523,6 @@ export async function syncOp(opID) {
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
     if (!localOp.localchanged) {
-      // merge blockers and related portals
-      remoteOp.mergeBlockers(localOp);
       await remoteOp.store();
     } else {
       const con = new MergeDialog({

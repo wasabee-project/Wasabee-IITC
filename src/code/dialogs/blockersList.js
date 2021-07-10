@@ -9,6 +9,7 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
+import WasabeeBlocker from "../model/blocker";
 
 import PortalUI from "../ui/portal";
 
@@ -40,9 +41,9 @@ const BlockerList = WDialog.extend({
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
-    this.sortable = this._getListDialogContent(0, false); // defaults to sorting by op order
+    this.sortable = await this._getListDialogContent(0, false); // defaults to sorting by op order
     loadFaked(operation);
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -52,9 +53,9 @@ const BlockerList = WDialog.extend({
       const operation = getSelectedOperation();
       blockerAutomark(operation);
     };
-    buttons[wX("RESET")] = () => {
+    buttons[wX("RESET")] = async () => {
       const operation = getSelectedOperation();
-      operation.blockers = new Array();
+      await WasabeeBlocker.removeBlockers(operation);
       this.update();
       operation.update(false); // blockers do not need to be sent to server
       window.map.fire("wasabee:crosslinks");
@@ -69,9 +70,11 @@ const BlockerList = WDialog.extend({
     };
     buttons["Clear Automark"] = () => {
       const operation = getSelectedOperation();
+      operation.startBatchMode();
       for (const m of operation.markers) {
         if (m.comment == "auto-marked") operation.removeMarker(m);
       }
+      operation.endBatchMode();
     };
 
     this.createDialog({
@@ -85,10 +88,10 @@ const BlockerList = WDialog.extend({
   },
 
   // when op changed or crosslink ended
-  update: function () {
+  update: async function () {
     const operation = getSelectedOperation();
     if (!this._enabled) return;
-    this.sortable = this._getListDialogContent(
+    this.sortable = await this._getListDialogContent(
       this.sortable.sortBy,
       this.sortable.sortAsc
     );
@@ -97,28 +100,28 @@ const BlockerList = WDialog.extend({
   },
 
   // because the sortable values depend on the operation, we can't have it created at addHooks unless we want a lot of getSelectedOperations embedded here
-  _getListDialogContent(sortBy, sortAsc) {
+  async _getListDialogContent(sortBy, sortAsc) {
     const operation = getSelectedOperation();
     const content = new Sortable();
+
+    const blockers = await WasabeeBlocker.getAll(operation);
+
     content.fields = [
       {
         name: wX("FROM_PORT"),
         value: (blocker) => {
-          return operation.getPortal(blocker.fromPortalId).name;
+          return blocker.fromPortal.name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          const p = operation.getPortal(blocker.fromPortalId);
-          row.appendChild(PortalUI.displayFormat(p));
+          row.appendChild(PortalUI.displayFormat(blocker.fromPortal));
         },
       },
       {
         name: this._smallScreen ? "#" : wX("COUNT"),
         value: (blocker) => {
-          const c = operation.blockers.filter(
-            (b) =>
-              b.fromPortalId == blocker.fromPortalId ||
-              b.toPortalID == blocker.fromPortalId
+          const c = blockers.filter(
+            (b) => b.from == blocker.from || b.to == blocker.from
           );
           return c.length;
         },
@@ -127,21 +130,18 @@ const BlockerList = WDialog.extend({
       {
         name: wX("TO_PORT"),
         value: (blocker) => {
-          return operation.getPortal(blocker.toPortalId).name;
+          return blocker.toPortal.name;
         },
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          const p = operation.getPortal(blocker.toPortalId);
-          row.appendChild(PortalUI.displayFormat(p));
+          row.appendChild(PortalUI.displayFormat(blocker.toPortal));
         },
       },
       {
         name: this._smallScreen ? "#" : wX("COUNT"),
         value: (blocker) => {
-          const c = operation.blockers.filter(
-            (b) =>
-              b.fromPortalId == blocker.toPortalId ||
-              b.toPortalId == blocker.toPortalId
+          const c = blockers.filter(
+            (b) => b.from == blocker.to || b.to == blocker.to
           );
           return c.length;
         },
@@ -150,7 +150,7 @@ const BlockerList = WDialog.extend({
     ];
     content.sortBy = sortBy;
     content.sortAsc = sortAsc;
-    content.items = operation.blockers;
+    content.items = blockers;
     return content;
   },
 });

@@ -43,8 +43,6 @@ const MergeDialog = WDialog.extend({
   },
 
   useServer: async function () {
-    // merge blockers and related portals
-    this.options.opRemote.mergeBlockers(this.options.opOwn);
     await this.options.opRemote.store();
     if (getSelectedOperation().ID == this.options.opRemote.ID)
       await makeSelectedOperation(this.options.opRemote.ID);

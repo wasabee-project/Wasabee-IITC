@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 import WasabeeMarker from "../model/marker";
+import WasabeeBlocker from "../model/blocker";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -227,10 +228,10 @@ const TrawlDialog = WDialog.extend({
 
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
-    L.DomEvent.on(button, "click", () => {
+    L.DomEvent.on(button, "click", async () => {
       const op = getSelectedOperation();
       if (clearMarkers.checked == true) this._clearMarkers();
-      op.blockers = Array();
+      await WasabeeBlocker.removeBlockers(op);
       const points = this._getTrawlPoints();
       const td = new TrawlerDialog({
         points: points,
@@ -245,9 +246,9 @@ const TrawlDialog = WDialog.extend({
     crazyWarning.textContent = wX("TRAWL_BULK_LOAD_WARNING");
     const crazyButton = L.DomUtil.create("button", null, container);
     crazyButton.textContent = wX("TRAWL_BULK_LOAD");
-    L.DomEvent.on(crazyButton, "click", () => {
+    L.DomEvent.on(crazyButton, "click", async () => {
       const op = getSelectedOperation();
-      op.blockers = Array();
+      await WasabeeBlocker.removeBlockers(op);
       if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
