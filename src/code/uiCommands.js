@@ -130,7 +130,9 @@ export function listenForAddedPortals(newPortal) {
   if (!newPortal.portal.options.data.title) return;
 
   const op = getSelectedOperation();
-  op.updatePortal(PortalUI.fromIITC(newPortal.portal));
+  const portal = PortalUI.fromIITC(newPortal.portal);
+  op.updatePortal(portal);
+  WasabeeBlocker.updatePortal(op, portal);
 }
 
 export function listenForPortalDetails(e) {

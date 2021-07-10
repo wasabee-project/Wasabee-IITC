@@ -109,12 +109,13 @@ const BlockerList = WDialog.extend({
     content.fields = [
       {
         name: wX("FROM_PORT"),
-        value: (blocker) => {
-          return blocker.fromPortal.name;
-        },
+        value: (blocker) =>
+          blocker.fromPortal ? blocker.fromPortal.name : blocker.from,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          row.appendChild(PortalUI.displayFormat(blocker.fromPortal));
+          if (blocker.fromPortal)
+            row.appendChild(PortalUI.displayFormat(blocker.fromPortal));
+          else row.textContent = value;
         },
       },
       {
@@ -129,12 +130,13 @@ const BlockerList = WDialog.extend({
       },
       {
         name: wX("TO_PORT"),
-        value: (blocker) => {
-          return blocker.toPortal.name;
-        },
+        value: (blocker) =>
+          blocker.toPortal ? blocker.toPortal.name : blocker.to,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          row.appendChild(PortalUI.displayFormat(blocker.toPortal));
+          if (blocker.toPortal)
+            row.appendChild(PortalUI.displayFormat(blocker.toPortal));
+          else row.textContent = value;
         },
       },
       {

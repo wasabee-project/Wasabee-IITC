@@ -29,6 +29,7 @@ export default class WasabeeBlocker {
     if (portal.name === portal.id) return;
     const p = await store.get([op.ID, portal.id]);
     if (!p) return;
+    if (p.name === portal.name) return;
     await store.put({
       opID: op.ID,
       id: portal.id,
@@ -87,13 +88,18 @@ export default class WasabeeBlocker {
     await WasabeeBlocker.addPortal(op, toPortal);
   }
 
+  static async getPortals(op) {
+    const portals = await (
+      await db
+    ).getAllFromIndex("blockers_portals", "opID", op.ID);
+    return portals;
+  }
+
   static async getAll(op) {
     const blockers = await (
       await db
     ).getAllFromIndex("blockers", "opID", op.ID);
-    const portals = await (
-      await db
-    ).getAllFromIndex("blockers_portals", "opID", op.ID);
+    const portals = await WasabeeBlocker.getPortals(op);
     const portalsMap = new Map();
     for (const p of portals) {
       portalsMap.set(p.id, p);
@@ -102,6 +108,6 @@ export default class WasabeeBlocker {
       b.fromPortal = portalsMap.get(b.from);
       b.toPortal = portalsMap.get(b.to);
     }
-    return blockers.filter((b) => b.fromPortal && b.toPortal);
+    return blockers;
   }
 }

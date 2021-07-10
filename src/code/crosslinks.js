@@ -1,5 +1,4 @@
 import WasabeePortal from "./model/portal";
-import WasabeeLink from "./model/link";
 import WasabeeMarker from "./model/marker";
 import { getSelectedOperation } from "./selectedOp";
 
