@@ -1,4 +1,5 @@
 import WasabeeOp from "./model/operation";
+import WasabeeBlocker from "./model/blocker";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 
@@ -138,6 +139,7 @@ export async function setupLocalStorage() {
 //** This function removes an operation from the main list */
 export async function removeOperation(opID) {
   await WasabeeOp.delete(opID);
+  WasabeeBlocker.removeBlockers(opID); // no need to await
   window.map.fire("wasabee:op:delete", opID);
 }
 
@@ -172,6 +174,7 @@ export async function resetOps() {
   const ops = await opsList();
   // don't fire event here
   await Promise.all(ops.map(WasabeeOp.delete));
+  ops.map(WasabeeBlocker.removeBlockers); // no need to await
 }
 
 export function hiddenOpsList() {
@@ -245,7 +248,10 @@ export async function removeNonOwnedOps() {
   for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
     // don't fire event here
-    if (!op || !op.isOwnedOp()) await WasabeeOp.delete(opID);
+    if (!op || !op.isOwnedOp()) {
+      await WasabeeOp.delete(opID);
+      WasabeeBlocker.removeBlockers(opID); // no need to await
+    }
   }
   await changeOpIfNeeded();
 }

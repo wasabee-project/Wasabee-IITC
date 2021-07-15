@@ -55,7 +55,7 @@ const BlockerList = WDialog.extend({
     };
     buttons[wX("RESET")] = async () => {
       const operation = getSelectedOperation();
-      await WasabeeBlocker.removeBlockers(operation);
+      await WasabeeBlocker.removeBlockers(operation.ID);
       this.update();
       operation.update(false); // blockers do not need to be sent to server
       window.map.fire("wasabee:crosslinks");

@@ -231,7 +231,7 @@ const TrawlDialog = WDialog.extend({
     L.DomEvent.on(button, "click", async () => {
       const op = getSelectedOperation();
       if (clearMarkers.checked == true) this._clearMarkers();
-      await WasabeeBlocker.removeBlockers(op);
+      await WasabeeBlocker.removeBlockers(op.ID);
       const points = this._getTrawlPoints();
       const td = new TrawlerDialog({
         points: points,
@@ -248,7 +248,7 @@ const TrawlDialog = WDialog.extend({
     crazyButton.textContent = wX("TRAWL_BULK_LOAD");
     L.DomEvent.on(crazyButton, "click", async () => {
       const op = getSelectedOperation();
-      await WasabeeBlocker.removeBlockers(op);
+      await WasabeeBlocker.removeBlockers(op.ID);
       if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
