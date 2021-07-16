@@ -196,6 +196,8 @@
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": "vor ({minutes} Minuten)",
   "MM": "Maximale Feldanzahl",
+  "MM_SET_ALL_PORTALS": "All visible portals",
+  "MM_SET_ALL_KEYS": "All key portals",
   "MULTI_M_TITLE": "Draw Max Layers",
   "MULTI_M": "Maximale Feldanzahl",
   "MULTIMAX": "Maximale Feldanzahl!",
