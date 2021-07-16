@@ -161,6 +161,8 @@ const MarkerAddDialog = WDialog.extend({
     option.value = "";
     option.textContent = wX("UNASSIGNED");
 
+    if (!WasabeeMe.isLoggedIn()) return;
+
     const operation = getSelectedOperation();
     if (!operation.isOnCurrentServer()) return;
 
