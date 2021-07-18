@@ -67,6 +67,7 @@ export default class Sortable {
 
     // class getters and setter's can't be async,
     // this lets us build each row as a promise, then resolve them all together
+    const instantValues = [];
     const promises = incoming.map(async (obj) => {
       const row = L.DomUtil.create("tr");
       const data = {
@@ -105,23 +106,32 @@ export default class Sortable {
           cell.style.display = "none";
         }
       }
+      instantValues.push(data);
       return data;
     });
 
     // resolve all rows at once
     // XXX convert to allSettled and check for individual errors rather than failing hard if any row fails
     // console.log(promises);
-    this._done = Promise.all(promises).then(
-      (values) => {
-        this._items = values;
-        this.sort();
-        return true;
-      },
-      (reject) => {
-        console.log("rejected", reject);
-        this._done = false;
-      }
-    );
+    if (instantValues.length === promises.length) {
+      // all promises are already fulfilled, dont use async Promise.all
+      this._items = instantValues;
+      this.sort();
+      this._done = true;
+    } else {
+      // always async
+      this._done = Promise.all(promises).then(
+        (values) => {
+          this._items = values;
+          this.sort();
+          return true;
+        },
+        (reject) => {
+          console.log("rejected", reject);
+          this._done = false;
+        }
+      );
+    }
   }
 
   get fields() {
