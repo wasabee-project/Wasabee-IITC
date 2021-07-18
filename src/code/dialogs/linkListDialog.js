@@ -45,7 +45,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     return fields.slice(0, 2).concat(linkFields, fields.slice(3));
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
     const links = operation.getLinkListFromPortal(this.options.portal);
@@ -60,6 +60,8 @@ const LinkListDialog = OperationChecklistDialog.extend({
     buttons[wX("OK")] = () => {
       this.closeDialog();
     };
+
+    await this.sortable.done;
 
     this.createDialog({
       title: wX("LINKS2", {

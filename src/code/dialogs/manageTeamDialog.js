@@ -42,7 +42,7 @@ const ManageTeamDialog = WDialog.extend({
     window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
-  _setupTable: function () {
+  _setupTable: async function () {
     const table = new Sortable();
     table.fields = [
       {
@@ -128,8 +128,7 @@ const ManageTeamDialog = WDialog.extend({
     ];
     table.sortBy = 0;
 
-    // async populate
-    this._refreshTeam(table);
+    await this._refreshTeam(table);
 
     return table;
   },
@@ -147,19 +146,20 @@ const ManageTeamDialog = WDialog.extend({
     }
   },
 
-  update: function () {
-    const container = this._dialogContent(); // build the UI
+  update: async function () {
+    const container = await this._dialogContent(); // build the UI
     // this is the correct way to change out a dialog's contents, audit the entire codebase making this change
     this.setContent(container);
     this.setTitle(wX("MANAGE_TEAM", { teamName: this.options.team.Name }));
   },
 
-  _dialogContent: function () {
+  _dialogContent: async function () {
     const container = L.DomUtil.create("div", "container");
     const list = L.DomUtil.create("div", "list", container);
 
-    const table = this._setupTable();
+    const table = await this._setupTable();
     list.appendChild(table.table);
+    await table.done;
 
     const addlabel = L.DomUtil.create("label", null, container);
     addlabel.textContent = wX("ADD_AGENT");
@@ -305,8 +305,8 @@ const ManageTeamDialog = WDialog.extend({
     return container;
   },
 
-  _displayDialog: function () {
-    const container = this._dialogContent();
+  _displayDialog: async function () {
+    const container = await this._dialogContent();
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
