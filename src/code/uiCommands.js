@@ -132,7 +132,9 @@ export function listenForAddedPortals(newPortal) {
   const op = getSelectedOperation();
   const portal = PortalUI.fromIITC(newPortal.portal);
   op.updatePortal(portal);
-  WasabeeBlocker.updatePortal(op, portal);
+  WasabeeBlocker.updatePortal(op, portal).then((r) => {
+    if (r) window.map.fire("wasabee:crosslinks:update");
+  });
 }
 
 export function listenForPortalDetails(e) {
@@ -145,7 +147,9 @@ export function listenForPortalDetails(e) {
   });
   const op = getSelectedOperation();
   op.updatePortal(portal);
-  WasabeeBlocker.updatePortal(op, portal);
+  WasabeeBlocker.updatePortal(op, portal).then((r) => {
+    if (r) window.map.fire("wasabee:crosslinks:update");
+  });
 }
 
 // This is what should be called to add to the queue
@@ -197,6 +201,7 @@ function pdqDoNext() {
   window.portalDetail.request(p);
 }
 
+// load faked op portals
 export function loadFaked(operation, force = false) {
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
@@ -207,6 +212,20 @@ export function loadFaked(operation, force = false) {
 
   const f = new Array();
   for (const x of operation.fakedPortals) f.push(x.id);
+  if (f.length > 0) getPortalDetails(f);
+}
+
+// load faked blocker portals
+export async function loadBlockerFaked(operation, force = false) {
+  const flag =
+    localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
+    false;
+
+  // local storage always returns as string
+  if (flag !== "true" && !force) return;
+
+  const bp = await WasabeeBlocker.getPortals(operation);
+  const f = bp.filter((p) => p.id === p.name).map((p) => p.id);
   if (f.length > 0) getPortalDetails(f);
 }
 

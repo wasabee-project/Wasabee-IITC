@@ -4,7 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import {
   listenForAddedPortals,
   listenForPortalDetails,
-  loadFaked,
+  loadBlockerFaked,
   blockerAutomark,
 } from "../uiCommands";
 import wX from "../wX";
@@ -25,6 +25,7 @@ const BlockerList = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:crosslinks:update", this.update, this);
     window.map.on("wasabee:crosslinks:done", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
@@ -35,6 +36,7 @@ const BlockerList = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:crosslinks:update", this.update, this);
     window.map.off("wasabee:crosslinks:done", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
@@ -44,7 +46,7 @@ const BlockerList = WDialog.extend({
   _displayDialog: async function () {
     const operation = getSelectedOperation();
     this.sortable = await this._getListDialogContent(0, false); // defaults to sorting by op order
-    loadFaked(operation);
+    loadBlockerFaked(operation);
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog();
@@ -57,12 +59,11 @@ const BlockerList = WDialog.extend({
       const operation = getSelectedOperation();
       await WasabeeBlocker.removeBlockers(operation.ID);
       this.update();
-      operation.update(false); // blockers do not need to be sent to server
       window.map.fire("wasabee:crosslinks");
     };
     buttons[wX("LOAD PORTALS")] = () => {
       const operation = getSelectedOperation();
-      loadFaked(operation, true); // force
+      loadBlockerFaked(operation, true); // force
     };
     buttons[wX("TRAWL TITLE")] = () => {
       const td = new TrawlDialog();

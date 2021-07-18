@@ -26,10 +26,10 @@ export default class WasabeeBlocker {
 
   static async updatePortal(op, portal) {
     const store = (await db).transaction("blockers_portals", "readwrite").store;
-    if (portal.name === portal.id) return;
+    if (portal.name === portal.id) return false;
     const p = await store.get([op.ID, portal.id]);
-    if (!p) return;
-    if (p.name === portal.name) return;
+    if (!p) return false;
+    if (p.name === portal.name) return false;
     await store.put({
       opID: op.ID,
       id: portal.id,
