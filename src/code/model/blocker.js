@@ -24,11 +24,17 @@ export default class WasabeeBlocker {
     await store.put(ent);
   }
 
+  // return true if a blocker portal is updated
   static async updatePortal(op, portal) {
     const store = (await db).transaction("blockers_portals", "readwrite").store;
     if (portal.name === portal.id) return false;
     const p = await store.get([op.ID, portal.id]);
     if (!p) return false;
+    if (p.lat !== portal.lat || p.lng !== portal.lng) {
+      // portal move, drop blockers
+      await WasabeeBlocker.removeBlocker(op, portal.id);
+      return true;
+    }
     if (p.name === portal.name) return false;
     await store.put({
       opID: op.ID,

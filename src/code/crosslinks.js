@@ -1,5 +1,6 @@
 import WasabeePortal from "./model/portal";
 import WasabeeMarker from "./model/marker";
+import WasabeeBlocker from "./model/blocker";
 import { getSelectedOperation } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
@@ -194,7 +195,7 @@ function testLink(link, operation) {
           (link.options.data.dLngE6 / 1e6).toFixed(6),
           link.options.data.dGuid
         );
-      operation.addBlocker(fromPortal, toPortal);
+      WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
       break;
     }
   }

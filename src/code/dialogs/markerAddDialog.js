@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../model/me";
 import WasabeeTeam from "../model/team";
 import WasabeeMarker from "../model/marker";
+import WasabeeBlocker from "../model/blocker";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
@@ -149,9 +150,11 @@ const MarkerAddDialog = WDialog.extend({
     };
 
     // XXX remove comment from args in 0.20
-    if (operation.addMarker(selectedType, PortalUI.getSelected(), options))
+    if (operation.addMarker(selectedType, PortalUI.getSelected(), options)) {
+      if (WasabeeMarker.isDestructMarkerType(selectedType))
+        WasabeeBlocker.removeBlocker(operation, PortalUI.getSelected().id);
       await this.update();
-    else alert(wX("ALREADY_HAS_MARKER"));
+    } else alert(wX("ALREADY_HAS_MARKER"));
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;
   },

@@ -1,5 +1,4 @@
 import WasabeeLink from "./link";
-import WasabeeBlocker from "./blocker";
 import WasabeePortal from "./portal";
 import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
@@ -147,7 +146,7 @@ export default class WasabeeOp extends Evented {
       ID: this.ID,
       name: this.name,
       creator: this.creator,
-      opportals: Array.from(this._idToOpportals.values()), // includes blocker portals
+      opportals: Array.from(this._idToOpportals.values()),
       anchors: this.anchors,
       links: this.links,
       markers: this.markers,
@@ -162,6 +161,7 @@ export default class WasabeeOp extends Evented {
   toExport() {
     // round-trip through JSON.stringify to ensure a deep copy
     const o = new WasabeeOp(JSON.stringify(this));
+    // drop +0.21
     o.cleanPortalList(); // remove portals which are only relevant to blockers
     return JSON.stringify(o);
   }
@@ -581,8 +581,6 @@ export default class WasabeeOp extends Evented {
           for (const m of this.markers) {
             if (m.portalId == old.id) m.portalId = fake.id;
           }
-          // remove blockers on the old portal
-          WasabeeBlocker.removeBlocker(this, old.id);
 
           this._idToOpportals.delete(old.id);
           // add the new portal so any data related to the real portal (keys) still works
@@ -685,10 +683,6 @@ export default class WasabeeOp extends Evented {
     }
   }
 
-  addBlocker(fromPortal, toPortal) {
-    WasabeeBlocker.addBlocker(this, fromPortal, toPortal);
-  }
-
   get fakedPortals() {
     const c = Array.from(this._idToOpportals.values()).filter((p) => p.faked);
     return c;
@@ -766,21 +760,10 @@ export default class WasabeeOp extends Evented {
       marker.assign(options.assign);
     this.markers.push(marker);
 
-    // only need this for virus/destroy/decay -- this should be in the marker class
-    const destructMarkerTypes = [
-      WasabeeMarker.constants.MARKER_TYPE_DECAY,
-      WasabeeMarker.constants.MARKER_TYPE_DESTROY,
-      WasabeeMarker.constants.MARKER_TYPE_VIRUS,
-    ];
-    if (destructMarkerTypes.includes(markerType)) {
-      // remove related blockers
-      WasabeeBlocker.removeBlocker(this, portal.id);
-    }
-
     this.update(true);
     // run crosslink to update the layer
     // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
-    if (destructMarkerTypes.includes(markerType)) this.updateBlockers();
+    if (marker.isDestructMarker()) this.updateBlockers();
     return true;
   }
 
@@ -854,15 +837,6 @@ export default class WasabeeOp extends Evented {
   }
 
   convertLinksToObjs(links) {
-    const tmpLinks = new Array();
-    if (!links || links.length == 0) return tmpLinks;
-    for (const l of links) {
-      tmpLinks.push(new WasabeeLink(l, this));
-    }
-    return tmpLinks;
-  }
-
-  convertBlockersToObjs(links) {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
@@ -1166,7 +1140,6 @@ export default class WasabeeOp extends Evented {
     if (oldOp.name != this.name) changes.name = this.name;
     if (oldOp.color != this.color) changes.color = this.color;
     if (oldOp.comment != this.comment) changes.comment = this.comment;
-    // blockers: ignored by the server, handle them later
     // zones: handle them later
 
     for (const [id, p] of this._idToOpportals) {
@@ -1267,7 +1240,7 @@ export default class WasabeeOp extends Evented {
     return count;
   }
 
-  // assume that `this` is a server OP (no blockers, teams/keys are correct)
+  // assume that `this` is a server OP (teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {
       compatibility: {

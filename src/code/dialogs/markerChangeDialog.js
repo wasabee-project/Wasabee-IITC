@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import WasabeeMarker from "../model/marker";
+import WasabeeBlocker from "../model/blocker";
 
 import PortalUI from "../ui/portal";
 
@@ -56,6 +57,8 @@ const MarkerChangeDialog = WDialog.extend({
           comment: this.options.marker.comment,
           assign: this.options.marker.assignedTo,
         });
+        if (WasabeeMarker.isDestructMarkerType(this._type.value))
+          WasabeeBlocker.removeBlocker(operation, portal.id);
         operation.endBatchMode();
       }
       this.closeDialog();
