@@ -8,7 +8,7 @@ const MarkerList = OperationChecklistDialog.extend({
     TYPE: "markerList",
   },
 
-  _displayDialog: function () {
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
     this.sortable = this.getListDialogContent(
@@ -26,6 +26,8 @@ const MarkerList = OperationChecklistDialog.extend({
     buttons[wX("OK")] = () => {
       this.closeDialog();
     };
+
+    await this.sortable.done;
 
     this.createDialog({
       title: wX("MARKER_LIST", { opName: operation.name }),
