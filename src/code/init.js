@@ -40,7 +40,14 @@ window.plugin.wasabee.init = async () => {
     return;
   }
 
-  Wasabee.idb = await db;
+  try {
+    Wasabee.idb = await db;
+  } catch (e) {
+    alert("Wasabee: unable to access the storage: " + e.toString());
+    plugin_info.error = e; //eslint-disable-line
+    return;
+  }
+
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee._updateList = new Map();
   Wasabee.portalDetailQueue = new Array();
