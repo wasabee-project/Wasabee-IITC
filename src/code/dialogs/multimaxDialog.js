@@ -152,7 +152,7 @@ const MultimaxDialog = WDialog.extend({
     if (base)
       this._operation.addLink(pOne, pTwo, {
         description: commentPrefix + "base",
-        oder: ++order,
+        order: ++order,
       });
 
     if (!Array.isArray(sequence) || !sequence.length) {
