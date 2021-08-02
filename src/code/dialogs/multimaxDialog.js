@@ -145,7 +145,7 @@ const MultimaxDialog = WDialog.extend({
     pOne,
     pTwo,
     portals,
-    order = 0,
+    order = 0, // first link is order + 1
     base = true,
     commentPrefix = "multimax "
   ) {
@@ -158,14 +158,17 @@ const MultimaxDialog = WDialog.extend({
     );
 
     // shift current op tasks order
-    if (order < this._operation.nextOrder) {
+    if (order < this._operation.nextOrder - 1) {
       let diff = sequence.length * 2 + 1;
       if (this._flcheck.checked) diff += sequence.length - 1;
       for (const l of this._operation.links) {
-        if (l.opOrder >= order) l.opOrder += diff;
+        // skip base
+        if (l.toPortalId === pOne.id && l.fromPortalId === pTwo.id) continue;
+        if (l.fromPortalId === pOne.id && l.toPortalId === pTwo.id) continue;
+        if (l.opOrder > order) l.opOrder += diff;
       }
       for (const m of this._operation.markers) {
-        if (m.opOrder >= order) m.opOrder += diff;
+        if (m.opOrder > order) m.opOrder += diff;
       }
     }
 
