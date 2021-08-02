@@ -291,7 +291,7 @@
   "SAVELINKS": "Save Links",
   "SECONDS": "(Hace {seconds} segundos)",
   "SEL_PORT_FIRST": "¡Por favor, primero seleccionar portal ancla!",
-  "SEL_SB_ANCHOR ": "Selecciona el área del ancla para hacer acercamiento para añadir a la supernova",
+  "SEL_SB_ANCHOR": "Selecciona el área del ancla para hacer acercamiento para añadir a la supernova.",
   "SEL_SB_ANCHOR2": "Zoom out. Make sure portals have all loaded, then click draw.",
   "SEL_SB_ANCHOR3": "Please be patient, it can take a bit.",
   "SEL_SL_ANCHOR": "Select the portal to save the links of. Click save links button and look at checklist.",

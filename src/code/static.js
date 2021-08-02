@@ -86,12 +86,12 @@ W.static = {
 };
 
 W.static.strings = {}; // empty object, fill it below
-W.static.strings.Deutsch = require("./translations/german.json");
-W.static.strings.Espanol = require("./translations/spanish.json");
-W.static.strings.English = require("./translations/english.json");
-W.static.strings.Italiano = require("./translations/italian.json");
-W.static.strings.Tagalog = require("./translations/filipino.json");
-W.static.strings.French = require("./translations/french.json");
+W.static.strings["Deutsch"] = require("./translations/german.json");
+W.static.strings["Espanol"] = require("./translations/spanish.json");
+W.static.strings["English"] = require("./translations/english.json");
+W.static.strings["Italiano"] = require("./translations/italian.json");
+W.static.strings["Tagalog"] = require("./translations/filipino.json");
+W.static.strings["Français"] = require("./translations/french.json");
 
 W.static.defaultOperationColor = "orange";
 
