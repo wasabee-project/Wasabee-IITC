@@ -196,6 +196,7 @@
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": "vor ({minutes} Minuten)",
   "MM": "Maximale Feldanzahl",
+  "MM_INSERT_ORDER": "Insert at the end",
   "MULTI_M_TITLE": "Draw Max Layers",
   "MULTI_M": "Maximale Feldanzahl",
   "MULTIMAX": "Maximale Feldanzahl!",

@@ -196,6 +196,7 @@
   "MIN_SRC_PORT_LVL": "Nivel mínimo requerido para el portal fuente",
   "MINUTES": "(Hace {minutes} minutos)",
   "MM": "Multimax",
+  "MM_INSERT_ORDER": "Insert at the end",
   "MULTI_M_TITLE": "Draw Max Layers",
   "MULTI_M": "Multimax",
   "MULTIMAX": "¡Multimax!",

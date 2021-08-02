@@ -196,6 +196,7 @@
   "MIN_SRC_PORT_LVL": "Level minimum requis pour le portail source",
   "MINUTES": "(il y a {minutes} minute(s))",
   "MM": "Multimax",
+  "MM_INSERT_ORDER": "Insert at the end",
   "MULTI_M_TITLE": "Dessiner le maximum de couches",
   "MULTI_M": "Draw",
   "MULTIMAX": "Multimax!",

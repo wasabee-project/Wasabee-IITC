@@ -92,6 +92,14 @@ const MultimaxDialog = WDialog.extend({
     this._flcheck.type = "checkbox";
     this._flcheck.id = "wasabee-multimax-backlink";
 
+    const orderFromEndLabel = L.DomUtil.create("label", null, container);
+    orderFromEndLabel.textContent = wX("MM_INSERT_ORDER");
+    orderFromEndLabel.htmlFor = "wasabee-multimax-insert-order";
+    this._orderFromEnd = L.DomUtil.create("input", null, container);
+    this._orderFromEnd.type = "checkbox";
+    this._orderFromEnd.id = "wasabee-multimax-insert-order";
+    this._orderFromEnd.checked = true;
+
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("MULTI_M");
@@ -149,6 +157,18 @@ const MultimaxDialog = WDialog.extend({
       window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
     );
 
+    // shift current op tasks order
+    if (order < this._operation.nextOrder) {
+      let diff = sequence.length * 2 + 1;
+      if (this._flcheck.checked) diff += sequence.length - 1;
+      for (const l of this._operation.links) {
+        if (l.opOrder >= order) l.opOrder += diff;
+      }
+      for (const m of this._operation.markers) {
+        if (m.opOrder >= order) m.opOrder += diff;
+      }
+    }
+
     if (base)
       this._operation.addLink(pOne, pTwo, {
         description: commentPrefix + "base",
@@ -202,7 +222,12 @@ const MultimaxDialog = WDialog.extend({
     this._operation.startBatchMode();
 
     console.log("starting multimax");
-    const length = this.MM(this._anchorOne, this._anchorTwo, portals)[0];
+    const length = this.MM(
+      this._anchorOne,
+      this._anchorTwo,
+      portals,
+      this._orderFromEnd.checked ? this._operation.nextOrder - 1 : 0
+    )[0];
     console.log("multimax done");
 
     this._operation.endBatchMode(); // save and run crosslinks
