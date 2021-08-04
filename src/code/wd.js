@@ -67,7 +67,7 @@ export async function drawWasabeeDkeys() {
       const list = JSON.parse(data);
       if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
         return;
-
+      window.plugin.wasabee.idb.clear("defensivekeys");
       for (const n of list.DefensiveKeys) {
         try {
           await window.plugin.wasabee.idb.put("defensivekeys", n);
