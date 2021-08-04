@@ -9,6 +9,9 @@ import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import db from "../db";
 
+// 0.20->0.21 blocker migration
+import WasabeeBlocker from "./blocker";
+
 export default class WasabeeOp extends Evented {
   constructor(obj) {
     super();
@@ -55,6 +58,17 @@ export default class WasabeeOp extends Evented {
     this._coordsToOpportals = new Map();
     if (opportals) for (const p of opportals) this._idToOpportals.set(p.id, p);
     this.buildCoordsLookupTable();
+
+    // 0.20->0.21 blocker migration
+    if (obj.blockers) {
+      for (const blocker of obj.blockers) {
+        WasabeeBlocker.addBlocker(
+          this,
+          this.getPortal(blocker.fromPortalId),
+          this.getPortal(blocker.toPortalId)
+        );
+      }
+    }
 
     this.cleanAnchorList();
     this.cleanPortalList();
