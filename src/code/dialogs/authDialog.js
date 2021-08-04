@@ -205,6 +205,7 @@ const AuthDialog = WDialog.extend({
       client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
       scope: "email profile openid",
       response_type: "id_token permission",
+      prompt: "none",
     };
 
     window.gapi.auth2.authorize(options, async (response) => {
