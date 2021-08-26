@@ -92,6 +92,7 @@ W.static.strings["English"] = require("./translations/english.json");
 W.static.strings["Italiano"] = require("./translations/italian.json");
 W.static.strings["Tagalog"] = require("./translations/filipino.json");
 W.static.strings["Français"] = require("./translations/french.json");
+W.static.strings["Português"] = require("./translations/portuguese.json");
 
 W.static.defaultOperationColor = "orange";
 
