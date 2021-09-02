@@ -132,7 +132,6 @@ class IITCScript {
 
 const config = {
   entry: {
-    //static: "./src/code/static.js",
     init: "./src/code/init.js",
   },
   output: {
@@ -175,7 +174,6 @@ module.exports = (env, argv) => {
     Object.assign(meta, pluginConfig.headers.dev);
   } else {
     config.output.path = path.join(outputPath, "prod");
-    config.devtool = "nosources-source-map";
     Object.assign(meta, pluginConfig.headers.prod);
   }
   config.plugins.push(new IITCScript({ meta: meta, withMeta: true }));

@@ -26,8 +26,8 @@
     "webpack-cli": "^4.8.0"
   },
   "scripts": {
-    "build": "webpack --mode production",
-    "build-dev": "webpack --mode development",
+    "build": "webpack --progress --mode production",
+    "build-dev": "webpack --progress --mode development",
     "locales": "gulp locales"
   },
   "repository": {
