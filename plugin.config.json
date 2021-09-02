@@ -16,10 +16,7 @@
             "namespace": "https://wasabee.rocks/",
             "description": "Wasabee is not for dating.",
             "author": "Wasabee Project Team",
-            "category": "Draw",
-            "include": "https://intel.ingress.com/*",
-            "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-            "grant": "none"
+            "category": "Draw"
         }
     },
     "releaseFolder": {

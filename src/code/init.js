@@ -1,3 +1,4 @@
+import statics from "./static";
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
 import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
@@ -21,6 +22,7 @@ import db from "./db";
 import polyfill from "./polyfill";
 
 const Wasabee = window.plugin.wasabee;
+Wasabee.static = statics;
 
 window.plugin.wasabee.init = async () => {
   // polyfill
