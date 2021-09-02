@@ -19,8 +19,10 @@ import WasabeeMe from "./model/me";
 import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
+import statics from "./static";
 
 const Wasabee = window.plugin.wasabee;
+Wasabee.static = statics;
 
 window.plugin.wasabee.init = async () => {
   // polyfill

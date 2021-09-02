@@ -1,7 +1,9 @@
+import statics from "./static";
+
 // aliases to make review easier
-let strings = window.plugin.wasabee.static.strings;
-const defaultLang = window.plugin.wasabee.static.constants.DEFAULT_LANGUAGE;
-const localStoreKey = window.plugin.wasabee.static.constants.LANGUAGE_KEY;
+let strings = statics.strings;
+const defaultLang = statics.constants.DEFAULT_LANGUAGE;
+const localStoreKey = statics.constants.LANGUAGE_KEY;
 
 const templateRe = /\{ *([\w_ -]+) *\}/g;
 

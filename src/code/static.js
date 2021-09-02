@@ -1,7 +1,4 @@
-// this file is loaded by the build system
-const W = window.plugin.wasabee || {};
-
-W.static = {
+const statics = {
   CSS: {
     main: require("./css/wasabee.css"),
     autodraws: require("./css/autodraws.css"),
@@ -85,32 +82,32 @@ W.static = {
   ],
 };
 
-W.static.strings = {}; // empty object, fill it below
-W.static.strings["Deutsch"] = require("./translations/german.json");
-W.static.strings["Espanol"] = require("./translations/spanish.json");
-W.static.strings["English"] = require("./translations/english.json");
-W.static.strings["Italiano"] = require("./translations/italian.json");
-W.static.strings["Tagalog"] = require("./translations/filipino.json");
-W.static.strings["Français"] = require("./translations/french.json");
-W.static.strings["Português"] = require("./translations/portuguese.json");
+statics.strings = {}; // empty object, fill it below
+statics.strings["Deutsch"] = require("./translations/german.json");
+statics.strings["Espanol"] = require("./translations/spanish.json");
+statics.strings["English"] = require("./translations/english.json");
+statics.strings["Italiano"] = require("./translations/italian.json");
+statics.strings["Tagalog"] = require("./translations/filipino.json");
+statics.strings["Français"] = require("./translations/french.json");
+statics.strings["Português"] = require("./translations/portuguese.json");
 
-W.static.defaultOperationColor = "orange";
+statics.defaultOperationColor = "orange";
 
-W.static.linkStyle = {
+statics.linkStyle = {
   dashArray: [5, 5, 1, 5],
   assignedDashArray: [4, 2, 1],
   opacity: 1,
   weight: 2,
 };
 
-W.static.selfBlockStyle = {
+statics.selfBlockStyle = {
   color: "#ff1111",
   dashArray: [1, 5],
   opacity: 4,
   weight: 3,
 };
 
-W.static.backgroundLinkStyle = {
+statics.backgroundLinkStyle = {
   dashArray: [8, 5],
   opacity: 0.4,
   weight: 2,
@@ -118,10 +115,10 @@ W.static.backgroundLinkStyle = {
   interactive: false,
 };
 
-W.static.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");
+statics.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");
 
 // https://leafletjs.com/reference-1.0.3.html#path
-W.static.layerTypes = new Map([
+statics.layerTypes = new Map([
   [
     "main",
     {
@@ -180,4 +177,5 @@ W.static.layerTypes = new Map([
   ],
 ]);
 
-export const constants = W.static.constants;
+export const constants = statics.constants;
+export default statics;
