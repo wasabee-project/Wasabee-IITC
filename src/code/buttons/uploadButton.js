@@ -38,6 +38,7 @@ const UploadButton = WButton.extend({
         }
 
         try {
+          this.button.classList.add("loading");
           const r = await uploadOpPromise();
           // switch to the new version in local store -- uploadOpPromise stores it
           await makeSelectedOperation(r.ID);
@@ -55,6 +56,7 @@ const UploadButton = WButton.extend({
             console.error(e);
             alert(`Upload + Update Failed: ${e.toString()}`);
           }
+          this.button.classList.remove("loading");
         }
       },
     });
@@ -122,6 +124,7 @@ const UploadButton = WButton.extend({
     if (operation.isServerOp()) {
       try {
         if (force) delete operation.lasteditid;
+        this.button.classList.add("loading");
         const success = await updateOpPromise(operation);
         if (success) {
           operation.localchanged = false;
@@ -158,6 +161,7 @@ const UploadButton = WButton.extend({
         console.error(e);
         alert(`Update Failed: ${e.toString()}`);
       }
+      this.button.classList.remove("loading");
       return;
     }
   },
