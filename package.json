@@ -28,6 +28,7 @@
   "scripts": {
     "build": "webpack --progress --mode production",
     "build-dev": "webpack --progress --mode development",
+    "build-scot": "webpack --progress --mode development --env scot",
     "locales": "gulp locales"
   },
   "repository": {

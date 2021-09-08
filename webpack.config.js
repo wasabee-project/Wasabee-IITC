@@ -168,7 +168,11 @@ const config = {
 module.exports = (env, argv) => {
   const pluginConfig = require("./plugin.config.json");
   const meta = pluginConfig.headers.common;
-  if (argv.mode === "development") {
+  if (argv.mode === "development" && env.scot) {
+    config.output.path = path.join(outputPath, "scot");
+    config.devtool = "eval-source-map";
+    Object.assign(meta, pluginConfig.headers.scot);
+  } else if (argv.mode === "development") {
     config.output.path = path.join(outputPath, "dev");
     config.devtool = "eval-source-map";
     Object.assign(meta, pluginConfig.headers.dev);
