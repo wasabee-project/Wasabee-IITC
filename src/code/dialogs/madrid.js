@@ -9,8 +9,6 @@ import {
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
 
-import PortalUI from "../ui/portal";
-
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
 const MadridDialog = MultimaxDialog.extend({
@@ -20,143 +18,67 @@ const MadridDialog = MultimaxDialog.extend({
 
   needWritePermission: true,
 
-  // addHooks inherited from MultimaxDialog
-  _displayDialog: function () {
+  _addSetZone: function (text, thisKey, container) {
+    const label = L.DomUtil.create("div", "set_label", container);
+    label.textContent = text;
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("SET");
+    const display = L.DomUtil.create("span", null, container);
+    if (this[thisKey]) {
+      display.textContent = wX("PORTAL_COUNT", {
+        count: this[thisKey].length,
+      });
+    } else {
+      display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(button, "click", () => {
+      this[thisKey] = getAllPortalsOnScreen(getSelectedOperation());
+      // XXX this is not enough, need to cache them in case IITC purges them
+      display.textContent = wX("PORTAL_COUNT", {
+        count: this[thisKey].length,
+      });
+    });
+  },
+
+  _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
 
-    const anchorOneLabel = L.DomUtil.create("label", null, container);
-    anchorOneLabel.textContent = wX("ANCHOR1");
-    const anchorOneButton = L.DomUtil.create("button", null, container);
-    anchorOneButton.textContent = wX("SET");
-    this._anchorOneDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchorOne) {
-      this._anchorOneDisplay.appendChild(
-        PortalUI.displayFormat(this._anchorOne, this._smallScreen)
-      );
-    } else {
-      this._anchorOneDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorOneButton, "click", () => {
-      this._anchorOne = PortalUI.getSelected();
-      if (this._anchorOne) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchorOne);
-        this._anchorOneDisplay.textContent = "";
-        this._anchorOneDisplay.appendChild(
-          PortalUI.displayFormat(this._anchorOne, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addSetPortal(
+      wX("ANCHOR1"),
+      "_anchorOne",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+    );
+    this._addSetZone(wX("MADRID_SET_1"), "_portalSetOne", container);
 
-    const setOneLabel = L.DomUtil.create("div", "set_label", container);
-    setOneLabel.textContent = wX("MADRID_SET_1");
-    const setOneButton = L.DomUtil.create("button", null, container);
-    setOneButton.textContent = wX("SET");
-    this._setOneDisplay = L.DomUtil.create("span", null, container);
-    if (this._portalSetOne) {
-      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetOne.length,
-      });
-    } else {
-      this._setOneDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(setOneButton, "click", () => {
-      this._portalSetOne = getAllPortalsOnScreen(getSelectedOperation());
-      // XXX this is not enough, need to cache them in case IITC purges them
-      this._setOneDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetOne.length,
-      });
-    });
-
-    const anchorTwoLabel = L.DomUtil.create("label", null, container);
-    anchorTwoLabel.textContent = wX("ANCHOR2");
-    const anchorTwoButton = L.DomUtil.create("button", null, container);
-    anchorTwoButton.textContent = wX("SET");
-    this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchorTwo) {
-      this._anchorTwoDisplay.appendChild(
-        PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
-      );
-    } else {
-      this._anchorTwoDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorTwoButton, "click", () => {
-      this._anchorTwo = PortalUI.getSelected();
-      if (this._anchorTwo) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
-          JSON.stringify(this._anchorTwo);
-        this._anchorTwoDisplay.textContent = "";
-        this._anchorTwoDisplay.appendChild(
-          PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-
-    const setTwoLabel = L.DomUtil.create("div", "set_label", container);
-    setTwoLabel.textContent = wX("MADRID_SET_2");
-    const setTwoButton = L.DomUtil.create("button", null, container);
-    setTwoButton.textContent = wX("SET");
-    this._setTwoDisplay = L.DomUtil.create("span", null, container);
-    if (this._portalSetTwo) {
-      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetTwo.length,
-      });
-    } else {
-      this._setTwoDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(setTwoButton, "click", () => {
-      this._portalSetTwo = getAllPortalsOnScreen(getSelectedOperation());
-      // XXX cache
-      this._setTwoDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetTwo.length,
-      });
-    });
+    this._addSetPortal(
+      wX("ANCHOR2"),
+      "_anchorTwo",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+    );
+    this._addSetZone(wX("MADRID_SET_2"), "_portalSetTwo", container);
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
     anchorThreeLabel.textContent = wX("ANCHOR3");
     const anchorThreeDisplay = L.DomUtil.create("span", null, container);
     anchorThreeDisplay.textContent = "Auto-determined";
+    this._addSetZone(wX("MADRID_SET_3"), "_portalSetThree", container);
 
-    const setThreeLabel = L.DomUtil.create("div", "set_label", container);
-    setThreeLabel.textContent = wX("MADRID_SET_3");
-    const setThreeButton = L.DomUtil.create("button", null, container);
-    setThreeButton.textContent = wX("SET");
-    this._setThreeDisplay = L.DomUtil.create("span", null, container);
-    if (this._portalSetThree) {
-      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetThree.length,
-      });
-    } else {
-      this._setThreeDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(setThreeButton, "click", () => {
-      this._portalSetThree = getAllPortalsOnScreen(getSelectedOperation());
-      // XXX cache
-      this._setThreeDisplay.textContent = wX("PORTAL_COUNT", {
-        count: this._portalSetThree.length,
-      });
-    });
-
-    //Add backlinks after all the rest is set up
-    const fllabel = L.DomUtil.create("label", null, container);
-    fllabel.textContent = wX("ADD_BL");
-    fllabel.htmlFor = "wasabee-madrid-backlink";
-    this._flcheck = L.DomUtil.create("input", null, container);
-    this._flcheck.type = "checkbox";
-    this._flcheck.id = "wasabee-madrid-backlink";
-
-    const balancedLabel = L.DomUtil.create("label", null, container);
-    balancedLabel.textContent = "Balanced";
-    balancedLabel.htmlFor = "wasabee-madrid-balanced";
-    this._balancedcheck = L.DomUtil.create("input", null, container);
-    this._balancedcheck.type = "checkbox";
-    this._balancedcheck.id = "wasabee-madrid-balanced";
+    this._addCheckbox(
+      wX("ADD_BL"),
+      "wasabee-madrid-backlink",
+      "_flcheck",
+      container
+    );
+    this._addCheckbox(
+      "Balanced", // wX
+      "wasabee-madrid-balanced",
+      "_balancedcheck",
+      container
+    );
 
     const newLine = L.DomUtil.create("label", "newline", container);
     const dividerBeforeDraw = L.DomUtil.create("span", null, container);
@@ -177,6 +99,13 @@ const MadridDialog = MultimaxDialog.extend({
       alert(`Madrid found ${total} layers`);
       // this.closeDialog();
     });
+
+    return container;
+  },
+
+  // addHooks inherited from MultimaxDialog
+  _displayDialog: function () {
+    const container = this._buildContent();
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
@@ -205,16 +134,6 @@ const MadridDialog = MultimaxDialog.extend({
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = testPortal();
-  },
-
-  getSpine: function (pOne, pTwo, portals) {
-    const portalsMap = new Map(portals.map((p) => [p.id, p]));
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-    const sequence = this.longestSequence(poset, null, (a, b) =>
-      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
-    );
-
-    return sequence.map((id) => portalsMap.get(id));
   },
 
   doBalancedMadrid: function () {

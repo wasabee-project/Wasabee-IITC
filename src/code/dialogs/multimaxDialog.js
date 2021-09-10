@@ -25,7 +25,46 @@ const MultimaxDialog = WDialog.extend({
     this._displayDialog();
   },
 
-  _displayDialog: function () {
+  _addSetPortal: function (text, thisKey, container, storageKey) {
+    const label = L.DomUtil.create("label", null, container);
+    label.textContent = text;
+    const button = L.DomUtil.create("button", null, container);
+    button.textContent = wX("SET");
+    const display = L.DomUtil.create("span", null, container);
+    if (this[thisKey]) {
+      display.appendChild(
+        PortalUI.displayFormat(this[thisKey], this._smallScreen)
+      );
+    } else {
+      display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(button, "click", () => {
+      this[thisKey] = PortalUI.getSelected();
+      if (this[thisKey]) {
+        if (storageKey)
+          localStorage[storageKey] = JSON.stringify(this[thisKey]);
+        display.textContent = "";
+        display.appendChild(
+          PortalUI.displayFormat(this[thisKey], this._smallScreen)
+        );
+      } else {
+        display.textContent = wX("NOT_SET");
+        alert(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+  },
+
+  _addCheckbox: function (text, id, thisKey, container, defaultValue) {
+    const label = L.DomUtil.create("label", null, container);
+    label.textContent = text;
+    label.htmlFor = id;
+    this[thisKey] = L.DomUtil.create("input", null, container);
+    this[thisKey].type = "checkbox";
+    this[thisKey].id = id;
+    this[thisKey].checked = defaultValue;
+  },
+
+  _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_INSTRUCTIONS");
@@ -33,72 +72,33 @@ const MultimaxDialog = WDialog.extend({
     const description2 = L.DomUtil.create("div", "desc", container);
     description2.textContent = wX("SEL_SB_ANCHOR2");
 
-    const anchorOneLabel = L.DomUtil.create("label", null, container);
-    anchorOneLabel.textContent = wX("ANCHOR1");
-    const anchorOneButton = L.DomUtil.create("button", null, container);
-    anchorOneButton.textContent = wX("SET");
-    this._anchorOneDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchorOne) {
-      this._anchorOneDisplay.appendChild(
-        PortalUI.displayFormat(this._anchorOne, this._smallScreen)
-      );
-    } else {
-      this._anchorOneDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorOneButton, "click", () => {
-      this._anchorOne = PortalUI.getSelected();
-      if (this._anchorOne) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchorOne);
-        this._anchorOneDisplay.textContent = "";
-        this._anchorOneDisplay.appendChild(
-          PortalUI.displayFormat(this._anchorOne, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addSetPortal(
+      wX("ANCHOR1"),
+      "_anchorOne",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+    );
+    this._addSetPortal(
+      wX("ANCHOR2"),
+      "_anchorTwo",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+    );
 
-    const anchorTwoLabel = L.DomUtil.create("label", null, container);
-    anchorTwoLabel.textContent = wX("ANCHOR2");
-    const anchorTwoButton = L.DomUtil.create("button", null, container);
-    anchorTwoButton.textContent = wX("SET");
-    this._anchorTwoDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchorTwo) {
-      this._anchorTwoDisplay.appendChild(
-        PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
-      );
-    } else {
-      this._anchorTwoDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorTwoButton, "click", () => {
-      this._anchorTwo = PortalUI.getSelected();
-      if (this._anchorTwo) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
-          JSON.stringify(this._anchorTwo);
-        this._anchorTwoDisplay.textContent = "";
-        this._anchorTwoDisplay.appendChild(
-          PortalUI.displayFormat(this._anchorTwo, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addCheckbox(
+      wX("ADD_BL"),
+      "wasabee-multimax-backlink",
+      "_flcheck",
+      container
+    );
 
-    const fllabel = L.DomUtil.create("label", null, container);
-    fllabel.textContent = wX("ADD_BL");
-    fllabel.htmlFor = "wasabee-multimax-backlink";
-    this._flcheck = L.DomUtil.create("input", null, container);
-    this._flcheck.type = "checkbox";
-    this._flcheck.id = "wasabee-multimax-backlink";
-
-    const orderFromEndLabel = L.DomUtil.create("label", null, container);
-    orderFromEndLabel.textContent = wX("MM_INSERT_ORDER");
-    orderFromEndLabel.htmlFor = "wasabee-multimax-insert-order";
-    this._orderFromEnd = L.DomUtil.create("input", null, container);
-    this._orderFromEnd.type = "checkbox";
-    this._orderFromEnd.id = "wasabee-multimax-insert-order";
-    this._orderFromEnd.checked = true;
+    this._addCheckbox(
+      wX("MM_INSERT_ORDER"),
+      "wasabee-multimax-insert-order",
+      "_orderFromEnd",
+      container,
+      true
+    );
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
@@ -108,6 +108,12 @@ const MultimaxDialog = WDialog.extend({
       alert(`Multimax found ${total} layers`);
       // this.closeDialog();
     });
+
+    return container;
+  },
+
+  _displayDialog: function () {
+    const container = this._buildContent();
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
@@ -129,13 +135,21 @@ const MultimaxDialog = WDialog.extend({
 
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
-    this.title = wX("MULTI_M");
-    this.label = wX("MULTI_M");
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
     if (p) this._anchorTwo = new WasabeePortal(p);
     this._urp = L.latLng(testPortal());
+  },
+
+  getSpine: function (pOne, pTwo, portals) {
+    const portalsMap = new Map(portals.map((p) => [p.id, p]));
+    const poset = this.buildPOSet(pOne, pTwo, portals);
+    const sequence = this.longestSequence(poset, null, (a, b) =>
+      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
+    );
+
+    return sequence.map((id) => portalsMap.get(id));
   },
 
   /*
@@ -149,13 +163,7 @@ const MultimaxDialog = WDialog.extend({
     base = true,
     commentPrefix = "multimax "
   ) {
-    const portalsMap = new Map(portals.map((p) => [p.id, p]));
-
-    const poset = this.buildPOSet(pOne, pTwo, portals);
-
-    const sequence = this.longestSequence(poset, null, (a, b) =>
-      window.map.distance(portalsMap.get(a).latLng, portalsMap.get(b).latLng)
-    );
+    const sequence = this.getSpine(pOne, pTwo, portals);
 
     // shift current op tasks order
     if (order < this._operation.nextOrder - 1) {
@@ -185,12 +193,7 @@ const MultimaxDialog = WDialog.extend({
 
     let prev = null;
 
-    for (const node of sequence) {
-      const p = portalsMap.get(node);
-      if (!p) {
-        console.log("skipping: " + node);
-        continue;
-      }
+    for (const p of sequence) {
       this._operation.addLink(p, pOne, {
         description: commentPrefix + "link",
         order: ++order,
