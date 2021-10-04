@@ -131,7 +131,7 @@
   "HOW_TO_VIDS": "<h3>Tuto:</h3><div class='desc'><a href='https://www.youtube.com/playlist?list=PLyku9nmtwrADKQM9_EZk7NYbZXVOrBhXa'>Wasabee Playlist</a></div>",
   "IMP_COMP": "Importation reussi. ",
   "IMP_DT_OP": "Op Drawtools: ",
-  "IMP_NOPE": "Echec de l'importation",
+  "IMP_NOPE": "Echec de l'importation: {error}",
   "IMP_WAS_OP": "Importer les opérations Wasabee",
   "IMPORT_OP_SUCCESS": "Importer l'opération : {opName} Reussi.",
   "IMPORT_OP_TITLE": "Importer l'opération : {date}",

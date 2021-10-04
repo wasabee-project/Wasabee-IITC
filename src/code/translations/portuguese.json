@@ -131,7 +131,7 @@
   "HOW_TO_VIDS": "<h3>Vídeos de instruções:</h3><div class='desc'><a href='https://www.youtube.com/playlist?list=PLyku9nmtwrADKQM9_EZk7NYbZXVOrBhXa'>Wasabee Playlist</a></div>",
   "IMP_COMP": "Importação concluída. Encontrada ",
   "IMP_DT_OP": "Importar OP Drawtools: ",
-  "IMP_NOPE": "A Importação Falhou.",
+  "IMP_NOPE": "A Importação Falhou: {error}",
   "IMP_WAS_OP": "Importar Operação Wasabee",
   "IMPORT_OP_SUCCESS": "OP Importada: ${value} successfuly.",
   "IMPORT_OP_TITLE": "Importar Op: ${value}",

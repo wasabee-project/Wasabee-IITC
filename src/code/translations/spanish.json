@@ -131,7 +131,7 @@
   "HOW_TO_VIDS": "<h3>Videos de Cómo Se Hace:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>0.15 Introducción</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Introducción Antigua</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Introducción al Servidor</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Equipos y Permisos</a></li></ul>",
   "IMP_COMP": "Importación Completa. Se encontró",
   "IMP_DT_OP": "Op en Drawtools Importada",
-  "IMP_NOPE": "Importación Falló.",
+  "IMP_NOPE": "Importación Falló: {error}",
   "IMP_WAS_OP": "Importar Operación Wasabee",
   "IMPORT_OP_SUCCESS": "Operación {opName} Importada Exitosamente.",
   "IMPORT_OP_TITLE": "Importar Op {date}",

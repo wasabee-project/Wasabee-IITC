@@ -141,12 +141,22 @@ const ImportDialog = WDialog.extend({
     try {
       const data = JSON.parse(string);
       const importedOp = new WasabeeOp(data);
-      await importedOp.store();
-      await makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
+      const localOp = await WasabeeOp.load(importedOp.ID);
+      if (localOp) {
+        alert(
+          wX("IMP_NOPE", {
+            error: "op already exists, either delete it or duplicate",
+          })
+        );
+        await makeSelectedOperation(importedOp.ID);
+      } else {
+        await importedOp.store();
+        await makeSelectedOperation(importedOp.ID);
+        alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
+      }
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);
-      alert(wX("IMP_NOPE"));
+      alert(wX("IMP_NOPE", { error: "data invalid" }));
     }
   },
 

@@ -131,7 +131,7 @@
   "HOW_TO_VIDS": "<h3>Erklärungsvideos:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>0.15 Intro</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Altes Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Teams and Permissions</a></li></ul>",
   "IMP_COMP": "Import Komplett. Gefunden ",
   "IMP_DT_OP": "Importierte Drawtools Op: ",
-  "IMP_NOPE": "Import Fehlgeschlagen.",
+  "IMP_NOPE": "Import Fehlgeschlagen: {error}",
   "IMP_WAS_OP": "Importiere Wasabee Operation",
   "IMPORT_OP_SUCCESS": "Importierte Operation: {opName}. Erfolgreich.",
   "IMPORT_OP_TITLE": "Importierte Op: {date}",

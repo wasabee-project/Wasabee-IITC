@@ -131,7 +131,7 @@
   "HOW_TO_VIDS": "<h3>How-To Videos:</h3><ul><li><a href='https://youtu.be/YxHo-5pj0R4'>Intro</a></li><li><a href='https://www.youtube.com/watch?v=vYZOeqGGyMg'>Lumang Intro</li><li><a href='https://www.youtube.com/watch?v=6i8vX3O8vG4&t=9s'>Server Intro</a></li><li><a href='https://www.youtube.com/watch?v=HomPiLbRsxE'>Pangkat at Permisyo</a></li></ul>",
   "IMP_COMP": "Natapos ang Pag Import. ",
   "IMP_DT_OP": "Na-Import na Drawtools Op: ",
-  "IMP_NOPE": "Pag-I-Import Hindi Matagumpay.",
+  "IMP_NOPE": "Pag-I-Import Hindi Matagumpay: {error}",
   "IMP_WAS_OP": "I-Import ang Wasabee operasyon",
   "IMPORT_OP_SUCCESS": "Na-Import na Operasyon: {opName} Matagumpay.",
   "IMPORT_OP_TITLE": "Na-Import na Op: {date}",
