@@ -16,6 +16,12 @@ const markers = {
   MARKER_TYPE_VIRUS: "UseVirusPortalAlert",
 };
 
+const destructMarkerTypes = [
+  markers.MARKER_TYPE_DECAY,
+  markers.MARKER_TYPE_DESTROY,
+  markers.MARKER_TYPE_VIRUS,
+];
+
 const markerTypes = new Set(Object.values(markers));
 
 const STATE_UNASSIGNED = "pending";
@@ -109,5 +115,13 @@ export default class WasabeeMarker {
 
   get state() {
     return this._state;
+  }
+
+  isDestructMarker() {
+    return destructMarkerTypes.includes(this.type);
+  }
+
+  static isDestructMarkerType(type) {
+    return destructMarkerTypes.includes(type);
   }
 }

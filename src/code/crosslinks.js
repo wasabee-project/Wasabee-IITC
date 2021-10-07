@@ -1,6 +1,6 @@
 import WasabeePortal from "./model/portal";
-import WasabeeLink from "./model/link";
 import WasabeeMarker from "./model/marker";
+import WasabeeBlocker from "./model/blocker";
 import { getSelectedOperation } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
@@ -188,7 +188,6 @@ function testLink(link, operation) {
           (link.options.data.oLngE6 / 1e6).toFixed(6),
           link.options.data.oGuid
         );
-      operation._addPortal(fromPortal);
       let toPortal = PortalUI.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
@@ -196,12 +195,7 @@ function testLink(link, operation) {
           (link.options.data.dLngE6 / 1e6).toFixed(6),
           link.options.data.dGuid
         );
-      operation._addPortal(toPortal);
-      const blocker = new WasabeeLink(
-        { fromPortalId: fromPortal.id, toPortalId: toPortal.id },
-        operation
-      );
-      operation.addBlocker(blocker); // op.update() is called here
+      WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
       break;
     }
   }

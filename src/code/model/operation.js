@@ -9,6 +9,9 @@ import { GetWasabeeServer } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import db from "../db";
 
+// 0.20->0.21 blocker migration
+import WasabeeBlocker from "./blocker";
+
 export default class WasabeeOp extends Evented {
   constructor(obj) {
     super();
@@ -33,7 +36,6 @@ export default class WasabeeOp extends Evented {
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
     this.localchanged = obj.localchanged === false ? obj.localchanged : true;
-    this.blockers = this.convertBlockersToObjs(obj.blockers);
     this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
     this.zones = this.convertZonesToObjs(obj.zones);
     // this.modified = obj.modified ? obj.modified : null;
@@ -50,13 +52,23 @@ export default class WasabeeOp extends Evented {
 
     if (!this.links) this.links = new Array();
     if (!this.markers) this.markers = new Array();
-    if (!this.blockers) this.blockers = new Array();
 
     const opportals = this.convertPortalsToObjs(obj.opportals);
     this._idToOpportals = new Map();
     this._coordsToOpportals = new Map();
     if (opportals) for (const p of opportals) this._idToOpportals.set(p.id, p);
     this.buildCoordsLookupTable();
+
+    // 0.20->0.21 blocker migration
+    if (obj.blockers) {
+      for (const blocker of obj.blockers) {
+        WasabeeBlocker.addBlocker(
+          this,
+          this.getPortal(blocker.fromPortalId),
+          this.getPortal(blocker.toPortalId)
+        );
+      }
+    }
 
     this.cleanAnchorList();
     this.cleanPortalList();
@@ -116,7 +128,6 @@ export default class WasabeeOp extends Evented {
     json.fetched = this.fetched;
     json.stored = this.stored;
     json.localchanged = this.localchanged;
-    json.blockers = this.blockers;
     json.keysonhand = this.keysonhand;
     json.teamlist = this.teamlist;
     json.background = this.background;
@@ -149,7 +160,7 @@ export default class WasabeeOp extends Evented {
       ID: this.ID,
       name: this.name,
       creator: this.creator,
-      opportals: Array.from(this._idToOpportals.values()), // includes blocker portals
+      opportals: Array.from(this._idToOpportals.values()),
       anchors: this.anchors,
       links: this.links,
       markers: this.markers,
@@ -164,6 +175,7 @@ export default class WasabeeOp extends Evented {
   toExport() {
     // round-trip through JSON.stringify to ensure a deep copy
     const o = new WasabeeOp(JSON.stringify(this));
+    // drop +0.21
     o.cleanPortalList(); // remove portals which are only relevant to blockers
     return JSON.stringify(o);
   }
@@ -221,10 +233,6 @@ export default class WasabeeOp extends Evented {
         m.portalId = rename.get(m.portalId);
       }
       this.anchors = this.anchors.map((a) => rename.get(a));
-      for (const b of this.blockers) {
-        b.fromPortalId = rename.get(b.fromPortalId);
-        b.toPortalId = rename.get(b.toPortalId);
-      }
 
       for (const id of toRemove) this._idToOpportals.delete(id);
     }
@@ -502,33 +510,25 @@ export default class WasabeeOp extends Evented {
     for (const a of this.anchors) {
       newPortals.set(a, this._idToOpportals.get(a));
     }
-    for (const b of this.blockers) {
-      newPortals.set(b.fromPortalId, this._idToOpportals.get(b.fromPortalId));
-      newPortals.set(b.toPortalId, this._idToOpportals.get(b.toPortalId));
-    }
 
     // sanitize OP if it get corrupt by my code elsewhere...
     const missingPortal = new Set();
-    let corrupt =
-      this.links.length + this.markers.length + this.blockers.length;
+    let corrupt = this.links.length + this.markers.length;
     for (const [id, v] of newPortals) {
       if (v === undefined) {
         this.links = this.links.filter(
           (l) => l.fromPortalId != id && l.toPortalId != id
         );
         this.markers = this.markers.filter((m) => m.portalId != id);
-        this.blockers = this.blockers.filter(
-          (b) => b.fromPortalId != id && b.toPortalId != id
-        );
         missingPortal.add(id);
       }
     }
-    corrupt -= this.links.length + this.markers.length + this.blockers.length;
+    corrupt -= this.links.length + this.markers.length;
     if (missingPortal.size > 0) {
       // leave some trace
       console.trace("op corruption: missing portals");
       alert(
-        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers/blockers. Please check your OP and report to the devs.`
+        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
       );
       this.cleanAnchorList();
       for (const id of missingPortal) newPortals.delete(id);
@@ -595,10 +595,7 @@ export default class WasabeeOp extends Evented {
           for (const m of this.markers) {
             if (m.portalId == old.id) m.portalId = fake.id;
           }
-          // remove blockers on the old portal
-          this.blockers = this.blockers.filter(
-            (b) => b.fromPortalId != old.id && b.toPortalId != old.id
-          );
+
           this._idToOpportals.delete(old.id);
           // add the new portal so any data related to the real portal (keys) still works
           this._addPortal(portal);
@@ -625,10 +622,7 @@ export default class WasabeeOp extends Evented {
         for (const m of this.markers) {
           if (m.portalId == old.id) m.portalId = portal.id;
         }
-        for (const b of this.blockers) {
-          if (b.fromPortalId == old.id) b.fromPortalId = portal.id;
-          if (b.toPortalId == old.id) b.toPortalId = portal.id;
-        }
+
         this._idToOpportals.delete(old.id);
 
         //this.opportals = Array.from(this._idToOpportals.values());
@@ -700,29 +694,6 @@ export default class WasabeeOp extends Evented {
     this._addPortal(portal);
     if (!this.containsAnchor(portal.id)) {
       this.anchors.push(portal.id);
-    }
-  }
-
-  containsBlocker(link) {
-    if (!this.blockers || this.blockers.length == 0) return false;
-
-    for (const l of this.blockers) {
-      if (
-        l.fromPortalId == link.fromPortalId &&
-        l.toPortalId == link.toPortalId
-      ) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  addBlocker(link) {
-    if (!link.fromPortalId || !link.toPortalId) return;
-    if (!this.containsBlocker(link)) {
-      this.blockers.push(link);
-      // this.update(false); // can trigger a redraw-storm, just skip
-      // this.store(); // do not await, let it happen in the background -- ideally now blockers should not be part of the op json, but stored independently in indexeddb
     }
   }
 
@@ -803,23 +774,10 @@ export default class WasabeeOp extends Evented {
       marker.assign(options.assign);
     this.markers.push(marker);
 
-    // only need this for virus/destroy/decay -- this should be in the marker class
-    const destructMarkerTypes = [
-      WasabeeMarker.constants.MARKER_TYPE_DECAY,
-      WasabeeMarker.constants.MARKER_TYPE_DESTROY,
-      WasabeeMarker.constants.MARKER_TYPE_VIRUS,
-    ];
-    if (destructMarkerTypes.includes(markerType)) {
-      // remove related blockers
-      this.blockers = this.blockers.filter(
-        (b) => b.fromPortalId !== portal.id && b.toPortalId !== portal.id
-      );
-    }
-
     this.update(true);
     // run crosslink to update the layer
     // XXX: we don't need to check, only redraw, so we need something clever, probably in mapDraw or crosslink.js
-    if (destructMarkerTypes.includes(markerType)) this.updateBlockers();
+    if (marker.isDestructMarker()) this.updateBlockers();
     return true;
   }
 
@@ -845,7 +803,6 @@ export default class WasabeeOp extends Evented {
     this.anchors = Array();
     this.links = Array();
     this.markers = Array();
-    this.blockers = Array();
 
     this._idToOpportals.clear();
     this._coordsToOpportals.clear();
@@ -854,7 +811,6 @@ export default class WasabeeOp extends Evented {
 
   clearAllLinks() {
     this.links = Array();
-    this.blockers = Array();
     this.cleanAnchorList();
     this.cleanPortalList();
     this.update(true);
@@ -895,15 +851,6 @@ export default class WasabeeOp extends Evented {
   }
 
   convertLinksToObjs(links) {
-    const tmpLinks = new Array();
-    if (!links || links.length == 0) return tmpLinks;
-    for (const l of links) {
-      tmpLinks.push(new WasabeeLink(l, this));
-    }
-    return tmpLinks;
-  }
-
-  convertBlockersToObjs(links) {
     const tmpLinks = new Array();
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
@@ -1207,7 +1154,6 @@ export default class WasabeeOp extends Evented {
     if (oldOp.name != this.name) changes.name = this.name;
     if (oldOp.color != this.color) changes.color = this.color;
     if (oldOp.comment != this.comment) changes.comment = this.comment;
-    // blockers: ignored by the server, handle them later
     // zones: handle them later
 
     for (const [id, p] of this._idToOpportals) {
@@ -1293,14 +1239,6 @@ export default class WasabeeOp extends Evented {
     return this.localchanged;
   }
 
-  mergeBlockers(op) {
-    // merge portals
-    for (const p of op.opportals) {
-      this._addPortal(p);
-    }
-    for (const b of op.blockers) this.blockers.push(b); // do not use addBlocker
-  }
-
   mergeZones(op) {
     const ids = new Set();
     let count = 0;
@@ -1316,7 +1254,7 @@ export default class WasabeeOp extends Evented {
     return count;
   }
 
-  // assume that `this` is a server OP (no blockers, teams/keys are correct)
+  // assume that `this` is a server OP (teams/keys are correct)
   applyChanges(changes, op) {
     const summary = {
       compatibility: {
@@ -1347,8 +1285,10 @@ export default class WasabeeOp extends Evented {
       },
     };
 
-    // merge *portals* and blockers
-    this.mergeBlockers(op);
+    // merge *portals*
+    for (const p of op.opportals) {
+      this._addPortal(p);
+    }
 
     // add missing zones
     summary.addition.zone = this.mergeZones(op);
