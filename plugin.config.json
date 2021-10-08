@@ -10,6 +10,9 @@
             "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/latest/dev/wasabee.meta.js",
             "version": "0.20.BUILDDATE-dev"
         },
+        "pr": {
+            "version": "0.20-pr"
+        },
         "scot": {
             "downloadURL": "https://am.wasabee.rocks/static/dev/wasabee.user.js",
             "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js",

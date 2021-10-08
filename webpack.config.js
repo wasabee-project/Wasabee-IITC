@@ -168,14 +168,21 @@ const config = {
 module.exports = (env, argv) => {
   const pluginConfig = require("./plugin.config.json");
   const meta = pluginConfig.headers.common;
-  if (argv.mode === "development" && env.scot) {
-    config.output.path = path.join(outputPath, "scot");
-    config.devtool = "eval-source-map";
-    Object.assign(meta, pluginConfig.headers.scot);
-  } else if (argv.mode === "development") {
-    config.output.path = path.join(outputPath, "dev");
-    config.devtool = "eval-source-map";
-    Object.assign(meta, pluginConfig.headers.dev);
+  if (argv.mode === "development") {
+    if(env.scot) {
+      config.output.path = path.join(outputPath, "scot");
+      config.devtool = "eval-source-map";
+      Object.assign(meta, pluginConfig.headers.scot);
+    } else if(env.pr) {
+      config.output.path = path.join(outputPath, "dev");
+      config.devtool = "inline-source-map";
+      Object.assign(meta, pluginConfig.headers.pr);
+      meta.version += env.pr;
+    } else if (argv.mode === "development") {
+      config.output.path = path.join(outputPath, "dev");
+      config.devtool = "eval-source-map";
+      Object.assign(meta, pluginConfig.headers.dev);
+    }
   } else {
     config.output.path = path.join(outputPath, "prod");
     Object.assign(meta, pluginConfig.headers.prod);

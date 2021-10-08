@@ -29,6 +29,7 @@
     "build": "webpack --progress --mode production",
     "build-dev": "webpack --progress --mode development",
     "build-scot": "webpack --progress --mode development --env scot",
+    "build-pr": "webpack --progress --mode development --env pr=${PR_NUMBER}",
     "locales": "gulp locales"
   },
   "repository": {
