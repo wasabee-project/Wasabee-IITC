@@ -132,11 +132,14 @@ const WLAgent = L.Marker.extend({
       zoom: zoom,
     });
 
-    window.registerMarkerForOMS(this);
     this.bindPopup((layer) => layer._getPopup(), {
       className: "wasabee-popup",
       closeButton: false,
     });
+
+    this.off("click", this._openPopup);
+    window.registerMarkerForOMS(this);
+    this.on("spiderfiedclick", this._openPopup);
   },
 
   update: function () {

@@ -114,8 +114,8 @@ const WLLink = L.GeodesicPolyline.extend({
       L.DomUtil.create("div", "enl", div).textContent = link.description;
     L.DomUtil.create("div", "enl", div).textContent = "# " + link.throwOrderPos;
     const buttonset = L.DomUtil.create("div", "buttonset", div);
-    const del = L.DomUtil.create("button", null, buttonset);
     if (operation.canWrite()) {
+      const del = L.DomUtil.create("button", null, buttonset);
       del.textContent = wX("DELETE_LINK");
       L.DomEvent.on(del, "click", (ev) => {
         L.DomEvent.stop(ev);
