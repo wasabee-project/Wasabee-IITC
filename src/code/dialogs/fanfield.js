@@ -8,6 +8,59 @@ import wX from "../wX";
 
 import PortalUI from "../ui/portal";
 
+export function angle(a, p) {
+  if (a.id == p.id) throw Error("same portal");
+  if (a.latLng.lng == p.latLng.lng) {
+    if (a.latLng.lat > p.latLng.lat) return 0;
+    else return Math.PI;
+  }
+  const link = new GeodesicLine(a.latLng, p.latLng);
+  return link.bearing();
+}
+
+export function sortPortalsByAngle(anchor, portals, start, end) {
+  const startAngle = angle(anchor, start);
+  const endAngle = angle(anchor, end);
+
+  // swap start/end if more than 180°
+  let invert = false;
+  if (
+    (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) >
+    Math.PI
+  ) {
+    invert = true;
+  }
+
+  const good = new Map();
+  for (const p of portals) {
+    if (p.id == anchor.id) continue;
+    const pAngle = angle(anchor, p);
+
+    good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
+  }
+  // add start and end portals just in case
+  good.set(startAngle, start);
+  good.set(endAngle, end);
+
+  const sorted = new Array(...good.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map((v) => v[1]);
+
+  if (invert) {
+    sorted.reverse();
+  }
+  // Build the sequence of portals between start/end
+  const slice = new Array();
+  let s = 0;
+  for (s = 0; sorted[s].id != start.id; s++);
+  for (; sorted[s % sorted.length].id != end.id; s++) {
+    slice.push(sorted[s % sorted.length]);
+  }
+  slice.push(end);
+
+  return slice;
+}
+
 const FanfieldDialog = WDialog.extend({
   statics: {
     TYPE: "FanfieldDialog",
@@ -149,48 +202,14 @@ const FanfieldDialog = WDialog.extend({
       return;
     }
 
-    const startAngle = this._angle(this._anchor, this._start);
-    const endAngle = this._angle(this._anchor, this._end);
-
-    // swap start/end if more than 180°
-    this._invert = false;
-    if (
-      (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) %
-        (2 * Math.PI) >
-      Math.PI
-    ) {
-      this._invert = true;
-    }
-
-    const good = new Map();
     const op = getSelectedOperation();
-    for (const p of getAllPortalsOnScreen(op)) {
-      if (p.id == this._anchor.id) continue;
-      const pAngle = this._angle(this._anchor, p);
-
-      good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
-    }
-    // add start and end portals just in case
-    good.set(startAngle, this._start);
-    good.set(endAngle, this._end);
-
-    const sorted = new Array(...good.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map((v) => v[1]);
-
-    if (this._invert) {
-      sorted.reverse();
-    }
-    // Build the sequence of portals between start/end
-    const slice = new Array();
-    let start = 0;
-    for (start = 0; sorted[start].id != this._start.id; start++);
-    for (; sorted[start % sorted.length].id != this._end.id; start++) {
-      slice.push(sorted[start % sorted.length]);
-    }
-    slice.push(this._end);
-
-    this._draw(slice);
+    const steps = sortPortalsByAngle(
+      this._anchor,
+      getAllPortalsOnScreen(op),
+      this._start,
+      this._end
+    );
+    this._draw(steps);
   },
 
   // draw takes the sorted list of poratls and draws the links
@@ -252,11 +271,6 @@ const FanfieldDialog = WDialog.extend({
     const ap = 313 * order + 1250 * fields;
     // too many parameters for wX();
     alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
-  },
-
-  _angle: function (a, p) {
-    const link = new GeodesicLine(a.latLng, p.latLng);
-    return link.bearing();
   },
 });
 

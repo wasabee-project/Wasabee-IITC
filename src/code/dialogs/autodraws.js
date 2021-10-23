@@ -7,6 +7,7 @@ import SaveLinksDialog from "../dialogs/saveLinks";
 import OnionfieldDialog from "../dialogs/onionfield";
 import HomogeneousDialog from "../dialogs/homogeneous";
 import MadridDialog from "../dialogs/madrid";
+import FlipFlopDialog from "../dialogs/flipflop";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({
@@ -74,6 +75,14 @@ const AutodrawsDialog = WDialog.extend({
           this._dialog.dialog("close");
           const sl = new SaveLinksDialog();
           sl.enable();
+        },
+      },
+      {
+        text: wX("FLIP_FLOP_NAME"),
+        callback: () => {
+          this.closeDialog();
+          const ff = new FlipFlopDialog();
+          ff.enable();
         },
       },
     ];
