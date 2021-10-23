@@ -225,6 +225,8 @@ const FlipFlopDialog = WDialog.extend({
         this.best.two,
         this.best.three
       );
+      if (interval.length !== linkedPortals.length) continue;
+
       const angleSort = interval.map((p) => p.id);
       let i = 0,
         j = 0;
