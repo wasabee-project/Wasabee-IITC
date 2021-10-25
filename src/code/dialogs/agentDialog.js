@@ -18,23 +18,31 @@ const AgentDialog = WDialog.extend({
 
   _displayDialog: async function () {
     const html = L.DomUtil.create("div", null);
-    const agent = L.DomUtil.create("div", null, html);
 
     try {
       const data = await WasabeeAgent.get(this.options.gid);
-      const name = L.DomUtil.create("h2", "enl, wasabee-agent-label", agent);
-      name.textContent = data.name;
-      const vLabel = L.DomUtil.create("label", null, agent);
-      vLabel.textContent = "V Verified: ";
-      L.DomUtil.create("div", null, vLabel).textContent = data.Vverified;
-      const rocksLabel = L.DomUtil.create("label", null, agent);
-      rocksLabel.textContent = "Rocks Verified: ";
-      L.DomUtil.create("div", null, rocksLabel).textContent = data.rocks;
-      const img = L.DomUtil.create("img", null, agent);
+      L.DomUtil.create("h2", "wasabee-agent-label", html).textContent =
+        data.getName();
+
+      const ul = L.DomUtil.create("ul", "", html);
+      const rows = [
+        ["Server name: ", data.name],
+        ["V name: ", data.vname],
+        ["V verified: ", data.Vverified],
+        ["Rocks name: ", data.rocksname],
+        ["Rocks Verified: ", data.rocks],
+      ];
+      for (const [label, value] of rows) {
+        const li = L.DomUtil.create("li", "", ul);
+        L.DomUtil.create("label", null, li).textContent = label;
+        L.DomUtil.create("span", null, li).textContent = value;
+      }
+
+      const img = L.DomUtil.create("img", null, html);
       img.src = data.pic;
     } catch (e) {
       console.error(e);
-      agent.innerHTML = e.toString();
+      html.innerHTML = e.toString();
     }
 
     const buttons = {};

@@ -155,7 +155,7 @@ async function getMarkerPopup(PortalID) {
     const a = await WasabeeAgent.get(dk.GID);
     const li = L.DomUtil.create("li", null, ul);
     if (a) {
-      li.appendChild(await AgentUI.formatDisplay(a));
+      li.appendChild(AgentUI.formatDisplay(a));
     } else {
       const fake = L.DomUtil.create("span", null, li);
       fake.textContent = wX("LOADING");

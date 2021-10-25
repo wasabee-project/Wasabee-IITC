@@ -45,10 +45,10 @@ const OnlineAgentList = WDialog.extend({
     this._table.fields = [
       {
         name: wX("AGENT"),
-        value: (agent) => agent.name,
+        value: (agent) => agent.getName(),
         sort: (a, b) => a.localeCompare(b),
-        format: async (cell, value, agent) =>
-          cell.appendChild(await AgentUI.formatDisplay(agent)),
+        format: (cell, value, agent) =>
+          cell.appendChild(AgentUI.formatDisplay(agent)),
       },
       {
         name: "Last Seen",

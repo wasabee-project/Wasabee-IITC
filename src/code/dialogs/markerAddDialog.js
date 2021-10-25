@@ -182,7 +182,7 @@ const MarkerAddDialog = WDialog.extend({
             alreadyAdded.add(a.id);
             option = L.DomUtil.create("option");
             option.value = a.id;
-            option.textContent = a.name;
+            option.textContent = a.getName();
             menu.appendChild(option);
           }
         }

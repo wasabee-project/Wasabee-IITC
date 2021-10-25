@@ -128,7 +128,7 @@ const AssignDialog = WDialog.extend({
             alreadyAdded.push(a.id);
             option = L.DomUtil.create("option");
             option.value = a.id;
-            option.textContent = a.name;
+            option.textContent = a.getName();
             if (a.id == current) option.selected = true;
             menu.appendChild(option);
           }

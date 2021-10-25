@@ -281,8 +281,8 @@ const OpsDialog = WDialog.extend({
       };
       if (sum.currentserver) {
         const agent = await WasabeeAgent.get(tmpOp.creator);
-        sum.owner = agent.name;
-        sum.ownerDisplay = await AgentUI.formatDisplay(agent);
+        sum.owner = agent.getName();
+        sum.ownerDisplay = AgentUI.formatDisplay(agent);
       } else {
         sum.owner = window.PLAYER.nickname;
       }

@@ -212,7 +212,7 @@ const OperationChecklistDialog = WDialog.extend({
         value: async (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
             const agent = await WasabeeAgent.get(thing.assignedTo);
-            if (agent != null) return agent.name;
+            if (agent != null) return agent.getName();
             return "GID: [" + thing.assignedTo + "]";
           }
           return ". . .";
