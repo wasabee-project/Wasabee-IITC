@@ -1,6 +1,6 @@
 name: Pull request artifacts
 on:
-  pull_request:
+  pull_request_target:
     branches: [dev]
 jobs:
   build-and-deploy-dev:
