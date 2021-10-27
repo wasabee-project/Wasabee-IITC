@@ -55,7 +55,7 @@ const OnlineAgentList = WDialog.extend({
         value: (agent) => agent.date,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => {
-          if (agent) cell.textContent = agent.timeSinceformat();
+          if (agent) cell.textContent = AgentUI.timeSinceformat(agent);
         },
       },
       {

@@ -245,4 +245,5 @@ const WLAgent = L.Marker.extend({
 export default {
   formatDisplay,
   WLAgent,
+  timeSinceformat,
 };
