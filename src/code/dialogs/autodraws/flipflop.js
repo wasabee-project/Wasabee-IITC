@@ -115,6 +115,8 @@ const FlipFlopDialog = AutoDraw.extend({
       window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
     );
 
+    this._addSelectSet(wX("AUTODRAW_PORTALS_SET"), "set", container, "all");
+
     L.DomUtil.create("label", null, container).textContent = "#SBUL";
     this._nbSbul = L.DomUtil.create("input", null, container);
     this._nbSbul.type = "number";
@@ -265,7 +267,7 @@ const FlipFlopDialog = AutoDraw.extend({
     }
 
     this._operation = getSelectedOperation();
-    const portals = getAllPortalsOnScreen(this._operation).filter(
+    const portals = this._portalSets["set"].portals.filter(
       (p) => p.id != this._anchorOne.id
     );
 
@@ -309,7 +311,7 @@ const FlipFlopDialog = AutoDraw.extend({
           j + 1,
           revAngleSort
         );
-        if (best.steps.length < res.length) {
+        if (!best.two || best.steps.length < res.length) {
           best.steps = res;
           best.two = pTwo;
           best.three = pThree;
@@ -323,8 +325,7 @@ const FlipFlopDialog = AutoDraw.extend({
     if (best.steps.length > maxSteps)
       best.steps = best.steps.slice(0, maxSteps);
 
-    // Calculate the multimax
-    if (!best.steps.length) {
+    if (!best.two) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }

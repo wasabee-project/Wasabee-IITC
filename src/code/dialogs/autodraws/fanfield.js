@@ -3,7 +3,7 @@ import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
-import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
 
 export function angle(a, p) {
@@ -77,6 +77,7 @@ const FanfieldDialog = AutoDraw.extend({
   addHooks: function () {
     AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
+    this._updatePortalSet();
   },
 
   _displayDialog: function () {
@@ -102,6 +103,8 @@ const FanfieldDialog = AutoDraw.extend({
       container,
       "wasabee-fanfield-end"
     );
+
+    this._addSelectSet(wX("AUTODRAW_PORTALS_SET"), "set", container, "all");
 
     const description2 = L.DomUtil.create("div", "desc secondary", container);
     description2.textContent = wX("SELECT_FAN_PORTALS2");
@@ -139,10 +142,9 @@ const FanfieldDialog = AutoDraw.extend({
       return;
     }
 
-    const op = getSelectedOperation();
     const steps = sortPortalsByAngle(
       this._anchor,
-      getAllPortalsOnScreen(op),
+      this._portalSets["set"].portals,
       this._start,
       this._end
     );

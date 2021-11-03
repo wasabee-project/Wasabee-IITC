@@ -48,6 +48,7 @@
   "AUTH_SELECT_ACCOUNT": "Selecionar conta",
   "AUTO_DRAWS": "Auto-draw",
   "AUTODRAWS": "Wasabee Auto-draw Opções",
+  "AUTODRAW_PORTALS_SET": "Portals",
   "AUTOLOAD_RATE": "Taxa de solicitação de detalhes do portal (ms)",
   "AUTOLOAD": "Carregar automaticamente os detalhes do portal em falta",
   "AUTOMARK STOP": "Auto-Marcar interrompido devido a portais não serem carregados",

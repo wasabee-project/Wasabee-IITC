@@ -48,6 +48,7 @@
   "AUTH_SELECT_ACCOUNT": "Sélectionner le compte",
   "AUTO_DRAWS": "Auto-Draw",
   "AUTODRAWS": "Choix d'Auto-draw",
+  "AUTODRAW_PORTALS_SET": "Portals",
   "AUTOLOAD_RATE": "Délai entre deux requêtes",
   "AUTOLOAD": "Charger automatiquement les données manquantes de portails",
   "AUTOMARK STOP": "Le processus d'Auto-Mark s'est arrêté suite à l'absence de donnée pour certains portails.",
