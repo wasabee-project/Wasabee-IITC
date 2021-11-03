@@ -1,0 +1,25 @@
+name: Pull request Comment
+on:
+  workflow_run:
+    workflows: ["Pull request build"]
+    types:
+      - completed
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: pr
+
+      - name: Pull request artifacts
+        uses: gavv/pull-request-artifacts@v1.0.0
+        with:
+          commit: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts-branch: artifacts
+          artifacts: |
+            wasabee.user.js

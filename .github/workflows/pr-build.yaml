@@ -1,0 +1,23 @@
+name: Pull request build
+on:
+  pull_request:
+    branches: [dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+
+      - name: Build
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          npm install
+          npm run build-pr
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: pr
+          path: releases/dev/wasabee.user.js
