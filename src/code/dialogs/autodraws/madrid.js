@@ -1,6 +1,6 @@
-import { getSelectedOperation } from "../selectedOp";
-import { clearAllLinks } from "../uiCommands";
-import wX from "../wX";
+import { getSelectedOperation } from "../../selectedOp";
+import { clearAllLinks } from "../../uiCommands";
+import wX from "../../wX";
 import MultimaxDialog from "./multimaxDialog";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up

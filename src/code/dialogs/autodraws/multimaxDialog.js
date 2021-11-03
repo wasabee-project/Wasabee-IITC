@@ -1,16 +1,16 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import WasabeeMarker from "../model/marker";
-import { getSelectedOperation } from "../selectedOp";
-import wX from "../wX";
+import { WDialog } from "../../leafletClasses";
+import WasabeePortal from "../../model/portal";
+import WasabeeMarker from "../../model/marker";
+import { getSelectedOperation } from "../../selectedOp";
+import wX from "../../wX";
 import {
   getAllPortalsOnScreen,
   testPortal,
   clearAllLinks,
-} from "../uiCommands";
-import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
+} from "../../uiCommands";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 
-import PortalUI from "../ui/portal";
+import PortalUI from "../../ui/portal";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX

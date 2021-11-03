@@ -1,16 +1,16 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
+import { WDialog } from "../../leafletClasses";
+import WasabeePortal from "../../model/portal";
+import { getSelectedOperation } from "../../selectedOp";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 // import WasabeeLink from "../model/link";
 import {
   clearAllLinks,
   getAllPortalsOnScreen,
   testPortal,
-} from "../uiCommands";
-import wX from "../wX";
+} from "../../uiCommands";
+import wX from "../../wX";
 
-import PortalUI from "../ui/portal";
+import PortalUI from "../../ui/portal";
 
 const HomogeneousDialog = WDialog.extend({
   statics: {

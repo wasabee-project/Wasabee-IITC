@@ -1,14 +1,14 @@
-import { WDialog } from "../leafletClasses";
-import wX from "../wX";
-import { getSelectedOperation } from "../selectedOp";
-import { getAllPortalsOnScreen, clearAllLinks } from "../uiCommands";
+import { WDialog } from "../../leafletClasses";
+import wX from "../../wX";
+import { getSelectedOperation } from "../../selectedOp";
+import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
 
-import WasabeePortal from "../model/portal";
-import WasabeeMarker from "../model/marker";
-import PortalUI from "../ui/portal";
+import WasabeePortal from "../../model/portal";
+import WasabeeMarker from "../../model/marker";
+import PortalUI from "../../ui/portal";
 
 import { angle } from "./fanfield";
-import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 
 function selectAngleInterval(anchor, portalsSorted, start, end) {
   const startAngle = angle(anchor, start);

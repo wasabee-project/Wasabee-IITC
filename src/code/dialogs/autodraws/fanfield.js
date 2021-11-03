@@ -1,12 +1,12 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersect, GeodesicLine } from "../crosslinks";
-import WasabeeLink from "../model/link";
-import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
-import wX from "../wX";
+import { WDialog } from "../../leafletClasses";
+import WasabeePortal from "../../model/portal";
+import { getSelectedOperation } from "../../selectedOp";
+import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
+import WasabeeLink from "../../model/link";
+import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+import wX from "../../wX";
 
-import PortalUI from "../ui/portal";
+import PortalUI from "../../ui/portal";
 
 export function angle(a, p) {
   if (a.id == p.id) throw Error("same portal");

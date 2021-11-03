@@ -1,10 +1,10 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import { getSelectedOperation } from "../selectedOp";
-import { clearAllLinks, getAllPortalsLinked } from "../uiCommands";
-import wX from "../wX";
+import { WDialog } from "../../leafletClasses";
+import WasabeePortal from "../../model/portal";
+import { getSelectedOperation } from "../../selectedOp";
+import { clearAllLinks, getAllPortalsLinked } from "../../uiCommands";
+import wX from "../../wX";
 
-import PortalUI from "../ui/portal";
+import PortalUI from "../../ui/portal";
 
 const SaveLinksDialog = WDialog.extend({
   statics: {
