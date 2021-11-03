@@ -1,11 +1,10 @@
-import { WDialog } from "../../leafletClasses";
+import { AutoDraw } from "./tools";
 import wX from "../../wX";
 import { getSelectedOperation } from "../../selectedOp";
 import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
 
 import WasabeePortal from "../../model/portal";
 import WasabeeMarker from "../../model/marker";
-import PortalUI from "../../ui/portal";
 
 import { angle } from "./fanfield";
 import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
@@ -85,51 +84,20 @@ function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
-const FlipFlopDialog = WDialog.extend({
+const FlipFlopDialog = AutoDraw.extend({
   statics: {
     TYPE: "madridDialog",
   },
 
-  needWritePermission: true,
-
   initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
+    AutoDraw.prototype.initialize.call(this, options);
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
   },
 
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  _addSetPortal: function (text, thisKey, container, storageKey) {
-    const label = L.DomUtil.create("label", null, container);
-    label.textContent = text;
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("SET");
-    const display = L.DomUtil.create("span", null, container);
-    if (this[thisKey]) {
-      display.appendChild(
-        PortalUI.displayFormat(this[thisKey], this._smallScreen)
-      );
-    } else {
-      display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(button, "click", () => {
-      this[thisKey] = PortalUI.getSelected();
-      if (this[thisKey]) {
-        if (storageKey)
-          localStorage[storageKey] = JSON.stringify(this[thisKey]);
-        display.textContent = "";
-        display.appendChild(
-          PortalUI.displayFormat(this[thisKey], this._smallScreen)
-        );
-      } else {
-        display.textContent = wX("NOT_SET");
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
   },
 
   _buildContent: function () {

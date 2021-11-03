@@ -1,20 +1,23 @@
-import { WDialog } from "../../leafletClasses";
+import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks, getAllPortalsLinked } from "../../uiCommands";
 import wX from "../../wX";
 
-import PortalUI from "../../ui/portal";
-
-const SaveLinksDialog = WDialog.extend({
+const SaveLinksDialog = AutoDraw.extend({
   statics: {
     TYPE: "SaveLinksDialog",
   },
 
-  needWritePermission: true,
+  initialize: function (options) {
+    AutoDraw.prototype.initialize.call(this, options);
+    const p =
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    if (p) this._anchor = new WasabeePortal(p);
+  },
 
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
@@ -24,38 +27,12 @@ const SaveLinksDialog = WDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SEL_SL_ANCHOR");
 
-    //anchor portal text
-    const anchorLabel = L.DomUtil.create("label", null, container);
-    anchorLabel.textContent = wX("ANCHOR_PORTAL");
-
-    //Set Button
-    const anchorButton = L.DomUtil.create("button", null, container);
-    anchorButton.textContent = wX("SET");
-    this._anchorDisplay = L.DomUtil.create("div", "anchor", container);
-
-    //do magic
-    if (this._anchor) {
-      this._anchorDisplay.appendChild(
-        PortalUI.displayFormat(this._anchor, this._smallScreen)
-      );
-    } else {
-      this._anchorDisplay.textContent = wX("NOT_SET");
-    }
-
-    L.DomEvent.on(anchorButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor = PortalUI.getSelected();
-      if (this._anchor) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchor);
-        this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(
-          PortalUI.displayFormat(this._anchor, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addSetPortal(
+      wX("ANCHOR_PORTAL"),
+      "_anchor",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+    );
 
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("SAVELINKS_DRAW");
@@ -80,13 +57,6 @@ const SaveLinksDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.savelinks,
     });
-  },
-
-  initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
-    const p =
-      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor = new WasabeePortal(p);
   },
 
   saveLinks: function () {

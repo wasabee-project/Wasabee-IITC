@@ -1,12 +1,10 @@
-import { WDialog } from "../../leafletClasses";
+import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
-
-import PortalUI from "../../ui/portal";
 
 export function angle(a, p) {
   if (a.id == p.id) throw Error("same portal");
@@ -61,13 +59,23 @@ export function sortPortalsByAngle(anchor, portals, start, end) {
   return slice;
 }
 
-const FanfieldDialog = WDialog.extend({
+const FanfieldDialog = AutoDraw.extend({
   statics: {
     TYPE: "FanfieldDialog",
   },
 
+  initialize: function (options) {
+    AutoDraw.prototype.initialize.call(this, options);
+    let p = localStorage["wasabee-anchor-1"];
+    if (p) this._anchor = new WasabeePortal(p);
+    p = localStorage["wasabee-fanfield-start"];
+    if (p) this._start = new WasabeePortal(p);
+    p = localStorage["wasabee-fanfield-end"];
+    if (p) this._end = new WasabeePortal(p);
+  },
+
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
@@ -76,85 +84,26 @@ const FanfieldDialog = WDialog.extend({
     const description = L.DomUtil.create("div", "desc", container);
     description.textContent = wX("SELECT_FAN_PORTALS");
 
-    const anchorLabel = L.DomUtil.create("label", null, container);
-    anchorLabel.textContent = wX("ANCHOR_PORTAL");
-    const anchorButton = L.DomUtil.create("button", null, container);
-    anchorButton.textContent = wX("SET");
-    this._anchorDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchor) {
-      this._anchorDisplay.appendChild(
-        PortalUI.displayFormat(this._anchor, this._smallScreen)
-      );
-    } else {
-      this._anchorDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor = PortalUI.getSelected();
-      if (this._anchor) {
-        localStorage["wasabee-anchor-1"] = JSON.stringify(this._anchor);
-        this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(
-          PortalUI.displayFormat(this._anchor, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addSetPortal(
+      wX("ANCHOR_PORTAL"),
+      "_anchor",
+      container,
+      "wasabee-anchor-1"
+    );
+    this._addSetPortal(
+      wX("START_PORT"),
+      "_start",
+      container,
+      "wasabee-fanfield-start"
+    );
+    this._addSetPortal(
+      wX("END_PORT"),
+      "_end",
+      container,
+      "wasabee-fanfield-end"
+    );
 
-    const startLabel = L.DomUtil.create("label", null, container);
-    startLabel.textContent = wX("START_PORT");
-    const startButton = L.DomUtil.create("button", null, container);
-    startButton.textContent = wX("SET");
-    this._startDisplay = L.DomUtil.create("span", null, container);
-    if (this._start) {
-      this._startDisplay.appendChild(
-        PortalUI.displayFormat(this._start, this._smallScreen)
-      );
-    } else {
-      this._startDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(startButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._start = PortalUI.getSelected();
-      if (this._start) {
-        localStorage["wasabee-fanfield-start"] = JSON.stringify(this._start);
-        this._startDisplay.textContent = "";
-        this._startDisplay.appendChild(
-          PortalUI.displayFormat(this._start, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-
-    const endLabel = L.DomUtil.create("label", null, container);
-    endLabel.textContent = wX("END_PORT");
-    const endButton = L.DomUtil.create("button", null, container);
-    endButton.textContent = wX("SET");
-    this._endDisplay = L.DomUtil.create("span", null, container);
-    if (this._end) {
-      this._endDisplay.appendChild(
-        PortalUI.displayFormat(this._end, this._smallScreen)
-      );
-    } else {
-      this._endDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(endButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._end = PortalUI.getSelected();
-      if (this._end) {
-        localStorage["wasabee-fanfield-end"] = JSON.stringify(this._end);
-        this._endDisplay.textContent = "";
-        this._endDisplay.appendChild(
-          PortalUI.displayFormat(this._end, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-
-    const description2 = L.DomUtil.create("div", "desc2", container);
+    const description2 = L.DomUtil.create("div", "desc secondary", container);
     description2.textContent = wX("SELECT_FAN_PORTALS2");
 
     // Bottom buttons bar
@@ -181,18 +130,6 @@ const FanfieldDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.fanfield,
     });
-  },
-
-  initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
-    this.title = wX("FAN_FIELD3");
-    this.label = wX("FAN_FIELD3");
-    let p = localStorage["wasabee-anchor-1"];
-    if (p) this._anchor = new WasabeePortal(p);
-    p = localStorage["wasabee-fanfield-start"];
-    if (p) this._start = new WasabeePortal(p);
-    p = localStorage["wasabee-fanfield-end"];
-    if (p) this._end = new WasabeePortal(p);
   },
 
   // fanfiled determines the portals between start/end and their angle (and order)

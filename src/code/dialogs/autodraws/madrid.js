@@ -10,8 +10,6 @@ const MadridDialog = MultimaxDialog.extend({
     TYPE: "madridDialog",
   },
 
-  needWritePermission: true,
-
   _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
