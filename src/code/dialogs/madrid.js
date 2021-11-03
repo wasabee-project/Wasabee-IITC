@@ -1,11 +1,5 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
-import {
-  getAllPortalsOnScreen,
-  testPortal,
-  clearAllLinks,
-} from "../uiCommands";
+import { clearAllLinks } from "../uiCommands";
 import wX from "../wX";
 import MultimaxDialog from "./multimaxDialog";
 
@@ -18,28 +12,6 @@ const MadridDialog = MultimaxDialog.extend({
 
   needWritePermission: true,
 
-  _addSetZone: function (text, thisKey, container) {
-    const label = L.DomUtil.create("div", "set_label", container);
-    label.textContent = text;
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("SET");
-    const display = L.DomUtil.create("span", null, container);
-    if (this[thisKey]) {
-      display.textContent = wX("PORTAL_COUNT", {
-        count: this[thisKey].length,
-      });
-    } else {
-      display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(button, "click", () => {
-      this[thisKey] = getAllPortalsOnScreen(getSelectedOperation());
-      // XXX this is not enough, need to cache them in case IITC purges them
-      display.textContent = wX("PORTAL_COUNT", {
-        count: this[thisKey].length,
-      });
-    });
-  },
-
   _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
@@ -51,7 +23,7 @@ const MadridDialog = MultimaxDialog.extend({
       container,
       window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
     );
-    this._addSetZone(wX("MADRID_SET_1"), "_portalSetOne", container);
+    this._addSelectSet(wX("MADRID_SET_1"), "setOne", container, "all");
 
     this._addSetPortal(
       wX("ANCHOR2"),
@@ -59,13 +31,13 @@ const MadridDialog = MultimaxDialog.extend({
       container,
       window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
     );
-    this._addSetZone(wX("MADRID_SET_2"), "_portalSetTwo", container);
+    this._addSelectSet(wX("MADRID_SET_2"), "setTwo", container, "all");
 
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
     anchorThreeLabel.textContent = wX("ANCHOR3");
     const anchorThreeDisplay = L.DomUtil.create("span", null, container);
     anchorThreeDisplay.textContent = "Auto-determined";
-    this._addSetZone(wX("MADRID_SET_3"), "_portalSetThree", container);
+    this._addSelectSet(wX("MADRID_SET_3"), "setThree", container, "all");
 
     this._addCheckbox(
       wX("ADD_BL"),
@@ -125,48 +97,43 @@ const MadridDialog = MultimaxDialog.extend({
     });
   },
 
-  initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
-    this.title = wX("MADRID");
-    this.label = wX("MADRID");
-    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchorOne = new WasabeePortal(p);
-    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchorTwo = new WasabeePortal(p);
-    this._urp = testPortal();
-  },
-
   doBalancedMadrid: function () {
     // Calculate the multimax
     if (
       !this._anchorOne ||
       !this._anchorTwo ||
-      !this._portalSetOne ||
-      !this._portalSetTwo ||
-      !this._portalSetThree
+      !this._portalSets.setOne.portals.length ||
+      !this._portalSets.setTwo.portals.length ||
+      !this._portalSets.setThree.portals.length
     ) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }
 
     // the set 1 must contain anchor 1 (first back link)
-    if (this._portalSetOne.find((p) => this._anchorOne.id == p.id) == undefined)
-      this._portalSetOne.push(this._anchorOne);
+    if (
+      this._portalSets.setOne.portals.find((p) => this._anchorOne.id == p.id) ==
+      undefined
+    )
+      this._portalSets.setOne.portals.push(this._anchorOne);
     // the set 2 must contain anchor 2 (first back link)
-    if (this._portalSetTwo.find((p) => this._anchorTwo.id == p.id) == undefined)
-      this._portalSetTwo.push(this._anchorTwo);
+    if (
+      this._portalSets.setTwo.portals.find((p) => this._anchorTwo.id == p.id) ==
+      undefined
+    )
+      this._portalSets.setTwo.portals.push(this._anchorTwo);
 
     const spineThree = this.getSpine(
       this._anchorOne,
       this._anchorTwo,
-      this._portalSetThree
+      this._portalSets.setThree.portals
     );
     const lastThree = spineThree[spineThree.length - 1];
 
     const spineOne = this.getSpine(
       this._anchorTwo,
       lastThree,
-      this._portalSetOne.filter(
+      this._portalSets.setOne.portals.filter(
         (p) =>
           this._anchorOne.id == p.id ||
           this.fieldCoversPortal(this._anchorTwo, lastThree, p, this._anchorOne)
@@ -177,7 +144,7 @@ const MadridDialog = MultimaxDialog.extend({
     const spineTwo = this.getSpine(
       lastThree,
       lastOne,
-      this._portalSetTwo.filter(
+      this._portalSets.setTwo.portals.filter(
         (p) =>
           this._anchorTwo.id == p.id ||
           this.fieldCoversPortal(lastThree, lastOne, p, this._anchorTwo)
@@ -251,9 +218,9 @@ const MadridDialog = MultimaxDialog.extend({
     if (
       !this._anchorOne ||
       !this._anchorTwo ||
-      !this._portalSetOne ||
-      !this._portalSetTwo ||
-      !this._portalSetThree
+      !this._portalSets.setOne.portals.length ||
+      !this._portalSets.setTwo.portals.length ||
+      !this._portalSets.setThree.portals.length
     ) {
       alert(wX("INVALID REQUEST"));
       return 0;
@@ -268,7 +235,7 @@ const MadridDialog = MultimaxDialog.extend({
     const [len1, order1, last1] = this.MM(
       this._anchorOne,
       this._anchorTwo,
-      this._portalSetThree,
+      this._portalSets.setThree.portals,
       1,
       false,
       "madrid protocol "
@@ -277,13 +244,16 @@ const MadridDialog = MultimaxDialog.extend({
 
     const newThree = last1;
     // the set 1 must contain anchor 1 (first back link)
-    if (this._portalSetOne.find((p) => this._anchorOne.id == p.id) == undefined)
-      this._portalSetOne.push(this._anchorOne);
+    if (
+      this._portalSets.setOne.portals.find((p) => this._anchorOne.id == p.id) ==
+      undefined
+    )
+      this._portalSets.setOne.portals.push(this._anchorOne);
 
     const [len2, order2, last2] = this.MM(
       this._anchorTwo,
       newThree,
-      this._portalSetOne.filter(
+      this._portalSets.setOne.portals.filter(
         (p) =>
           this._anchorOne.id == p.id ||
           this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
@@ -297,13 +267,16 @@ const MadridDialog = MultimaxDialog.extend({
     // _anchorOne is no longer useful, use last2
     const newOne = last2;
     // the set 2 must contain anchor 2 (first back link)
-    if (this._portalSetTwo.find((p) => this._anchorTwo.id == p.id) == undefined)
-      this._portalSetTwo.push(this._anchorTwo);
+    if (
+      this._portalSets.setTwo.portals.find((p) => this._anchorTwo.id == p.id) ==
+      undefined
+    )
+      this._portalSets.setTwo.portals.push(this._anchorTwo);
 
     const len3 = this.MM(
       newThree,
       newOne,
-      this._portalSetTwo.filter(
+      this._portalSets.setTwo.portals.filter(
         (p) =>
           this._anchorTwo.id == p.id ||
           this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
