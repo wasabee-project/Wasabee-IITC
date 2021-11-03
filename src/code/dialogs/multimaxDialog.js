@@ -143,13 +143,13 @@ const MultimaxDialog = WDialog.extend({
     display.textContent = wX("NOT_SET");
     {
       const o = L.DomUtil.create("option", null, select);
-      o.textContent = "All visible portals";
+      o.textContent = wX("MM_SET_ALL_PORTALS");
       o.value = "all";
       o.selected = defaultValue == o.value;
     }
     {
       const o = L.DomUtil.create("option", null, select);
-      o.textContent = "All Key Portals";
+      o.textContent = wX("MM_SET_ALL_KEYS");
       o.value = "keys";
       o.selected = defaultValue == o.value;
     }
@@ -161,7 +161,7 @@ const MultimaxDialog = WDialog.extend({
     }
     for (const zone of this._operation.zones) {
       const o = L.DomUtil.create("option", null, select);
-      o.textContent = "Keys in " + zone.name;
+      o.textContent = wX("MM_SET_KEYS_ZONE", { zoneName: zone.name });
       o.value = "keys" + zone.id;
       o.selected = defaultValue == o.value;
     }
@@ -220,7 +220,7 @@ const MultimaxDialog = WDialog.extend({
       true
     );
 
-    this._addSelectSet("Spine region", "spine", container, "all");
+    this._addSelectSet(wX("MM_SPINE"), "spine", container, "all");
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
