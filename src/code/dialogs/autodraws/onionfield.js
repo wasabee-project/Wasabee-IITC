@@ -1,22 +1,25 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import { getSelectedOperation } from "../selectedOp";
-import { greatCircleArcIntersect } from "../crosslinks";
-import WasabeeLink from "../model/link";
-import { clearAllLinks, getAllPortalsOnScreen } from "../uiCommands";
-import wX from "../wX";
+import { AutoDraw } from "./tools";
+import WasabeePortal from "../../model/portal";
+import { getSelectedOperation } from "../../selectedOp";
+import { greatCircleArcIntersect } from "../../crosslinks";
+import WasabeeLink from "../../model/link";
+import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+import wX from "../../wX";
 
-import PortalUI from "../ui/portal";
-
-const OnionfieldDialog = WDialog.extend({
+const OnionfieldDialog = AutoDraw.extend({
   statics: {
     TYPE: "OnionDialog",
   },
 
-  needWritePermission: true,
+  initialize: function (options) {
+    AutoDraw.prototype.initialize.call(this, options);
+    const p =
+      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    if (p) this._anchor = new WasabeePortal(p);
+  },
 
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
   },
 
@@ -27,41 +30,12 @@ const OnionfieldDialog = WDialog.extend({
     const description3 = L.DomUtil.create("div", "desc", container);
     description3.textContent = wX("SEL_SB_ANCHOR2");
 
-    const dividerBeforePortals = L.DomUtil.create("span", null, container);
-    dividerBeforePortals.textContent = "";
-
-    const anchorLabel = L.DomUtil.create("label", null, container);
-    anchorLabel.textContent = wX("ANCHOR_PORTAL");
-    const anchorButton = L.DomUtil.create("button", null, container);
-    anchorButton.textContent = wX("SET");
-    this._anchorDisplay = L.DomUtil.create("span", null, container);
-    if (this._anchor) {
-      this._anchorDisplay.appendChild(
-        PortalUI.displayFormat(this._anchor, this._smallScreen)
-      );
-    } else {
-      this._anchorDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchorButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor = PortalUI.getSelected();
-      if (this._anchor) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchor);
-        this._anchorDisplay.textContent = "";
-        this._anchorDisplay.appendChild(
-          PortalUI.displayFormat(this._anchor, this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-    const dividerBeforeDraw = L.DomUtil.create("span", null, container);
-    dividerBeforeDraw.textContent = "";
-
-    // Bottom buttons bar
-    const placeholder = L.DomUtil.create("label", "placeholder", container);
-    placeholder.textContent = "\u2063";
+    this._addSetPortal(
+      wX("ANCHOR_PORTAL"),
+      "_anchor",
+      container,
+      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+    );
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
@@ -85,15 +59,6 @@ const OnionfieldDialog = WDialog.extend({
       dialogClass: "onion",
       buttons: buttons,
     });
-  },
-
-  initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
-    this.title = "Onion/Rose";
-    this.label = "Onion/Rose";
-    const p =
-      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchor = new WasabeePortal(p);
   },
 
   onion: function () {

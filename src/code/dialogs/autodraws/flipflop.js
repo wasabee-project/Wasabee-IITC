@@ -1,14 +1,13 @@
-import { WDialog } from "../leafletClasses";
-import wX from "../wX";
-import { getSelectedOperation } from "../selectedOp";
-import { getAllPortalsOnScreen, clearAllLinks } from "../uiCommands";
+import { AutoDraw } from "./tools";
+import wX from "../../wX";
+import { getSelectedOperation } from "../../selectedOp";
+import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
 
-import WasabeePortal from "../model/portal";
-import WasabeeMarker from "../model/marker";
-import PortalUI from "../ui/portal";
+import WasabeePortal from "../../model/portal";
+import WasabeeMarker from "../../model/marker";
 
 import { angle } from "./fanfield";
-import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 
 function selectAngleInterval(anchor, portalsSorted, start, end) {
   const startAngle = angle(anchor, start);
@@ -85,51 +84,20 @@ function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
-const FlipFlopDialog = WDialog.extend({
+const FlipFlopDialog = AutoDraw.extend({
   statics: {
     TYPE: "madridDialog",
   },
 
-  needWritePermission: true,
-
   initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
+    AutoDraw.prototype.initialize.call(this, options);
     let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
     if (p) this._anchorOne = new WasabeePortal(p);
   },
 
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
-  },
-
-  _addSetPortal: function (text, thisKey, container, storageKey) {
-    const label = L.DomUtil.create("label", null, container);
-    label.textContent = text;
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("SET");
-    const display = L.DomUtil.create("span", null, container);
-    if (this[thisKey]) {
-      display.appendChild(
-        PortalUI.displayFormat(this[thisKey], this._smallScreen)
-      );
-    } else {
-      display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(button, "click", () => {
-      this[thisKey] = PortalUI.getSelected();
-      if (this[thisKey]) {
-        if (storageKey)
-          localStorage[storageKey] = JSON.stringify(this[thisKey]);
-        display.textContent = "";
-        display.appendChild(
-          PortalUI.displayFormat(this[thisKey], this._smallScreen)
-        );
-      } else {
-        display.textContent = wX("NOT_SET");
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
   },
 
   _buildContent: function () {
@@ -146,6 +114,8 @@ const FlipFlopDialog = WDialog.extend({
       container,
       window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
     );
+
+    this._addSelectSet(wX("AUTODRAW_PORTALS_SET"), "set", container, "all");
 
     L.DomUtil.create("label", null, container).textContent = "#SBUL";
     this._nbSbul = L.DomUtil.create("input", null, container);
@@ -297,7 +267,7 @@ const FlipFlopDialog = WDialog.extend({
     }
 
     this._operation = getSelectedOperation();
-    const portals = getAllPortalsOnScreen(this._operation).filter(
+    const portals = this._portalSets["set"].portals.filter(
       (p) => p.id != this._anchorOne.id
     );
 
@@ -341,7 +311,7 @@ const FlipFlopDialog = WDialog.extend({
           j + 1,
           revAngleSort
         );
-        if (best.steps.length < res.length) {
+        if (!best.two || best.steps.length < res.length) {
           best.steps = res;
           best.two = pTwo;
           best.three = pThree;
@@ -355,8 +325,7 @@ const FlipFlopDialog = WDialog.extend({
     if (best.steps.length > maxSteps)
       best.steps = best.steps.slice(0, maxSteps);
 
-    // Calculate the multimax
-    if (!best.steps.length) {
+    if (!best.two) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }

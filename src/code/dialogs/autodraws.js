@@ -1,13 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import MultimaxDialog from "../dialogs/multimaxDialog";
-import FanfieldDialog from "../dialogs/fanfield";
-import StarburstDialog from "../dialogs/starburst";
-import SaveLinksDialog from "../dialogs/saveLinks";
-import OnionfieldDialog from "../dialogs/onionfield";
-import HomogeneousDialog from "../dialogs/homogeneous";
-import MadridDialog from "../dialogs/madrid";
-import FlipFlopDialog from "../dialogs/flipflop";
+import MultimaxDialog from "./autodraws/multimaxDialog";
+import FanfieldDialog from "./autodraws/fanfield";
+import StarburstDialog from "./autodraws/starburst";
+import SaveLinksDialog from "./autodraws/saveLinks";
+import OnionfieldDialog from "./autodraws/onionfield";
+import HomogeneousDialog from "./autodraws/homogeneous";
+import MadridDialog from "./autodraws/madrid";
+import FlipFlopDialog from "./autodraws/flipflop";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({

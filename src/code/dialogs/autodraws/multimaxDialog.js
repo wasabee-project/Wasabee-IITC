@@ -1,67 +1,31 @@
-import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import { getSelectedOperation } from "../selectedOp";
-import wX from "../wX";
-import {
-  getAllPortalsOnScreen,
-  testPortal,
-  clearAllLinks,
-} from "../uiCommands";
-import { greatCircleArcIntersectByLatLngs } from "../crosslinks";
-
-import PortalUI from "../ui/portal";
+import { AutoDraw } from "./tools";
+import WasabeePortal from "../../model/portal";
+import { getSelectedOperation } from "../../selectedOp";
+import wX from "../../wX";
+import { testPortal, clearAllLinks } from "../../uiCommands";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
-const MultimaxDialog = WDialog.extend({
+const MultimaxDialog = AutoDraw.extend({
   statics: {
     TYPE: "multimaxDialog",
   },
 
-  needWritePermission: true,
+  initialize: function (options) {
+    AutoDraw.prototype.initialize.call(this, options);
+    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    if (p) this._anchorOne = new WasabeePortal(p);
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
+    if (p) this._anchorTwo = new WasabeePortal(p);
+    this._urp = L.latLng(testPortal());
+  },
 
   addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+    AutoDraw.prototype.addHooks.call(this);
+
     this._displayDialog();
-  },
-
-  _addSetPortal: function (text, thisKey, container, storageKey) {
-    const label = L.DomUtil.create("label", null, container);
-    label.textContent = text;
-    const button = L.DomUtil.create("button", null, container);
-    button.textContent = wX("SET");
-    const display = L.DomUtil.create("span", null, container);
-    if (this[thisKey]) {
-      display.appendChild(
-        PortalUI.displayFormat(this[thisKey], this._smallScreen)
-      );
-    } else {
-      display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(button, "click", () => {
-      this[thisKey] = PortalUI.getSelected();
-      if (this[thisKey]) {
-        if (storageKey)
-          localStorage[storageKey] = JSON.stringify(this[thisKey]);
-        display.textContent = "";
-        display.appendChild(
-          PortalUI.displayFormat(this[thisKey], this._smallScreen)
-        );
-      } else {
-        display.textContent = wX("NOT_SET");
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-  },
-
-  _addCheckbox: function (text, id, thisKey, container, defaultValue) {
-    const label = L.DomUtil.create("label", null, container);
-    label.textContent = text;
-    label.htmlFor = id;
-    this[thisKey] = L.DomUtil.create("input", null, container);
-    this[thisKey].type = "checkbox";
-    this[thisKey].id = id;
-    this[thisKey].checked = defaultValue;
+    this._updatePortalSet();
   },
 
   _buildContent: function () {
@@ -100,6 +64,8 @@ const MultimaxDialog = WDialog.extend({
       true
     );
 
+    this._addSelectSet(wX("MM_SPINE"), "spine", container, "all");
+
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("MULTI_M");
@@ -131,15 +97,6 @@ const MultimaxDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.multimaxButton,
     });
-  },
-
-  initialize: function (options) {
-    WDialog.prototype.initialize.call(this, options);
-    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
-    if (p) this._anchorOne = new WasabeePortal(p);
-    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
-    if (p) this._anchorTwo = new WasabeePortal(p);
-    this._urp = L.latLng(testPortal());
   },
 
   getSpine: function (pOne, pTwo, portals) {
@@ -216,11 +173,10 @@ const MultimaxDialog = WDialog.extend({
 
   doMultimax: function () {
     // this._operation is OK here
-    this._operation = getSelectedOperation();
-    const portals = getAllPortalsOnScreen(this._operation);
+    const portals = this._portalSets.spine.portals;
 
     // Calculate the multimax
-    if (!this._anchorOne || !this._anchorTwo || !portals) {
+    if (!this._anchorOne || !this._anchorTwo || !portals.length) {
       alert(wX("INVALID REQUEST"));
       return 0;
     }
