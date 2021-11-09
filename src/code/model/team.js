@@ -52,11 +52,8 @@ export default class WasabeeTeam {
   static async get(teamID, maxAgeSeconds = 60) {
     const cached = await (await db).get("teams", teamID);
     if (cached) {
-      const t = new WasabeeTeam(cached);
-      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        t.cached = true;
-        return t;
-      }
+      if (cached.fetched + maxAgeSeconds * 1000 > Date.now())
+        return new WasabeeTeam(cached);
     }
 
     if (!WasabeeMe.isLoggedIn()) return null;

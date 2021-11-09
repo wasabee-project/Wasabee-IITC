@@ -1,0 +1,26 @@
+{
+  "contributors": [
+    {
+      "name": "McBen",
+      "url": "https://github.com/McBen"
+    }
+  ],
+  "dependencies": {
+    "@types/jquery": "*",
+    "@types/jqueryui": "*",
+    "@types/leaflet": "*",
+    "@types/spectrum": "*"
+  },
+  "description": "TypeScript definitions for IITC (Ingress Intel Total Conversation)",
+  "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/iitc",
+  "license": "MIT",
+  "main": "",
+  "name": "iitc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+    "directory": "types/iitc"
+  },
+  "types": "index.d.ts",
+  "version": "0.30.2"
+}

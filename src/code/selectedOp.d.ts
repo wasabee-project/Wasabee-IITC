@@ -1,0 +1,17 @@
+import WasabeeOp from "./model/operation";
+export declare function getSelectedOperation(): WasabeeOp;
+export declare function initSelectedOperation(): Promise<any>;
+export declare function changeOpIfNeeded(): Promise<any>;
+export declare function loadNewDefaultOp(): Promise<any>;
+export declare function makeSelectedOperation(opID: any): Promise<void>;
+export declare function setupLocalStorage(): Promise<void>;
+export declare function removeOperation(opID: any): Promise<void>;
+export declare function showOperation(opID: any): void;
+export declare function hideOperation(opID: any): void;
+export declare function resetHiddenOps(): void;
+export declare function resetOps(): Promise<void>;
+export declare function hiddenOpsList(): any;
+export declare function setOpBackground(opID: any, background: any): Promise<void>;
+export declare function opsList(hidden?: boolean): Promise<any[]>;
+export declare function duplicateOperation(opID: any): Promise<any>;
+export declare function removeNonOwnedOps(): Promise<void>;
