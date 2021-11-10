@@ -1,13 +1,12 @@
 import statics from "./static";
 
-// aliases to make review easier
 let strings = statics.strings;
 const defaultLang = statics.constants.DEFAULT_LANGUAGE;
 const localStoreKey = statics.constants.LANGUAGE_KEY;
 
 const templateRe = /\{ *([\w_ -]+) *\}/g;
 
-export function wX(key, data) {
+export function wX(key: string, data?: object) {
   const lang = getLanguage();
 
   // if the skin system is initialized, switch to it
