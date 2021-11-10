@@ -4,6 +4,16 @@ import { teamPromise } from "../server";
 import db from "../db";
 
 export default class WasabeeTeam {
+  fetched: number;
+  id: string;
+  name: string;
+  rc: string;
+  rk: string;
+  jlt: string;
+  agents: Array<WasabeeAgent>;
+
+  _a: Array<WasabeeAgent>;
+
   constructor(data) {
     if (typeof data == "string") {
       try {
@@ -52,8 +62,10 @@ export default class WasabeeTeam {
   static async get(teamID, maxAgeSeconds = 60) {
     const cached = await (await db).get("teams", teamID);
     if (cached) {
-      if (cached.fetched + maxAgeSeconds * 1000 > Date.now())
-        return new WasabeeTeam(cached);
+      const t = new WasabeeTeam(cached);
+      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
+        return t;
+      }
     }
 
     if (!WasabeeMe.isLoggedIn()) return null;

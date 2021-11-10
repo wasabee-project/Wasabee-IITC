@@ -153,8 +153,6 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
     const team = await WasabeeTeam.get(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
-    // we don't need to draw if pulled from cache
-    if (team.cached === true) return done;
 
     const agents = team.getAgents();
     for (const agent of agents) {
