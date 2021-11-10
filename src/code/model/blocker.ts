@@ -1,15 +1,31 @@
 import db from "../db";
+import type WasabeeOp from "./operation";
+import type WasabeePortal from "./portal";
+
+export interface IBlockerPortal {
+  opID: OpID;
+  id: PortalID;
+  name: string;
+  lat: string;
+  lng: string;
+}
 
 export default class WasabeeBlocker {
+  opID: OpID;
+  from: PortalID;
+  to: PortalID;
+
+  fromPortal?: WasabeePortal;
+  toPortal?: WasabeePortal;
+
   constructor(obj) {
     this.opID = obj.opID;
     this.from = obj.fromPortal.id;
     this.to = obj.toPortal.id;
   }
 
-  static async addPortal(op, portal) {
-    const store = await (await db).transaction("blockers_portals", "readwrite")
-      .store;
+  static async addPortal(op: WasabeeOp, portal: WasabeePortal) {
+    const store = (await db).transaction("blockers_portals", "readwrite").store;
     const ent = {
       opID: op.ID,
       id: portal.id,
@@ -25,7 +41,7 @@ export default class WasabeeBlocker {
   }
 
   // return true if a blocker portal is updated
-  static async updatePortal(op, portal) {
+  static async updatePortal(op: WasabeeOp, portal: WasabeePortal) {
     const store = (await db).transaction("blockers_portals", "readwrite").store;
     if (portal.name === portal.id) return false;
     const p = await store.get([op.ID, portal.id]);
@@ -48,41 +64,43 @@ export default class WasabeeBlocker {
 
   static async removeBlocker(op, portalId) {
     const store = (await db).transaction("blockers", "readwrite").store;
-    let cursor = await store
+    let cfrom = await store
       .index("from")
       .openKeyCursor(IDBKeyRange.only([op.ID, portalId]));
-    while (cursor) {
-      store.delete(cursor.primaryKey);
-      cursor = await cursor.continue();
+    while (cfrom) {
+      store.delete(cfrom.primaryKey);
+      cfrom = await cfrom.continue();
     }
-    cursor = await store
+    let cto = await store
       .index("to")
       .openKeyCursor(IDBKeyRange.only([op.ID, portalId]));
-    while (cursor) {
-      store.delete(cursor.primaryKey);
-      cursor = await cursor.continue();
+    while (cto) {
+      store.delete(cto.primaryKey);
+      cto = await cto.continue();
     }
     await (await db).delete("blockers_portals", [op.ID, portalId]);
   }
 
-  static async removeBlockers(opID) {
-    let store = (await db).transaction("blockers", "readwrite").store;
-    let cursor = await store
-      .index("opID")
-      .openKeyCursor(IDBKeyRange.only(opID));
-    while (cursor) {
-      store.delete(cursor.primaryKey);
-      cursor = await cursor.continue();
+  static async removeBlockers(opID: string) {
+    const sb = (await db).transaction("blockers", "readwrite").store;
+    let co = await sb.index("opID").openKeyCursor(IDBKeyRange.only(opID));
+    while (co) {
+      sb.delete(co.primaryKey);
+      co = await co.continue();
     }
-    store = (await db).transaction("blockers_portals", "readwrite").store;
-    cursor = await store.index("opID").openKeyCursor(IDBKeyRange.only(opID));
-    while (cursor) {
-      store.delete(cursor.primaryKey);
-      cursor = await cursor.continue();
+    const sp = (await db).transaction("blockers_portals", "readwrite").store;
+    let cp = await sp.index("opID").openKeyCursor(IDBKeyRange.only(opID));
+    while (cp) {
+      sp.delete(cp.primaryKey);
+      cp = await cp.continue();
     }
   }
 
-  static async addBlocker(op, fromPortal, toPortal) {
+  static async addBlocker(
+    op: WasabeeOp,
+    fromPortal: WasabeePortal,
+    toPortal: WasabeePortal
+  ) {
     const blocker = new WasabeeBlocker({
       opID: op.ID,
       fromPortal: fromPortal,
@@ -94,14 +112,14 @@ export default class WasabeeBlocker {
     await WasabeeBlocker.addPortal(op, toPortal);
   }
 
-  static async getPortals(op) {
+  static async getPortals(op: WasabeeOp) {
     const portals = await (
       await db
     ).getAllFromIndex("blockers_portals", "opID", op.ID);
     return portals;
   }
 
-  static async getAll(op) {
+  static async getAll(op: WasabeeOp) {
     const blockers = await (
       await db
     ).getAllFromIndex("blockers", "opID", op.ID);
