@@ -16,7 +16,7 @@
     "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "allowUmdGlobalAccess": true
   },
   "include": [

@@ -139,9 +139,15 @@ const config = {
   },
   resolve: {
     modules: ["node_modules"],
+    extensions: ['.ts', '.js'],
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.(png|gif|svg)$/,
         use: "url-loader",
@@ -169,11 +175,11 @@ module.exports = (env, argv) => {
   const pluginConfig = require("./plugin.config.json");
   const meta = pluginConfig.headers.common;
   if (argv.mode === "development") {
-    if(env.scot) {
+    if (env.scot) {
       config.output.path = path.join(outputPath, "scot");
       config.devtool = "eval-source-map";
       Object.assign(meta, pluginConfig.headers.scot);
-    } else if(env.pr) {
+    } else if (env.pr) {
       config.output.path = path.join(outputPath, "dev");
       config.devtool = "inline-source-map";
       Object.assign(meta, pluginConfig.headers.pr);
