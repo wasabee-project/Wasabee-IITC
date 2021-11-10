@@ -1,9 +1,67 @@
 import { openDB } from "idb";
 
+import type { DBSchema } from "idb";
+import type WasabeeAgent from "./model/agent";
+import type { IBlockerPortal } from "./model/blocker";
+import type WasabeeBlocker from "./model/blocker";
+import type { ILocalOp } from "./model/operation";
+import type WasabeeTeam from "./model/team";
+import type { WDKey } from "./wd";
+
 const version = 3;
 
+interface WasabeeDB extends DBSchema {
+  agents: {
+    key: GoogleID;
+    value: WasabeeAgent;
+    indexes: {
+      date: string;
+      fetched: string;
+    };
+  };
+  teams: {
+    key: TeamID;
+    value: WasabeeTeam;
+    indexes: {
+      fetched: string;
+    };
+  };
+  defensivekeys: {
+    key: [GoogleID, PortalID];
+    value: WDKey;
+    indexes: {
+      PortalID: string;
+      Count: number;
+    };
+  };
+  operations: {
+    key: OpID;
+    value: ILocalOp;
+    indexes: {
+      fetched: string;
+      server: string;
+    };
+  };
+  blockers: {
+    key: [OpID, PortalID, PortalID];
+    value: WasabeeBlocker;
+    indexes: {
+      opID: OpID;
+      from: PortalID;
+      to: PortalID;
+    };
+  };
+  blockers_portals: {
+    key: [OpID, PortalID];
+    value: IBlockerPortal;
+    indexes: {
+      opID: OpID;
+    };
+  };
+}
+
 // XXX audit these to make sure all the various indexes are used
-const db = openDB("wasabee", version, {
+const db = openDB<WasabeeDB>("wasabee", version, {
   upgrade(db, oldVersion, newVersion, tx) {
     if (oldVersion < 1) {
       const agents = db.createObjectStore("agents", { keyPath: "id" });
