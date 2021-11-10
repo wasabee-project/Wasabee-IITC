@@ -1,4 +1,9 @@
 export default class WasabeeZone {
+  id: ZoneID;
+  name: string;
+  color: string;
+  points: zonePoint[];
+
   constructor(obj) {
     this.id = Number(obj.id);
     this.name = obj.name;
@@ -14,7 +19,7 @@ export default class WasabeeZone {
 
   toJSON() {
     return {
-      id: Number(this.id),
+      id: +this.id,
       name: `${this.name}`,
       color: this.color,
       points: this.points,
@@ -22,7 +27,7 @@ export default class WasabeeZone {
   }
 
   //ray casting algo
-  contains(latlng) {
+  contains(latlng: { lat: number; lng: number }) {
     this.points.sort((a, b) => {
       return a.position - b.position;
     });
@@ -51,9 +56,13 @@ export default class WasabeeZone {
 }
 
 class zonePoint {
+  position: number;
+  lat: number;
+  lng: number;
+
   constructor(obj) {
     this.position = Number(obj.position);
-    this.lat = Number(obj.lat);
-    this.lng = Number(obj.lng);
+    this.lat = +obj.lat;
+    this.lng = +obj.lng;
   }
 }
