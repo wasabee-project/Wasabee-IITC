@@ -1,13 +1,12 @@
-/// <reference path="./model/index.d.ts" />
-
 export {};
 
 declare global {
   type OpID = string;
   type PortalID = string;
   type TeamID = string;
-  type LinkID = string;
-  type MarkerID = string;
+  type TaskID = string;
+  type LinkID = TaskID;
+  type MarkerID = TaskID;
   type GoogleID = string;
   type ZoneID = number;
 }

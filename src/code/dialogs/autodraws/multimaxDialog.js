@@ -130,10 +130,10 @@ const MultimaxDialog = AutoDraw.extend({
         // skip base
         if (l.toPortalId === pOne.id && l.fromPortalId === pTwo.id) continue;
         if (l.fromPortalId === pOne.id && l.toPortalId === pTwo.id) continue;
-        if (l.opOrder > order) l.opOrder += diff;
+        if (l.order > order) l.order += diff;
       }
       for (const m of this._operation.markers) {
-        if (m.opOrder > order) m.opOrder += diff;
+        if (m.order > order) m.order += diff;
       }
     }
 

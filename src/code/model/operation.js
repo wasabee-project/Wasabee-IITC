@@ -415,7 +415,7 @@ export default class WasabeeOp extends Evented {
   setLinkOrder(linkID, order) {
     for (const v of this.links) {
       if (v.ID == linkID) {
-        v.opOrder = Number(order);
+        v.setOrder(order);
       }
     }
     this.update(true);
@@ -424,7 +424,7 @@ export default class WasabeeOp extends Evented {
   setMarkerOrder(markerID, order) {
     for (const v of this.markers) {
       if (v.ID == markerID) {
-        v.opOrder = Number(order);
+        v.setOrder(order);
       }
     }
     this.update(true);
@@ -660,7 +660,7 @@ export default class WasabeeOp extends Evented {
             this
           );
     if (options.description) link.description = options.description;
-    if (options.order) link.opOrder = options.order;
+    if (options.order) link.setOrder(options.order);
     if (options.color) link.color = options.color;
 
     if (!existingLink) {
@@ -1007,10 +1007,10 @@ export default class WasabeeOp extends Evented {
   get nextOrder() {
     let o = 0;
     for (const l of this.links) {
-      o = Math.max(o, l.opOrder);
+      o = Math.max(o, l.order);
     }
     for (const m of this.markers) {
-      o = Math.max(o, m.opOrder);
+      o = Math.max(o, m.order);
     }
     return ++o;
   }
