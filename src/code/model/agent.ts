@@ -3,7 +3,31 @@ import WasabeeMe from "./me";
 import WasabeeTeam from "./team";
 import db from "../db";
 
+
 export default class WasabeeAgent {
+  id: string;
+  name: string;
+  vname: string;
+  rocksname: string;
+  intelname: string;
+  intelfaction: string;
+  level: number;
+  enlid: string;
+  pic: string;
+  Vverified: boolean;
+  blacklisted: boolean;
+  rocks: boolean;
+  lat: number;
+  lng: number;
+  date: string;
+
+  ShareWD?: boolean;
+  LoadWD?: boolean;
+  squad?: string;
+  state?: boolean;
+
+  fetched: number;
+
   constructor(obj) {
     if (typeof obj == "string") {
       try {
@@ -135,11 +159,10 @@ export default class WasabeeAgent {
   }
 
   // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
-  static async get(gid, maxAgeSeconds = 86400) {
+  static async get(gid: string, maxAgeSeconds = 86400) {
     const cached = await (await db).get("agents", gid);
     if (cached && cached.fetched > Date.now() - 1000 * maxAgeSeconds) {
       const a = new WasabeeAgent(cached);
-      a.cached = true;
       // console.debug("returning from cache", a);
       return a;
     }
