@@ -12,7 +12,6 @@ import db from "../db";
 // 0.20->0.21 blocker migration
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
-import type { LatLngExpression } from "leaflet";
 
 export type KeyOnHand = {
   portalId: string;
@@ -96,12 +95,8 @@ export default class WasabeeOp extends Evented implements IOperation {
   constructor(obj) {
     super();
     if (typeof obj == "string") {
-      try {
-        obj = JSON.parse(obj);
-      } catch (e) {
-        console.error("corrupted operation", e);
-        return null;
-      }
+      console.trace("op waits for an object");
+      return null;
     }
 
     this.ID = obj.ID ? obj.ID : generateId();
@@ -254,10 +249,19 @@ export default class WasabeeOp extends Evented implements IOperation {
   // JSON with everything optional removed -- inception grade logic here
   toExport() {
     // round-trip through JSON.stringify to ensure a deep copy
-    const o = new WasabeeOp(JSON.stringify(this));
-    // drop +0.21
-    o.cleanPortalList(); // remove portals which are only relevant to blockers
+    const o = new WasabeeOp(JSON.parse(JSON.stringify(this)));
     return JSON.stringify(o);
+  }
+
+  getFetchedOp() {
+    if (!this.fetchedOp) return null;
+    try {
+      const json = JSON.parse(this.fetchedOp);
+      return new WasabeeOp(json);
+    } catch (e) {
+      console.error("corrupted fetched op", e);
+      return null;
+    }
   }
 
   // read only (for inspection)
@@ -1235,7 +1239,7 @@ export default class WasabeeOp extends Evented implements IOperation {
       comment: null,
     };
     // empty op if old OP (or local OP)
-    const oldOp = new WasabeeOp(origin ? origin : this.fetchedOp || {});
+    const oldOp = new WasabeeOp(origin ? origin : this.getFetchedOp() || {});
     const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
     const oldMarkers = new Map(oldOp.markers.map((m) => [m.ID, m]));
 

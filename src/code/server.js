@@ -105,11 +105,6 @@ export function deleteOpPromise(opID) {
   return genericDelete(`/api/v1/draw/${opID}`, new FormData());
 }
 
-// returns a promise to op stat from the server
-export function statOpPromise(opID) {
-  return genericGet(`/api/v1/draw/${opID}/stat`);
-}
-
 // returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
 // use WasabeeTeam.get
 export function teamPromise(teamid) {
@@ -225,16 +220,6 @@ export function targetPromise(agentID, portal, type = "ad hoc") {
     }),
     "application/json;charset=UTF-8"
   );
-}
-
-// work in progress -- server support not finished
-export function routePromise(agentID, portal) {
-  const ll = portal.lat + "," + portal.lng;
-  const fd = new FormData();
-  fd.append("id", agentID);
-  fd.append("portal", portal.name);
-  fd.append("ll", ll);
-  return genericPost(`/api/v1/agent/${agentID}/route`, fd);
 }
 
 // returns a promise to /me if the access token is valid
@@ -421,11 +406,10 @@ async function genericPut(url, formData, contentType) {
     switch (response.status) {
       case 200:
         try {
-          const text = await response.text();
-          const obj = JSON.parse(text);
+          const obj = await response.json();
           if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
-          return Promise.resolve(text);
+          return Promise.resolve(obj);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -476,11 +460,10 @@ async function genericPost(url, formData, contentType) {
     switch (response.status) {
       case 200:
         try {
-          const text = await response.text();
-          const obj = JSON.parse(text);
+          const obj = await response.json();
           if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
-          return Promise.resolve(text);
+          return Promise.resolve(obj);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -531,11 +514,10 @@ async function genericDelete(url, formData, contentType) {
     switch (response.status) {
       case 200:
         try {
-          const text = await response.text();
-          const obj = JSON.parse(text);
+          const obj = await response.json();
           if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
           // returns a promise to the content
-          return Promise.resolve(text);
+          return Promise.resolve(obj);
         } catch (e) {
           console.error(e);
           return Promise.reject(e);
@@ -582,11 +564,13 @@ async function genericGet(url) {
       case 200:
         try {
           const text = await response.text();
+          // isn't always json ? no, see /firebase paths (jwt)
           if (
             response.headers.get("Content-Type").includes("application/json")
           ) {
             const obj = JSON.parse(text);
             if (obj.updateID) GetUpdateList().set(obj.updateID, Date.now());
+            return Promise.resolve(obj);
           }
           // returns a promise to the content
           return Promise.resolve(text);

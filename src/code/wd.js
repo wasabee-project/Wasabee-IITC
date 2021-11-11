@@ -63,8 +63,7 @@ export async function drawWasabeeDkeys() {
 
   if (WasabeeMe.isLoggedIn()) {
     try {
-      const data = await dKeylistPromise();
-      const list = JSON.parse(data);
+      const list = await dKeylistPromise();
       if (!list || !list.DefensiveKeys || list.DefensiveKeys.length == 0)
         return;
       window.plugin.wasabee.idb.clear("defensivekeys");

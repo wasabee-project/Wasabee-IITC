@@ -61,9 +61,7 @@ const MergeDialog = WDialog.extend({
     const origin = new WasabeeOp(
       // while merge should only occurs with server ops, it appears users succeed to merge
       // with local ops. This is a failsafe for those edge-cases
-      this.options.opOwn.fetchedOp
-        ? this.options.opOwn.fetchedOp
-        : this.options.opOwn.toExport()
+      this.options.opOwn.getFetchedOp() || this.options.opOwn.toExport()
     );
     const changes = this.options.opOwn.changes(origin);
     const summary = this._opRebase.applyChanges(changes, this.options.opOwn);

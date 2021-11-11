@@ -42,12 +42,8 @@ export default class WasabeeMe {
 
   constructor(data) {
     if (typeof data == "string") {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.error(e);
-        return null;
-      }
+      console.trace('me waits for an object');
+      return null;
     }
     this.GoogleID = data.GoogleID;
     this.name = data.name;
@@ -100,7 +96,7 @@ export default class WasabeeMe {
   static localGet() {
     const lsme = localStorage[constants.AGENT_INFO_KEY];
     if (typeof lsme == "string") {
-      return new WasabeeMe(lsme); // do not store
+      return new WasabeeMe(JSON.parse(lsme)); // do not store
     }
     return null;
   }

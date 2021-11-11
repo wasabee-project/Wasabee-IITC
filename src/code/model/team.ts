@@ -16,12 +16,8 @@ export default class WasabeeTeam {
 
   constructor(data) {
     if (typeof data == "string") {
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.error(e);
-        return;
-      }
+      console.trace("team waits for an object");
+      return;
     }
 
     let fromServer = false;

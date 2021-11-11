@@ -30,12 +30,11 @@ export default class WasabeeAgent {
 
   constructor(obj) {
     if (typeof obj == "string") {
-      try {
-        obj = JSON.parse(obj);
-      } catch (e) {
-        console.error(e);
-        obj = {};
-      }
+      console.trace('agent waits for an object');
+      obj = {
+        id: "00000",
+        name: 'invalid agent',
+      };
     }
     // console.debug("passed to constructor", obj);
 
