@@ -19,6 +19,7 @@ import wX from "../wX";
 
 import PortalUI from "../ui/portal";
 import LinkUI from "../ui/link";
+import { displayInfo, displayWarning } from "../error";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -365,9 +366,9 @@ const OperationChecklistDialog = WDialog.extend({
           li.textContent = c;
           li.appendChild(LinkUI.displayFormat(link, operation));
         }
-        alert(container, true);
+        displayWarning(container, true);
       } else {
-        alert(`Found ${fieldCount} fields and no empty fields.`);
+        displayInfo(`Found ${fieldCount} fields and no empty fields.`);
       }
     }
     return { field: fieldCount, empty: emptyCount };

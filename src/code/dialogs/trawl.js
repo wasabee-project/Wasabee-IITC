@@ -5,6 +5,7 @@ import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 import WasabeeMarker from "../model/marker";
 import WasabeeBlocker from "../model/blocker";
+import { displayInfo } from "../error";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -187,7 +188,7 @@ const TrawlerDialog = WDialog.extend({
     window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
     if (this.options.automark) blockerAutomark(getSelectedOperation());
     this.closeDialog();
-    alert("trawl done");
+    displayInfo("trawl done");
   },
 });
 
@@ -364,7 +365,7 @@ const TrawlDialog = WDialog.extend({
     // render the results
     mdr.pauseRenderQueue(false);
 
-    this.bulkAlert = alert(
+    this.bulkAlert = displayInfo(
       "please wait until status says 'done'; If the first didn't trigger a load, close this dialog and try again"
     );
   },
@@ -373,7 +374,7 @@ const TrawlDialog = WDialog.extend({
     if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
-    alert("bulk data load done");
+    displayInfo("bulk data load done");
     window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 });

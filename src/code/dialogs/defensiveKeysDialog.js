@@ -6,6 +6,7 @@ import WasabeeDList from "./wasabeeDlist";
 import { getAgentPortalWasabeeDkeys } from "../wd";
 
 import PortalUI from "../ui/portal";
+import { displayError, displayInfo } from "../error";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -112,11 +113,11 @@ const DefensiveKeysDialog = WDialog.extend({
       const j = JSON.stringify(dk);
       console.log(j);
       await dKeyPromise(j);
-      alert("Registered with server");
+      displayInfo("Registered with server");
       window.map.fire("wasabee:defensivekeys");
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
   },
 });

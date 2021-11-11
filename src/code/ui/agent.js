@@ -6,6 +6,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import WasabeeAgent from "../model/agent";
+import { displayInfo, displayWarning } from "../error";
 
 function formatDisplay(agent) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
@@ -197,7 +198,7 @@ const WLAgent = L.Marker.extend({
       L.DomEvent.stop(ev);
       const selectedPortal = PortalUI.getSelected();
       if (!selectedPortal) {
-        alert(wX("SELECT PORTAL"));
+        displayWarning(wX("SELECT PORTAL"));
         return;
       }
 
@@ -211,7 +212,7 @@ const WLAgent = L.Marker.extend({
         callback: async () => {
           try {
             await targetPromise(agent.id, selectedPortal);
-            alert(wX("TARGET SENT"));
+            displayInfo(wX("TARGET SENT"));
           } catch (e) {
             console.error(e);
           }

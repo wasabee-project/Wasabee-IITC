@@ -1,3 +1,4 @@
+import { displayError, displayInfo } from "../../error";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
@@ -66,7 +67,7 @@ const MadridDialog = MultimaxDialog.extend({
       const total = this._balancedcheck.checked
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
-      alert(`Madrid found ${total} layers`);
+      displayInfo(`Madrid found ${total} layers`);
       // this.closeDialog();
     });
 
@@ -104,7 +105,7 @@ const MadridDialog = MultimaxDialog.extend({
       !this._portalSets.setTwo.portals.length ||
       !this._portalSets.setThree.portals.length
     ) {
-      alert(wX("INVALID REQUEST"));
+      displayError(wX("INVALID REQUEST"));
       return 0;
     }
 
@@ -220,7 +221,7 @@ const MadridDialog = MultimaxDialog.extend({
       !this._portalSets.setTwo.portals.length ||
       !this._portalSets.setThree.portals.length
     ) {
-      alert(wX("INVALID REQUEST"));
+      displayError(wX("INVALID REQUEST"));
       return 0;
     }
     this._operation.startBatchMode(); // bypass save and crosslinks checks

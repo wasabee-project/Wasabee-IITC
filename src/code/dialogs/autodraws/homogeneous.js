@@ -11,6 +11,7 @@ import {
 import wX from "../../wX";
 
 import PortalUI from "../../ui/portal";
+import { displayError, displayWarning } from "../../error";
 
 const HomogeneousDialog = AutoDraw.extend({
   statics: {
@@ -142,7 +143,7 @@ const HomogeneousDialog = AutoDraw.extend({
     this._layerGroup.clearLayers();
 
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
-      alert("please select three anchors");
+      displayError("please select three anchors");
       return;
     }
 
@@ -175,7 +176,7 @@ const HomogeneousDialog = AutoDraw.extend({
     this._draw();
 
     if (this._failed > 0) {
-      alert(
+      displayWarning(
         `Unable to find ${this._failed} splits, try less depth or a different region`
       );
     }
@@ -186,7 +187,7 @@ const HomogeneousDialog = AutoDraw.extend({
     this._layerGroup.clearLayers();
 
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
-      alert("please select three anchors");
+      displayError("please select three anchors");
       return;
     }
 
@@ -218,7 +219,7 @@ const HomogeneousDialog = AutoDraw.extend({
     this._draw();
 
     if (this._failed > 0) {
-      alert(
+      displayWarning(
         `Unable to find ${this._failed} splits, try less depth or a different region`
       );
     }
@@ -226,7 +227,7 @@ const HomogeneousDialog = AutoDraw.extend({
     this._failed = 0;
 
     if (!this._anchorOne || !this._anchorTwo || !this._anchorThree) {
-      alert("please select three anchors");
+      displayError("please select three anchors");
       return;
     }
   },

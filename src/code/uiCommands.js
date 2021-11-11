@@ -18,11 +18,16 @@ import {
 } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
-import { ServerError } from "./error";
+import {
+  displayError,
+  displayInfo,
+  displayWarning,
+  ServerError,
+} from "./error";
 
 export function addPortal(operation, portal) {
   if (!portal) {
-    alert(wX("SELECT PORTAL"));
+    displayError(wX("SELECT PORTAL"));
     return;
   }
   operation.addPortal(portal);
@@ -31,11 +36,11 @@ export function addPortal(operation, portal) {
 export function swapPortal(operation, portal) {
   const selectedPortal = PortalUI.getSelected();
   if (!selectedPortal) {
-    alert(wX("SELECT PORTAL"));
+    displayError(wX("SELECT PORTAL"));
     return;
   }
   if (portal.id === selectedPortal.id) {
-    alert(wX("SELF SWAP"));
+    displayError(wX("SELF SWAP"));
     return;
   }
 
@@ -404,7 +409,7 @@ export async function blockerAutomark(operation, first = true) {
   let wportal = operation.getPortal(portalId);
   if (!wportal) wportal = PortalUI.get(portalId);
   if (!wportal) {
-    alert(wX("AUTOMARK STOP"));
+    displayInfo(wX("AUTOMARK STOP"));
     return;
   }
   // console.log(wportal);
@@ -532,11 +537,11 @@ export async function fullSync() {
     window.map.fire("wasabee:fullsync");
     window.map.fire("wasabee:teams"); // if any team dialogs are open
 
-    alert(wX("SYNC DONE"));
+    displayInfo(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
-    if (e instanceof ServerError) alert(e.toString());
-    if (WasabeeMe.isLoggedIn()) alert(wX("NOT_LOADED"));
+    if (e instanceof ServerError) displayError(e);
+    if (WasabeeMe.isLoggedIn()) displayWarning(wX("NOT_LOADED"));
     else new AuthDialog().enable();
   }
 }

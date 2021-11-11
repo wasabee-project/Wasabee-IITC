@@ -12,6 +12,7 @@ import db from "../db";
 // 0.20->0.21 blocker migration
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
+import { displayWarning } from "../error";
 
 export type KeyOnHand = {
   portalId: string;
@@ -607,7 +608,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     if (missingPortal.size > 0) {
       // leave some trace
       console.trace("op corruption: missing portals");
-      alert(
+      displayWarning(
         `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
       );
       this.cleanAnchorList();

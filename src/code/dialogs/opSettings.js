@@ -16,6 +16,7 @@ import { addToColorList } from "../skin";
 import WasabeeMe from "../model/me";
 
 import { convertColorToHex } from "../auxiliar";
+import { displayError } from "../error";
 
 const OpSettingDialog = WDialog.extend({
   statics: {
@@ -75,7 +76,7 @@ const OpSettingDialog = WDialog.extend({
       L.DomEvent.on(input, "change", async (ev) => {
         L.DomEvent.stop(ev);
         if (!input.value || input.value == "") {
-          alert(wX("USE_VALID_NAME"));
+          displayError(wX("USE_VALID_NAME"));
         } else {
           const so = getSelectedOperation();
           so.name = input.value;
@@ -144,7 +145,7 @@ const OpSettingDialog = WDialog.extend({
           window.map.fire("wasabee:op:change");
         } catch (e) {
           console.log(e);
-          alert("Invalid date format");
+          displayError("Invalid date format");
         }
       });
     } else {
@@ -202,7 +203,7 @@ const OpSettingDialog = WDialog.extend({
               console.log("delete from server successful");
             } catch (e) {
               console.error(e);
-              alert(e.toString());
+              displayError(e);
             }
           }
           await removeOperation(so.ID);

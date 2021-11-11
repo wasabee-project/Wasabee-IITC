@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import PortalUI from "../ui/portal";
+import { displayError } from "../error";
 
 const LinkDialog = WDialog.extend({
   statics: {
@@ -56,7 +57,7 @@ const LinkDialog = WDialog.extend({
           PortalUI.displayFormat(this._source, this._smallScreen)
         );
       } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -83,7 +84,7 @@ const LinkDialog = WDialog.extend({
           PortalUI.displayFormat(this._anchor1, this._smallScreen)
         );
       } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
@@ -97,7 +98,7 @@ const LinkDialog = WDialog.extend({
           order: operation.nextOrder,
         });
       } else {
-        alert("Select both Source and Anchor 1");
+        displayError("Select both Source and Anchor 1");
       }
     });
 
@@ -124,7 +125,7 @@ const LinkDialog = WDialog.extend({
           PortalUI.displayFormat(this._anchor2, this._smallScreen)
         );
       } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
@@ -138,7 +139,7 @@ const LinkDialog = WDialog.extend({
           order: operation.nextOrder,
         });
       } else {
-        alert(wX("SEL_SRC_ANC2"));
+        displayError(wX("SEL_SRC_ANC2"));
       }
     });
 
@@ -147,7 +148,7 @@ const LinkDialog = WDialog.extend({
     button.textContent = wX("ADD_BUTTON_LINKS");
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
-      if (!this._source) alert(wX("SEL_SRC_PORT"));
+      if (!this._source) displayError(wX("SEL_SRC_PORT"));
       const operation = getSelectedOperation();
       if (this._anchor1) {
         operation.addLink(this._source, this._anchor1, {

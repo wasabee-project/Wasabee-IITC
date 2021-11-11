@@ -17,6 +17,7 @@ import WasabeeOp from "./model/operation";
 import WasabeePortal from "./model/portal";
 
 import PortalUI from "./ui/portal";
+import { displayInfo } from "./error";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -110,7 +111,7 @@ export function initFirebase() {
           };
           const portal = new WasabeePortal(raw);
           const f = PortalUI.displayFormat(portal);
-          alert(f.outerHTML + "<br>Sent by: " + target.Sender, true);
+          displayInfo(f.outerHTML + "<br>Sent by: " + target.Sender, true);
         } catch (e) {
           console.error(e);
         }

@@ -13,6 +13,7 @@ import TeamMembershipList from "./teamMembershipList";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
+import { displayError, displayInfo } from "../error";
 
 const TeamListDialog = WDialog.extend({
   statics: {
@@ -169,16 +170,16 @@ const TeamListDialog = WDialog.extend({
         callback: async () => {
           const newname = p.inputField.value;
           if (!newname) {
-            alert(wX("NAME_REQ"));
+            displayError(wX("NAME_REQ"));
             return;
           }
           try {
             await newTeamPromise(newname);
-            alert(wX("TEAM_CREATED", { teamName: newname }));
+            displayInfo(wX("TEAM_CREATED", { teamName: newname }));
             this._me = await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
-            alert(e.toString());
+            displayError(e);
           }
           window.map.fire("wasabee:teams");
         },
@@ -206,7 +207,7 @@ const TeamListDialog = WDialog.extend({
       this._me = await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },
@@ -219,7 +220,7 @@ const TeamListDialog = WDialog.extend({
       await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },
@@ -232,7 +233,7 @@ const TeamListDialog = WDialog.extend({
       await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },

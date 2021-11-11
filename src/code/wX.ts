@@ -13,7 +13,7 @@ export function wX(key: string, data?: object) {
   if (window.plugin.wasabee.skin && window.plugin.wasabee.skin.strings)
     strings = window.plugin.wasabee.skin.strings;
 
-  let s = null;
+  let s: string = null;
   if (strings[lang] && strings[lang][key]) s = strings[lang][key];
   if (!s && strings[defaultLang] && strings[defaultLang][key])
     s = strings[defaultLang][key];

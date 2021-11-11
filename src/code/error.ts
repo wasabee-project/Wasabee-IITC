@@ -6,6 +6,29 @@ interface IServerError {
   error?: string;
 }
 
+export function displayInfo(content: string | HTMLElement, isHTML?: boolean) {
+  return window.dialog({
+    title: 'Wasabee info',
+    text: isHTML ? null : content.toString(),
+    html: isHTML ? content : null,
+  })
+}
+
+export function displayWarning(content: string | HTMLElement, isHTML?: boolean) {
+  return window.dialog({
+    title: 'Wasabee warning',
+    text: isHTML ? null : content.toString(),
+    html: isHTML ? content : null,
+  })
+}
+
+export function displayError(err: { toString(): string }) {
+  return window.dialog({
+    title: 'Wasabee error',
+    text: err.toString(),
+  })
+}
+
 // no stacktrace error
 export class ServerError implements IServerError {
   code: number;

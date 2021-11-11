@@ -5,6 +5,7 @@ import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
+import { displayError, displayInfo } from "../../error";
 
 export function angle(a, p) {
   if (a.id == p.id) throw Error("same portal");
@@ -138,7 +139,7 @@ const FanfieldDialog = AutoDraw.extend({
   // fanfiled determines the portals between start/end and their angle (and order)
   fanfield: function () {
     if (!this._anchor || !this._start || !this._end) {
-      alert(wX("SET_3_PORT"));
+      displayError(wX("SET_3_PORT"));
       return;
     }
 
@@ -209,7 +210,9 @@ const FanfieldDialog = AutoDraw.extend({
     op.endBatchMode();
     const ap = 313 * order + 1250 * fields;
     // too many parameters for wX();
-    alert(`Fanfield found ${order} links and ${fields} fields for ${ap} AP`);
+    displayInfo(
+      `Fanfield found ${order} links and ${fields} fields for ${ap} AP`
+    );
   },
 });
 

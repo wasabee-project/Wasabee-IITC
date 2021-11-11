@@ -7,6 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import PortalUI from "../ui/portal";
+import { displayError } from "../error";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -154,7 +155,7 @@ const MarkerAddDialog = WDialog.extend({
       if (WasabeeMarker.isDestructMarkerType(selectedType))
         WasabeeBlocker.removeBlocker(operation, PortalUI.getSelected().id);
       await this.update();
-    } else alert(wX("ALREADY_HAS_MARKER"));
+    } else displayError(wX("ALREADY_HAS_MARKER"));
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;
   },

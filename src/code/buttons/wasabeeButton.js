@@ -12,6 +12,7 @@ import { wX } from "../wX";
 import { logoutPromise } from "../server";
 import { postToFirebase } from "../firebaseSupport";
 import { resetCaches } from "../uiCommands";
+import { displayError } from "../error";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -111,7 +112,7 @@ const WasabeeButton = WButton.extend({
           await logoutPromise();
         } catch (e) {
           console.error(e);
-          alert(e.toString());
+          displayError(e);
         }
         WasabeeMe.purge();
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login

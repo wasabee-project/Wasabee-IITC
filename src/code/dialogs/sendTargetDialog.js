@@ -8,6 +8,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
 import PortalUI from "../ui/portal";
+import { displayError, displayInfo } from "../error";
 
 const SendTargetDialog = WDialog.extend({
   statics: {
@@ -130,10 +131,10 @@ const SendTargetDialog = WDialog.extend({
     }
     targetPromise(this._value, this._portal, this._targettype)
       .then(() => {
-        alert(wX("TARGET SENT"));
+        displayInfo(wX("TARGET SENT"));
         this.closeDialog();
       })
-      .catch((e) => alert(e));
+      .catch((e) => displayError(e));
   },
 });
 

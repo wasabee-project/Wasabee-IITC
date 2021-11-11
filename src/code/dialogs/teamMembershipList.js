@@ -4,6 +4,7 @@ import WasabeeTeam from "../model/team";
 import wX from "../wX";
 
 import AgentUI from "../ui/agent";
+import { displayError } from "../error";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -19,7 +20,7 @@ const TeamMembershipList = WDialog.extend({
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog().catch((e) => {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     });
   },
 

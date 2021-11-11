@@ -20,6 +20,7 @@ import WasabeeMe from "./model/me";
 import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
+import { displayError } from "./error";
 
 const Wasabee = window.plugin.wasabee;
 Wasabee.static = statics;
@@ -36,7 +37,7 @@ window.plugin.wasabee.init = async () => {
     window.iitcBuildDate == undefined ||
     window.iitcBuildDate < "2020-01-18-170317"
   ) {
-    alert(
+    displayError(
       "Wasabee won't work on this version of IITC; please <a href='https://iitc.app'>update to 0.30.1 or newer from https://iitc.app</a>. On desktop, <strong>do not use the IITC button</strong>, use the TamperMonkey/GreaseMonkey method."
     );
     return;
@@ -45,7 +46,7 @@ window.plugin.wasabee.init = async () => {
   try {
     Wasabee.idb = await db;
   } catch (e) {
-    alert("Wasabee: unable to access the storage: " + e.toString());
+    displayError("Wasabee: unable to access the storage: " + e.toString());
     plugin_info.error = e; //eslint-disable-line
     return;
   }
@@ -227,7 +228,7 @@ window.plugin.wasabee.init = async () => {
 // and use webpack, rather than importing it ourself
 function initGoogleAPI() {
   if (typeof window.gapi !== "undefined") {
-    alert(
+    displayError(
       "Wasabee detected another GAPI instance; there may be authentication issues"
     );
     window.gapi.load("auth2", () => {

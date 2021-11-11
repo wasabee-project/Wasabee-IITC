@@ -2,6 +2,7 @@ import WasabeeOp from "./model/operation";
 import WasabeeBlocker from "./model/blocker";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
+import { displayError } from "./error";
 
 function setRestoreOpID(opID) {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
@@ -80,7 +81,7 @@ export async function makeSelectedOperation(opID) {
   const op = await WasabeeOp.load(opID);
   if (op == null) {
     console.log("makeSelectedOperation called on invalid opID");
-    alert("attempted to load invalid opID");
+    displayError("attempted to load invalid opID");
     return;
   }
 

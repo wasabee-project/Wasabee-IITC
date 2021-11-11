@@ -5,6 +5,7 @@ import { greatCircleArcIntersect } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
+import { displayError } from "../../error";
 
 const OnionfieldDialog = AutoDraw.extend({
   statics: {
@@ -65,7 +66,7 @@ const OnionfieldDialog = AutoDraw.extend({
     // this._operation is OK here
     this._operation = getSelectedOperation();
     if (!this._anchor) {
-      alert("no anchor selected");
+      displayError("no anchor selected");
       return;
     }
     this._colors = [

@@ -18,6 +18,7 @@ import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
 
 import AgentUI from "../ui/agent";
+import { displayError, displayInfo } from "../error";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = WDialog.extend({
@@ -78,15 +79,15 @@ const ManageTeamDialog = WDialog.extend({
                       this.options.team.ID,
                       squadDialog.inputField.value
                     );
-                    alert(
+                    displayInfo(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
                   } catch (e) {
                     console.error(e);
-                    alert(e.toString());
+                    displayError(e);
                   }
                 } else {
-                  alert(wX("INPUT_SQUAD_NAME"));
+                  displayInfo(wX("INPUT_SQUAD_NAME"));
                 }
                 this.update();
               },
@@ -169,11 +170,11 @@ const ManageTeamDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       try {
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
-        alert(wX("ADD_SUCC_INSTR"));
+        displayInfo(wX("ADD_SUCC_INSTR"));
         window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
-        alert(e.toString());
+        displayError(e);
       }
     });
 
@@ -188,12 +189,12 @@ const ManageTeamDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       try {
         await renameTeamPromise(this.options.team.ID, renameField.value);
-        alert(`renamed to ${renameField.value}`);
+        displayInfo(`renamed to ${renameField.value}`);
         this.options.team.Name = renameField.value; // for display
         window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
-        alert(e.toString());
+        displayError(e);
       }
     });
 
@@ -219,13 +220,13 @@ const ManageTeamDialog = WDialog.extend({
           rockscommField.value,
           rocksapiField.value
         );
-        alert("updated rocks info");
+        displayInfo("updated rocks info");
         this.options.team.RocksComm = rockscommField.value; // for display
         this.options.team.RocksKey = rocksapiField.value; // for display
         this.update();
       } catch (e) {
         console.error(e);
-        alert(e.toString());
+        displayError(e);
       }
     });
 
@@ -274,12 +275,12 @@ const ManageTeamDialog = WDialog.extend({
         callback: async () => {
           try {
             await deleteTeamPromise(this.options.team.ID);
-            alert(`${this.options.team.Name} removed`);
+            displayInfo(`${this.options.team.Name} removed`);
             this.closeDialog();
             await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
-            alert(e.toString());
+            displayError(e);
           }
           window.map.fire("wasabee:teams");
         },

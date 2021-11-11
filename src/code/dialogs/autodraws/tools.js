@@ -5,6 +5,7 @@ import wX from "../../wX";
 import { getAllPortalsOnScreen } from "../../uiCommands";
 
 import PortalUI from "../../ui/portal";
+import { displayError } from "../../error";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -116,7 +117,7 @@ export const AutoDraw = WDialog.extend({
         );
       } else {
         display.textContent = wX("NOT_SET");
-        alert(wX("PLEASE_SELECT_PORTAL"));
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
   },
