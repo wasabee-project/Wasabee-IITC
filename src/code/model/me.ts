@@ -42,7 +42,7 @@ export default class WasabeeMe {
 
   constructor(data) {
     if (typeof data == "string") {
-      console.trace('me waits for an object');
+      console.trace("me waits for an object");
       return null;
     }
     this.GoogleID = data.GoogleID;
@@ -132,9 +132,9 @@ export default class WasabeeMe {
   }
 
   // use waitGet with "force == true" if you want a fresh value now
-  static async waitGet(force?: boolean) {
-    let me = WasabeeMe.localGet();
-
+  // may throw if force == true
+  static async waitGet(force?: boolean, noFail?: boolean) {
+    const me = WasabeeMe.localGet();
     if (
       me === null ||
       me.fetched == undefined ||
@@ -145,15 +145,12 @@ export default class WasabeeMe {
         const response = await mePromise();
         const newme = new WasabeeMe(response);
         newme.store();
-        me = newme;
       } catch (e) {
-        WasabeeMe.purge();
-        console.error(e);
-        // alert(e.toString());
-        me = null;
+        if (force && !noFail) throw e;
       }
     }
-    return me;
+    // use updated (or null) me object
+    return WasabeeMe.localGet();
   }
 
   static async purge() {

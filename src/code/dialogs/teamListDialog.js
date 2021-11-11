@@ -9,7 +9,6 @@ import {
   SetTeamLoadWD,
 } from "../server";
 import PromptDialog from "./promptDialog";
-import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
@@ -22,7 +21,7 @@ const TeamListDialog = WDialog.extend({
 
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet(true); // no cache
+    this._me = await WasabeeMe.waitGet(true, true); // no cache unless server error
     window.map.on("wasabee:teams", this.update, this);
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog();
@@ -34,9 +33,9 @@ const TeamListDialog = WDialog.extend({
     window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
-  update: async function () {
+  update: function () {
     if (!this._enabled) return;
-    this._me = await WasabeeMe.waitGet(); // cache is fine -- this can probably be removed
+    this._me = WasabeeMe.localGet();
     this.setContent(this._buildContent());
   },
 
@@ -156,8 +155,6 @@ const TeamListDialog = WDialog.extend({
   _displayDialog: function () {
     if (!this._me) {
       this.disable();
-      const ad = new AuthDialog();
-      ad.enable();
       return;
     }
 

@@ -12,9 +12,9 @@ const DefensiveKeysDialog = WDialog.extend({
     TYPE: "defensiveKeysDialog",
   },
 
-  addHooks: async function () {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet();
+    this._me = WasabeeMe.localGet();
     this._pch = (portal) => {
       this._portalClickedHook(portal);
     };

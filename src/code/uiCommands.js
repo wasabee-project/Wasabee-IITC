@@ -18,6 +18,7 @@ import {
 } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
+import { ServerError } from "./error";
 
 export function addPortal(operation, portal) {
   if (!portal) {
@@ -534,8 +535,9 @@ export async function fullSync() {
     alert(wX("SYNC DONE"));
   } catch (e) {
     console.error(e);
-    new AuthDialog().enable();
-    alert("You are not logged in.");
+    if (e instanceof ServerError) alert(e.toString());
+    if (WasabeeMe.isLoggedIn()) alert(wX("NOT_LOADED"));
+    else new AuthDialog().enable();
   }
 }
 
