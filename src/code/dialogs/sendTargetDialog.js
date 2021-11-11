@@ -50,18 +50,22 @@ const SendTargetDialog = WDialog.extend({
     const operation = getSelectedOperation();
 
     if (this.options.target instanceof WasabeeMarker) {
-      const portal = operation.getPortal(this.options.target.portalId);
+      this._portal = operation.getPortal(this.options.target.portalId);
       this._targettype = this.options.target.type;
-      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
+      divtitle.appendChild(
+        PortalUI.displayFormat(this._portal, this._smallScreen)
+      );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
     }
 
     if (this.options.target instanceof WasabeePortal) {
-      const portal = this.options.target;
+      this._portal = this.options.target;
       this._targettype = "anchor";
-      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
+      divtitle.appendChild(
+        PortalUI.displayFormat(this._portal, this._smallScreen)
+      );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
@@ -120,13 +124,11 @@ const SendTargetDialog = WDialog.extend({
   },
 
   _sendTarget: function () {
-    if (!this._value) {
+    if (!this._value || !this._portal) {
       this.closeDialog();
       return;
     }
-    const operation = getSelectedOperation();
-    const portal = operation.getPortal(this.options.target.portalId);
-    targetPromise(this._value, portal, this._targettype)
+    targetPromise(this._value, this._portal, this._targettype)
       .then(() => {
         alert(wX("TARGET SENT"));
         this.closeDialog();
