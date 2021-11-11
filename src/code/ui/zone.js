@@ -12,7 +12,7 @@ const WLZone = L.LayerGroup.extend({
     let layer;
     if (zone.points.length == 1)
       layer = L.marker(zone.points[0], {
-        icon: L.divIcon.coloredSvg(zone.color),
+        icon: new L.DivIcon.ColoredSvg(zone.color),
       });
     else if (zone.points.length == 2)
       layer = L.polyline(zone.points, { color: zone.color });

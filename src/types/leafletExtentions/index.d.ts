@@ -21,6 +21,22 @@ declare module "leaflet" {
   // tslint:disable-next-line:no-empty-interface
   class GeodesicCircle extends Polyline { }
 
+  interface Polyline {
+    initialize: typeof L.Polyline.prototype.constructor;
+  }
+  interface Marker {
+    initialize: typeof L.Marker.prototype.constructor;
+  }
+  interface LayerGroup {
+    initialize: typeof L.LayerGroup.prototype.constructor;
+  }
+  interface Layer {
+    _popup: Popup;
+  }
+  interface Popup {
+    _wrapper: HTMLDivElement;
+  }
+
   // extends PolynineOption to any prop
   interface PolylineOptions {
     /* guid: string */
@@ -35,5 +51,11 @@ declare module "leaflet" {
 
   interface Marker {
     update(): this;
+  }
+
+  namespace DivIcon {
+    class ColoredSvg extends DivIcon {
+      constructor(color: string, options?: MarkerOptions);
+    }
   }
 }
