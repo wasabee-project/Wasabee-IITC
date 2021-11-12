@@ -9,7 +9,7 @@ export function generateId(len = 40) {
   }).join("");
 }
 
-export function newColors(incoming) {
+export function newColors(incoming: string) {
   switch (incoming) {
     case "groupa":
       return "orange";
@@ -24,13 +24,13 @@ export function newColors(incoming) {
     case "groupf":
       return "fuchsia";
     case "main":
-      return window.plugin.wasabee.skin.defaultOperationColor;
+      return window.plugin.wasabee.skin.defaultOperationColor as string;
     default:
       return incoming;
   }
 }
 
-export function convertColorToHex(color, on_error = "#000000") {
+export function convertColorToHex(color: string, on_error = "#000000") {
   try {
     return colorString.to.hex(colorString.get.rgb(newColors(color)));
   } catch {
