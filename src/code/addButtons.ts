@@ -1,4 +1,4 @@
-import { ButtonsControl } from "./leafletClasses";
+import { ButtonsControl, ButtonsControlOptions } from "./leafletClasses";
 import QuickdrawButton from "./buttons/quickdrawButton";
 import WasabeeButton from "./buttons/wasabeeButton";
 import SyncButton from "./buttons/syncButton";
@@ -13,11 +13,12 @@ export function addButtons() {
     return;
   }
 
-  const options = {};
-  // XXX next refactor pass, don't require a container to be passed in, get the formatting on ButtonsControl.onAdd()
-  options.container = L.DomUtil.create("ul", "leaflet-bar");
-  options.position = "topleft";
-  options.buttons = new Map();
+  const options: ButtonsControlOptions = {
+    // XXX next refactor pass, don't require a container to be passed in, get the formatting on ButtonsControl.onAdd()
+    container: L.DomUtil.create("ul", "leaflet-bar"),
+    position: "topleft",
+    buttons: new Map(),
+  };
   for (const Constructor of [
     WasabeeButton,
     OpButton,
