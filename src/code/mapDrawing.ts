@@ -9,6 +9,7 @@ import AnchorUI from "./ui/anchor";
 import AgentUI from "./ui/agent";
 import MarkerUI from "./ui/marker";
 import ZoneUI from "./ui/zone";
+import type { PathOptions } from "leaflet";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -22,7 +23,7 @@ export function drawMap() {
 }
 
 // updates all existing markers, adding any that need to be added, removing any that need to be removed
-function updateMarkers(op) {
+function updateMarkers(op: WasabeeOp) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Markers") === false) return; // yes, === false, undefined == true
   if (!op.markers || op.markers.length == 0) {
     Wasabee.markerLayerGroup.clearLayers();
@@ -43,7 +44,7 @@ function updateMarkers(op) {
       ll.setState(m.state);
       layerMap.delete(m.ID);
     } else {
-      const lMarker = new MarkerUI.WLMarker(m, op);
+      const lMarker = new MarkerUI.WLMarker(m);
       lMarker.addTo(Wasabee.markerLayerGroup);
     }
   }
@@ -56,7 +57,7 @@ function updateMarkers(op) {
 }
 
 // resetting is consistently 1ms faster than trying to update
-function resetLinks(operation) {
+function resetLinks(operation: WasabeeOp) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Links") === false) return; // yes, === false, undefined == true
   Wasabee.linkLayerGroup.clearLayers();
 
@@ -68,7 +69,7 @@ function resetLinks(operation) {
   }
 }
 
-export async function drawBackgroundOps(opIDs) {
+export async function drawBackgroundOps(opIDs?: OpID[]) {
   if (window.isLayerGroupDisplayed("Wasabee Background Ops") === false) return;
   Wasabee.backgroundOpsGroup.clearLayers();
 
@@ -82,7 +83,11 @@ export async function drawBackgroundOps(opIDs) {
   }
 }
 
-export function drawBackgroundOp(operation, layerGroup, style) {
+export function drawBackgroundOp(
+  operation?: WasabeeOp,
+  layerGroup?: L.LayerGroup,
+  style?: PathOptions
+) {
   if (!operation) return;
   if (!operation.links || operation.links.length == 0) return;
 
@@ -98,7 +103,7 @@ export function drawBackgroundOp(operation, layerGroup, style) {
   }
 }
 
-function resetZones(operation) {
+function resetZones(operation: WasabeeOp) {
   Wasabee.zoneLayerGroup.clearLayers();
 
   if (!operation.zones || operation.zones.length == 0) return;
@@ -134,7 +139,7 @@ export async function drawAgents() {
 
 // map agent GID to leaflet layer ID
 function agentLayerMap() {
-  const layerMap = new Map();
+  const layerMap = new Map<GoogleID, number>();
   for (const marker of Wasabee.agentLayerGroup.getLayers()) {
     layerMap.set(marker.options.id, Wasabee.agentLayerGroup.getLayerId(marker));
   }
@@ -142,7 +147,11 @@ function agentLayerMap() {
 }
 
 // use alreadyDone to reduce processing when using this in a loop, otherwise leave it unset
-export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
+export async function drawSingleTeam(
+  teamID: TeamID,
+  layerMap?: Map<GoogleID, number>,
+  alreadyDone?: GoogleID[]
+) {
   const done = new Array();
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return done; // yes, === false, undefined == true
   if (alreadyDone === undefined) alreadyDone = new Array();
@@ -166,14 +175,14 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
 }
 
 // draws a single agent -- can be triggered by firebase
-export async function drawSingleAgent(gid) {
+export async function drawSingleAgent(gid: GoogleID) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
   const agent = await WasabeeAgent.get(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
   if (agent != null) _drawAgent(agent);
 }
 
 // returns true if drawn, false if ignored
-function _drawAgent(agent, layerMap = agentLayerMap()) {
+function _drawAgent(agent: WasabeeAgent, layerMap = agentLayerMap()) {
   if (!agent.id || (!agent.lat && !agent.lng)) {
     return false;
   }
@@ -198,7 +207,7 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
 }
 
 // update all anchors, adding missing and removing unneeded
-function updateAnchors(op) {
+function updateAnchors(op: WasabeeOp) {
   if (window.isLayerGroupDisplayed("Wasabee Draw Portals") === false) return; // yes, === false, undefined == true
   if (!op.anchors || op.anchors.length == 0) {
     Wasabee.portalLayerGroup.clearLayers();
