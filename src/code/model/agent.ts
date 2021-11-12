@@ -1,59 +1,129 @@
 import { agentPromise } from "../server";
 import WasabeeMe from "./me";
-import WasabeeTeam from "./team";
 import db from "../db";
 
-
-export default class WasabeeAgent {
-  id: string;
+interface BaseAgent {
+  id: GoogleID;
   name: string;
-  vname: string;
-  rocksname: string;
-  intelname: string;
-  intelfaction: string;
-  level: number;
-  enlid: string;
-  pic: string;
-  Vverified: boolean;
-  blacklisted: boolean;
+  intelname?: string;
+  intelfaction: "unset" | "ENLIGHTENED" | "RESISTANCE";
+  pic?: string;
+  lat: number;
+  lng: number;
+  date: string;
+}
+
+interface RockAgent extends BaseAgent {
+  rocksname?: string;
   rocks: boolean;
+}
+
+interface VAgent extends BaseAgent {
+  enlid?: string;
+  vname?: string;
+  Vverified: boolean;
+  level: number;
+  blacklisted: boolean;
+}
+
+interface ServerTeamAgent extends BaseAgent {
+  shareWD?: boolean;
+  loadWD?: boolean;
+  state?: boolean;
+  squad?: string;
+}
+
+export interface ServerAgent
+  extends BaseAgent,
+    RockAgent,
+    VAgent,
+    ServerTeamAgent {}
+
+// local model
+interface TeamAgent extends BaseAgent {
+  shareWDKeys?: boolean;
+  loadWDKeys?: boolean;
+  shareLocation?: boolean;
+  comment?: string;
+}
+
+interface Agent extends BaseAgent, RockAgent, VAgent, TeamAgent {
+  fetched?: number;
+}
+
+// convert agent in server model to client model
+function serverAgentToAgent(agent: ServerAgent) {
+  return {
+    ...agent,
+    shareWDKeys: agent.shareWD,
+    loadWDKeys: agent.loadWD,
+    shareLocation: agent.state,
+    comment: agent.squad,
+  };
+}
+
+export default class WasabeeAgent implements Agent {
+  id: GoogleID;
+  name: string;
+  pic?: string;
   lat: number;
   lng: number;
   date: string;
 
-  ShareWD?: boolean;
-  LoadWD?: boolean;
-  squad?: string;
-  state?: boolean;
+  // intel
+  intelname?: string;
+  intelfaction: "unset" | "ENLIGHTENED" | "RESISTANCE";
+
+  // V
+  enlid?: string;
+  vname?: string;
+  Vverified: boolean;
+  level: number;
+  blacklisted: boolean;
+
+  // rocks
+  rocksname?: string;
+  rocks: boolean;
+
+  // per team data
+  shareWDKeys?: boolean;
+  loadWDKeys?: boolean;
+  shareLocation?: boolean;
+  comment?: string;
 
   fetched: number;
 
-  constructor(obj) {
+  constructor(obj: Agent) {
     if (typeof obj == "string") {
-      console.trace('agent waits for an object');
-      obj = {
-        id: "00000",
-        name: 'invalid agent',
-      };
+      console.trace("agent waits for an object");
+      return null;
     }
+    // if ServerAgent
+    if ("shareWD" in obj || "squad" in obj) obj = serverAgentToAgent(obj);
     // console.debug("passed to constructor", obj);
 
     // things which are stable across all teams
     this.id = obj.id;
     this.name = obj.name;
-    this.vname = obj.vname;
-    this.rocksname = obj.rocksname;
-    this.intelname = obj.intelname !== "unset" ? obj.intelname : null;
+    this.intelname = obj.intelname !== "unset" ? obj.intelname : "";
     this.intelfaction = obj.intelfaction;
-    this.level = obj.level ? Number(obj.level) : 0;
-    this.enlid = obj.enlid ? obj.enlid : null;
     this.pic = obj.pic ? obj.pic : null;
-    this.Vverified = !!obj.Vverified;
-    this.blacklisted = !!obj.blacklisted;
-    this.rocks = !!obj.rocks;
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
     this.date = obj.date ? obj.date : null; // last location sub, not fetched
+    // V
+    this.enlid = obj.enlid ? obj.enlid : null;
+    this.vname = obj.vname;
+    this.Vverified = !!obj.Vverified;
+    this.level = obj.level ? Number(obj.level) : 0;
+    this.blacklisted = !!obj.blacklisted;
+    // rocks
+    this.rocksname = obj.rocksname;
+    this.rocks = !!obj.rocks;
+
+    if (this.Vverified) this.name = this.vname || this.name;
+    else if (this.rocks) this.name = this.rocksname || this.name;
+    else if (this.intelname) this.name = this.intelname + " [!]";
 
     /* what did we decide to do with these?
     this.startlat = obj.startlat ? obj.startlat : 0;
@@ -62,10 +132,10 @@ export default class WasabeeAgent {
     this.sharestart = obj.sharestart ? obj.sharestart : false; */
 
     // vary per-team, don't set on direct pulls
-    if (obj.ShareWD) this.ShareWD = obj.ShareWD;
-    if (obj.LoadWD) this.LoadWD = obj.LoadWD;
-    if (obj.squad) this.squad = obj.squad;
-    if (obj.state) this.state = obj.state;
+    if (obj.shareWDKeys) this.shareWDKeys = obj.shareWDKeys;
+    if (obj.loadWDKeys) this.loadWDKeys = obj.loadWDKeys;
+    if (obj.shareLocation) this.shareLocation = obj.shareLocation;
+    if (obj.comment) this.comment = obj.comment;
     // this.distance = obj.distance ? Number(obj.distance) : 0; // don't use this
 
     // not sent by server, but preserve if from cache
@@ -80,20 +150,6 @@ export default class WasabeeAgent {
     if (this.Vverified && this.vname) return this.vname;
     if (this.rocks && this.rocksname) return this.rocksname;
     if (this.intelname) return this.intelname;
-    return this.name;
-  }
-
-  // deprecated
-  async getTeamName(teamID = 0) {
-    if (teamID == 0) return this.name;
-
-    const team = await WasabeeTeam.get(teamID);
-    if (team == null) return this.name;
-    // XXX is there a cute team.agents.filter() we can use here?
-    for (const a of team.agents) {
-      if (a.id == this.id) return a.name;
-    }
-
     return this.name;
   }
 
@@ -140,10 +196,10 @@ export default class WasabeeAgent {
     // cansendto is never true from a team pull, but might be true from a direct pull
 
     // remove things which make no sense in the global cache
-    delete cached.ShareWD;
-    delete cached.LoadWD;
-    delete cached.squad;
-    delete cached.state;
+    delete cached.shareWDKeys;
+    delete cached.loadWDKeys;
+    delete cached.comment;
+    delete cached.shareLocation;
 
     try {
       await (await db).put("agents", cached);

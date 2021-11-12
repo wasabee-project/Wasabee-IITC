@@ -17,7 +17,8 @@
     "downlevelIteration": true,
     "allowJs": true,
     "checkJs": false,
-    "allowUmdGlobalAccess": true
+    "allowUmdGlobalAccess": true,
+    "noUnusedLocals": true
   },
   "include": [
     "src/**/*"

@@ -55,13 +55,13 @@ const ManageTeamDialog = WDialog.extend({
       },
       {
         name: wX("TEAM STATE"),
-        value: (agent) => agent.state,
+        value: (agent) => agent.shareLocation,
         sort: (a, b) => a && !b,
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("SQUAD"),
-        value: (agent) => agent.squad,
+        value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
           const button = L.DomUtil.create("a", null, cell);

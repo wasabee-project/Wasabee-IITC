@@ -61,13 +61,13 @@ const TeamMembershipList = WDialog.extend({
       },
       {
         name: wX("SQUAD"),
-        value: (agent) => agent.squad,
+        value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: "Sharing Location",
-        value: (agent) => agent.state,
+        value: (agent) => agent.shareLocation,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           if (value) cell.textContent = "✅";
@@ -75,7 +75,7 @@ const TeamMembershipList = WDialog.extend({
       },
       {
         name: "Sharing W-D Keys",
-        value: (agent) => agent.ShareWD,
+        value: (agent) => agent.shareWDKeys,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           if (value) cell.textContent = "✅";
