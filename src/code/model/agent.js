@@ -20,7 +20,7 @@ export default class WasabeeAgent {
     this.name = obj.name;
     this.vname = obj.vname;
     this.rocksname = obj.rocksname;
-    this.intelname = obj.intelname;
+    this.intelname = obj.intelname !== "unset" ? obj.intelname : null;
     this.intelfaction = obj.intelfaction;
     this.level = obj.level ? Number(obj.level) : 0;
     this.enlid = obj.enlid ? obj.enlid : null;
@@ -53,6 +53,14 @@ export default class WasabeeAgent {
     this._updateCache();
   }
 
+  getName() {
+    if (this.Vverified && this.vname) return this.vname;
+    if (this.rocks && this.rocksname) return this.rocksname;
+    if (this.intelname) return this.intelname;
+    return this.name;
+  }
+
+  // deprecated
   async getTeamName(teamID = 0) {
     if (teamID == 0) return this.name;
 

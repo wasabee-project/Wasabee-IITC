@@ -7,7 +7,7 @@ import wX from "../wX";
 
 import WasabeeAgent from "../model/agent";
 
-async function formatDisplay(agent, teamID = 0) {
+function formatDisplay(agent) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
   if (agent.Vverified || agent.rocks) {
     L.DomUtil.addClass(display, "enl");
@@ -20,7 +20,27 @@ async function formatDisplay(agent, teamID = 0) {
     const ad = new AgentDialog({ gid: agent.id });
     ad.enable();
   });
-  display.textContent = await agent.getTeamName(teamID);
+
+  let prefix = "";
+  if (agent.Vverified) prefix += "V";
+  else if (agent.vname === agent.name) prefix += "v";
+  if (agent.rocks) prefix += "R";
+  else if (agent.rocksname === agent.name) prefix += "r";
+  if (agent.intelname) {
+    // no identity source exept intel
+    if (!agent.rocksname && !agent.vname) prefix += "I";
+    // no verified source
+    else if (!agent.rocks && !agent.Vverified) prefix += "I";
+    // match server preference
+    else if (agent.intelname === agent.name) prefix += "I";
+    // match server preference, in lower case
+    else if (agent.intelname.toLowerCase() === agent.name.toLowerCase())
+      prefix += "i";
+  }
+
+  display.textContent = prefix
+    ? `[${prefix}] ` + agent.getName()
+    : agent.getName();
   return display;
 }
 
@@ -119,7 +139,7 @@ const WLAgent = L.Marker.extend({
   initialize: function (agent) {
     const zoom = window.map.getZoom();
     L.Marker.prototype.initialize.call(this, agent.latLng, {
-      title: agent.name,
+      title: agent.getName(),
       icon: L.divIcon({
         className: "wasabee-agent-icon",
         iconSize: iconSize(zoom),
@@ -163,7 +183,7 @@ const WLAgent = L.Marker.extend({
     const content = L.DomUtil.create("div", "wasabee-agent-popup");
     const title = L.DomUtil.create("div", "desc", content);
     title.id = agent.id;
-    title.textContent = agent.name;
+    title.textContent = agent.getName();
 
     WasabeeAgent.get(this.options.id)
       .then(formatDisplay)
@@ -185,7 +205,7 @@ const WLAgent = L.Marker.extend({
         title: wX("SEND TARGET"),
         label: wX("SEND TARGET CONFIRM", {
           portalName: PortalUI.displayName(selectedPortal),
-          agent: agent.name,
+          agent: agent.getName(),
         }),
         type: "agent",
         callback: async () => {

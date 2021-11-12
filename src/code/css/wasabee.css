@@ -52,6 +52,14 @@
 }
 // .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; }
 
+.wasabee-dialog-agent ul {
+  padding-left: 0;
+}
+
+.wasabee-dialog-agent li {
+  list-style: none;
+}
+
 /* defined in agent.js, always on an <a> -- can this be pruned ? */
 .wasabee-agent-label a {
   text-shadow: 1px 1px #000, 1px -1px #000, -1px 1px #000, -1px -1px #000,

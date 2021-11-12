@@ -107,7 +107,7 @@ const WLMarker = PortalUI.WLPortal.extend({
       try {
         const a = await WasabeeAgent.get(marker.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        if (a) assignment.appendChild(await AgentUI.formatDisplay(a));
+        if (a) assignment.appendChild(AgentUI.formatDisplay(a));
         else assignment.textContent += " " + marker.assignedTo;
       } catch (err) {
         console.error(err);
@@ -117,7 +117,7 @@ const WLMarker = PortalUI.WLPortal.extend({
       try {
         const a = await WasabeeAgent.get(marker.completedID);
         assignment.innerHTML = wX("COMPLETED BY", {
-          agentName: a ? a.name : marker.completedID,
+          agentName: a ? a.getName() : marker.completedID,
         });
       } catch (e) {
         console.error(e);
