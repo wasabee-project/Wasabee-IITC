@@ -1,49 +1,74 @@
-import WasabeeAgent from "./agent";
+import WasabeeAgent, { ServerAgent } from "./agent";
 import WasabeeMe from "./me";
 import { teamPromise } from "../server";
 import db from "../db";
 
-export default class WasabeeTeam {
-  fetched: number;
-  id: string;
-  name: string;
+interface RocksTeam {
   rc: string;
   rk: string;
+}
+
+interface VTeam {
+  vt: string;
+  vr: string;
+}
+
+interface ServerTeam extends RocksTeam, VTeam {
+  id: TeamID;
+  name: string;
+  agents: ServerAgent[];
   jlt: string;
-  agents: Array<WasabeeAgent>;
+}
 
-  _a: Array<WasabeeAgent>;
+interface Team extends RocksTeam, VTeam {
+  id: TeamID;
+  name: string;
+  agents: WasabeeAgent[];
+  jlt: string;
 
-  constructor(data) {
+  fetched?: number;
+}
+
+export default class WasabeeTeam implements Team {
+  id: TeamID;
+  name: string;
+  agents: WasabeeAgent[];
+  jlt: string;
+  // Rocks
+  rc: string;
+  rk: string;
+  // V
+  vt: string;
+  vr: string;
+
+  fetched: number;
+
+  constructor(data: Team | ServerTeam) {
     if (typeof data == "string") {
       console.trace("team waits for an object");
       return;
     }
 
     let fromServer = false;
-    if (data.fetched == null) fromServer = true;
-    this.fetched = data.fetched ? data.fetched : Date.now();
+    if ("fetched" in data) {
+      this.fetched = data.fetched;
+    } else {
+      this.fetched = Date.now();
+      fromServer = true;
+    }
 
     this.id = data.id;
     this.name = data.name;
     this.rc = data.rc;
     this.rk = data.rk;
     this.jlt = data.jlt;
-    this.agents = data.agents; // raw agent data
-
-    // this block (1) adds agent to agents cache and (2) populates _a
-    // _a is a buffer of pre-built WasabeeAgents we can return via getAgents() w/o having to await
-    this._a = new Array();
-    for (const agent of data.agents) {
-      agent.fetched = this.fetched;
-      this._a.push(new WasabeeAgent(agent)); // add to agent cache
-    }
+    this.vt = data.vt;
+    this.vr = data.vr;
+    this.agents = data.agents.map(
+      (a) => new WasabeeAgent({ ...a, fetched: this.fetched })
+    );
 
     if (fromServer) this._updateCache();
-  }
-
-  getAgents() {
-    return this._a;
   }
 
   async _updateCache() {

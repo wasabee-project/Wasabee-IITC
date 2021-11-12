@@ -177,8 +177,7 @@ const MarkerAddDialog = WDialog.extend({
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
-        const agents = tt.getAgents();
-        for (const a of agents) {
+        for (const a of tt.agents) {
           if (!alreadyAdded.has(a.id)) {
             alreadyAdded.add(a.id);
             option = L.DomUtil.create("option");

@@ -154,8 +154,7 @@ export async function drawSingleTeam(teamID, layerMap, alreadyDone) {
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
 
-    const agents = team.getAgents();
-    for (const agent of agents) {
+    for (const agent of team.agents) {
       if (!alreadyDone.includes(agent.id) && _drawAgent(agent, layerMap))
         done.push(agent.id);
     }
