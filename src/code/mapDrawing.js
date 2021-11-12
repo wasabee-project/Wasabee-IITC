@@ -126,17 +126,17 @@ export async function drawAgents() {
 
   // remove those not found in this fetch
   for (const d of doneAgents) layerMap.delete(d);
-  for (const agent in layerMap) {
-    console.debug("removing stale agent", agent);
-    Wasabee.agentLayerGroup.removeLayer(agent);
+  for (const [aid, lid] of layerMap) {
+    console.debug("removing stale agent", aid);
+    Wasabee.agentLayerGroup.removeLayer(lid);
   }
 }
 
 // map agent GID to leaflet layer ID
 function agentLayerMap() {
   const layerMap = new Map();
-  for (const agent of Wasabee.agentLayerGroup.getLayers()) {
-    layerMap.set(agent.options.id, agent._leaflet_id);
+  for (const marker of Wasabee.agentLayerGroup.getLayers()) {
+    layerMap.set(marker.options.id, Wasabee.agentLayerGroup.getLayerId(marker));
   }
   return layerMap;
 }
@@ -174,7 +174,7 @@ export async function drawSingleAgent(gid) {
 
 // returns true if drawn, false if ignored
 function _drawAgent(agent, layerMap = agentLayerMap()) {
-  if (!agent.id || !agent.lat || !agent.lng) {
+  if (!agent.id || (!agent.lat && !agent.lng)) {
     return false;
   }
 
@@ -182,6 +182,7 @@ function _drawAgent(agent, layerMap = agentLayerMap()) {
     // new, add to map
     const marker = new AgentUI.WLAgent(agent);
     marker.addTo(Wasabee.agentLayerGroup);
+    layerMap.set(agent.id, Wasabee.agentLayerGroup.getLayerId(marker));
   } else {
     // move existing icons, if they actually moved
     const a = layerMap.get(agent.id);

@@ -47,7 +47,7 @@ function formatDisplay(agent) {
 
 function timeSinceformat(agent) {
   if (!agent.date) return "";
-  const date = Date.parse(agent.date + " UTC");
+  const date = Date.parse(agent.date + "Z");
   if (Number.isNaN(date)) return `(${agent.date} UTC)`; // FireFox Date.parse no good
   if (date == 0) return "";
 
@@ -185,11 +185,16 @@ const WLAgent = L.Marker.extend({
     const title = L.DomUtil.create("div", "desc", content);
     title.id = agent.id;
     title.textContent = agent.getName();
+    const time = L.DomUtil.create("div", "desc", content);
+    time.id = agent.id;
+    time.textContent = timeSinceformat(agent);
 
     WasabeeAgent.get(this.options.id)
       .then(formatDisplay)
       .then((fd) => {
-        title.innerHTML = fd.outerHTML + timeSinceformat(agent);
+        title.textContent = "";
+        title.appendChild(fd);
+        time.textContent = timeSinceformat(agent);
       });
 
     const sendTarget = L.DomUtil.create("button", null, content);
