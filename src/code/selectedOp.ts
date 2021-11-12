@@ -4,15 +4,15 @@ import wX from "./wX";
 import { generateId } from "./auxiliar";
 import { displayError } from "./error";
 
-function setRestoreOpID(opID) {
+function setRestoreOpID(opID: OpID) {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
 }
 
-function getRestoreOpID() {
+function getRestoreOpID(): OpID {
   return localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY];
 }
 
-export function getSelectedOperation() {
+export function getSelectedOperation(): WasabeeOp {
   return window.plugin.wasabee._selectedOp;
 }
 
@@ -34,7 +34,7 @@ export async function initSelectedOperation() {
       }
     }
   }
-  return window.plugin.wasabee._selectedOp;
+  return getSelectedOperation();
 }
 
 export async function changeOpIfNeeded() {
@@ -44,23 +44,23 @@ export async function changeOpIfNeeded() {
     if (ops.length == 0) await loadNewDefaultOp();
     else await makeSelectedOperation(ops[ops.length - 1]);
   }
-  return window.plugin.wasabee._selectedOp;
+  return getSelectedOperation();
 }
 
 // create a new op and set it as selected
 export async function loadNewDefaultOp() {
   const newOp = new WasabeeOp({
     creator: PLAYER.nickname,
-    name: wX("DEFAULT OP NAME", { date: new Date().toGMTString() }),
+    name: wX("DEFAULT OP NAME", { date: new Date().toUTCString() }),
   });
   await newOp.store();
   await makeSelectedOperation(newOp.ID);
-  return window.plugin.wasabee._selectedOp;
+  return getSelectedOperation();
 }
 
 // this is the function that loads an op from the store, makes it the selected op and draws it to the screen
 // only this should write to _selectedOp
-export async function makeSelectedOperation(opID) {
+export async function makeSelectedOperation(opID: OpID) {
   // _selectedOp is null at first load (or page reload), should never be after that
   let previousID;
   if (window.plugin.wasabee._selectedOp != null) {
@@ -138,14 +138,14 @@ export async function setupLocalStorage() {
 }
 
 //** This function removes an operation from the main list */
-export async function removeOperation(opID) {
+export async function removeOperation(opID: OpID) {
   await WasabeeOp.delete(opID);
   WasabeeBlocker.removeBlockers(opID); // no need to await
   window.map.fire("wasabee:op:delete", opID);
 }
 
 //** This function shows an operation to the main list */
-export function showOperation(opID) {
+export function showOperation(opID: OpID) {
   const hiddenOps = hiddenOpsList();
   if (hiddenOps.includes(opID)) {
     localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY] =
@@ -155,7 +155,7 @@ export function showOperation(opID) {
 }
 
 //** This function hides an operation to the main list */
-export function hideOperation(opID) {
+export function hideOperation(opID: OpID) {
   const hiddenOps = hiddenOpsList();
   if (!hiddenOps.includes(opID)) {
     hiddenOps.push(opID);
@@ -178,7 +178,7 @@ export async function resetOps() {
   ops.map(WasabeeBlocker.removeBlockers); // no need to await
 }
 
-export function hiddenOpsList() {
+export function hiddenOpsList(): OpID[] {
   try {
     const raw =
       localStorage[window.plugin.wasabee.static.constants.OPS_LIST_HIDDEN_KEY];
@@ -188,7 +188,7 @@ export function hiddenOpsList() {
   }
 }
 
-export async function setOpBackground(opID, background) {
+export async function setOpBackground(opID: OpID, background: boolean) {
   const sop = getSelectedOperation();
   const op = sop.ID === opID ? sop : await WasabeeOp.load(opID);
   if (op.background == background) return;
@@ -202,7 +202,7 @@ export async function setOpBackground(opID, background) {
 
 export async function opsList(hidden = true) {
   // after 0.19, remove the list and just query the idb keys
-  let ops = [];
+  let ops: OpID[] = [];
   try {
     const raw =
       localStorage[window.plugin.wasabee.static.constants.OPS_LIST_KEY];
@@ -222,8 +222,8 @@ export async function opsList(hidden = true) {
   return ops;
 }
 
-export async function duplicateOperation(opID) {
-  let op = null;
+export async function duplicateOperation(opID: OpID) {
+  let op: WasabeeOp = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;
     await op.store();
@@ -234,7 +234,7 @@ export async function duplicateOperation(opID) {
   // XXX op.toExport() might be helpful here
 
   op.ID = generateId();
-  op.name = op.name + " " + new Date().toGMTString();
+  op.name = op.name + " " + new Date().toUTCString();
   op.creator = window.PLAYER.nickname;
   op.teamlist = null;
   op.fetched = null;
