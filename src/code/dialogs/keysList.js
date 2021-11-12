@@ -117,7 +117,7 @@ const KeysList = WDialog.extend({
 
     let gid = "no-user";
     if (this._me) {
-      gid = this._me.GoogleID;
+      gid = this._me.id;
       this.sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),

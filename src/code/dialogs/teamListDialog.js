@@ -61,14 +61,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: wX("TEAM STATE"),
         value: (team) => team.State,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curstate = obj.State;
-          link.textContent = curstate;
-          if (curstate == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleTeam(obj.ID, curstate);
+            await this.toggleTeam(obj.ID, value);
             this.update();
           };
         },
@@ -76,14 +74,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: "Share W-D Keys",
         value: (team) => team.ShareWD,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curshare = obj.ShareWD;
-          link.textContent = curshare;
-          if (curshare == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleShareWD(obj.ID, curshare);
+            await this.toggleShareWD(obj.ID, value);
             this.update();
             window.map.fire("wasabee:defensivekeys");
           };
@@ -92,14 +88,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: "Load W-D Keys",
         value: (team) => team.LoadWD,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curload = obj.LoadWD;
-          link.textContent = curload;
-          if (curload == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleLoadWD(obj.ID, curload);
+            await this.toggleLoadWD(obj.ID, value);
             this.update();
             window.map.fire("wasabee:defensivekeys");
           };
@@ -107,12 +101,12 @@ const TeamListDialog = WDialog.extend({
       },
       {
         name: "",
-        value: (team) => team.State,
+        value: () => "",
         sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = "";
-          if (this._me.GoogleID != obj.Owner) {
+          if (this._me.id != obj.Owner) {
             link.textContent = wX("LEAVE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
@@ -200,8 +194,7 @@ const TeamListDialog = WDialog.extend({
   },
 
   toggleTeam: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamState(teamID, newState);
       this._me = await WasabeeMe.waitGet(true);
@@ -213,8 +206,7 @@ const TeamListDialog = WDialog.extend({
   },
 
   toggleShareWD: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamShareWD(teamID, newState);
       await WasabeeMe.waitGet(true);
@@ -226,8 +218,7 @@ const TeamListDialog = WDialog.extend({
   },
 
   toggleLoadWD: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamLoadWD(teamID, newState);
       await WasabeeMe.waitGet(true);

@@ -90,7 +90,7 @@ const WasabeeDList = WDialog.extend({
     ];
     content.sortBy = 0;
 
-    content.items = await getAgentWasabeeDkeys(this._me.GoogleID);
+    content.items = await getAgentWasabeeDkeys(this._me.id);
 
     return content;
   },

@@ -2,78 +2,78 @@ import { mePromise } from "../server";
 import db from "../db";
 
 import { constants } from "../static";
+import WasabeeAgent from "./agent";
 
 export interface MeTeam {
-  ID: string,
-  Name: string,
-  RocksComm: string,
-  RocksKey: string,
-  JoinLinkToken: string,
-  ShareWD: "On" | "Off",
-  LoadWD: "On" | "Off",
-  State: "On" | "Off",
-  Owner: string,
-  VTeam: string,
-  VTeamRole: string,
+  ID: string;
+  Name: string;
+  RocksComm: string;
+  RocksKey: string;
+  JoinLinkToken: string;
+  ShareWD: boolean;
+  LoadWD: boolean;
+  State: boolean;
+  Owner: string;
+  VTeam: string;
+  VTeamRole: string;
 }
 
 interface MeOp {
-  ID: string,
+  ID: OpID;
+  Name: string;
+  IsOwner: boolean;
+  Color: string; // ??
+  TeamID: TeamID;
 }
 
-export default class WasabeeMe {
-  GoogleID: string;
-  name: string;
-  vname: string;
-  rocksname: string;
-  intelname: string;
-  level: number;
-  Teams: Array<MeTeam>;
-  Ops: Array<MeOp>;
-  fetched: number;
-  Vverified: boolean;
-  blacklisted: boolean;
-  enlid: string;
-  pic: string;
-  intelfaction: string;
-  querytoken: string;
+export default class WasabeeMe extends WasabeeAgent {
+  querytoken?: string;
+  lockey?: string;
+  vapi?: string;
 
-  _teamMap: Map<string, "On" | "Off">;
+  Telegram: {
+    ID: string;
+    Verified: boolean;
+    Authtoken: string;
+  };
+
+  Teams: MeTeam[];
+  Ops: MeOp[];
+
+  _teamMap: Map<string, boolean>;
 
   constructor(data) {
     if (typeof data == "string") {
       console.trace("me waits for an object");
       return null;
     }
-    this.GoogleID = data.GoogleID;
-    this.name = data.name;
-    this.vname = data.vname;
-    this.rocksname = data.rocksname;
-    this.intelname = data.intelname;
-    this.level = data.level ? data.level : 0;
-    this.Teams = Array();
-    this.Ops = Array();
-    this.fetched = Date.now();
-    this.Vverified = data.Vverified;
-    this.blacklisted = data.blacklisted;
-    this.enlid = data.enlid;
-    this._teamMap = null;
-    // RAID and RISC are unused by clients
+    data.id = data.GoogleID || data.id;
+    super(data);
+    this.querytoken = data.querytoken;
     this.pic = data.pic;
     this.intelfaction = data.intelfaction;
-    this.querytoken = data.querytoken;
+    this.lockey = data.lockey;
+    this.querytoken = data.lockey;
+    this.vapi = data.vapi;
 
+    this.Teams = [];
     if (data.Teams && data.Teams.length > 0) {
       for (const team of data.Teams) {
+        team.ShareWD = team.ShareWD == "On" || team.ShareWD === true;
+        team.LoadWD = team.LoadWD == "On" || team.LoadWD === true;
+        team.State = team.State == "On" || team.State === true;
         this.Teams.push(team);
       }
     }
+
+    this.Ops = [];
     if (data.Ops && data.Ops.length > 0) {
       for (const op of data.Ops) {
         this.Ops.push(op);
       }
     }
     this.fetched = data.fetched ? data.fetched : Date.now();
+    this._teamMap = null;
   }
 
   static maxCacheAge() {
@@ -172,15 +172,6 @@ export default class WasabeeMe {
   teamJoined(teamID) {
     if (this._teamMap == null) this.makeTeamMap();
     if (this._teamMap.has(teamID)) return true;
-    return false;
-  }
-
-  teamEnabled(teamID) {
-    if (this._teamMap == null) this.makeTeamMap();
-    if (this._teamMap.has(teamID)) {
-      const m = this._teamMap.get(teamID);
-      if (m == "On") return true;
-    }
     return false;
   }
 

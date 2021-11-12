@@ -37,7 +37,7 @@ const DefensiveKeysDialog = WDialog.extend({
         PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
       );
       const mine = await getAgentPortalWasabeeDkeys(
-        this._me.GoogleID,
+        this._me.id,
         this._selectedPortal.id
       );
       if (mine) {

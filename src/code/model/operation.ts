@@ -1023,7 +1023,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
-    if (me.GoogleID == this.creator) return true;
+    if (me.id == this.creator) return true;
     // if the user has no teams enabled, it can't be writable
     if (!me.Teams || me.Teams.length == 0) return false;
     // if on a write-allowed team, is writable
@@ -1054,7 +1054,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     // if current user is op creator, it is always writable
     const me = WasabeeMe.cacheGet();
     if (!me) return "read"; // fail safe
-    if (me.GoogleID == this.creator) return "write";
+    if (me.id == this.creator) return "write";
 
     const teamsID = new Set(me.Teams.map((t) => t.ID));
     // look for team permission
@@ -1082,7 +1082,7 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     const me = WasabeeMe.cacheGet();
     if (!me) return false;
-    if (me.GoogleID == this.creator) return true;
+    if (me.id == this.creator) return true;
     return false;
   }
 
