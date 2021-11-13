@@ -1,8 +1,12 @@
 import WasabeeMe from "./model/me";
 import WasabeeOp from "./model/operation";
 import { getSelectedOperation, removeOperation } from "./selectedOp";
-import WasabeeMarker from "./model/marker";
 import { ServerError } from "./error";
+import type { TaskState } from "./model/task";
+import type WasabeePortal from "./model/portal";
+import type WasabeeAgent from "./model/agent";
+import type WasabeeTeam from "./model/team";
+import type { WDKey } from "./wd";
 
 export default function () {
   return GetWasabeeServer();
@@ -36,6 +40,14 @@ export function SetWasabeeServer(server) {
   if (!server.startsWith("http")) server = "https://" + server;
   if (server.endsWith("/")) server = server.slice(0, -1);
   localStorage[window.plugin.wasabee.static.constants.SERVER_BASE_KEY] = server;
+}
+
+interface IServerStatus {
+  status: string;
+}
+
+interface IServerUpdate extends IServerStatus {
+  updateID: string;
 }
 
 /*
@@ -84,20 +96,22 @@ export function mePromise() {
 
 // returns a promise to a list of defensive keys for all enabled teams
 export function dKeylistPromise() {
-  return genericGet("/api/v1/d");
+  return genericGet<{
+    DefensiveKeys: WDKey[];
+  }>("/api/v1/d");
 }
 
 // removes the agent from the team; return value is status code
-export function leaveTeamPromise(teamID) {
-  return genericDelete(`/api/v1/me/${teamID}`, new FormData());
+export function leaveTeamPromise(teamID: TeamID) {
+  return genericDelete(`/api/v1/me/${teamID}`);
 }
 
 // updates an agent's location ; return value is status code
-export function locationPromise(lat, lng) {
+export function locationPromise(lat: number, lng: number) {
   return genericGet(`/api/v1/me?lat=${lat}&lon=${lng}`);
 }
 
-export function setIntelID(name, faction, querytoken) {
+export function setIntelID(name: string, faction: string, querytoken: string) {
   const fd = new FormData();
   fd.append("name", name);
   fd.append("faction", faction);
@@ -106,37 +120,41 @@ export function setIntelID(name, faction, querytoken) {
 }
 
 // changes agent's team state on the server; return value is status message
-export function SetTeamState(teamID, state) {
+export function SetTeamState(teamID: TeamID, state: "On" | "Off") {
   return genericGet(`/api/v1/me/${teamID}?state=${state}`);
 }
 
-export function SetTeamShareWD(teamID, state) {
+export function SetTeamShareWD(teamID: TeamID, state: "On" | "Off") {
   return genericGet(`/api/v1/me/${teamID}/wdshare?state=${state}`);
 }
 
-export function SetTeamLoadWD(teamID, state) {
+export function SetTeamLoadWD(teamID: TeamID, state: "On" | "Off") {
   return genericGet(`/api/v1/me/${teamID}/wdload?state=${state}`);
 }
 
 // updates an agent's single defensive key
-export function dKeyPromise(json) {
+export function dKeyPromise(json: string) {
   return genericPost("/api/v1/d", json, "application/json;charset=UTF-8");
 }
 
 // many d-keys at once
-export function dKeyBulkPromise(json) {
+export function dKeyBulkPromise(json: string) {
   return genericPost("/api/v1/d/bulk", json, "application/json;charset=UTF-8");
 }
 
 /* agent */
 
 // returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
-export function agentPromise(GID) {
-  return genericGet(`/api/v1/agent/${GID}`);
+export function agentPromise(GID: GoogleID) {
+  return genericGet<WasabeeAgent>(`/api/v1/agent/${GID}`);
 }
 
 // sends a target (portal) to the server to notify the agent
-export function targetPromise(agentID, portal, type = "ad hoc") {
+export function targetPromise(
+  agentID: GoogleID,
+  portal: WasabeePortal,
+  type = "ad hoc"
+) {
   return genericPost(
     `/api/v1/agent/${agentID}/target`,
     JSON.stringify({
@@ -154,97 +172,103 @@ export function targetPromise(agentID, portal, type = "ad hoc") {
 
 // returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
 // use WasabeeTeam.get
-export function teamPromise(teamid) {
-  return genericGet(`/api/v1/team/${teamid}`);
+export function teamPromise(teamid: TeamID) {
+  return genericGet<WasabeeTeam>(`/api/v1/team/${teamid}`);
 }
 
-export function sendAnnounce(teamID, message) {
+export function sendAnnounce(teamID: TeamID, message: string) {
   const fd = new FormData();
   fd.append("m", message);
   return genericPost(`/api/v1/team/${teamID}/announce`, fd);
 }
 
-export function pullRocks(teamID) {
+export function pullRocks(teamID: TeamID) {
   return genericGet(`/api/v1/team/${teamID}/rocks`);
 }
 
 // local change: none // cache: none
-export function newTeamPromise(name) {
+export function newTeamPromise(name: string) {
   return genericGet(`/api/v1/team/new?name=${name}`);
 }
 
 // local change: none // cache: none
-export function renameTeamPromise(teamID, name) {
+export function renameTeamPromise(teamID: TeamID, name: string) {
   const fd = new FormData();
   fd.append("teamname", name);
   return genericPut(`/api/v1/team/${teamID}/rename`, fd);
 }
 
 // local change: none // cache: none
-export function deleteTeamPromise(teamID) {
-  return genericDelete(`/api/v1/team/${teamID}`, new FormData());
+export function deleteTeamPromise(teamID: TeamID) {
+  return genericDelete(`/api/v1/team/${teamID}`);
 }
 
-export function changeTeamOwnerPromise(teamID, newOwner) {
+export function changeTeamOwnerPromise(teamID: TeamID, newOwner: GoogleID) {
   return genericGet(`/api/v1/team/${teamID}/chown?to=${newOwner}`);
 }
 
 // local change: none // cache: none
-export function addAgentToTeamPromise(agentID, teamID) {
+export function addAgentToTeamPromise(agentID: GoogleID, teamID: TeamID) {
   return genericPost(`/api/v1/team/${teamID}/${agentID}`, new FormData());
 }
 
 // removes another agent from an owned team ; return value is status code
-export function removeAgentFromTeamPromise(agentID, teamID) {
-  return genericDelete(`/api/v1/team/${teamID}/${agentID}`, new FormData());
+export function removeAgentFromTeamPromise(agentID: GoogleID, teamID: TeamID) {
+  return genericDelete(`/api/v1/team/${teamID}/${agentID}`);
 }
 
 // local change: none // cache: none
-export function rocksPromise(teamID, community, apikey) {
+export function rocksPromise(
+  teamID: TeamID,
+  community: string,
+  apikey: string
+) {
   return genericGet(
     `/api/v1/team/${teamID}/rockscfg?rockscomm=${community}&rockskey=${apikey}`
   );
 }
 
 // local change: none // cache: none
-export function setAgentTeamSquadPromise(agentID, teamID, squad) {
+export function setAgentTeamSquadPromise(
+  agentID: GoogleID,
+  teamID: TeamID,
+  squad: string
+) {
   const fd = new FormData();
   fd.append("squad", squad);
   return genericPost(`/api/v1/team/${teamID}/${agentID}/squad`, fd);
 }
 
-export function createJoinLinkPromise(teamID) {
-  return genericGet(`/api/v1/team/${teamID}/genJoinKey`);
+export function createJoinLinkPromise(teamID: TeamID) {
+  return genericGet<{ Key: string }>(`/api/v1/team/${teamID}/genJoinKey`);
 }
 
-export function deleteJoinLinkPromise(teamID) {
+export function deleteJoinLinkPromise(teamID: TeamID) {
   return genericGet(`/api/v1/team/${teamID}/delJoinKey`);
 }
 
 // returns a promise to fetch a WasabeeOp
 // local change: If the server's copy is newer than the local copy, otherwise none
 // not generic since 304 result processing and If-Modified-Since header
-export async function opPromise(opID) {
+export async function opPromise(opID: OpID) {
   let ims = "Sat, 29 Oct 1994 19:43:31 GMT"; // the dawn of time...
   const localop = await WasabeeOp.load(opID);
   if (localop != null && localop.fetched) ims = localop.fetched;
 
   try {
-    const raw = await generic({
+    const raw = await generic<WasabeeOp>({
       url: `/api/v1/draw/${opID}`,
       method: "GET",
       headers: localop
-        ? {
-            "If-None-Match": localop.lasteditid,
-            "If-Modified-Since": localop.lasteditid ? null : ims,
-          }
+        ? localop.lasteditid
+          ? {
+              "If-None-Match": localop.lasteditid,
+            }
+          : {
+              "If-Modified-Since": ims,
+            }
         : null,
     });
-
-    if (raw === 304) {
-      localop.server = GetWasabeeServer();
-      return localop;
-    }
 
     const newop = new WasabeeOp(raw);
     newop.localchanged = false;
@@ -263,6 +287,9 @@ export async function opPromise(opID) {
       );
     }
     switch (e.code) {
+      case 304:
+        localop.server = GetWasabeeServer();
+        return localop;
       case 403:
       // fallthrough
       case 410:
@@ -280,7 +307,7 @@ export async function uploadOpPromise() {
   const operation = getSelectedOperation();
   const json = operation.toExport();
 
-  const response = await genericPost(
+  const response = await genericPost<WasabeeMe>(
     "/api/v1/draw",
     json,
     "application/json;charset=UTF-8"
@@ -294,18 +321,22 @@ export async function uploadOpPromise() {
 }
 
 // sends a changed op to the server
-export async function updateOpPromise(operation) {
+export async function updateOpPromise(operation: WasabeeOp) {
   const json = operation.toExport();
 
   try {
-    const update = await generic({
+    const update = await generic<IServerUpdate>({
       url: `/api/v1/draw/${operation.ID}`,
       method: "PUT",
       body: json,
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8",
-        "If-Match": operation.lasteditid || null,
-      },
+      headers: operation.lasteditid
+        ? {
+            "Content-Type": "application/json;charset=UTF-8",
+            "If-Match": operation.lasteditid,
+          }
+        : {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
     });
     operation.lasteditid = update.updateID;
     operation.remoteChanged = false;
@@ -337,51 +368,69 @@ export async function updateOpPromise(operation) {
 }
 
 // removes an op from the server
-export function deleteOpPromise(opID) {
-  return genericDelete(`/api/v1/draw/${opID}`, new FormData());
+export function deleteOpPromise(opID: OpID) {
+  return genericDelete(`/api/v1/draw/${opID}`);
 }
 
-export function setOpInfo(opID, info) {
+export function setOpInfo(opID: OpID, info: string) {
   const fd = new FormData();
   fd.append("info", info);
   return genericPost(`/api/v1/draw/${opID}/info`, fd);
 }
 
 // adds a permission to an op; return value is status code
-export function addPermPromise(opID, teamID, role, zone) {
+export function addPermPromise(
+  opID: OpID,
+  teamID: TeamID,
+  role: string,
+  zone: ZoneID
+) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
-  fd.append("zone", zone);
+  fd.append("zone", `${zone}`);
   return genericPost(`/api/v1/draw/${opID}/perms`, fd);
 }
 
 // removes a permission from an op; return value is status code
-export function delPermPromise(opID, teamID, role, zone) {
+export function delPermPromise(
+  opID: OpID,
+  teamID: TeamID,
+  role: string,
+  zone: ZoneID
+) {
   const fd = new FormData();
   fd.append("team", teamID);
   fd.append("role", role);
-  fd.append("zone", zone);
+  fd.append("zone", `${zone}`);
   return genericDelete(`/api/v1/draw/${opID}/perms`, fd);
 }
 
 // local change: none // cache: none
-export function assignMarkerPromise(opID, markerID, agentID) {
+export function assignMarkerPromise(
+  opID: OpID,
+  markerID: MarkerID,
+  agentID: GoogleID
+) {
   const fd = new FormData();
   fd.append("agent", agentID);
   return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/assign`, fd);
 }
 
 // performs a link assignment on the server, sending notifications
-export function assignLinkPromise(opID, linkID, agentID) {
+export function assignLinkPromise(opID: OpID, linkID: LinkID, agentID) {
   const fd = new FormData();
   fd.append("agent", agentID);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/assign`, fd);
 }
 
 // changes a markers status on the server, sending relevant notifications
-export function SetMarkerState(opID, markerID, state) {
-  let action = "incomplete";
+export function SetMarkerState(
+  opID: OpID,
+  markerID: MarkerID,
+  state: TaskState
+) {
+  let action: "incomplete" | "acknowledge" | "complete" = "incomplete";
   switch (state) {
     case "acknowledged":
       action = "acknowledge";
@@ -400,8 +449,8 @@ export function SetMarkerState(opID, markerID, state) {
 }
 
 // changes a link's status on the server, sending relevant notifications
-export function SetLinkState(opID, linkID, state) {
-  let action = "incomplete";
+export function SetLinkState(opID: OpID, linkID: LinkID, state: TaskState) {
+  let action: "incomplete" | "acknowledge" | "complete" = "incomplete";
   switch (state) {
     // no acknowledge for links -- use incomplete
     case "pending":
@@ -417,47 +466,47 @@ export function SetLinkState(opID, linkID, state) {
   return genericGet(`/api/v1/draw/${opID}/link/${linkID}/${action}`);
 }
 
-export function setAssignmentStatus(op, object, completed) {
-  let type = "link";
-  if (object instanceof WasabeeMarker) type = "marker";
-  let c = "incomplete";
-  if (completed) c = "complete";
-
-  return genericGet(`/api/v1/draw/${op.ID}/${type}/${object.ID}/${c}`);
-}
-
-export function reverseLinkDirection(opID, linkID) {
+export function reverseLinkDirection(opID: OpID, linkID: LinkID) {
   return genericGet(`/api/v1/draw/${opID}/link/${linkID}/swap`);
 }
 
-export function setMarkerComment(opID, markerID, comment) {
+export function setMarkerComment(
+  opID: OpID,
+  markerID: MarkerID,
+  comment: string
+) {
   const fd = new FormData();
   fd.append("comment", comment);
   return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/comment`, fd);
 }
 
-export function setLinkComment(opID, linkID, desc) {
+export function setLinkComment(opID: OpID, linkID: LinkID, desc: string) {
   const fd = new FormData();
   fd.append("desc", desc);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/desc`, fd);
 }
 
-export function setLinkZone(opID, linkID, zone) {
+export function setLinkZone(opID: OpID, linkID: LinkID, zone: ZoneID) {
   const fd = new FormData();
-  fd.append("zone", zone);
+  fd.append("zone", `${zone}`);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/zone`, fd);
 }
 
-export function setMarkerZone(opID, markerID, zone) {
+export function setMarkerZone(opID: OpID, markerID: MarkerID, zone: ZoneID) {
   const fd = new FormData();
-  fd.append("zone", zone);
+  fd.append("zone", `${zone}`);
   return genericPost(`/api/v1/draw/${opID}/marker/${markerID}/zone`, fd);
 }
 
 // updates an agent's key count, return value is status code
-export function opKeyPromise(opID, portalID, onhand, capsule) {
+export function opKeyPromise(
+  opID: OpID,
+  portalID: PortalID,
+  onhand: number,
+  capsule: string
+) {
   const fd = new FormData();
-  fd.append("count", onhand);
+  fd.append("count", `${onhand}`);
   fd.append("capsule", capsule);
   return genericPost(`/api/v1/draw/${opID}/portal/${portalID}/keyonhand`, fd);
 }
@@ -465,7 +514,7 @@ export function opKeyPromise(opID, portalID, onhand, capsule) {
 /* The following are for Wasabee-WebUI and not used in Wasabee-IITC */
 
 // in the service-worker for IITC
-export function sendTokenToWasabee(token) {
+export function sendTokenToWasabee(token: string) {
   // no need for a form-data, just send the raw token
   return genericPost(`/api/v1/me/firebase`, token);
 }
@@ -481,19 +530,16 @@ export function getCustomTokenFromServer() {
 /* generic method */
 /**
  * Generic fetch method against wasabee server
- *
- * @param {Object} request
- * @param {string} request.url
- * @param {string} request.method
- * @param {string | FormData} [request.body]
- * @param {HeadersInit} [request.headers]
- * @param {boolean} [request.raw]
- * @param {boolean} [request.retried]
- * @returns {Promise<304 | string | Object>}
  */
-async function generic(request) {
-  /** @type RequestInit */
-  const requestInit = {
+async function generic<T>(request: {
+  url: string;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  body?: FormData | string;
+  headers?: HeadersInit;
+  raw?: boolean;
+  retried?: boolean;
+}): Promise<T> {
+  const requestInit: RequestInit = {
     method: request.method,
     mode: "cors",
     cache: "default",
@@ -507,16 +553,16 @@ async function generic(request) {
   try {
     const response = await fetch(GetWasabeeServer() + request.url, requestInit);
     /** @type Object | string */
-    const payload = await response.text();
+    const payload: string = await response.text();
 
     let jsonPayload;
     if (!request.raw) {
       if (!payload && !request.retried && response.ok) {
         // server shouldn't reply empty string
         console.warn(
-          `server answers is empty on [${request.url}], retry once, just in case`
+          `server answers is empty on[${request.url}], retry once, just in case `
         );
-        return generic({ ...request, retried: true });
+        return generic<T>({ ...request, retried: true });
       }
       try {
         jsonPayload = JSON.parse(payload);
@@ -535,11 +581,8 @@ async function generic(request) {
       case 200:
         if (!request.raw && jsonPayload.updateID)
           GetUpdateList().set(jsonPayload.updateID, Date.now());
-        return Promise.resolve(request.raw ? payload : jsonPayload);
+        return Promise.resolve((request.raw ? payload : jsonPayload) as T);
       // break;
-      case 304: // If-None-Match or If-Modified-Since replied NotModified
-        return Promise.resolve(304);
-      // break
       case 401:
         WasabeeMe.purge();
       // fallthrough;
@@ -549,6 +592,8 @@ async function generic(request) {
       // fallthrough
       case 412: // mismatch etag
       // fallthrough
+      case 304: // If-None-Match or If-Modified-Since replied NotModified
+      // fallthrough;
       default:
         return Promise.reject(
           new ServerError({
@@ -569,15 +614,19 @@ async function generic(request) {
   }
 }
 
-function genericGet(url) {
-  return generic({
+function genericGet<T>(url: string) {
+  return generic<T>({
     method: "GET",
     url: url,
   });
 }
 
-function genericPost(url, formData, contentType) {
-  return generic({
+function genericPost<T>(
+  url: string,
+  formData: FormData | string,
+  contentType?: string
+) {
+  return generic<T>({
     url: url,
     method: "POST",
     body: formData,
@@ -585,20 +634,18 @@ function genericPost(url, formData, contentType) {
   });
 }
 
-function genericPut(url, formData, contentType) {
-  return generic({
+function genericPut<T>(url: string, formData: FormData) {
+  return generic<T>({
     url: url,
     method: "PUT",
     body: formData,
-    headers: contentType ? { "Content-Type": contentType } : null,
   });
 }
 
-function genericDelete(url, formData, contentType) {
-  return generic({
+function genericDelete<T>(url: string, formData?: FormData) {
+  return generic<T>({
     url: url,
     method: "DELETE",
     body: formData,
-    headers: contentType ? { "Content-Type": contentType } : null,
   });
 }

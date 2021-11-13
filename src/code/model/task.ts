@@ -1,5 +1,7 @@
 import { generateId } from "../auxiliar";
 
+export type TaskState = "pending" | "assigned" | "acknowledged" | "completed";
+
 export default class Task {
   ID: TaskID;
   order: number;
@@ -8,7 +10,7 @@ export default class Task {
   completedID?: GoogleID;
   comment?: string;
 
-  _state: "pending" | "assigned" | "acknowledged" | "completed";
+  _state: TaskState;
 
   constructor(obj: any) {
     this.ID = obj.ID || generateId();
@@ -39,7 +41,7 @@ export default class Task {
     return this._state;
   }
 
-  set state(state) {
+  set state(state: TaskState) {
     switch (state) {
       case "assigned": // fall-through
       case "acknowledged":

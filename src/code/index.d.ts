@@ -9,4 +9,6 @@ declare global {
   type MarkerID = TaskID;
   type GoogleID = string;
   type ZoneID = number;
+
+  var wasabeewebui: any;
 }

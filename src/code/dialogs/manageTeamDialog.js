@@ -252,8 +252,7 @@ const ManageTeamDialog = WDialog.extend({
       joinlinkadd.textContent = "Create";
       L.DomEvent.on(joinlinkadd, "click", async (ev) => {
         L.DomEvent.stop(ev);
-        const response = await createJoinLinkPromise(this.options.team.ID);
-        const j = JSON.parse(response);
+        const j = await createJoinLinkPromise(this.options.team.ID);
         this.options.team.JoinLinkToken = j.Key;
         this.update();
       });
