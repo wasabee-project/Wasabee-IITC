@@ -1,4 +1,32 @@
-export default class Sortable {
+interface SortableItem<T> {
+  obj: T;
+  row: HTMLTableRowElement;
+  index: number;
+  values: unknown[];
+  sortValues: unknown[];
+}
+
+export interface SortableField<T> {
+  name: string;
+  className?: string;
+  value: (thing: T) => unknown;
+  sortValue?: (value: unknown, thing: T) => unknown;
+  sort?: (a: unknown, b: unknown, aobj?: T, bobj?: T) => number;
+  format?: (cell: HTMLTableCellElement, value: unknown, thing?: T) => void;
+  smallScreenHide?: boolean;
+}
+
+export default class Sortable<T> {
+  _items: Array<SortableItem<T>>;
+  _fields: Array<SortableField<T>>;
+  _sortBy: number;
+  _sortAsc: boolean;
+  _table: HTMLTableElement;
+  _head: HTMLTableSectionElement;
+  _body: HTMLTableSectionElement;
+  _smallScreen: boolean;
+  _done: Promise<boolean | void> | boolean;
+
   constructor() {
     this._items = [];
     this._fields = [];
@@ -81,15 +109,14 @@ export default class Sortable {
       for (const field of this._fields) {
         // calculate the value using the field's rules
         let value = field.value(obj);
-        if (value != null && typeof value.then === "function")
-          value = await value; // resolve promises
+        if (value != null && value instanceof Promise) value = await value; // resolve promises
         data.values.push(value);
 
         // calculate sortValue using the field's rules if required
         let sortValue = value;
         if (field.sortValue) {
           sortValue = field.sortValue(value, obj);
-          if (sortValue != null && typeof sortValue.then === "function")
+          if (sortValue != null && sortValue instanceof Promise)
             sortValue = await sortValue; // resolve promises
         }
         data.sortValues.push(sortValue);
@@ -100,7 +127,7 @@ export default class Sortable {
         if (field.format) {
           field.format(cell, value, obj);
         } else {
-          cell.textContent = value;
+          cell.textContent = value as string;
         }
         if (field.smallScreenHide && this._smallScreen) {
           cell.style.display = "none";
@@ -164,9 +191,9 @@ export default class Sortable {
           (ev) => {
             L.DomEvent.stop(ev);
             for (const element of titleRow.children) {
-              L.DomUtil.removeClass(element, "sorted");
-              L.DomUtil.removeClass(element, "asc");
-              L.DomUtil.removeClass(element, "desc");
+              L.DomUtil.removeClass(element as HTMLElement, "sorted");
+              L.DomUtil.removeClass(element as HTMLElement, "asc");
+              L.DomUtil.removeClass(element as HTMLElement, "desc");
             }
             if (index == this._sortBy) {
               this._sortAsc = !this._sortAsc;
