@@ -19,7 +19,7 @@ export function initSkin() {
 }
 
 function addCSS(name, content) {
-  if (!Wasabee._css) Wasabee._css = new Array();
+  if (!Wasabee._css) Wasabee._css = [];
   if (Wasabee._css.includes(name)) {
     document.getElementById("wasabee-css-" + name).remove();
     Wasabee._css.splice(Wasabee._css.indexOf(name));
@@ -36,7 +36,7 @@ function resetCSS() {
   for (const name of Wasabee._css) {
     document.getElementById("wasabee-css-" + name).remove();
   }
-  Wasabee._css = new Array();
+  Wasabee._css = [];
 }
 
 // const addFallback = () => {
@@ -51,7 +51,7 @@ function resetCSS() {
 //     Wasabee.skin.selfBlockStyle = Wasabee.static.selfBlockStyle;
 // };
 
-export function changeSkin(names) {
+export function changeSkin(names: string[]) {
   if (!window.plugin.wasabeeSkins) window.plugin.wasabeeSkins = {};
 
   if (names.length == 0) {
@@ -117,7 +117,7 @@ function initAnchorIcon() {
     const tmp = L.DomUtil.create("div");
     tmp.innerHTML = iconHTML;
 
-    const icon = tmp.firstChild;
+    const icon = tmp.firstChild as HTMLElement;
     icon.id = "wasabee-anchor-svg";
     document.body.appendChild(icon);
   }
@@ -135,13 +135,15 @@ function initOpsColor() {
   }
 }
 
-export function addToColorList(color) {
-  const datalist = document.getElementById("wasabee-colors-datalist");
+export function addToColorList(color: string) {
+  const datalist = document.getElementById(
+    "wasabee-colors-datalist"
+  ) as HTMLDataListElement;
   // fail safe
   if (!datalist) return;
 
   for (const c of datalist.children) {
-    if (c.value == color) {
+    if ((c as HTMLOptionElement).value == color) {
       datalist.insertBefore(c, datalist.firstChild);
       return;
     }
