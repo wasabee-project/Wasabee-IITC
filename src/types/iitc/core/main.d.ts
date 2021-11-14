@@ -3,9 +3,13 @@ import * as jQuery from "jquery";
 import { Intel } from "./inteltypes";
 import { MapDataRequest } from "./map_data_request";
 
+export interface IPlugin {
+  [pluginName: string]: any;
+}
+
 declare global {
   /** All iitc Pluigns */
-  var plugin: any;
+  var plugin: IPlugin;
 
   /** iitc-Pluigns setup/initialize function */
   var bootPlugins: BootCallback[];

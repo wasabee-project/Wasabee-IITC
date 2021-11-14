@@ -132,7 +132,7 @@ class IITCScript {
 
 const config = {
   entry: {
-    init: "./src/code/init.js",
+    init: "./src/code/init.ts",
   },
   output: {
     filename: "wasabee.user.js",

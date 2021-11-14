@@ -21,8 +21,25 @@ import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
 import { displayError } from "./error";
+import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 
-const Wasabee = window.plugin.wasabee;
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+interface Wasabee {
+  static: any;
+  _inited: boolean;
+  _selectedOp: WasabeeOp;
+  _updateList: Map<string, number>;
+  idb: Awaited<typeof db>;
+  portalDetailQueue: PortalID[];
+  portalLayerGroup: LayerGroup;
+  linkLayerGroup: LayerGroup;
+  markerLayerGroup: LayerGroup;
+  agentLayerGroup: LayerGroup;
+  zoneLayerGroup: FeatureGroup;
+  backgroundOpsGroup: LayerGroup;
+}
+
+const Wasabee: Wasabee = window.plugin.wasabee;
 Wasabee.static = statics;
 
 window.plugin.wasabee.init = async () => {
@@ -62,7 +79,7 @@ window.plugin.wasabee.init = async () => {
   await initSelectedOperation();
   initServer();
 
-  const skins = [];
+  const skins: string[] = [];
   const ss = localStorage[Wasabee.static.constants.SKIN_KEY];
   try {
     const l = JSON.parse(ss);
@@ -159,7 +176,7 @@ window.plugin.wasabee.init = async () => {
   }
 
   // hooks called when layers are enabled/disabled
-  window.map.on("layeradd", (obj) => {
+  window.map.on("layeradd", (obj: LayerEvent) => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
@@ -173,14 +190,14 @@ window.plugin.wasabee.init = async () => {
     }
   });
 
-  window.map.on("layerremove", (obj) => {
+  window.map.on("layerremove", (obj: LayerEvent) => {
     if (
       obj.layer === Wasabee.portalLayerGroup ||
       obj.layer === Wasabee.linkLayerGroup ||
       obj.layer === Wasabee.markerLayerGroup ||
       obj.layer === Wasabee.zoneLayerGroup
     ) {
-      obj.layer.clearLayers();
+      (obj.layer as LayerGroup).clearLayers();
     }
   });
 
@@ -219,8 +236,8 @@ window.plugin.wasabee.init = async () => {
     window.map.fire("wasabee:defensivekeys");
   }
 
-  window.map.on("wdialog", (dialog) => {
-    postToFirebase({ id: "analytics", action: dialog.constructor.TYPE });
+  window.map.on("wdialog", (event) => {
+    postToFirebase({ id: "analytics", action: event.dialogType });
   });
 };
 

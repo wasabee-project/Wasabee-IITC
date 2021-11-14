@@ -3,8 +3,8 @@ import { IITC, PortalGUID } from "./iitctypes";
 export {};
 
 declare global {
-  const script_info: any;
-  const iitcBuildDate: string;
+  var script_info: any;
+  var iitcBuildDate: string;
 
   // CONFIG OPTIONS ////////////////////////////////////////////////////
   const REFRESH: number; /** @default = 30; // refresh view every 30s (base time) */

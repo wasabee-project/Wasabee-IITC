@@ -10,5 +10,6 @@ declare global {
   type GoogleID = string;
   type ZoneID = number;
 
+  const plugin_info: any;
   var wasabeewebui: any;
 }
