@@ -1,7 +1,11 @@
 import statics from "./static";
 import { initCrossLinks } from "./crosslinks";
 import initServer from "./server";
-import { setupLocalStorage, initSelectedOperation } from "./selectedOp";
+import {
+  setupLocalStorage,
+  initSelectedOperation,
+  removeNonOwnedOps,
+} from "./selectedOp";
 import {
   drawMap,
   drawAgents,
@@ -141,6 +145,8 @@ window.plugin.wasabee.init = async () => {
   window.map.on("wasabee:op:select", drawMap);
   window.map.on("wasabee:agentlocations", drawAgents);
   window.map.on("wasabee:logout", drawAgents);
+
+  window.map.on("wasabee:logout", removeNonOwnedOps);
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {

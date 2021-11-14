@@ -3,6 +3,7 @@ import WasabeeBlocker from "./model/blocker";
 import wX from "./wX";
 import { generateId } from "./auxiliar";
 import { displayError } from "./error";
+import type { LeafletEvent } from "leaflet";
 
 function setRestoreOpID(opID: OpID) {
   localStorage[window.plugin.wasabee.static.constants.SELECTED_OP_KEY] = opID;
@@ -244,12 +245,18 @@ export async function duplicateOperation(opID: OpID) {
   return op;
 }
 
-// this checks me from cache; if not logged in, no op is owned and all on server will be deleted, which may confuse users
-export async function removeNonOwnedOps() {
+// use the provided GID to delete server ops
+export async function removeNonOwnedOps(
+  data: LeafletEvent & { GID: GoogleID }
+) {
+  // no GID provided, likely following a server change while not logged in
+  if (!data.GID) {
+    return;
+  }
   for (const opID of await opsList()) {
     const op = await WasabeeOp.load(opID);
     // don't fire event here
-    if (!op || !op.isOwnedOp()) {
+    if (!op || (op.isServerOp() && op.creator !== data.GID)) {
       await WasabeeOp.delete(opID);
       WasabeeBlocker.removeBlockers(opID); // no need to await
     }

@@ -154,6 +154,7 @@ export default class WasabeeMe extends WasabeeAgent {
   }
 
   static async purge() {
+    const me = WasabeeMe.localGet();
     delete localStorage[constants.AGENT_INFO_KEY];
     delete localStorage["sentToServer"]; // resend firebase token on login
 
@@ -166,7 +167,7 @@ export default class WasabeeMe extends WasabeeAgent {
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
-    window.map.fire("wasabee:logout");
+    window.map.fire("wasabee:logout", { GID: me ? me.id : null});
   }
 
   teamJoined(teamID) {
