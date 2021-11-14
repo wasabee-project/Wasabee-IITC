@@ -5,52 +5,62 @@ import wX from "./wX";
 // import { getPortalDetails } from "./uiCommands";
 
 import AgentUI from "./ui/agent";
+import type { LayerEvent, LayerGroup } from "leaflet";
+
+import db from "./db";
+
+export type WDKey = {
+  Name: string;
+  PortalID: string;
+  GID: string;
+  Lat: string;
+  Lng: string;
+  Count: number;
+  CapID: string;
+};
+
+let defensiveLayer: LayerGroup;
 
 // setup function
 export function initWasabeeD() {
-  window.plugin.wasabee.defensiveLayers = new L.LayerGroup();
-  window.addLayerGroup(
-    "Wasabee-D Keys",
-    window.plugin.wasabee.defensiveLayers,
-    false
-  );
+  window.plugin.wasabee.defensiveLayers = defensiveLayer = new L.LayerGroup();
+  window.addLayerGroup("Wasabee-D Keys", defensiveLayer, false);
 
   // hook called in init.js after load
   window.map.on("wasabee:defensivekeys", drawWasabeeDkeys);
 
-  window.map.on("layeradd", (obj) => {
-    if (obj.layer === window.plugin.wasabee.defensiveLayers) {
+  window.map.on("layeradd", (obj: LayerEvent) => {
+    if (obj.layer === defensiveLayer) {
       window.map.fire("wasabee:defensivekeys");
     }
   });
 
-  window.map.on("layerremove", (obj) => {
-    if (obj.layer === window.plugin.wasabee.defensiveLayers) {
+  window.map.on("layerremove", (obj: LayerEvent) => {
+    if (obj.layer === defensiveLayer) {
       // clearLayers doesn't actually remove the data, just hides it from the map
-      window.plugin.wasabee.defensiveLayers.clearLayers();
+      defensiveLayer.clearLayers();
     }
   });
 }
 
-export function getAllWasabeeDkeys() {
-  return window.plugin.wasabee.idb.getAll("defensivekeys");
+export async function getAllWasabeeDkeys() {
+  return (await db).getAll("defensivekeys");
 }
 
-export async function getAgentWasabeeDkeys(gid) {
+export async function getAgentWasabeeDkeys(gid: GoogleID) {
   const dks = await getAllWasabeeDkeys();
   return dks.filter((dk) => dk.GID == gid);
 }
 
-export function getAllPortalWasabeeDkeys(portalid) {
-  return window.plugin.wasabee.idb.getAllFromIndex(
-    "defensivekeys",
-    "PortalID",
-    portalid
-  );
+export async function getAllPortalWasabeeDkeys(portalid: PortalID) {
+  return (await db).getAllFromIndex("defensivekeys", "PortalID", portalid);
 }
 
-export function getAgentPortalWasabeeDkeys(gid, portalid) {
-  return window.plugin.wasabee.idb.get("defensivekeys", [gid, portalid]);
+export async function getAgentPortalWasabeeDkeys(
+  gid: GoogleID,
+  portalid: PortalID
+) {
+  return (await db).get("defensivekeys", [gid, portalid]);
 }
 
 // This is the primary hook that is called on map refresh
@@ -59,7 +69,7 @@ export function getAgentPortalWasabeeDkeys(gid, portalid) {
 export async function drawWasabeeDkeys() {
   if (window.isLayerGroupDisplayed("Wasabee-D Keys") === false) return;
   console.debug("running drawWasabeeDkeys");
-  window.plugin.wasabee.defensiveLayers.clearLayers();
+  defensiveLayer.clearLayers();
 
   if (WasabeeMe.isLoggedIn()) {
     try {
@@ -85,25 +95,20 @@ export async function drawWasabeeDkeys() {
 // draws each distinct portalID once
 async function drawMarkers() {
   const dks = await getAllWasabeeDkeys();
-  const done = new Map();
+  const done = new Set<PortalID>();
   for (const dk of dks) {
     if (done.has(dk.PortalID)) continue;
-    done.set(dk.PortalID, true);
+    done.add(dk.PortalID);
     drawMarker(dk);
   }
 }
 
 // remove and re-add each marker
-function drawMarker(dk) {
-  if (
-    window.plugin.wasabee.defensiveLayers[dk.PortalID] &&
-    window.plugin.wasabee.defensiveLayers[dk.PortalID]._leaflet_id
-  )
-    window.plugin.wasabee.defensiveLayers.removeLayer(
-      window.plugin.wasabee.defensiveLayers[dk.PortalID]
-    );
+function drawMarker(dk: WDKey) {
+  if (defensiveLayer[dk.PortalID] && defensiveLayer[dk.PortalID]._leaflet_id)
+    defensiveLayer.removeLayer(defensiveLayer[dk.PortalID]);
 
-  const marker = L.marker([dk.Lat, dk.Lng], {
+  const marker = L.marker([+dk.Lat, +dk.Lng], {
     title: dk.Name,
     icon: L.divIcon({
       className: "wasabee-defense-icon",
@@ -113,8 +118,8 @@ function drawMarker(dk) {
       popupAnchor: L.point(-1, -48),
     }),
   });
-  window.plugin.wasabee.defensiveLayers[dk.PortalID] = marker;
-  marker.addTo(window.plugin.wasabee.defensiveLayers);
+  defensiveLayer[dk.PortalID] = marker;
+  marker.addTo(defensiveLayer);
 
   window.registerMarkerForOMS(marker);
   marker.bindPopup("loading...", {
@@ -143,7 +148,7 @@ function drawMarker(dk) {
 }
 
 // draw the popup, display the individual agents and their counts
-async function getMarkerPopup(PortalID) {
+async function getMarkerPopup(PortalID: PortalID) {
   const container = L.DomUtil.create("div", "wasabee-wd-popup"); // leaflet-draw-tooltip would be cool
   const ul = L.DomUtil.create("ul", null, container);
 
