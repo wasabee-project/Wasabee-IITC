@@ -173,7 +173,7 @@ const SettingsDialog = WDialog.extend({
     skinsButton.textContent = wX("SKINS_BUTTON");
     L.DomEvent.on(skinsButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const skinDialog = new SkinDialog(window.map);
+      const skinDialog = new SkinDialog();
       skinDialog.enable();
     });
 
