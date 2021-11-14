@@ -25,7 +25,7 @@ import {
   ServerError,
 } from "./error";
 
-export function addPortal(operation, portal) {
+export function addPortal(operation: WasabeeOp, portal: WasabeePortal) {
   if (!portal) {
     displayError(wX("SELECT PORTAL"));
     return;
@@ -33,7 +33,7 @@ export function addPortal(operation, portal) {
   operation.addPortal(portal);
 }
 
-export function swapPortal(operation, portal) {
+export function swapPortal(operation: WasabeeOp, portal: WasabeePortal) {
   const selectedPortal = PortalUI.getSelected();
   if (!selectedPortal) {
     displayError(wX("SELECT PORTAL"));
@@ -61,7 +61,7 @@ export function swapPortal(operation, portal) {
   con.enable();
 }
 
-export function deletePortal(operation, portal) {
+export function deletePortal(operation: WasabeeOp, portal: WasabeePortal) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE ANCHOR PROMPT");
   pr.appendChild(PortalUI.displayFormat(portal));
@@ -77,7 +77,11 @@ export function deletePortal(operation, portal) {
   con.enable();
 }
 
-export function deleteMarker(operation, marker, portal) {
+export function deleteMarker(
+  operation: WasabeeOp,
+  marker: WasabeeMarker,
+  portal: WasabeePortal
+) {
   const pr = L.DomUtil.create("div", null);
   pr.textContent = wX("DELETE MARKER PROMPT");
   pr.appendChild(PortalUI.displayFormat(portal));
@@ -93,7 +97,7 @@ export function deleteMarker(operation, marker, portal) {
   con.enable();
 }
 
-export function clearAllItems(operation) {
+export function clearAllItems(operation: WasabeeOp) {
   const con = new ConfirmDialog({
     title: `Clear: ${operation.name}`,
     label: `Do you want to reset ${operation.name}?`,
@@ -106,7 +110,7 @@ export function clearAllItems(operation) {
   con.enable();
 }
 
-export function clearAllLinks(operation) {
+export function clearAllLinks(operation: WasabeeOp) {
   const con = new ConfirmDialog({
     title: `Clear Links: ${operation.name}`,
     label: `Do you want to remove all links from ${operation.name}?`,
@@ -119,7 +123,7 @@ export function clearAllLinks(operation) {
   con.enable();
 }
 
-export function clearAllMarkers(operation) {
+export function clearAllMarkers(operation: WasabeeOp) {
   const con = new ConfirmDialog({
     title: `Clear Markers: ${operation.name}`,
     label: `Do you want to remove all markers from ${operation.name}?`,
@@ -208,7 +212,7 @@ function pdqDoNext() {
 }
 
 // load faked op portals
-export function loadFaked(operation, force = false) {
+export function loadFaked(operation: WasabeeOp, force = false) {
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
     false;
@@ -222,7 +226,7 @@ export function loadFaked(operation, force = false) {
 }
 
 // load faked blocker portals
-export async function loadBlockerFaked(operation, force = false) {
+export async function loadBlockerFaked(operation: WasabeeOp, force = false) {
   const flag =
     localStorage[window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED] ||
     false;
@@ -259,7 +263,7 @@ export function sendLocation() {
   );
 }
 
-export function getAllPortalsOnScreen(operation) {
+export function getAllPortalsOnScreen(operation: WasabeeOp) {
   const bounds = window.map.getBounds();
   const x = [];
   for (const portal in window.portals) {
@@ -278,10 +282,18 @@ export function getAllPortalsOnScreen(operation) {
   return x;
 }
 
-export function getAllPortalsLinked(operation, originPortal) {
+export function getAllPortalsLinked(
+  operation: WasabeeOp,
+  originPortal: WasabeePortal
+) {
   const x = [];
   for (const link in window.links) {
     const p = window.links[link];
+
+    if (
+      operation.containsLinkFromTo(p.options.data.oGuid, p.options.data.dGuid)
+    )
+      continue;
 
     const linkPortal1 = new WasabeePortal({
       id: p.options.data.oGuid,
@@ -299,9 +311,6 @@ export function getAllPortalsLinked(operation, originPortal) {
       comment: "out",
     });
 
-    if (operation.containsLinkFromTo(linkPortal1, linkPortal2)) {
-      continue;
-    }
     if (linkPortal1.id === originPortal.id) {
       x.push(linkPortal2);
     }
@@ -345,7 +354,7 @@ export function testPortal(recursed = false) {
 }
 
 // recursive function to auto-mark blockers
-export async function blockerAutomark(operation, first = true) {
+export async function blockerAutomark(operation: WasabeeOp, first = true) {
   const blockers = await WasabeeBlocker.getAll(operation);
   if (first) {
     operation.startBatchMode();
@@ -370,7 +379,7 @@ export async function blockerAutomark(operation, first = true) {
     }
   }
   // build count list
-  const portals = new Array();
+  const portals: PortalID[] = [];
   for (const b of blockers) {
     if (
       !operation.containsMarkerByID(
@@ -387,7 +396,7 @@ export async function blockerAutomark(operation, first = true) {
     )
       portals.push(b.to);
   }
-  const reduced = {};
+  const reduced: { [id: PortalID]: number } = {};
   for (const p of portals) {
     if (!reduced[p]) reduced[p] = 0;
     reduced[p]++;
@@ -431,10 +440,10 @@ export async function blockerAutomark(operation, first = true) {
   if (first) operation.endBatchMode();
 }
 
-export function zoomToOperation(operation) {
+export function zoomToOperation(operation: WasabeeOp) {
   if (!operation) return;
   const mbr = operation.mbr;
-  if (mbr && isFinite(mbr._southWest.lat) && isFinite(mbr._northEast.lat)) {
+  if (mbr && mbr.isValid()) {
     window.map.fitBounds(mbr);
   }
 }
@@ -485,7 +494,6 @@ export async function fullSync() {
   try {
     let reloadOpID = null;
     const me = await WasabeeMe.waitGet(true);
-    const promises = new Array();
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner
@@ -513,12 +521,13 @@ export async function fullSync() {
         serverOps.map((op) => op.ID)
       );
 
+    const promises: Promise<WasabeeOp>[] = [];
     for (const opID of opsID) {
       promises.push(opPromise(opID));
     }
     const ops = (await Promise.allSettled(promises))
       .filter((p) => p.status === "fulfilled")
-      .map((p) => p.value);
+      .map((p: PromiseFulfilledResult<WasabeeOp>) => p.value);
     for (const newop of ops) {
       const localOp = await WasabeeOp.load(newop.ID);
       const reloadSO = await updateLocalOp(localOp, newop);
@@ -546,7 +555,7 @@ export async function fullSync() {
   }
 }
 
-export async function syncOp(opID) {
+export async function syncOp(opID: OpID) {
   const localOp = await WasabeeOp.load(opID);
   const remoteOp = await opPromise(opID);
   if (remoteOp.lasteditid != localOp.lasteditid) {
@@ -562,7 +571,7 @@ export async function syncOp(opID) {
   }
 }
 
-export function deleteLocalOp(opname, opid) {
+export function deleteLocalOp(opname: string, opid: OpID) {
   const con = new ConfirmDialog({
     title: wX("REM_LOC_CP", { opName: opname }),
     label: wX("YESNO_DEL", { opName: opname }),
