@@ -27,8 +27,8 @@ export function initFirebase() {
   const server = GetWasabeeServer();
 
   const iframe = L.DomUtil.create("iframe");
-  iframe.width = 0;
-  iframe.height = 0;
+  iframe.width = "0";
+  iframe.height = "0";
   iframe.src = server + "/static/firebase/index.html";
   iframe.id = frameID;
 
@@ -122,7 +122,16 @@ export function initFirebase() {
   });
 }
 
-export function postToFirebase(message) {
+interface FirebaseMessage {
+  id: string;
+  method: string;
+  action: string;
+  error: string;
+  app_name: string;
+  app_version: string;
+}
+
+export function postToFirebase(message: Partial<FirebaseMessage>) {
   // prevent analytics data from being sent if not enabled by the user: GPDR
   /* if (
     message.id == "analytics" &&
