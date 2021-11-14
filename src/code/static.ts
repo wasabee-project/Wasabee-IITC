@@ -1,4 +1,11 @@
-const statics = {
+// todo complete/rework
+type Statics = {
+  CSS: { [name: string]: string };
+  dialogNames: { [name: string]: string };
+  [name: string]: any;
+}
+
+const statics: Statics = {
   CSS: {
     main: require("./css/wasabee.css"),
     autodraws: require("./css/autodraws.css"),
