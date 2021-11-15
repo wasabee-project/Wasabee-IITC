@@ -84,7 +84,7 @@ const statics = {
 
 statics.strings = {}; // empty object, fill it below
 statics.strings["Deutsch"] = require("./translations/german.json");
-statics.strings["Espanol"] = require("./translations/spanish.json");
+statics.strings["Español"] = require("./translations/spanish.json");
 statics.strings["English"] = require("./translations/english.json");
 statics.strings["Italiano"] = require("./translations/italian.json");
 statics.strings["Tagalog"] = require("./translations/filipino.json");
