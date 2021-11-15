@@ -91,6 +91,8 @@ statics.strings["Tagalog"] = require("./translations/filipino.json");
 statics.strings["Français"] = require("./translations/french.json");
 statics.strings["Português"] = require("./translations/portuguese.json");
 statics.strings["Русский"] = require("./translations/Russian.json");
+statics.strings["Česky"] = require("./translations/czech.json");
+
 
 statics.defaultOperationColor = "orange";
 
