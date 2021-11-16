@@ -32,7 +32,6 @@
   "API_KEY": " api key: ",
   "ASS_TO": "Atrubuir a:",
   "ASSIGN LINK PROMPT": "Atribuir link para: ${value}",
-  "ASSIGN MARKER PROMPT": "Atrubuir marcador para: ${value}",
   "ASSIGN OUTBOUND PROMPT": "Atribuir todos os links externos de: ${value}",
   "ASSIGN OUTBOUND": "Atribuir links externos",
   "ASSIGN": "Atribuir",
