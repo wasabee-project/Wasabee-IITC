@@ -32,7 +32,6 @@
   "API_KEY": " chiave api: ",
   "ASS_TO": "Assegnato a",
   "ASSIGN LINK PROMPT": "Assegna link da: {portalName}",
-  "ASSIGN MARKER PROMPT": "Assegna marker da: {portalName}",
   "ASSIGN OUTBOUND PROMPT": "Assegna tutti i link in uscita da: {portalName}",
   "ASSIGN OUTBOUND": "Assegna Link in uscita",
   "ASSIGN": "Assegna",
