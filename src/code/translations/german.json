@@ -32,7 +32,6 @@
   "API_KEY": " api key: ",
   "ASS_TO": "Zugewiesen an",
   "ASSIGN LINK PROMPT": "Link zugewiesenen von: {portalName}",
-  "ASSIGN MARKER PROMPT": "Markierung zugewiesenen von: {portalName}",
   "ASSIGN OUTBOUND PROMPT": "Alle ausgehenden Links zugewiesenen von: {portalName}",
   "ASSIGN OUTBOUND": "Ordne ausgehende Links zu",
   "ASSIGN": "Zuweisen",
