@@ -32,7 +32,6 @@
   "API_KEY": " api key: ",
   "ASS_TO": "Nakatalaga kay",
   "ASSIGN LINK PROMPT": "Magatalaga ng link mula: {portalName}",
-  "ASSIGN MARKER PROMPT": "Magtalaga ng marker mula: {portalName}",
   "ASSIGN OUTBOUND PROMPT": "I-Talaga lahat ng outbound links mula: {portalName}",
   "ASSIGN OUTBOUND": "Magtalaga ng Outbound Links",
   "ASSIGN": "Italaga",
