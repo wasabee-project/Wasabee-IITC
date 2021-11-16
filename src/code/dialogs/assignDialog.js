@@ -32,13 +32,11 @@ const AssignDialog = WDialog.extend({
       this.closeDialog();
     };
 
-    // create container then setup asynchronously
-    this._html = L.DomUtil.create("div", "container");
-    this._setup();
+    const html = this._buildContent();
 
     this.createDialog({
       title: this._name,
-      html: this._html,
+      html: html,
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
@@ -46,12 +44,15 @@ const AssignDialog = WDialog.extend({
     });
   },
 
-  _setup: async function () {
+  _buildContent: function () {
+    const html = L.DomUtil.create("div", "container");
+
     const target = this.options.target;
     const operation = getSelectedOperation();
     this._targetID = target.ID;
-    const divtitle = L.DomUtil.create("div", "desc", this._html);
-    const menu = await this._getAgentMenu(target.assignedTo);
+
+    const divtitle = L.DomUtil.create("div", "desc", html);
+    const menu = L.DomUtil.create("div", "wasabee-agent-menu", html);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
@@ -62,9 +63,8 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(
         LinkUI.displayFormat(target, operation, this._smallScreen)
       );
-      const t = L.DomUtil.create("label", null);
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("LINK ASSIGNMENT");
-      menu.prepend(t);
     }
 
     if (target instanceof WasabeeMarker) {
@@ -74,9 +74,8 @@ const AssignDialog = WDialog.extend({
         portalName: PortalUI.displayName(portal),
       });
       divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
-      const t = L.DomUtil.create("label", null);
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("MARKER ASSIGNMENT");
-      menu.prepend(t);
     }
 
     if (target instanceof WasabeePortal) {
@@ -86,35 +85,26 @@ const AssignDialog = WDialog.extend({
         portalName: PortalUI.displayName(portal),
       });
       divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
-      const t = L.DomUtil.create("label", null);
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("ANCHOR ASSIGNMENT");
-      menu.prepend(t);
     }
 
-    this._html.appendChild(menu);
-  },
-
-  _buildContent: function () {
-    const content = L.DomUtil.create("div");
-    if (typeof this._label == "string") {
-      content.textContent = this._label;
-    } else {
-      content.appendChild(this._label);
-    }
-    return content;
-  },
-
-  _getAgentMenu: async function (current) {
-    const container = L.DomUtil.create("div", "wasabee-agent-menu");
-    const menu = L.DomUtil.create("select", null, container);
-    let option = menu.appendChild(L.DomUtil.create("option", null));
+    const select = L.DomUtil.create("select", null, menu);
+    const option = L.DomUtil.create("option", null, select);
     option.value = "";
     option.textContent = wX("UNASSIGNED");
-    const alreadyAdded = new Array();
 
-    menu.addEventListener("change", (value) => {
+    L.DomEvent.on(select, "change", (value) => {
       this.localAssign(value);
     });
+
+    this._populateAgentSelect(select, target.assignedTo);
+
+    return html;
+  },
+
+  _populateAgentSelect: async function (select, current) {
+    const alreadyAdded = new Array();
 
     const me = await WasabeeMe.waitGet();
     for (const t of getSelectedOperation().teamlist) {
@@ -126,19 +116,16 @@ const AssignDialog = WDialog.extend({
         for (const a of agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
-            option = L.DomUtil.create("option");
+            const option = L.DomUtil.create("option", "", select);
             option.value = a.id;
             option.textContent = a.getName();
             if (a.id == current) option.selected = true;
-            menu.appendChild(option);
           }
         }
       } catch (e) {
         console.error(e);
       }
     }
-
-    return container;
   },
 
   localAssign: function (value) {
