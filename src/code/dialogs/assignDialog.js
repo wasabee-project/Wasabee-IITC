@@ -137,11 +137,9 @@ const AssignDialog = WDialog.extend({
       operation.assignLink(this._targetID, value.srcElement.value);
     }
     if (this._type == "Anchor") {
-      const links = operation.getLinkListFromPortal(
-        operation.getPortal(this._targetID)
-      );
+      const links = operation.getLinkListFromPortal(this.options.target);
       for (const l of links) {
-        if (l.fromPortalId == this._targetID) {
+        if (l.fromPortalId == this.options.target.id) {
           operation.assignLink(l.ID, value.srcElement.value);
         }
       }
