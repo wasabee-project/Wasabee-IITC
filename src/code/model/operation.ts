@@ -1300,12 +1300,13 @@ export default class WasabeeOp extends Evented implements IOperation {
         const fields = [
           "fromPortalId",
           "toPortalId",
-          "assignedTo",
-          "description",
-          "throwOrderPos",
           "color",
-          "completed",
           "zone",
+          "order",
+          "assignedTo",
+          "completedID",
+          "comment",
+          "state",
         ];
         const diff = fields
           .filter((k) => oldLink[k] != l[k])
@@ -1326,12 +1327,14 @@ export default class WasabeeOp extends Evented implements IOperation {
       } else {
         const oldMarker = oldMarkers.get(m.ID);
         const fields = [
+          /* "portalId", */ // unlikely because we don't swap marker yet
           "type",
-          "comment",
-          "assignedTo",
-          "state",
-          "order",
           "zone",
+          "order",
+          "assignedTo",
+          "completedID",
+          "comment",
+          "state",
         ];
         const diff = fields
           .filter((k) => oldMarker[k] != m[k])
