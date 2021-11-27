@@ -183,6 +183,7 @@
   "MIN_SRC_PORT_LVL": "Minimum level required on source portal",
   "MINUTES": " ({minutes} minutes ago)",
   "MM": "Multimax",
+  "MM_BOTH_SIDE": "Use both base sides",
   "MM_INSERT_ORDER": "Insert at the end",
   "MM_SET_ALL_PORTALS": "All visible portals",
   "MM_SET_ALL_KEYS": "All GetKey Markers",
