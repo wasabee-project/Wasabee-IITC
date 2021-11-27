@@ -1336,16 +1336,25 @@ export default class WasabeeOp extends Evented implements IOperation {
     return this.localchanged;
   }
 
+  // currently overwrite zones instead of ignoring conflict
   mergeZones(op: WasabeeOp) {
-    const ids = new Set();
+    const ids = new Map();
     let count = 0;
     for (const z of this.zones) {
-      ids.add(z.id);
+      ids.set(z.id, z);
     }
     for (const z of op.zones) {
       if (!ids.has(z.id)) {
         this.zones.push(z);
         count += 1;
+      } else {
+        const lz = ids.get(z.id);
+        if (JSON.stringify(z) !== JSON.stringify(lz)) {
+          lz.color = z.color;
+          lz.name = z.name;
+          lz.points = z.points;
+          count += 1;
+        }
       }
     }
     return count;
