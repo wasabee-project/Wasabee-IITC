@@ -3,7 +3,7 @@ type Statics = {
   CSS: { [name: string]: string };
   dialogNames: { [name: string]: string };
   [name: string]: any;
-}
+};
 
 const statics: Statics = {
   CSS: {
@@ -55,7 +55,6 @@ const statics: Statics = {
     LANGUAGE_KEY: "wasabee-language",
     DEFAULT_LANGUAGE: "English",
     AGENT_INFO_KEY: "wasabee-me",
-    MULTIMAX_UNREACHABLE_KEY: "wasabee-mm-unreachable",
     LINK_SOURCE_KEY: "wasabee-link-source",
     ANCHOR_ONE_KEY: "wasabee-anchor-1",
     ANCHOR_TWO_KEY: "wasabee-anchor-2",

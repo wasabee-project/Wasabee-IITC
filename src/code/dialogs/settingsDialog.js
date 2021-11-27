@@ -108,20 +108,6 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
     );
 
-    const urpKey =
-      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY;
-    if (!localStorage[urpKey]) {
-      localStorage[urpKey] = '{"lat": -74.2,"lng:"-143.4}';
-    }
-    const pairs = [
-      ["Antarctic West", '{"lat":-74.2,"lng":-143.4}'],
-      ["Antarctic East", '{"lat":-74.2,"lng":30.0}'],
-      ["Equatorial Atlantic", '{"lat":-2.66,"lng":-4.28}'],
-      ["Arctic West", '{"lat":74.2,"lng":-143.4}'],
-      ["Arctic East", '{"lat":78.5,"lng":143.4}'],
-    ];
-    this._addSelect(container, "Multimax test point", urpKey, pairs);
-
     this._addCheckBox(
       container,
       wX("MERGE ON UPDATE"),
