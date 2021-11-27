@@ -126,10 +126,13 @@ export const AutoDraw = WDialog.extend({
     const label = L.DomUtil.create("label", "checkbox-label", container);
     label.textContent = text;
     label.htmlFor = id;
-    this[thisKey] = L.DomUtil.create("input", "checkbox-input", container);
-    this[thisKey].type = "checkbox";
-    this[thisKey].id = id;
-    this[thisKey].checked = defaultValue;
+    const checkbox = L.DomUtil.create("input", "checkbox-input", container);
+    checkbox.type = "checkbox";
+    checkbox.id = id;
+    checkbox.checked = defaultValue;
+    L.DomEvent.on(checkbox, "change", () => {
+      this[thisKey] = checkbox.checked;
+    });
   },
 
   _addSelectSet: function (text, setKey, container, defaultValue) {

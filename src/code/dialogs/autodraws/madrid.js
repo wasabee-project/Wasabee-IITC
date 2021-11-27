@@ -67,7 +67,7 @@ const MadridDialog = MultimaxDialog.extend({
     button.textContent = wX("MADRID");
     L.DomEvent.on(button, "click", () => {
       this._operation = getSelectedOperation();
-      const total = this._balancedcheck.checked
+      const total = this._balancedcheck
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
       displayInfo(`Madrid found ${total} layers`);
