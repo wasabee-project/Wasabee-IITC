@@ -394,6 +394,15 @@ export default class WasabeeOp extends Evented implements IOperation {
     return this.getLinkByPortalIDs(portal1.id, portal2.id);
   }
 
+  getLinkById(linkID: LinkID) {
+    for (const l of this.links) {
+      if (l.ID == linkID) {
+        return l;
+      }
+    }
+    return null;
+  }
+
   getLinkListFromPortal(portal: WasabeePortal) {
     const links = this.links.filter(function (listLink) {
       return (
@@ -1231,36 +1240,6 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   changes(origin?: WasabeeOp) {
-    interface PortalType {
-      type: "portal";
-      portal: WasabeePortal;
-    }
-    interface LinkType {
-      type: "link";
-      link: WasabeeLink;
-    }
-    interface MarkerType {
-      type: "marker";
-      marker: WasabeeMarker;
-    }
-    interface OpChanges {
-      addition: (PortalType | LinkType | MarkerType)[];
-      edition: ((PortalType | LinkType | MarkerType) & {
-        diff: [string, any][];
-      })[];
-      deletion: ((LinkType | MarkerType) & { id: TaskID })[];
-      name: string;
-      color: string;
-      comment: string;
-    }
-    const changes: OpChanges = {
-      addition: [],
-      edition: [],
-      deletion: [],
-      name: null,
-      color: null,
-      comment: null,
-    };
     // empty op if old OP (or local OP)
     const oldOp = new WasabeeOp(origin ? origin : this.getFetchedOp() || {});
     const oldLinks = new Map(oldOp.links.map((l) => [l.ID, l]));
@@ -1270,9 +1249,9 @@ export default class WasabeeOp extends Evented implements IOperation {
     const newMarkers = new Map(this.markers.map((m) => [m.ID, m]));
 
     // Note: teams/keyonhand are atomic
-    if (oldOp.name != this.name) changes.name = this.name;
-    if (oldOp.color != this.color) changes.color = this.color;
-    if (oldOp.comment != this.comment) changes.comment = this.comment;
+    if (oldOp.name != this.name) return true;
+    if (oldOp.color != this.color) return true;
+    if (oldOp.comment != this.comment) return true;
     // zones: handle them later
 
     for (const [id, p] of this._idToOpportals) {
@@ -1282,19 +1261,18 @@ export default class WasabeeOp extends Evented implements IOperation {
         const diff = fields
           .filter((k) => oldPortal[k] != p[k])
           .map((k) => [k, oldPortal[k]] as [string, any]);
-        if (diff.length > 0)
-          changes.edition.push({ type: "portal", portal: p, diff: diff });
+        if (diff.length > 0) return true;
       }
     }
 
-    for (const [id, l] of oldLinks) {
+    for (const id of oldLinks.keys()) {
       if (!newLinks.has(id)) {
-        changes.deletion.push({ type: "link", link: l, id: id });
+        return true;
       }
     }
     for (const l of this.links) {
       if (!oldLinks.has(l.ID)) {
-        changes.addition.push({ type: "link", link: l });
+        return true;
       } else {
         const oldLink = oldLinks.get(l.ID);
         const fields = [
@@ -1311,19 +1289,18 @@ export default class WasabeeOp extends Evented implements IOperation {
         const diff = fields
           .filter((k) => oldLink[k] != l[k])
           .map((k) => [k, oldLink[k]] as [string, any]);
-        if (diff.length > 0)
-          changes.edition.push({ type: "link", link: l, diff: diff });
+        if (diff.length > 0) return true;
       }
     }
 
-    for (const [id, m] of oldMarkers) {
+    for (const id of oldMarkers.keys()) {
       if (!newMarkers.has(id)) {
-        changes.deletion.push({ type: "marker", marker: m, id: id });
+        return true;
       }
     }
     for (const m of this.markers) {
       if (!oldMarkers.has(m.ID)) {
-        changes.addition.push({ type: "marker", marker: m });
+        return true;
       } else {
         const oldMarker = oldMarkers.get(m.ID);
         const fields = [
@@ -1339,29 +1316,20 @@ export default class WasabeeOp extends Evented implements IOperation {
         const diff = fields
           .filter((k) => oldMarker[k] != m[k])
           .map((k) => [k, oldMarker[k]] as [string, any]);
-        if (diff.length > 0)
-          changes.edition.push({ type: "marker", marker: m, diff: diff });
+        if (diff.length > 0) return true;
       }
     }
 
-    return changes;
+    return false;
   }
 
   checkChanges() {
     if (this.localchanged) {
-      const changes = this.changes();
-      if (
-        changes.addition.length +
-          changes.edition.length +
-          changes.deletion.length ==
-        0
-      )
-        this.localchanged = false;
+      this.localchanged = this.changes();
     }
     return this.localchanged;
   }
 
-  // currently overwrite zones instead of ignoring conflict
   mergeZones(op: WasabeeOp) {
     const ids = new Map<ZoneID, WasabeeZone>();
     let count = 0;
@@ -1372,136 +1340,9 @@ export default class WasabeeOp extends Evented implements IOperation {
       if (!ids.has(z.id)) {
         this.zones.push(z);
         count += 1;
-      } else {
-        const lz = ids.get(z.id);
-        if (JSON.stringify(z) !== JSON.stringify(lz)) {
-          lz.color = z.color;
-          lz.name = z.name;
-          lz.points = z.points;
-          count += 1;
-        }
       }
     }
     return count;
-  }
-
-  // assume that `this` is a server OP (teams/keys are correct)
-  applyChanges(changes: ReturnType<WasabeeOp["changes"]>, op: WasabeeOp) {
-    const summary = {
-      compatibility: {
-        ok: true,
-        rewrite: {
-          link: 0,
-          marker: 0,
-        },
-      },
-      addition: {
-        link: 0,
-        marker: 0,
-        zone: 0,
-        ignored: 0,
-      },
-      deletion: {
-        link: 0,
-        marker: 0,
-      },
-      edition: {
-        portal: 0,
-        link: 0,
-        marker: 0,
-        assignment: 0,
-        duplicate: 0,
-        singlePortalLink: 0,
-        removed: 0,
-      },
-    };
-
-    // merge *portals*
-    for (const p of op.opportals) {
-      this._addPortal(p);
-    }
-
-    // add missing zones
-    summary.addition.zone = this.mergeZones(op);
-
-    for (const d of changes.deletion) {
-      if (d.type == "link") {
-        const links = this.links.filter((l) => l.ID != d.id);
-        summary.deletion.link += this.links.length - links.length;
-        this.links = links;
-      } else if (d.type == "marker") {
-        const markers = this.markers.filter((m) => m.ID != d.id);
-        summary.deletion.marker += this.markers.length - markers.length;
-        this.markers = markers;
-      }
-    }
-    // links/markers absent from `this` are not added back
-    for (const e of changes.edition) {
-      if (e.type == "portal") {
-        const portal = this.getPortal(e.portal.id);
-        for (const kv of e.diff) portal[kv[0]] = e.portal[kv[0]];
-        summary.edition.portal += 1;
-      } else if (e.type == "link") {
-        let found = false;
-        for (const l of this.links) {
-          if (l.ID == e.link.ID) {
-            const link = this.getLinkByPortalIDs(
-              e.link.fromPortalId,
-              e.link.toPortalId
-            );
-            if (link && link != l) {
-              // remove the link if leading to a duplicate
-              // note: in some unexpected situation, this could lead to link loses (when user swap portal a LOT on the same spines)
-              this.links = this.links.filter((l) => l.ID != e.link.ID);
-              summary.edition.duplicate += 1;
-            } else {
-              for (const kv of e.diff) l[kv[0]] = e.link[kv[0]];
-              if (l.fromPortalId == l.toPortalId) {
-                this.links = this.links.filter((link) => link.ID != l.ID);
-                summary.edition.singlePortalLink += 1;
-              } else {
-                summary.edition.link += 1;
-                if (e.diff.some((kv) => kv[0] == "assignedTo"))
-                  summary.edition.assignment += 1;
-              }
-            }
-            found = true;
-            break;
-          }
-        }
-        if (!found) summary.edition.removed += 1;
-      } else if (e.type == "marker") {
-        let found = false;
-        for (const m of this.markers) {
-          if (m.ID == e.marker.ID) {
-            for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
-            summary.edition.marker += 1;
-            if (e.diff.some((kv) => kv[0] == "assignedTo"))
-              summary.edition.assignment += 1;
-            found = true;
-            break;
-          }
-        }
-        if (!found) summary.edition.removed += 1;
-      }
-    }
-    // `this` takes over `changes` for additions
-    for (const a of changes.addition) {
-      if (a.type == "portal") {
-        // already done
-      } else if (a.type == "link") {
-        if (!this.getLinkByPortalIDs(a.link.fromPortalId, a.link.toPortalId)) {
-          this.links.push(a.link);
-          summary.addition.link += 1;
-        } else summary.addition.ignored += 1;
-      } else if (a.type == "marker") {
-        if (!this.containsMarkerByID(a.marker.portalId, a.marker.type)) {
-          this.markers.push(a.marker);
-          summary.addition.marker += 1;
-        } else summary.addition.ignored += 1;
-      }
-    }
-    return summary;
   }
 
   determineZone(latlng: { lat: number; lng: number }) {

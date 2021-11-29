@@ -1,13 +1,14 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../model/agent";
+// import WasabeeAgent from "../model/agent";
 import WasabeeOp from "../model/operation";
-import Sortable from "../sortable";
+// import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
-import { drawBackgroundOp } from "../mapDrawing";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import { computeRebaseChanges, applyRebaseChanges } from "../model/changes";
+
+// import PortalUI from "../ui/portal";
+// import LinkUI from "../ui/link";
 
 const MergeDialog = WDialog.extend({
   statics: {
@@ -33,7 +34,8 @@ const MergeDialog = WDialog.extend({
     this._layer.remove();
   },
 
-  rebase: async function () {
+  rebase: async function (changes) {
+    applyRebaseChanges(this._opRebase, this.options.opOwn, changes);
     await this._opRebase.store();
     if (getSelectedOperation().ID == this._opRebase.ID)
       await makeSelectedOperation(this._opRebase.ID);
@@ -58,70 +60,167 @@ const MergeDialog = WDialog.extend({
 
   _displayDialog: function () {
     this._opRebase = new WasabeeOp(this.options.opRemote);
-    const origin = new WasabeeOp(
-      // while merge should only occurs with server ops, it appears users succeed to merge
-      // with local ops. This is a failsafe for those edge-cases
-      this.options.opOwn.getFetchedOp() || this.options.opOwn.toExport()
+    const origin = this.options.opOwn.getFetchedOp()
+      ? new WasabeeOp(this.options.opOwn.getFetchedOp())
+      : new WasabeeOp({
+          // dummy op
+          ID: this.options.opOwn.ID,
+          name: this.options.opOwn.name,
+          comment: this.options.opOwn.comment,
+          color: this.options.opOwn.color,
+          referencetime: this.options.opOwn.referencetime,
+        });
+    const changes = computeRebaseChanges(
+      origin,
+      this._opRebase,
+      this.options.opOwn
     );
-    const changes = this.options.opOwn.changes(origin);
-    const summary = this._opRebase.applyChanges(changes, this.options.opOwn);
-    this._opRebase.cleanAll();
-    this._opRebase.remoteChanged = this.options.opOwn.remoteChanged;
-    this._opRebase.localchanged = this.options.opOwn.localchanged;
+    console.debug(changes);
+    const conflicts = [];
 
-    const remoteChanges = this.options.opRemote.changes(origin);
-    const rebaseChanges = this._opRebase.changes(origin);
-
-    // if nothing was deleted on the server,
-    // and if portal swaps do not end up to 1-portal link
-    // auto merge
-    if (
-      remoteChanges.deletion.length === 0 &&
-      summary.edition.singlePortalLink === 0
-    ) {
-      this.rebase();
-      return;
+    for (const pc of changes.portals.conflict) {
+      if (pc.type === "edition/edition") {
+        conflicts.push({
+          conflict: pc,
+          masterValue: this._opRebase.getPortal(pc.id),
+          followerValue: this.options.opOwn.getPortal(pc.id),
+        });
+      }
+    }
+    for (const zc of changes.zones.conflict) {
+      if (zc.type === "edition/edition") {
+        conflicts.push({
+          conflict: zc,
+          masterValue: this._opRebase.getZone(zc.id),
+          followerValue: this.options.opOwn.getZone(zc.id),
+        });
+      }
+    }
+    // don't show double addition, caused by old export
+    for (const mc of changes.markers.conflict) {
+      if (mc.type !== "addition/addition") {
+        conflicts.push({
+          conflict: mc,
+          masterValue: this._opRebase.getMarker(mc.id),
+          followerValue: this.options.opOwn.getMarker(mc.id),
+        });
+      }
+    }
+    for (const lc of changes.links.conflict) {
+      if (lc.type !== "addition/addition") {
+        conflicts.push({
+          conflict: lc,
+          masterValue: this._opRebase.getLinkById(lc.id),
+          followerValue: this.options.opOwn.getLinkById(lc.id),
+        });
+      }
     }
 
-    const style = {
-      dashArray: [2, 8],
-      opacity: 0.86,
-      weight: 4,
-      color: "blue",
-      interactive: false,
-    };
-    drawBackgroundOp(this._opRebase, this._layer, style);
+    if (conflicts.length === 0) {
+      this.rebase(changes);
+      return;
+    }
 
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);
     desc.textContent = wX("MERGE_MESSAGE", { opName: this.options.opOwn.name });
-    content.appendChild(this.formatSummary(summary));
 
-    const details = L.DomUtil.create("div", "details", content);
-    {
-      const div = L.DomUtil.create("div", "local", details);
-      div.innerHTML = "<span>" + wX("MERGE_CHANGES_LOCAL") + "</span>";
-      div.appendChild(this.formatChanges(changes, origin, this.options.opOwn));
-    }
-    {
-      const div = L.DomUtil.create("div", "merge", details);
-      div.innerHTML = "<span>" + wX("MERGE_CHANGES_MERGE") + "</span>";
-      div.appendChild(
-        this.formatChanges(rebaseChanges, origin, this._opRebase)
+    L.DomUtil.create("h3", "", content).textContent = "Conflicts:";
+
+    const details = L.DomUtil.create("table", "conflicts", content);
+    const head = L.DomUtil.create("tr", "", details);
+    // master head
+    const masterHead = L.DomUtil.create("th", "master", head);
+    masterHead.colSpan = 2;
+    masterHead.textContent = "Master copy";
+    const masterRadioHead = L.DomUtil.create(
+      "input",
+      "",
+      L.DomUtil.create("th", "master", head)
+    );
+    masterRadioHead.type = "radio";
+    masterRadioHead.name = this.options.opOwn.ID;
+    // follower head
+    const followerRadioHead = L.DomUtil.create(
+      "input",
+      "",
+      L.DomUtil.create("th", "follower", head)
+    );
+    followerRadioHead.type = "radio";
+    followerRadioHead.name = this.options.opOwn.ID;
+    const followerHead = L.DomUtil.create("th", "follower", head);
+    followerHead.colSpan = 2;
+    followerHead.textContent = "Local copy";
+
+    L.DomEvent.on(masterRadioHead, "change", () => {
+      if (masterRadioHead.checked) {
+        details
+          .querySelectorAll("td.master input")
+          .forEach((el) => (el.checked = true));
+        for (const c of conflicts) c.conflict.value = c.masterValue;
+      }
+    });
+    L.DomEvent.on(followerRadioHead, "change", () => {
+      if (followerRadioHead.checked) {
+        details
+          .querySelectorAll("td.follower input")
+          .forEach((el) => (el.checked = true));
+        for (const c of conflicts) c.conflict.value = c.followerValue;
+      }
+    });
+
+    for (const c of conflicts) {
+      const row = L.DomUtil.create("tr", "", details);
+      // master props
+      const masterTD = L.DomUtil.create("td", "master", row);
+      masterTD.textContent = JSON.stringify(c.conflict.master.props);
+      // master type
+      L.DomUtil.create("td", "master", row).textContent =
+        c.conflict.master.type === "edition" ? "~" : "-";
+      // master radio
+      const masterRadio = L.DomUtil.create(
+        "input",
+        "",
+        L.DomUtil.create("td", "master", row)
       );
-    }
-    {
-      const div = L.DomUtil.create("div", "server", details);
-      div.innerHTML = "<span>" + wX("MERGE_CHANGES_REMOTE") + "</span>";
-      div.appendChild(
-        this.formatChanges(remoteChanges, origin, this.options.opRemote)
+      masterRadio.type = "radio";
+      masterRadio.name = c.conflict.id;
+      masterRadio.value = "master";
+      masterRadio.checked = true;
+      // follower radio
+      const followerRadio = L.DomUtil.create(
+        "input",
+        "",
+        L.DomUtil.create("td", "follower", row)
       );
+      followerRadio.type = "radio";
+      followerRadio.name = c.conflict.id;
+      followerRadio.value = "master";
+      // follower type
+      L.DomUtil.create("td", "follower", row).textContent =
+        c.conflict.follower.type === "edition" ? "~" : "-";
+      // follower props
+      const followerTD = L.DomUtil.create("td", "follower", row);
+      followerTD.textContent = JSON.stringify(c.conflict.follower.props);
+
+      L.DomEvent.on(masterRadio, "change", () => {
+        if (masterRadio.checked) {
+          c.conflict.value = c.masterValue;
+          followerRadioHead.checked = false;
+        }
+      });
+      L.DomEvent.on(followerRadio, "change", () => {
+        if (followerRadio.checked) {
+          c.conflict.value = c.followerValue;
+          masterRadioHead.checked = false;
+        }
+      });
     }
 
     const buttons = [];
     buttons.push({
       text: wX("MERGE_REBASE"),
-      click: () => this.rebase(),
+      click: () => this.rebase(changes),
     });
     buttons.push({
       text: wX("MERGE_REPLACE"),
@@ -142,155 +241,6 @@ const MergeDialog = WDialog.extend({
       dialogClass: "merge",
       buttons: buttons,
     });
-  },
-
-  formatSummary: function (summary) {
-    // wX
-    const list = [];
-    if (!summary.compatibility.ok)
-      list.push(
-        `old OP detected, merge ${summary.compatibility.rewrite.link} links and ${summary.compatibility.rewrite.marker} markers`
-      );
-    if (
-      summary.addition.link + summary.addition.marker + summary.addition.zone >
-      0
-    )
-      list.push(
-        `add ${summary.addition.link} links, ${summary.addition.marker} markers and ${summary.addition.zone} zones`
-      );
-    if (summary.addition.ignored > 0)
-      list.push(
-        `ignore ${summary.addition.ignored} new portals/links/markers already present on remote`
-      );
-    if (summary.deletion.link + summary.deletion.marker > 0)
-      list.push(
-        `delete ${summary.deletion.link} links and ${summary.deletion.marker} markers`
-      );
-    if (
-      summary.edition.portal + summary.edition.link + summary.edition.marker >
-      0
-    )
-      list.push(
-        `edit ${summary.edition.portal} portals, ${summary.edition.link} links and ${summary.edition.marker} markers`
-      );
-    if (summary.edition.duplicate > 0)
-      list.push(`ignore ${summary.edition.duplicate} new duplicates`);
-    if (summary.edition.removed > 0)
-      list.push(
-        `ignore ${summary.edition.removed} links and markers removed from remote`
-      );
-    if (summary.edition.singlePortalLink > 0)
-      list.push(
-        `delete ${summary.edition.singlePortalLink} single portal links`
-      );
-    if (summary.edition.assignment > 0)
-      list.push(`change ${summary.edition.assignment} assignments`);
-
-    const rebaseMessage = L.DomUtil.create("div");
-    rebaseMessage.append("Rebase summary:");
-
-    if (list.length > 0) {
-      const rebaseList = L.DomUtil.create("ul", null, rebaseMessage);
-      for (const item of list)
-        L.DomUtil.create("li", null, rebaseList).textContent = item;
-    } else {
-      rebaseMessage.textContent =
-        "The local changes don't alter the server version.";
-    }
-
-    return rebaseMessage;
-  },
-
-  formatChanges: function (changes, origin, operation) {
-    const sortable = new Sortable();
-    sortable.fields = [
-      {
-        name: " ",
-        value: (e) => e.type,
-        format: (cell, value) => {
-          cell.textContent = value;
-        },
-      },
-      {
-        name: " ",
-        value: (e) => {
-          let v = "";
-          if (e.data.type === "link") {
-            v = e.data.link.ID;
-          } else if (e.data.type === "portal") {
-            v = e.data.portal.id;
-          } else if (e.data.type === "marker") {
-            v = e.data.marker.ID;
-          }
-          return v.slice(0, 4);
-        },
-        format: (cell, value) => {
-          cell.innerHTML = `<code>${value}</code>`;
-        },
-      },
-      {
-        name: "Entry",
-        value: (e) => e.data.type,
-        format: (cell, value, e) => {
-          const op = e.type === "-" ? origin : operation;
-          if (e.data.type === "link") {
-            cell.appendChild(LinkUI.displayFormat(e.data.link, op));
-          } else if (e.data.type === "portal") {
-            cell.appendChild(PortalUI.displayFormat(e.data.portal));
-          } else if (e.data.type === "marker") {
-            const portal = op.getPortal(e.data.marker.portalId);
-            cell.appendChild(PortalUI.displayFormat(portal));
-          } else {
-            cell.textContent = value;
-          }
-          if (e.type === "~") {
-            const pre = L.DomUtil.create("code", null, cell);
-            (async () => {
-              const diff = [];
-              for (const [k, v] of e.data.diff) {
-                let item = e.data.link || e.data.portal || e.data.marker;
-                let prev = v;
-                let cur = item[k];
-                if (k.endsWith("ortalId")) {
-                  prev = origin.getPortal(prev).name;
-                  cur = operation.getPortal(cur).name;
-                } else if (k === "assignedTo") {
-                  if (prev !== "") prev = await WasabeeAgent.get(prev);
-                  if (cur !== "") cur = await WasabeeAgent.get(cur);
-                  if (prev) prev = prev.name;
-                  if (cur) cur = cur.name;
-                }
-                diff.push([k, prev, cur]);
-              }
-              pre.textContent = JSON.stringify(diff);
-            })();
-          }
-        },
-      },
-    ];
-
-    const items = [];
-    for (const a of changes.addition) {
-      items.push({
-        type: "+",
-        data: a,
-      });
-    }
-    for (const e of changes.edition) {
-      items.push({
-        type: "~",
-        data: e,
-      });
-    }
-    for (const d of changes.deletion) {
-      items.push({
-        type: "-",
-        data: d,
-      });
-    }
-
-    sortable.items = items;
-    return sortable.table;
   },
 });
 
