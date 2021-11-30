@@ -1,14 +1,14 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-// import WasabeeAgent from "../model/agent";
+import WasabeeAgent from "../model/agent";
 import WasabeeOp from "../model/operation";
-// import Sortable from "../sortable";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 import { computeRebaseChanges, applyRebaseChanges } from "../model/changes";
 
-// import PortalUI from "../ui/portal";
-// import LinkUI from "../ui/link";
+import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
+import MarkerUI from "../ui/marker";
 
 const MergeDialog = WDialog.extend({
   statics: {
@@ -60,7 +60,7 @@ const MergeDialog = WDialog.extend({
 
   _displayDialog: function () {
     this._opRebase = new WasabeeOp(this.options.opRemote);
-    const origin = this.options.opOwn.getFetchedOp()
+    this._origin = this.options.opOwn.getFetchedOp()
       ? new WasabeeOp(this.options.opOwn.getFetchedOp())
       : new WasabeeOp({
           // dummy op
@@ -71,7 +71,7 @@ const MergeDialog = WDialog.extend({
           referencetime: this.options.opOwn.referencetime,
         });
     const changes = computeRebaseChanges(
-      origin,
+      this._origin,
       this._opRebase,
       this.options.opOwn
     );
@@ -81,6 +81,7 @@ const MergeDialog = WDialog.extend({
     for (const pc of changes.portals.conflict) {
       if (pc.type === "edition/edition") {
         conflicts.push({
+          kind: "portal",
           conflict: pc,
           masterValue: this._opRebase.getPortal(pc.id),
           followerValue: this.options.opOwn.getPortal(pc.id),
@@ -90,6 +91,7 @@ const MergeDialog = WDialog.extend({
     for (const zc of changes.zones.conflict) {
       if (zc.type === "edition/edition") {
         conflicts.push({
+          kind: "zone",
           conflict: zc,
           masterValue: this._opRebase.getZone(zc.id),
           followerValue: this.options.opOwn.getZone(zc.id),
@@ -100,6 +102,7 @@ const MergeDialog = WDialog.extend({
     for (const mc of changes.markers.conflict) {
       if (mc.type !== "addition/addition") {
         conflicts.push({
+          kind: "marker",
           conflict: mc,
           masterValue: this._opRebase.getMarker(mc.id),
           followerValue: this.options.opOwn.getMarker(mc.id),
@@ -109,6 +112,7 @@ const MergeDialog = WDialog.extend({
     for (const lc of changes.links.conflict) {
       if (lc.type !== "addition/addition") {
         conflicts.push({
+          kind: "link",
           conflict: lc,
           masterValue: this._opRebase.getLinkById(lc.id),
           followerValue: this.options.opOwn.getLinkById(lc.id),
@@ -172,8 +176,12 @@ const MergeDialog = WDialog.extend({
     for (const c of conflicts) {
       const row = L.DomUtil.create("tr", "", details);
       // master props
-      const masterTD = L.DomUtil.create("td", "master", row);
-      masterTD.textContent = JSON.stringify(c.conflict.master.props);
+      this.formatConflict(
+        c,
+        c.conflict.master,
+        this._opRebase,
+        L.DomUtil.create("td", "master", row)
+      );
       // master type
       L.DomUtil.create("td", "master", row).textContent =
         c.conflict.master.type === "edition" ? "~" : "-";
@@ -200,8 +208,12 @@ const MergeDialog = WDialog.extend({
       L.DomUtil.create("td", "follower", row).textContent =
         c.conflict.follower.type === "edition" ? "~" : "-";
       // follower props
-      const followerTD = L.DomUtil.create("td", "follower", row);
-      followerTD.textContent = JSON.stringify(c.conflict.follower.props);
+      this.formatConflict(
+        c,
+        c.conflict.follower,
+        this.options.opOwn,
+        L.DomUtil.create("td", "follower", row)
+      );
 
       L.DomEvent.on(masterRadio, "change", () => {
         if (masterRadio.checked) {
@@ -241,6 +253,114 @@ const MergeDialog = WDialog.extend({
       dialogClass: "merge",
       buttons: buttons,
     });
+  },
+
+  formatConflict(conflict, change, op, container) {
+    // fail safe for now
+    try {
+      if (conflict.kind === "link") {
+        const link = this._origin.getLinkById(change.id);
+        const linkDisplay = LinkUI.displayFormat(link, this._origin);
+        container.appendChild(linkDisplay);
+        if (change.type === "deletion") linkDisplay.classList.add("strike");
+        else {
+          const list = L.DomUtil.create("ul", "", container);
+          for (const k in change.props) {
+            this.formatProp(k, link, change.props, op, list);
+          }
+        }
+      } else if (conflict.kind === "marker") {
+        const marker = this._origin.getMarker(change.id);
+        const markerDisplay = MarkerUI.displayFormat(marker, this._origin);
+        container.appendChild(markerDisplay);
+        if (change.type === "deletion") markerDisplay.classList.add("strike");
+        else {
+          const list = L.DomUtil.create("ul", "", container);
+          for (const k in change.props) {
+            this.formatProp(k, marker, change.props, op, list);
+          }
+        }
+      } else if (conflict.kind === "portal") {
+        const portal = this._origin.getPortal(change.id);
+        const portalDisplay = PortalUI.displayFormat(portal);
+        container.appendChild(portalDisplay);
+        // only edition/edition
+        const list = L.DomUtil.create("ul", "", container);
+        for (const k in change.props) {
+          this.formatProp(k, portal, change.props, op, list);
+        }
+      } else if (conflict.kind === "zone") {
+        const zone = this._origin.getZone(change.id);
+        const zoneDisplay = L.DomUtil.create("span");
+        zoneDisplay.textContent = "Zone: " + zone.name;
+        container.appendChild(zoneDisplay);
+        // only edition/edition
+        const list = L.DomUtil.create("ul", "", container);
+        for (const k in change.props) {
+          this.formatProp(k, zone, change.props, op, list);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      container.append(JSON.stringify(change.props));
+    }
+  },
+
+  formatProp(key, old, next, op, container) {
+    const li = L.DomUtil.create("li", "", container);
+    // content with default value
+    const keySpan = L.DomUtil.create("span", "", li);
+    keySpan.textContent = key + ": ";
+    const oldSpan = L.DomUtil.create("span", "strike", li);
+    oldSpan.textContent = old[key];
+    const newSpan = L.DomUtil.create("span", "", li);
+    newSpan.textContent = next[key];
+
+    if (key === "hardness") {
+      keySpan.textContent = "Hard: ";
+    } else if (key === "comment") {
+      keySpan.textContent = "Comment: ";
+    } else if (key === "assignedTo") {
+      keySpan.textContent = "Assign: ";
+    } else if (key === "completedID") {
+      keySpan.textContent = "Completed by: ";
+    } else if (key === "state") {
+      keySpan.textContent = "State: ";
+    } else if (key === "color") {
+      keySpan.textContent = "Color: ";
+    } else if (key === "order") {
+      keySpan.textContent = "Order: ";
+    } else if (key === "zone") {
+      keySpan.textContent = "Zone: ";
+    } else if (key === "points") {
+      keySpan.textContent = "Shape has changed";
+      oldSpan.textContent = "";
+      newSpan.textContent = "";
+    } else if (key === "fromPortalId") {
+      keySpan.textContent = "From: ";
+    } else if (key === "toPortalId") {
+      keySpan.textContent = "To: ";
+    }
+
+    if (key === "assignedTo" || key === "completedID") {
+      if (old[key])
+        WasabeeAgent.get(old[key]).then(
+          (a) => (oldSpan.textContent = a.getName())
+        );
+      if (next[key])
+        WasabeeAgent.get(next[key]).then(
+          (a) => (newSpan.textContent = a.getName())
+        );
+    }
+
+    if (key === "fromPortalId" || key === "toPortalId") {
+      oldSpan.textContent = "";
+      oldSpan.appendChild(
+        PortalUI.displayFormat(this._origin.getPortal(old[key]))
+      );
+      newSpan.textContent = "";
+      newSpan.appendChild(PortalUI.displayFormat(op.getPortal(next[key])));
+    }
   },
 });
 

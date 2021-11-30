@@ -50,7 +50,7 @@
 .wasabee-table > thead .sortable.desc:before {
   content: "\25bc";
 }
-// .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; }
+/* .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; } */
 
 .wasabee-dialog-agent ul {
   padding-left: 0;
@@ -531,23 +531,36 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   padding-left: 1em;
 }
 
-/* merge dialog */
-@media (min-width: 700px) {
-    .wasabee-dialog-merge .details {
-        display: grid;
-        grid-template-columns: auto auto auto;
-    }
+.wasabee-dialog-merge .conflicts {
+  border-collapse: collapse;
+  empty-cells: show;
+  width: 100%;
+  clear: both;
+  background: #0004;
 }
 
-.wasabee-dialog-merge .details .wasabee-table {
-    margin-bottom: auto;
-    border: 1px solid white;
-    margin-right: 2px;
-    margin-left: 2px;
+.wasabee-dialog-merge .conflicts tr:nth-child(2n + 1) {
+  background: #0004;
 }
 
-.wasabee-dialog-merge .details .wasabee-table code {
-  display: block;
+.wasabee-dialog-merge .conflicts td,
+.wasabee-dialog-merge .conflicts th {
+  border-width: 0 1px;
+  border-style: solid;
+  padding: 3px 4px;
+  text-align: left;
+  vertical-align: baseline;
+}
+.wasabee-dialog-merge .conflicts td:first-child,
+.wasabee-dialog-merge .conflicts th:first-child {
+  border-left-width: 0;
+}
+.wasabee-dialog-merge .conflicts td:last-child,
+.wasabee-dialog-merge .conflicts th:last-child {
+  border-right-width: 0;
+}
+.wasabee-dialog-merge .strike {
+  text-decoration: line-through;
 }
 
 /* color pickers */
