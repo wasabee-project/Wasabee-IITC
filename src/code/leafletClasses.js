@@ -100,7 +100,7 @@ export const WDialog = L.Handler.extend({
     L.setOptions(this, options);
     // determine large or small screen dialog sizes
     this._smallScreen = this._isMobile();
-    window.map.fire("wdialog", this);
+    window.map.fire("wdialog", { dialogType: this.constructor.TYPE });
     this.options.usePane =
       this.options.usePane &&
       window.isSmartphone() &&

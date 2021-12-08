@@ -1,11 +1,12 @@
 import PortalUI from "./portal";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import AgentDialog from "../dialogs/agentDialog";
-import { targetPromise, routePromise } from "../server";
+import { targetPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import WasabeeAgent from "../model/agent";
+import { displayInfo, displayWarning } from "../error";
 
 function formatDisplay(agent) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
@@ -46,11 +47,11 @@ function formatDisplay(agent) {
 
 function timeSinceformat(agent) {
   if (!agent.date) return "";
-  const date = Date.parse(agent.date + " UTC");
+  const date = Date.parse(agent.date + "Z");
   if (Number.isNaN(date)) return `(${agent.date} UTC)`; // FireFox Date.parse no good
   if (date == 0) return "";
 
-  const seconds = Math.floor((new Date() - date) / 1000);
+  const seconds = Math.floor((Date.now() - date) / 1000);
   if (seconds < 0) return "";
   let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
 
@@ -184,11 +185,16 @@ const WLAgent = L.Marker.extend({
     const title = L.DomUtil.create("div", "desc", content);
     title.id = agent.id;
     title.textContent = agent.getName();
+    const time = L.DomUtil.create("div", "desc", content);
+    time.id = agent.id;
+    time.textContent = timeSinceformat(agent);
 
     WasabeeAgent.get(this.options.id)
       .then(formatDisplay)
       .then((fd) => {
-        title.innerHTML = fd.outerHTML + timeSinceformat(agent);
+        title.textContent = "";
+        title.appendChild(fd);
+        time.textContent = timeSinceformat(agent);
       });
 
     const sendTarget = L.DomUtil.create("button", null, content);
@@ -197,7 +203,7 @@ const WLAgent = L.Marker.extend({
       L.DomEvent.stop(ev);
       const selectedPortal = PortalUI.getSelected();
       if (!selectedPortal) {
-        alert(wX("SELECT PORTAL"));
+        displayWarning(wX("SELECT PORTAL"));
         return;
       }
 
@@ -211,35 +217,7 @@ const WLAgent = L.Marker.extend({
         callback: async () => {
           try {
             await targetPromise(agent.id, selectedPortal);
-            alert(wX("TARGET SENT"));
-          } catch (e) {
-            console.error(e);
-          }
-        },
-      });
-      d.enable();
-    });
-
-    // this needs wX
-    const requestRoute = L.DomUtil.create("button", null, content);
-    requestRoute.textContent = "Send Route to Target";
-    requestRoute.style.display = "none"; // hide this until the server-side is ready
-    L.DomEvent.on(requestRoute, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const selectedPortal = PortalUI.getSelected();
-      if (!selectedPortal) {
-        alert(wX("SELECT PORTAL"));
-        return;
-      }
-
-      const d = new ConfirmDialog({
-        title: "Send Route to Target",
-        label: "Do you really want to request the route to be sent?",
-        type: "agent",
-        callback: async () => {
-          try {
-            await routePromise(agent.id, selectedPortal);
-            alert("Route Sent");
+            displayInfo(wX("TARGET SENT"));
           } catch (e) {
             console.error(e);
           }

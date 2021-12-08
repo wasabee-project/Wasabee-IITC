@@ -3,6 +3,7 @@ import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
+import { displayError } from "../../error";
 
 const StarburstDialog = AutoDraw.extend({
   statics: {
@@ -64,7 +65,7 @@ const StarburstDialog = AutoDraw.extend({
 
   starburst: function () {
     if (!this._anchor) {
-      alert("Select an anchor portal");
+      displayError("Select an anchor portal");
       return;
     }
 

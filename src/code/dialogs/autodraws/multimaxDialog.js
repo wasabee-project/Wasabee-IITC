@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../../selectedOp";
 import wX from "../../wX";
 import { testPortal, clearAllLinks } from "../../uiCommands";
 import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
+import { displayError, displayInfo } from "../../error";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -71,7 +72,7 @@ const MultimaxDialog = AutoDraw.extend({
     button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
-      alert(`Multimax found ${total} layers`);
+      displayInfo(`Multimax found ${total} layers`);
       // this.closeDialog();
     });
 
@@ -130,10 +131,10 @@ const MultimaxDialog = AutoDraw.extend({
         // skip base
         if (l.toPortalId === pOne.id && l.fromPortalId === pTwo.id) continue;
         if (l.fromPortalId === pOne.id && l.toPortalId === pTwo.id) continue;
-        if (l.opOrder > order) l.opOrder += diff;
+        if (l.order > order) l.order += diff;
       }
       for (const m of this._operation.markers) {
-        if (m.opOrder > order) m.opOrder += diff;
+        if (m.order > order) m.order += diff;
       }
     }
 
@@ -144,7 +145,7 @@ const MultimaxDialog = AutoDraw.extend({
       });
 
     if (!Array.isArray(sequence) || !sequence.length) {
-      // alert("No layers found");
+      // displayInfo("No layers found");
       return [0, order, null];
     }
 
@@ -177,7 +178,7 @@ const MultimaxDialog = AutoDraw.extend({
 
     // Calculate the multimax
     if (!this._anchorOne || !this._anchorTwo || !portals.length) {
-      alert(wX("INVALID REQUEST"));
+      displayError(wX("INVALID REQUEST"));
       return 0;
     }
 

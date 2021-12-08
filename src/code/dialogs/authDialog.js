@@ -11,6 +11,7 @@ import { sendLocation, fullSync } from "../uiCommands";
 import { wX } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../model/me";
+import { displayError } from "../error";
 
 const AuthDialog = WDialog.extend({
   statics: {
@@ -43,7 +44,7 @@ const AuthDialog = WDialog.extend({
   _displayDialog: function () {
     const syncLoggedIn = window.gapi.auth2.getAuthInstance();
     if (syncLoggedIn) {
-      alert(wX("AUTH INCOMPAT"));
+      displayError(wX("AUTH INCOMPAT"));
       return;
     }
 
@@ -128,7 +129,7 @@ const AuthDialog = WDialog.extend({
           postToFirebase({ id: "wasabeeLogin", method: "iOS" });
         } catch (e) {
           console.error(e);
-          alert(e.toString());
+          displayError(e);
         }
         window.map.fire("wasabee:defensivekeys");
       });
@@ -173,7 +174,7 @@ const AuthDialog = WDialog.extend({
               postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
             } catch (e) {
               console.error(e);
-              alert(e.toString());
+              displayError(e);
             }
           }
           window.map.fire("wasabee:defensivekeys");
@@ -212,7 +213,7 @@ const AuthDialog = WDialog.extend({
       if (response.error) {
         postToFirebase({ id: "exception", error: response.error });
         if (response.error === "idpiframe_initialization_failed") {
-          alert("You need enable cookies or allow [*.]google.com");
+          displayError("You need enable cookies or allow [*.]google.com");
         }
         if (
           response.error == "user_logged_out" ||
@@ -223,7 +224,7 @@ const AuthDialog = WDialog.extend({
             if (responseSelect.error) {
               postToFirebase({ id: "exception", error: response.error });
               const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
-              alert(err);
+              displayError(err);
               console.log(err);
               return;
             }
@@ -235,7 +236,7 @@ const AuthDialog = WDialog.extend({
                 method: "gsapiAuth (immediate_failed)",
               });
             } catch (e) {
-              alert(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
+              displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
               console.error(e);
               this.closeDialog();
             }
@@ -245,7 +246,7 @@ const AuthDialog = WDialog.extend({
           const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
           postToFirebase({ id: "exception", error: err });
           console.log(err);
-          alert(err);
+          displayError(err);
         }
         return;
       }
@@ -256,7 +257,7 @@ const AuthDialog = WDialog.extend({
       } catch (e) {
         postToFirebase({ id: "exception", error: e.toString() });
         console.error(e);
-        alert(e.toString());
+        displayError(e);
         this.closeDialog();
       }
     });
@@ -275,7 +276,7 @@ const AuthDialog = WDialog.extend({
         if (response.error) {
           this.closeDialog();
           const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
-          alert(err);
+          displayError(err);
           postToFirebase({ id: "exception", error: err });
           return;
         }
@@ -285,7 +286,9 @@ const AuthDialog = WDialog.extend({
           postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
         } catch (e) {
           console.error(e);
-          alert(`send access token failed (gsapiAuthChoose): ${e.toString()}`);
+          displayError(
+            `send access token failed (gsapiAuthChoose): ${e.toString()}`
+          );
           postToFirebase({ id: "exception", error: e.toString() });
         }
       }

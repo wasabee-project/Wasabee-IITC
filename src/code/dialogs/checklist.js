@@ -19,6 +19,7 @@ import wX from "../wX";
 
 import PortalUI from "../ui/portal";
 import LinkUI from "../ui/link";
+import { displayInfo, displayWarning } from "../error";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -104,7 +105,7 @@ const OperationChecklistDialog = WDialog.extend({
     const columns = [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
-        value: (thing) => thing.opOrder,
+        value: (thing) => thing.order,
         // sort: (a, b) => a - b,
         format: (cell, value, thing) => {
           const oif = L.DomUtil.create("input");
@@ -114,9 +115,9 @@ const OperationChecklistDialog = WDialog.extend({
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
             if (thing instanceof WasabeeLink) {
-              operation.setLinkOrder(thing.ID, oif.value);
+              operation.setLinkOrder(thing.ID, +oif.value);
             } else {
-              operation.setMarkerOrder(thing.ID, oif.value);
+              operation.setMarkerOrder(thing.ID, +oif.value);
             }
           });
           cell.appendChild(oif);
@@ -302,7 +303,7 @@ const OperationChecklistDialog = WDialog.extend({
 
   countFields: function (operation, doAlert) {
     const links = Array.from(operation.links);
-    links.sort((a, b) => a.opOrder - b.opOrder);
+    links.sort((a, b) => a.order - b.order);
 
     let fieldCount = 0;
     let emptyCount = 0;
@@ -327,7 +328,7 @@ const OperationChecklistDialog = WDialog.extend({
       b.add(link.fromPortalId);
 
       // ignore link with order 0
-      if (link.opOrder > 0) {
+      if (link.order > 0) {
         // the link closes at least one field
         const p1 = operation.getPortal(link.fromPortalId);
         const p2 = operation.getPortal(link.toPortalId);
@@ -365,9 +366,9 @@ const OperationChecklistDialog = WDialog.extend({
           li.textContent = c;
           li.appendChild(LinkUI.displayFormat(link, operation));
         }
-        alert(container, true);
+        displayWarning(container, true);
       } else {
-        alert(`Found ${fieldCount} fields and no empty fields.`);
+        displayInfo(`Found ${fieldCount} fields and no empty fields.`);
       }
     }
     return { field: fieldCount, empty: emptyCount };

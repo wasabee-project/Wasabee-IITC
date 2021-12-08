@@ -9,11 +9,11 @@ import {
   SetTeamLoadWD,
 } from "../server";
 import PromptDialog from "./promptDialog";
-import AuthDialog from "./authDialog";
 import TeamMembershipList from "./teamMembershipList";
 import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
+import { displayError, displayInfo } from "../error";
 
 const TeamListDialog = WDialog.extend({
   statics: {
@@ -22,7 +22,7 @@ const TeamListDialog = WDialog.extend({
 
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet(true); // no cache
+    this._me = await WasabeeMe.waitGet(true, true); // no cache unless server error
     window.map.on("wasabee:teams", this.update, this);
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog();
@@ -34,9 +34,9 @@ const TeamListDialog = WDialog.extend({
     window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
-  update: async function () {
+  update: function () {
     if (!this._enabled) return;
-    this._me = await WasabeeMe.waitGet(); // cache is fine -- this can probably be removed
+    this._me = WasabeeMe.localGet();
     this.setContent(this._buildContent());
   },
 
@@ -61,14 +61,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: wX("TEAM STATE"),
         value: (team) => team.State,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curstate = obj.State;
-          link.textContent = curstate;
-          if (curstate == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleTeam(obj.ID, curstate);
+            await this.toggleTeam(obj.ID, value);
             this.update();
           };
         },
@@ -76,14 +74,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: "Share W-D Keys",
         value: (team) => team.ShareWD,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curshare = obj.ShareWD;
-          link.textContent = curshare;
-          if (curshare == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleShareWD(obj.ID, curshare);
+            await this.toggleShareWD(obj.ID, value);
             this.update();
             window.map.fire("wasabee:defensivekeys");
           };
@@ -92,14 +88,12 @@ const TeamListDialog = WDialog.extend({
       {
         name: "Load W-D Keys",
         value: (team) => team.LoadWD,
-        sort: (a, b) => a.localeCompare(b),
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          let curload = obj.LoadWD;
-          link.textContent = curload;
-          if (curload == "On") L.DomUtil.addClass(link, "enl");
+          link.textContent = value ? "On" : "Off";
+          if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
-            await this.toggleLoadWD(obj.ID, curload);
+            await this.toggleLoadWD(obj.ID, value);
             this.update();
             window.map.fire("wasabee:defensivekeys");
           };
@@ -107,12 +101,12 @@ const TeamListDialog = WDialog.extend({
       },
       {
         name: "",
-        value: (team) => team.State,
+        value: () => "",
         sort: null,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
           link.textContent = "";
-          if (this._me.GoogleID != obj.Owner) {
+          if (this._me.id != obj.Owner) {
             link.textContent = wX("LEAVE");
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
@@ -156,8 +150,6 @@ const TeamListDialog = WDialog.extend({
   _displayDialog: function () {
     if (!this._me) {
       this.disable();
-      const ad = new AuthDialog();
-      ad.enable();
       return;
     }
 
@@ -172,16 +164,16 @@ const TeamListDialog = WDialog.extend({
         callback: async () => {
           const newname = p.inputField.value;
           if (!newname) {
-            alert(wX("NAME_REQ"));
+            displayError(wX("NAME_REQ"));
             return;
           }
           try {
             await newTeamPromise(newname);
-            alert(wX("TEAM_CREATED", { teamName: newname }));
+            displayInfo(wX("TEAM_CREATED", { teamName: newname }));
             this._me = await WasabeeMe.waitGet(true);
           } catch (e) {
             console.error(e);
-            alert(e.toString());
+            displayError(e);
           }
           window.map.fire("wasabee:teams");
         },
@@ -202,40 +194,37 @@ const TeamListDialog = WDialog.extend({
   },
 
   toggleTeam: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamState(teamID, newState);
       this._me = await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },
 
   toggleShareWD: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamShareWD(teamID, newState);
       await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },
 
   toggleLoadWD: async function (teamID, currentState) {
-    let newState = "Off";
-    if (currentState == "Off") newState = "On";
+    const newState = currentState ? "Off" : "On";
     try {
       await SetTeamLoadWD(teamID, newState);
       await WasabeeMe.waitGet(true);
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
     return newState;
   },

@@ -110,9 +110,9 @@ const WLLink = L.GeodesicPolyline.extend({
     L.DomUtil.create("div", null, div).appendChild(
       displayFormat(link, operation)
     );
-    if (link.description)
-      L.DomUtil.create("div", "enl", div).textContent = link.description;
-    L.DomUtil.create("div", "enl", div).textContent = "# " + link.throwOrderPos;
+    if (link.comment)
+      L.DomUtil.create("div", "enl", div).textContent = link.comment;
+    L.DomUtil.create("div", "enl", div).textContent = "# " + link.order;
     const buttonset = L.DomUtil.create("div", "buttonset", div);
     if (operation.canWrite()) {
       const del = L.DomUtil.create("button", null, buttonset);

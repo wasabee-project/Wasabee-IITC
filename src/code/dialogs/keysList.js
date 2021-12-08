@@ -18,13 +18,13 @@ const KeysList = WDialog.extend({
     usePane: true,
   },
 
-  addHooks: async function () {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
-      this._me = await WasabeeMe.waitGet();
+      this._me = WasabeeMe.localGet();
     } else {
       this._me = null;
     }
@@ -53,12 +53,12 @@ const KeysList = WDialog.extend({
     });
   },
 
-  update: async function () {
+  update: function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("operation changed");
 
     // update me if needed
-    if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
+    if (WasabeeMe.isLoggedIn()) this._me = WasabeeMe.localGet();
     else this._me = null;
 
     this.setTitle(wX("KEY_LIST2", { opName: operation.name }));
@@ -117,7 +117,7 @@ const KeysList = WDialog.extend({
 
     let gid = "no-user";
     if (this._me) {
-      gid = this._me.GoogleID;
+      gid = this._me.id;
       this.sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),

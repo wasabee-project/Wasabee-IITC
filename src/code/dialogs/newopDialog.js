@@ -4,6 +4,7 @@ import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { displayError } from "../error";
 
 const NewopDialog = WDialog.extend({
   statics: {
@@ -45,7 +46,7 @@ const NewopDialog = WDialog.extend({
             await newop.store();
             await makeSelectedOperation(newop.ID);
           } else {
-            alert(wX("OP_NAME_UNSET"));
+            displayError(wX("OP_NAME_UNSET"));
           }
         },
         placeholder: wX("MUST_NOT_BE_EMPTY"),

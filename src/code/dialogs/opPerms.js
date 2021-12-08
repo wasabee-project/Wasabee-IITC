@@ -5,6 +5,7 @@ import WasabeeTeam from "../model/team";
 import WasabeeMe from "../model/me";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
+import { displayError } from "../error";
 
 const OpPermList = WDialog.extend({
   statics: {
@@ -175,7 +176,7 @@ const OpPermList = WDialog.extend({
 
   addPerm: async function (teamID, role, zone) {
     if (!WasabeeMe.isLoggedIn()) {
-      alert(wX("NOT LOGGED IN SHORT"));
+      displayError(wX("NOT LOGGED IN SHORT"));
       return;
     }
     const operation = getSelectedOperation();
@@ -196,13 +197,13 @@ const OpPermList = WDialog.extend({
       window.map.fire("wasabee:op:change");
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
   },
 
   delPerm: async function (obj) {
     if (!WasabeeMe.isLoggedIn()) {
-      alert(wX("NOT LOGGED IN SHORT"));
+      displayError(wX("NOT LOGGED IN SHORT"));
       return;
     }
     const operation = getSelectedOperation();
@@ -220,7 +221,7 @@ const OpPermList = WDialog.extend({
       window.map.fire("wasabee:op:change");
     } catch (e) {
       console.error(e);
-      alert(e);
+      displayError(e);
     }
   },
 });

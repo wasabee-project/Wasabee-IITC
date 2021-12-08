@@ -3,6 +3,7 @@ import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks, getAllPortalsLinked } from "../../uiCommands";
 import wX from "../../wX";
+import { displayError } from "../../error";
 
 const SaveLinksDialog = AutoDraw.extend({
   statics: {
@@ -61,7 +62,7 @@ const SaveLinksDialog = AutoDraw.extend({
 
   saveLinks: function () {
     if (!this._anchor) {
-      alert("Select an anchor portal");
+      displayError("Select an anchor portal");
       return;
     }
 

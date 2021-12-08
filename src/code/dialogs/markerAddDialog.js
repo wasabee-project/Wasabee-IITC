@@ -7,6 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import PortalUI from "../ui/portal";
+import { displayError } from "../error";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -154,7 +155,7 @@ const MarkerAddDialog = WDialog.extend({
       if (WasabeeMarker.isDestructMarkerType(selectedType))
         WasabeeBlocker.removeBlocker(operation, PortalUI.getSelected().id);
       await this.update();
-    } else alert(wX("ALREADY_HAS_MARKER"));
+    } else displayError(wX("ALREADY_HAS_MARKER"));
     localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
       selectedType;
   },
@@ -176,8 +177,7 @@ const MarkerAddDialog = WDialog.extend({
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
-        const agents = tt.getAgents();
-        for (const a of agents) {
+        for (const a of tt.agents) {
           if (!alreadyAdded.has(a.id)) {
             alreadyAdded.add(a.id);
             option = L.DomUtil.create("option");

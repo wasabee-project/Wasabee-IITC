@@ -8,6 +8,7 @@ import WasabeeMarker from "../../model/marker";
 
 import { angle } from "./fanfield";
 import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
+import { displayError, displayInfo } from "../../error";
 
 function selectAngleInterval(anchor, portalsSorted, start, end) {
   const startAngle = angle(anchor, start);
@@ -130,7 +131,7 @@ const FlipFlopDialog = AutoDraw.extend({
     button.textContent = wX("FANFIELD");
     L.DomEvent.on(button, "click", () => {
       const total = this.doFanGun();
-      alert(`Flip flop: found ${total} links`);
+      displayInfo(`Flip flop: found ${total} links`);
     });
 
     return container;
@@ -262,7 +263,7 @@ const FlipFlopDialog = AutoDraw.extend({
   doFanGun: function () {
     // Calculate the multimax
     if (!this._anchorOne) {
-      alert(wX("INVALID REQUEST"));
+      displayError(wX("INVALID REQUEST"));
       return 0;
     }
 
@@ -326,7 +327,7 @@ const FlipFlopDialog = AutoDraw.extend({
       best.steps = best.steps.slice(0, maxSteps);
 
     if (!best.two) {
-      alert(wX("INVALID REQUEST"));
+      displayError(wX("INVALID REQUEST"));
       return 0;
     }
 

@@ -112,8 +112,7 @@ const AssignDialog = WDialog.extend({
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
-        const agents = tt.getAgents();
-        for (const a of agents) {
+        for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
             const option = L.DomUtil.create("option", "", select);

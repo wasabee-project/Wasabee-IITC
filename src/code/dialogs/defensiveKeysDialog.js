@@ -6,15 +6,16 @@ import WasabeeDList from "./wasabeeDlist";
 import { getAgentPortalWasabeeDkeys } from "../wd";
 
 import PortalUI from "../ui/portal";
+import { displayError, displayInfo } from "../error";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
     TYPE: "defensiveKeysDialog",
   },
 
-  addHooks: async function () {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet();
+    this._me = WasabeeMe.localGet();
     this._pch = (portal) => {
       this._portalClickedHook(portal);
     };
@@ -36,7 +37,7 @@ const DefensiveKeysDialog = WDialog.extend({
         PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
       );
       const mine = await getAgentPortalWasabeeDkeys(
-        this._me.GoogleID,
+        this._me.id,
         this._selectedPortal.id
       );
       if (mine) {
@@ -112,11 +113,11 @@ const DefensiveKeysDialog = WDialog.extend({
       const j = JSON.stringify(dk);
       console.log(j);
       await dKeyPromise(j);
-      alert("Registered with server");
+      displayInfo("Registered with server");
       window.map.fire("wasabee:defensivekeys");
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
   },
 });

@@ -10,6 +10,7 @@ import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import MergeDialog from "../dialogs/mergeDialog";
 import wX from "../wX";
+import { displayError, displayInfo } from "../error";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -42,7 +43,7 @@ const UploadButton = WButton.extend({
           const r = await uploadOpPromise();
           // switch to the new version in local store -- uploadOpPromise stores it
           await makeSelectedOperation(r.ID);
-          alert(wX("UPLOADED"));
+          displayInfo(wX("UPLOADED"));
           this.update();
           // this._invisible();
         } catch (e) {
@@ -50,11 +51,11 @@ const UploadButton = WButton.extend({
           console.warn(e.toString() + ": trying as update");
           try {
             await updateOpPromise(operation);
-            alert(wX("UPDATED"));
+            displayInfo(wX("UPDATED"));
             this.update();
           } catch (e) {
             console.error(e);
-            alert(`Upload + Update Failed: ${e.toString()}`);
+            displayError(`Upload + Update Failed: ${e.toString()}`);
           }
           this.button.classList.remove("loading");
         }
@@ -134,7 +135,7 @@ const UploadButton = WButton.extend({
           // reload if we use rebase
           if (operation != getSelectedOperation())
             await makeSelectedOperation(operation.ID);
-          alert(wX("UPDATED"));
+          displayInfo(wX("UPDATED"));
           this.update();
         } else {
           // need rebase or force
@@ -159,7 +160,7 @@ const UploadButton = WButton.extend({
         }
       } catch (e) {
         console.error(e);
-        alert(`Update Failed: ${e.toString()}`);
+        displayError(`Update Failed: ${e.toString()}`);
       }
       this.button.classList.remove("loading");
       return;
