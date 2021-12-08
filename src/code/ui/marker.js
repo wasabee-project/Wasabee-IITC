@@ -86,15 +86,13 @@ const WLMarker = PortalUI.WLPortal.extend({
   },
 
   _popupMarkerComment: function (container, marker, canWrite) {
-    if (marker.comment) {
-      const comment = L.DomUtil.create(
-        "div",
-        "wasabee-marker-popup-comment",
-        container
-      );
-      comment.textContent = marker.comment;
-      if (canWrite) L.DomEvent.on(comment, "click", this._setComment, this);
-    }
+    const comment = L.DomUtil.create(
+      "div",
+      "wasabee-marker-popup-comment",
+      container
+    );
+    comment.textContent = marker.comment || wX("SET_COMMENT");
+    if (canWrite) L.DomEvent.on(comment, "click", this._setComment, this);
   },
 
   _popupAssignState: async function (container, marker) {

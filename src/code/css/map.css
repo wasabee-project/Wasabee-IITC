@@ -87,6 +87,11 @@
 
 .wasabee-marker-popup-comment {
   font-weight: initial;
+  cursor: pointer;
+}
+
+.wasabee-marker-popup-comment:hover {
+  text-decoration: underline;
 }
 
 .wasabee-marker-popup-kind {
