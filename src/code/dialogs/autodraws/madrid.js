@@ -1,7 +1,10 @@
+import { portalInField } from "../../crosslinks";
 import { displayError, displayInfo } from "../../error";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
+import { getSignedSpine } from "./algorithm";
+import { drawSpine, insertLinks } from "./drawRoutines";
 import MultimaxDialog from "./multimaxDialog";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
@@ -96,6 +99,36 @@ const MadridDialog = MultimaxDialog.extend({
     });
   },
 
+  getSpines: function (anchorOne, anchorTwo, setOne, setTwo, setThree) {
+    const [spineThree] = getSignedSpine(anchorOne, anchorTwo, setThree, false);
+    const lastThree = spineThree[spineThree.length - 1];
+
+    const [spineOne] = getSignedSpine(
+      anchorTwo,
+      lastThree,
+      setOne.filter(
+        (p) =>
+          anchorOne.id == p.id ||
+          portalInField(anchorTwo, lastThree, p, anchorOne)
+      ),
+      false
+    );
+    const lastOne = spineOne[spineOne.length - 1];
+
+    const [spineTwo] = getSignedSpine(
+      lastThree,
+      lastOne,
+      setTwo.filter(
+        (p) =>
+          anchorTwo.id == p.id ||
+          portalInField(lastThree, lastOne, p, anchorTwo)
+      ),
+      false
+    );
+
+    return [spineOne, spineTwo, spineThree];
+  },
+
   doBalancedMadrid: function () {
     // Calculate the multimax
     if (
@@ -122,36 +155,13 @@ const MadridDialog = MultimaxDialog.extend({
     )
       this._portalSets.setTwo.portals.push(this._anchorTwo);
 
-    const spineThree = this.getSpine(
+    const spines = this.getSpines(
       this._anchorOne,
       this._anchorTwo,
+      this._portalSets.setOne.portals,
+      this._portalSets.setTwo.portals,
       this._portalSets.setThree.portals
     );
-    const lastThree = spineThree[spineThree.length - 1];
-
-    const spineOne = this.getSpine(
-      this._anchorTwo,
-      lastThree,
-      this._portalSets.setOne.portals.filter(
-        (p) =>
-          this._anchorOne.id == p.id ||
-          this.fieldCoversPortal(this._anchorTwo, lastThree, p, this._anchorOne)
-      )
-    );
-    const lastOne = spineOne[spineOne.length - 1];
-
-    const spineTwo = this.getSpine(
-      lastThree,
-      lastOne,
-      this._portalSets.setTwo.portals.filter(
-        (p) =>
-          this._anchorTwo.id == p.id ||
-          this.fieldCoversPortal(lastThree, lastOne, p, this._anchorTwo)
-      )
-    );
-    // const lastTwo = spineTwo[spineTwo.length - 1];
-
-    const spines = [spineOne, spineTwo, spineThree];
     const step = spines.map((s) => 1 / s.length);
 
     this._operation.startBatchMode();
@@ -181,7 +191,7 @@ const MadridDialog = MultimaxDialog.extend({
       // hackish, I have no proof of this working in all cases
       for (
         let i = 0;
-        (!p || !this.fieldCoversPortal(p, pTwo, pThree, pOne)) && i < 3;
+        (!p || !portalInField(p, pTwo, pThree, pOne)) && i < 3;
         i++
       ) {
         this._operation.setPortalComment(pOne, "point of disbalance");
@@ -192,7 +202,7 @@ const MadridDialog = MultimaxDialog.extend({
         pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
         pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
       }
-      if (!this.fieldCoversPortal(p, pTwo, pThree, pOne))
+      if (!portalInField(p, pTwo, pThree, pOne))
         console.log("well, this doesn't work here...");
       const toTwo = this._operation.addLink(p, pTwo, { description: "link" });
       const toThree = this._operation.addLink(p, pThree, {
@@ -209,9 +219,6 @@ const MadridDialog = MultimaxDialog.extend({
     return indices[0] + indices[1] + indices[2] - 2;
   },
 
-  // fieldCoversPortal inherited from MultimaxDialog
-  // MM "
-
   doMadrid: function () {
     // Calculate the multimax
     if (
@@ -224,47 +231,12 @@ const MadridDialog = MultimaxDialog.extend({
       displayError(wX("INVALID REQUEST"));
       return 0;
     }
-    this._operation.startBatchMode(); // bypass save and crosslinks checks
-    this._operation.addLink(this._anchorOne, this._anchorTwo, {
-      description: "madrid base",
-      order: 1,
-    });
-
-    let len = 0;
-    const [len1, order1, last1] = this.MM(
-      this._anchorOne,
-      this._anchorTwo,
-      this._portalSets.setThree.portals,
-      1,
-      false,
-      "madrid protocol "
-    );
-    len += len1;
-
-    const newThree = last1;
     // the set 1 must contain anchor 1 (first back link)
     if (
       this._portalSets.setOne.portals.find((p) => this._anchorOne.id == p.id) ==
       undefined
     )
       this._portalSets.setOne.portals.push(this._anchorOne);
-
-    const [len2, order2, last2] = this.MM(
-      this._anchorTwo,
-      newThree,
-      this._portalSets.setOne.portals.filter(
-        (p) =>
-          this._anchorOne.id == p.id ||
-          this.fieldCoversPortal(this._anchorTwo, newThree, p, this._anchorOne)
-      ),
-      order1,
-      false,
-      "madrid protocol "
-    );
-    len += len2 - 1;
-
-    // _anchorOne is no longer useful, use last2
-    const newOne = last2;
     // the set 2 must contain anchor 2 (first back link)
     if (
       this._portalSets.setTwo.portals.find((p) => this._anchorTwo.id == p.id) ==
@@ -272,23 +244,62 @@ const MadridDialog = MultimaxDialog.extend({
     )
       this._portalSets.setTwo.portals.push(this._anchorTwo);
 
-    const len3 = this.MM(
-      newThree,
-      newOne,
-      this._portalSets.setTwo.portals.filter(
-        (p) =>
-          this._anchorTwo.id == p.id ||
-          this.fieldCoversPortal(newThree, newOne, p, this._anchorTwo)
-      ),
-      order2,
-      false,
-      "madrid protocol "
-    )[0];
-    len += len3 - 1;
+    const spines = this.getSpines(
+      this._anchorOne,
+      this._anchorTwo,
+      this._portalSets.setOne.portals,
+      this._portalSets.setTwo.portals,
+      this._portalSets.setThree.portals
+    );
+
+    this._operation.startBatchMode(); // bypass save and crosslinks checks
+    let order = insertLinks(
+      this._operation,
+      [
+        this._operation.addLink(this._anchorOne, this._anchorTwo, {
+          description: "madrid base",
+        }),
+      ],
+      this._operation.nextOrder - 1
+    );
+
+    order = drawSpine(
+      this._operation,
+      this._anchorOne,
+      this._anchorTwo,
+      spines[2],
+      order,
+      {
+        commentPrefix: "madrid ",
+        backlink: this._flcheck,
+      }
+    );
+    order = drawSpine(
+      this._operation,
+      this._anchorTwo,
+      spines[2][spines[2].length - 1],
+      spines[0].slice(1),
+      order,
+      {
+        commentPrefix: "madrid ",
+        backlink: this._flcheck,
+      }
+    );
+    /* order = */ drawSpine(
+      this._operation,
+      spines[2][spines[2].length - 1],
+      spines[0][spines[0].length - 1],
+      spines[1].slice(1),
+      order,
+      {
+        commentPrefix: "madrid ",
+        backlink: this._flcheck,
+      }
+    );
 
     this._operation.endBatchMode(); // save and run crosslinks
 
-    return len;
+    return spines[0].length + spines[1].length + spines[2].length - 2;
   },
 });
 
