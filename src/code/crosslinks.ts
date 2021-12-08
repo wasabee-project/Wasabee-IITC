@@ -8,14 +8,16 @@ import PortalUI from "./ui/portal";
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
 
-function toCartesian(lat: number, lng: number): [number, number, number] {
+type Vec3 = [number, number, number];
+
+function toCartesian(lat: number, lng: number): Vec3 {
   lat *= d2r;
   lng *= d2r;
   var o = Math.cos(lat);
   return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
 }
 
-function cross(t: [number, number, number], n: [number, number, number]): [number, number, number] {
+function cross(t: Vec3, n: Vec3): Vec3 {
   return [
     t[1] * n[2] - t[2] * n[1],
     t[2] * n[0] - t[0] * n[2],
@@ -23,8 +25,12 @@ function cross(t: [number, number, number], n: [number, number, number]): [numbe
   ];
 }
 
-function dot(t: [number, number, number], n: [number, number, number]) {
+function dot(t: Vec3, n: Vec3) {
   return t[0] * n[0] + t[1] * n[1] + t[2] * n[2];
+}
+
+function det(a: Vec3, b: Vec3, c: Vec3) {
+  return dot(cross(a, b), c);
 }
 
 function equals(a: L.LatLng, b: L.LatLng) {
@@ -34,7 +40,39 @@ function equals(a: L.LatLng, b: L.LatLng) {
 // take L.LatLng
 // note: cache cos/sin calls in the object, in order to be efficient, try using same LatLng objects across calls, like using latLng from WasabeePortal attached to an op
 interface LLC extends L.LatLng {
-  _cartesian?: [number, number, number],
+  _cartesian?: Vec3;
+}
+
+export function extendLatLngToLLC(ll: LLC) {
+  if (ll._cartesian) return ll;
+  ll._cartesian = toCartesian(ll.lat, ll.lng);
+  return ll;
+}
+
+export function fieldSign(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal
+) {
+  const ca = extendLatLngToLLC(a.latLng)._cartesian;
+  const cb = extendLatLngToLLC(b.latLng)._cartesian;
+  const cc = extendLatLngToLLC(c.latLng)._cartesian;
+  if (det(ca, cb, cc) > 0) return 1;
+  return -1;
+}
+
+export function portalInField(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal,
+  portal: WasabeePortal
+) {
+  const sign = fieldSign(a, b, c);
+  return (
+    fieldSign(a, b, portal) * sign > 0 &&
+    fieldSign(b, c, portal) * sign > 0 &&
+    fieldSign(c, a, portal) * sign > 0
+  );
 }
 
 export function greatCircleArcIntersectByLatLngs(a0: LLC, a1: LLC, b0: LLC, b1: LLC) {
@@ -52,18 +90,10 @@ export function greatCircleArcIntersectByLatLngs(a0: LLC, a1: LLC, b0: LLC, b1: 
   if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
 
   // a) convert into 3D coordinates on a unit sphere & cache into latLng object
-  const ca0 = (a0._cartesian = a0._cartesian
-    ? a0._cartesian
-    : toCartesian(a0.lat, a0.lng));
-  const ca1 = (a1._cartesian = a1._cartesian
-    ? a1._cartesian
-    : toCartesian(a1.lat, a1.lng));
-  const cb0 = (b0._cartesian = b0._cartesian
-    ? b0._cartesian
-    : toCartesian(b0.lat, b0.lng));
-  const cb1 = (b1._cartesian = b1._cartesian
-    ? b1._cartesian
-    : toCartesian(b1.lat, b1.lng));
+  const ca0 = extendLatLngToLLC(a0)._cartesian;
+  const ca1 = extendLatLngToLLC(a1)._cartesian;
+  const cb0 = extendLatLngToLLC(b0)._cartesian;
+  const cb1 = extendLatLngToLLC(b1)._cartesian;
 
   // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
   // find the intersetion line
