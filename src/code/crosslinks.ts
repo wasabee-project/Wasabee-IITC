@@ -164,19 +164,6 @@ export function greatCircleArcIntersectByLatLngs(...args: (LLC | LLC[])[]) {
   return false;
 }
 
-// takes WasabeeLink or L.geodesicPolyline format
-export function greatCircleArcIntersect(existing, drawn) {
-  const eLL = existing.getLatLngs();
-  const dLL = drawn.getLatLngs();
-
-  const a0 = eLL[0];
-  const a1 = eLL[1];
-  const b0 = dLL[0];
-  const b1 = dLL[1];
-
-  return greatCircleArcIntersectByLatLngs(a0, a1, b0, b1);
-}
-
 function testPolyLine(
   wasabeeLink: WasabeeLink,
   realLink: IITC.Link,
