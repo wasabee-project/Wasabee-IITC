@@ -1,13 +1,11 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
-// import WasabeeLink from "../model/link";
 import {
-  clearAllLinks,
-  getAllPortalsOnScreen,
-  testPortal,
-} from "../../uiCommands";
+  greatCircleArcIntersectByLatLngs,
+  portalInField,
+} from "../../crosslinks";
+import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
 
 import PortalUI from "../../ui/portal";
@@ -26,8 +24,6 @@ const HomogeneousDialog = AutoDraw.extend({
     if (p) this._anchorTwo = new WasabeePortal(p);
     p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY];
     if (p) this._anchorThree = new WasabeePortal(p);
-
-    this._urp = L.latLng(testPortal());
     this._failed = 0;
   },
 
@@ -149,14 +145,7 @@ const HomogeneousDialog = AutoDraw.extend({
 
     const portals = new Array();
     for (const p of getAllPortalsOnScreen(this._operation)) {
-      if (
-        this._fieldCovers(
-          this._anchorOne,
-          this._anchorTwo,
-          this._anchorThree,
-          p
-        )
-      )
+      if (portalInField(this._anchorOne, this._anchorTwo, this._anchorThree, p))
         portals.push(p);
     }
 
@@ -193,14 +182,7 @@ const HomogeneousDialog = AutoDraw.extend({
 
     const portals = new Array();
     for (const p of getAllPortalsOnScreen(this._operation)) {
-      if (
-        this._fieldCovers(
-          this._anchorOne,
-          this._anchorTwo,
-          this._anchorThree,
-          p
-        )
-      )
+      if (portalInField(this._anchorOne, this._anchorTwo, this._anchorThree, p))
         portals.push(p);
     }
 
@@ -775,19 +757,6 @@ const HomogeneousDialog = AutoDraw.extend({
 
     const point = L.point((A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3);
     return window.map.unproject(point);
-  },
-
-  _fieldCovers: function (a, b, c, p) {
-    const urp = this._urp;
-
-    let crossings = 0;
-    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, b.latLng))
-      crossings++;
-    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, a.latLng, c.latLng))
-      crossings++;
-    if (greatCircleArcIntersectByLatLngs(urp, p.latLng, b.latLng, c.latLng))
-      crossings++;
-    return crossings == 1; // crossing 0 or 2 is OK, crossing 3 is
   },
 });
 

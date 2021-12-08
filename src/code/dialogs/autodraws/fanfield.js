@@ -1,7 +1,7 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
+import { GeodesicLine, testSelfBlock } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
@@ -182,7 +182,7 @@ const FanfieldDialog = AutoDraw.extend({
         for (const real of op.links) {
           // Check links to anchor only
           if (real.toPortalId != this._anchor.id) continue;
-          if (greatCircleArcIntersect(real, testlink)) {
+          if (testSelfBlock(testlink, op)) {
             crossed = true;
             break;
           }

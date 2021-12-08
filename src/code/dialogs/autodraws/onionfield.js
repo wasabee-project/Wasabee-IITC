@@ -1,7 +1,7 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { greatCircleArcIntersect } from "../../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
@@ -284,7 +284,13 @@ const OnionfieldDialog = AutoDraw.extend({
   // looks only at links in current (not op or live data)
   _testBlock: function (current, testing) {
     for (const against of current) {
-      if (greatCircleArcIntersect(against, testing)) return true;
+      if (
+        greatCircleArcIntersectByLatLngs(
+          testing.getLatLngs(this._operation),
+          against.getLatLngs(this._operation)
+        )
+      )
+        return true;
     }
     return false;
   },
