@@ -51,7 +51,7 @@ export default class WasabeeLink extends Task {
 
   getLatLngs(operation: WasabeeOp) {
     operation = operation || getSelectedOperation();
-    const returnArray = Array<L.LatLngExpression>();
+    const returnArray: L.LatLng[] = [];
 
     const fromPortal = operation.getPortal(this.fromPortalId);
     if (!fromPortal || !fromPortal.lat) {
