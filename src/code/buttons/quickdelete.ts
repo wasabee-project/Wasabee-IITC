@@ -5,6 +5,7 @@ import type { Wasabee } from "../init";
 import type { WLMarker } from "../ui/marker";
 import type { WLLink } from "../ui/link";
 import type { LeafletMouseEvent } from "leaflet";
+import { getSelectedOperation } from "../selectedOp";
 
 const W: Wasabee = window.plugin.wasabee;
 
@@ -13,7 +14,7 @@ class QuickDeleteButton extends WButton {
 
   needWritePermission: true;
 
-  handler: L.Handler;
+  handler: QuickDeleteHandler;
 
   constructor(container: HTMLElement) {
     super(container);
@@ -49,19 +50,38 @@ class QuickDeleteButton extends WButton {
     this.update();
   }
 
+  actionApply() {
+    const operation = getSelectedOperation();
+    operation.markers = operation.markers.filter(
+      (m) => !this.handler.deletedMarker.has(m.ID)
+    );
+    operation.links = operation.links.filter(
+      (l) => !this.handler.deletedLink.has(l.ID)
+    );
+    operation.cleanAnchorList();
+    operation.cleanPortalList();
+    operation.update(true);
+    operation.updateBlockers();
+    this.disable();
+  }
+
+  actionCancel() {
+    this.disable();
+  }
+
   getSubActions() {
     const applySubAction = {
       title: wX("toolbar.quick_delete.apply.title"),
       text: wX("toolbar.quick_delete.apply.text"),
-      callback: () => {},
-      context: null,
+      callback: this.actionApply,
+      context: this,
     };
 
     const cancelSubAction = {
       title: wX("toolbar.quick_delete.cancel.title"),
       text: wX("toolbar.quick_delete.cancel.title"),
-      callback: () => {},
-      context: null,
+      callback: this.actionCancel,
+      context: this,
     };
 
     return [applySubAction, cancelSubAction];
@@ -70,11 +90,13 @@ class QuickDeleteButton extends WButton {
   enable() {
     WButton.prototype.enable.call(this);
     this.button.classList.add("active");
+    this.handler.enable();
   }
 
   disable() {
     WButton.prototype.disable.call(this);
     this.button.classList.remove("active");
+    this.handler.disable();
   }
 }
 
@@ -84,20 +106,36 @@ class QuickDeleteHandler extends L.Handler {
 
   constructor() {
     super(window.map);
+    this.deletedMarker = new Set();
+    this.deletedLink = new Set();
   }
 
   toggleMarker(event: LeafletMouseEvent) {
     const layer = event.target as WLMarker;
-    if (this.deletedMarker.has(layer.options.id))
+    layer.closePopup();
+    if (this.deletedMarker.has(layer.options.id)) {
       this.deletedMarker.delete(layer.options.id);
-    else this.deletedMarker.add(layer.options.id);
+      layer.setOpacity(1);
+    } else {
+      this.deletedMarker.add(layer.options.id);
+      layer.setOpacity(0.5);
+    }
   }
 
   toggleLink(event: LeafletMouseEvent) {
     const layer = event.target as WLLink;
-    if (this.deletedLink.has(layer.options.linkID))
+    layer.closePopup();
+    if (this.deletedLink.has(layer.options.linkID)) {
       this.deletedLink.delete(layer.options.linkID);
-    else this.deletedLink.add(layer.options.linkID);
+      layer.setStyle({
+        opacity: 1,
+      });
+    } else {
+      this.deletedLink.add(layer.options.linkID);
+      layer.setStyle({
+        opacity: 0.5,
+      });
+    }
   }
 
   addHooks() {
@@ -112,9 +150,13 @@ class QuickDeleteHandler extends L.Handler {
   removeHooks() {
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
       layer.off("click", this.toggleMarker, this);
+      layer.setOpacity(1);
     });
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
       layer.off("click", this.toggleLink, this);
+      layer.setStyle({
+        opacity: 1,
+      });
     });
   }
 }
