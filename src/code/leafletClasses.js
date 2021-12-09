@@ -301,6 +301,7 @@ export const WButton = L.Class.extend({
     this.handler = this._toggleActions;
     // this.actionsContainer == the sub menu items created by the individual buttons
 
+    /*
     this.button = this._createButton({
       container: container,
       // buttonImage: null,
@@ -308,6 +309,7 @@ export const WButton = L.Class.extend({
       context: this,
       // className: ...,
     });
+    */
   },
 
   update: function () {
