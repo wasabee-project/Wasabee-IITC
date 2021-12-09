@@ -53,7 +53,6 @@ export default class WasabeeMe extends WasabeeAgent {
     this.pic = data.pic;
     this.intelfaction = data.intelfaction;
     this.lockey = data.lockey;
-    this.querytoken = data.lockey;
     this.vapi = data.vapi;
 
     this.Teams = [];
@@ -167,7 +166,7 @@ export default class WasabeeMe extends WasabeeAgent {
     const dkos = tr.objectStore("defensivekeys");
     await Promise.all([agentos.clear(), teamos.clear(), dkos.clear(), tr.done]);
 
-    window.map.fire("wasabee:logout", { GID: me ? me.id : null});
+    window.map.fire("wasabee:logout", { GID: me ? me.id : null });
   }
 
   teamJoined(teamID) {
