@@ -38,7 +38,6 @@
   "ASSIGNED_ONLY_SHORT": "KT",
   "ASSIGNED_ONLY": "Kun tildelt",
   "assigned": "Tildelt",
-  "AUTH ANDROID": "På Android, prøv 'hurtigt' først. Hvis det mislykkes, prøv hovedlogin med 'vælg_konto'.",
   "AUTH INCOMPAT": "Du har aktiveret et plugin i TamperMonkey, der er inkompatibelt med Wasabee",
   "AUTH IOS": "På iOS skal du bruge \"Log ind\". Hvis det mislykkes, skal du bruge 'Webview-login' og derefter bruge 'Verify Webview'-knappen for at fuldføre processen.",
   "AUTH REQUIRED": "Godkendelse påkrævet",

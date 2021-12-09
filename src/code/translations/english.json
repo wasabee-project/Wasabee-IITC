@@ -38,7 +38,6 @@
   "ASSIGNED_ONLY_SHORT": "AO",
   "ASSIGNED_ONLY": "Assigned Only",
   "assigned": "Assigned",
-  "AUTH ANDROID": "On Android, try 'quick' first. If that fails, try the main login with 'select_account'.",
   "AUTH INCOMPAT": "You have activated a plugin in TamperMonkey that is incompatable with Wasabee",
   "AUTH IOS": "On iOS, use the main 'Log In' option. If that fails, use 'Webview Login' then use the 'Verify Webview' button to complete the process.",
   "AUTH REQUIRED": "Authentication Required",

@@ -38,7 +38,6 @@
   "ASSIGNED_ONLY_SHORT": "AO",
   "ASSIGNED_ONLY": "Assigned Only",
   "assigned": "Zugewiesen",
-  "AUTH ANDROID": "Mit Android versuche 'quick' zuerst. Wenn das fehlschlägt, versuche es mit 'select_account' ",
   "AUTH INCOMPAT": "Du hast ein Plugin aktiviert welches inkompatibel zu Wasabee ist.",
   "AUTH IOS": "Mit IOS nutze 'Log in'. Wenn das fehlschlägt nutze 'Webview Log in'; Danach nutze den 'Verify Webview' Knopf um den Prozess abzuschließen",
   "AUTH REQUIRED": "Authorisierung benötigt",

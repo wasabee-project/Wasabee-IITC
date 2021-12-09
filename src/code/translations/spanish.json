@@ -38,7 +38,6 @@
   "ASSIGNED_ONLY_SHORT": "AO",
   "ASSIGNED_ONLY": "Assigned Only",
   "assigned": "Asignado",
-  "AUTH ANDROID": "On En Android, prueba 'rápido' primero. Si eso falla, intenta el inicio de sesión principal con 'select_account'.",
   "AUTH INCOMPAT": "Has activado un plugin en TamperMonkey que es incompatible con Wasabee",
   "AUTH IOS": "En iOS, usa el 'Iniciar Sesión' principal. Si eso falla intenta usar 'Inicio de Sesión Vista Web'; luego usa el botón 'Verificar Vista Web' para completar el proceso.",
   "AUTH REQUIRED": "Autenticación Requerida",

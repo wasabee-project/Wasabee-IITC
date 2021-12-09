@@ -82,9 +82,6 @@ const AuthDialog = WDialog.extend({
     if (this._ios) {
       title.textContent = wX("AUTH IOS");
     }
-    if (this._android) {
-      title.textContent = wX("AUTH ANDROID");
-    }
 
     const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.textContent = wX("LOG IN");
