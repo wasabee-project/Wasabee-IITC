@@ -119,6 +119,10 @@
   background-image: url(../images/toolbar_quickdraw.svg);
   background-size: 60%;
 }
+.wasabee-toolbar-quickdelete {
+  background-image: url(../images/toolbar_quickdelete.svg);
+  background-size: 60%;
+}
 .wasabee-toolbar-link {
   background-image: url(../images/toolbar_addlinks.svg)
 }
