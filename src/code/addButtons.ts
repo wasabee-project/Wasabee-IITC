@@ -24,11 +24,11 @@ export function addButtons() {
     WasabeeButton,
     OpButton,
     QuickdrawButton,
+    QuickDeleteButton,
     LinkButton,
     MarkerButton,
     SyncButton,
     UploadButton,
-    QuickDeleteButton,
   ]) {
     const item = L.DomUtil.create("li", null, options.container);
     const button = new Constructor(item);
