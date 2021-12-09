@@ -28,7 +28,7 @@ import { displayError } from "./error";
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
-interface Wasabee {
+export interface Wasabee {
   static: any;
   _inited: boolean;
   _selectedOp: WasabeeOp;

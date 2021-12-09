@@ -1,6 +1,6 @@
-import PortalUI from "./portal";
+import type { WLPortal } from "./portal";
 import type WasabeeMarker from "../model/marker";
-declare class WLMarker extends PortalUI.WLPortal {
+export declare class WLMarker extends WLPortal {
   state: string;
   constructor(marker: WasabeeMarker);
   setState(state: string): void;

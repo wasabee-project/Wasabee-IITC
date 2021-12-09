@@ -15,7 +15,7 @@ interface WLPortalOptions extends L.MarkerOptions {
   title?: string;
   id: string;
 }
-declare class WLPortal extends L.Marker {
+export declare class WLPortal extends L.Marker {
   type: string;
   options: WLPortalOptions;
   constructor(options: WLPortalOptions);
