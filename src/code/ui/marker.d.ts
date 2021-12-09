@@ -1,6 +1,7 @@
 import type { WLPortal } from "./portal";
 import type WasabeeMarker from "../model/marker";
-export declare class WLMarker extends WLPortal {
+
+export class WLMarker extends WLPortal {
   state: string;
   constructor(marker: WasabeeMarker);
   setState(state: string): void;
@@ -12,7 +13,3 @@ export declare class WLMarker extends WLPortal {
   _setComment(ev: any): void;
   _setMarkerType(ev: any): void;
 }
-declare const _default: {
-  WLMarker: typeof WLMarker;
-};
-export default _default;
