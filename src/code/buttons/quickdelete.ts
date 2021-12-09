@@ -6,6 +6,7 @@ import type { WLMarker } from "../ui/marker";
 import type { WLLink } from "../ui/link";
 import type { LeafletMouseEvent } from "leaflet";
 import { getSelectedOperation } from "../selectedOp";
+import type { WLAnchor } from "../ui/anchor";
 
 const W: Wasabee = window.plugin.wasabee;
 
@@ -110,9 +111,14 @@ class QuickDeleteHandler extends L.Handler {
     this.deletedLink = new Set();
   }
 
-  toggleMarker(event: LeafletMouseEvent) {
+  clickMarker(event: LeafletMouseEvent) {
+    if (!this.enabled()) return;
     const layer = event.target as WLMarker;
     layer.closePopup();
+    this.toggleMarker(layer);
+  }
+
+  toggleMarker(layer: WLMarker) {
     if (this.deletedMarker.has(layer.options.id)) {
       this.deletedMarker.delete(layer.options.id);
       layer.setOpacity(1);
@@ -122,9 +128,14 @@ class QuickDeleteHandler extends L.Handler {
     }
   }
 
-  toggleLink(event: LeafletMouseEvent) {
+  clickLink(event: LeafletMouseEvent) {
+    if (!this.enabled()) return;
     const layer = event.target as WLLink;
     layer.closePopup();
+    this.toggleLink(layer);
+  }
+
+  toggleLink(layer: WLLink) {
     if (this.deletedLink.has(layer.options.linkID)) {
       this.deletedLink.delete(layer.options.linkID);
       layer.setStyle({
@@ -138,25 +149,58 @@ class QuickDeleteHandler extends L.Handler {
     }
   }
 
+  clickAnchor(event: LeafletMouseEvent) {
+    if (!this.enabled()) return;
+    const layer = event.target as WLAnchor;
+    layer.closePopup();
+    this.toggleAnchor(layer);
+  }
+
+  toggleAnchor(layer: WLAnchor) {
+    const operation = getSelectedOperation();
+    const portal = operation.getPortal(layer.options.portalId);
+    const links = operation.getLinkListFromPortal(portal);
+    // toggle all links if all deleted
+    if (links.every((l) => this.deletedLink.has(l.ID))) {
+      W.linkLayerGroup.eachLayer((layer: WLLink) => {
+        if (links.find((l) => l.ID == layer.options.linkID))
+          this.toggleLink(layer);
+      });
+    } else {
+      // delete all links
+      W.linkLayerGroup.eachLayer((layer: WLLink) => {
+        if (!this.deletedLink.has(layer.options.linkID))
+          if (links.find((l) => l.ID == layer.options.linkID))
+            this.toggleLink(layer);
+      });
+    }
+  }
+
   addHooks() {
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
-      layer.on("click", this.toggleMarker, this);
+      layer.on("click", this.clickMarker, this);
     });
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
-      layer.on("click", this.toggleLink, this);
+      layer.on("click", this.clickLink, this);
+    });
+    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
+      layer.on("click", this.clickAnchor, this);
     });
   }
 
   removeHooks() {
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
-      layer.off("click", this.toggleMarker, this);
+      layer.off("click", this.clickMarker, this);
       layer.setOpacity(1);
     });
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
-      layer.off("click", this.toggleLink, this);
+      layer.off("click", this.clickLink, this);
       layer.setStyle({
         opacity: 1,
       });
+    });
+    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
+      layer.off("click", this.clickAnchor, this);
     });
   }
 }
