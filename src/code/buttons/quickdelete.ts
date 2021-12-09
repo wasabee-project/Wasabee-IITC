@@ -3,6 +3,8 @@ import wX from "../wX";
 
 import type { Wasabee } from "../init";
 import type { WLMarker } from "../ui/marker";
+import type { WLLink } from "../ui/link";
+import type { LeafletMouseEvent } from "leaflet";
 
 const W: Wasabee = window.plugin.wasabee;
 
@@ -84,19 +86,37 @@ class QuickDeleteHandler extends L.Handler {
     super(window.map);
   }
 
-  toggleMarker(layer: WLMarker) {
+  toggleMarker(event: LeafletMouseEvent) {
+    const layer = event.target as WLMarker;
     if (this.deletedMarker.has(layer.options.id))
       this.deletedMarker.delete(layer.options.id);
     else this.deletedMarker.add(layer.options.id);
+  }
+
+  toggleLink(event: LeafletMouseEvent) {
+    const layer = event.target as WLLink;
+    if (this.deletedLink.has(layer.options.linkID))
+      this.deletedLink.delete(layer.options.linkID);
+    else this.deletedLink.add(layer.options.linkID);
   }
 
   addHooks() {
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
       layer.on("click", this.toggleMarker, this);
     });
+    W.linkLayerGroup.eachLayer((layer: WLLink) => {
+      layer.on("click", this.toggleLink, this);
+    });
   }
 
-  removeHooks() {}
+  removeHooks() {
+    W.markerLayerGroup.eachLayer((layer: WLMarker) => {
+      layer.off("click", this.toggleMarker, this);
+    });
+    W.linkLayerGroup.eachLayer((layer: WLLink) => {
+      layer.off("click", this.toggleLink, this);
+    });
+  }
 }
 
 export default QuickDeleteButton;
