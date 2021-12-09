@@ -104,7 +104,7 @@ const ImportDialog = WDialog.extend({
     let string = this._textarea.value;
     if (
       string.match(
-        new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
+        new RegExp("^(https?://)?(www|intel)\\.ingress\\.com/(intel)?.*")
       )
     ) {
       displayError(wX("NO_STOCK_INTEL"));
