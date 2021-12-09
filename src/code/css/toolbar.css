@@ -72,6 +72,10 @@
   background-color: #3c9;
 }
 
+.wasabee-buttons.leaflet-control a.wasabee-toolbar-quickdelete.active {
+  background-color: #e66;
+}
+
 /* align verticaly button subactions */
 .wasabee-actions li {
   display: block;
