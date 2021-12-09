@@ -542,8 +542,6 @@ export async function fullSync() {
       if (op !== so) zoomToOperation(op);
     }
 
-    // update UI to reflect new ops list
-    window.map.fire("wasabee:fullsync");
     window.map.fire("wasabee:teams"); // if any team dialogs are open
 
     displayInfo(wX("SYNC DONE"));
@@ -553,6 +551,8 @@ export async function fullSync() {
     if (WasabeeMe.isLoggedIn()) displayWarning(wX("NOT_LOADED"));
     else new AuthDialog().enable();
   }
+  // update UI to reflect new ops list
+  window.map.fire("wasabee:fullsync");
 }
 
 export async function syncOp(opID: OpID) {
