@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - v0.*
 jobs:
   build-and-deploy-prod:
     runs-on: ubuntu-latest
@@ -16,6 +18,7 @@ jobs:
           npx gulp build-prod
 
       - name: Deploy 🚀
+        if: ${{ github.ref_type == 'tag' }}
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: dist # The branch the action should deploy to.
