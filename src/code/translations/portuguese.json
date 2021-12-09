@@ -208,6 +208,7 @@
   "NO LONGER AVAILABLE SHORT": "Recurso removido do servidor",
   "NOT LOGGED IN SHORT": "Não logado",
   "NOT LOGGED IN": "Não logado: ${value}",
+  "NOT_LOADED": "Não totalmente carregado, tente novamente.",
   "NOT_SET": "não configurado",
   "NTNAME": "Nome",
   "OK": "OK",

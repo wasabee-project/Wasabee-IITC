@@ -208,6 +208,7 @@
   "NO LONGER AVAILABLE SHORT": "Recurso eliminado del servidor",
   "NOT LOGGED IN SHORT": "Sesión No Iniciada",
   "NOT LOGGED IN": "Sesión No Iniciada: {error}",
+  "NOT_LOADED": "No está cargado completamente, intentar de nuevo.",
   "NOT_SET": "no definido",
   "NTNAME": "Nombre",
   "OK": "OK",

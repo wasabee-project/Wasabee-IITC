@@ -208,6 +208,7 @@
   "NO LONGER AVAILABLE SHORT": "Ressource vom Server entfernt",
   "NOT LOGGED IN SHORT": "Nicht eingeloggt.",
   "NOT LOGGED IN": "Nicht eingeloggt: {error}",
+  "NOT_LOADED": "Nicht vollständig geladen - bitte erneut probieren.",
   "NOT_SET": "nicht gesetzt",
   "NTNAME": "Name",
   "OK": "OK",
