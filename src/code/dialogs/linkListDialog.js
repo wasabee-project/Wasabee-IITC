@@ -78,6 +78,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
   },
 
   update: async function () {
+    if (!this.sortable) return;
     const operation = getSelectedOperation();
     const links = operation.getLinkListFromPortal(this.options.portal);
     const fromCount = links.filter(

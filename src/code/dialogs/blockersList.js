@@ -90,8 +90,9 @@ const BlockerList = WDialog.extend({
 
   // when op changed or crosslink ended
   update: async function () {
-    const operation = getSelectedOperation();
     if (!this._enabled) return;
+    if (!this.sortable) return;
+    const operation = getSelectedOperation();
     this.sortable = await this._getListDialogContent(
       this.sortable.sortBy,
       this.sortable.sortAsc
