@@ -139,12 +139,12 @@ class QuickDeleteHandler extends L.Handler {
     if (this.deletedLink.has(layer.options.linkID)) {
       this.deletedLink.delete(layer.options.linkID);
       layer.setStyle({
-        opacity: 1,
+        opacity: window.plugin.wasabee.skin.linkStyle.opacity || 1,
       });
     } else {
       this.deletedLink.add(layer.options.linkID);
       layer.setStyle({
-        opacity: 0.5,
+        opacity: 0.5 * (window.plugin.wasabee.skin.linkStyle.opacity || 1),
       });
     }
   }
@@ -177,30 +177,30 @@ class QuickDeleteHandler extends L.Handler {
   }
 
   addHooks() {
+    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
+      layer.on("spiderfiedclick", this.clickAnchor, this);
+    });
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
-      layer.on("click", this.clickMarker, this);
+      layer.on("spiderfiedclick", this.clickMarker, this);
     });
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
       layer.on("click", this.clickLink, this);
     });
-    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
-      layer.on("click", this.clickAnchor, this);
-    });
   }
 
   removeHooks() {
+    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
+      layer.off("spiderfiedclick", this.clickAnchor, this);
+    });
     W.markerLayerGroup.eachLayer((layer: WLMarker) => {
-      layer.off("click", this.clickMarker, this);
+      layer.off("spiderfiedclick", this.clickMarker, this);
       layer.setOpacity(1);
     });
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
       layer.off("click", this.clickLink, this);
       layer.setStyle({
-        opacity: 1,
+        opacity: window.plugin.wasabee.skin.linkStyle.opacity || 1,
       });
-    });
-    W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
-      layer.off("click", this.clickAnchor, this);
     });
   }
 }
