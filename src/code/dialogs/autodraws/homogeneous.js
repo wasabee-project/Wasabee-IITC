@@ -2,8 +2,11 @@ import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
 import {
+  extendLatLngToLLC,
   greatCircleArcIntersectByLatLngs,
   portalInField,
+  dist2,
+  fieldCenter,
 } from "../../crosslinks";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
@@ -73,13 +76,30 @@ function getSubregions(centerPoint, possibles, one, two, three) {
 }
 
 /**
+ * Sort in place by distance to point
+ * @param {WasabeePortal[]} portals
+ * @param {import("leaflet").LatLng} point
+ */
+function sortByDistance(portals, point) {
+  // straight square distance is good enough in 3D
+  const cp = extendLatLngToLLC(point)._cartesian;
+  const cPs = new Map(
+    portals.map((p) => [
+      p.id,
+      dist2(cp, extendLatLngToLLC(p.latLng)._cartesian),
+    ])
+  );
+  return portals.sort((a, b) => cPs.get(a.id) - cPs.get(b.id));
+}
+
+/**
  *
  * @param {WasabeePortal[]} portalsCovered
  * @param {WasabeePortal} one
  * @param {WasabeePortal} two
  * @param {WasabeePortal} three
  * @param {number} depth
- * @returns
+ * @returns {import("./homogeneous").Tree}
  */
 function fullRecurser(portalsCovered, one, two, three, depth) {
   const alreadyCalculatedCover = new Map();
@@ -91,6 +111,15 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
     "missing splits"
   );
 
+  /**
+   * Find one of the best (in terms of splits) HF configuration as a Tree decomposition
+   * @param {number} depth
+   * @param {WasabeePortal[]} portalsCovered
+   * @param {WasabeePortal} one
+   * @param {WasabeePortal} two
+   * @param {WasabeePortal} three
+   * @returns {import("./homogeneous").Tree}
+   */
   const homogeneousFrom = (depth, portalsCovered, one, two, three) => {
     if (depth <= 1)
       return { success: true, anchors: [one, two, three], split: 0 };
@@ -101,6 +130,7 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
         getNbSplitPerDepth(depth),
         portalsCovered.length
       );
+      /** @type {import("./homogeneous").Tree} */
       let bestResult = {
         success: false,
         anchors: [one, two, three],
@@ -108,6 +138,7 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
         portal: null,
         children: null,
       };
+      sortByDistance(portalsCovered, fieldCenter(one, two, three));
       for (const wp of portalsCovered) {
         const subregions = getSubregions(
           wp,
