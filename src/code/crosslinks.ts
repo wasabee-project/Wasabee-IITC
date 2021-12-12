@@ -10,14 +10,27 @@ import type WasabeeLink from "./model/link";
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
+const r2d = 180 / Math.PI;
 
 type Vec3 = [number, number, number];
+interface LLC extends L.LatLng {
+  _cartesian?: Vec3;
+}
 
 function toCartesian(lat: number, lng: number): Vec3 {
   lat *= d2r;
   lng *= d2r;
   var o = Math.cos(lat);
   return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
+}
+
+export function toLatLng(xyz: Vec3): LLC {
+  const lat = Math.atan2(xyz[2], Math.sqrt(xyz[0] * xyz[0] + xyz[1] * xyz[1]));
+  const lng = Math.atan2(xyz[1], xyz[0]);
+
+  const ll: LLC = L.latLng({ lat: lat * r2d, lng: lng * r2d });
+  ll._cartesian = [...xyz];
+  return ll;
 }
 
 function cross(t: Vec3, n: Vec3): Vec3 {
@@ -36,15 +49,34 @@ function det(a: Vec3, b: Vec3, c: Vec3) {
   return dot(cross(a, b), c);
 }
 
+function norm2(a: Vec3) {
+  return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+}
+
+function norm(a: Vec3) {
+  return Math.hypot(...a);
+}
+
+// where is the fast inverse square root when we need it ?
+export function normalize(a: Vec3): Vec3 {
+  const n = 1 / norm(a);
+  return [a[0] * n, a[1] * n, a[2] * n];
+}
+
+export function dist2(a: Vec3, b: Vec3) {
+  return norm2([
+    a[0] - b[0],
+    a[1] - b[1],
+    a[2] - b[2],
+  ])
+}
+
 function equals(a: L.LatLng, b: L.LatLng) {
   return a.lat === b.lat && a.lng === b.lng;
 }
 
 // take L.LatLng
 // note: cache cos/sin calls in the object, in order to be efficient, try using same LatLng objects across calls, like using latLng from WasabeePortal attached to an op
-interface LLC extends L.LatLng {
-  _cartesian?: Vec3;
-}
 
 export function extendLatLngToLLC(ll: LLC) {
   if (ll._cartesian) return ll;
@@ -87,11 +119,11 @@ export function fieldCenter(
   const cb = extendLatLngToLLC(b.latLng)._cartesian;
   const cc = extendLatLngToLLC(c.latLng)._cartesian;
   const ccenter: Vec3 = [
-    ca[0]+cb[0]+cc[0],
-    ca[1]+cb[1]+cc[1],
-    ca[2]+cb[2]+cc[2],
+    ca[0] + cb[0] + cc[0],
+    ca[1] + cb[1] + cc[1],
+    ca[2] + cb[2] + cc[2],
   ];
-  return ccenter;
+  return toLatLng(ccenter);
 }
 
 export function greatCircleArcIntersectByLatLngs(a0: LLC[], a1: LLC[]): boolean;
