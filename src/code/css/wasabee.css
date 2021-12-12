@@ -514,6 +514,10 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   padding-left: 1em;
 }
 
+.field-count li.inner-link > div {
+  display: inline;
+}
+
 .field-count ul {
   padding-left: 1em;
 }

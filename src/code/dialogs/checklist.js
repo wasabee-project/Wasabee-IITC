@@ -20,7 +20,6 @@ import wX from "../wX";
 import PortalUI from "../ui/portal";
 import LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
-import { fieldSign } from "../crosslinks";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -304,60 +303,17 @@ const OperationChecklistDialog = WDialog.extend({
   },
 
   countFields: function (operation, doAlert) {
-    const links = Array.from(operation.links);
-    links.sort((a, b) => a.order - b.order);
+    const {
+      fieldCount,
+      emptyCount,
+      emptyFieldLinks,
+      linksFromInner,
+      coveredPortals,
+    } = operation.getOrderInfo();
 
-    let fieldCount = 0;
-    let emptyCount = 0;
-
-    // maps a portal id to its linked portals
-    const portalLinks = new Map();
-    const emptyFieldLinks = [];
-    for (const link of links) {
-      if (!portalLinks.has(link.fromPortalId))
-        portalLinks.set(link.fromPortalId, new Set());
-      if (!portalLinks.has(link.toPortalId))
-        portalLinks.set(link.toPortalId, new Set());
-      const a = portalLinks.get(link.fromPortalId);
-      const b = portalLinks.get(link.toPortalId);
-
-      // common neighbors portal
-      const intersect = new Set();
-      for (const p of a) if (b.has(p)) intersect.add(p);
-
-      // update the mapping
-      a.add(link.toPortalId);
-      b.add(link.fromPortalId);
-
-      // ignore link with order 0
-      if (link.order > 0) {
-        // the link closes at least one field
-        const p1 = operation.getPortal(link.fromPortalId);
-        const p2 = operation.getPortal(link.toPortalId);
-        const positive = [];
-        const negative = [];
-        // ignore earth curvature (todo: use it)
-        for (const pid of intersect) {
-          const p = operation.getPortal(pid);
-          const sign = fieldSign(p, p1, p2);
-          if (sign > 0) positive.push(p);
-          else negative.push(p);
-        }
-        if (positive.length) fieldCount += 1;
-        if (negative.length) fieldCount += 1;
-        // if the link closes multiple fields on the same side of the link, we have empty fields.
-        if (positive.length > 1 || negative.length > 1) {
-          let count = 0;
-          if (positive.length > 1) count += positive.length - 1;
-          if (negative.length > 1) count += negative.length - 1;
-          emptyFieldLinks.push([link, count]);
-          emptyCount += count;
-        }
-      }
-    }
     if (doAlert) {
-      if (emptyFieldLinks.length > 0) {
-        const container = L.DomUtil.create("div", "field-count");
+      const container = L.DomUtil.create("div", "field-count");
+      if (emptyFieldLinks.length) {
         const header = L.DomUtil.create("div", null, container);
         header.textContent = `Found ${fieldCount} fields and ${emptyCount} empty field(s) on ${emptyFieldLinks.length} link(s)`;
         const content = L.DomUtil.create("ul", null, container);
@@ -366,12 +322,29 @@ const OperationChecklistDialog = WDialog.extend({
           li.textContent = c;
           li.appendChild(LinkUI.displayFormat(link, operation));
         }
+      } else {
+        const header = L.DomUtil.create("div", null, container);
+        header.textContent = `Found ${fieldCount} fields and no empty field`;
+      }
+      if (linksFromInner.length) {
+        const header = L.DomUtil.create("div", null, container);
+        header.textContent = `Found ${linksFromInner.length} links from covered portals`;
+        const content = L.DomUtil.create("ul", null, container);
+        for (const link of linksFromInner) {
+          const cl = coveredPortals.get(link.fromPortalId);
+          const li = L.DomUtil.create("li", "inner-link", content);
+          li.append(`${link.order}: `);
+          li.appendChild(LinkUI.displayFormat(link, operation));
+          li.append(` at ${cl.order} by link `);
+          li.appendChild(LinkUI.displayFormat(cl, operation));
+        }
+      }
+      if (emptyFieldLinks.length || linksFromInner.length) {
         displayWarning(container, true);
       } else {
-        displayInfo(`Found ${fieldCount} fields and no empty fields.`);
+        displayInfo(container, true);
       }
     }
-    return { field: fieldCount, empty: emptyCount };
   },
 });
 
