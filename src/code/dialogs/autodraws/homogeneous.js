@@ -8,8 +8,165 @@ import {
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
 
-import PortalUI from "../../ui/portal";
 import { displayError, displayWarning } from "../../error";
+
+/**
+ * Split a set of portals inside a field into three sets with respect to a portal in the field
+ * @param {WasabeePortal} centerPoint Portal inside the field one/two/three
+ * @param {WasabeePortal[]} possibles Portals inside the field one/two/three
+ * @param {WasabeePortal} one
+ * @param {WasabeePortal} two
+ * @param {WasabeePortal} three
+ * @returns {[WasabeePortal[],WasabeePortal[],WasabeePortal[]]} Sets of portals inside one/two/centerPoint, two/three/centerPoint and three/one/centerPoint
+ */
+function getSubregions(centerPoint, possibles, one, two, three) {
+  const possibleExceptAnchors = new Array();
+  for (const p of possibles) {
+    const guid = p.id || p.options.guid;
+    if (
+      guid !== centerPoint.id &&
+      guid !== one.id &&
+      guid !== two.id &&
+      guid !== three.id
+    )
+      possibleExceptAnchors.push(p);
+  }
+
+  const onePortals = new Array();
+  const twoPortals = new Array();
+  const threePortals = new Array();
+  for (const p of possibleExceptAnchors) {
+    if (
+      greatCircleArcIntersectByLatLngs(
+        p.latLng,
+        one.latLng,
+        centerPoint.latLng,
+        two.latLng
+      ) ||
+      greatCircleArcIntersectByLatLngs(
+        p.latLng,
+        one.latLng,
+        centerPoint.latLng,
+        three.latLng
+      )
+    )
+      twoPortals.push(p);
+    else if (
+      greatCircleArcIntersectByLatLngs(
+        p.latLng,
+        two.latLng,
+        centerPoint.latLng,
+        one.latLng
+      ) ||
+      greatCircleArcIntersectByLatLngs(
+        p.latLng,
+        two.latLng,
+        centerPoint.latLng,
+        three.latLng
+      )
+    )
+      threePortals.push(p);
+    else onePortals.push(p);
+  }
+
+  return [onePortals, twoPortals, threePortals];
+}
+
+/**
+ *
+ * @param {WasabeePortal[]} portalsCovered
+ * @param {WasabeePortal} one
+ * @param {WasabeePortal} two
+ * @param {WasabeePortal} three
+ * @param {number} depth
+ * @returns
+ */
+function fullRecurser(portalsCovered, one, two, three, depth) {
+  const alreadyCalculatedCover = new Map();
+  const getNbSplitPerDepth = (depth) => (3 ** (depth - 1) - 1) / 2;
+
+  console.log(
+    "Expect at least",
+    Math.max(0, getNbSplitPerDepth(depth) - portalsCovered.length),
+    "missing splits"
+  );
+
+  const homogeneousFrom = (depth, portalsCovered, one, two, three) => {
+    if (depth <= 1)
+      return { success: true, anchors: [one, two, three], split: 0 };
+
+    const key = [depth, one.id, two.id, three.id].sort().toString();
+    if (alreadyCalculatedCover.get(key) === undefined) {
+      const maxNbSplit = Math.min(
+        getNbSplitPerDepth(depth),
+        portalsCovered.length
+      );
+      let bestResult = {
+        success: false,
+        anchors: [one, two, three],
+        split: 0,
+        portal: null,
+        children: null,
+      };
+      for (const wp of portalsCovered) {
+        const subregions = getSubregions(
+          wp,
+          new Array(...portalsCovered),
+          one,
+          two,
+          three
+        );
+        const maxNbSplitSubregions =
+          Math.min(getNbSplitPerDepth(depth - 1), subregions[0].length) +
+          Math.min(getNbSplitPerDepth(depth - 1), subregions[1].length) +
+          Math.min(getNbSplitPerDepth(depth - 1), subregions[2].length);
+        if (maxNbSplitSubregions + 1 <= bestResult.split) {
+          // Skip the portal since it will induce less splits than the current best choice
+          continue;
+        }
+
+        let ret1 = homogeneousFrom(
+          depth - 1,
+          new Array(...subregions[0]),
+          one,
+          two,
+          wp
+        );
+        let ret2 = homogeneousFrom(
+          depth - 1,
+          new Array(...subregions[1]),
+          two,
+          three,
+          wp
+        );
+        let ret3 = homogeneousFrom(
+          depth - 1,
+          new Array(...subregions[2]),
+          one,
+          three,
+          wp
+        );
+
+        const nbSplit = ret1.split + ret2.split + ret3.split + 1;
+
+        if (nbSplit > bestResult.split) {
+          bestResult.success = ret1.success && ret2.success && ret3.success;
+          bestResult.split = nbSplit;
+          bestResult.portal = wp;
+          bestResult.children = [ret1, ret2, ret3];
+        }
+
+        if (nbSplit == maxNbSplit) {
+          // we cannot do more split so it is one of the best choice
+          break;
+        }
+      }
+      alreadyCalculatedCover.set(key, bestResult);
+    }
+    return alreadyCalculatedCover.get(key);
+  };
+  return homogeneousFrom(depth, portalsCovered, one, two, three);
+}
 
 const HomogeneousDialog = AutoDraw.extend({
   statics: {
@@ -187,11 +344,12 @@ const HomogeneousDialog = AutoDraw.extend({
     }
 
     console.time("HF deep recurser");
-    const tree = this._fullRecurser(
+    const tree = fullRecurser(
       portals,
       this._anchorOne,
       this._anchorTwo,
-      this._anchorThree
+      this._anchorThree,
+      +this.depthMenu.value
     );
     console.timeEnd("HF deep recurser");
 
@@ -294,7 +452,7 @@ const HomogeneousDialog = AutoDraw.extend({
     for (const [k, wp] of sorted) {
       // silence lint
       this._trash = k;
-      const subregions = this._getSubregions(
+      const subregions = getSubregions(
         wp,
         new Array(...portalsCovered),
         one,
@@ -343,134 +501,6 @@ const HomogeneousDialog = AutoDraw.extend({
       bestResult.children[1].split +
       bestResult.children[2].split;
     return bestResult;
-  },
-
-  _fullRecurser: function (portalsCovered, one, two, three) {
-    const alreadyCalculatedCover = new Map();
-    const getNbSplitPerDepth = (depth) => (3 ** (depth - 1) - 1) / 2;
-
-    console.log(
-      "Expect at least",
-      Math.max(
-        0,
-        getNbSplitPerDepth(this.depthMenu.value) - portalsCovered.length
-      ),
-      "missing splits"
-    );
-
-    const homogeneousFrom = (depth, portalsCovered, one, two, three) => {
-      if (depth <= 1)
-        return { success: true, anchors: [one, two, three], split: 0 };
-
-      const key = [depth, one.id, two.id, three.id].sort().toString();
-      if (alreadyCalculatedCover.get(key) === undefined) {
-        // sort portals according to the balance between the regions
-        const m = new Map();
-        // for each of the portals in play
-        for (const wp of portalsCovered) {
-          const subregions = this._getSubregions(
-            wp,
-            new Array(...portalsCovered),
-            one,
-            two,
-            three
-          );
-          // one of the regions didn't have enough
-          if (!subregions) continue;
-          // is this one better than the previous?
-          // smallest difference in the number of portals between the greatest and least, 0 being ideal
-          const differential =
-            Math.max(
-              subregions[0].length,
-              subregions[1].length,
-              subregions[2].length
-            ) -
-            Math.min(
-              subregions[0].length,
-              subregions[1].length,
-              subregions[2].length
-            );
-          m.set(wp.id, differential);
-        }
-
-        const sorted = new Map([...m.entries()].sort((a, b) => a[1] - b[1]));
-
-        const maxNbSplit = Math.min(
-          getNbSplitPerDepth(depth),
-          portalsCovered.length
-        );
-        let bestResult = {
-          success: false,
-          anchors: [one, two, three],
-          split: 0,
-          portal: null,
-          children: null,
-        };
-        for (const k of sorted.keys()) {
-          const wp = PortalUI.get(k);
-          const subregions = this._getSubregions(
-            wp,
-            new Array(...portalsCovered),
-            one,
-            two,
-            three
-          );
-          const maxNbSplitSubregions =
-            Math.min(getNbSplitPerDepth(depth - 1), subregions[0].length) +
-            Math.min(getNbSplitPerDepth(depth - 1), subregions[1].length) +
-            Math.min(getNbSplitPerDepth(depth - 1), subregions[2].length);
-          if (maxNbSplitSubregions + 1 <= bestResult.split) {
-            // Skip the portal since it will induce less splits than the current best choice
-            continue;
-          }
-
-          let ret1 = homogeneousFrom(
-            depth - 1,
-            new Array(...subregions[0]),
-            one,
-            two,
-            wp
-          );
-          let ret2 = homogeneousFrom(
-            depth - 1,
-            new Array(...subregions[1]),
-            two,
-            three,
-            wp
-          );
-          let ret3 = homogeneousFrom(
-            depth - 1,
-            new Array(...subregions[2]),
-            one,
-            three,
-            wp
-          );
-
-          const nbSplit = ret1.split + ret2.split + ret3.split + 1;
-
-          if (nbSplit > bestResult.split) {
-            bestResult.success = ret1.success && ret2.success && ret3.success;
-            bestResult.split = nbSplit;
-            bestResult.portal = wp;
-            bestResult.children = [ret1, ret2, ret3];
-          }
-
-          if (nbSplit == maxNbSplit) {
-            // we cannot do more split so it is one of the best choice
-            break;
-          }
-        }
-        alreadyCalculatedCover.set(key, bestResult);
-      }
-      return alreadyCalculatedCover.get(key);
-    };
-    return homogeneousFrom(
-      this.depthMenu.value,
-      portalsCovered,
-      one,
-      two,
-      three
-    );
   },
 
   _drawTreeCore: function (tree) {
@@ -695,59 +725,6 @@ const HomogeneousDialog = AutoDraw.extend({
       replace: true,
     });
     draw(1, tree, one, two);
-  },
-
-  _getSubregions: function (centerPoint, possibles, one, two, three) {
-    const possibleExceptAnchors = new Array();
-    for (const p of possibles) {
-      const guid = p.id || p.options.guid;
-      if (
-        guid !== centerPoint.id &&
-        guid !== one.id &&
-        guid !== two.id &&
-        guid !== three.id
-      )
-        possibleExceptAnchors.push(p);
-    }
-
-    const onePortals = new Array();
-    const twoPortals = new Array();
-    const threePortals = new Array();
-    for (const p of possibleExceptAnchors) {
-      if (
-        greatCircleArcIntersectByLatLngs(
-          p.latLng,
-          one.latLng,
-          centerPoint.latLng,
-          two.latLng
-        ) ||
-        greatCircleArcIntersectByLatLngs(
-          p.latLng,
-          one.latLng,
-          centerPoint.latLng,
-          three.latLng
-        )
-      )
-        twoPortals.push(p);
-      else if (
-        greatCircleArcIntersectByLatLngs(
-          p.latLng,
-          two.latLng,
-          centerPoint.latLng,
-          one.latLng
-        ) ||
-        greatCircleArcIntersectByLatLngs(
-          p.latLng,
-          two.latLng,
-          centerPoint.latLng,
-          three.latLng
-        )
-      )
-        threePortals.push(p);
-      else onePortals.push(p);
-    }
-
-    return [onePortals, twoPortals, threePortals];
   },
 
   _getCenter: function (a, b, c) {
