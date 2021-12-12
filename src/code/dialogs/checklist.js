@@ -20,6 +20,7 @@ import wX from "../wX";
 import PortalUI from "../ui/portal";
 import LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
+import { fieldSign } from "../crosslinks";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -338,10 +339,8 @@ const OperationChecklistDialog = WDialog.extend({
         // ignore earth curvature (todo: use it)
         for (const pid of intersect) {
           const p = operation.getPortal(pid);
-          const det =
-            (p1.lat - p2.lat) * (p.lng - p2.lng) -
-            (p1.lng - p2.lng) * (p.lat - p2.lat);
-          if (det > 0) positive.push(p);
+          const sign = fieldSign(p, p1, p2);
+          if (sign > 0) positive.push(p);
           else negative.push(p);
         }
         if (positive.length) fieldCount += 1;
