@@ -181,7 +181,7 @@ module.exports = (env, argv) => {
       Object.assign(meta, pluginConfig.headers.scot);
     } else if (env.pr) {
       config.output.path = path.join(outputPath, "dev");
-      config.devtool = "inline-source-map";
+      config.devtool = "eval-source-map";
       Object.assign(meta, pluginConfig.headers.pr);
       meta.version += env.pr;
     } else if (argv.mode === "development") {
