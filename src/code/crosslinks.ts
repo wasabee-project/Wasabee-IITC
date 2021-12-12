@@ -78,6 +78,22 @@ export function portalInField(
   );
 }
 
+export function fieldCenter(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal
+) {
+  const ca = extendLatLngToLLC(a.latLng)._cartesian;
+  const cb = extendLatLngToLLC(b.latLng)._cartesian;
+  const cc = extendLatLngToLLC(c.latLng)._cartesian;
+  const ccenter: Vec3 = [
+    ca[0]+cb[0]+cc[0],
+    ca[1]+cb[1]+cc[1],
+    ca[2]+cb[2]+cc[2],
+  ];
+  return ccenter;
+}
+
 export function greatCircleArcIntersectByLatLngs(a0: LLC[], a1: LLC[]): boolean;
 export function greatCircleArcIntersectByLatLngs(
   a0: LLC,
