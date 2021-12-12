@@ -93,7 +93,7 @@ function sortByDistance(portals, point) {
 }
 
 /**
- *
+ * Find one of the best (in terms of splits) HF configuration as a Tree decomposition
  * @param {WasabeePortal[]} portalsCovered
  * @param {WasabeePortal} one
  * @param {WasabeePortal} two
@@ -197,6 +197,91 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
     return alreadyCalculatedCover.get(key);
   };
   return homogeneousFrom(depth, portalsCovered, one, two, three);
+}
+
+/**
+ * Find a HF Tree decomposition with a greedy heuristic, may fail even if HF exists
+ * @param {WasabeePortal[]} portalsCovered
+ * @param {WasabeePortal} one
+ * @param {WasabeePortal} two
+ * @param {WasabeePortal} three
+ * @param {number} depth
+ * @returns {import("./homogeneous").Tree}
+ */
+function greedy(portalsCovered, one, two, three, depth) {
+  if (depth <= 1)
+    return { success: true, anchors: [one, two, three], split: 0 };
+
+  // empty tree
+  /** @type {import("./homogeneous").Tree} */
+  let bestResult = {
+    success: false,
+    anchors: [one, two, three],
+    split: 0,
+    portal: null,
+    children: null,
+  };
+
+  if (!portalsCovered.length) {
+    return bestResult;
+  }
+
+  // sort first by distance to center
+  sortByDistance(portalsCovered, fieldCenter(one, two, three));
+
+  // greedy heuristic:
+  // find the portal that divides the area into regions with the closest number of portals
+  // starts at the center-most and works outwards
+  let differential = portalsCovered.length;
+  let best = [];
+  let bestp = {};
+  // for each of the portals in play
+  for (const wp of portalsCovered) {
+    const subregions = getSubregions(
+      wp,
+      new Array(...portalsCovered),
+      one,
+      two,
+      three
+    );
+    // smallest difference in the number of portals between the greatest and least, 0 being ideal
+    const temp =
+      Math.max(
+        subregions[0].length,
+        subregions[1].length,
+        subregions[2].length
+      ) -
+      Math.min(
+        subregions[0].length,
+        subregions[1].length,
+        subregions[2].length
+      );
+    if (temp < differential) {
+      best = subregions;
+      differential = temp;
+      bestp = wp;
+    }
+    // found one with equal number of portals in all 3, quit digging
+    if (differential == 0) break;
+  }
+
+  bestResult.portal = bestp;
+
+  bestResult.children = [
+    greedy(new Array(...best[0]), one, two, bestp, depth - 1),
+    greedy(new Array(...best[1]), two, three, bestp, depth - 1),
+    greedy(new Array(...best[2]), one, three, bestp, depth - 1),
+  ];
+  bestResult.success =
+    bestResult.children[0].success &&
+    bestResult.children[1].success &&
+    bestResult.children[2].success;
+  bestResult.split =
+    1 +
+    bestResult.children[0].split +
+    bestResult.children[1].split +
+    bestResult.children[2].split;
+  return bestResult;
 }
 
 const HomogeneousDialog = AutoDraw.extend({
@@ -337,15 +422,15 @@ const HomogeneousDialog = AutoDraw.extend({
         portals.push(p);
     }
 
-    console.time("HF recurser");
-    const tree = this._recurser(
-      1,
+    console.time("HF greedy");
+    const tree = greedy(
       portals,
       this._anchorOne,
       this._anchorTwo,
-      this._anchorThree
+      this._anchorThree,
+      this.depthMenu.value
     );
-    console.timeEnd("HF recurser");
+    console.timeEnd("HF greedy");
 
     this._tree = tree;
     this._failed = (3 ** (+this.depthMenu.value - 1) - 1) / 2 - tree.split;
@@ -440,98 +525,6 @@ const HomogeneousDialog = AutoDraw.extend({
     this._operation.cleanPortalList();
 
     this._redrawButton.style.display = "";
-  },
-
-  _recurser: function (depth, portalsCovered, one, two, three) {
-    if (depth >= this.depthMenu.value)
-      return { success: true, anchors: [one, two, three], split: 0 };
-
-    // empty tree
-    let bestResult = {
-      success: false,
-      anchors: [one, two, three],
-      split: 0,
-      portal: null,
-      children: null,
-    };
-
-    // console.log(depth, "portals in consideration", portalsCovered);
-
-    // build a map of all portals coverd by field one,two,three
-    // keyed by distance to the centeroid of the field
-    // does this get us much in reality? doesn't seem like it
-    const m = new Map();
-    const center = this._getCenter(one, two, three);
-    for (const p of portalsCovered) {
-      if (p.id === one.id || p.id === two.id || p.id === three.id) continue;
-      const cDist = window.map.distance(center, p.latLng || p._latlng);
-      m.set(cDist, p);
-    }
-    // sort by distance to centeroid the field
-    const sorted = new Map([...m.entries()].sort((a, b) => a[0] - b[0]));
-    if (sorted.size == 0) {
-      // console.log("empty set");
-      return bestResult;
-    }
-
-    // find the portal that divides the area into regions with the closest number of portals
-    // starts at the center-most and works outwards
-    let differential = portalsCovered.length;
-    let best = [];
-    let bestp = {};
-    // for each of the portals in play
-    for (const [k, wp] of sorted) {
-      // silence lint
-      this._trash = k;
-      const subregions = getSubregions(
-        wp,
-        new Array(...portalsCovered),
-        one,
-        two,
-        three
-      );
-      // one of the regions didn't have enough
-      // if (!subregions) continue; // never
-      // is this one better than the previous?
-      // smallest difference in the number of portals between the greatest and least, 0 being ideal
-      const temp =
-        Math.max(
-          subregions[0].length,
-          subregions[1].length,
-          subregions[2].length
-        ) -
-        Math.min(
-          subregions[0].length,
-          subregions[1].length,
-          subregions[2].length
-        );
-      if (temp < differential) {
-        best = subregions;
-        differential = temp;
-        bestp = wp;
-      }
-      // found one with equal number of portals in all 3, quit digging
-      // if (differential == 0) break;
-    }
-
-    // console.log("best balance: ", bestp.name, differential, best);
-    bestResult.portal = bestp;
-
-    bestResult.children = [
-      this._recurser(depth + 1, new Array(...best[0]), one, two, bestp),
-      this._recurser(depth + 1, new Array(...best[1]), two, three, bestp),
-      this._recurser(depth + 1, new Array(...best[2]), one, three, bestp),
-    ];
-    bestResult.success =
-      bestResult.children[0].success &&
-      bestResult.children[1].success &&
-      bestResult.children[2].success;
-    bestResult.split =
-      1 +
-      bestResult.children[0].split +
-      bestResult.children[1].split +
-      bestResult.children[2].split;
-    return bestResult;
   },
 
   _drawTreeCore: function (tree) {
