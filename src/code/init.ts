@@ -25,7 +25,13 @@ import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
 import { displayError } from "./error";
+
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
+import type { WLAnchor } from "./ui/anchor";
+import type { WLLink } from "./ui/link";
+import type { WLMarker } from "./ui/marker";
+import type { WLAgent } from "./ui/agent";
+import type { WLZone } from "./ui/zone";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -35,11 +41,11 @@ export interface Wasabee {
   _updateList: Map<string, number>;
   idb: Awaited<typeof db>;
   portalDetailQueue: PortalID[];
-  portalLayerGroup: LayerGroup;
-  linkLayerGroup: LayerGroup;
-  markerLayerGroup: LayerGroup;
-  agentLayerGroup: LayerGroup;
-  zoneLayerGroup: FeatureGroup;
+  portalLayerGroup: LayerGroup<WLAnchor>;
+  linkLayerGroup: LayerGroup<WLLink>;
+  markerLayerGroup: LayerGroup<WLMarker>;
+  agentLayerGroup: LayerGroup<WLAgent>;
+  zoneLayerGroup: FeatureGroup<WLZone>;
   backgroundOpsGroup: LayerGroup;
 }
 
