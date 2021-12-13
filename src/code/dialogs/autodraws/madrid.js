@@ -5,13 +5,29 @@ import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
 import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";
-import MultimaxDialog from "./multimaxDialog";
+import { AutoDraw } from "./tools";
+import WasabeePortal from "../../model/portal";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
-const MadridDialog = MultimaxDialog.extend({
+const MadridDialog = AutoDraw.extend({
   statics: {
     TYPE: "madridDialog",
+  },
+
+  initialize: function (options) {
+    AutoDraw.prototype.initialize.call(this, options);
+    let p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    if (p) this._anchorOne = new WasabeePortal(p);
+    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
+    if (p) this._anchorTwo = new WasabeePortal(p);
+  },
+
+  addHooks: function () {
+    AutoDraw.prototype.addHooks.call(this);
+
+    this._displayDialog();
+    this._updatePortalSet();
   },
 
   _buildContent: function () {
