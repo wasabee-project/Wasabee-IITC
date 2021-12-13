@@ -1,6 +1,7 @@
 const path = require("path");
 const outputPath = path.join(__dirname, "releases");
 const ESLintPlugin = require("eslint-webpack-plugin");
+const childProcess = require("child_process");
 
 const { ConcatSource } = require("webpack-sources");
 const Compilation = require("webpack/lib/Compilation");
@@ -171,10 +172,23 @@ const config = {
   plugins: [new ESLintPlugin({ fix: true })],
 };
 
+function getCommitShort() {
+  try {
+    const commit = childProcess
+      .execSync("git rev-parse --short HEAD")
+      .toString()
+      .trim();
+    return commit;
+  } catch {
+    return null;
+  }
+}
+
 module.exports = (env, argv) => {
   const pluginConfig = require("./plugin.config.json");
   const meta = pluginConfig.headers.common;
   if (argv.mode === "development") {
+    const commit = getCommitShort();
     if (env.scot) {
       config.output.path = path.join(outputPath, "scot");
       config.devtool = "eval-source-map";
@@ -189,6 +203,7 @@ module.exports = (env, argv) => {
       config.devtool = "eval-source-map";
       Object.assign(meta, pluginConfig.headers.dev);
     }
+    if (commit) meta.version += `-${commit}`;
   } else {
     config.output.path = path.join(outputPath, "prod");
     Object.assign(meta, pluginConfig.headers.prod);
