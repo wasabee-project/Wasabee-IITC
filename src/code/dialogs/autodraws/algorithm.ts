@@ -1,4 +1,4 @@
-import { fieldSign } from "../../crosslinks";
+import { fieldSign, GeodesicLine } from "../../crosslinks";
 import type WasabeePortal from "../../model/portal";
 
 type Poset<T> = Map<T, T[]>;
@@ -166,4 +166,67 @@ export function getSignedSpine(
   const sequence =
     sequencePos.length > sequenceNeg.length ? sequencePos : sequenceNeg;
   return [sequence.map((id) => portalsMap.get(id))];
+}
+
+/** Returns bearing of link a-p */
+export function angle(a: WasabeePortal, p: WasabeePortal) {
+  if (a.id == p.id) throw Error("same portal");
+  if (a.latLng.lng == p.latLng.lng) {
+    if (a.latLng.lat > p.latLng.lat) return 0;
+    else return Math.PI;
+  }
+  const link = new GeodesicLine(a.latLng, p.latLng);
+  return link.bearing();
+}
+
+/** Sort portals by angle from anchor */
+export function sortPortalsByAngle(
+  anchor: WasabeePortal,
+  portals: WasabeePortal[]
+) {
+  const good = new Map<number, WasabeePortal>();
+  for (const p of portals) {
+    if (p.id == anchor.id) continue;
+    const pAngle = angle(anchor, p);
+    good.set(pAngle, p);
+  }
+
+  const sorted = new Array(...good.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map((v) => v[1]);
+
+  return sorted;
+}
+
+/**
+ * Select portals in the interval start-end wrt their angle from anchor.
+ * The portals must be sorted by angle and contains start/end
+ */
+export function selectAngleInterval(
+  anchor: WasabeePortal,
+  portalsSorted: WasabeePortal[],
+  start: WasabeePortal,
+  end: WasabeePortal
+) {
+  const startAngle = angle(anchor, start);
+  const endAngle = angle(anchor, end);
+
+  // swap start/end if more than 180°
+  if (
+    (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) >
+    Math.PI
+  ) {
+    [start, end] = [end, start];
+  }
+
+  // Build the sequence of portals between start/end
+  const slice = new Array<WasabeePortal>();
+  let s = 0;
+  for (s = 0; portalsSorted[s].id != start.id; s++);
+  for (; portalsSorted[s % portalsSorted.length].id != end.id; s++) {
+    slice.push(portalsSorted[s % portalsSorted.length]);
+  }
+  slice.push(end);
+
+  return slice;
 }

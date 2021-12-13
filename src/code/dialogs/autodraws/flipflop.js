@@ -6,48 +6,9 @@ import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
 import WasabeePortal from "../../model/portal";
 import WasabeeMarker from "../../model/marker";
 
-import { angle } from "./fanfield";
+import { selectAngleInterval, sortPortalsByAngle } from "./algorithm";
 import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 import { displayError, displayInfo } from "../../error";
-
-function selectAngleInterval(anchor, portalsSorted, start, end) {
-  const startAngle = angle(anchor, start);
-  const endAngle = angle(anchor, end);
-
-  // swap start/end if more than 180°
-  if (
-    (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) >
-    Math.PI
-  ) {
-    [start, end] = [end, start];
-  }
-
-  // Build the sequence of portals between start/end
-  const slice = new Array();
-  let s = 0;
-  for (s = 0; portalsSorted[s].id != start.id; s++);
-  for (; portalsSorted[s % portalsSorted.length].id != end.id; s++) {
-    slice.push(portalsSorted[s % portalsSorted.length]);
-  }
-  slice.push(end);
-
-  return slice;
-}
-
-function sortPortalsByAngle(anchor, portals) {
-  const good = new Map();
-  for (const p of portals) {
-    if (p.id == anchor.id) continue;
-    const pAngle = angle(anchor, p);
-    good.set(pAngle, p);
-  }
-
-  const sorted = new Array(...good.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map((v) => v[1]);
-
-  return sorted;
-}
 
 function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
   const res = [];

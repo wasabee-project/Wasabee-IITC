@@ -1,63 +1,19 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { GeodesicLine, testSelfBlock } from "../../crosslinks";
+import { testSelfBlock } from "../../crosslinks";
 import WasabeeLink from "../../model/link";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
 import { displayError, displayInfo } from "../../error";
 
-export function angle(a, p) {
-  if (a.id == p.id) throw Error("same portal");
-  if (a.latLng.lng == p.latLng.lng) {
-    if (a.latLng.lat > p.latLng.lat) return 0;
-    else return Math.PI;
-  }
-  const link = new GeodesicLine(a.latLng, p.latLng);
-  return link.bearing();
-}
+import { sortPortalsByAngle, selectAngleInterval } from "./algorithm";
 
-export function sortPortalsByAngle(anchor, portals, start, end) {
-  const startAngle = angle(anchor, start);
-  const endAngle = angle(anchor, end);
-
-  // swap start/end if more than 180°
-  let invert = false;
-  if (
-    (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) >
-    Math.PI
-  ) {
-    invert = true;
-  }
-
-  const good = new Map();
-  for (const p of portals) {
-    if (p.id == anchor.id) continue;
-    const pAngle = angle(anchor, p);
-
-    good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
-  }
-  // add start and end portals just in case
-  good.set(startAngle, start);
-  good.set(endAngle, end);
-
-  const sorted = new Array(...good.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map((v) => v[1]);
-
-  if (invert) {
-    sorted.reverse();
-  }
-  // Build the sequence of portals between start/end
-  const slice = new Array();
-  let s = 0;
-  for (s = 0; sorted[s].id != start.id; s++);
-  for (; sorted[s % sorted.length].id != end.id; s++) {
-    slice.push(sorted[s % sorted.length]);
-  }
-  slice.push(end);
-
-  return slice;
+export function sortPortals(anchor, portals, start, end) {
+  if (!portals.find((p) => p.id === start.id)) portals.push(start);
+  if (!portals.find((p) => p.id === end.id)) portals.push(end);
+  const sorted = sortPortalsByAngle(anchor, portals);
+  return selectAngleInterval(anchor, sorted, start, end);
 }
 
 const FanfieldDialog = AutoDraw.extend({
@@ -143,7 +99,7 @@ const FanfieldDialog = AutoDraw.extend({
       return;
     }
 
-    const steps = sortPortalsByAngle(
+    const steps = sortPortals(
       this._anchor,
       this._portalSets["set"].portals,
       this._start,
