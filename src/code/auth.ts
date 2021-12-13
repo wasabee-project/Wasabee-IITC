@@ -2,9 +2,26 @@ import { postToFirebase } from "./firebaseSupport";
 import WasabeeMe from "./model/me";
 import { oneTimeToken, SendAccessTokenAsync } from "./server";
 
+const JWT_KEY = "wasabee-jwt";
+
+function storeJWT(jwt) {
+  localStorage[JWT_KEY] = jwt;
+}
+
+export function deleteJWT() {
+  localStorage.removeItem(JWT_KEY);
+}
+
+export function getJWT() {
+  return localStorage.getItem(JWT_KEY);
+}
+
 /** wrap send access token to get me */
 export async function sendAccessToken(token: string) {
   const r = await SendAccessTokenAsync(token);
+  if (r && (r as any).jwt) {
+    storeJWT((r as any).jwt);
+  }
   return r ? new WasabeeMe(r) : await WasabeeMe.waitGet(true);
 }
 

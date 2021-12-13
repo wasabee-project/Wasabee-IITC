@@ -25,6 +25,7 @@ import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
 import { displayError } from "./error";
+import { deleteJWT } from "./auth";
 
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 import type { WLAnchor } from "./ui/anchor";
@@ -153,6 +154,8 @@ window.plugin.wasabee.init = async () => {
   window.map.on("wasabee:logout", drawAgents);
 
   window.map.on("wasabee:logout", removeNonOwnedOps);
+
+  window.map.on("wasabee:logout", deleteJWT);
 
   // when the UI is woken from sleep on many devices
   window.addResumeFunction(() => {

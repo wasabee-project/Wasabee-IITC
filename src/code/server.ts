@@ -7,6 +7,7 @@ import type WasabeePortal from "./model/portal";
 import type WasabeeAgent from "./model/agent";
 import type WasabeeTeam from "./model/team";
 import type { WDKey } from "./wd";
+import { getJWT } from "./auth";
 
 export default function () {
   return GetWasabeeServer();
@@ -546,9 +547,15 @@ async function generic<T>(request: {
     credentials: "include",
     redirect: "manual",
     referrerPolicy: "origin",
+    headers: {},
   };
   if (request.body) requestInit.body = request.body;
   if (request.headers) requestInit.headers = request.headers;
+
+  if (request.url.startsWith("/api")) {
+    const jwt = getJWT();
+    if (jwt) requestInit.headers["Authorization"] = `Bearer ${jwt}`;
+  }
 
   try {
     const response = await fetch(GetWasabeeServer() + request.url, requestInit);
