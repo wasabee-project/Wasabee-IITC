@@ -73,6 +73,7 @@ export default class WasabeeLink extends Task {
   setColor(color: string, operation: WasabeeOp) {
     this.color = color;
     if (this.color == operation.color) this.color = "main";
+    operation.update();
   }
 
   getColor(operation: WasabeeOp) {
