@@ -442,13 +442,17 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.updateBlockers();
   }
 
-  removeMarker(marker: WasabeeMarker) {
+  removeMarkerByID(markerID: MarkerID) {
     this.markers = this.markers.filter(function (listMarker) {
-      return listMarker.ID !== marker.ID;
+      return listMarker.ID !== markerID;
     });
     this.cleanPortalList();
     this.update(true);
     this.updateBlockers();
+  }
+
+  removeMarker(marker: WasabeeMarker) {
+    this.removeMarkerByID(marker.ID);
   }
 
   setMarkerComment(marker: WasabeeMarker, comment: string) {
@@ -529,6 +533,15 @@ export default class WasabeeOp extends Evented implements IOperation {
       p.hardness = hardness;
       this.update(true);
     }
+  }
+
+
+  removeLinkByID(linkID: LinkID) {
+    this.links = this.links.filter((l) => l.ID != linkID);
+    this.cleanAnchorList();
+    this.cleanPortalList();
+    this.update(true);
+    this.updateBlockers();
   }
 
   //Passed in are the start, end, and portal the link is being removed from(so the other portal can be removed if no more links exist to it)

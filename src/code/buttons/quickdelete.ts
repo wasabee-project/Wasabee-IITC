@@ -16,6 +16,7 @@ class QuickDeleteButton extends WButton {
   needWritePermission: true;
 
   handler: QuickDeleteHandler;
+  state: "off" | "on" | "instant";
 
   constructor(container: HTMLElement) {
     super(container);
@@ -23,21 +24,22 @@ class QuickDeleteButton extends WButton {
     this.title = wX("toolbar.quick_delete.title");
     this.type = QuickDeleteButton.TYPE;
 
-    this.handler = new QuickDeleteHandler();
+    this.handler = new QuickDeleteHandler(this);
 
     this.button = this._createButton({
       title: this.title,
       container: container,
       className: "wasabee-toolbar-quickdelete",
       context: this,
-      callback: this._toggleActions,
+      callback: this.toggleActions,
     });
+    this.state = "off";
 
     this.actionsContainer = this._createSubActions(this.getSubActions());
 
     this._container.appendChild(this.actionsContainer);
 
-    window.map.on("wasabee:op:change", () => this.disable());
+    window.map.on("wasabee:op:change", this.opChange, this);
 
     // update text
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
@@ -49,6 +51,28 @@ class QuickDeleteButton extends WButton {
     });
 
     this.update();
+  }
+
+  opChange() {
+    if (this.state == 'on') this.disable();
+    else if (this.state == 'instant') {
+      this.handler.disable();
+      this.handler.enable();
+    }
+  }
+
+  toggleActions() {
+    if (this.state == "off") {
+      this.enable();
+      this.state = "on";
+    } else if (this.state == "on") {
+      this.disable();
+      this.enable();
+      this.state = "instant";
+      this.button.classList.add("blink");
+    } else {
+      this.disable();
+    }
   }
 
   actionApply() {
@@ -89,15 +113,19 @@ class QuickDeleteButton extends WButton {
   }
 
   enable() {
-    WButton.prototype.enable.call(this);
+    super.enable();
     this.button.classList.add("active");
     this.handler.enable();
+    return this;
   }
 
   disable() {
-    WButton.prototype.disable.call(this);
+    super.disable();
     this.button.classList.remove("active");
+    this.button.classList.remove("blink");
     this.handler.disable();
+    this.state = "off";
+    return this;
   }
 }
 
@@ -105,10 +133,13 @@ class QuickDeleteHandler extends L.Handler {
   deletedMarker: Set<TaskID>;
   deletedLink: Set<TaskID>;
 
-  constructor() {
+  control: QuickDeleteButton;
+
+  constructor(control: QuickDeleteButton) {
     super(window.map);
     this.deletedMarker = new Set();
     this.deletedLink = new Set();
+    this.control = control;
   }
 
   clickMarker(event: LeafletMouseEvent) {
@@ -119,6 +150,11 @@ class QuickDeleteHandler extends L.Handler {
   }
 
   toggleMarker(layer: WLMarker) {
+    if (this.control.state == "instant") {
+      const operation = getSelectedOperation();
+      return operation.removeMarkerByID(layer.options.id);
+    }
+
     if (this.deletedMarker.has(layer.options.id)) {
       this.deletedMarker.delete(layer.options.id);
       layer.setOpacity(1);
@@ -136,6 +172,11 @@ class QuickDeleteHandler extends L.Handler {
   }
 
   toggleLink(layer: WLLink) {
+    if (this.control.state == "instant") {
+      const operation = getSelectedOperation();
+      return operation.removeLinkByID(layer.options.linkID);
+    }
+
     if (this.deletedLink.has(layer.options.linkID)) {
       this.deletedLink.delete(layer.options.linkID);
       layer.setStyle({
@@ -158,6 +199,9 @@ class QuickDeleteHandler extends L.Handler {
 
   toggleAnchor(layer: WLAnchor) {
     const operation = getSelectedOperation();
+    if (this.control.state == "instant")
+      return operation.removeAnchor(layer.options.portalId);
+
     const portal = operation.getPortal(layer.options.portalId);
     const links = operation.getLinkListFromPortal(portal);
     // toggle all links if all deleted
@@ -176,6 +220,15 @@ class QuickDeleteHandler extends L.Handler {
     }
   }
 
+  keyUpListener(e) {
+    if (!this.enabled()) return;
+
+    // [esc]
+    if (e.originalEvent.keyCode === 27) {
+      this.control.disable();
+    }
+  }
+
   addHooks() {
     W.portalLayerGroup.eachLayer((layer: WLAnchor) => {
       layer.on("spiderfiedclick", this.clickAnchor, this);
@@ -186,6 +239,7 @@ class QuickDeleteHandler extends L.Handler {
     W.linkLayerGroup.eachLayer((layer: WLLink) => {
       layer.on("click", this.clickLink, this);
     });
+    window.map.on("keyup", this.keyUpListener, this);
   }
 
   removeHooks() {
@@ -202,6 +256,7 @@ class QuickDeleteHandler extends L.Handler {
         opacity: window.plugin.wasabee.skin.linkStyle.opacity || 1,
       });
     });
+    window.map.off("keyup", this.keyUpListener, this);
   }
 }
 
