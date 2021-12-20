@@ -200,11 +200,13 @@ const TrawlDialog = WDialog.extend({
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:op:select", this.closeDialog, this);
     this._displayDialog();
   },
 
   // define our work in _displayDialog
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
@@ -223,6 +225,10 @@ const TrawlDialog = WDialog.extend({
     this.automark.type = "checkbox";
     this.automark.checked = false;
     this.automark.id = "wasabee-trawl-automark";
+
+    if (!operation.canWrite()) {
+      options.style.display = "none";
+    }
 
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");

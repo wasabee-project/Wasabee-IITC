@@ -51,10 +51,13 @@ const BlockerList = WDialog.extend({
     buttons[wX("OK")] = () => {
       this.closeDialog();
     };
-    buttons[wX("AUTOMARK")] = () => {
-      const operation = getSelectedOperation();
-      blockerAutomark(operation);
-    };
+    // doesn't support op select event
+    if (operation.canWrite()) {
+      buttons[wX("AUTOMARK")] = () => {
+        const operation = getSelectedOperation();
+        blockerAutomark(operation);
+      };
+    }
     buttons[wX("RESET")] = async () => {
       const operation = getSelectedOperation();
       await WasabeeBlocker.removeBlockers(operation.ID);
@@ -69,14 +72,16 @@ const BlockerList = WDialog.extend({
       const td = new TrawlDialog();
       td.enable();
     };
-    buttons["Clear Automark"] = () => {
-      const operation = getSelectedOperation();
-      operation.startBatchMode();
-      for (const m of operation.markers) {
-        if (m.comment == "auto-marked") operation.removeMarker(m);
-      }
-      operation.endBatchMode();
-    };
+    if (operation.canWrite()) {
+      buttons["Clear Automark"] = () => {
+        const operation = getSelectedOperation();
+        operation.startBatchMode();
+        for (const m of operation.markers) {
+          if (m.comment == "auto-marked") operation.removeMarker(m);
+        }
+        operation.endBatchMode();
+      };
+    }
 
     this.createDialog({
       title: wX("KNOWN_BLOCK", { opName: operation.name }),
