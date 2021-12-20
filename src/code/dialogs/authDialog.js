@@ -77,15 +77,8 @@ const AuthDialog = WDialog.extend({
       }
     }
 
-    const title = L.DomUtil.create("div", "desc", content);
-    if (this._ios) {
-      title.textContent = wX("AUTH IOS");
-    }
-
     const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.textContent = wX("LOG IN");
-    // XXX until we can figure out why IITC-M iOS doesn't set the cookie very often
-    if (this._ios) gapiButton.style.display = "none";
 
     L.DomEvent.on(gapiButton, "click", (ev) => {
       L.DomEvent.stop(ev);
@@ -102,33 +95,6 @@ const AuthDialog = WDialog.extend({
         gapiSelectButton.disabled = true;
         gapiSelectButton.textContent = "... loading ...";
         this.gsapiAuthChoose();
-      });
-    }
-
-    // webview cannot work on android IITC-M
-    if (this._ios) {
-      const webviewButton = L.DomUtil.create("button", "webview", content);
-      webviewButton.textContent = wX("WEBVIEW");
-      L.DomEvent.on(webviewButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        window.open(GetWasabeeServer());
-        webviewButton.style.display = "none";
-        postwebviewButton.style.display = "block";
-      });
-      const postwebviewButton = L.DomUtil.create("button", "webview", content);
-      postwebviewButton.textContent = wX("WEBVIEW VERIFY");
-      postwebviewButton.style.display = "none";
-      L.DomEvent.on(postwebviewButton, "click", async (ev) => {
-        L.DomEvent.stop(ev);
-        try {
-          const me = await WasabeeMe.waitGet(true);
-          this._successLogin(me);
-          postToFirebase({ id: "wasabeeLogin", method: "iOS" });
-        } catch (e) {
-          console.error(e);
-          displayError(e);
-        }
-        window.map.fire("wasabee:defensivekeys");
       });
     }
 
