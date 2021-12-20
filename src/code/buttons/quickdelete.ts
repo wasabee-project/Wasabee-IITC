@@ -7,6 +7,7 @@ import type { WLLink } from "../ui/link";
 import type { LeafletMouseEvent } from "leaflet";
 import { getSelectedOperation } from "../selectedOp";
 import type { WLAnchor } from "../ui/anchor";
+import { postToFirebase } from "../firebaseSupport";
 
 const W: Wasabee = window.plugin.wasabee;
 
@@ -65,10 +66,12 @@ class QuickDeleteButton extends WButton {
     if (this.state == "off") {
       this.enable();
       this.state = "on";
+      postToFirebase({ id: 'analytics', action: 'quickdelete' });
     } else if (this.state == "on") {
       this.disable();
       this.enable();
       this.state = "instant";
+      postToFirebase({ id: 'analytics', action: 'quickdelete:instant' });
       this.button.classList.add("blink");
     } else {
       this.disable();
