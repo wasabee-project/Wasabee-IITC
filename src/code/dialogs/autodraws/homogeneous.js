@@ -362,7 +362,7 @@ const HomogeneousDialog = AutoDraw.extend({
       "wasabee-homogeneous-deep",
       "_fullSearch",
       container,
-      false
+      true
     );
 
     const spanRedraw = L.DomUtil.create("div", null, container);

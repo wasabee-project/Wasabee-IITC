@@ -130,6 +130,7 @@ export const AutoDraw = WDialog.extend({
     checkbox.type = "checkbox";
     checkbox.id = id;
     checkbox.checked = defaultValue;
+    this[thisKey] = defaultValue;
     L.DomEvent.on(checkbox, "change", () => {
       this[thisKey] = checkbox.checked;
     });
