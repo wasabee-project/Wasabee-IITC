@@ -154,12 +154,12 @@ const OnionfieldDialog = AutoDraw.extend({
     );
 
     const optionLabel = L.DomUtil.create("label", null, container);
-    optionLabel.textContent = "Options"; // wX
+    optionLabel.textContent = wX("autodraw.onion.variant");
     this.optionMenu = L.DomUtil.create("select", null, container);
     for (const [text, value] of [
-      ["~Equilateral", "equi"],
-      ["Let it grow", "grow"],
-      ["Perfect balance", "balanced"], // need wX on first column
+      [wX("autodraw.onion.variant.equilateral"), "equi"],
+      [wX("autodraw.onion.variant.grow"), "grow"],
+      [wX("autodraw.onion.variant.balanced"), "balanced"],
     ]) {
       const option = L.DomUtil.create("option", null, this.optionMenu);
       option.value = value;
