@@ -6,6 +6,122 @@ import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
 import { displayError } from "../../error";
 
+/**
+ * Sort trangle vertices by widest angle
+ * @param {WasabeePortal} one
+ * @param {WasabeePortal} two
+ * @param {WasabeePortal} three
+ * @returns {[WasabeePortal, WasabeePortal, WasabeePortal]}
+ */
+function sortAnchors(one, two, three) {
+  const a = [
+    [one, euclideanAngle(one, two, three)],
+    [two, euclideanAngle(two, three, one)],
+    [three, euclideanAngle(three, one, two)],
+  ];
+  return a.sort((a, b) => b[1] - a[1]).map((a) => a[0]);
+}
+
+/**
+ * Returns the angle a<bc
+ * @param {WasabeePortal} a
+ * @param {WasabeePortal} b
+ * @param {WasabeePortal} c
+ * @returns
+ */
+function euclideanAngle(a, b, c) {
+  // this formua finds b, swap a&b for our purposes
+  const A = window.map.project(b.latLng);
+  const B = window.map.project(a.latLng);
+  const C = window.map.project(c.latLng);
+
+  const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+  const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+  const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+  const Z = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+  return Z;
+}
+
+/**
+ *
+ * @param {WasabeePortal} anchor
+ * @param {WasabeePortal[]} portals
+ * @param {"equi" | "balenced" | "grow"} type
+ * @returns
+ */
+function onion(anchor, portals, type) {
+  portals = portals.filter((p) => p.id !== anchor.id);
+  if (portals.length < 2) return [];
+
+  const m = new Map();
+  for (const p of portals) {
+    const pDist = window.map.distance(anchor.latLng, p.latLng);
+    m.set(pDist, p);
+  }
+  const sorted = [...m.entries()].sort((a, b) => a[0] - b[0]).map((a) => a[1]);
+
+  let [one, two, three] = sortAnchors(anchor, sorted[0], sorted[1]);
+  const path = [
+    {
+      from: two,
+      to: one,
+    },
+    {
+      from: three,
+      to: one,
+    },
+    {
+      from: three,
+      to: two,
+    },
+  ];
+
+  portals = portals.filter((p) => p.id !== two.id && p.id !== three.id);
+
+  const round = type === "grow" ? 3 : 1;
+
+  let running = round;
+  while (running > 0 && portals.length > 0) {
+    running = running - 1;
+
+    // sorted remaining by distance to one
+    const m = new Map();
+    for (const p of portals) {
+      const pDist = window.map.distance(one.latLng, p.latLng);
+      m.set(pDist, p);
+    }
+    const sorted = [...m.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map((a) => a[1]);
+
+    // for each of the portals in play
+    const wp = sorted.find((p) => portalInField(p, two, three, one));
+    if (wp) {
+      running = round;
+      portals = portals.filter((p) => p.id !== wp.id);
+
+      path.push({ from: wp, to: two });
+      path.push({ from: wp, to: three });
+      path.push({ from: wp, to: one });
+
+      if (type === "balanced") {
+        [one, two, three] = [two, three, wp];
+      } else {
+        // determine the widest angle, wp<23, use that to determine next covered portal
+        [one, two, three] = sortAnchors(two, three, wp);
+      }
+    }
+    if (running < round) {
+      if (type == "grow") {
+        // drop the widest angle constraint, take the next one
+        [one, two, three] = [two, three, one];
+      }
+    }
+  }
+  // console.log("hit bottom", thisPath.length);
+  return path;
+}
+
 const OnionfieldDialog = AutoDraw.extend({
   statics: {
     TYPE: "OnionDialog",
@@ -103,11 +219,7 @@ const OnionfieldDialog = AutoDraw.extend({
     ];
     const allPortals = getAllPortalsOnScreen(this._operation);
 
-    const links = this._recurser(
-      allPortals,
-      this._anchor,
-      this.optionMenu.value
-    );
+    const links = onion(this._anchor, allPortals, this.optionMenu.value);
 
     this._operation.startBatchMode();
     links.forEach((l, i) =>
@@ -117,110 +229,6 @@ const OnionfieldDialog = AutoDraw.extend({
       })
     );
     this._operation.endBatchMode();
-  },
-
-  // the data passing for this (portalsRemaining, thisPath)
-  // is designed to allow for determining optimum path, the fast route is quick
-  // and gets a reasonable set, optimum path determination is VERY slow and nets
-  // only a few extra layers
-  _recurser: function (portalsRemaining, start, type) {
-    portalsRemaining = portalsRemaining.filter((p) => p.id !== start.id);
-    if (portalsRemaining.length < 2) return [];
-
-    const m = new Map();
-    for (const p of portalsRemaining) {
-      const pDist = window.map.distance(start.latLng, p.latLng);
-      m.set(pDist, p);
-    }
-    const sorted = [...m.entries()]
-      .sort((a, b) => a[0] - b[0])
-      .map((a) => a[1]);
-
-    let [one, two, three] = this._sortAnchors(start, sorted[0], sorted[1]);
-    const path = [
-      {
-        from: two,
-        to: one,
-      },
-      {
-        from: three,
-        to: one,
-      },
-      {
-        from: three,
-        to: two,
-      },
-    ];
-
-    portalsRemaining = portalsRemaining.filter(
-      (p) => p.id !== two.id && p.id !== three.id
-    );
-
-    const round = type === "grow" ? 3 : 1;
-
-    let running = round;
-    while (running > 0 && portalsRemaining.length > 0) {
-      running = running - 1;
-
-      // sorted remaining by distance to one
-      const m = new Map();
-      for (const p of portalsRemaining) {
-        const pDist = window.map.distance(one.latLng, p.latLng);
-        m.set(pDist, p);
-      }
-      const sorted = [...m.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map((a) => a[1]);
-
-      // for each of the portals in play
-      const wp = sorted.find((p) => portalInField(p, two, three, one));
-      if (wp) {
-        running = round;
-        portalsRemaining = portalsRemaining.filter((p) => p.id !== wp.id);
-
-        path.push({ from: wp, to: two });
-        path.push({ from: wp, to: three });
-        path.push({ from: wp, to: one });
-
-        if (type === "balanced") {
-          [one, two, three] = [two, three, wp];
-        } else {
-          // determine the widest angle, wp<23, use that to determine next covered portal
-          [one, two, three] = this._sortAnchors(two, three, wp);
-        }
-      }
-      if (running < round) {
-        if (type == "grow") {
-          // drop the widest angle constraint, take the next one
-          [one, two, three] = [two, three, one];
-        }
-      }
-    }
-    // console.log("hit bottom", thisPath.length);
-    return path;
-  },
-
-  _sortAnchors: function (one, two, three) {
-    const a = [
-      [one, this._angle(one, two, three)],
-      [two, this._angle(two, three, one)],
-      [three, this._angle(three, one, two)],
-    ];
-    return a.sort((a, b) => b[1] - a[1]).map((a) => a[0]);
-  },
-
-  // angle a<bc in radians
-  _angle: function (a, b, c) {
-    // this formua finds b, swap a&b for our purposes
-    const A = window.map.project(b.latLng);
-    const B = window.map.project(a.latLng);
-    const C = window.map.project(c.latLng);
-
-    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
-    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
-    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
-    const Z = Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
-    return Z;
   },
 });
 
