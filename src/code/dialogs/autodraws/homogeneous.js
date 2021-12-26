@@ -338,14 +338,10 @@ const HomogeneousDialog = AutoDraw.extend({
 
     const depthLabel = L.DomUtil.create("label", null, container);
     depthLabel.textContent = wX("MAX_SPLITS");
-    this.depthMenu = L.DomUtil.create("select", null, container);
-    let dc = 2;
-    while (dc <= 6) {
-      const depthOption = L.DomUtil.create("option", null, this.depthMenu);
-      depthOption.value = dc;
-      depthOption.textContent = dc;
-      dc++;
-    } // no need for an event, we will read the value directly below
+    this.depthMenu = L.DomUtil.create("input", null, container);
+    this.depthMenu.type = "number";
+    this.depthMenu.min = 2;
+    this.depthMenu.value = 4;
 
     const orderLabel = L.DomUtil.create("label", null, container);
     orderLabel.textContent = "Order";
@@ -385,8 +381,9 @@ const HomogeneousDialog = AutoDraw.extend({
     L.DomEvent.on(drawButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this._operation = getSelectedOperation();
-      if (this._fullSearch) this.hdeepfield.call(this);
-      else this.hfield.call(this);
+      if (+this.depthMenu.value < 2) return;
+      if (this._fullSearch) this.hdeepfield();
+      else this.hfield();
     });
 
     const buttons = {};
@@ -428,7 +425,7 @@ const HomogeneousDialog = AutoDraw.extend({
       this._anchorOne,
       this._anchorTwo,
       this._anchorThree,
-      this.depthMenu.value
+      +this.depthMenu.value
     );
     console.timeEnd("HF greedy");
 
