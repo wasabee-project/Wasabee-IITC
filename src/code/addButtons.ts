@@ -6,6 +6,7 @@ import OpButton from "./buttons/opButton";
 import LinkButton from "./buttons/linkButton";
 import MarkerButton from "./buttons/markerButton";
 import UploadButton from "./buttons/uploadButton";
+import QuickDeleteButton from "./buttons/quickdelete";
 
 /* This function adds the plugin buttons on the left side of the screen */
 export function addButtons() {
@@ -23,6 +24,7 @@ export function addButtons() {
     WasabeeButton,
     OpButton,
     QuickdrawButton,
+    QuickDeleteButton,
     LinkButton,
     MarkerButton,
     SyncButton,

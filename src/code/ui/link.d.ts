@@ -1,22 +1,25 @@
 import type WasabeeOp from "../model/operation";
 import type WasabeeLink from "../model/link";
-declare function displayFormat(
+
+export function displayFormat(
   link: WasabeeLink,
   operation: WasabeeOp,
   smallScreen?: boolean
 ): HTMLDivElement;
-declare function minLevel(
+
+export function minLevel(
   link: WasabeeLink,
   operation: WasabeeOp
 ): HTMLSpanElement;
-declare class WLLink extends L.GeodesicPolyline {
+
+interface WLLinkOptions extends L.PolylineOptions {
+  opID: OpID;
+  linkID: LinkID;
+}
+
+export class WLLink extends L.GeodesicPolyline {
   _wlink: WasabeeLink;
+  options: WLLinkOptions;
   constructor(link: WasabeeLink, operation: WasabeeOp);
   _getPopup(): HTMLDivElement;
 }
-declare const _default: {
-  displayFormat: typeof displayFormat;
-  minLevel: typeof minLevel;
-  WLLink: typeof WLLink;
-};
-export default _default;
