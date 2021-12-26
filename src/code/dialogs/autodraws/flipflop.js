@@ -48,7 +48,7 @@ function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
 // to not require passing values around when we can get them from this.XXX
 const FlipFlopDialog = AutoDraw.extend({
   statics: {
-    TYPE: "madridDialog",
+    TYPE: "flipflopDialog",
   },
 
   initialize: function (options) {
@@ -89,7 +89,7 @@ const FlipFlopDialog = AutoDraw.extend({
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = wX("FANFIELD");
+    button.textContent = wX("DRAW");
     L.DomEvent.on(button, "click", () => {
       const total = this.doFanGun();
       displayInfo(`Flip flop: found ${total} links`);
