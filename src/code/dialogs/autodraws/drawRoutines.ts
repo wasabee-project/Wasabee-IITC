@@ -2,6 +2,7 @@ import type WasabeeLink from "../../model/link";
 import type WasabeeOp from "../../model/operation";
 import type WasabeePortal from "../../model/portal";
 
+// get the list of links from a spine to anchors
 function getSpineLinks(
   anchor1: WasabeePortal,
   anchor2: WasabeePortal,
@@ -25,14 +26,16 @@ function getSpineLinks(
   return linksDesc;
 }
 
+// insert an array of wasabee link into an draw after the given order
 export function insertLinks(
   op: WasabeeOp,
   links: WasabeeLink[],
-  order: number
+  order: number,
+  noShift = false
 ) {
   for (const l of links) l.order = 0;
   // shift current op tasks order
-  if (order < op.nextOrder - 1) {
+  if (!noShift && order < op.nextOrder - 1) {
     for (const l of op.links) if (l.order > order) l.order += links.length;
     for (const m of op.markers) if (m.order > order) m.order += links.length;
   }
@@ -40,6 +43,7 @@ export function insertLinks(
   return order;
 }
 
+// draw a spine into an op, with order and comment
 export function drawSpine(
   op: WasabeeOp,
   anchor1: WasabeePortal,
@@ -63,5 +67,5 @@ export function drawSpine(
     )
     .filter((l) => l);
 
-  return insertLinks(op, wlinks, order);
+  return insertLinks(op, wlinks, order, options.noShift);
 }
