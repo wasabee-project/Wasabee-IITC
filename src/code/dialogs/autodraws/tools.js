@@ -93,7 +93,7 @@ export const AutoDraw = WDialog.extend({
     }
   },
 
-  _addSetPortal: function (text, thisKey, container, storageKey) {
+  _addSetPortal: function (text, thisKey, container, storageKey, callback) {
     const label = L.DomUtil.create("label", "set-portal-label", container);
     label.textContent = text;
     const button = L.DomUtil.create("button", "set-portal-button", container);
@@ -119,6 +119,7 @@ export const AutoDraw = WDialog.extend({
         display.textContent = wX("NOT_SET");
         displayError(wX("PLEASE_SELECT_PORTAL"));
       }
+      if (callback) callback();
     });
   },
 

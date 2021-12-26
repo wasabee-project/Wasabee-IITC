@@ -92,6 +92,10 @@ function sortByDistance(portals, point) {
   return portals.sort((a, b) => cPs.get(a.id) - cPs.get(b.id));
 }
 
+function numInnerPortalsPerDepth(depth) {
+  return (3 ** (depth - 1) - 1) / 2;
+}
+
 /**
  * Find one of the best (in terms of splits) HF configuration as a Tree decomposition
  * @param {WasabeePortal[]} portalsCovered
@@ -103,11 +107,10 @@ function sortByDistance(portals, point) {
  */
 function fullRecurser(portalsCovered, one, two, three, depth) {
   const alreadyCalculatedCover = new Map();
-  const getNbSplitPerDepth = (depth) => (3 ** (depth - 1) - 1) / 2;
 
   console.log(
     "Expect at least",
-    Math.max(0, getNbSplitPerDepth(depth) - portalsCovered.length),
+    Math.max(0, numInnerPortalsPerDepth(depth) - portalsCovered.length),
     "missing splits"
   );
 
@@ -127,7 +130,7 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
     const key = [depth, one.id, two.id, three.id].sort().toString();
     if (alreadyCalculatedCover.get(key) === undefined) {
       const maxNbSplit = Math.min(
-        getNbSplitPerDepth(depth),
+        numInnerPortalsPerDepth(depth),
         portalsCovered.length
       );
       /** @type {import("./homogeneous").Tree} */
@@ -148,9 +151,9 @@ function fullRecurser(portalsCovered, one, two, three, depth) {
           three
         );
         const maxNbSplitSubregions =
-          Math.min(getNbSplitPerDepth(depth - 1), subregions[0].length) +
-          Math.min(getNbSplitPerDepth(depth - 1), subregions[1].length) +
-          Math.min(getNbSplitPerDepth(depth - 1), subregions[2].length);
+          Math.min(numInnerPortalsPerDepth(depth - 1), subregions[0].length) +
+          Math.min(numInnerPortalsPerDepth(depth - 1), subregions[1].length) +
+          Math.min(numInnerPortalsPerDepth(depth - 1), subregions[2].length);
         if (maxNbSplitSubregions + 1 <= bestResult.split) {
           // Skip the portal since it will induce less splits than the current best choice
           continue;
@@ -305,6 +308,21 @@ const HomogeneousDialog = AutoDraw.extend({
     this._layerGroup = new L.LayerGroup();
     window.addLayerGroup("Wasabee H-G Debug", this._layerGroup, true);
     this._displayDialog();
+    this._updatePortalSet();
+  },
+
+  _updatePortalSet: function () {
+    AutoDraw.prototype._updatePortalSet.call(this);
+    if (this._anchorOne && this._anchorTwo && this._anchorThree) {
+      this._portalSets.portals.portals =
+        this._portalSets.portals.portals.filter((p) =>
+          portalInField(this._anchorOne, this._anchorTwo, this._anchorThree, p)
+        );
+
+      this._portalSets.portals.display.textContent = wX("PORTAL_COUNT", {
+        count: this._portalSets.portals.portals.length,
+      });
+    }
   },
 
   removeHooks: function () {
@@ -321,20 +339,26 @@ const HomogeneousDialog = AutoDraw.extend({
       wX("ANCHOR_PORTAL"),
       "_anchorOne",
       container,
-      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY
+      window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY,
+      this._updatePortalSet.bind(this)
     );
     this._addSetPortal(
       wX("ANCHOR_PORTAL2"),
       "_anchorTwo",
       container,
-      window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY
+      window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY,
+      this._updatePortalSet.bind(this)
     );
     this._addSetPortal(
       wX("ANCHOR_PORTAL3"),
       "_anchorThree",
       container,
-      window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY
+      window.plugin.wasabee.static.constants.ANCHOR_THREE_KEY,
+      this._updatePortalSet.bind(this)
     );
+
+    this._addSelectSet(wX("AUTODRAW_PORTALS_SET"), "portals", container, "all");
+    this.spanPortalNeeded = L.DomUtil.create("span", "", container);
 
     const depthLabel = L.DomUtil.create("label", null, container);
     depthLabel.textContent = wX("MAX_SPLITS");
@@ -342,6 +366,12 @@ const HomogeneousDialog = AutoDraw.extend({
     this.depthMenu.type = "number";
     this.depthMenu.min = 2;
     this.depthMenu.value = 4;
+
+    L.DomEvent.on(this.depthMenu, "change", () => {
+      this.spanPortalNeeded.textContent = `(${numInnerPortalsPerDepth(
+        +this.depthMenu.value
+      )} needed)`;
+    });
 
     const orderLabel = L.DomUtil.create("label", null, container);
     orderLabel.textContent = "Order";
@@ -430,7 +460,7 @@ const HomogeneousDialog = AutoDraw.extend({
     console.timeEnd("HF greedy");
 
     this._tree = tree;
-    this._failed = (3 ** (+this.depthMenu.value - 1) - 1) / 2 - tree.split;
+    this._failed = numInnerPortalsPerDepth(+this.depthMenu.value) - tree.split;
 
     this._draw();
 
@@ -467,7 +497,8 @@ const HomogeneousDialog = AutoDraw.extend({
     console.timeEnd("HF deep recurser");
 
     this._tree = tree;
-    this._failed = (3 ** (+this.depthMenu.value - 1) - 1) / 2 - tree.split;
+    this._failed =
+      numInnerPortalsPerDepth(+this.depthMenu.value) / 2 - tree.split;
 
     this._draw();
 
