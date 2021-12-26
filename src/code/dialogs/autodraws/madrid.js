@@ -8,8 +8,48 @@ import { drawSpine, insertLinks } from "./drawRoutines";
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 
-// now that the formerly external mm functions are in the class, some of the logic can be cleaned up
-// to not require passing values around when we can get them from this.XXX
+/**
+ * Return the spines in set 1, 2 and 3:
+ *  - 1: starting from anchorOne, with anchorTwo and last portal of spine 3 as anchors
+ *  - 2: starting from anchortwo, with last portals of spines 1/3 as anchors
+ *  - 3: in set 3, with anchorOne and anchorTwo as anchors
+ * Spines are thrown in order 3-1-2
+ * @param {WasabeePortal} anchorOne
+ * @param {WasabeePortal} anchorTwo
+ * @param {WasabeePortal[]} setOne
+ * @param {WasabeePortal[]} setTwo
+ * @param {WasabeePortal[]} setThree
+ * @returns {[WasabeePortal[], WasabeePortal[], WasabeePortal[]]}
+ */
+function getSpines(anchorOne, anchorTwo, setOne, setTwo, setThree) {
+  const [spineThree] = getSignedSpine(anchorOne, anchorTwo, setThree, false);
+  const lastThree = spineThree[spineThree.length - 1];
+
+  const [spineOne] = getSignedSpine(
+    anchorTwo,
+    lastThree,
+    setOne.filter(
+      (p) =>
+        anchorOne.id == p.id ||
+        portalInField(anchorTwo, lastThree, p, anchorOne)
+    ),
+    false
+  );
+  const lastOne = spineOne[spineOne.length - 1];
+
+  const [spineTwo] = getSignedSpine(
+    lastThree,
+    lastOne,
+    setTwo.filter(
+      (p) =>
+        anchorTwo.id == p.id || portalInField(lastThree, lastOne, p, anchorTwo)
+    ),
+    false
+  );
+
+  return [spineOne, spineTwo, spineThree];
+}
+
 const MadridDialog = AutoDraw.extend({
   statics: {
     TYPE: "madridDialog",
@@ -115,36 +155,6 @@ const MadridDialog = AutoDraw.extend({
     });
   },
 
-  getSpines: function (anchorOne, anchorTwo, setOne, setTwo, setThree) {
-    const [spineThree] = getSignedSpine(anchorOne, anchorTwo, setThree, false);
-    const lastThree = spineThree[spineThree.length - 1];
-
-    const [spineOne] = getSignedSpine(
-      anchorTwo,
-      lastThree,
-      setOne.filter(
-        (p) =>
-          anchorOne.id == p.id ||
-          portalInField(anchorTwo, lastThree, p, anchorOne)
-      ),
-      false
-    );
-    const lastOne = spineOne[spineOne.length - 1];
-
-    const [spineTwo] = getSignedSpine(
-      lastThree,
-      lastOne,
-      setTwo.filter(
-        (p) =>
-          anchorTwo.id == p.id ||
-          portalInField(lastThree, lastOne, p, anchorTwo)
-      ),
-      false
-    );
-
-    return [spineOne, spineTwo, spineThree];
-  },
-
   doBalancedMadrid: function () {
     // Calculate the multimax
     if (
@@ -171,7 +181,7 @@ const MadridDialog = AutoDraw.extend({
     )
       this._portalSets.setTwo.portals.push(this._anchorTwo);
 
-    const spines = this.getSpines(
+    const spines = getSpines(
       this._anchorOne,
       this._anchorTwo,
       this._portalSets.setOne.portals,
@@ -260,7 +270,7 @@ const MadridDialog = AutoDraw.extend({
     )
       this._portalSets.setTwo.portals.push(this._anchorTwo);
 
-    const spines = this.getSpines(
+    const spines = getSpines(
       this._anchorOne,
       this._anchorTwo,
       this._portalSets.setOne.portals,
