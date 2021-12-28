@@ -22,6 +22,7 @@ function getSpineLinks(
     linksDesc.push({ from: p, to: anchor2 });
     if (options.backlink && prev)
       linksDesc.push({ from: p, to: prev, back: true });
+    prev = p;
   }
   return linksDesc;
 }
