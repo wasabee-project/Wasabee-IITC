@@ -60,7 +60,7 @@ export function getAccessToken(selectAccount = false) {
             response.error == "immediate_failed"
           ) {
             // retry with account selection
-            return getAccessToken(true);
+            return resolve(getAccessToken(true));
           }
         }
 
