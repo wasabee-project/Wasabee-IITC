@@ -9,7 +9,7 @@ import { displayInfo } from "./error";
 export function setupToolbox() {
   const toolbox = document.getElementById("toolbox");
 
-  const aboutLink = L.DomUtil.create("a", null, toolbox);
+  const aboutLink = L.DomUtil.create("a", "wasabee", toolbox);
   aboutLink.href = "#";
   aboutLink.textContent = wX("ABOUT_WASABEE");
   L.DomEvent.on(aboutLink, "click", (ev) => {
@@ -18,7 +18,7 @@ export function setupToolbox() {
     ad.enable();
   });
 
-  const settingsLink = L.DomUtil.create("a", null, toolbox);
+  const settingsLink = L.DomUtil.create("a", "wasabee", toolbox);
   settingsLink.href = "#";
   settingsLink.textContent = wX("SETTINGS");
 
@@ -28,7 +28,7 @@ export function setupToolbox() {
     sd.enable();
   });
 
-  const locationLink = L.DomUtil.create("a", null, toolbox);
+  const locationLink = L.DomUtil.create("a", "wasabee", toolbox);
   locationLink.textContent = wX("SEND_LOC");
   L.DomEvent.on(locationLink, "click", (ev) => {
     L.DomEvent.stop(ev);
@@ -50,7 +50,7 @@ export function setupToolbox() {
     );
   });
 
-  const onlineAgentLink = L.DomUtil.create("a", null, toolbox);
+  const onlineAgentLink = L.DomUtil.create("a", "wasabee", toolbox);
   onlineAgentLink.textContent = "Teammates Online";
   L.DomEvent.on(onlineAgentLink, "click", (ev) => {
     L.DomEvent.stop(ev);

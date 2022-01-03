@@ -3,15 +3,12 @@ import WasabeeMe from "../model/me";
 import TeamListDialog from "../dialogs/teamListDialog";
 import OpsDialog from "../dialogs/opsDialog";
 import AuthDialog from "../dialogs/authDialog";
-import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-import { resetOps, setupLocalStorage } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
 import { postToFirebase } from "../firebaseSupport";
-import { resetCaches } from "../uiCommands";
 import { displayError } from "../error";
 
 const WasabeeButton = WButton.extend({
@@ -146,25 +143,6 @@ const WasabeeButton = WButton.extend({
           this.disable();
           const nb = new NewopDialog();
           nb.enable();
-        },
-        context: this,
-      },
-      {
-        title: wX("CLEAROPS BUTTON TITLE"),
-        text: wX("CLEAROPS BUTTON"),
-        callback: () => {
-          this.disable();
-          const con = new ConfirmDialog({
-            title: wX("CLEAROPS BUTTON TITLE"),
-            label: wX("CLEAROPS PROMPT"),
-            type: "operation",
-            callback: async () => {
-              await resetCaches();
-              await resetOps();
-              await setupLocalStorage();
-            },
-          });
-          con.enable();
         },
         context: this,
       },

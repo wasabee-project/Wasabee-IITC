@@ -1,4 +1,4 @@
-import { openDB } from "idb";
+import { deleteDB, openDB } from "idb";
 
 import type { DBSchema } from "idb";
 import type WasabeeAgent from "./model/agent";
@@ -108,5 +108,10 @@ const db = openDB<WasabeeDB>("wasabee", version, {
     console.debug(newVersion, tx);
   },
 });
+
+export async function deleteDatabase() {
+  (await db).close();
+  return deleteDB("wasabee");
+}
 
 export default db;

@@ -4,6 +4,7 @@ import WasabeeMe from "../model/me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
+import { clearAllData } from "../uiCommands";
 
 const SettingsDialog = WDialog.extend({
   statics: {
@@ -206,6 +207,10 @@ const SettingsDialog = WDialog.extend({
     const buttons = {};
     buttons[wX("OK")] = () => {
       this.closeDialog();
+    };
+    buttons[wX("CLEAROPS BUTTON")] = () => {
+      this.closeDialog();
+      clearAllData();
     };
 
     this.createDialog({

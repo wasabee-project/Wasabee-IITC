@@ -32,6 +32,7 @@ import type { WLLink } from "./ui/link";
 import type { WLMarker } from "./ui/marker";
 import type { WLAgent } from "./ui/agent";
 import type { WLZone } from "./ui/zone";
+import type { ButtonsControl } from "./leafletClasses";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -47,6 +48,9 @@ export interface Wasabee {
   agentLayerGroup: LayerGroup<WLAgent>;
   zoneLayerGroup: FeatureGroup<WLZone>;
   backgroundOpsGroup: LayerGroup;
+  buttons: ButtonsControl;
+  defensiveLayers: LayerGroup;
+  crossLinkLayers: LayerGroup;
 }
 
 const Wasabee: Wasabee = window.plugin.wasabee;

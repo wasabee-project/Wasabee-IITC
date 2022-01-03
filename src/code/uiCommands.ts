@@ -24,6 +24,9 @@ import {
   displayWarning,
   ServerError,
 } from "./error";
+import { deleteDatabase } from "./db";
+import { constants } from "./static";
+import type { Wasabee } from "./init";
 
 export function addPortal(operation: WasabeeOp, portal: WasabeePortal) {
   if (!portal) {
@@ -585,10 +588,65 @@ export function deleteLocalOp(opname: string, opid: OpID) {
   con.enable();
 }
 
-export async function resetCaches() {
-  await window.plugin.wasabee.idb.clear("agents");
-  await window.plugin.wasabee.idb.clear("teams");
-  await window.plugin.wasabee.idb.clear("defensivekeys");
+export function clearAllData() {
+  const con = new ConfirmDialog({
+    title: wX("CLEAROPS BUTTON TITLE"),
+    label: wX("CLEAROPS PROMPT"),
+    type: "operation",
+    callback: async () => {
+      // remove database
+      deleteDatabase();
+      // cleanup localStorage
+      for (const key of [
+        constants.SELECTED_OP_KEY,
+        constants.OPS_LIST_KEY,
+        constants.OPS_LIST_HIDDEN_KEY,
+        constants.OPS_SHOW_HIDDEN_OPS,
+        constants.SEND_LOCATION_KEY,
+        constants.SEND_ANALYTICS_KEY,
+        constants.EXPERT_MODE_KEY,
+        constants.LANGUAGE_KEY,
+        constants.AGENT_INFO_KEY,
+        constants.MULTIMAX_UNREACHABLE_KEY,
+        constants.LINK_SOURCE_KEY,
+        constants.ANCHOR_ONE_KEY,
+        constants.ANCHOR_TWO_KEY,
+        constants.ANCHOR_THREE_KEY,
+        constants.PORTAL_DETAIL_RATE_KEY,
+        constants.SKIN_KEY,
+        constants.LAST_MARKER_KEY,
+        constants.AUTO_LOAD_FAKED,
+        constants.TRAWL_SKIP_STEPS,
+        constants.USE_PANES,
+        constants.SKIP_CONFIRM,
+        constants.SERVER_BASE_KEY,
+        constants.REBASE_UPDATE_KEY,
+      ]) {
+        delete localStorage[key];
+      }
+
+      const Wasabee: Wasabee = window.plugin.wasabee;
+
+      // remove buttons
+      Wasabee.buttons.remove();
+
+      // remove toolbox
+      document
+        .querySelectorAll("#toolbox a.wasabee")
+        .forEach((e) => e.remove());
+
+      // remove layers
+      window.removeLayerGroup(Wasabee.portalLayerGroup);
+      window.removeLayerGroup(Wasabee.linkLayerGroup);
+      window.removeLayerGroup(Wasabee.markerLayerGroup);
+      window.removeLayerGroup(Wasabee.agentLayerGroup);
+      window.removeLayerGroup(Wasabee.zoneLayerGroup);
+      window.removeLayerGroup(Wasabee.backgroundOpsGroup);
+      window.removeLayerGroup(Wasabee.defensiveLayers);
+      window.removeLayerGroup(Wasabee.crossLinkLayers);
+    },
+  });
+  con.enable();
 }
 
 export function setMarkersToZones() {
