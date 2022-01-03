@@ -66,7 +66,7 @@
   "CLEAR_EVERYTHING": "Supprimer Portails/Links et Marquers",
   "CLEAROPS BUTTON TITLE": "Supprimer TOUTES les données Wasabee",
   "CLEAROPS BUTTON": "Supprimer les données Wasabee",
-  "CLEAROPS PROMPT": "Toutes les opérations et données relatives à Wasabee seront supprimées de cet appareil. Seules les données présentes sur le/les serveurs seront récupérées à la prochaine synchronisation.",
+  "CLEAROPS PROMPT": "Toutes les opérations et données relatives à Wasabee seront supprimées de cet appareil. Seules les données présentes sur le/les serveurs seront récupérées à la prochaine synchronisation. Wasabee sera désactivé jusqu'au prochain rechargement d'IITC.",
   "CLOSE": "Fermer",
   "COMMENT": "Commentaire",
   "COMPLETED BY": "Fait par {agentName}",

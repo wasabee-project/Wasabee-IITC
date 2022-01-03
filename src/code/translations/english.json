@@ -67,7 +67,7 @@
   "CLEAR": "Clear selection",
   "CLEAROPS BUTTON TITLE": "Clear Data",
   "CLEAROPS BUTTON": "Clear Data",
-  "CLEAROPS PROMPT": "Clear all local OPS. Ops will be restored at next download.",
+  "CLEAROPS PROMPT": "Clear all local OPS. Ops will be restored at next download. Wasabee will be disabled until next page reload.",
   "CLOSE": "Close",
   "COMMENT": "Comment",
   "COMPLETED BY": "Completed by {agentName}",
