@@ -172,6 +172,8 @@ const AuthDialog = WDialog.extend({
       postToFirebase({ id: "wasabeeLogin", method: "gapiAuth" });
       this._successLogin(me);
     } catch (e) {
+      this.disable();
+      this.enable();
       if (e instanceof ServerError) {
         displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
       } else {
@@ -188,6 +190,8 @@ const AuthDialog = WDialog.extend({
       postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
       this._successLogin(me);
     } catch (e) {
+      this.disable();
+      this.enable();
       if (e instanceof ServerError) {
         displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
       } else {
