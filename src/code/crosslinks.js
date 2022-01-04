@@ -201,6 +201,13 @@ function testLink(link, operation) {
         operation
       );
       operation.addBlocker(blocker); // op.update() is called here
+      // highlight the drawnLink as crossing a real link
+      const blocked = L.geodesicPolyline(
+        drawnLink.getLatLngs(operation),
+        window.plugin.wasabee.skin.selfBlockStyle
+      );
+      blocked.options.interactive = false;
+      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
       break;
     }
   }
