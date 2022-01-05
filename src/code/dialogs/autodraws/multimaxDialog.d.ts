@@ -6,21 +6,7 @@ export default class MultimaxDialog extends AutoDraw {
   _anchorTwo: WasabeePortal;
   _flcheck: boolean;
   _orderFromEnd: boolean;
-  _urp: L.LatLng;
+  _bothSide: boolean;
 
   constructor();
-  MM(
-    pOne: WasabeePortal,
-    pTwo: WasabeePortal,
-    portals: WasabeePortal[],
-    order?: number,
-    base?: boolean,
-    commentPrefix?: string
-  ): any[];
-  fieldCoversPortal(a: any, b: any, c: any, p: any): boolean;
-  getSpine(
-    one: WasabeePortal,
-    two: WasabeePortal,
-    portals: WasabeePortal[]
-  ): WasabeePortal[];
 }

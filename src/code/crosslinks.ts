@@ -4,18 +4,36 @@ import WasabeeBlocker from "./model/blocker";
 import { getSelectedOperation } from "./selectedOp";
 
 import PortalUI from "./ui/portal";
+import type WasabeeOp from "./model/operation";
+import type { IITC } from "../types/iitc";
+import type WasabeeLink from "./model/link";
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
+const r2d = 180 / Math.PI;
 
-function toCartesian(lat: number, lng: number): [number, number, number] {
+type Vec3 = [number, number, number];
+interface LLC extends L.LatLng {
+  _cartesian?: Vec3;
+}
+
+function toCartesian(lat: number, lng: number): Vec3 {
   lat *= d2r;
   lng *= d2r;
   var o = Math.cos(lat);
   return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
 }
 
-function cross(t: [number, number, number], n: [number, number, number]): [number, number, number] {
+export function toLatLng(xyz: Vec3): LLC {
+  const lat = Math.atan2(xyz[2], Math.sqrt(xyz[0] * xyz[0] + xyz[1] * xyz[1]));
+  const lng = Math.atan2(xyz[1], xyz[0]);
+
+  const ll: LLC = L.latLng({ lat: lat * r2d, lng: lng * r2d });
+  ll._cartesian = [...xyz];
+  return ll;
+}
+
+function cross(t: Vec3, n: Vec3): Vec3 {
   return [
     t[1] * n[2] - t[2] * n[1],
     t[2] * n[0] - t[0] * n[2],
@@ -23,8 +41,34 @@ function cross(t: [number, number, number], n: [number, number, number]): [numbe
   ];
 }
 
-function dot(t: [number, number, number], n: [number, number, number]) {
+function dot(t: Vec3, n: Vec3) {
   return t[0] * n[0] + t[1] * n[1] + t[2] * n[2];
+}
+
+function det(a: Vec3, b: Vec3, c: Vec3) {
+  return dot(cross(a, b), c);
+}
+
+function norm2(a: Vec3) {
+  return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+}
+
+function norm(a: Vec3) {
+  return Math.hypot(...a);
+}
+
+// where is the fast inverse square root when we need it ?
+export function normalize(a: Vec3): Vec3 {
+  const n = 1 / norm(a);
+  return [a[0] * n, a[1] * n, a[2] * n];
+}
+
+export function dist2(a: Vec3, b: Vec3) {
+  return norm2([
+    a[0] - b[0],
+    a[1] - b[1],
+    a[2] - b[2],
+  ])
 }
 
 function equals(a: L.LatLng, b: L.LatLng) {
@@ -33,11 +77,64 @@ function equals(a: L.LatLng, b: L.LatLng) {
 
 // take L.LatLng
 // note: cache cos/sin calls in the object, in order to be efficient, try using same LatLng objects across calls, like using latLng from WasabeePortal attached to an op
-interface LLC extends L.LatLng {
-  _cartesian?: [number, number, number],
+
+export function extendLatLngToLLC(ll: LLC) {
+  if (ll._cartesian) return ll;
+  ll._cartesian = toCartesian(ll.lat, ll.lng);
+  return ll;
 }
 
-export function greatCircleArcIntersectByLatLngs(a0: LLC, a1: LLC, b0: LLC, b1: LLC) {
+export function fieldSign(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal
+) {
+  const ca = extendLatLngToLLC(a.latLng)._cartesian;
+  const cb = extendLatLngToLLC(b.latLng)._cartesian;
+  const cc = extendLatLngToLLC(c.latLng)._cartesian;
+  if (det(ca, cb, cc) > 0) return 1;
+  return -1;
+}
+
+export function portalInField(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal,
+  portal: WasabeePortal
+) {
+  const sign = fieldSign(a, b, c);
+  return (
+    fieldSign(a, b, portal) * sign > 0 &&
+    fieldSign(b, c, portal) * sign > 0 &&
+    fieldSign(c, a, portal) * sign > 0
+  );
+}
+
+export function fieldCenter(
+  a: WasabeePortal,
+  b: WasabeePortal,
+  c: WasabeePortal
+) {
+  const ca = extendLatLngToLLC(a.latLng)._cartesian;
+  const cb = extendLatLngToLLC(b.latLng)._cartesian;
+  const cc = extendLatLngToLLC(c.latLng)._cartesian;
+  const ccenter: Vec3 = [
+    ca[0] + cb[0] + cc[0],
+    ca[1] + cb[1] + cc[1],
+    ca[2] + cb[2] + cc[2],
+  ];
+  return toLatLng(ccenter);
+}
+
+export function greatCircleArcIntersectByLatLngs(a0: LLC[], a1: LLC[]): boolean;
+export function greatCircleArcIntersectByLatLngs(
+  a0: LLC,
+  a1: LLC,
+  b0: LLC,
+  b1: LLC
+): boolean;
+export function greatCircleArcIntersectByLatLngs(...args: (LLC | LLC[])[]) {
+  const [a0, a1, b0, b1] = args.flat();
   // 0) quick checks
   // zero length line
   if (equals(a0, a1)) return false;
@@ -52,18 +149,10 @@ export function greatCircleArcIntersectByLatLngs(a0: LLC, a1: LLC, b0: LLC, b1: 
   if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
 
   // a) convert into 3D coordinates on a unit sphere & cache into latLng object
-  const ca0 = (a0._cartesian = a0._cartesian
-    ? a0._cartesian
-    : toCartesian(a0.lat, a0.lng));
-  const ca1 = (a1._cartesian = a1._cartesian
-    ? a1._cartesian
-    : toCartesian(a1.lat, a1.lng));
-  const cb0 = (b0._cartesian = b0._cartesian
-    ? b0._cartesian
-    : toCartesian(b0.lat, b0.lng));
-  const cb1 = (b1._cartesian = b1._cartesian
-    ? b1._cartesian
-    : toCartesian(b1.lat, b1.lng));
+  const ca0 = extendLatLngToLLC(a0)._cartesian;
+  const ca1 = extendLatLngToLLC(a1)._cartesian;
+  const cb0 = extendLatLngToLLC(b0)._cartesian;
+  const cb1 = extendLatLngToLLC(b1)._cartesian;
 
   // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
   // find the intersetion line
@@ -123,21 +212,17 @@ export function greatCircleArcIntersectByLatLngs(a0: LLC, a1: LLC, b0: LLC, b1: 
   return false;
 }
 
-// takes WasabeeLink or L.geodesicPolyline format
-export function greatCircleArcIntersect(existing, drawn) {
-  const eLL = existing.getLatLngs();
-  const dLL = drawn.getLatLngs();
-
-  const a0 = eLL[0];
-  const a1 = eLL[1];
-  const b0 = dLL[0];
-  const b1 = dLL[1];
-
-  return greatCircleArcIntersectByLatLngs(a0, a1, b0, b1);
-}
-
-function testPolyLine(wasabeeLink, realLink, operation) {
-  if (greatCircleArcIntersect(realLink, wasabeeLink)) {
+function testPolyLine(
+  wasabeeLink: WasabeeLink,
+  realLink: IITC.Link,
+  operation: WasabeeOp
+) {
+  if (
+    greatCircleArcIntersectByLatLngs(
+      realLink.getLatLngs(),
+      wasabeeLink.getLatLngs(operation)
+    )
+  ) {
     if (!operation.markers || operation.markers.length == 0) {
       return true;
     }
@@ -161,9 +246,9 @@ function testPolyLine(wasabeeLink, realLink, operation) {
   return false;
 }
 
-function showCrossLink(link, operation) {
+function showCrossLink(link: IITC.Link) {
   // this should be in static.js or skin
-  const blocked = L.geodesicPolyline(link.getLatLngs(operation), {
+  const blocked = L.geodesicPolyline(link.getLatLngs(), {
     color: "#d22",
     opacity: 0.7,
     weight: 5,
@@ -176,7 +261,7 @@ function showCrossLink(link, operation) {
   window.plugin.wasabee._crosslinkCache.set(link.options.guid, blocked);
 }
 
-function testLink(link, operation) {
+function testLink(link: IITC.Link, operation: WasabeeOp) {
   // if the crosslink already exists, do not recheck
   if (window.plugin.wasabee._crosslinkCache.has(link.options.guid)) {
     return;
@@ -184,7 +269,7 @@ function testLink(link, operation) {
 
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
-      showCrossLink(link, operation);
+      showCrossLink(link);
       let fromPortal = PortalUI.get(link.options.data.oGuid);
       if (!fromPortal)
         fromPortal = WasabeePortal.fake(
@@ -205,18 +290,19 @@ function testLink(link, operation) {
   }
 }
 
-function testSelfBlock(incoming, operation) {
+export function testSelfBlock(incoming: WasabeeLink, operation: WasabeeOp) {
   for (const against of operation.links) {
     if (incoming.ID == against.ID) continue;
-    if (greatCircleArcIntersect(against, incoming)) {
-      const blocked = L.geodesicPolyline(
+    if (
+      greatCircleArcIntersectByLatLngs(
         against.getLatLngs(operation),
-        window.plugin.wasabee.skin.selfBlockStyle
-      );
-      blocked.options.interactive = false;
-      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
+        incoming.getLatLngs(operation)
+      )
+    ) {
+      return true;
     }
   }
+  return false;
 }
 
 // lets see if using a generator makes the GUI more responsive on large ops
@@ -247,12 +333,19 @@ export function checkAllLinks() {
   }
 
   for (const l of operation.links) {
-    testSelfBlock(l, operation);
+    if (testSelfBlock(l, operation)) {
+      const blocked = L.geodesicPolyline(
+        l.getLatLngs(operation),
+        window.plugin.wasabee.skin.selfBlockStyle
+      );
+      blocked.options.interactive = false;
+      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
+    }
   }
   window.map.fire("wasabee:crosslinks:done");
 }
 
-function onLinkAdded(data) {
+function onLinkAdded(data: EventLinkAdded) {
   testLink(data.link, getSelectedOperation());
 }
 
@@ -333,9 +426,9 @@ export class GeodesicLine {
     return this.lng1 == this.lng2;
   }
 
-  latAtLng(lng) {
+  latAtLng(lng: number) {
     lng = (lng * Math.PI) / 180; //to radians
-    let lat;
+    let lat: number;
     // if we're testing the start/end point, return that directly rather than calculating
     // 1. this may be fractionally faster, no complex maths
     // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
@@ -347,7 +440,7 @@ export class GeodesicLine {
       lat = Math.atan(
         (this.sinLat1CosLat2 * Math.sin(lng - this.lng2) -
           this.sinLat2CosLat1 * Math.sin(lng - this.lng1)) /
-        this.cosLat1CosLat2SinDLng
+          this.cosLat1CosLat2SinDLng
       );
     }
     return (lat * 180) / Math.PI; // return value in degrees

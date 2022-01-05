@@ -13,6 +13,7 @@ import db from "../db";
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
 import { displayWarning } from "../error";
+import { fieldSign, portalInField } from "../crosslinks";
 
 export type KeyOnHand = {
   portalId: string;
@@ -1574,5 +1575,88 @@ export default class WasabeeOp extends Evented implements IOperation {
     }
     // default to primary zone
     return 1;
+  }
+
+  getOrderInfo() {
+    const links = Array.from(this.links);
+    links.sort((a, b) => a.order - b.order);
+
+    // map portal id to link they got covered
+    const coveredPortals = new Map<PortalID, WasabeeLink>();
+    const linksFromInner: WasabeeLink[] = [];
+
+    let fieldCount = 0;
+    let emptyCount = 0;
+
+    // maps a portal id to its linked portals
+    const portalLinks = new Map<PortalID, Set<LinkID>>();
+    const emptyFieldLinks: [WasabeeLink, number][] = [];
+    for (const link of links) {
+      if (!portalLinks.has(link.fromPortalId))
+        portalLinks.set(link.fromPortalId, new Set());
+      if (!portalLinks.has(link.toPortalId))
+        portalLinks.set(link.toPortalId, new Set());
+      const a = portalLinks.get(link.fromPortalId);
+      const b = portalLinks.get(link.toPortalId);
+
+      // common neighbors portal
+      const intersect = new Set<PortalID>();
+      for (const p of a) if (b.has(p)) intersect.add(p);
+
+      // update the mapping
+      a.add(link.toPortalId);
+      b.add(link.fromPortalId);
+
+      // ignore link with order 0
+      if (link.order > 0) {
+        // the link closes at least one field
+        const p1 = this.getPortal(link.fromPortalId);
+        const p2 = this.getPortal(link.toPortalId);
+        const positive: WasabeePortal[] = [];
+        const negative: WasabeePortal[] = [];
+        // ignore earth curvature (todo: use it)
+        for (const pid of intersect) {
+          const p = this.getPortal(pid);
+          const sign = fieldSign(p, p1, p2);
+          if (sign > 0) positive.push(p);
+          else negative.push(p);
+        }
+        if (positive.length) fieldCount += 1;
+        if (negative.length) fieldCount += 1;
+        // if the link closes multiple fields on the same side of the link, we have empty fields.
+        // doesn't support crossed links configuration yet
+        if (positive.length > 1 || negative.length > 1) {
+          let count = 0;
+          if (positive.length > 1) count += positive.length - 1;
+          if (negative.length > 1) count += negative.length - 1;
+          emptyFieldLinks.push([link, count]);
+          emptyCount += count;
+        }
+
+        // record covering time
+        for (const pid of intersect) {
+          const p = this.getPortal(pid);
+          for (const a of this.anchors) {
+            if (a === pid || a === p1.id || a === p2.id) continue;
+            if (!coveredPortals.has(a)) {
+              const ap = this.getPortal(a);
+              if (portalInField(p1, p2, p, ap)) coveredPortals.set(a, link);
+            }
+          }
+        }
+      }
+
+      if (coveredPortals.has(link.fromPortalId)) {
+        linksFromInner.push(link);
+      }
+    }
+
+    return {
+      fieldCount,
+      emptyFieldLinks,
+      emptyCount,
+      linksFromInner,
+      coveredPortals,
+    };
   }
 }

@@ -1,63 +1,81 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { greatCircleArcIntersect, GeodesicLine } from "../../crosslinks";
-import WasabeeLink from "../../model/link";
+import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
 import { clearAllLinks } from "../../uiCommands";
 import wX from "../../wX";
 import { displayError, displayInfo } from "../../error";
 
-export function angle(a, p) {
-  if (a.id == p.id) throw Error("same portal");
-  if (a.latLng.lng == p.latLng.lng) {
-    if (a.latLng.lat > p.latLng.lat) return 0;
-    else return Math.PI;
-  }
-  const link = new GeodesicLine(a.latLng, p.latLng);
-  return link.bearing();
+import { sortPortalsByAngle, selectAngleInterval } from "./algorithm";
+import { insertLinks } from "./drawRoutines";
+
+function sortPortals(anchor, portals, start, end) {
+  if (!portals.find((p) => p.id === start.id)) portals.push(start);
+  if (!portals.find((p) => p.id === end.id)) portals.push(end);
+  const sorted = sortPortalsByAngle(anchor, portals);
+  return selectAngleInterval(anchor, sorted, start, end);
 }
 
-export function sortPortalsByAngle(anchor, portals, start, end) {
-  const startAngle = angle(anchor, start);
-  const endAngle = angle(anchor, end);
+/**
+ * Return the link descriptions for fanfield
+ * @param {WasabeePortal} anchor
+ * @param {WasabeePortal[]} portals
+ * @param {WasabeePortal} start
+ * @param {WasabeePortal} end
+ * @returns {[{ from: WasabeePortal, to: WasabeePortal, comment: string}[], number]}
+ */
+function fanfield(anchor, portals, start, end) {
+  let fields = 0;
+  const links = [];
 
-  // swap start/end if more than 180°
-  let invert = false;
-  if (
-    (((endAngle - startAngle) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) >
-    Math.PI
-  ) {
-    invert = true;
+  const sorted = sortPortals(anchor, portals, start, end);
+
+  const available = Array.from(sorted);
+  available.reverse();
+
+  for (let i = available.length - 1; i >= 0; i--) {
+    const wp = available[i];
+    links.push({ from: wp, to: anchor, comment: "anchor" });
+
+    if (i + 1 == available.length) continue;
+
+    // Find the interval of portals that are linkable
+    let j = i + 1;
+    let prev = null;
+    for (; j < available.length; j++) {
+      const p = available[j];
+      if (
+        prev &&
+        greatCircleArcIntersectByLatLngs(
+          anchor.latLng,
+          prev.latLng,
+          wp.latLng,
+          p.latLng
+        )
+      )
+        break;
+      prev = p;
+    }
+    j--;
+    links.push({
+      from: wp,
+      to: available[j],
+      comment: "subfield",
+    });
+    fields++;
+
+    for (var k = j - 1; k > i; k--) {
+      links.push({
+        from: wp,
+        to: available[k],
+        comment: "double subfield",
+      });
+      fields += 2;
+    }
+    // remove covered portals
+    available.splice(i + 1, j - i - 1);
   }
-
-  const good = new Map();
-  for (const p of portals) {
-    if (p.id == anchor.id) continue;
-    const pAngle = angle(anchor, p);
-
-    good.set(pAngle, p); // what are the odds of two having EXACTLY the same angle?
-  }
-  // add start and end portals just in case
-  good.set(startAngle, start);
-  good.set(endAngle, end);
-
-  const sorted = new Array(...good.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map((v) => v[1]);
-
-  if (invert) {
-    sorted.reverse();
-  }
-  // Build the sequence of portals between start/end
-  const slice = new Array();
-  let s = 0;
-  for (s = 0; sorted[s].id != start.id; s++);
-  for (; sorted[s % sorted.length].id != end.id; s++) {
-    slice.push(sorted[s % sorted.length]);
-  }
-  slice.push(end);
-
-  return slice;
+  return [links, fields];
 }
 
 const FanfieldDialog = AutoDraw.extend({
@@ -143,75 +161,31 @@ const FanfieldDialog = AutoDraw.extend({
       return;
     }
 
-    const steps = sortPortalsByAngle(
+    const [links, fields] = fanfield(
       this._anchor,
       this._portalSets["set"].portals,
       this._start,
       this._end
     );
-    this._draw(steps);
-  },
 
-  // draw takes the sorted list of poratls and draws the links
-  // determining any sub-fields can be added
-  _draw: function (sorted) {
     const op = getSelectedOperation();
+
     op.startBatchMode();
-    let order = 0;
-    let fields = 0;
+    const wlinks = links
+      .map((l) =>
+        op.addLink(l.from, l.to, {
+          description: "fanfield " + l.comment,
+        })
+      )
+      .filter((l) => l);
 
-    const available = Array.from(sorted);
-    available.reverse();
-
-    for (let i = available.length - 1; i >= 0; i--) {
-      const wp = available[i];
-      order++;
-      op.addLink(wp, this._anchor, { description: "fan anchor", order: order });
-
-      // skip back links if first portal
-      if (i + 1 == available.length) continue;
-
-      // Find the interval of portals that are linkable
-      let j = i + 1;
-      for (; j < available.length; j++) {
-        const testlink = new WasabeeLink(
-          { fromPortalId: wp.id, toPortalId: available[j].id },
-          op
-        );
-        let crossed = false;
-        for (const real of op.links) {
-          // Check links to anchor only
-          if (real.toPortalId != this._anchor.id) continue;
-          if (greatCircleArcIntersect(real, testlink)) {
-            crossed = true;
-            break;
-          }
-        }
-        if (crossed) break;
-      }
-      j--;
-      op.addLink(wp, available[j], {
-        description: "fan subfield",
-        order: ++order,
-      });
-      fields++;
-
-      for (var k = j - 1; k > i; k--) {
-        const check = available[k];
-        op.addLink(wp, check, {
-          description: "fan double subfield",
-          order: ++order,
-        });
-        fields += 2;
-      }
-      // remove covered portals
-      available.splice(i + 1, j - i - 1);
-    }
+    insertLinks(op, wlinks, 0);
     op.endBatchMode();
-    const ap = 313 * order + 1250 * fields;
+
+    const ap = 313 * links.length + 1250 * fields;
     // too many parameters for wX();
     displayInfo(
-      `Fanfield found ${order} links and ${fields} fields for ${ap} AP`
+      `Fanfield found ${links.length} links and ${fields} fields for ${ap} AP`
     );
   },
 });

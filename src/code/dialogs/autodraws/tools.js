@@ -93,7 +93,7 @@ export const AutoDraw = WDialog.extend({
     }
   },
 
-  _addSetPortal: function (text, thisKey, container, storageKey) {
+  _addSetPortal: function (text, thisKey, container, storageKey, callback) {
     const label = L.DomUtil.create("label", "set-portal-label", container);
     label.textContent = text;
     const button = L.DomUtil.create("button", "set-portal-button", container);
@@ -119,6 +119,7 @@ export const AutoDraw = WDialog.extend({
         display.textContent = wX("NOT_SET");
         displayError(wX("PLEASE_SELECT_PORTAL"));
       }
+      if (callback) callback();
     });
   },
 
@@ -126,10 +127,14 @@ export const AutoDraw = WDialog.extend({
     const label = L.DomUtil.create("label", "checkbox-label", container);
     label.textContent = text;
     label.htmlFor = id;
-    this[thisKey] = L.DomUtil.create("input", "checkbox-input", container);
-    this[thisKey].type = "checkbox";
-    this[thisKey].id = id;
-    this[thisKey].checked = defaultValue;
+    const checkbox = L.DomUtil.create("input", "checkbox-input", container);
+    checkbox.type = "checkbox";
+    checkbox.id = id;
+    checkbox.checked = defaultValue;
+    this[thisKey] = defaultValue;
+    L.DomEvent.on(checkbox, "change", () => {
+      this[thisKey] = checkbox.checked;
+    });
   },
 
   _addSelectSet: function (text, setKey, container, defaultValue) {
