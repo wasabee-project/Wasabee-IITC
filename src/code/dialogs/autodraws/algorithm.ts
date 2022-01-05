@@ -3,8 +3,10 @@ import type WasabeePortal from "../../model/portal";
 
 type Poset<T> = Map<T, T[]>;
 
-// given two anchor, build a map that shows which and how many portals are covered by each possible field by guid
-// note: a portal always covers itself
+/**
+  given two anchor, build a map that shows which and how many portals are covered by each possible field by guid
+  note: a portal always covers itself
+*/
 export function buildPoset(
   anchor1: WasabeePortal,
   anchor2: WasabeePortal,
@@ -34,14 +36,16 @@ export function buildPoset(
   return [posetPositive, posetNegative];
 }
 
-// given a poset, compute the maximal paths from all elements
-// the result contains a map that gives for any element the next ones and the list of the elements
-// that have the longest paths
 interface LongestSequences<T> {
   children: T[];
   length: number;
   number: number;
 }
+/**
+  given a poset, compute the maximal paths from all elements
+  the result contains a map that gives for any element the next ones and the list of the elements
+  that have the longest paths 
+*/
 function longestSequencesPoset<T>(poset: Poset<T>) {
   const alreadyCalculatedChildren = new Map<
     T | "__start__",
@@ -82,17 +86,19 @@ function longestSequencesPoset<T>(poset: Poset<T>) {
   };
 }
 
-// given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
-// that minimizes the flight distance
-// notes:
-// - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
-// - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
-//   and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
-//   (inner to outer)
 interface LongestSequence<T> {
   seq: T[];
   dist: number;
 }
+/**
+  given a poset, find the longest sequence p1,p2,...pk such that poset(p2) contains p1, poset(p3) contains p2 etc
+  that minimizes the flight distance
+  notes:
+  - the result is an empty sequence only if the poset is empty or if poset(p) is empty for any p
+  - if the poset is given by buildPOSet, the first element is the guid of a portal that doesn't cover any other portal,
+    and the last element is the portal that covers all portals of the sequence and isn't covered by any other portal
+    (inner to outer)
+*/
 export function longestSequence<T>(
   poset: Poset<T>,
   start?: T,
@@ -142,6 +148,7 @@ export function longestSequence<T>(
     .reduce((S1, S2) => (S1.dist < S2.dist ? S1 : S2)).seq;
 }
 
+/** Returns longest spines from each side of the base `pOne/pTwo` */
 export function getSignedSpine(
   pOne: WasabeePortal,
   pTwo: WasabeePortal,

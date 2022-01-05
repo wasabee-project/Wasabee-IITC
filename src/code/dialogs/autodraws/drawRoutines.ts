@@ -2,7 +2,7 @@ import type WasabeeLink from "../../model/link";
 import type WasabeeOp from "../../model/operation";
 import type WasabeePortal from "../../model/portal";
 
-// get the list of links from a spine to anchors
+/** Return the description of links for the given spine */
 function getSpineLinks(
   anchor1: WasabeePortal,
   anchor2: WasabeePortal,
@@ -27,7 +27,7 @@ function getSpineLinks(
   return linksDesc;
 }
 
-// insert an array of wasabee link into an draw after the given order
+/** Insert in `op` the links after the order `order`  */
 export function insertLinks(
   op: WasabeeOp,
   links: WasabeeLink[],
@@ -44,7 +44,7 @@ export function insertLinks(
   return order;
 }
 
-// draw a spine into an op, with order and comment
+/** Insert a spine in `op` after order `order` */
 export function drawSpine(
   op: WasabeeOp,
   anchor1: WasabeePortal,
