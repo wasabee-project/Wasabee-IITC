@@ -60,6 +60,7 @@ const FlipFlopDialog = AutoDraw.extend({
   addHooks: function () {
     AutoDraw.prototype.addHooks.call(this);
     this._displayDialog();
+    this._updatePortalSet();
   },
 
   _buildContent: function () {
