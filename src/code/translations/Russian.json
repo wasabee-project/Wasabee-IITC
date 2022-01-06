@@ -107,7 +107,7 @@
   "FarmPortalMarker": "Отфармить",
   "FLIP_FLOP_NAME": "Flip flop",
   "FLIP_FLOP_TITLE": "Flip flop",
-  "FLIP_FLOP_DESC": "From a given anchor, a set of visible portal and a number of SBUL, find a fanfield to throw links from the anchor by decreasing distance to avoid searching keys.",
+  "FLIP_FLOP_DESC": "Исходя из заданного опорника, видимых порталов и количества SBUL, найти fanfield, в котором очередность перенавеса с опорника будет идти по уменьшению длины линков для того, чтобы избежать поиска ключей.",
   "FLIP_FLOP_INSTRUCTION": "Select a portal, zoom to see enough portals and press Draw. Once a fanfield is found, you can search for other anchors for consecutive rethrow",
   "FLIP_FLOP_FIND_ANCHORS": "Find other anchors",
   "FROM_1-2": "от опорного линка 1-2",
