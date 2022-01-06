@@ -7,6 +7,7 @@ import PortalUI from "./ui/portal";
 import type WasabeeOp from "./model/operation";
 import type { IITC } from "../types/iitc";
 import type WasabeeLink from "./model/link";
+import type { PolylineOptions } from "leaflet";
 
 // from iitc rework : https://github.com/IITC-CE/ingress-intel-total-conversion/pull/333
 const d2r = Math.PI / 180;
@@ -317,6 +318,15 @@ function* realLinks() {
   }
 }
 
+function addToCrossLinkLayers(l: WasabeeLink, operation: WasabeeOp, polyOptions: PolylineOptions) {
+  const blocked = L.geodesicPolyline(
+    l.getLatLngs(operation),
+    polyOptions
+  );
+  blocked.options.interactive = false;
+  blocked.addTo(window.plugin.wasabee.crossLinkLayers);
+}
+
 export function checkAllLinks() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
 
@@ -333,13 +343,21 @@ export function checkAllLinks() {
   }
 
   for (const l of operation.links) {
+    // Highlight if crosses any other Wasabee links
     if (testSelfBlock(l, operation)) {
-      const blocked = L.geodesicPolyline(
-        l.getLatLngs(operation),
-        window.plugin.wasabee.skin.selfBlockStyle
-      );
-      blocked.options.interactive = false;
-      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
+      addToCrossLinkLayers(l,operation,window.plugin.wasabee.skin.selfBlockStyle);
+    }
+    else
+    {
+      const rlinkGenerator = realLinks();
+      //  Highlight if crosses any real links without markers
+      for (const rlink of rlinkGenerator) {
+        if (testPolyLine(l, rlink, operation))
+        {
+          addToCrossLinkLayers(l,operation,window.plugin.wasabee.skin.selfBlockStyle);
+          break
+        }
+      }
     }
   }
   window.map.fire("wasabee:crosslinks:done");
