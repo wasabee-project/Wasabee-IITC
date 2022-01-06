@@ -89,13 +89,15 @@ const statics: Statics = {
 };
 
 statics.strings = {}; // empty object, fill it below
-statics.strings["Deutsch"] = require("./translations/german.json");
-statics.strings["Espanol"] = require("./translations/spanish.json");
-statics.strings["English"] = require("./translations/english.json");
-statics.strings["Italiano"] = require("./translations/italian.json");
-statics.strings["Tagalog"] = require("./translations/filipino.json");
-statics.strings["Français"] = require("./translations/french.json");
-statics.strings["Português"] = require("./translations/portuguese.json");
+statics.strings["Deutsch"] = require("./translations/German.json");
+statics.strings["Espanol"] = require("./translations/Spanish.json");
+statics.strings["English"] = require("./translations/English.json");
+statics.strings["Italiano"] = require("./translations/Italian.json");
+statics.strings["Tagalog"] = require("./translations/Filipino.json");
+statics.strings["Français"] = require("./translations/French.json");
+statics.strings["Português"] = require("./translations/Portuguese.json");
+statics.strings["Русский"] = require("./translations/Russian.json");
+statics.strings["Dansk"] = require("./translations/Danish.json");
 
 statics.defaultOperationColor = "orange";
 
