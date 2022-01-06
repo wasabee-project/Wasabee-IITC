@@ -90,10 +90,10 @@ const FlipFlopDialog = AutoDraw.extend({
 
     // Go button
     const button = L.DomUtil.create("button", "drawb", container);
-    button.textContent = wX("DRAW");
+    button.textContent = wX("autodraw.common.draw_button");
     L.DomEvent.on(button, "click", () => {
       const total = this.doFanGun();
-      displayInfo(`Flip flop: found ${total} links`);
+      displayInfo(wX("autodraw.flipflop.result", { count: total }));
     });
 
     return container;

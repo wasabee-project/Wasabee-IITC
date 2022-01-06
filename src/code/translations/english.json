@@ -46,6 +46,8 @@
   "AUTO_DRAWS": "Auto-draw",
   "AUTODRAWS": "Wasabee Auto-draw Options",
   "AUTODRAW_PORTALS_SET": "Portals",
+  "autodraw.common.draw_button": "Draw",
+  "autodraw.flipflop.result": "Flip flop: found {count} links",
   "autodraw.onion.variant": "Option",
   "autodraw.onion.variant.equilateral": "~Equilateral",
   "autodraw.onion.variant.grow": "Let it grow",
