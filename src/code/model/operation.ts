@@ -91,8 +91,8 @@ export default class WasabeeOp extends Evented implements IOperation {
   _idToOpportals: Map<string, WasabeePortal>;
   _coordsToOpportals: Map<string, WasabeePortal>;
 
-  _dirtyCoordsTable: boolean = false;
-  _batchmode: boolean = false;
+  _dirtyCoordsTable = false;
+  _batchmode = false;
 
   constructor(obj) {
     super();
@@ -104,16 +104,16 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.ID = obj.ID ? obj.ID : generateId();
     this.name = obj.name ? obj.name : "unnamed op";
     this.creator = obj.creator ? obj.creator : "unset";
-    this.anchors = obj.anchors ? obj.anchors : Array();
+    this.anchors = obj.anchors ? obj.anchors : [];
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : "main";
     this.comment = obj.comment ? obj.comment : null;
-    this.teamlist = obj.teamlist ? obj.teamlist : Array();
+    this.teamlist = obj.teamlist ? obj.teamlist : [];
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
     this.localchanged = obj.localchanged === false ? obj.localchanged : true;
-    this.keysonhand = obj.keysonhand ? obj.keysonhand : Array();
+    this.keysonhand = obj.keysonhand ? obj.keysonhand : [];
     this.zones = this.convertZonesToObjs(obj.zones);
     // this.modified = obj.modified ? obj.modified : null;
     this.referencetime = obj.referencetime ? obj.referencetime : null;
@@ -127,8 +127,8 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     this.background = !!obj.background;
 
-    if (!this.links) this.links = new Array();
-    if (!this.markers) this.markers = new Array();
+    if (!this.links) this.links = [];
+    if (!this.markers) this.markers = [];
 
     const opportals = this.convertPortalsToObjs(obj.opportals);
     this._idToOpportals = new Map();
@@ -297,7 +297,7 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     if (this._dirtyCoordsTable) {
       console.debug("operation: removing duplicates");
-      const toRemove = new Array();
+      const toRemove = [];
       const rename = new Map();
 
       for (const [id, p] of this._idToOpportals) {
@@ -947,7 +947,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   convertLinksToObjs(links: any[]) {
-    const tmpLinks = new Array();
+    const tmpLinks = [];
     if (!links || links.length == 0) return tmpLinks;
     for (const l of links) {
       tmpLinks.push(new WasabeeLink(l));
@@ -956,7 +956,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   convertMarkersToObjs(markers: any[]) {
-    const tmpMarkers = new Array();
+    const tmpMarkers = [];
     if (!markers || markers.length == 0) return tmpMarkers;
     if (markers) {
       for (const m of markers) {
@@ -967,7 +967,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   convertPortalsToObjs(portals: any[]) {
-    const tmpPortals = Array();
+    const tmpPortals = [];
     if (!portals || portals.length == 0) return tmpPortals;
     for (const p of portals) {
       if (p instanceof WasabeePortal) {
@@ -988,7 +988,7 @@ export default class WasabeeOp extends Evented implements IOperation {
         { id: 2, name: "Secondary", color: "yellow" },
       ].map((obj) => new WasabeeZone(obj));
     }
-    const tmpZones = Array();
+    const tmpZones = [];
     for (const z of zones) {
       if (z instanceof WasabeeZone) {
         tmpZones.push(z);
@@ -1246,9 +1246,9 @@ export default class WasabeeOp extends Evented implements IOperation {
 
   changes(origin?: WasabeeOp) {
     const changes = {
-      addition: new Array(),
-      edition: new Array(),
-      deletion: new Array(),
+      addition: [],
+      edition: [],
+      deletion: [],
       name: null,
       color: null,
       comment: null,

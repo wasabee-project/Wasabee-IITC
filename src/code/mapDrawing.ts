@@ -122,7 +122,7 @@ export async function drawAgents() {
 
   const layerMap = agentLayerMap();
 
-  let doneAgents = new Array();
+  let doneAgents = [];
   const me = await WasabeeMe.waitGet(); // cache hold-time age is 24 hours... not too frequent
   for (const t of me.Teams) {
     const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
@@ -152,9 +152,9 @@ export async function drawSingleTeam(
   layerMap?: Map<GoogleID, number>,
   alreadyDone?: GoogleID[]
 ) {
-  const done = new Array();
+  const done = [];
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return done; // yes, === false, undefined == true
-  if (alreadyDone === undefined) alreadyDone = new Array();
+  if (alreadyDone === undefined) alreadyDone = [];
   if (layerMap === undefined) layerMap = agentLayerMap();
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */

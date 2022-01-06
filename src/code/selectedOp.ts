@@ -24,7 +24,7 @@ export async function initSelectedOperation() {
       await loadNewDefaultOp();
     } else {
       // verify it exists before trying to load
-      let tmp = await WasabeeOp.load(toLoad);
+      const tmp = await WasabeeOp.load(toLoad);
       if (tmp == null) {
         console.log(
           "most recently loaded up not present in local store, starting with new default op"
@@ -123,7 +123,7 @@ export async function setupLocalStorage() {
     ops = await opsList();
   }
 
-  const migrations = Array();
+  const migrations = [];
   for (const opID of ops) {
     migrations.push(WasabeeOp.migrate(opID));
   }
@@ -239,7 +239,7 @@ export async function duplicateOperation(opID: OpID) {
   op.creator = window.PLAYER.nickname;
   op.teamlist = null;
   op.fetched = null;
-  op.keysonhand = new Array();
+  op.keysonhand = [];
   op.cleanAll();
   await op.store();
   return op;

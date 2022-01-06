@@ -223,7 +223,7 @@ export function loadFaked(operation: WasabeeOp, force = false) {
   // local storage always returns as string
   if (flag !== "true" && !force) return;
 
-  const f = new Array();
+  const f = [];
   for (const x of operation.fakedPortals) f.push(x.id);
   if (f.length > 0) getPortalDetails(f);
 }
@@ -470,7 +470,7 @@ export async function fullSync() {
 
     // delete operations absent from server unless the owner
     const ol = await opsList();
-    const serverOps = new Array();
+    const serverOps = [];
     for (const opID of ol) {
       const op = await WasabeeOp.load(opID);
       if (op && op.server === server && !opsID.has(op.ID)) serverOps.push(op);

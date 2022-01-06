@@ -20,7 +20,7 @@ interface LLC extends L.LatLng {
 function toCartesian(lat: number, lng: number): Vec3 {
   lat *= d2r;
   lng *= d2r;
-  var o = Math.cos(lat);
+  const o = Math.cos(lat);
   return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
 }
 
@@ -401,7 +401,7 @@ export class GeodesicLine {
   cosLat1CosLat2SinDLng: number;
 
   constructor(start: L.LatLng, end: L.LatLng) {
-    let d2r = Math.PI / 180.0;
+    const d2r = Math.PI / 180.0;
     // let r2d = 180.0 / Math.PI; //eslint-disable-line
     // maths based on http://williams.best.vwh.net/avform.htm#Int
     if (start.lng == end.lng) {
@@ -412,11 +412,11 @@ export class GeodesicLine {
     this.lat2 = end.lat * d2r;
     this.lng1 = start.lng * d2r;
     this.lng2 = end.lng * d2r;
-    let dLng = this.lng1 - this.lng2;
-    let sinLat1 = Math.sin(this.lat1);
-    let sinLat2 = Math.sin(this.lat2);
-    let cosLat1 = Math.cos(this.lat1);
-    let cosLat2 = Math.cos(this.lat2);
+    const dLng = this.lng1 - this.lng2;
+    const sinLat1 = Math.sin(this.lat1);
+    const sinLat2 = Math.sin(this.lat2);
+    const cosLat1 = Math.cos(this.lat1);
+    const cosLat2 = Math.cos(this.lat2);
     this.sinLat1CosLat2 = sinLat1 * cosLat2;
     this.sinLat2CosLat1 = sinLat2 * cosLat1;
     this.cosLat1CosLat2SinDLng = cosLat1 * cosLat2 * Math.sin(dLng);

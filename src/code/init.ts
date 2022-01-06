@@ -84,7 +84,7 @@ window.plugin.wasabee.init = async () => {
 
   Wasabee._selectedOp = null; // the in-memory working op;
   Wasabee._updateList = new Map();
-  Wasabee.portalDetailQueue = new Array();
+  Wasabee.portalDetailQueue = [];
 
   initSkin();
   // can this be moved to the auth dialog?
