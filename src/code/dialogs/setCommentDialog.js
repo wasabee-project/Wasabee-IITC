@@ -79,7 +79,7 @@ export const SetCommentDialog = WDialog.extend({
     const container = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", container);
     const input = L.DomUtil.create("input", null, container);
-    input.placeholder = "comment";
+    input.placeholder = wX("COMMENT");
 
     if (this.commentType == "link") {
       desc.textContent = wX("SET_LINK_COMMENT");
@@ -139,7 +139,7 @@ export const SetCommentDialog = WDialog.extend({
       );
 
       const hardnessInput = L.DomUtil.create("input", null, container);
-      hardnessInput.placeholder = "hardness";
+      hardnessInput.placeholder = wX("dialog.setcomment.portal_hardness");
       if (this.portal.hardness) hardnessInput.value = this.portal.hardness;
       hardnessInput.addEventListener(
         "change",
