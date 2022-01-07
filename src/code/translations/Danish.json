@@ -94,6 +94,7 @@
   "DELETE_OP": "Slet {opName}",
   "DESCRIP_PLACEHOLD": "Beskrivelse (valgfri)",
   "DestroyPortalAlert": "Ødelæg/Skyd",
+  "dialog.setcomment.portal_hardness": "Hardness",
   "DRAW TOOLS FORMAT": "Draw Tools Format",
   "DUPE_OP": "Duplikere Operation",
   "END_PORT": "Slut Portal ",
