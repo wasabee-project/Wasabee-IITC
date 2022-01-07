@@ -94,6 +94,7 @@
   "DELETE_OP": "Tangalin {opName}",
   "DESCRIP_PLACEHOLD": "Description (opsyonal)",
   "DestroyPortalAlert": "Sirain",
+  "dialog.setcomment.portal_hardness": "Hardness",
   "DRAW TOOLS FORMAT": "Draw Tools Format",
   "DUPE_OP": "Kopyahin ang Operasyon",
   "END_PORT": "End Portal ",
