@@ -94,7 +94,7 @@
   "DELETE_OP": "Apagar ${value}",
   "DESCRIP_PLACEHOLD": "Descrição (opcional)",
   "DestroyPortalAlert": "Destroir",
-  "dialog.setcomment.portal_hardness": "Hardness",
+  "dialog.setcomment.portal_hardness": "Difículdade",
   "DRAW TOOLS FORMAT": "Formato Draw Tools",
   "DUPE_OP": "Duplicar Operação",
   "END_PORT": "Portal final ",
