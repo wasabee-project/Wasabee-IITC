@@ -4,6 +4,7 @@ interface SortableItem<T> {
   index: number;
   values: unknown[];
   sortValues: unknown[];
+  filtered: boolean;
 }
 
 export interface SortableField<T> {
@@ -14,7 +15,9 @@ export interface SortableField<T> {
   sort?: (a: unknown, b: unknown, aobj?: T, bobj?: T) => number;
   format?: (cell: HTMLTableCellElement, value: unknown, thing?: T) => void;
   smallScreenHide?: boolean;
-  foot?: (cell: HTMLTableCellElement) => void;
+  foot?: (cell: HTMLTableCellElement) => void,
+  filter?: (thing: T, value: unknown, filterValue: string) => boolean;
+  filterValue?: string;
 }
 
 export default class Sortable<T> {
@@ -31,6 +34,8 @@ export default class Sortable<T> {
   _sortByStoreKey: string;
   _sortAscStoreKey: string;
 
+  _filterEnable: boolean;
+
   constructor() {
     this._items = [];
     this._fields = [];
@@ -45,8 +50,12 @@ export default class Sortable<T> {
 
     // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
+
     this._sortByStoreKey = "";
     this._sortAscStoreKey = "";
+    
+    this._filterEnable = false;
+
     this._done = true;
   }
 
@@ -128,6 +137,7 @@ export default class Sortable<T> {
         index: index, // the position in the list, set & used by sort()
         values: [], // the computed values for this row
         sortValues: [], // the computed sort values for this row
+        filtered: true, // match current filter
       };
       index++;
       for (const field of this._fields) {
@@ -175,6 +185,7 @@ export default class Sortable<T> {
         (values) => {
           this._items = values;
           this.sort();
+          this.applyFilters();
           return true;
         },
         (reject) => {
@@ -193,10 +204,21 @@ export default class Sortable<T> {
     this._fields = value;
     this.renderHead();
     this.renderFoot();
+    this.applyFilters();
   }
 
   get done() {
     return this._done;
+  }
+
+  set filter(value: boolean) {
+    this._filterEnable = value;
+    this.renderHead();
+    this.applyFilters();
+  }
+
+  get filter() {
+    return this._filterEnable;
   }
 
   renderHead() {
@@ -236,6 +258,19 @@ export default class Sortable<T> {
           },
           false
         );
+      }
+      if (field.filter) {
+        if (!this._filterEnable) delete field.filterValue;
+        else {
+          cell.textContent = "";
+          const input = L.DomUtil.create("input", "filter", cell);
+          input.placeholder = field.name;
+          if (field.filterValue) input.value = field.filterValue;
+          L.DomEvent.on(input, "change", () => {
+            field.filterValue = input.value;
+            this.applyFilters();
+          });
+        }
       }
     }
   }
@@ -280,5 +315,46 @@ export default class Sortable<T> {
       item.index = index;
       this._body.appendChild(item.row);
     }
+  }
+
+  applyFilters() {
+    for (const item of this._items) {
+      if (!this._filterEnable) item.row.style.display = null;
+      else {
+        item.filtered = true;
+        for (let i = 0; i < this._fields.length; ++i) {
+          const field = this._fields[i];
+          if (
+            field.filter &&
+            field.filterValue &&
+            !field.filter(item.obj, item.values[i], field.filterValue)
+          ) {
+            item.filtered = false;
+            break;
+          }
+        }
+        if (item.filtered) item.row.style.display = null;
+        else item.row.style.display = "none";
+      }
+    }
+  }
+
+  getFiltered() {
+    return this._items
+      .filter((it) => !this._filterEnable || it.filtered)
+      .map((it) => it.obj);
+  }
+
+  importFilterFrom(sortable: Sortable<T>) {
+    if (!sortable._filterEnable) return;
+    for (const field of sortable.fields) {
+      if (field.filter) {
+        const f = this.fields.find((f) => f.name === field.name);
+        if (f) {
+          f.filterValue = field.filterValue;
+        }
+      }
+    }
+    this.filter = true;
   }
 }

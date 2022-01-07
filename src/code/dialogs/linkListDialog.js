@@ -69,6 +69,13 @@ const LinkListDialog = OperationChecklistDialog.extend({
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
+    buttons["Toggle Filter"] = () => {
+      this.sortable.filter = !this.sortable.filter;
+    };
+    const picker = this.getBulkPicker();
+    buttons["Color Filtered"] = () => {
+      picker.click();
+    };
 
     await this.sortable.done;
 
