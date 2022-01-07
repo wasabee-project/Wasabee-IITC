@@ -94,6 +94,7 @@
   "DELETE_OP": "Удалить {opName}",
   "DESCRIP_PLACEHOLD": "Описание (опционально)",
   "DestroyPortalAlert": "Снести",
+  "dialog.setcomment.portal_hardness": "Hardness",
   "DRAW TOOLS FORMAT": "Формат ДТ",
   "DUPE_OP": "Дублировать операцию",
   "END_PORT": "Конечный портал ",
