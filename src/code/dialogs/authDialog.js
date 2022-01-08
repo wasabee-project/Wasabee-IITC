@@ -1,17 +1,17 @@
 import { WDialog } from "../leafletClasses";
-import {
-  SendAccessTokenAsync,
-  GetWasabeeServer,
-  SetWasabeeServer,
-  oneTimeToken,
-  setIntelID,
-} from "../server";
+import { GetWasabeeServer, SetWasabeeServer, setIntelID } from "../server";
 import PromptDialog from "./promptDialog";
 import { sendLocation, fullSync } from "../uiCommands";
 import { wX } from "../wX";
 import { postToFirebase } from "../firebaseSupport";
 import WasabeeMe from "../model/me";
-import { displayError } from "../error";
+import { displayError, ServerError } from "../error";
+import {
+  isAuthAvailable,
+  getAccessToken,
+  sendAccessToken,
+  sendOneTimeToken,
+} from "../auth";
 
 const AuthDialog = WDialog.extend({
   statics: {
@@ -32,25 +32,25 @@ const AuthDialog = WDialog.extend({
       sendLocation();
   },
 
-  _successLogin: async function (me) {
-    const newme = me ? new WasabeeMe(me) : await WasabeeMe.waitGet(true);
-    newme.store();
+  _successLogin: function (me) {
+    me.store();
     window.map.fire("wasabee:login");
     this.closeDialog();
     fullSync();
-    setIntelID(window.PLAYER.nickname, window.PLAYER.team, newme.querytoken); // no need to await
+    if (me.querytoken)
+      setIntelID(window.PLAYER.nickname, window.PLAYER.team, me.querytoken);
   },
 
   _displayDialog: function () {
-    const syncLoggedIn = window.gapi.auth2.getAuthInstance();
-    if (syncLoggedIn) {
+    if (isAuthAvailable()) {
       displayError(wX("AUTH INCOMPAT"));
       return;
     }
 
     const content = L.DomUtil.create("div", "content");
-    this._server = L.DomUtil.create("div", null, content);
-    this._server.textContent = GetWasabeeServer();
+    this._server = L.DomUtil.create("input", "", content);
+    this._server.readOnly = true;
+    this._server.value = GetWasabeeServer();
 
     const ua = L.DomUtil.create("div", "useragent", content);
     this._android = false;
@@ -78,21 +78,14 @@ const AuthDialog = WDialog.extend({
       }
     }
 
-    const title = L.DomUtil.create("div", "desc", content);
-    if (this._ios) {
-      title.textContent = wX("AUTH IOS");
-    }
-
     const gapiButton = L.DomUtil.create("button", "gapi", content);
     gapiButton.textContent = wX("LOG IN");
-    // XXX until we can figure out why IITC-M iOS doesn't set the cookie very often
-    if (this._ios) gapiButton.style.display = "none";
 
     L.DomEvent.on(gapiButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       gapiButton.disabled = true;
       gapiButton.textContent = "... loading ...";
-      this.gapiAuth.call(this);
+      this.gapiAuth();
     });
 
     if (!this._android && !this._ios) {
@@ -102,33 +95,7 @@ const AuthDialog = WDialog.extend({
         L.DomEvent.stop(ev);
         gapiSelectButton.disabled = true;
         gapiSelectButton.textContent = "... loading ...";
-        this.gsapiAuthChoose.call(this);
-      });
-    }
-
-    // webview cannot work on android IITC-M
-    if (this._ios) {
-      const webviewButton = L.DomUtil.create("button", "webview", content);
-      webviewButton.textContent = wX("WEBVIEW");
-      L.DomEvent.on(webviewButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        window.open(GetWasabeeServer());
-        webviewButton.style.display = "none";
-        postwebviewButton.style.display = "block";
-      });
-      const postwebviewButton = L.DomUtil.create("button", "webview", content);
-      postwebviewButton.textContent = wX("WEBVIEW VERIFY");
-      postwebviewButton.style.display = "none";
-      L.DomEvent.on(postwebviewButton, "click", async (ev) => {
-        L.DomEvent.stop(ev);
-        try {
-          await this._successLogin();
-          postToFirebase({ id: "wasabeeLogin", method: "iOS" });
-        } catch (e) {
-          console.error(e);
-          displayError(e);
-        }
-        window.map.fire("wasabee:defensivekeys");
+        this.gsapiAuthChoose();
       });
     }
 
@@ -146,7 +113,7 @@ const AuthDialog = WDialog.extend({
         callback: () => {
           if (serverDialog.inputField.value) {
             SetWasabeeServer(serverDialog.inputField.value);
-            this._server.textContent = GetWasabeeServer();
+            this._server.value = GetWasabeeServer();
             WasabeeMe.purge();
           }
           window.map.fire("wasabee:defensivekeys");
@@ -166,8 +133,8 @@ const AuthDialog = WDialog.extend({
         callback: async () => {
           if (ottDialog.inputField.value) {
             try {
-              await oneTimeToken(ottDialog.inputField.value);
-              await this._successLogin();
+              const me = await sendOneTimeToken(ottDialog.inputField.value);
+              this._successLogin(me);
               postToFirebase({ id: "wasabeeLogin", method: "One Time Token" });
             } catch (e) {
               console.error(e);
@@ -198,98 +165,40 @@ const AuthDialog = WDialog.extend({
 
   // this works in most cases
   // but fails on android if the account logged into intel is different than the one used for Wasabee
-  gapiAuth: function () {
-    const options = {
-      client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
-      scope: "email profile openid",
-      response_type: "id_token permission",
-      prompt: "none",
-    };
-
-    window.gapi.auth2.authorize(options, async (response) => {
-      if (response.error) {
-        postToFirebase({ id: "exception", error: response.error });
-        if (response.error === "idpiframe_initialization_failed") {
-          displayError("You need enable cookies or allow [*.]google.com");
-        }
-        if (
-          response.error == "user_logged_out" ||
-          response.error == "immediate_failed"
-        ) {
-          options.prompt = "select_account"; // try again, forces prompt but preserves "immediate" selection
-          window.gapi.auth2.authorize(options, async (responseSelect) => {
-            if (responseSelect.error) {
-              postToFirebase({ id: "exception", error: response.error });
-              const err = `error from gapiAuth (immediate_failed): ${responseSelect.error}: ${responseSelect.error_subtype}`;
-              displayError(err);
-              console.log(err);
-              return;
-            }
-            try {
-              const r = await SendAccessTokenAsync(responseSelect.access_token);
-              await this._successLogin(r);
-              postToFirebase({
-                id: "wasabeeLogin",
-                method: "gsapiAuth (immediate_failed)",
-              });
-            } catch (e) {
-              displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
-              console.error(e);
-              this.closeDialog();
-            }
-          });
-        } else {
-          this.closeDialog();
-          const err = `error from gapiAuth: ${response.error}: ${response.error_subtype}`;
-          postToFirebase({ id: "exception", error: err });
-          console.log(err);
-          displayError(err);
-        }
-        return;
-      }
-      try {
-        const r = await SendAccessTokenAsync(response.access_token);
-        await this._successLogin(r);
-        postToFirebase({ id: "wasabeeLogin", method: "gsapiAuth" });
-      } catch (e) {
-        postToFirebase({ id: "exception", error: e.toString() });
-        console.error(e);
+  gapiAuth: async function () {
+    try {
+      const token = await getAccessToken(false);
+      const me = await sendAccessToken(token);
+      postToFirebase({ id: "wasabeeLogin", method: "gapiAuth" });
+      this._successLogin(me);
+    } catch (e) {
+      this.disable();
+      this.enable();
+      if (e instanceof ServerError) {
+        displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
+      } else {
         displayError(e);
-        this.closeDialog();
+        postToFirebase({ id: "exception", error: e });
       }
-    });
+    }
   },
 
-  gsapiAuthChoose: function () {
-    window.gapi.auth2.authorize(
-      {
-        prompt: "select_account",
-        client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,
-        scope: "email profile openid",
-        response_type: "id_token permission",
-        // immediate: false // this seems to break everything
-      },
-      async (response) => {
-        if (response.error) {
-          this.closeDialog();
-          const err = `error from gsapiAuthChoose: ${response.error}: ${response.error_subtype}`;
-          displayError(err);
-          postToFirebase({ id: "exception", error: err });
-          return;
-        }
-        try {
-          const r = await SendAccessTokenAsync(response.access_token);
-          await this._successLogin(r);
-          postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
-        } catch (e) {
-          console.error(e);
-          displayError(
-            `send access token failed (gsapiAuthChoose): ${e.toString()}`
-          );
-          postToFirebase({ id: "exception", error: e.toString() });
-        }
+  gsapiAuthChoose: async function () {
+    try {
+      const token = await getAccessToken(true);
+      const me = await sendAccessToken(token);
+      postToFirebase({ id: "wasabeeLogin", method: "gsapiAuthChoose" });
+      this._successLogin(me);
+    } catch (e) {
+      this.disable();
+      this.enable();
+      if (e instanceof ServerError) {
+        displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
+      } else {
+        displayError(e);
+        postToFirebase({ id: "exception", error: e });
       }
-    );
+    }
   },
 });
 
