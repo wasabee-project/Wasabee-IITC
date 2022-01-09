@@ -102,7 +102,7 @@
   "EXPORT OP TITLE": "Exportar Op actual",
   "EXPORT OP": "Exportar Op",
   "EXPORT": "Exportar",
-  "FAKED": "Faked: [{portalId}]",
+  "FAKED": "Virtual: [{portalId}]",
   "FANFIELD": "¡Dibujar!",
   "FANFIELD2": "Fanfield",
   "FarmPortalMarker": "Farmear",
