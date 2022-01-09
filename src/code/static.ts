@@ -80,6 +80,10 @@ const statics: Statics = {
       smoothFactor: 1,
       interactive: false,
     },
+    WEBUI_DEFAULT: "https://webui.wasabee.rocks",
+    JOIN_TEAM_TEMPLATE:
+      "https://webui.wasabee.rocks/?server={server}#/team/{teamid}/join/{token}",
+    FIREBASE_IFRAME: "https://cdn2.wasabee.rocks/iitcplugin/firebase/",
   },
   publicServers: [
     { name: "Americas", url: "https://am.wasabee.rocks", short: "🇺🇸" },

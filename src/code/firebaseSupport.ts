@@ -20,6 +20,7 @@ import { displayInfo, displayWarning } from "./error";
 import WasabeeAgent from "./model/agent";
 import { getJWT } from "./auth";
 import WasabeeMe from "./model/me";
+import { constants } from "./static";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -32,7 +33,7 @@ export function initFirebase() {
   const iframe = L.DomUtil.create("iframe");
   iframe.width = "0";
   iframe.height = "0";
-  iframe.src = "https://cdn2.wasabee.rocks/iitcplugin/firebase/";
+  iframe.src = constants.FIREBASE_IFRAME;
   iframe.id = frameID;
 
   iframe.addEventListener("load", () => {

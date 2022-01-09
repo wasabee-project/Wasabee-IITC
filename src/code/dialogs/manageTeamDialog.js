@@ -16,6 +16,7 @@ import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
+import { constants } from "../static";
 
 import AgentUI from "../ui/agent";
 import { displayError, displayInfo } from "../error";
@@ -229,7 +230,11 @@ const ManageTeamDialog = WDialog.extend({
     if (team.jlt) {
       const joinlink = L.DomUtil.create("input", null, container);
       const server = GetWasabeeServer();
-      joinlink.value = `${server}/api/v1/team/${team.id}/join/${team.jlt}`;
+      joinlink.value = L.Util.template(constants.JOIN_TEAM_TEMPLATE, {
+        server: server,
+        teamid: team.id,
+        token: team.jlt,
+      });
       joinlink.readOnly = true;
       L.DomEvent.on(joinlink, "click", (ev) => ev.target.select());
       const joinlinkdel = L.DomUtil.create("button", null, container);
