@@ -35,16 +35,11 @@ const QuickdrawButton = WButton.extend({
       this.handler._nextDrawnLinksColor = ev.target.value;
     });
 
-    this.actionsContainer = this._createSubActions(this.getSubActions());
-
-    this._container.appendChild(this.actionsContainer);
+    this.setSubActions(this.getSubActions());
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("QD TITLE");
-      const newSubActions = this._createSubActions(this.getSubActions());
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
 
       if (this.handler._enabled)
         this.handler._tooltip.updateContent(this.handler._getTooltipText());

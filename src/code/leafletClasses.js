@@ -403,22 +403,4 @@ export const WButton = L.Class.extend({
 
     return link;
   },
-
-  _createSubActions: function (buttons) {
-    const container = L.DomUtil.create("ul", "wasabee-actions");
-    for (const b of buttons) {
-      const li = L.DomUtil.create("li", "wasabee-subactions", container);
-      this._createButton({
-        title: b.title,
-        text: b.text,
-        html: b.html,
-        buttonImage: b.img,
-        container: li,
-        callback: b.callback,
-        context: b.context,
-        className: "wasabee-subactions",
-      });
-    }
-    return container;
-  },
 });

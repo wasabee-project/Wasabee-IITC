@@ -35,23 +35,19 @@ const WasabeeButton = WButton.extend({
     this._buildActions();
 
     // build and display as if not logged in
-    this.actionsContainer = this._getActions();
-    this._container.appendChild(this.actionsContainer);
+    this.setSubActions(this.getSubActions());
     // check login state and update if necessary
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("WASABEE BUTTON TITLE");
       this._buildActions();
-      const newSubActions = this._getActions();
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
     });
 
     this.update();
   },
 
-  _getActions: function () {
+  getSubActions: function () {
     let tmp = [];
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
@@ -70,7 +66,7 @@ const WasabeeButton = WButton.extend({
     // settings always at the end
     tmp = tmp.concat(this._SettingsActions);
 
-    return this._createSubActions(tmp);
+    return tmp;
   },
 
   _buildActions: function () {
@@ -185,9 +181,7 @@ const WasabeeButton = WButton.extend({
       if (loggedIn) this.button.classList.add("wasabee-logged-in");
       else this.button.classList.remove("wasabee-logged-in");
 
-      const old = this.actionsContainer;
-      this.actionsContainer = this._getActions();
-      old.parentNode.replaceChild(this.actionsContainer, old);
+      this.setSubActions(this.getSubActions());
       this.disable();
     }
   },
