@@ -36,7 +36,7 @@ class QuickDeleteButton extends WButton {
     });
     this.state = "off";
 
-    this.actionsContainer = this._createSubActions(this.getSubActions());
+    this.setSubActions(this.getSubActions());
 
     this._container.appendChild(this.actionsContainer);
 
@@ -45,18 +45,15 @@ class QuickDeleteButton extends WButton {
     // update text
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("toolbar.quick_delete.title");
-      const newSubActions = this._createSubActions(this.getSubActions());
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
     });
 
     this.update();
   }
 
   opChange() {
-    if (this.state == 'on') this.disable();
-    else if (this.state == 'instant') {
+    if (this.state == "on") this.disable();
+    else if (this.state == "instant") {
       this.handler.disable();
       this.handler.enable();
     }
@@ -64,14 +61,16 @@ class QuickDeleteButton extends WButton {
 
   toggleActions() {
     if (this.state == "off") {
-      this.enable();
       this.state = "on";
-      postToFirebase({ id: 'analytics', action: 'quickdelete' });
+      this.enable();
+      this.setSubActions(this.getSubActions());
+      postToFirebase({ id: "analytics", action: "quickdelete" });
     } else if (this.state == "on") {
       this.disable();
-      this.enable();
       this.state = "instant";
-      postToFirebase({ id: 'analytics', action: 'quickdelete:instant' });
+      this.enable();
+      this.setSubActions(this.getSubActions());
+      postToFirebase({ id: "analytics", action: "quickdelete:instant" });
       this.button.classList.add("blink");
     } else {
       this.disable();
@@ -98,16 +97,26 @@ class QuickDeleteButton extends WButton {
   }
 
   getSubActions() {
+    if (this.state === "instant")
+      return [
+        {
+          text: wX("toolbar.quick_delete.stop.text"),
+          title: wX("toolbar.quick_delete.stop.title"),
+          callback: this.disable,
+          context: this,
+        },
+      ];
+
     const applySubAction = {
-      title: wX("toolbar.quick_delete.apply.title"),
       text: wX("toolbar.quick_delete.apply.text"),
+      title: wX("toolbar.quick_delete.apply.title"),
       callback: this.actionApply,
       context: this,
     };
 
     const cancelSubAction = {
+      text: wX("toolbar.quick_delete.cancel.text"),
       title: wX("toolbar.quick_delete.cancel.title"),
-      text: wX("toolbar.quick_delete.cancel.title"),
       callback: this.actionCancel,
       context: this,
     };

@@ -359,6 +359,25 @@ export const WButton = L.Class.extend({
     }
   },
 
+  setSubActions: function (actions) {
+    if (!this.actionsContainer) {
+      this.actionsContainer = L.DomUtil.create(
+        "ul",
+        "wasabee-actions",
+        this._container
+      );
+    }
+    this.actionsContainer.textContent = "";
+    for (const action of actions) {
+      const li = L.DomUtil.create(
+        "li",
+        "wasabee-subactions",
+        this.actionsContainer
+      );
+      this._createButton({ ...action, container: li });
+    }
+  },
+
   _createButton: function (options) {
     const link = L.DomUtil.create(
       "a",

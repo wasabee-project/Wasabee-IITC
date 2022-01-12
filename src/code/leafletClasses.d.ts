@@ -89,6 +89,7 @@ export declare class WButton extends L.Class {
   setControl(control: any): void;
   disable(): void;
   enable(): void;
+  setSubActions(actions: ButtonOptions[]): void;
   _createButton(options: ButtonOptions): HTMLAnchorElement;
   _createSubActions(buttons: ButtonOptions[]): HTMLUListElement;
 }
