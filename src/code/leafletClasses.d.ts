@@ -4,9 +4,9 @@
 export declare class WTooltip extends L.Class {
   _pane: HTMLElement;
   _container: HTMLDivElement;
-  constructor();
+  constructor(map: L.Map);
   dispose(): void;
-  updateContent(labelText: any): this;
+  updateContent(labelText: string): this;
   updatePosition(latlng: L.LatLngExpression): this;
   showAsError(): this;
   removeError(): this;

@@ -199,7 +199,6 @@ const ZonedrawHandler = L.Handler.extend({
     window.map.on("click", this._click, this);
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
-    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -210,7 +209,6 @@ const ZonedrawHandler = L.Handler.extend({
     window.map.off("click", this._click, this);
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
-    window.map.off("mousemove", this._onMouseMove, this);
   },
 
   _opchange: function () {
@@ -236,14 +234,7 @@ const ZonedrawHandler = L.Handler.extend({
     getSelectedOperation().addZonePoint(this.zoneID, e.latlng);
   },
 
-  _onMouseMove: function (e) {
-    if (e.latlng) {
-      this._tooltip.updatePosition(e.latlng);
-    }
-    L.DomEvent.preventDefault(e.originalEvent);
-  },
-
   _getTooltipText: function () {
-    return { text: wX("ZONE_DRAW") };
+    return wX("ZONE_DRAW");
   },
 });

@@ -6,17 +6,25 @@ export const WTooltip = L.Class.extend({
 
     this._container = L.DomUtil.create("div", "wasabee-tooltip", this._pane);
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
+    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   dispose: function () {
+    window.map.off("mousemove", this._onMouseMove, this);
     this._pane.removeChild(this._container);
     this._container = null;
   },
 
   updateContent: function (labelText) {
     // const span = L.DomUtil.create("span", null, this._container);
-    this._container.textContent = labelText.text;
+    this._container.textContent = labelText;
     return this;
+  },
+
+  _onMouseMove: function (event) {
+    if (event.layerPoint) {
+      L.DomUtil.setPosition(this._container, event.layerPoint);
+    }
   },
 
   updatePosition: function (latlng) {

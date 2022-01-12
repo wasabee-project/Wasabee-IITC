@@ -146,7 +146,6 @@ const QuickDrawControl = L.Handler.extend({
     window.map.on("wasabee:portal:click", this._portalClicked, this);
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
-    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -169,7 +168,6 @@ const QuickDrawControl = L.Handler.extend({
     window.map.off("wasabee:portal:click", this._portalClicked, this);
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
-    window.map.off("mousemove", this._onMouseMove, this);
   },
 
   _opchange: function () {
@@ -204,14 +202,6 @@ const QuickDrawControl = L.Handler.extend({
     }
   },
 
-  _onMouseMove: function (e) {
-    if (e.latlng) {
-      this._tooltip.updatePosition(e.latlng);
-      this._guideUpdate(e);
-    }
-    L.DomEvent.preventDefault(e.originalEvent);
-  },
-
   _guideUpdate: function (e) {
     if (!this._guideLayerGroup) return;
     for (const l of this._guideLayerGroup.getLayers()) {
@@ -238,28 +228,28 @@ const QuickDrawControl = L.Handler.extend({
 
   _getTooltipText: function () {
     if (this._drawMode === "quickdraw") {
-      if (!this._anchor1) return { text: wX("QDSTART") };
-      if (!this._anchor2) return { text: wX("QDNEXT") };
-      return { text: wX("QDCONT") };
+      if (!this._anchor1) return wX("QDSTART");
+      if (!this._anchor2) return wX("QDNEXT");
+      return wX("QDCONT");
     }
     if (this._drawMode === "star") {
       // XXX wX this
-      if (!this._anchor) return { text: "Select the star anchor" };
-      return { text: "Select a portal" };
+      if (!this._anchor)
+        return wX("toolbar.quick_draw.tooltip.star_mode.anchor");
+      return wX("toolbar.quick_draw.tooltip.star_mode.portal");
     }
     // must be in single-link mode
     // XXX wX this
-    if (!this._previous) return { text: "Click first portal" };
-    return { text: "Click next portal" };
+    if (!this._previous)
+      return wX("toolbar.quick_draw.tooltip.single_mode.first");
+    return wX("toolbar.quick_draw.tooltip.single_mode.next");
   },
 
   _portalClicked: function (portal) {
     const selectedPortal = PortalUI.fromIITC(portal);
     if (!selectedPortal) {
       // XXX wX this
-      this._tooltip.updateContent({
-        text: "Portal data not loaded, please try again",
-      });
+      this._tooltip.updateContent(wX("toolbar.quick_draw.tooltip.portal_fail"));
       return;
     }
     if (this._drawMode == "quickdraw") {
