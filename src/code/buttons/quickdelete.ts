@@ -1,4 +1,4 @@
-import { WButton } from "../leafletClasses";
+import { WButton, WTooltip } from "../leafletClasses";
 import wX from "../wX";
 
 import type { Wasabee } from "../init";
@@ -146,6 +146,7 @@ class QuickDeleteHandler extends L.Handler {
   deletedLink: Set<TaskID>;
 
   control: QuickDeleteButton;
+  tooltip: WTooltip;
 
   constructor(control: QuickDeleteButton) {
     super(window.map);
@@ -252,6 +253,12 @@ class QuickDeleteHandler extends L.Handler {
       layer.on("click", this.clickLink, this);
     });
     window.map.on("keyup", this.keyUpListener, this);
+    this.tooltip = new WTooltip(window.map);
+    this.tooltip.updateContent(
+      this.control.state === "instant"
+        ? wX("toolbar.quick_delete.tooltip.quick_mode")
+        : wX("toolbar.quick_delete.tooltip.toggle_mode")
+    );
   }
 
   removeHooks() {
@@ -269,6 +276,7 @@ class QuickDeleteHandler extends L.Handler {
       });
     });
     window.map.off("keyup", this.keyUpListener, this);
+    this.tooltip.dispose();
   }
 }
 
