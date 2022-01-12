@@ -17,6 +17,7 @@ const TeamMembershipList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:team:update", this.update, this);
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog().catch((e) => {
       console.error(e);
@@ -26,14 +27,15 @@ const TeamMembershipList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:team:update", this.update, this);
     window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
   _displayDialog: async function () {
-    const table = this._setupTable();
+    this._table = this._setupTable();
 
     const team = await WasabeeTeam.get(this.options.teamID, 10); // max cache age of 10 seconds
-    table.items = team.agents;
+    this._table.items = team.agents;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -42,11 +44,17 @@ const TeamMembershipList = WDialog.extend({
 
     this.createDialog({
       title: team.name,
-      html: table.table,
+      html: this._table.table,
       width: "auto",
       dialogClass: "teamlist",
       buttons: buttons,
     });
+  },
+
+  update: async function () {
+    const team = await WasabeeTeam.get(this.options.teamID, 10);
+    this._table.items = team.agents;
+    this.setTitle(team.name);
   },
 
   _setupTable: function () {
@@ -63,7 +71,6 @@ const TeamMembershipList = WDialog.extend({
         name: wX("SQUAD"),
         value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
-        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: "Sharing Location",

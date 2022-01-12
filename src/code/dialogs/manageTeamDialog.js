@@ -58,7 +58,6 @@ const ManageTeamDialog = WDialog.extend({
         name: wX("TEAM STATE"),
         value: (agent) => agent.shareLocation,
         sort: (a, b) => a && !b,
-        // , format: (cell, value) => (cell.textContent = value)
       },
       {
         name: wX("SQUAD"),
@@ -83,6 +82,8 @@ const ManageTeamDialog = WDialog.extend({
                     displayInfo(
                       `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
                     );
+                    // refresh team data
+                    await WasabeeTeam.get(this.options.team.ID, 0);
                   } catch (e) {
                     console.error(e);
                     displayError(e);
@@ -90,7 +91,7 @@ const ManageTeamDialog = WDialog.extend({
                 } else {
                   displayInfo(wX("INPUT_SQUAD_NAME"));
                 }
-                this.update();
+                window.map.fire("wasabee:team:update");
               },
               current: value,
               placeholder: "boots",
@@ -115,6 +116,8 @@ const ManageTeamDialog = WDialog.extend({
               callback: async () => {
                 try {
                   await removeAgentFromTeamPromise(value, this.options.team.ID);
+                  // refresh team data
+                  await WasabeeTeam.get(this.options.team.ID, 0);
                 } catch (e) {
                   console.error(e);
                 }
@@ -174,6 +177,8 @@ const ManageTeamDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       try {
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
+        // refresh team data
+        await WasabeeTeam.get(this.options.team.ID, 0);
         displayInfo(wX("ADD_SUCC_INSTR"));
         window.map.fire("wasabee:team:update");
       } catch (e) {
@@ -193,6 +198,8 @@ const ManageTeamDialog = WDialog.extend({
       L.DomEvent.stop(ev);
       try {
         await renameTeamPromise(team.id, renameField.value);
+        // refresh team data
+        await WasabeeTeam.get(this.options.team.ID, 0);
         displayInfo(`renamed to ${renameField.value}`);
         window.map.fire("wasabee:team:update");
       } catch (e) {
