@@ -81,8 +81,6 @@ const MarkerAddDialog = WDialog.extend({
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
         o.textContent = wX(k);
-        if (markers.has(k)) o.disabled = true;
-        else if (!defaultType) defaultType = k;
       }
       this._type.value = defaultType;
     } else {

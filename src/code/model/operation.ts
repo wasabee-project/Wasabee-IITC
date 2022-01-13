@@ -857,7 +857,7 @@ export default class WasabeeOp extends Evented implements IOperation {
 
   addMarker(markerType: string, portal: WasabeePortal, options) {
     if (!portal) return false;
-    if (this.containsMarker(portal, markerType)) return false;
+
     // save a trip to update()
     this._addPortal(portal);
     const marker = new WasabeeMarker({
