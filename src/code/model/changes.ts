@@ -385,13 +385,6 @@ export function computeRebaseChanges(
       (a.fromPortalId === b.fromPortalId && a.toPortalId === b.toPortalId) ||
       (a.fromPortalId === b.toPortalId && a.toPortalId === b.fromPortalId)
   );
-  // use master ID if markers are added at both ends
-  // note: assume we shouldn't have multiple markers with same type on a portal
-  unifyAdditions(
-    masterChanges.markers,
-    followerChanges.markers,
-    (a, b) => a.portalId === b.portalId && a.type === b.type
-  );
 
   const changes = {
     props: rebaseDiff(masterChanges.props, followerChanges.props),
