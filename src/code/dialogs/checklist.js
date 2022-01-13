@@ -79,11 +79,11 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("SET_LINKS_ZONES")] = () => {
       setLinksToZones();
     };
-    buttons["Toggle Filter"] = () => {
+    buttons[wX("dialog.checklist.button.toggle_filters")] = () => {
       this.sortable.filter = !this.sortable.filter;
     };
     const picker = this.getBulkPicker();
-    buttons["Color Filtered"] = () => {
+    buttons[wX("dialog.checklist.button.color_filtered")] = () => {
       picker.click();
     };
 
