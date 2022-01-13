@@ -40,7 +40,6 @@ const MarkerChangeDialog = WDialog.extend({
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
-      if (markers.has(k) && k != this.options.marker.type) o.disabled = true;
     }
     this._type.value = this.options.marker.type;
 

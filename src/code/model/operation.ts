@@ -383,7 +383,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     if (!portal) return markers;
     for (const m of this.markers) {
       if (m.portalId == portal.id) {
-        markers.set(m.type, m);
+        markers.set(m.ID, m);
       }
     }
     return markers;
@@ -1445,7 +1445,7 @@ export default class WasabeeOp extends Evented implements IOperation {
           }
           if (d.type == "marker") {
             const marker = this.getPortalMarkers(d.marker.portalId).get(
-              d.marker.type
+              d.marker.ID
             );
             if (marker) {
               d.id = marker.ID;
@@ -1466,7 +1466,7 @@ export default class WasabeeOp extends Evented implements IOperation {
           }
           if (e.type == "marker") {
             const marker = this.getPortalMarkers(e.marker.portalId).get(
-              e.marker.type
+              e.marker.ID
             );
             if (marker) {
               e.id = marker.ID;
