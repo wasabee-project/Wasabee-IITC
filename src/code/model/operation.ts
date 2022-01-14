@@ -378,17 +378,6 @@ export default class WasabeeOp extends Evented implements IOperation {
     return false;
   }
 
-  getPortalMarkers(portal: WasabeePortal) {
-    const markers = new Map<string, WasabeeMarker>();
-    if (!portal) return markers;
-    for (const m of this.markers) {
-      if (m.portalId == portal.id) {
-        markers.set(m.type, m);
-      }
-    }
-    return markers;
-  }
-
   getLinkByPortalIDs(portalId1: PortalID, portalId2: PortalID) {
     for (const l of this.links) {
       if (
@@ -857,7 +846,7 @@ export default class WasabeeOp extends Evented implements IOperation {
 
   addMarker(markerType: string, portal: WasabeePortal, options) {
     if (!portal) return false;
-    if (this.containsMarker(portal, markerType)) return false;
+
     // save a trip to update()
     this._addPortal(portal);
     const marker = new WasabeeMarker({
@@ -1404,79 +1393,6 @@ export default class WasabeeOp extends Evented implements IOperation {
     // add missing zones
     summary.addition.zone = this.mergeZones(op);
 
-    // try to detect 0.18 ops with inconsistent IDs
-    {
-      const ids = new Set();
-      for (const l of this.links) {
-        ids.add(l.ID);
-      }
-      for (const m of this.markers) {
-        ids.add(m.ID);
-      }
-      let foundCollision = false;
-      for (const d of changes.deletion) {
-        if (d.type == "link" || d.type == "marker")
-          if (ids.has(d.id)) {
-            foundCollision = true;
-            break;
-          }
-      }
-      if (!foundCollision && op.links.some((l) => ids.has(l.ID)))
-        foundCollision = true;
-      if (!foundCollision && op.markers.some((m) => ids.has(m.ID)))
-        foundCollision = true;
-
-      // foundCollision: either there is a collision in IDs, or everything fine
-      if (!foundCollision) {
-        // unless someone deleted everything and rebuild an OP, IDs differ between op and `this`
-        // we need to use the server IDs so everyone use the same IDs
-        // this will occur with old client editing the ops, and old ops with always parallel writers (none is sync; bound to disappear)
-        summary.compatibility.ok = false;
-        for (const d of changes.deletion) {
-          if (d.type == "link") {
-            const link = this.getLinkByPortalIDs(
-              d.link.fromPortalId,
-              d.link.toPortalId
-            );
-            if (link) {
-              d.id = link.ID;
-              summary.compatibility.rewrite.link += 1;
-            }
-          }
-          if (d.type == "marker") {
-            const marker = this.getPortalMarkers(d.marker.portalId).get(
-              d.marker.type
-            );
-            if (marker) {
-              d.id = marker.ID;
-              summary.compatibility.rewrite.marker += 1;
-            }
-          }
-        }
-        for (const e of changes.edition) {
-          if (e.type == "link") {
-            const link = this.getLinkByPortalIDs(
-              e.link.fromPortalId,
-              e.link.toPortalId
-            );
-            if (link) {
-              e.id = link.ID;
-              summary.compatibility.rewrite.link += 1;
-            }
-          }
-          if (e.type == "marker") {
-            const marker = this.getPortalMarkers(e.marker.portalId).get(
-              e.marker.type
-            );
-            if (marker) {
-              e.id = marker.ID;
-              summary.compatibility.rewrite.marker += 1;
-            }
-          }
-        }
-      }
-    }
-
     for (const d of changes.deletion) {
       if (d.type == "link") {
         const links = this.links.filter((l) => l.ID != d.id);
@@ -1527,18 +1443,10 @@ export default class WasabeeOp extends Evented implements IOperation {
         let found = false;
         for (const m of this.markers) {
           if (m.ID == e.marker.ID) {
-            const markers = this.getPortalMarkers(e.marker.portalId);
-            const marker = markers.get(e.marker.type);
-            if (marker && marker != m) {
-              // remove the marker if leading to a duplicate
-              this.markers = this.markers.filter((m) => m.ID != e.marker.ID);
-              summary.edition.duplicate += 1;
-            } else {
-              for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
-              summary.edition.marker += 1;
-              if (e.diff.some((kv) => kv[0] == "assignedTo"))
-                summary.edition.assignment += 1;
-            }
+            for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
+            summary.edition.marker += 1;
+            if (e.diff.some((kv) => kv[0] == "assignedTo"))
+              summary.edition.assignment += 1;
             found = true;
             break;
           }

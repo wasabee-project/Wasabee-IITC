@@ -35,21 +35,16 @@ const MarkerChangeDialog = WDialog.extend({
 
     this._type = L.DomUtil.create("select", null, content);
 
-    const markers = operation.getPortalMarkers(portal);
     for (const k of WasabeeMarker.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
-      if (markers.has(k) && k != this.options.marker.type) o.disabled = true;
     }
     this._type.value = this.options.marker.type;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (
-        WasabeeMarker.markerTypes.has(this._type.value) &&
-        !markers.has(this._type.value)
-      ) {
+      if (WasabeeMarker.markerTypes.has(this._type.value)) {
         operation.startBatchMode();
         operation.removeMarker(this.options.marker);
         operation.addMarker(this._type.value, portal, {

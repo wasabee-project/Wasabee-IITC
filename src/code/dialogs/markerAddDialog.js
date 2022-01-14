@@ -62,10 +62,6 @@ const MarkerAddDialog = WDialog.extend({
         this._selectedPortal.latLng
       );
 
-      const markers = getSelectedOperation().getPortalMarkers(
-        this._selectedPortal
-      );
-
       let defaultType =
         window.plugin.wasabee.static.constants.DEFAULT_MARKER_TYPE;
       if (
@@ -75,14 +71,11 @@ const MarkerAddDialog = WDialog.extend({
         defaultType =
           localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY];
       }
-      defaultType = markers.has(defaultType) ? null : defaultType;
 
       for (const k of WasabeeMarker.markerTypes) {
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
         o.textContent = wX(k);
-        if (markers.has(k)) o.disabled = true;
-        else if (!defaultType) defaultType = k;
       }
       this._type.value = defaultType;
     } else {
@@ -152,12 +145,12 @@ const MarkerAddDialog = WDialog.extend({
 
     // XXX remove comment from args in 0.20
     if (operation.addMarker(selectedType, PortalUI.getSelected(), options)) {
+      localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
+        selectedType;
       if (WasabeeMarker.isDestructMarkerType(selectedType))
         WasabeeBlocker.removeBlocker(operation, PortalUI.getSelected().id);
       await this.update();
     } else displayError(wX("ALREADY_HAS_MARKER"));
-    localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
-      selectedType;
   },
 
   _getAgentMenu: async function (menu) {
