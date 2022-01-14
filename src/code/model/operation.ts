@@ -378,17 +378,6 @@ export default class WasabeeOp extends Evented implements IOperation {
     return false;
   }
 
-  getPortalMarkers(portal: WasabeePortal) {
-    const markers = new Map<string, WasabeeMarker>();
-    if (!portal) return markers;
-    for (const m of this.markers) {
-      if (m.portalId == portal.id) {
-        markers.set(m.ID, m);
-      }
-    }
-    return markers;
-  }
-
   getLinkByPortalIDs(portalId1: PortalID, portalId2: PortalID) {
     for (const l of this.links) {
       if (
@@ -1454,18 +1443,10 @@ export default class WasabeeOp extends Evented implements IOperation {
         let found = false;
         for (const m of this.markers) {
           if (m.ID == e.marker.ID) {
-            const markers = this.getPortalMarkers(e.marker.portalId);
-            const marker = markers.get(e.marker.type);
-            if (marker && marker != m) {
-              // remove the marker if leading to a duplicate
-              this.markers = this.markers.filter((m) => m.ID != e.marker.ID);
-              summary.edition.duplicate += 1;
-            } else {
-              for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
-              summary.edition.marker += 1;
-              if (e.diff.some((kv) => kv[0] == "assignedTo"))
-                summary.edition.assignment += 1;
-            }
+            for (const kv of e.diff) m[kv[0]] = e.marker[kv[0]];
+            summary.edition.marker += 1;
+            if (e.diff.some((kv) => kv[0] == "assignedTo"))
+              summary.edition.assignment += 1;
             found = true;
             break;
           }
