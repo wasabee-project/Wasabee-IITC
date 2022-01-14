@@ -10,6 +10,11 @@
             "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/latest/dev/wasabee.meta.js",
             "version": "0.20.BUILDDATE-dev"
         },
+        "testing": {
+            "downloadURL": "https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.user.js",
+            "updateURL": "https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.meta.js",
+            "version": "0.20.BUILDDATE-testing"
+        },
         "pr": {
             "version": "0.20-pr"
         },

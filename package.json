@@ -35,10 +35,11 @@
     "webpack-cli": "^4.8.0"
   },
   "scripts": {
-    "build": "webpack --progress --mode production",
-    "build-dev": "webpack --progress --mode development",
-    "build-scot": "webpack --progress --mode development --env scot",
-    "build-pr": "webpack --progress --mode development --env pr=${PR_NUMBER}",
+    "build": "webpack --progress --env build=prod",
+    "build-dev": "webpack --progress --env build=dev",
+    "build-scot": "webpack --progress --env build=scot",
+    "build-pr": "webpack --progress --env build=pr --env pr=${PR_NUMBER}",
+    "build-testing": "webpack --progress --env build=testing",
     "format:check": "prettier --check src/code",
     "format:run": "prettier --write src/code",
     "lint:check": "eslint src",

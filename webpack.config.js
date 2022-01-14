@@ -140,13 +140,13 @@ const config = {
   },
   resolve: {
     modules: ["node_modules"],
-    extensions: ['.ts', '.js'],
+    extensions: [".ts", ".js"],
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
       {
@@ -187,27 +187,31 @@ function getCommitShort() {
 module.exports = (env, argv) => {
   const pluginConfig = require("./plugin.config.json");
   const meta = pluginConfig.headers.common;
-  if (argv.mode === "development") {
-    const commit = getCommitShort();
-    if (env.scot) {
-      config.output.path = path.join(outputPath, "scot");
-      config.devtool = "eval-source-map";
-      Object.assign(meta, pluginConfig.headers.scot);
-    } else if (env.pr) {
-      config.output.path = path.join(outputPath, "dev");
-      config.devtool = "eval-source-map";
-      Object.assign(meta, pluginConfig.headers.pr);
+  const build = env.build;
+  if (build in pluginConfig.headers)
+    Object.assign(meta, pluginConfig.headers[build]);
+  switch (build) {
+    case "prod":
+    case "dev":
+    case "testing":
+    case "scot":
+      config.output.path = path.join(outputPath, build);
+      break;
+    case "pr":
       meta.version += env.pr;
-    } else if (argv.mode === "development") {
       config.output.path = path.join(outputPath, "dev");
-      config.devtool = "eval-source-map";
-      Object.assign(meta, pluginConfig.headers.dev);
-    }
-    if (commit) meta.version += `-${commit}`;
-  } else {
-    config.output.path = path.join(outputPath, "prod");
-    Object.assign(meta, pluginConfig.headers.prod);
+    default:
   }
+
+  if (build !== "prod") {
+    const commit = getCommitShort();
+    if (commit) meta.version += `-${commit}`;
+    config.devtool = "eval-source-map";
+    config.mode = "development";
+  } else {
+    config.mode = "production";
+  }
+
   config.plugins.push(new IITCScript({ meta: meta, withMeta: true }));
   return config;
 };
