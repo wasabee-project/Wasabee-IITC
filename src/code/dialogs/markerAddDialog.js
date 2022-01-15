@@ -33,10 +33,10 @@ const MarkerAddDialog = WDialog.extend({
   },
 
   update: async function () {
-    this._type.innerHTML = "";
+    this._type.textContent = "";
 
     // zones can be populated even if portal not selected
-    this._zones.innerHTML = ""; // do we need to do this every time? the zone list can change while this dialog is open.
+    this._zones.textContent = ""; // do we need to do this every time? the zone list can change while this dialog is open.
     const zoneAll = L.DomUtil.create("option", null, this._zones);
     zoneAll.value = 0;
     zoneAll.textContent = "All"; // wX this
@@ -47,8 +47,11 @@ const MarkerAddDialog = WDialog.extend({
     }
 
     // clean and rebuild
-    this._assign.innerHTML = "";
-    await this._getAgentMenu(this._assign);
+    const options = await this._getAgentMenu();
+    this._assign.textContent = "";
+    for (const option of options) {
+      this._assign.appendChild(option);
+    }
 
     this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
@@ -153,15 +156,17 @@ const MarkerAddDialog = WDialog.extend({
     } else displayError(wX("ALREADY_HAS_MARKER"));
   },
 
-  _getAgentMenu: async function (menu) {
-    let option = menu.appendChild(L.DomUtil.create("option", null));
+  _getAgentMenu: async function () {
+    const options = [];
+    const option = L.DomUtil.create("option", null);
     option.value = "";
     option.textContent = wX("UNASSIGNED");
+    options.push(option);
 
-    if (!WasabeeMe.isLoggedIn()) return;
+    if (!WasabeeMe.isLoggedIn()) return options;
 
     const operation = getSelectedOperation();
-    if (!operation.isOnCurrentServer()) return;
+    if (!operation.isOnCurrentServer()) return options;
 
     const alreadyAdded = new Set();
     const me = await WasabeeMe.waitGet();
@@ -173,16 +178,17 @@ const MarkerAddDialog = WDialog.extend({
         for (const a of tt.agents) {
           if (!alreadyAdded.has(a.id)) {
             alreadyAdded.add(a.id);
-            option = L.DomUtil.create("option");
+            const option = L.DomUtil.create("option");
             option.value = a.id;
             option.textContent = a.getName();
-            menu.appendChild(option);
+            options.push(option);
           }
         }
       } catch (e) {
         console.error(e);
       }
     }
+    return options;
   },
 });
 
