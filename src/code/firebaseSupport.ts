@@ -62,7 +62,16 @@ export function initFirebase() {
   $(document.body).append(iframe);
 }
 
-async function onMessage(event: MessageEvent<{ data: WMessage }>) {
+async function onMessage(
+  event: MessageEvent<{ data: WMessage } | "permission-blocked">
+) {
+  if (event.data === "permission-blocked") {
+    displayWarning(
+      `Visit <a href="${constants.FIREBASE_IFRAME}">${constants.FIREBASE_IFRAME}</a> and press the button to authorize live updates. You will need to reload IITC afterward.`,
+      true
+    );
+    return;
+  }
   const data = event.data.data;
   switch (data.cmd) {
     case "Agent Location Change":
