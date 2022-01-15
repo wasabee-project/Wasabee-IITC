@@ -226,7 +226,7 @@ const ImportDialog = WDialog.extend({
       }
     }
     displayInfo(
-      wX("IMP_COMP") + found + wX("PORT_FAKE") + faked + wX("USE_SWAP_INSTRUCT")
+      wX("dialog.import.success_message", { count: found, faked: faked })
     );
 
     // get the op out of batchmode, but do not update UI or run crosslinks yet
