@@ -67,7 +67,7 @@ export default class Task {
   }
 
   assign(gid?: GoogleID) {
-    if (gid !== this.assignedTo) this._state = gid ? "pending" : "assigned";
+    if (gid !== this.assignedTo) this._state = gid ? "assigned" : "pending";
     this.assignedTo = gid ? gid : null;
   }
 
