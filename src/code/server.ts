@@ -8,6 +8,9 @@ import type WasabeeAgent from "./model/agent";
 import type WasabeeTeam from "./model/team";
 import type { WDKey } from "./wd";
 import { getJWT } from "./auth";
+import type Task from "./model/task";
+import type WasabeeLink from "./model/link";
+import type WasabeeMarker from "./model/marker";
 
 export default function () {
   return GetWasabeeServer();
@@ -407,6 +410,117 @@ export function delPermPromise(
   return genericDelete(`/api/v1/draw/${opID}/perms`, fd);
 }
 
+export function getLinkPromise(opID: OpID, taskID: TaskID) {
+  return genericGet<WasabeeLink>(`/api/v1/draw/${opID}/link/${taskID}`);
+}
+
+export function getMarkerPromise(opID: OpID, taskID: TaskID) {
+  return genericGet<WasabeeMarker>(`/api/v1/draw/${opID}/marker/${taskID}`);
+}
+
+// tasks
+
+export function taskGetPromise(opID: OpID, taskID: TaskID) {
+  return genericGet<Task>(`/api/v1/draw/${opID}/task/${taskID}`);
+}
+
+export function taskOrderPromise(opID: OpID, taskID: TaskID, order: number) {
+  const fd = new FormData();
+  fd.append("order", `${order}`);
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/order`,
+    fd
+  );
+}
+
+export function taskAssignPromise(
+  opID: OpID,
+  taskID: TaskID,
+  gids: GoogleID[]
+) {
+  const fd = new FormData();
+  for (const gid of gids) {
+    fd.append("agent[]", gid);
+  }
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/assign`,
+    fd
+  );
+}
+
+export function taskDeleteAssignPromise(opID: OpID, taskID: TaskID) {
+  return genericDelete<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/assign`
+  );
+}
+
+export function taskCommentPromise(
+  opID: OpID,
+  taskID: TaskID,
+  comment: string
+) {
+  const fd = new FormData();
+  fd.append("comment", comment);
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/comment`,
+    fd
+  );
+}
+
+export function taskCompletePromise(
+  opID: OpID,
+  taskID: TaskID,
+  complete: boolean
+) {
+  const action = complete ? "complete" : "incomplete";
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/${action}`
+  );
+}
+
+export function taskAckPromise(opID: OpID, taskID: TaskID) {
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/acknowledge`
+  );
+}
+
+export function taskRejectPromise(opID: OpID, taskID: TaskID) {
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/reject`
+  );
+}
+
+export function taskClaimPromise(opID: OpID, taskID: TaskID) {
+  return genericPut<IServerUpdate>(`/api/v1/draw/${opID}/task/${taskID}/claim`);
+}
+
+export function taskZonePromise(opID: OpID, taskID: TaskID, zone: ZoneID) {
+  const fd = new FormData();
+  fd.append("zone", `${zone}`);
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/zone`,
+    fd
+  );
+}
+
+export function taskDeltaPromise(opID: OpID, taskID: TaskID, delta: number) {
+  const fd = new FormData();
+  fd.append("delta", `${delta}`);
+  return genericPut<IServerUpdate>(`/api/v1/draw/${opID}/task/${taskID}/delta`);
+}
+
+export function taskAddDependPromise(opID: OpID, taskID: TaskID, dep: TaskID) {
+  return genericPut<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/depend/${dep}`
+  );
+}
+
+export function taskDelDependPromise(opID: OpID, taskID: TaskID, dep: TaskID) {
+  return genericDelete<IServerUpdate>(
+    `/api/v1/draw/${opID}/task/${taskID}/depend/${dep}`
+  );
+}
+
 // local change: none // cache: none
 export function assignMarkerPromise(
   opID: OpID,
@@ -419,7 +533,11 @@ export function assignMarkerPromise(
 }
 
 // performs a link assignment on the server, sending notifications
-export function assignLinkPromise(opID: OpID, linkID: LinkID, agentID) {
+export function assignLinkPromise(
+  opID: OpID,
+  linkID: LinkID,
+  agentID: GoogleID
+) {
   const fd = new FormData();
   fd.append("agent", agentID);
   return genericPost(`/api/v1/draw/${opID}/link/${linkID}/assign`, fd);
@@ -641,7 +759,7 @@ function genericPost<T>(
   });
 }
 
-function genericPut<T>(url: string, formData: FormData) {
+function genericPut<T>(url: string, formData?: FormData) {
   return generic<T>({
     url: url,
     method: "PUT",

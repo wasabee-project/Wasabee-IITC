@@ -5,11 +5,17 @@
  * simply pass the messages along using window.parent.postMessage.
  */
 import { drawSingleTeam } from "./mapDrawing";
-import { opPromise, GetWasabeeServer } from "./server";
+import {
+  opPromise,
+  GetWasabeeServer,
+  getLinkPromise,
+  getMarkerPromise,
+} from "./server";
 import {
   makeSelectedOperation,
   removeOperation,
   changeOpIfNeeded,
+  getSelectedOperation,
 } from "./selectedOp";
 import { updateLocalOp } from "./uiCommands";
 import WasabeeOp from "./model/operation";
@@ -21,6 +27,8 @@ import WasabeeAgent from "./model/agent";
 import { getJWT } from "./auth";
 import WasabeeMe from "./model/me";
 import { constants } from "./static";
+import WasabeeLink from "./model/link";
+import WasabeeMarker from "./model/marker";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -37,15 +45,18 @@ export function initFirebase() {
   iframe.id = frameID;
 
   iframe.addEventListener("load", () => {
-    port.onmessage = onMessage;
-    iframe.contentWindow.postMessage('init', '*', [channel.port2]);
-
-    if (WasabeeMe.isLoggedIn()) {
-      postToFirebase({
-        id: "wasabeeLogin",
-        method: "auto"
-      });
-    }
+    port.onmessage = (ev) => {
+      if (ev.data === "ready") {
+        port.onmessage = onMessage;
+        if (WasabeeMe.isLoggedIn()) {
+          postToFirebase({
+            id: "wasabeeLogin",
+            method: "auto",
+          });
+        }
+      }
+    };
+    iframe.contentWindow.postMessage("init", "*", [channel.port2]);
   });
 
   $(document.body).append(iframe);
@@ -79,6 +90,10 @@ async function onMessage(event: MessageEvent<{ data: WMessage }>) {
     // fallthrough
     case "Marker Assignment Change":
     // fallthrough
+    case "Task Status Change":
+    // fallthrough
+    case "Task Assignment Change":
+    // fallthrough
     case "Marker Status Change":
     // fallthrough
     case "Map Change":
@@ -106,7 +121,14 @@ async function onMessage(event: MessageEvent<{ data: WMessage }>) {
 }
 
 async function opDataChange(
-  data: LinkAssignment | LinkState | MarkerAssignment | MarkerState | OpChange
+  data:
+    | LinkAssignment
+    | LinkState
+    | MarkerAssignment
+    | MarkerState
+    | TaskAssignment
+    | TaskState
+    | OpChange
 ) {
   let uid = data.updateID;
   if (data.cmd !== "Map Change") uid += data.cmd;
@@ -127,17 +149,24 @@ async function opDataChange(
     return;
   }
 
+  const sop = getSelectedOperation();
+  const cur = sop.ID === data.opID;
+
   switch (data.cmd) {
     case "Link Assignment Change":
+      if (cur) handleLinkAssignement(sop, data);
       console.log(data);
       break;
     case "Link Status Change":
+      if (cur) handleLinkStatus(sop, data);
       console.log(data);
       break;
     case "Marker Assignment Change":
+      if (cur) handleMarkerAssignement(sop, data);
       console.log(data);
       break;
     case "Marker Status Change":
+      if (cur) handleMarkerStatus(sop, data);
       console.log(data);
       break;
     case "Map Change":
@@ -155,7 +184,39 @@ async function opDataChange(
         console.error(e);
       }
       break;
+    default:
+      console.log(data);
   }
+}
+
+async function handleLinkAssignement(
+  operation: WasabeeOp,
+  data: LinkAssignment
+) {
+  const link = new WasabeeLink(await getLinkPromise(data.opID, data.linkID));
+  operation.assignLink(link.ID, link.assignedTo);
+}
+
+async function handleLinkStatus(operation: WasabeeOp, data: LinkState) {
+  const link = new WasabeeLink(await getLinkPromise(data.opID, data.linkID));
+  operation.setLinkState(link.ID, link.state);
+}
+
+async function handleMarkerAssignement(
+  operation: WasabeeOp,
+  data: MarkerAssignment
+) {
+  const marker = new WasabeeMarker(
+    await getMarkerPromise(data.opID, data.markerID)
+  );
+  operation.assignMarker(marker.ID, marker.assignedTo);
+}
+
+async function handleMarkerStatus(operation: WasabeeOp, data: MarkerState) {
+  const marker = new WasabeeMarker(
+    await getMarkerPromise(data.opID, data.markerID)
+  );
+  operation.setMarkerState(marker.ID, marker.state);
 }
 
 type AgentLocation = {
@@ -265,7 +326,7 @@ export function postToFirebase(message: Partial<FirebaseMessage>) {
   if (
     message.id == "analytics" &&
     localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
-    "true"
+      "true"
   )
     return;
 
