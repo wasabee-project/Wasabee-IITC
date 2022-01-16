@@ -186,6 +186,7 @@ export function operationChanges(origin: WasabeeOp, current: WasabeeOp) {
       "comment",
       "referencetime",
       "color",
+      "localchanged",
     ]),
     portals: compareList(
       origin.opportals,

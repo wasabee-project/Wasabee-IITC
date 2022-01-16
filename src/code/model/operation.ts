@@ -112,7 +112,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.teamlist = obj.teamlist ? obj.teamlist : [];
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
-    this.localchanged = obj.localchanged === false ? obj.localchanged : true;
+    this.localchanged = !!obj.localchanged;
     this.keysonhand = obj.keysonhand ? obj.keysonhand : [];
     this.zones = this.convertZonesToObjs(obj.zones);
     // this.modified = obj.modified ? obj.modified : null;
