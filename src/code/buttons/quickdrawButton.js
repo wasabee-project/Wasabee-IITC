@@ -141,6 +141,7 @@ const QuickDrawControl = L.Handler.extend({
     window.map.on("wasabee:portal:click", this._portalClicked, this);
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
+    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -163,6 +164,7 @@ const QuickDrawControl = L.Handler.extend({
     window.map.off("wasabee:portal:click", this._portalClicked, this);
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
+    window.map.off("mousemove", this._onMouseMove, this);
   },
 
   _opchange: function () {
@@ -194,6 +196,12 @@ const QuickDrawControl = L.Handler.extend({
       postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
       this._operation.clearAllLinks();
       window.map.fire("wasabee:crosslinks");
+    }
+  },
+
+  _onMouseMove: function (e) {
+    if (e.latlng) {
+      this._guideUpdate(e);
     }
   },
 
