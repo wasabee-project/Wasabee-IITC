@@ -29,6 +29,11 @@ const AboutDialog = WDialog.extend({
     // wX is the translation call, it looks up the string in the agent's chosen language
     support.innerHTML = wX("SUPPORT_INSTRUCT");
 
+    if (this._smallScreen) {
+      const mobileApp = L.DomUtil.create("div", null, html);
+      mobileApp.innerHTML = wX("WASABEE_MOBILE_APP");
+    }
+
     const tips = L.DomUtil.create("div", null, html);
     tips.innerHTML =
       "<h3>Show your love</h3><a href='https://www.patreon.com/wasabee' target=\"_blank\">Patreon</a>";
