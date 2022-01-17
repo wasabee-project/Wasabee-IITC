@@ -31,7 +31,7 @@ const AboutDialog = WDialog.extend({
 
     if (this._smallScreen) {
       const mobileApp = L.DomUtil.create("div", null, html);
-      mobileApp.innerHTML = wX("WASABEE_MOBILE_APP");
+      mobileApp.innerHTML = wX("dialog.about.download_mobile_app");
     }
 
     const tips = L.DomUtil.create("div", null, html);
