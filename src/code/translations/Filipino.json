@@ -92,6 +92,7 @@
   "DELETE_OP": "Tangalin {opName}",
   "DESCRIP_PLACEHOLD": "Description (opsyonal)",
   "DestroyPortalAlert": "Sirain",
+  "dialog.about.download_mobile_app": "<h3>Wasabee App: </h3><div class='desc'><a href='https://app.wasabee.rocks' target='_blank'>Download the ground Agents application</a></div>",
   "dialog.setcomment.portal_hardness": "Hardness",
   "dialog.import.success_message": "Import Complete. Found {count} portals and used {faked} faked. Please use the swap feature to move faked portals to the real portals at the same location. Zooming in on the 'Loading' portals in the checklist might force them to load.",
   "DRAW TOOLS FORMAT": "Draw Tools Format",
