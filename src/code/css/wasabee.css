@@ -279,6 +279,10 @@
   margin: 0px 25px;
 }
 
+.wasabee-dialog-markeradd div.bulk {
+  grid-column: 2;
+}
+
 .wasabee-dialog-markeradd div.content input {
   grid-column: 1 / span 2;
 }
