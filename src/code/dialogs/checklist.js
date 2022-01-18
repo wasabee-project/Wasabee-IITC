@@ -315,7 +315,11 @@ const OperationChecklistDialog = WDialog.extend({
       const container = L.DomUtil.create("div", "field-count");
       if (emptyFieldLinks.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${fieldCount} fields and ${emptyCount} empty field(s) on ${emptyFieldLinks.length} link(s)`;
+        header.textContent = wX("dialog.checklist.field_count_with_empty", {
+          fieldCount: fieldCount,
+          emptyCount: emptyCount,
+          linkCount: emptyFieldLinks,
+        });
         const content = L.DomUtil.create("ul", null, container);
         for (const [link, c] of emptyFieldLinks) {
           const li = L.DomUtil.create("li", "empty-field-link", content);
@@ -324,18 +328,26 @@ const OperationChecklistDialog = WDialog.extend({
         }
       } else {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${fieldCount} fields and no empty field`;
+        header.textContent = wX("dialog.checklist.field_count", {
+          fieldCount: fieldCount,
+        });
       }
       if (linksFromInner.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${linksFromInner.length} links from covered portals`;
+        header.textContent = wX("dialog.checklist.link_from_inside", {
+          count: linksFromInner.length,
+        });
         const content = L.DomUtil.create("ul", null, container);
         for (const link of linksFromInner) {
           const cl = coveredPortals.get(link.fromPortalId);
           const li = L.DomUtil.create("li", "inner-link", content);
           li.append(`${link.order}: `);
           li.appendChild(LinkUI.displayFormat(link, operation));
-          li.append(` at ${cl.order} by link `);
+          li.append(
+            wX("dialog.checklist.link_from_inside.covered_at_order", {
+              order: cl.order,
+            })
+          );
           li.appendChild(LinkUI.displayFormat(cl, operation));
         }
       }
