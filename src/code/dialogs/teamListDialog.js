@@ -111,8 +111,8 @@ const TeamListDialog = WDialog.extend({
             L.DomEvent.on(link, "click", (ev) => {
               L.DomEvent.stop(ev);
               const cd = new ConfirmDialog({
-                title: `Leave ${obj.Name}?`,
-                label: `If you leave ${obj.Name} you cannot rejoin unless the owner re-adds you.`,
+                title: wX("dialog.leave_team.title", { teamName: obj.Name }),
+                label: wX("dialog.leave_team.text"),
                 type: "team",
                 callback: async () => {
                   try {

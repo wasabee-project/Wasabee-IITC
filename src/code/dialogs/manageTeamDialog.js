@@ -60,7 +60,7 @@ const ManageTeamDialog = WDialog.extend({
         sort: (a, b) => a && !b,
       },
       {
-        name: wX("SQUAD"),
+        name: wX("COMMENT"),
         value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, obj) => {
@@ -69,8 +69,8 @@ const ManageTeamDialog = WDialog.extend({
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
             const squadDialog = new PromptDialog({
-              title: `Set Squad for ${obj.name}`,
-              label: "Squad",
+              title: wX("dialog.agent_comment.title", { agentName: obj.name }),
+              label: wX("dialog.agent_comment.text"),
               callback: async () => {
                 if (squadDialog.inputField.value) {
                   try {
@@ -110,8 +110,11 @@ const ManageTeamDialog = WDialog.extend({
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
             const con = new ConfirmDialog({
-              title: `${button.textContent}: ${obj.name}`,
-              label: `${button.textContent}: ${obj.name}?`,
+              title: wX("dialog.remove_agent.title", { agentName: obj.name }),
+              label: wX("dialog.remove_agent.text", {
+                agentName: obj.name,
+                teamName: this.options.team.Name,
+              }),
               type: "agent",
               callback: async () => {
                 try {

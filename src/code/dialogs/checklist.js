@@ -169,7 +169,7 @@ const OperationChecklistDialog = WDialog.extend({
         },
       },
       {
-        name: "Zone",
+        name: wX("ZONE"),
         value: (thing) => thing.zone,
         sort: (a, b) => a - b,
         format: (cell, value, thing) => {
