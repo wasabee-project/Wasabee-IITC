@@ -247,6 +247,7 @@
   "PERM DENIED SHORT": "Permission denied",
   "PERMS": "{opName} permissions",
   "PLEASE_SELECT_PORTAL": "Please select a portal",
+  "popup.marker.state_button": "Set State",
   "PORT_FAKE": "<deprecated for dialog.import.success_message>",
   "PORTAL KEY LIST": "Key list for portal {portalName}",
   "PORTAL_COUNT": "{count} portals",
