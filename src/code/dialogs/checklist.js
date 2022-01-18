@@ -267,8 +267,8 @@ const OperationChecklistDialog = WDialog.extend({
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
             const rev = L.DomUtil.create("a", null, cell);
+            L.DomUtil.create("i", "fas fa-arrows-alt-h", rev);
             rev.href = "#";
-            rev.textContent = "🔄";
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);
@@ -276,7 +276,7 @@ const OperationChecklistDialog = WDialog.extend({
 
             const del = L.DomUtil.create("a", null, cell);
             del.href = "#";
-            del.textContent = "🗑";
+            L.DomUtil.create("i", "fas fa-trash", del);
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeLink(obj.fromPortalId, obj.toPortalId);
@@ -284,7 +284,7 @@ const OperationChecklistDialog = WDialog.extend({
           } else {
             const del = L.DomUtil.create("a", null, cell);
             del.href = "#";
-            del.textContent = "🗑";
+            L.DomUtil.create("i", "fas fa-trash", del);
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeMarker(obj);

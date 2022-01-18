@@ -36,7 +36,11 @@ const AgentDialog = WDialog.extend({
       for (const [label, value] of rows) {
         const li = L.DomUtil.create("li", "", ul);
         L.DomUtil.create("label", null, li).textContent = label;
-        L.DomUtil.create("span", null, li).textContent = value;
+        if (value === true) {
+          L.DomUtil.create("i", "fas fa-check", li);
+        } else {
+          L.DomUtil.create("span", null, li).textContent = value;
+        }
       }
 
       const img = L.DomUtil.create("img", null, html);

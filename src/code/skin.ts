@@ -1,3 +1,34 @@
+import { library, dom } from "@fortawesome/fontawesome-svg-core";
+import {
+  faCheck,
+  faTrash,
+  faServer,
+  faSync,
+  faArrowsAltH,
+  faPen,
+  faEraser,
+  faBan,
+  faPalette,
+  faAsterisk,
+  faDesktop,
+} from "@fortawesome/free-solid-svg-icons";
+
+for (const icon of [
+  faCheck,
+  faTrash,
+  faServer,
+  faSync,
+  faArrowsAltH,
+  faPen,
+  faEraser,
+  faBan,
+  faPalette,
+  faAsterisk,
+  faDesktop,
+])
+  library.add(icon);
+dom.watch();
+
 const Wasabee = window.plugin.wasabee;
 
 // the skins probably aren't loaded by the time W's init is called
