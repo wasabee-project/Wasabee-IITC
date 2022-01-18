@@ -94,7 +94,7 @@ const MadridDialog = AutoDraw.extend({
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
     anchorThreeLabel.textContent = wX("ANCHOR3");
     const anchorThreeDisplay = L.DomUtil.create("span", null, container);
-    anchorThreeDisplay.textContent = "Auto-determined";
+    anchorThreeDisplay.textContent = wX("autodraw.madrid.auto_determined");
     this._addSelectSet(wX("MADRID_SET_3"), "setThree", container, "all");
 
     this._addCheckbox(

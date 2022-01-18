@@ -233,7 +233,7 @@ const ManageTeamDialog = WDialog.extend({
     });
 
     const joinlinklabel = L.DomUtil.create("label", null, container);
-    joinlinklabel.textContent = "Join Link";
+    joinlinklabel.textContent = wX("dialog.team_manage.join_link");
     if (team.jlt) {
       const joinlink = L.DomUtil.create("input", null, container);
       const server = GetWasabeeServer();
@@ -245,7 +245,7 @@ const ManageTeamDialog = WDialog.extend({
       joinlink.readOnly = true;
       L.DomEvent.on(joinlink, "click", (ev) => ev.target.select());
       const joinlinkdel = L.DomUtil.create("button", null, container);
-      joinlinkdel.textContent = "Revoke";
+      joinlinkdel.textContent = wX("dialog.team_manage.join_link.revoke");
       L.DomEvent.on(joinlinkdel, "click", async (ev) => {
         L.DomEvent.stop(ev);
         await deleteJoinLinkPromise(team.id);
@@ -254,7 +254,7 @@ const ManageTeamDialog = WDialog.extend({
     } else {
       L.DomUtil.create("span", null, container).textContent = "not set";
       const joinlinkadd = L.DomUtil.create("button", null, container);
-      joinlinkadd.textContent = "Create";
+      joinlinkadd.textContent = wX("dialog.team_manage.join_link.create");
       L.DomEvent.on(joinlinkadd, "click", async (ev) => {
         L.DomEvent.stop(ev);
         await createJoinLinkPromise(team.id);

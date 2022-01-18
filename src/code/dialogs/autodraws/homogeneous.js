@@ -374,7 +374,7 @@ const HomogeneousDialog = AutoDraw.extend({
     });
 
     const orderLabel = L.DomUtil.create("label", null, container);
-    orderLabel.textContent = "Order";
+    orderLabel.textContent = wX("autodraw.homogeneous.order");
     this.orderMenu = L.DomUtil.create("select", null, container);
     for (const [text, value] of [
       [wX("FROM_DEPTH"), "core"], // need wX on first column

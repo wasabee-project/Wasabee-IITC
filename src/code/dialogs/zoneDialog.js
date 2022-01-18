@@ -78,10 +78,13 @@ const ZoneDialog = WDialog.extend({
       L.DomUtil.create("table", "wasabee-table", container)
     );
     const hr = L.DomUtil.create("tr", null, tbody);
-    L.DomUtil.create("th", null, hr).textContent = "ID";
-    L.DomUtil.create("th", null, hr).textContent = "Name";
-    L.DomUtil.create("th", null, hr).textContent = "Color";
-    if (canWrite) L.DomUtil.create("th", null, hr).textContent = "Commands";
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.id");
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.name");
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.color");
+    if (canWrite)
+      L.DomUtil.create("th", null, hr).textContent = wX(
+        "dialog.zones.commands"
+      );
 
     for (const z of op.zones) {
       const tr = L.DomUtil.create("tr", null, tbody);

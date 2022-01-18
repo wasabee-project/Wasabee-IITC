@@ -228,7 +228,7 @@ const OpSettingDialog = WDialog.extend({
 
     const zoneDiv = L.DomUtil.create("div", null, buttonSection);
     const zoneButton = L.DomUtil.create("button", null, zoneDiv);
-    zoneButton.textContent = "Zones";
+    zoneButton.textContent = wX("dialog.op_settings.zones");
     L.DomEvent.on(zoneButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const z = new ZoneDialog();
