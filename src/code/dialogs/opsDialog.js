@@ -106,9 +106,12 @@ const OpsDialog = WDialog.extend({
           link.href = "#";
           link.textContent = op.name;
           if (!op.local) {
-            link.title = `Last fetched: ${op.fetched}\n`;
-            if (op.localchanged) link.title += "Local has changed\n";
-            if (op.remotechanged) link.title += "Remote has changed";
+            link.title =
+              wX("dialog.ops_list.last_fetched", { date: op.fetched }) + "\n";
+            if (op.localchanged)
+              link.title += wX("dialog.ops_list.local_change") + "\n";
+            if (op.remotechanged)
+              link.title += wX("dialog.ops_list.remote_change") + "\n";
           }
           if (op.id == getSelectedOperation().ID) link.classList.add("enl");
           L.DomEvent.on(link, "click", async (ev) => {

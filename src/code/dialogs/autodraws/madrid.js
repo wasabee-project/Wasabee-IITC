@@ -126,7 +126,7 @@ const MadridDialog = AutoDraw.extend({
       const total = this._balancedcheck
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
-      displayInfo(`Madrid found ${total} layers`);
+      displayInfo(wX("autodraw.madrid.result", { count: total }));
       // this.closeDialog();
     });
 

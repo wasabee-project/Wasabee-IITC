@@ -79,9 +79,6 @@ const ManageTeamDialog = WDialog.extend({
                       this.options.team.ID,
                       squadDialog.inputField.value
                     );
-                    displayInfo(
-                      `squad updated to ${squadDialog.inputField.value} for ${obj.name}`
-                    );
                     // refresh team data
                     await WasabeeTeam.get(this.options.team.ID, 0);
                   } catch (e) {
@@ -203,7 +200,6 @@ const ManageTeamDialog = WDialog.extend({
         await renameTeamPromise(team.id, renameField.value);
         // refresh team data
         await WasabeeTeam.get(this.options.team.ID, 0);
-        displayInfo(`renamed to ${renameField.value}`);
         window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
@@ -281,7 +277,6 @@ const ManageTeamDialog = WDialog.extend({
         callback: async () => {
           try {
             await deleteTeamPromise(team.id);
-            displayInfo(`${team.name} removed`);
             this.closeDialog();
             await WasabeeMe.waitGet(true);
           } catch (e) {

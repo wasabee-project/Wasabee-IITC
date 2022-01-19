@@ -368,9 +368,10 @@ const HomogeneousDialog = AutoDraw.extend({
     this.depthMenu.value = 4;
 
     L.DomEvent.on(this.depthMenu, "change", () => {
-      this.spanPortalNeeded.textContent = `(${numInnerPortalsPerDepth(
-        +this.depthMenu.value
-      )} needed)`;
+      this.spanPortalNeeded.textContent = wX(
+        "autodraw.homogeneous.portals_required",
+        { count: numInnerPortalsPerDepth(+this.depthMenu.value) }
+      );
     });
 
     const orderLabel = L.DomUtil.create("label", null, container);
@@ -466,7 +467,7 @@ const HomogeneousDialog = AutoDraw.extend({
 
     if (this._failed > 0) {
       displayWarning(
-        `Unable to find ${this._failed} splits, try less depth or a different region`
+        wX("autodraw.homogeneous.missing_split", { count: this._failed })
       );
     }
   },
@@ -504,7 +505,7 @@ const HomogeneousDialog = AutoDraw.extend({
 
     if (this._failed > 0) {
       displayWarning(
-        `Unable to find ${this._failed} splits, try less depth or a different region`
+        wX("autodraw.homogeneous.missing_split", { count: this._failed })
       );
     }
 

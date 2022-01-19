@@ -29,6 +29,7 @@ import WasabeeMe from "./model/me";
 import { constants } from "./static";
 import WasabeeLink from "./model/link";
 import WasabeeMarker from "./model/marker";
+import wX from "./wX";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -67,7 +68,9 @@ async function onMessage(
 ) {
   if (event.data === "permission-blocked") {
     displayWarning(
-      `Visit <a href="${constants.FIREBASE_IFRAME}">${constants.FIREBASE_IFRAME}</a> and press the button to authorize live updates. You will need to reload IITC afterward.`,
+      wX("dialog.firebase.setup", {
+        url: `<a href="${constants.FIREBASE_IFRAME}">${constants.FIREBASE_IFRAME}</a>`,
+      }),
       true
     );
     return;
@@ -87,7 +90,9 @@ async function onMessage(
     case "Generic Message":
       const agent = await WasabeeAgent.get(data.sender);
       const name = agent ? agent.name : "[unknown sender]";
-      displayInfo(`Team announcement: “${data.msg}” from ${name}`);
+      displayInfo(
+        wX("dialog.team_message", { message: data.msg, sender: name })
+      );
       break;
     case "Login":
       console.debug("server reported teammate login: ", data.gid);
