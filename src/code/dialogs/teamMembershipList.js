@@ -68,7 +68,7 @@ const TeamMembershipList = WDialog.extend({
           cell.appendChild(AgentUI.formatDisplay(agent)),
       },
       {
-        name: wX("SQUAD"),
+        name: wX("COMMENT"),
         value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
       },

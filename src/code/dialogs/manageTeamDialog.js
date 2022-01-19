@@ -72,23 +72,19 @@ const ManageTeamDialog = WDialog.extend({
               title: wX("dialog.agent_comment.title", { agentName: obj.name }),
               label: wX("dialog.agent_comment.text"),
               callback: async () => {
-                if (squadDialog.inputField.value) {
-                  try {
-                    await setAgentTeamSquadPromise(
-                      obj.id,
-                      this.options.team.ID,
-                      squadDialog.inputField.value
-                    );
-                    // refresh team data
-                    await WasabeeTeam.get(this.options.team.ID, 0);
-                  } catch (e) {
-                    console.error(e);
-                    displayError(e);
-                  }
-                } else {
-                  displayInfo(wX("INPUT_SQUAD_NAME"));
+                try {
+                  await setAgentTeamSquadPromise(
+                    obj.id,
+                    this.options.team.ID,
+                    squadDialog.inputField.value
+                  );
+                  // refresh team data
+                  await WasabeeTeam.get(this.options.team.ID, 0);
+                  window.map.fire("wasabee:team:update");
+                } catch (e) {
+                  console.error(e);
+                  displayError(e);
                 }
-                window.map.fire("wasabee:team:update");
               },
               current: value,
               placeholder: "boots",
