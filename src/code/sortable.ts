@@ -14,6 +14,7 @@ export interface SortableField<T> {
   sort?: (a: unknown, b: unknown, aobj?: T, bobj?: T) => number;
   format?: (cell: HTMLTableCellElement, value: unknown, thing?: T) => void;
   smallScreenHide?: boolean;
+  foot?: (cell: HTMLTableCellElement) => void,
 }
 
 export default class Sortable<T> {
@@ -24,6 +25,7 @@ export default class Sortable<T> {
   _table: HTMLTableElement;
   _head: HTMLTableSectionElement;
   _body: HTMLTableSectionElement;
+  _foot: HTMLTableSectionElement;
   _smallScreen: boolean;
   _done: Promise<boolean | void> | boolean;
 
@@ -37,6 +39,7 @@ export default class Sortable<T> {
     // create this once for all
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
+    this._foot = L.DomUtil.create("tfoot", null, this._table);
 
     // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
@@ -168,6 +171,7 @@ export default class Sortable<T> {
   set fields(value) {
     this._fields = value;
     this.renderHead();
+    this.renderFoot();
   }
 
   get done() {
@@ -206,6 +210,16 @@ export default class Sortable<T> {
           false
         );
       }
+    }
+  }
+
+  renderFoot() {
+    this._foot.textContent = "";
+    if (this._fields.every((f) => !f.foot)) return;
+    const footerRow = this._foot.insertRow(-1);
+    for (const field of this._fields) {
+      const cell = L.DomUtil.create("td", field.className, footerRow);
+      if (field.foot) field.foot(cell);
     }
   }
 
