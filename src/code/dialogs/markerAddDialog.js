@@ -39,7 +39,7 @@ const MarkerAddDialog = WDialog.extend({
     this._zones.textContent = ""; // do we need to do this every time? the zone list can change while this dialog is open.
     const zoneAll = L.DomUtil.create("option", null, this._zones);
     zoneAll.value = 0;
-    zoneAll.textContent = "All"; // wX this
+    zoneAll.textContent = wX("dialog.common.zone_all");
     for (const z of getSelectedOperation().zones) {
       const o = L.DomUtil.create("option", null, this._zones);
       o.value = z.id;

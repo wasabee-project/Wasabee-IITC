@@ -102,8 +102,8 @@ export function deleteMarker(
 
 export function clearAllItems(operation: WasabeeOp) {
   const con = new ConfirmDialog({
-    title: `Clear: ${operation.name}`,
-    label: `Do you want to reset ${operation.name}?`,
+    title: wX("dialog.clear_all.title", { opName: operation.name }),
+    label: wX("dialog.clear_all.text", { opName: operation.name }),
     type: "operation",
     callback: () => {
       operation.clearAllItems();
@@ -115,8 +115,8 @@ export function clearAllItems(operation: WasabeeOp) {
 
 export function clearAllLinks(operation: WasabeeOp) {
   const con = new ConfirmDialog({
-    title: `Clear Links: ${operation.name}`,
-    label: `Do you want to remove all links from ${operation.name}?`,
+    title: wX("dialog.clear_links.title", { opName: operation.name }),
+    label: wX("dialog.clear_links.text", { opName: operation.name }),
     type: "operation",
     callback: () => {
       operation.clearAllLinks();
@@ -128,8 +128,8 @@ export function clearAllLinks(operation: WasabeeOp) {
 
 export function clearAllMarkers(operation: WasabeeOp) {
   const con = new ConfirmDialog({
-    title: `Clear Markers: ${operation.name}`,
-    label: `Do you want to remove all markers from ${operation.name}?`,
+    title: wX("dialog.clear_markers.title", { opName: operation.name }),
+    label: wX("dialog.clear_markers.text", { opName: operation.name }),
     type: "operation",
     callback: () => {
       operation.clearAllMarkers();

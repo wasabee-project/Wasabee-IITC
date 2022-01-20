@@ -65,7 +65,7 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(getSelectedOperation(), true); // force
     };
-    buttons["Count fields"] = () => {
+    buttons[wX("dialog.checklist.count_fields")] = () => {
       this.countFields(getSelectedOperation(), true);
     };
     buttons[wX("SET_MARKERS_ZONES")] = () => {
@@ -169,7 +169,7 @@ const OperationChecklistDialog = WDialog.extend({
         },
       },
       {
-        name: "Zone",
+        name: wX("ZONE"),
         value: (thing) => thing.zone,
         sort: (a, b) => a - b,
         format: (cell, value, thing) => {
@@ -260,7 +260,9 @@ const OperationChecklistDialog = WDialog.extend({
     ];
     if (canWrite)
       columns.push({
-        name: this._smallScreen ? "Cmds" : "Commands",
+        name: this._smallScreen
+          ? wX("dialog.common.commands_short")
+          : wX("dialog.common.commands"),
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
@@ -315,7 +317,11 @@ const OperationChecklistDialog = WDialog.extend({
       const container = L.DomUtil.create("div", "field-count");
       if (emptyFieldLinks.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${fieldCount} fields and ${emptyCount} empty field(s) on ${emptyFieldLinks.length} link(s)`;
+        header.textContent = wX("dialog.checklist.count_fields.with_empty", {
+          fieldCount: fieldCount,
+          emptyCount: emptyCount,
+          linkCount: emptyFieldLinks,
+        });
         const content = L.DomUtil.create("ul", null, container);
         for (const [link, c] of emptyFieldLinks) {
           const li = L.DomUtil.create("li", "empty-field-link", content);
@@ -324,18 +330,32 @@ const OperationChecklistDialog = WDialog.extend({
         }
       } else {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${fieldCount} fields and no empty field`;
+        header.textContent = wX("dialog.checklist.count_fields.no_empty", {
+          fieldCount: fieldCount,
+        });
       }
       if (linksFromInner.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = `Found ${linksFromInner.length} links from covered portals`;
+        header.textContent = wX(
+          "dialog.checklist.count_fields.link_from_inside",
+          {
+            count: linksFromInner.length,
+          }
+        );
         const content = L.DomUtil.create("ul", null, container);
         for (const link of linksFromInner) {
           const cl = coveredPortals.get(link.fromPortalId);
           const li = L.DomUtil.create("li", "inner-link", content);
           li.append(`${link.order}: `);
           li.appendChild(LinkUI.displayFormat(link, operation));
-          li.append(` at ${cl.order} by link `);
+          li.append(
+            wX(
+              "dialog.checklist.count_fields.link_from_inside.covered_at_order",
+              {
+                order: cl.order,
+              }
+            )
+          );
           li.appendChild(LinkUI.displayFormat(cl, operation));
         }
       }

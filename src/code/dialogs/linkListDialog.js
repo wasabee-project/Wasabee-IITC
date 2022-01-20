@@ -23,7 +23,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     );
     const linkFields = [
       {
-        name: "Length",
+        name: wX("dialog.link_list.length"),
         value: (link) => link.length(operation),
         format: (cell, data) => {
           cell.classList.add("length");
@@ -33,7 +33,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
         smallScreenHide: true,
       },
       {
-        name: "Min Lvl",
+        name: wX("dialog.link_list.level"),
         title: wX("MIN_SRC_PORT_LVL"),
         value: (link) => link.length(operation),
         format: (cell, data, link) => {

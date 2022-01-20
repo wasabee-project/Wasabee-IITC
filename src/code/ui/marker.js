@@ -126,7 +126,7 @@ const WLMarker = PortalUI.WLPortal.extend({
   _stateButton: function (container, marker) {
     const operation = getSelectedOperation();
     const stateButton = L.DomUtil.create("button", null, container);
-    stateButton.textContent = wX("MARKER STATE");
+    stateButton.textContent = wX("popup.marker.state_button");
     L.DomEvent.on(stateButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       const sd = new StateDialog({ target: marker, opID: operation.ID });

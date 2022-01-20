@@ -182,7 +182,7 @@ const OnionfieldDialog = AutoDraw.extend({
     };
 
     this.createDialog({
-      title: "Onion/Rose",
+      title: wX("ONION_WAS_TAKEN"),
       html: container,
       width: "auto",
       dialogClass: "onion",

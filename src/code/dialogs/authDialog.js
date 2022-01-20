@@ -12,6 +12,7 @@ import {
   sendAccessToken,
   sendOneTimeToken,
 } from "../auth";
+import { constants } from "../static";
 
 const AuthDialog = WDialog.extend({
   statics: {
@@ -124,12 +125,16 @@ const AuthDialog = WDialog.extend({
     });
 
     const oneTimeButton = L.DomUtil.create("button", "server", content);
-    oneTimeButton.textContent = "One Time Token Login";
+    oneTimeButton.textContent = wX("dialog.auth.ott.button");
     L.DomEvent.on(oneTimeButton, "click", (ev) => {
       L.DomEvent.stop(ev);
+      const text = L.DomUtil.create("span");
+      text.innerHTML = wX("dialog.auth.ott.text", {
+        url: `${constants.WEBUI_DEFAULT}/#/settings`,
+      });
       const ottDialog = new PromptDialog({
-        title: "One Time Token",
-        label: "One Time Token",
+        title: wX("dialog.auth.ott.title"),
+        label: text,
         callback: async () => {
           if (ottDialog.inputField.value) {
             try {

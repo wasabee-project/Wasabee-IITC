@@ -159,7 +159,7 @@ const WasabeeButton = WButton.extend({
 
     this._SettingsActions = [
       {
-        title: "Settings",
+        title: wX("toolbar.wasabee.settings"),
         text: "⚙",
         callback: () => {
           this.disable();

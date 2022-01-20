@@ -53,7 +53,7 @@ const TrawlerDialog = WDialog.extend({
 
     // same as dialogs/settings.js
     const trawlTitle = L.DomUtil.create("label", null, container);
-    trawlTitle.textContent = "Trawl Skip Tiles";
+    trawlTitle.textContent = wX("TRAWL SKIP TILES");
     const trawlSelect = L.DomUtil.create("select", null, container);
     const tss = Number(
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]

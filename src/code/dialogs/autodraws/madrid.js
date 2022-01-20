@@ -94,7 +94,7 @@ const MadridDialog = AutoDraw.extend({
     const anchorThreeLabel = L.DomUtil.create("label", null, container);
     anchorThreeLabel.textContent = wX("ANCHOR3");
     const anchorThreeDisplay = L.DomUtil.create("span", null, container);
-    anchorThreeDisplay.textContent = "Auto-determined";
+    anchorThreeDisplay.textContent = wX("autodraw.madrid.auto_determined");
     this._addSelectSet(wX("MADRID_SET_3"), "setThree", container, "all");
 
     this._addCheckbox(
@@ -104,7 +104,7 @@ const MadridDialog = AutoDraw.extend({
       container
     );
     this._addCheckbox(
-      "Balanced", // wX
+      wX("autodraw.madrid.balanced"),
       "wasabee-madrid-balanced",
       "_balancedcheck",
       container
@@ -126,7 +126,7 @@ const MadridDialog = AutoDraw.extend({
       const total = this._balancedcheck
         ? this.doBalancedMadrid.call(this)
         : this.doMadrid.call(this);
-      displayInfo(`Madrid found ${total} layers`);
+      displayInfo(wX("autodraw.madrid.result", { count: total }));
       // this.closeDialog();
     });
 

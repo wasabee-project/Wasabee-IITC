@@ -185,7 +185,11 @@ const FanfieldDialog = AutoDraw.extend({
     const ap = 313 * links.length + 1250 * fields;
     // too many parameters for wX();
     displayInfo(
-      `Fanfield found ${links.length} links and ${fields} fields for ${ap} AP`
+      wX("autodraw.fanfield.result", {
+        links: links.length,
+        fields: fields,
+        ap: ap,
+      })
     );
   },
 });

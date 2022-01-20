@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
+import wX from "../wX";
 
 const ZoneSetColorDialog = WDialog.extend({
   statics: {
@@ -20,7 +21,7 @@ const ZoneSetColorDialog = WDialog.extend({
 
   _displayDialog: function () {
     this.createDialog({
-      title: "Zone color",
+      title: wX("dialog.zone_color.title"),
       html: this._buildContent(),
       width: "auto",
       dialogClass: "zone-color",
@@ -30,8 +31,9 @@ const ZoneSetColorDialog = WDialog.extend({
   _buildContent: function () {
     const container = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", container);
-    desc.textContent =
-      "Set the color of all links in zone " + this.options.zone.name;
+    desc.textContent = wX("dialog.zone_color.text", {
+      zoneName: this.options.zone.name,
+    });
 
     const picker = L.DomUtil.create("input", "picker", container);
     picker.type = "color";

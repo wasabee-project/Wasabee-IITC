@@ -1150,9 +1150,8 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   zoneName(zoneID: ZoneID) {
-    if (zoneID == 0)
-      // All zone
-      return "All";
+    if (zoneID === 0)
+      return 0;
     for (const z of this.zones) {
       if (z.id == zoneID) return z.name;
     }

@@ -80,7 +80,20 @@ const MultimaxDialog = AutoDraw.extend({
     button.textContent = wX("MULTI_M");
     L.DomEvent.on(button, "click", () => {
       const total = this.doMultimax.call(this);
-      displayInfo(`Multimax found ${total.join(" and ")} layers`);
+      if (total.length === 2) {
+        displayInfo(
+          wX("autodraw.multimax.result_both_side", {
+            count1: total[0],
+            count2: total[1],
+          })
+        );
+      } else {
+        displayInfo(
+          wX("autodraw.multimax.result", {
+            count: total[0],
+          })
+        );
+      }
       // this.closeDialog();
     });
 

@@ -114,15 +114,18 @@ const OpPermList = WDialog.extend({
         },
       },
       {
-        name: "Zone",
-        value: (perm) => operation.zoneName(perm.zone),
+        name: wX("ZONE"),
+        value: (perm) => {
+          if (perm.zone === 0) return wX("dialog.common.zone_all");
+          return operation.zoneName(perm.zone);
+        },
         sort: (a, b) => a.localeCompare(b),
         // , format: (cell, value) => (cell.textContent = value)
         foot: (cell) => {
           this.zoneMenu = L.DomUtil.create("select", null, cell);
           const zoneAll = L.DomUtil.create("option", null, this.zoneMenu);
           zoneAll.value = "0";
-          zoneAll.textContent = "All";
+          zoneAll.textContent = wX("dialog.common.zone_all");
           for (const oz of operation.zones) {
             const z = L.DomUtil.create("option", null, this.zoneMenu);
             z.value = oz.id;
@@ -136,7 +139,7 @@ const OpPermList = WDialog.extend({
       for (const field of fields) delete field.foot;
     } else {
       fields.push({
-        name: "Commands",
+        name: wX("dialog.common.commands"),
         value: () => wX("REMOVE"),
         format: (cell, value, obj) => {
           const link = L.DomUtil.create("a", null, cell);

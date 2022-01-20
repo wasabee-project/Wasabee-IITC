@@ -73,7 +73,7 @@ const BlockerList = WDialog.extend({
       td.enable();
     };
     if (operation.canWrite()) {
-      buttons["Clear Automark"] = () => {
+      buttons[wX("dialog.blockers.clear_automark")] = () => {
         const operation = getSelectedOperation();
         operation.startBatchMode();
         for (const m of operation.markers) {

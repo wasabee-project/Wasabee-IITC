@@ -51,7 +51,7 @@ export function setupToolbox() {
   });
 
   const onlineAgentLink = L.DomUtil.create("a", "wasabee", toolbox);
-  onlineAgentLink.textContent = "Teammates Online";
+  onlineAgentLink.textContent = wX("toolbox.teammates");
   L.DomEvent.on(onlineAgentLink, "click", (ev) => {
     L.DomEvent.stop(ev);
     const oll = new OnlineAgentList();

@@ -43,7 +43,7 @@ const WLAnchor = PortalUI.WLPortal.extend({
     const requiredKeys = L.DomUtil.create("div", "desc", content);
     const onHand = operation.KeysOnHandForPortal(portal.id);
     const required = operation.KeysRequiredForPortal(portal.id);
-    requiredKeys.textContent = "Keys: " + onHand + " / " + required;
+    requiredKeys.textContent = wX("popup.anchor.keys", { onHand, required });
 
     const buttonSet = L.DomUtil.create(
       "div",
