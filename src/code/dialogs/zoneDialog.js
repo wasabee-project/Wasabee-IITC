@@ -107,7 +107,7 @@ const ZoneDialog = WDialog.extend({
       });
 
       if (canWrite) {
-        const commandcell = L.DomUtil.create("td", null, tr);
+        const commandcell = L.DomUtil.create("td", "actions", tr);
 
         const color = L.DomUtil.create("a", null, commandcell);
         L.DomUtil.create("i", "fas fa-palette", color);

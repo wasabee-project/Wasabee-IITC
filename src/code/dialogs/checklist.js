@@ -263,6 +263,7 @@ const OperationChecklistDialog = WDialog.extend({
         name: this._smallScreen
           ? wX("dialog.common.commands_short")
           : wX("dialog.common.commands"),
+        className: "actions",
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
