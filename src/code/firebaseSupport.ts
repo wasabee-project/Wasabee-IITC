@@ -88,11 +88,13 @@ async function onMessage(
       await changeOpIfNeeded();
       break;
     case "Generic Message":
-      const agent = await WasabeeAgent.get(data.sender);
-      const name = agent ? agent.name : "[unknown sender]";
-      displayInfo(
-        wX("dialog.team_message", { message: data.msg, sender: name })
-      );
+      {
+        const agent = await WasabeeAgent.get(data.sender);
+        const name = agent ? agent.name : "[unknown sender]";
+        displayInfo(
+          wX("dialog.team_message", { message: data.msg, sender: name })
+        );
+      }
       break;
     case "Login":
       console.debug("server reported teammate login: ", data.gid);
