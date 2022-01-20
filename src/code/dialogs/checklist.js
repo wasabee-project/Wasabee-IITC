@@ -260,7 +260,9 @@ const OperationChecklistDialog = WDialog.extend({
     ];
     if (canWrite)
       columns.push({
-        name: this._smallScreen ? "Cmds" : "Commands",
+        name: this._smallScreen
+          ? wX("dialog.common.commands_short")
+          : wX("dialog.common.commands"),
         value: (obj) => typeof obj,
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {

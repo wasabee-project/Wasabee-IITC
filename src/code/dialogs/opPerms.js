@@ -139,7 +139,7 @@ const OpPermList = WDialog.extend({
       for (const field of fields) delete field.foot;
     } else {
       fields.push({
-        name: "Commands",
+        name: wX("dialog.common.commands"),
         value: () => wX("REMOVE"),
         format: (cell, value, obj) => {
           const link = L.DomUtil.create("a", null, cell);

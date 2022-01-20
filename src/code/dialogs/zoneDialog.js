@@ -83,7 +83,7 @@ const ZoneDialog = WDialog.extend({
     L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.color");
     if (canWrite)
       L.DomUtil.create("th", null, hr).textContent = wX(
-        "dialog.zones.commands"
+        "dialog.common.commands"
       );
 
     for (const z of op.zones) {
