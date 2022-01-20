@@ -65,7 +65,7 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("LOAD PORTALS")] = () => {
       loadFaked(getSelectedOperation(), true); // force
     };
-    buttons["Count fields"] = () => {
+    buttons[wX("dialog.checklist.count_fields")] = () => {
       this.countFields(getSelectedOperation(), true);
     };
     buttons[wX("SET_MARKERS_ZONES")] = () => {
@@ -317,7 +317,7 @@ const OperationChecklistDialog = WDialog.extend({
       const container = L.DomUtil.create("div", "field-count");
       if (emptyFieldLinks.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = wX("dialog.checklist.field_count_with_empty", {
+        header.textContent = wX("dialog.checklist.count_fields.with_empty", {
           fieldCount: fieldCount,
           emptyCount: emptyCount,
           linkCount: emptyFieldLinks,
@@ -330,15 +330,18 @@ const OperationChecklistDialog = WDialog.extend({
         }
       } else {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = wX("dialog.checklist.field_count", {
+        header.textContent = wX("dialog.checklist.count_fields.no_empty", {
           fieldCount: fieldCount,
         });
       }
       if (linksFromInner.length) {
         const header = L.DomUtil.create("div", null, container);
-        header.textContent = wX("dialog.checklist.link_from_inside", {
-          count: linksFromInner.length,
-        });
+        header.textContent = wX(
+          "dialog.checklist.count_fields.link_from_inside",
+          {
+            count: linksFromInner.length,
+          }
+        );
         const content = L.DomUtil.create("ul", null, container);
         for (const link of linksFromInner) {
           const cl = coveredPortals.get(link.fromPortalId);
@@ -346,9 +349,12 @@ const OperationChecklistDialog = WDialog.extend({
           li.append(`${link.order}: `);
           li.appendChild(LinkUI.displayFormat(link, operation));
           li.append(
-            wX("dialog.checklist.link_from_inside.covered_at_order", {
-              order: cl.order,
-            })
+            wX(
+              "dialog.checklist.count_fields.link_from_inside.covered_at_order",
+              {
+                order: cl.order,
+              }
+            )
           );
           li.appendChild(LinkUI.displayFormat(cl, operation));
         }

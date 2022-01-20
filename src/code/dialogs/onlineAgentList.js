@@ -32,7 +32,7 @@ const OnlineAgentList = WDialog.extend({
     this.update();
 
     this.createDialog({
-      title: "Online Agents",
+      title: wX("dialog.online_agents.title"),
       html: this._table.table,
       width: "auto",
       dialogClass: "teamlist",
@@ -51,7 +51,7 @@ const OnlineAgentList = WDialog.extend({
           cell.appendChild(AgentUI.formatDisplay(agent)),
       },
       {
-        name: "Last Seen",
+        name: wX("dialog.online_agents.last_seen"),
         value: (agent) => agent.date,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => {
@@ -59,7 +59,7 @@ const OnlineAgentList = WDialog.extend({
         },
       },
       {
-        name: "Actions",
+        name: wX("dialog.online_agents.actions"),
         value: (agent) => agent.id,
         format: (cell, value, agent) => {
           if (value) {

@@ -63,7 +63,9 @@ const TeamListDialog = WDialog.extend({
         value: (team) => team.State,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.textContent = value ? "On" : "Off";
+          link.textContent = value
+            ? wX("dialog.common.on")
+            : wX("dialog.common.off");
           if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             await this.toggleTeam(obj.ID, value);
@@ -72,11 +74,13 @@ const TeamListDialog = WDialog.extend({
         },
       },
       {
-        name: "Share W-D Keys",
+        name: wX("dialog.team_list.share_wd_keys"),
         value: (team) => team.ShareWD,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.textContent = value ? "On" : "Off";
+          link.textContent = value
+            ? wX("dialog.common.on")
+            : wX("dialog.common.off");
           if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             await this.toggleShareWD(obj.ID, value);
@@ -86,11 +90,13 @@ const TeamListDialog = WDialog.extend({
         },
       },
       {
-        name: "Load W-D Keys",
+        name: wX("dialog.team_list.load_wd_keys"),
         value: (team) => team.LoadWD,
         format: (row, value, obj) => {
           const link = L.DomUtil.create("a", null, row);
-          link.textContent = value ? "On" : "Off";
+          link.textContent = value
+            ? wX("dialog.common.on")
+            : wX("dialog.common.off");
           if (value) L.DomUtil.addClass(link, "enl");
           link.onclick = async () => {
             await this.toggleLoadWD(obj.ID, value);

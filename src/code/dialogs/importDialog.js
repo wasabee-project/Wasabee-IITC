@@ -55,8 +55,7 @@ const ImportDialog = WDialog.extend({
     buttons[wX("GET DT")] = () => {
       this.drawToolsFormat();
     };
-    // wX
-    buttons["Fill from URL"] = () => {
+    buttons[wX("dialog.import.url")] = () => {
       this.fillFromURL();
     };
 
@@ -84,7 +83,7 @@ const ImportDialog = WDialog.extend({
   fillFromURL() {
     // todo: wX
     const prompt = new PromptDialog({
-      title: "Fill from URL",
+      title: wX("dialog.import.url"),
       label: "URL",
       callback: async () => {
         try {

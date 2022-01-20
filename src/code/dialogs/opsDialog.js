@@ -50,12 +50,11 @@ const OpsDialog = WDialog.extend({
     await this.updateSortable(0, false);
 
     const buttons = {};
-    // wX
-    buttons["Unhide all OPs"] = () => {
+    buttons[wX("dialog.ops_list.unhide_ops")] = () => {
       resetHiddenOps();
       this.update();
     };
-    buttons["Toggle Show/Hide"] = () => {
+    buttons[wX("dialog.ops_list.toggle_hide")] = () => {
       const showHiddenOps =
         localStorage[
           window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
@@ -98,7 +97,7 @@ const OpsDialog = WDialog.extend({
         },
       },
       {
-        name: "Name",
+        name: wX("dialog.common.name"),
         value: (op) => op.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
@@ -134,18 +133,18 @@ const OpsDialog = WDialog.extend({
             if (op.localchanged) {
               status.textContent = "☀";
               status.style.color = "green";
-              status.title = "Local changes";
+              status.title = wX("dialog.ops_list.local_change");
             }
             if (op.remotechanged) {
               status.textContent = "⛅";
               status.style.color = "red";
-              status.title = "Local&remote changes";
+              status.title = wX("dialog.ops_list.remote_change");
             }
           }
         },
       },
       {
-        name: "Owner",
+        name: wX("dialog.common.owner"),
         value: (op) => op.owner,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
@@ -184,23 +183,21 @@ const OpsDialog = WDialog.extend({
           const background = L.DomUtil.create("input", null, cell);
           background.type = "checkbox";
           background.checked = op.background;
-          // wX
           background.title = op.background
-            ? "Disable background"
-            : "Show in background";
+            ? wX("dialog.ops_list.background_disable")
+            : wX("dialog.ops_list.background_enable");
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             const background = ev.target;
-            // wX
             background.title = background.checked
-              ? "Disable background"
-              : "Show in background";
+              ? wX("dialog.ops_list.background_disable")
+              : wX("dialog.ops_list.background_enable");
             setOpBackground(op.id, background.checked);
           });
         },
       },
       {
-        name: "Cmds",
+        name: wX("dialog.common.commands_short"),
         value: () => null,
         sort: null,
         className: "actions",
@@ -220,7 +217,9 @@ const OpsDialog = WDialog.extend({
             const download = L.DomUtil.create("a", "", cell);
             download.href = "#";
             download.textContent = "↻";
-            download.title = "Download " + op.name;
+            download.title = wX("dialog.ops_list.download", {
+              opName: op.name,
+            });
             L.DomEvent.on(download, "click", (ev) => {
               L.DomEvent.stop(ev);
               syncOp(op.id);

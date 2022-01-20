@@ -55,7 +55,7 @@ const ZoneDialog = WDialog.extend({
     };
 
     this.createDialog({
-      title: "Zones",
+      title: wX("dialog.zones.title"),
       html: html,
       width: "auto",
       dialogClass: "zone",
@@ -79,7 +79,7 @@ const ZoneDialog = WDialog.extend({
     );
     const hr = L.DomUtil.create("tr", null, tbody);
     L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.id");
-    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.name");
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.common.name");
     L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.color");
     if (canWrite)
       L.DomUtil.create("th", null, hr).textContent = wX(

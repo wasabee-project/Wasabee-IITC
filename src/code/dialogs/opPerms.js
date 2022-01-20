@@ -114,7 +114,7 @@ const OpPermList = WDialog.extend({
         },
       },
       {
-        name: "Zone",
+        name: wX("ZONE"),
         value: (perm) => {
           if (perm.zone === 0) return wX("dialog.common.zone_all");
           return operation.zoneName(perm.zone);

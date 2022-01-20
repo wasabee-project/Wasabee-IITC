@@ -104,7 +104,7 @@ const MadridDialog = AutoDraw.extend({
       container
     );
     this._addCheckbox(
-      "Balanced", // wX
+      wX("autodraw.madrid.balanced"),
       "wasabee-madrid-balanced",
       "_balancedcheck",
       container

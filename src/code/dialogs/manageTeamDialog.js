@@ -247,7 +247,7 @@ const ManageTeamDialog = WDialog.extend({
         this.update();
       });
     } else {
-      L.DomUtil.create("span", null, container).textContent = "not set";
+      L.DomUtil.create("span", null, container).textContent = wX("NOT_SET");
       const joinlinkadd = L.DomUtil.create("button", null, container);
       joinlinkadd.textContent = wX("dialog.team_manage.join_link.create");
       L.DomEvent.on(joinlinkadd, "click", async (ev) => {

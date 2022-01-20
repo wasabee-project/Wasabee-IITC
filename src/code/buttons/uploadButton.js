@@ -68,7 +68,7 @@ const UploadButton = WButton.extend({
   update: function () {
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
-      this.title = wX("NOT LOGGED IN SHORT");
+      this.title = "";
       this.button.title = this.title;
       return;
     }
@@ -83,21 +83,21 @@ const UploadButton = WButton.extend({
 
     if (!operation.canWriteServer()) {
       this._invisible();
-      this.title = wX("UPDATE PERM DENIED");
+      this.title = "";
       this.button.title = this.title;
       return;
     }
 
     if (!operation.localchanged) {
       this._invisible();
-      this.title = wX("UPDATE HOVER NOT CHANGED", { opName: operation.name });
+      this.title = "";
       this.button.title = this.title;
       return;
     }
 
     if (operation.server && operation.server != GetWasabeeServer()) {
       this._invisible();
-      this.title = wX("UPDATE HOVER WRONG SERVER", { opName: operation.name });
+      this.title = "";
       this.button.title = this.title;
       return;
     }

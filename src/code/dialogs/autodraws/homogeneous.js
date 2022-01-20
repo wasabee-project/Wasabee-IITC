@@ -427,7 +427,7 @@ const HomogeneousDialog = AutoDraw.extend({
     };
 
     this.createDialog({
-      title: "Homogeneous",
+      title: wX("HG"),
       html: container,
       width: "auto",
       dialogClass: "homogeneous",
