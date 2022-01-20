@@ -13,7 +13,6 @@
 .wasabee-dialog-fanfield .container,
 .wasabee-dialog-flipflop .container,
 .wasabee-dialog-homogeneous .container,
-.wasabee-dialog-link .container,
 .wasabee-dialog-madrid .container,
 .wasabee-dialog-multimax .container,
 .wasabee-dialog-onion .container,
@@ -26,6 +25,13 @@
   max-width: 700px;
 }
 
+.wasabee-dialog-link .container {
+  display: grid;
+  grid-gap: 0.2em 0.5em;
+  align-items: center;
+  max-width: 700px;
+}
+
 .wasabee-dialog-fanfield label,
 .wasabee-dialog-flipflop label,
 .wasabee-dialog-link label,
@@ -35,6 +41,7 @@
 .wasabee-dialog-starburst label,
 .wasabee-dialog-savelinks label {
     grid-column: 1;
+    text-decoration: dotted underline;
 }
 
 .wasabee-dialog-fanfield button,
@@ -55,7 +62,10 @@
   grid-column: 4;
 }
 
-.wasabee-dialog-link .drawb,
+.wasabee-dialog-link .drawb {
+  grid-column: 1/3;
+}
+
 .wasabee-dialog-fanfield .drawb,
 .wasabee-dialog-flipflop .drawb,
 .wasabee-dialog-onion .drawb,
@@ -91,10 +101,13 @@
 }
 
 .wasabee-dialog-link .portal {
-  grid-column: 3;
+  grid-column: 1/4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .wasabee-dialog-link .add,
 .wasabee-dialog-link .desc {
-  grid-column: 4;
+  grid-column: 3;
 }
 
