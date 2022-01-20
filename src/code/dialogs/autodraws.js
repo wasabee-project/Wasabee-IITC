@@ -90,11 +90,7 @@ const AutodrawsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   _displayDialog: function () {
@@ -123,10 +119,6 @@ const AutodrawsDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.autodraws,
     });
-  },
-
-  _displaySmallDialog: function () {
-    this._displayDialog();
   },
 });
 

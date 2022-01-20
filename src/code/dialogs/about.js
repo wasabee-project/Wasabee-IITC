@@ -12,13 +12,7 @@ const AboutDialog = WDialog.extend({
   addHooks: function () {
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    // put any per-open setup here
-    // this is the call to actually do our work
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   // define our work in _displayDialog
@@ -63,12 +57,6 @@ const AboutDialog = WDialog.extend({
       dialogClass: "about",
       buttons: buttons,
     });
-  },
-
-  // small-screen versions go in _displaySmallDialog
-  _displaySmallDialog: function () {
-    // for this dialog, the small screen is the same as the normal
-    this._displayDialog();
   },
 });
 

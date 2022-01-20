@@ -13,11 +13,7 @@ const SettingsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   removeHooks: function () {
@@ -206,12 +202,6 @@ const SettingsDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.settings,
     });
-  },
-
-  // small-screen versions go in _displaySmallDialog
-  _displaySmallDialog: function () {
-    // for this dialog, the small screen is the same as the normal
-    this._displayDialog();
   },
 });
 

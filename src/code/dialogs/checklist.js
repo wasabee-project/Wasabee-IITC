@@ -133,7 +133,7 @@ const OperationChecklistDialog = WDialog.extend({
         format: (cell, value, thing) => {
           if (thing instanceof WasabeeLink) {
             cell.appendChild(LinkUI.displayFormat(thing, operation));
-            if (this._smallScreen) cell.colSpan = 2;
+            cell.colSpan = 2;
           } else {
             cell.appendChild(
               PortalUI.displayFormat(operation.getPortal(thing.portalId))
@@ -145,7 +145,7 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("TYPE"),
         value: (thing) => {
           if (thing instanceof WasabeeLink) {
-            return "Link";
+            return operation.getPortal(thing.toPortalId).name;
           } else {
             // push this shit into the marker class
             return wX(thing.type);
@@ -158,7 +158,7 @@ const OperationChecklistDialog = WDialog.extend({
           span.textContent = value;
 
           if (thing instanceof WasabeeLink) {
-            if (this._smallScreen) cell.style.display = "none";
+            cell.style.display = "none";
           } else if (thing instanceof WasabeeMarker && canWrite) {
             L.DomEvent.on(cell, "click", (ev) => {
               L.DomEvent.stop(ev);

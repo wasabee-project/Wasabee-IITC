@@ -16,11 +16,7 @@ const ZoneDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   removeHooks: function () {
@@ -62,10 +58,6 @@ const ZoneDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.zone,
     });
-  },
-
-  _displaySmallDialog: function () {
-    this._displayDialog();
   },
 
   buildList: function () {
