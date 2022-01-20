@@ -4,6 +4,7 @@
     "sourceType": "module"
   },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "plugins": ["eslint-plugin-local-rules"],
   "env": {
     "browser": true,
     "jest": false,
@@ -45,7 +46,8 @@
     "no-unused-expressions": 1,
     "no-void": 1,
     "no-sequences": 1,
-    "radix": 1
+    "radix": 1,
+    "local-rules/wx-keys": 2
   },
   "globals": {
     "L": "readonly",
