@@ -45,3 +45,8 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* tool-bar */
+.leaflet-touch li.wasabee-subactions a {
+	width: inherit;
+}
