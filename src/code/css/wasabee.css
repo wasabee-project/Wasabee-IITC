@@ -229,7 +229,9 @@
   font-weight: bold;
 }
 
-.wasabee-dialog-linklist {
+.wasabee-dialog-checklist th input,
+.wasabee-dialog-linklist th input {
+  width: 100%;
 }
 
 .wasabee-dialog-manageteam {
