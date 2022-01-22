@@ -320,7 +320,7 @@ const OperationChecklistDialog = WDialog.extend({
         header.textContent = wX("dialog.checklist.count_fields.with_empty", {
           fieldCount: fieldCount,
           emptyCount: emptyCount,
-          linkCount: emptyFieldLinks,
+          linkCount: emptyFieldLinks.length,
         });
         const content = L.DomUtil.create("ul", null, container);
         for (const [link, c] of emptyFieldLinks) {
