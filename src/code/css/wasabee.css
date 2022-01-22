@@ -75,6 +75,10 @@
   pointer-events: none;
 }
 
+.wasabee-dialog .container {
+  align-items: center;
+}
+
 /* all dialogs get this class -- do global stuff with it */
 /* .wasabee-dialog {
   background-color: rgba(250, 250, 250, 0.9);
