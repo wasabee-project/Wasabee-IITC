@@ -200,17 +200,17 @@ const OpsDialog = WDialog.extend({
           const background = L.DomUtil.create("input", null, cell);
           background.type = "checkbox";
           background.checked = op.background;
-          
+
           background.title = op.background
-          ? wX("dialog.ops_list.background_disable")
-          : wX("dialog.ops_list.background_enable");
+            ? wX("dialog.ops_list.background_disable")
+            : wX("dialog.ops_list.background_enable");
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             const background = ev.target;
             // wX
             background.title = background.checked
-            ? wX("dialog.ops_list.background_disable")
-            : wX("dialog.ops_list.background_enable");
+              ? wX("dialog.ops_list.background_disable")
+              : wX("dialog.ops_list.background_enable");
             setOpBackground(op.id, background.checked);
           });
         },

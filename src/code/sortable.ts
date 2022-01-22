@@ -37,10 +37,11 @@ export default class Sortable<T> {
     this._sortBy = 0; // which field/column number to sort by
     this._sortAsc = true; // ascending or descending
     this._table = L.DomUtil.create("table", "wasabee-table");
-
+ 
     // create this once for all
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
+    this._foot = L.DomUtil.create("tfoot", null, this._table);
 
     // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
