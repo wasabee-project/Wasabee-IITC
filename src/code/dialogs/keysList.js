@@ -45,7 +45,7 @@ const KeysList = WDialog.extend({
 
     this.createDialog({
       title: wX("KEY_LIST2", { opName: operation.name }),
-      html: this.getListDialogContent(operation, 0, false).table,
+      html: this.getListDialogContent(operation, 0, true).table,
       width: "auto",
       dialogClass: "keyslist",
       buttons: buttons,

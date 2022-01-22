@@ -24,6 +24,9 @@ const OpsDialog = WDialog.extend({
     TYPE: "opsDialog",
   },
 
+  SORTBY_KEY: "wasabee-opslist-sortby",
+  SORTASC_KEY: "wasabee-opslist-sortasc",
+
   options: {
     usePane: true,
   },
@@ -46,10 +49,22 @@ const OpsDialog = WDialog.extend({
   },
 
   _displayDialog: async function () {
-    this.initSortable();
-    await this.updateSortable(0, false);
+    if (localStorage[this.SORTBY_KEY] == null) {
+      localStorage[this.SORTBY_KEY] = 0;
+    }
+    if (localStorage[this.SORTASC_KEY] == null) {
+      localStorage[this.SORTASC_KEY] = "true";
+    }
+
+    this.initSortable(
+      localStorage[this.SORTBY_KEY],
+      localStorage[this.SORTASC_KEY] == "true"
+    );
+
+    await this.updateSortable();
 
     const buttons = {};
+    // wX
     buttons[wX("dialog.ops_list.unhide_ops")] = () => {
       resetHiddenOps();
       this.update();
@@ -80,13 +95,15 @@ const OpsDialog = WDialog.extend({
 
   update: async function () {
     if (this._enabled) {
-      await this.updateSortable(this.sortable.sortBy, this.sortable.sortAsc);
+      await this.updateSortable();
       // this.setContent(this.sortable.table);
     }
   },
 
-  initSortable: function () {
+  initSortable: function (sortBy, sortAsc) {
     const content = new Sortable();
+    content.sortBy = sortBy;
+    content.sortAsc = sortAsc;
     content.fields = [
       {
         name: "S",
@@ -183,15 +200,17 @@ const OpsDialog = WDialog.extend({
           const background = L.DomUtil.create("input", null, cell);
           background.type = "checkbox";
           background.checked = op.background;
+          
           background.title = op.background
-            ? wX("dialog.ops_list.background_disable")
-            : wX("dialog.ops_list.background_enable");
+          ? wX("dialog.ops_list.background_disable")
+          : wX("dialog.ops_list.background_enable");
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             const background = ev.target;
+            // wX
             background.title = background.checked
-              ? wX("dialog.ops_list.background_disable")
-              : wX("dialog.ops_list.background_enable");
+            ? wX("dialog.ops_list.background_disable")
+            : wX("dialog.ops_list.background_enable");
             setOpBackground(op.id, background.checked);
           });
         },
@@ -246,9 +265,11 @@ const OpsDialog = WDialog.extend({
       },
     ];
     this.sortable = content;
+    this.sortable.sortByStoreKey = this.SORTBY_KEY;
+    this.sortable.sortAscStoreKey = this.SORTASC_KEY;
   },
 
-  updateSortable: async function (sortBy, sortAsc) {
+  updateSortable: async function () {
     if (!this.sortable) return;
     // collapse markers and links into one array.
     const showHiddenOps =
@@ -294,8 +315,7 @@ const OpsDialog = WDialog.extend({
       }
       ops.push(sum);
     }
-    this.sortable.sortBy = sortBy;
-    this.sortable.sortAsc = sortAsc;
+
     this.sortable.items = ops;
     await this.sortable.done;
 

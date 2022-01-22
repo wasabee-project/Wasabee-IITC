@@ -26,6 +26,9 @@ const OperationChecklistDialog = WDialog.extend({
     TYPE: "operationChecklist",
   },
 
+  SORTBY_KEY: "wasabee-checklist-sortby",
+  SORTASC_KEY: "wasabee-checklist-sortasc",
+
   options: {
     usePane: true,
   },
@@ -51,12 +54,24 @@ const OperationChecklistDialog = WDialog.extend({
   _displayDialog: async function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
+
+    // defaults to sorting by op order
+    if (localStorage[this.SORTBY_KEY] == null) {
+      localStorage[this.SORTBY_KEY] = 0;
+    }
+    if (localStorage[this.SORTASC_KEY] == null) {
+      localStorage[this.SORTASC_KEY] = "true";
+    }
+
     this.sortable = this.getListDialogContent(
       operation,
       operation.links.concat(operation.markers),
-      0,
-      false
-    ); // defaults to sorting by op order
+      localStorage[this.SORTBY_KEY],
+      localStorage[this.SORTASC_KEY] == "true"
+    );
+
+    this.sortable.sortByStoreKey = this.SORTBY_KEY;
+    this.sortable.sortAscStoreKey = this.SORTASC_KEY;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -94,9 +109,10 @@ const OperationChecklistDialog = WDialog.extend({
     this.sortable = this.getListDialogContent(
       operation,
       operation.links.concat(operation.markers),
-      this.sortable.sortBy,
-      this.sortable.sortAsc
+      localStorage[this.SORTBY_KEY],
+      localStorage[this.SORTASC_KEY] == "true"
     );
+
     await this.sortable.done;
     this.setContent(this.sortable.table);
   },
@@ -297,9 +313,9 @@ const OperationChecklistDialog = WDialog.extend({
 
   getListDialogContent: function (operation, items, sortBy, sortAsc) {
     const content = new Sortable();
-    content.fields = this.getFields(operation);
-    content.sortBy = sortBy;
+    content.sortBy = sortBy; // Need to set sortBy/Asc before fields are set so column header gets sort triangle css class
     content.sortAsc = sortAsc;
+    content.fields = this.getFields(operation);
     content.items = items;
     return content;
   },
