@@ -30,12 +30,11 @@ const SettingsDialog = WDialog.extend({
   },
 
   _addCheckBox(container, label, id, storageKey, onChange, defValue) {
-    const title = L.DomUtil.create("label", null, container);
-    title.textContent = label;
-    title.htmlFor = id;
-    const check = L.DomUtil.create("input", null, container);
+    const title = L.DomUtil.create("label", "checkbox", container);
+    const check = L.DomUtil.create("input", "", title);
     check.type = "checkbox";
     check.id = id;
+    L.DomUtil.create("span", "", title).textContent = label;
     const sl = localStorage[storageKey];
     if (!defValue && sl === "true") check.checked = true;
     if (defValue && sl !== "false") check.checked = true;
@@ -132,14 +131,6 @@ const SettingsDialog = WDialog.extend({
       [1, 100, 250, 500, 750, 1000].map((v) => [v, v])
     );
 
-    const serverInfo = L.DomUtil.create("button", "server", container);
-    serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
-    serverInfo.href = "#";
-    L.DomEvent.on(serverInfo, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this.setServer();
-    });
-
     this._addSelect(
       container,
       wX("TRAWL SKIP TILES"),
@@ -155,6 +146,14 @@ const SettingsDialog = WDialog.extend({
         window.plugin.wasabee.static.constants.USE_PANES
       );
     }
+
+    const serverInfo = L.DomUtil.create("button", "server", container);
+    serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
+    serverInfo.href = "#";
+    L.DomEvent.on(serverInfo, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this.setServer();
+    });
 
     const skinsButton = L.DomUtil.create("button", null, container);
     skinsButton.textContent = wX("SKINS_BUTTON");

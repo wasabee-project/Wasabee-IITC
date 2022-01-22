@@ -373,33 +373,23 @@
   padding: 4px;
   width: 96%;
 }
-.wasabee-dialog-settings {
-  max-width: min-content;
+
+.wasabee-dialog-settings div.container > * {
+  display: block;
+  width: 100%;
+  margin: 0.3em 0;
 }
-.wasabee-dialog-settings div.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.wasabee-dialog-settings div.container > :first-child {
+  border: none;
+  margin: 0;
 }
 .wasabee-dialog-settings label {
-  grid-column-start: 1;
-  grid-column-end: 2;
+  border-top: solid 1px #fff5;
+  padding: 0.3em 0 0 0;
 }
-.wasabee-dialog-settings select {
-  grid-column-start: 2;
-  grid-column-end: 3;
-}
-.wasabee-dialog-settings input {
-  grid-column-start: 2;
-  grid-column-end: 3;
-}
-.wasabee-dialog-settings div.desc {
-  grid-column-start: 1;
-  grid-column-end: 3;
-}
-
-.wasabee-dialog-settings button {
-  grid-column-start: 1;
-  grid-column-end: 3;
+.wasabee-dialog-settings label.checkbox input {
+  margin-right: .5rem;
+  vertical-align: middle;
 }
 
 .wasabee-dialog-trawl div.container {
