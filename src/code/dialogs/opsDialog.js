@@ -18,6 +18,7 @@ import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
 import AgentUI from "../ui/agent";
+import { appendFAIcon } from "../auxiliar";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -129,10 +130,10 @@ const OpsDialog = WDialog.extend({
         format: (cell, value, op) => {
           if (!op.local) {
             if (op.localchanged && !op.remotechanged) {
-              L.DomUtil.create("i", "fas fa-desktop", cell);
+              appendFAIcon("desktop", cell);
               cell.title = wX("dialog.ops_list.local_change");
             } else if (op.remotechanged) {
-              L.DomUtil.create("i", "fas fa-server", cell);
+              appendFAIcon("server", cell);
               cell.title = wX("dialog.ops_list.remote_change");
             }
           }
@@ -200,7 +201,7 @@ const OpsDialog = WDialog.extend({
           // delete locally
           const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
-          L.DomUtil.create("i", "fas fa-trash", deleteLocaly);
+          appendFAIcon("trash", deleteLocaly);
           deleteLocaly.title = wX("REM_LOC_CP", { opName: op.name });
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
@@ -211,7 +212,7 @@ const OpsDialog = WDialog.extend({
             // download op
             const download = L.DomUtil.create("a", "", cell);
             download.href = "#";
-            L.DomUtil.create("i", "fas fa-sync", download);
+            appendFAIcon("sync", download);
             download.title = wX("dialog.ops_list.download", {
               opName: op.name,
             });

@@ -1,3 +1,4 @@
+import { findIconDefinition, icon, IconName } from "@fortawesome/fontawesome-svg-core";
 import colorString from "color-string";
 
 //** This function generates a unique ID for an object */
@@ -36,4 +37,11 @@ export function convertColorToHex(color: string, on_error = "#000000") {
   } catch {
     return on_error;
   }
+}
+
+export function appendFAIcon(iconName: IconName, container: Element) {
+  const iconDef = findIconDefinition({ prefix: 'fas', iconName: iconName });
+  if (!iconDef) return;
+  const iconNode = icon(iconDef).node[0];
+  container.appendChild(iconNode);
 }

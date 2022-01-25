@@ -20,6 +20,7 @@ import wX from "../wX";
 import PortalUI from "../ui/portal";
 import LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
+import { appendFAIcon } from "../auxiliar";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -268,7 +269,7 @@ const OperationChecklistDialog = WDialog.extend({
         format: (cell, value, obj) => {
           if (obj instanceof WasabeeLink) {
             const rev = L.DomUtil.create("a", null, cell);
-            L.DomUtil.create("i", "fas fa-arrows-alt-h", rev);
+            appendFAIcon("arrows-alt-h", rev);
             rev.href = "#";
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
@@ -277,7 +278,7 @@ const OperationChecklistDialog = WDialog.extend({
 
             const del = L.DomUtil.create("a", null, cell);
             del.href = "#";
-            L.DomUtil.create("i", "fas fa-trash", del);
+            appendFAIcon("trash", del);
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeLink(obj.fromPortalId, obj.toPortalId);
@@ -285,7 +286,7 @@ const OperationChecklistDialog = WDialog.extend({
           } else {
             const del = L.DomUtil.create("a", null, cell);
             del.href = "#";
-            L.DomUtil.create("i", "fas fa-trash", del);
+            appendFAIcon("trash", del);
             L.DomEvent.on(del, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.removeMarker(obj);

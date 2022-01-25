@@ -1,6 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import WasabeeAgent from "../model/agent";
+import { appendFAIcon } from "../auxiliar";
 
 const AgentDialog = WDialog.extend({
   statics: {
@@ -37,7 +38,7 @@ const AgentDialog = WDialog.extend({
         const li = L.DomUtil.create("li", "", ul);
         L.DomUtil.create("label", null, li).textContent = label;
         if (value === true) {
-          L.DomUtil.create("i", "fas fa-check", li);
+          appendFAIcon("check", li);
         } else {
           L.DomUtil.create("span", null, li).textContent = value;
         }

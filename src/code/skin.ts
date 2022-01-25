@@ -1,4 +1,4 @@
-import { library, dom } from "@fortawesome/fontawesome-svg-core";
+import { library } from "@fortawesome/fontawesome-svg-core";
 // avoid import from "@fortawesome/free-solid-svg-icons" to reduce *dev* build size
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
@@ -26,7 +26,6 @@ for (const icon of [
   faDesktop,
 ])
   library.add(icon);
-dom.watch();
 
 const Wasabee = window.plugin.wasabee;
 
