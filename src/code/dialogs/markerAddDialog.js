@@ -33,6 +33,24 @@ const MarkerAddDialog = WDialog.extend({
   },
 
   update: async function () {
+    // updating with a new portal selected and in bulk mode?
+    if (
+      this._selectedPortal &&
+      PortalUI.getSelected() &&
+      this._selectedPortal.id != PortalUI.getSelected().id &&
+      this._bulk.checked
+    ) {
+      this._selectedPortal = PortalUI.getSelected();
+      if (WasabeeMarker.markerTypes.has(this._type.value))
+        await this._addMarker(
+          this._type.value,
+          this._comment.value,
+          this._zones.value,
+          this._assign.value
+        );
+      return;
+    }
+
     this._type.textContent = "";
 
     // zones can be populated even if portal not selected
@@ -102,6 +120,11 @@ const MarkerAddDialog = WDialog.extend({
 
     L.DomUtil.create("label", null, content).textContent = wX("AGENT");
     this._assign = L.DomUtil.create("select", null, content);
+
+    L.DomUtil.create("label", null, content).textContent = wX("ADD_BULK");
+    const bulk = L.DomUtil.create("div", "bulk", content);
+    this._bulk = L.DomUtil.create("input", "checkbox-input", bulk);
+    this._bulk.type = "checkbox";
 
     this._comment = L.DomUtil.create("input", null, content);
     this._comment.placeholder = wX("SET_COMMENT");
