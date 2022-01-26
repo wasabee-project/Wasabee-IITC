@@ -86,10 +86,18 @@ export default class Sortable<T> {
 
   set sortByStoreKey(b) {
     this._sortByStoreKey = b;
+    if (localStorage[this._sortByStoreKey] == null) {
+      localStorage[this._sortByStoreKey] = 0;
+    }
+    this.sortBy = localStorage[this._sortByStoreKey];
   }
 
   set sortAscStoreKey(b) {
     this._sortAscStoreKey = b;
+    if (localStorage[this._sortAscStoreKey] == null) {
+      localStorage[this._sortAscStoreKey] = "true";
+    }
+    this._sortAsc = localStorage[this._sortAscStoreKey] == "true";
   }
 
   get table() {

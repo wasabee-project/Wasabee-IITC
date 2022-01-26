@@ -49,17 +49,7 @@ const OpsDialog = WDialog.extend({
   },
 
   _displayDialog: async function () {
-    if (localStorage[this.SORTBY_KEY] == null) {
-      localStorage[this.SORTBY_KEY] = 0;
-    }
-    if (localStorage[this.SORTASC_KEY] == null) {
-      localStorage[this.SORTASC_KEY] = "true";
-    }
-
-    this.initSortable(
-      localStorage[this.SORTBY_KEY],
-      localStorage[this.SORTASC_KEY] == "true"
-    );
+    this.initSortable();
 
     await this.updateSortable();
 
@@ -100,10 +90,10 @@ const OpsDialog = WDialog.extend({
     }
   },
 
-  initSortable: function (sortBy, sortAsc) {
+  initSortable: function () {
     const content = new Sortable();
-    content.sortBy = sortBy;
-    content.sortAsc = sortAsc;
+    content.sortByStoreKey = this.SORTBY_KEY;
+    content.sortAscStoreKey = this.SORTASC_KEY;
     content.fields = [
       {
         name: "S",
@@ -265,8 +255,6 @@ const OpsDialog = WDialog.extend({
       },
     ];
     this.sortable = content;
-    this.sortable.sortByStoreKey = this.SORTBY_KEY;
-    this.sortable.sortAscStoreKey = this.SORTASC_KEY;
   },
 
   updateSortable: async function () {

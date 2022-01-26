@@ -55,23 +55,10 @@ const OperationChecklistDialog = WDialog.extend({
     const operation = getSelectedOperation();
     loadFaked(operation);
 
-    // defaults to sorting by op order
-    if (localStorage[this.SORTBY_KEY] == null) {
-      localStorage[this.SORTBY_KEY] = 0;
-    }
-    if (localStorage[this.SORTASC_KEY] == null) {
-      localStorage[this.SORTASC_KEY] = "true";
-    }
-
     this.sortable = this.getListDialogContent(
       operation,
-      operation.links.concat(operation.markers),
-      localStorage[this.SORTBY_KEY],
-      localStorage[this.SORTASC_KEY] == "true"
+      operation.links.concat(operation.markers)
     );
-
-    this.sortable.sortByStoreKey = this.SORTBY_KEY;
-    this.sortable.sortAscStoreKey = this.SORTASC_KEY;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -108,9 +95,7 @@ const OperationChecklistDialog = WDialog.extend({
     this.setTitle(wX("OP_CHECKLIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
-      operation.links.concat(operation.markers),
-      localStorage[this.SORTBY_KEY],
-      localStorage[this.SORTASC_KEY] == "true"
+      operation.links.concat(operation.markers)
     );
 
     await this.sortable.done;
@@ -311,10 +296,10 @@ const OperationChecklistDialog = WDialog.extend({
     return columns;
   },
 
-  getListDialogContent: function (operation, items, sortBy, sortAsc) {
+  getListDialogContent: function (operation, items) {
     const content = new Sortable();
-    content.sortBy = sortBy; // Need to set sortBy/Asc before fields are set so column header gets sort triangle css class
-    content.sortAsc = sortAsc;
+    content.sortByStoreKey = this.SORTBY_KEY;
+    content.sortAscStoreKey = this.SORTASC_KEY;
     content.fields = this.getFields(operation);
     content.items = items;
     return content;

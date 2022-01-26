@@ -15,23 +15,7 @@ const MarkerList = OperationChecklistDialog.extend({
     const operation = getSelectedOperation();
     loadFaked(operation);
 
-    if (localStorage[this.SORTBY_KEY] == null) {
-      localStorage[this.SORTBY_KEY] = 0;
-    }
-    if (localStorage[this.SORTASC_KEY] == null) {
-      localStorage[this.SORTASC_KEY] = "true";
-    }
-
-    this.sortable = this.getListDialogContent(
-      operation,
-      operation.markers,
-      localStorage[this.SORTBY_KEY],
-      localStorage[this.SORTASC_KEY] == "true"
-    );
-
-    // where to save the column and dir when changed
-    this.sortable.sortByStoreKey = this.SORTBY_KEY;
-    this.sortable.sortAscStoreKey = this.SORTASC_KEY;
+    this.sortable = this.getListDialogContent(operation, operation.markers);
 
     const buttons = {};
     buttons[wX("CLEAR MARKERS")] = () => {
@@ -58,12 +42,7 @@ const MarkerList = OperationChecklistDialog.extend({
     if (!this.sortable) return;
     const operation = getSelectedOperation();
     this.setTitle(wX("MARKER_LIST", { opName: operation.name }));
-    this.sortable = this.getListDialogContent(
-      operation,
-      operation.markers,
-      localStorage[this.SORTBY_KEY],
-      localStorage[this.SORTASC_KEY] == "true"
-    );
+    this.sortable = this.getListDialogContent(operation, operation.markers);
     await this.sortable.done;
     this.setContent(this.sortable.table);
   },
