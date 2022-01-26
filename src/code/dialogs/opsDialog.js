@@ -24,6 +24,9 @@ const OpsDialog = WDialog.extend({
     TYPE: "opsDialog",
   },
 
+  SORTBY_KEY: "wasabee-opslist-sortby",
+  SORTASC_KEY: "wasabee-opslist-sortasc",
+
   options: {
     usePane: true,
   },
@@ -47,9 +50,11 @@ const OpsDialog = WDialog.extend({
 
   _displayDialog: async function () {
     this.initSortable();
-    await this.updateSortable(0, false);
+
+    await this.updateSortable();
 
     const buttons = {};
+    // wX
     buttons[wX("dialog.ops_list.unhide_ops")] = () => {
       resetHiddenOps();
       this.update();
@@ -80,7 +85,7 @@ const OpsDialog = WDialog.extend({
 
   update: async function () {
     if (this._enabled) {
-      await this.updateSortable(this.sortable.sortBy, this.sortable.sortAsc);
+      await this.updateSortable();
       // this.setContent(this.sortable.table);
     }
   },
@@ -183,12 +188,14 @@ const OpsDialog = WDialog.extend({
           const background = L.DomUtil.create("input", null, cell);
           background.type = "checkbox";
           background.checked = op.background;
+
           background.title = op.background
             ? wX("dialog.ops_list.background_disable")
             : wX("dialog.ops_list.background_enable");
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             const background = ev.target;
+            // wX
             background.title = background.checked
               ? wX("dialog.ops_list.background_disable")
               : wX("dialog.ops_list.background_enable");
@@ -245,10 +252,12 @@ const OpsDialog = WDialog.extend({
         },
       },
     ];
+    content.sortByStoreKey = this.SORTBY_KEY;
+    content.sortAscStoreKey = this.SORTASC_KEY;
     this.sortable = content;
   },
 
-  updateSortable: async function (sortBy, sortAsc) {
+  updateSortable: async function () {
     if (!this.sortable) return;
     // collapse markers and links into one array.
     const showHiddenOps =
@@ -294,8 +303,7 @@ const OpsDialog = WDialog.extend({
       }
       ops.push(sum);
     }
-    this.sortable.sortBy = sortBy;
-    this.sortable.sortAsc = sortAsc;
+
     this.sortable.items = ops;
     await this.sortable.done;
 

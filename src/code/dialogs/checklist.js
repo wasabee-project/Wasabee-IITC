@@ -26,6 +26,9 @@ const OperationChecklistDialog = WDialog.extend({
     TYPE: "operationChecklist",
   },
 
+  SORTBY_KEY: "wasabee-checklist-sortby",
+  SORTASC_KEY: "wasabee-checklist-sortasc",
+
   options: {
     usePane: true,
   },
@@ -51,12 +54,13 @@ const OperationChecklistDialog = WDialog.extend({
   _displayDialog: async function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
+
     this.sortable = this.getListDialogContent(
       operation,
       operation.links.concat(operation.markers),
-      0,
-      false
-    ); // defaults to sorting by op order
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
+    );
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -94,9 +98,10 @@ const OperationChecklistDialog = WDialog.extend({
     this.sortable = this.getListDialogContent(
       operation,
       operation.links.concat(operation.markers),
-      this.sortable.sortBy,
-      this.sortable.sortAsc
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
     );
+
     await this.sortable.done;
     this.setContent(this.sortable.table);
   },
@@ -295,11 +300,16 @@ const OperationChecklistDialog = WDialog.extend({
     return columns;
   },
 
-  getListDialogContent: function (operation, items, sortBy, sortAsc) {
+  getListDialogContent: function (
+    operation,
+    items,
+    sortByStoreKey,
+    sortAscStoreKey
+  ) {
     const content = new Sortable();
     content.fields = this.getFields(operation);
-    content.sortBy = sortBy;
-    content.sortAsc = sortAsc;
+    content.sortByStoreKey = sortByStoreKey;
+    content.sortAscStoreKey = sortAscStoreKey;
     content.items = items;
     return content;
   },

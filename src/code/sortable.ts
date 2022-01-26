@@ -28,14 +28,16 @@ export default class Sortable<T> {
   _foot: HTMLTableSectionElement;
   _smallScreen: boolean;
   _done: Promise<boolean | void> | boolean;
+  _sortByStoreKey: string;
+  _sortAscStoreKey: string;
 
   constructor() {
     this._items = [];
     this._fields = [];
     this._sortBy = 0; // which field/column number to sort by
-    this._sortAsc = false; // ascending or descending
+    this._sortAsc = true; // ascending or descending
     this._table = L.DomUtil.create("table", "wasabee-table");
-
+ 
     // create this once for all
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
@@ -43,7 +45,8 @@ export default class Sortable<T> {
 
     // if IITC-Mobile is detected... this is a kludge
     this._smallScreen = window.plugin.userLocation ? true : false;
-
+    this._sortByStoreKey = "";
+    this._sortAscStoreKey = "";
     this._done = true;
   }
 
@@ -68,6 +71,7 @@ export default class Sortable<T> {
 
   set sortBy(property) {
     this._sortBy = Number(property);
+    this.renderHead();
     this.sort();
   }
 
@@ -78,7 +82,24 @@ export default class Sortable<T> {
   set sortAsc(b) {
     if (b !== true) b = false;
     this._sortAsc = b;
+    this.renderHead();
     this.sort();
+  }
+
+  set sortByStoreKey(b) {
+    this._sortByStoreKey = b;
+    if (localStorage[this._sortByStoreKey] == null) {
+      localStorage[this._sortByStoreKey] = 0;
+    }
+    this.sortBy = localStorage[this._sortByStoreKey];
+  }
+
+  set sortAscStoreKey(b) {
+    this._sortAscStoreKey = b;
+    if (localStorage[this._sortAscStoreKey] == null) {
+      localStorage[this._sortAscStoreKey] = "true";
+    }
+    this._sortAsc = localStorage[this._sortAscStoreKey] == "true";
   }
 
   get table() {
@@ -189,22 +210,26 @@ export default class Sortable<T> {
         cell.style.display = "none";
       if (field.sort !== null) {
         L.DomUtil.addClass(cell, "sortable");
+        if (index == this._sortBy) {
+          L.DomUtil.addClass(cell, this._sortAsc ? "asc" : "desc");
+        }
         L.DomEvent.on(
           cell,
           "click",
           (ev) => {
             L.DomEvent.stop(ev);
             for (const element of titleRow.children) {
-              L.DomUtil.removeClass(element as HTMLElement, "sorted");
               L.DomUtil.removeClass(element as HTMLElement, "asc");
               L.DomUtil.removeClass(element as HTMLElement, "desc");
             }
             if (index == this._sortBy) {
               this._sortAsc = !this._sortAsc;
-              L.DomUtil.addClass(cell, "sorted");
-              L.DomUtil.addClass(cell, this._sortAsc ? "asc" : "desc");
             }
+            L.DomUtil.addClass(cell, this._sortAsc ? "asc" : "desc");
+            
             this._sortBy = index;
+            if (this._sortByStoreKey != null) localStorage[this._sortByStoreKey] = this._sortBy;
+            if (this._sortAscStoreKey != null) localStorage[this._sortAscStoreKey] = this._sortAsc.toString();
             this.sort();
           },
           false
@@ -246,7 +271,7 @@ export default class Sortable<T> {
       }
       // if two values are the same, preserve previous order
       if (l == 0) l = a.index - b.index;
-      return this._sortAsc ? -l : l;
+      return this._sortAsc ? l : -l;
     });
 
     for (const [index, item] of this._items.entries()) {
