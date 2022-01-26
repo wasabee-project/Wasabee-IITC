@@ -1,5 +1,18 @@
-import { findIconDefinition, icon, IconName } from "@fortawesome/fontawesome-svg-core";
 import colorString from "color-string";
+
+import { icon, IconName } from "@fortawesome/fontawesome-svg-core";
+// avoid import from "@fortawesome/free-solid-svg-icons" to reduce *dev* build size
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { faServer } from "@fortawesome/free-solid-svg-icons/faServer";
+import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
+import { faArrowsAltH } from "@fortawesome/free-solid-svg-icons/faArrowsAltH";
+import { faPen } from "@fortawesome/free-solid-svg-icons/faPen";
+import { faEraser } from "@fortawesome/free-solid-svg-icons/faEraser";
+import { faBan } from "@fortawesome/free-solid-svg-icons/faBan";
+import { faPalette } from "@fortawesome/free-solid-svg-icons/faPalette";
+import { faAsterisk } from "@fortawesome/free-solid-svg-icons/faAsterisk";
+import { faDesktop } from "@fortawesome/free-solid-svg-icons/faDesktop";
 
 //** This function generates a unique ID for an object */
 export function generateId(len = 40) {
@@ -39,8 +52,22 @@ export function convertColorToHex(color: string, on_error = "#000000") {
   }
 }
 
+const icons = [
+  faCheck,
+  faTrash,
+  faServer,
+  faSync,
+  faArrowsAltH,
+  faPen,
+  faEraser,
+  faBan,
+  faPalette,
+  faAsterisk,
+  faDesktop,
+];
+
 export function appendFAIcon(iconName: IconName, container: Element) {
-  const iconDef = findIconDefinition({ prefix: 'fas', iconName: iconName });
+  const iconDef = icons.find((i) => i.iconName === iconName);
   if (!iconDef) return;
   const iconNode = icon(iconDef).node[0];
   container.appendChild(iconNode);

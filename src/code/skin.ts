@@ -1,32 +1,3 @@
-import { library } from "@fortawesome/fontawesome-svg-core";
-// avoid import from "@fortawesome/free-solid-svg-icons" to reduce *dev* build size
-import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
-import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
-import { faServer } from "@fortawesome/free-solid-svg-icons/faServer";
-import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
-import { faArrowsAltH } from "@fortawesome/free-solid-svg-icons/faArrowsAltH";
-import { faPen } from "@fortawesome/free-solid-svg-icons/faPen";
-import { faEraser } from "@fortawesome/free-solid-svg-icons/faEraser";
-import { faBan } from "@fortawesome/free-solid-svg-icons/faBan";
-import { faPalette } from "@fortawesome/free-solid-svg-icons/faPalette";
-import { faAsterisk } from "@fortawesome/free-solid-svg-icons/faAsterisk";
-import { faDesktop } from "@fortawesome/free-solid-svg-icons/faDesktop";
-
-for (const icon of [
-  faCheck,
-  faTrash,
-  faServer,
-  faSync,
-  faArrowsAltH,
-  faPen,
-  faEraser,
-  faBan,
-  faPalette,
-  faAsterisk,
-  faDesktop,
-])
-  library.add(icon);
-
 const Wasabee = window.plugin.wasabee;
 
 // the skins probably aren't loaded by the time W's init is called
