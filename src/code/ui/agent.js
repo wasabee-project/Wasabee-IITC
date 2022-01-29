@@ -8,6 +8,10 @@ import wX from "../wX";
 import WasabeeAgent from "../model/agent";
 import { displayInfo, displayWarning } from "../error";
 
+/**
+ * @param {WasabeeAgent} agent
+ * @returns html anchor with agent name (and verification states)
+ */
 function formatDisplay(agent) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
   if (agent.Vverified || agent.rocks) {
@@ -23,6 +27,7 @@ function formatDisplay(agent) {
   });
 
   let prefix = "";
+  if (agent.communityname) prefix += "C";
   if (agent.Vverified) prefix += "V";
   else if (agent.vname === agent.name) prefix += "v";
   if (agent.rocks) prefix += "R";

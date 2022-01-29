@@ -27,6 +27,7 @@ const AgentDialog = WDialog.extend({
       const ul = L.DomUtil.create("ul", "", html);
       const rows = [
         ["Server name: ", data.name],
+        ["Ingress name: ", data.communityname],
         ["V name: ", data.vname],
         ["V verified: ", data.Vverified],
         ["Rocks name: ", data.rocksname],

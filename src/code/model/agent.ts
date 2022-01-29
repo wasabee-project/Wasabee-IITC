@@ -7,6 +7,7 @@ interface BaseAgent {
   name: string;
   intelname?: string;
   intelfaction: "unset" | "ENLIGHTENED" | "RESISTANCE";
+  communityname?: string;
   pic?: string;
   lat: number;
   lng: number;
@@ -70,7 +71,10 @@ export default class WasabeeAgent implements Agent {
   lng: number;
   date: string;
 
-  // intel
+  // Community (strong)
+  communityname?: string;
+
+  // intel (weak)
   intelname?: string;
   intelfaction: "unset" | "ENLIGHTENED" | "RESISTANCE";
 
@@ -107,6 +111,7 @@ export default class WasabeeAgent implements Agent {
     this.name = obj.name;
     this.intelname = obj.intelname !== "unset" ? obj.intelname : "";
     this.intelfaction = obj.intelfaction;
+    this.communityname = obj.communityname || '';
     this.pic = obj.pic ? obj.pic : null;
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
@@ -121,9 +126,11 @@ export default class WasabeeAgent implements Agent {
     this.rocksname = obj.rocksname;
     this.rocks = !!obj.rocks;
 
-    if (this.Vverified) this.name = this.vname || this.name;
+    if (this.communityname) this.name = this.communityname;
+    else if (this.Vverified) this.name = this.vname || this.name;
     else if (this.rocks) this.name = this.rocksname || this.name;
     else if (this.intelname) this.name = this.intelname + " [!]";
+    else this.name = this.name || '[unknown name]';
 
     /* what did we decide to do with these?
     this.startlat = obj.startlat ? obj.startlat : 0;
@@ -147,6 +154,7 @@ export default class WasabeeAgent implements Agent {
   }
 
   getName() {
+    if (this.communityname) return this.communityname;
     if (this.Vverified && this.vname) return this.vname;
     if (this.rocks && this.rocksname) return this.rocksname;
     if (this.intelname) return this.intelname;
@@ -174,26 +182,8 @@ export default class WasabeeAgent implements Agent {
       // console.debug("incoming is older, not updating cache");
       return;
     }
-    // note the new fetched time
-    cached.fetched = this.fetched;
-    // console.debug("updating cache");
-
-    // update location only if known
-    if (this.lat != 0 && this.lng != 0) {
-      cached.lat = this.lat;
-      cached.lng = this.lng;
-      cached.date = this.date;
-    }
-
-    // these probably won't change, but just be sure
-    cached.name = this.name;
-    cached.level = this.level;
-    cached.enlid = this.enlid;
-    cached.pic = this.pic;
-    cached.Vverified = this.Vverified;
-    cached.blacklisted = this.blacklisted;
-    cached.rocks = this.rocks;
-    // cansendto is never true from a team pull, but might be true from a direct pull
+    // update data
+    Object.assign(cached, this);
 
     // remove things which make no sense in the global cache
     delete cached.shareWDKeys;
