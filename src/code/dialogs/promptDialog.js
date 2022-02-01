@@ -14,6 +14,7 @@ const PromptDialog = WDialog.extend({
     placeholder: "",
     current: "",
     suggestions: [],
+    nonEmpty: false,
     // callback
     // cancelCallback
   },
@@ -30,6 +31,7 @@ const PromptDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
+      if (this.options.nonEmpty && !this.inputField.value) return;
       if (this.options.callback) this.options.callback();
       // callback must fire appropriate ui update events
       this.closeDialog();
@@ -61,6 +63,7 @@ const PromptDialog = WDialog.extend({
     this.inputField.id = "inputField";
     this.inputField.placeholder = this.options.placeholder;
     this.inputField.value = this.options.current;
+    this.inputField.required = this.options.nonEmpty;
 
     if (this.options.suggestions) {
       const datalist = L.DomUtil.create("datalist", null, content);

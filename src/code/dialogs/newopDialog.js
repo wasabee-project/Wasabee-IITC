@@ -50,6 +50,7 @@ const NewopDialog = WDialog.extend({
           }
         },
         placeholder: wX("MUST_NOT_BE_EMPTY"),
+        nonEmpty: true,
       });
       addDialog.enable();
     });

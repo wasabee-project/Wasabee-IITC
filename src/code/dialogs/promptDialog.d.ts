@@ -9,6 +9,7 @@ interface PromptDialogOptions extends WDialogOptions {
     text: string;
     value: string;
   }[];
+  nonEmpty?: boolean;
   callback?: () => void;
   cancelCallback?: () => void;
 }
