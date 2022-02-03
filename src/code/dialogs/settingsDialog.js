@@ -26,7 +26,7 @@ const SettingsDialog = WDialog.extend({
 
   update: function () {
     this.setContent(this._getContent());
-    // TODO also update the title
+    this.setTitle(wX("SETTINGS"));
   },
 
   _addCheckBox(container, label, id, storageKey, onChange, defValue) {
