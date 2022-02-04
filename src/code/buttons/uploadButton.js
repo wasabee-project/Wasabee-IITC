@@ -113,6 +113,7 @@ const UploadButton = WButton.extend({
 
   _invisible: function () {
     this.button.style.display = "none";
+    this.button.classList.remove("loading");
   },
 
   // update operation that is either
