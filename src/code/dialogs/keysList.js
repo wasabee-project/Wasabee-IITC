@@ -177,13 +177,19 @@ const KeysList = WDialog.extend({
       if (thesekeys && thesekeys.length > 0) {
         for (const t of thesekeys) {
           k.onHand += t.onhand;
+        }
+        for (const t of thesekeys) {
           if (t.gid == gid) {
-            k.iHave = t.onhand;
-            k.capsule = t.capsule;
+            const mk = {};
+            mk.id = a;
+            mk.Required = links.length;
+            mk.onHand = k.onHand;
+            mk.iHave = t.onhand;
+            mk.capsule = t.capsule;
+            keys.push(mk);
           }
         }
-      }
-      keys.push(k);
+      } else keys.push(k);
     }
 
     for (const p of operation.markers.filter(function (marker) {
@@ -202,13 +208,19 @@ const KeysList = WDialog.extend({
       if (thesekeys && thesekeys.length > 0) {
         for (const t of thesekeys) {
           k.onHand += t.onhand;
+        }
+        for (const t of thesekeys) {
           if (t.gid == gid) {
-            k.iHave = t.onhand;
-            k.capsule = t.capsule;
+            const mk = {};
+            mk.id = p.portalId;
+            mk.Required = wX("OPEN_REQUEST");
+            mk.onHand = k.onHand;
+            mk.iHave = t.onhand;
+            mk.capsule = t.capsule;
+            keys.push(mk);
           }
         }
-      }
-      keys.push(k);
+      } else keys.push(k);
     }
 
     this.sortable.sortBy = sortBy;

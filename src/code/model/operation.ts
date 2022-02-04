@@ -1109,6 +1109,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     onhand: number,
     capsule: string
   ) {
+    capsule = onhand > 0 ? capsule : ""
     if (typeof onhand == "string") {
       onhand = Number.parseInt(onhand, 10);
     }
