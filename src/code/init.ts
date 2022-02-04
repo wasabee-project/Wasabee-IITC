@@ -27,6 +27,11 @@ import polyfill from "./polyfill";
 import { displayError } from "./error";
 import { deleteJWT } from "./auth";
 
+// things to make global
+import WasabeeBlocker from "./model/blocker";
+import { wX } from "./wX";
+import { blockerAutomark } from "./uiCommands";
+
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 import type { WLAnchor } from "./ui/anchor";
 import type { WLLink } from "./ui/link";
@@ -258,6 +263,11 @@ window.plugin.wasabee.init = async () => {
   window.map.on("wdialog", (event) => {
     postToFirebase({ id: "analytics", action: event.dialogType });
   });
+
+  // export some things for third-party plugins
+  window.plugin.wasabee.Blockers = WasabeeBlocker;
+  window.plugin.wasabee.wX = wX;
+  window.plugin.wasabee.blockerAutomark = blockerAutomark;
 };
 
 // this can be moved to auth dialog, no need to init it for people who never log in
