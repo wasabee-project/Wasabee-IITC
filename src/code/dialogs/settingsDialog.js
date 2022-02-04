@@ -131,13 +131,6 @@ const SettingsDialog = WDialog.extend({
       [1, 100, 250, 500, 750, 1000].map((v) => [v, v])
     );
 
-    this._addSelect(
-      container,
-      wX("TRAWL SKIP TILES"),
-      window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
-    );
-
     if (window.isSmartphone()) {
       this._addCheckBox(
         container,

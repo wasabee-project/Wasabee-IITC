@@ -585,7 +585,6 @@ export function clearAllData() {
         constants.SKIN_KEY,
         constants.LAST_MARKER_KEY,
         constants.AUTO_LOAD_FAKED,
-        constants.TRAWL_SKIP_STEPS,
         constants.USE_PANES,
         constants.SKIP_CONFIRM,
         constants.SERVER_BASE_KEY,

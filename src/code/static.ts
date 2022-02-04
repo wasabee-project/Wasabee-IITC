@@ -63,7 +63,6 @@ const statics: Statics = {
     SKIN_KEY: "wasabee-skin",
     LAST_MARKER_KEY: "wasabee-last-marker-type",
     AUTO_LOAD_FAKED: "wasabee-autoload-faked",
-    TRAWL_SKIP_STEPS: "wasabee-trawl-skip",
     USE_PANES: "wasabee-use-panes",
     SKIP_CONFIRM: "wasabee-skip-confirm",
     OAUTH_CLIENT_ID:

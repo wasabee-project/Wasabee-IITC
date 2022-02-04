@@ -8,7 +8,6 @@ import {
   blockerAutomark,
 } from "../uiCommands";
 import wX from "../wX";
-import TrawlDialog from "./trawl";
 import WasabeeBlocker from "../model/blocker";
 
 import PortalUI from "../ui/portal";
@@ -67,10 +66,6 @@ const BlockerList = WDialog.extend({
     buttons[wX("LOAD PORTALS")] = () => {
       const operation = getSelectedOperation();
       loadBlockerFaked(operation, true); // force
-    };
-    buttons[wX("TRAWL TITLE")] = () => {
-      const td = new TrawlDialog();
-      td.enable();
     };
     if (operation.canWrite()) {
       buttons[wX("dialog.blockers.clear_automark")] = () => {
