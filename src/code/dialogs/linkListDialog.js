@@ -21,6 +21,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
       this,
       operation
     );
+    fields[2].name = "";
     const linkFields = [
       {
         name: wX("dialog.link_list.length"),
@@ -42,7 +43,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
         smallScreenHide: true,
       },
     ];
-    return fields.slice(0, 2).concat(linkFields, fields.slice(3));
+    return fields.slice(0, 3).concat(linkFields, fields.slice(3));
   },
 
   _displayDialog: async function () {
