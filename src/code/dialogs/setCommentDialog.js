@@ -84,11 +84,7 @@ export const SetCommentDialog = WDialog.extend({
     if (this.commentType == "link") {
       desc.textContent = wX("SET_LINK_COMMENT");
       desc.appendChild(
-        LinkUI.displayFormat(
-          this.options.target,
-          this.options.operation,
-          this._smallScreen
-        )
+        LinkUI.displayFormat(this.options.target, this.options.operation)
       );
       if (this.options.target.comment)
         input.value = this.options.target.comment;

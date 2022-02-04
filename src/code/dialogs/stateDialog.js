@@ -60,7 +60,7 @@ const StateDialog = WDialog.extend({
       this._type = "Link";
       this._name = wX("LINK STATE PROMPT", portal.name);
       divtitle.appendChild(
-        LinkUI.displayFormat(this.options.target, operation, this._smallScreen)
+        LinkUI.displayFormat(this.options.target, operation)
       );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK STATE");
@@ -71,7 +71,7 @@ const StateDialog = WDialog.extend({
       const portal = operation.getPortal(this.options.target.portalId);
       this._type = "Marker";
       this._name = wX("MARKER STATE PROMPT", portal.name);
-      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER STATE");
       menu.prepend(t);

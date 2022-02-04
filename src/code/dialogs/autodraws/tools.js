@@ -100,9 +100,7 @@ export const AutoDraw = WDialog.extend({
     button.textContent = wX("SET");
     const display = L.DomUtil.create("span", "set-portal-display", container);
     if (this[thisKey]) {
-      display.appendChild(
-        PortalUI.displayFormat(this[thisKey], this._smallScreen)
-      );
+      display.appendChild(PortalUI.displayFormat(this[thisKey]));
     } else {
       display.textContent = wX("NOT_SET");
     }
@@ -112,9 +110,7 @@ export const AutoDraw = WDialog.extend({
         if (storageKey)
           localStorage[storageKey] = JSON.stringify(this[thisKey]);
         display.textContent = "";
-        display.appendChild(
-          PortalUI.displayFormat(this[thisKey], this._smallScreen)
-        );
+        display.appendChild(PortalUI.displayFormat(this[thisKey]));
       } else {
         display.textContent = wX("NOT_SET");
         displayError(wX("PLEASE_SELECT_PORTAL"));

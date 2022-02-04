@@ -68,7 +68,7 @@ const WasabeeDList = WDialog.extend({
             lat: n.Lat,
             lng: n.Lng,
           });
-          cell.appendChild(PortalUI.displayFormat(p, this._smallScreen));
+          cell.appendChild(PortalUI.displayFormat(p));
         },
       },
       {

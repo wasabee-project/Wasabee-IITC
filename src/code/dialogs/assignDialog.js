@@ -60,9 +60,7 @@ const AssignDialog = WDialog.extend({
       this._name = wX("ASSIGN LINK PROMPT", {
         portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(
-        LinkUI.displayFormat(target, operation, this._smallScreen)
-      );
+      divtitle.appendChild(LinkUI.displayFormat(target, operation));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("LINK ASSIGNMENT");
     }
@@ -73,7 +71,7 @@ const AssignDialog = WDialog.extend({
       this._name = wX("ASSIGN MARKER PROMPT", {
         portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("MARKER ASSIGNMENT");
     }
@@ -84,7 +82,7 @@ const AssignDialog = WDialog.extend({
       this._name = wX("ASSIGN OUTBOUND PROMPT", {
         portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(PortalUI.displayFormat(portal, this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("ANCHOR ASSIGNMENT");
     }

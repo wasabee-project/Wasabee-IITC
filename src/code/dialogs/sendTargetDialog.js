@@ -53,9 +53,7 @@ const SendTargetDialog = WDialog.extend({
     if (this.options.target instanceof WasabeeMarker) {
       this._portal = operation.getPortal(this.options.target.portalId);
       this._targettype = this.options.target.type;
-      divtitle.appendChild(
-        PortalUI.displayFormat(this._portal, this._smallScreen)
-      );
+      divtitle.appendChild(PortalUI.displayFormat(this._portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
@@ -64,9 +62,7 @@ const SendTargetDialog = WDialog.extend({
     if (this.options.target instanceof WasabeePortal) {
       this._portal = this.options.target;
       this._targettype = "anchor";
-      divtitle.appendChild(
-        PortalUI.displayFormat(this._portal, this._smallScreen)
-      );
+      divtitle.appendChild(PortalUI.displayFormat(this._portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);

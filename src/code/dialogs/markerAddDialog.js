@@ -75,9 +75,7 @@ const MarkerAddDialog = WDialog.extend({
     if (this._selectedPortal) {
       this._portal.textContent = "";
       this._portal.textContent = "";
-      this._portal.appendChild(
-        PortalUI.displayFormat(this._selectedPortal, this._smallScreen)
-      );
+      this._portal.appendChild(PortalUI.displayFormat(this._selectedPortal));
 
       this._zones.value = getSelectedOperation().determineZone(
         this._selectedPortal.latLng
