@@ -59,7 +59,6 @@
   "dependencies": {
     "arc": "^0.1.1",
     "color-string": "^1.5.5",
-    "geodesy": "^2.2.1",
     "idb": "^6.1.2",
     "sortablejs": "^1.12.0"
   },
