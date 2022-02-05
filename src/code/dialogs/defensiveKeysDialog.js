@@ -83,7 +83,7 @@ const DefensiveKeysDialog = WDialog.extend({
     const content = this._buildContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

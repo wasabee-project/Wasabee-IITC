@@ -39,7 +39,7 @@ const KeysList = WDialog.extend({
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

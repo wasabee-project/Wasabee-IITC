@@ -42,7 +42,7 @@ const AboutDialog = WDialog.extend({
 
     // Since the JqueryUI dialog buttons are hard-coded, we have to override them to translate them
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

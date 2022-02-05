@@ -79,7 +79,7 @@ const TrawlerDialog = WDialog.extend({
     const content = this._buildContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog("close");
     };
 
@@ -263,7 +263,7 @@ const TrawlDialog = WDialog.extend({
     });
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

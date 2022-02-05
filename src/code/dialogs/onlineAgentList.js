@@ -25,7 +25,7 @@ const OnlineAgentList = WDialog.extend({
 
   _displayDialog: function () {
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

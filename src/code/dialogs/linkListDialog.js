@@ -66,7 +66,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
     );
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

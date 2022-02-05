@@ -48,7 +48,7 @@ const BlockerList = WDialog.extend({
     this.sortable = await this._getListDialogContent(0, false); // defaults to sorting by op order
     loadBlockerFaked(operation);
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
     // doesn't support op select event

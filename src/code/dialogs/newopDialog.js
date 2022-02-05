@@ -56,7 +56,7 @@ const NewopDialog = WDialog.extend({
     });
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

@@ -144,7 +144,7 @@ const MarkerAddDialog = WDialog.extend({
     });
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

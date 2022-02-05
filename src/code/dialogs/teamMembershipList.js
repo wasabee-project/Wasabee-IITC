@@ -38,7 +38,7 @@ const TeamMembershipList = WDialog.extend({
     this._table.items = team.agents;
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

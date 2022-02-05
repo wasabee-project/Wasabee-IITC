@@ -48,7 +48,7 @@ const OpPermList = WDialog.extend({
     const html = this.buildHTML(operation);
 
     const buttons = {};
-    buttons[wX("CLOSE")] = () => {
+    buttons[wX("OK")] = () => {
       this.closeDialog();
     };
 

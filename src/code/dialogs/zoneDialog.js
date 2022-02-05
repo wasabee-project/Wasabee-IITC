@@ -34,7 +34,7 @@ const ZoneDialog = WDialog.extend({
     const html = this.buildList();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

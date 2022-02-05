@@ -27,7 +27,7 @@ const MarkerList = OperationChecklistDialog.extend({
       clearAllMarkers(getSelectedOperation());
     };
 
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

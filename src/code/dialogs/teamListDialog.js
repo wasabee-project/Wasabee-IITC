@@ -160,7 +160,7 @@ const TeamListDialog = WDialog.extend({
     }
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
     buttons[wX("NEW_TEAM")] = () => {

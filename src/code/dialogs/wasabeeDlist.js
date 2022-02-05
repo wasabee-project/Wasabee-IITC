@@ -37,7 +37,7 @@ const WasabeeDList = WDialog.extend({
     const sortable = await this.getListDialogContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 

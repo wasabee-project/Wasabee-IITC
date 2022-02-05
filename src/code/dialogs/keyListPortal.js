@@ -35,7 +35,7 @@ const KeyListPortal = WDialog.extend({
     this._sortable = this.getSortable();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
