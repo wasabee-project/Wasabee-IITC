@@ -43,6 +43,8 @@ const iconTypes = {
 export default class WasabeeMarker extends Task {
   portalId: PortalID;
   type: string;
+  // future compatibility
+  attributes?: any[];
 
   // static properties is not supported by eslint yet
   static get markerTypes() {
@@ -57,20 +59,17 @@ export default class WasabeeMarker extends Task {
     super(obj);
     this.portalId = obj.portalId;
     this.type = obj.type;
+    this.attributes = obj.attributes || [];
   }
 
   toJSON(): any {
     return {
-      ID: this.ID,
-      zone: Number(this.zone),
-      order: Number(this.order),
-      completedID: this.completedID,
-      assignedTo: this.assignedTo,
-      state: this._state,
+      ...super.toJSON(),
 
       portalId: this.portalId,
       type: this.type,
-      comment: this.comment,
+      // preserve data
+      attributes: this.attributes,
     };
   }
 

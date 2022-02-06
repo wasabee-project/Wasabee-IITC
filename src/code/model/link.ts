@@ -32,15 +32,11 @@ export default class WasabeeLink extends Task {
   // build object to serialize
   toJSON() {
     return {
-      ID: this.ID,
-      throwOrderPos: this.order,
-      zone: this.zone,
-      assignedTo: this.assignedTo,
-      completed: !!this.completedID, // !! forces a boolean value
+      ...super.toJSON(),
+
       fromPortalId: this.fromPortalId,
       toPortalId: this.toPortalId,
       color: this.color,
-      description: this.comment,
     };
   }
 

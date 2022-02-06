@@ -7,8 +7,9 @@ export default class Task {
   order: number;
   zone: ZoneID;
   assignedTo?: GoogleID;
-  completedID?: GoogleID;
   comment?: string;
+  dependsOn?: TaskID[];
+  deltaminutes?: number;
 
   _state: TaskState;
 
@@ -16,10 +17,19 @@ export default class Task {
     this.ID = obj.ID || generateId();
     this.zone = +obj.zone || 1;
     this.order = +obj.order || 0;
+    // to be replaced by .assignments
     this.assignedTo = obj.assignedTo ? obj.assignedTo : null;
-    this.completedID = obj.completedID ? obj.completedID : null;
     this.comment = obj.comment ? obj.comment : "";
     this.state = obj._state || obj.state;
+    // need UI
+    this.deltaminutes = obj.deltaminutes;
+
+    // future compatibility
+    this.dependsOn = obj.dependsOn || [];
+
+    // for raw task
+    if (!this.assignedTo && obj.assignments && obj.assignments.length > 0)
+      this.assignedTo = obj.assignments[0];
   }
 
   toServer() {
@@ -31,9 +41,12 @@ export default class Task {
       ID: this.ID,
       zone: Number(this.zone),
       order: Number(this.order),
-      completedID: this.completedID,
       assignedTo: this.assignedTo,
       state: this._state,
+      comment: this.comment,
+      // preserve data
+      deltaminutes: this.deltaminutes,
+      dependsOn: this.dependsOn,
     };
   }
 
@@ -67,13 +80,13 @@ export default class Task {
   }
 
   assign(gid?: GoogleID) {
-    if (gid !== this.assignedTo) this._state = gid ? "assigned" : "pending";
+    if (gid !== this.assignedTo) {
+      this._state = gid ? "assigned" : "pending";
+    }
     this.assignedTo = gid ? gid : null;
   }
 
   complete(gid?: GoogleID) {
-    if (!this.completedID || gid)
-      this.completedID = gid ? gid : this.assignedTo;
     this._state = "completed";
   }
 
@@ -84,7 +97,6 @@ export default class Task {
   set completed(v) {
     if (v) this.complete();
     else {
-      delete this.completedID;
       this.state = "assigned";
     }
   }

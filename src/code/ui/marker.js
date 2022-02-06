@@ -111,16 +111,6 @@ const WLMarker = PortalUI.WLPortal.extend({
         console.error(err);
       }
     }
-    if (marker.state == "completed" && marker.completedID) {
-      try {
-        const a = await WasabeeAgent.get(marker.completedID);
-        assignment.innerHTML = wX("COMPLETED BY", {
-          agentName: a ? a.getName() : marker.completedID,
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
   },
 
   _stateButton: function (container, marker) {
