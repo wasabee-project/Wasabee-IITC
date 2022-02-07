@@ -99,7 +99,7 @@ export default class Sortable<T> {
     if (localStorage[this._sortAscStoreKey] == null) {
       localStorage[this._sortAscStoreKey] = "true";
     }
-    this._sortAsc = localStorage[this._sortAscStoreKey] == "true";
+    this.sortAsc = localStorage[this._sortAscStoreKey] == "true";
   }
 
   get table() {
