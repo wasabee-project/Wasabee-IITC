@@ -114,7 +114,7 @@
   "dialog.clear_links.text": "Voulez-vous supprimer tous les liens de {opName} ?",
   "dialog.clear_links.title": "Effacer les liens : {opName}",
   "dialog.clear_markers.text": "Voulez-vous supprimer tous les marqueurs de {opName} ?",
-  "dialog.clear_markers.title": "Effacer les liens : {opName}",
+  "dialog.clear_markers.title": "Effacer les marqueurs : {opName}",
   "dialog.checklist.count_fields": "Nombre de fields",
   "dialog.checklist.count_fields.no_empty": "{fieldCount} fields trouvés et aucun champ vide",
   "dialog.checklist.count_fields.with_empty": "{fieldCount} fields trouvés et {emptyCount} champ(s) vide(s) sur {linkCount} lien(s)",
