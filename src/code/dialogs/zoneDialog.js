@@ -3,7 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
 import ZoneSetColorDialog from "./zoneSetColor";
-import { convertColorToHex } from "../auxiliar";
+import { appendFAIcon, convertColorToHex } from "../auxiliar";
 import { setMarkersToZones, setLinksToZones } from "../uiCommands";
 
 const ZoneDialog = WDialog.extend({
@@ -107,11 +107,11 @@ const ZoneDialog = WDialog.extend({
       });
 
       if (canWrite) {
-        const commandcell = L.DomUtil.create("td", null, tr);
-
+        const commandcell = L.DomUtil.create("td", "actions", tr);
         const color = L.DomUtil.create("a", null, commandcell);
-        color.textContent = "🖌";
         color.href = "#";
+        color.title = wX("dialog.zones.color_links");
+        appendFAIcon("palette", color);
         L.DomEvent.on(color, "click", (ev) => {
           L.DomEvent.stop(ev);
           const zoneSetColorDialog = new ZoneSetColorDialog({
@@ -121,40 +121,50 @@ const ZoneDialog = WDialog.extend({
         });
         if (z.id != 1) {
           const del = L.DomUtil.create("a", null, commandcell);
-          del.textContent = "🗑";
           del.href = "#";
+          del.title = wX("dialog.common.delete");
+          appendFAIcon("trash", del);
           L.DomEvent.on(del, "click", (ev) => {
             L.DomEvent.stop(ev);
             getSelectedOperation().removeZone(z.id);
           });
         }
-        if (z.points.length == 0) {
-          const addPoints = L.DomUtil.create("a", null, commandcell);
-          addPoints.textContent = " 🖍";
-          addPoints.href = "#";
-          L.DomEvent.on(addPoints, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            this.ZonedrawHandler.zoneID = z.id;
-            this.ZonedrawHandler.enable();
-          });
-        } else {
-          const delPoints = L.DomUtil.create("a", null, commandcell);
-          delPoints.textContent = " 🧽";
-          delPoints.href = "#";
-          L.DomEvent.on(delPoints, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            getSelectedOperation().removeZonePoints(z.id);
-          });
-        }
-        if (this.ZonedrawHandler && this.ZonedrawHandler.enabled()) {
+        if (
+          this.ZonedrawHandler &&
+          this.ZonedrawHandler.zoneID === z.id &&
+          this.ZonedrawHandler.enabled()
+        ) {
           const stopDrawing = L.DomUtil.create("a", null, commandcell);
           stopDrawing.href = "#";
-          stopDrawing.textContent = " 🛑";
+          stopDrawing.title = wX("dialog.zones.stop_drawing");
+          appendFAIcon("ban", stopDrawing);
           L.DomEvent.on(stopDrawing, "click", (ev) => {
             L.DomEvent.stop(ev);
             this.ZonedrawHandler.disable();
             this.update();
           });
+        } else {
+          if (z.points.length == 0) {
+            const addPoints = L.DomUtil.create("a", null, commandcell);
+            addPoints.title = wX("dialog.zones.draw_zone_shape");
+            appendFAIcon("pen", addPoints);
+            addPoints.href = "#";
+            L.DomEvent.on(addPoints, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              this.ZonedrawHandler.zoneID = z.id;
+              this.ZonedrawHandler.enable();
+              this.update();
+            });
+          } else {
+            const delPoints = L.DomUtil.create("a", null, commandcell);
+            delPoints.title = wX("dialog.zones.delete_zone_shape");
+            appendFAIcon("eraser", delPoints);
+            delPoints.href = "#";
+            L.DomEvent.on(delPoints, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              getSelectedOperation().removeZonePoints(z.id);
+            });
+          }
         }
       }
     }

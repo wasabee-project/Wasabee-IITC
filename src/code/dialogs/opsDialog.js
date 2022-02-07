@@ -18,6 +18,7 @@ import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
 import AgentUI from "../ui/agent";
+import { appendFAIcon } from "../auxiliar";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -132,18 +133,13 @@ const OpsDialog = WDialog.extend({
           1 * op.local + 2 * op.localchanged + 4 * op.remotechanged,
         // sort: (a, b) => a - b,
         format: (cell, value, op) => {
-          const status = L.DomUtil.create("span", "", cell);
-          status.textContent = "";
           if (!op.local) {
-            if (op.localchanged) {
-              status.textContent = "☀";
-              status.style.color = "green";
-              status.title = wX("dialog.ops_list.local_change");
-            }
-            if (op.remotechanged) {
-              status.textContent = "⛅";
-              status.style.color = "red";
-              status.title = wX("dialog.ops_list.remote_change");
+            if (op.localchanged && !op.remotechanged) {
+              appendFAIcon("desktop", cell);
+              cell.title = wX("dialog.ops_list.local_change");
+            } else if (op.remotechanged) {
+              appendFAIcon("server", cell);
+              cell.title = wX("dialog.ops_list.remote_change");
             }
           }
         },
@@ -212,7 +208,7 @@ const OpsDialog = WDialog.extend({
           // delete locally
           const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
-          deleteLocaly.textContent = "🗑️";
+          appendFAIcon("trash", deleteLocaly);
           deleteLocaly.title = wX("REM_LOC_CP", { opName: op.name });
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
@@ -223,7 +219,7 @@ const OpsDialog = WDialog.extend({
             // download op
             const download = L.DomUtil.create("a", "", cell);
             download.href = "#";
-            download.textContent = "↻";
+            appendFAIcon("sync", download);
             download.title = wX("dialog.ops_list.download", {
               opName: op.name,
             });

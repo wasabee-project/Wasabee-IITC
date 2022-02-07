@@ -57,6 +57,8 @@
   },
   "homepage": "https://github.com/wasabee-project/Wasabee-IITC/blob/master/README.md",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "arc": "^0.1.1",
     "color-string": "^1.5.5",
     "geodesy": "^2.2.1",
