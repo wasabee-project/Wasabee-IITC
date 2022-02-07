@@ -26,7 +26,7 @@ export class AutoDraw extends WDialog {
     thisKey: string,
     container: HTMLDivElement,
     storageKey: string,
-    callback?: () => void,
+    callback?: () => void
   ): void;
   _addCheckbox(
     text: string,

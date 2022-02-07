@@ -525,7 +525,6 @@ export default class WasabeeOp extends Evented implements IOperation {
     }
   }
 
-
   removeLinkByID(linkID: LinkID) {
     this.links = this.links.filter((l) => l.ID != linkID);
     this.cleanAnchorList();
@@ -1150,8 +1149,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   zoneName(zoneID: ZoneID) {
-    if (zoneID === 0)
-      return 0;
+    if (zoneID === 0) return 0;
     for (const z of this.zones) {
       if (z.id == zoneID) return z.name;
     }

@@ -64,11 +64,7 @@ export function normalize(a: Vec3): Vec3 {
 }
 
 export function dist2(a: Vec3, b: Vec3) {
-  return norm2([
-    a[0] - b[0],
-    a[1] - b[1],
-    a[2] - b[2],
-  ])
+  return norm2([a[0] - b[0], a[1] - b[1], a[2] - b[2]]);
 }
 
 function equals(a: L.LatLng, b: L.LatLng) {

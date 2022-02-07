@@ -111,7 +111,7 @@ export default class WasabeeAgent implements Agent {
     this.name = obj.name;
     this.intelname = obj.intelname !== "unset" ? obj.intelname : "";
     this.intelfaction = obj.intelfaction;
-    this.communityname = obj.communityname || '';
+    this.communityname = obj.communityname || "";
     this.pic = obj.pic ? obj.pic : null;
     this.lat = obj.lat ? obj.lat : 0;
     this.lng = obj.lng ? obj.lng : 0;
@@ -130,7 +130,7 @@ export default class WasabeeAgent implements Agent {
     else if (this.Vverified) this.name = this.vname || this.name;
     else if (this.rocks) this.name = this.rocksname || this.name;
     else if (this.intelname) this.name = this.intelname + " [!]";
-    else this.name = this.name || '[unknown name]';
+    else this.name = this.name || "[unknown name]";
 
     /* what did we decide to do with these?
     this.startlat = obj.startlat ? obj.startlat : 0;

@@ -153,7 +153,7 @@ const KeysList = WDialog.extend({
         },
       ]);
     } else {
-      this.sortable.fields = always; 
+      this.sortable.fields = always;
     }
 
     const keys = new Array();

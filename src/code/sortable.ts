@@ -14,7 +14,7 @@ export interface SortableField<T> {
   sort?: (a: unknown, b: unknown, aobj?: T, bobj?: T) => number;
   format?: (cell: HTMLTableCellElement, value: unknown, thing?: T) => void;
   smallScreenHide?: boolean;
-  foot?: (cell: HTMLTableCellElement) => void,
+  foot?: (cell: HTMLTableCellElement) => void;
 }
 
 export default class Sortable<T> {
@@ -37,7 +37,7 @@ export default class Sortable<T> {
     this._sortBy = 0; // which field/column number to sort by
     this._sortAsc = true; // ascending or descending
     this._table = L.DomUtil.create("table", "wasabee-table");
- 
+
     // create this once for all
     this._head = L.DomUtil.create("thead", null, this._table);
     this._body = L.DomUtil.create("tbody", null, this._table);
@@ -226,10 +226,12 @@ export default class Sortable<T> {
               this._sortAsc = !this._sortAsc;
             }
             L.DomUtil.addClass(cell, this._sortAsc ? "asc" : "desc");
-            
+
             this._sortBy = index;
-            if (this._sortByStoreKey != null) localStorage[this._sortByStoreKey] = this._sortBy;
-            if (this._sortAscStoreKey != null) localStorage[this._sortAscStoreKey] = this._sortAsc.toString();
+            if (this._sortByStoreKey != null)
+              localStorage[this._sortByStoreKey] = this._sortBy;
+            if (this._sortAscStoreKey != null)
+              localStorage[this._sortAscStoreKey] = this._sortAsc.toString();
             this.sort();
           },
           false
