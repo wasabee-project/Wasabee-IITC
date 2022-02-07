@@ -11,6 +11,9 @@ const LinkListDialog = OperationChecklistDialog.extend({
     TYPE: "linkListDialog",
   },
 
+  SORTBY_KEY: "wasabee-linklist-sortby",
+  SORTASC_KEY: "wasabee-linklist-sortasc",
+
   options: {
     usePane: true,
     // portal
@@ -55,7 +58,12 @@ const LinkListDialog = OperationChecklistDialog.extend({
     ).length;
     const toCount = links.length - fromCount;
 
-    this.sortable = this.getListDialogContent(operation, links, 0, false); // defaults to sorting by op order
+    this.sortable = this.getListDialogContent(
+      operation,
+      links,
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
+    );
 
     const buttons = {};
     buttons[wX("OK")] = () => {
@@ -89,8 +97,8 @@ const LinkListDialog = OperationChecklistDialog.extend({
     this.sortable = this.getListDialogContent(
       operation,
       links,
-      this.sortable.sortBy,
-      this.sortable.sortAsc
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
     );
     await this.sortable.done;
     this.setContent(this.sortable.table);
