@@ -1,6 +1,6 @@
 import colorString from "color-string";
 
-import { icon, IconName } from "@fortawesome/fontawesome-svg-core";
+import { icon, IconLookup, IconName } from "@fortawesome/fontawesome-svg-core";
 // avoid import from "@fortawesome/free-solid-svg-icons" to reduce *dev* build size
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
@@ -69,6 +69,6 @@ const icons = [
 export function appendFAIcon(iconName: IconName, container: Element) {
   const iconDef = icons.find((i) => i.iconName === iconName);
   if (!iconDef) return;
-  const iconNode = icon(iconDef).node[0];
+  const iconNode = icon(iconDef as IconLookup).node[0];
   container.appendChild(iconNode);
 }
