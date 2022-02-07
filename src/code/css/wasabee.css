@@ -540,7 +540,7 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 }
 
 /* color pickers */
-.hidden-color-picker {
+input[type=color].hidden-color-picker {
   visibility: hidden;
   width: 0;
   height: 0;
