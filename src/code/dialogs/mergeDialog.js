@@ -316,14 +316,13 @@ const MergeDialog = WDialog.extend({
     const newSpan = L.DomUtil.create("span", "", li);
     newSpan.textContent = next[key];
 
+    // TODO wX
     if (key === "hardness") {
       keySpan.textContent = "Hard: ";
     } else if (key === "comment") {
       keySpan.textContent = "Comment: ";
     } else if (key === "assignedTo") {
       keySpan.textContent = "Assign: ";
-    } else if (key === "completedID") {
-      keySpan.textContent = "Completed by: ";
     } else if (key === "state") {
       keySpan.textContent = "State: ";
     } else if (key === "color") {
@@ -340,6 +339,8 @@ const MergeDialog = WDialog.extend({
       keySpan.textContent = "From: ";
     } else if (key === "toPortalId") {
       keySpan.textContent = "To: ";
+    } else if (key === "deltaminutes") {
+      keySpan.textContent = "Delta: ";
     }
 
     if (key === "assignedTo" || key === "completedID") {

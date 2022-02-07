@@ -13,7 +13,13 @@ type Change<T, K extends keyof T> = {
 
 type MarkerChange = Change<
   WasabeeMarker,
-  "type" | "zone" | "order" | "completedID" | "assignedTo" | "state" | "comment"
+  | "type"
+  | "zone"
+  | "order"
+  | "assignedTo"
+  | "state"
+  | "comment"
+  | "deltaminutes"
 >;
 type LinkChange = Change<
   WasabeeLink,
@@ -22,10 +28,10 @@ type LinkChange = Change<
   | "color"
   | "zone"
   | "order"
-  | "completedID"
   | "assignedTo"
   | "state"
   | "comment"
+  | "deltaminutes"
 >;
 
 type PortalChange = Change<WasabeePortal, "hardness" | "comment">;
@@ -66,10 +72,10 @@ function linkChanges(origin: WasabeeLink, current: WasabeeLink) {
       "color",
       "zone",
       "order",
-      "completedID",
       "assignedTo",
       "comment",
       "state",
+      "deltaminutes",
     ]),
   };
   return changes;
@@ -84,10 +90,10 @@ function markerChanges(origin: WasabeeMarker, current: WasabeeMarker) {
       /*"portalId",*/ // unlikely because we don't swap marker yet
       "zone",
       "order",
-      "completedID",
       "assignedTo",
       "comment",
       "state",
+      "deltaminutes",
     ]),
   };
   return changes;
@@ -435,6 +441,12 @@ export function defaultChangeChoice(
     lc.value = masterOrCurrent.getLinkById(lc.id as string);
   }
 }
+
+/*
+  current properties that are preserved on master:
+    - Task.dependsOn
+    - Marker.attributes
+*/
 
 export function applyRebaseChanges(
   master: WasabeeOp,
