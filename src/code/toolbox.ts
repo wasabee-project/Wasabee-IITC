@@ -20,7 +20,7 @@ export function setupToolbox() {
 
   const settingsLink = L.DomUtil.create("a", "wasabee", toolbox);
   settingsLink.href = "#";
-  settingsLink.textContent = wX("SETTINGS");
+  settingsLink.textContent = wX("SETTINGS_TOOLBOX");
 
   L.DomEvent.on(settingsLink, "click", (ev) => {
     L.DomEvent.stop(ev);
