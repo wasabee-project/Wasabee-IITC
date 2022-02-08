@@ -5,6 +5,7 @@ interface MergeDialogOptions extends WDialogOptions {
   opOwn: WasabeeOp;
   opRemote: WasabeeOp;
   updateCallback?: (op: WasabeeOp) => void;
+  cancelText?: string;
 }
 declare class MergeDialog extends WDialog {
   options: MergeDialogOptions;

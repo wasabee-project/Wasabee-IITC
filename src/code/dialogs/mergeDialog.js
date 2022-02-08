@@ -20,7 +20,8 @@ const MergeDialog = WDialog.extend({
     // title
     // opOwn
     // opRemote
-    // updateCallback
+    // updateCallback?
+    // cancelText?
   },
 
   addHooks: function () {
@@ -237,10 +238,12 @@ const MergeDialog = WDialog.extend({
       text: wX("MERGE_LOCAL"),
       click: () => this.useLocal(),
     });
-    buttons.push({
-      text: wX("CANCEL"),
-      click: () => this.closeDialog(),
-    });
+    if (this.options.updateCallback || this.options.cancelText) {
+      buttons.push({
+        text: this.options.cancelText || wX("CANCEL"),
+        click: () => this.closeDialog(),
+      });
+    }
     this.createDialog({
       title: this.options.title || wX("MERGE_TITLE"),
       html: content,

@@ -135,6 +135,7 @@
   "dialog.leave_team.title": "Leave: {teamName}",
   "dialog.link_list.length": "Length",
   "dialog.link_list.level": "Min Lvl",
+  "dialog.merge.cancel_upload": "Cancel upload",
   "dialog.merge.conflicts": "Conflicts:",
   "dialog.merge.local": "Local copy",
   "dialog.merge.server": "Server copy",

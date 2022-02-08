@@ -155,6 +155,7 @@ const UploadButton = WButton.extend({
               opOwn: getSelectedOperation(),
               opRemote: lastOp,
               updateCallback: (op) => this.doUpdate(op, true),
+              cancelText: wX("dialog.merge.cancel_upload"),
             });
             md.enable();
           }
