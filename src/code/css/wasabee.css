@@ -562,6 +562,9 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
 .wasabee-dialog-merge .strike {
   text-decoration: line-through;
 }
+.wasabee-dialog-merge .diff-label {
+  padding-right: .5em;
+}
 
 /* color pickers */
 input[type=color].hidden-color-picker {
