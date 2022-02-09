@@ -82,7 +82,6 @@ async function onMessage(
       drawSingleTeam(data.msg);
       break;
     case "Delete":
-      displayWarning("server requested op delete: " + data.opID);
       console.warn("server requested op delete: ", data.opID);
       await removeOperation(data.opID);
       await changeOpIfNeeded();
