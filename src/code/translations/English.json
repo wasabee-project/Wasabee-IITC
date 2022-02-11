@@ -158,6 +158,7 @@
   "dialog.team_members.location": "Sharing Location",
   "dialog.team_members.wd_keys": "Sharing W-D Keys",
   "dialog.team_message": "Team announcement: “{message}” from {sender}",
+  "dialog.update_warning": "Wasabee is out of date. Please update using your plugin manager or by going to <a href='https://wasabee.rocks'>https://wasabee.rocks</a>",
   "dialog.zone_color.title": "Zone Color",
   "dialog.zone_color.text": "Set the color of all links in zone {zoneName}",
   "dialog.zones.color": "Color",

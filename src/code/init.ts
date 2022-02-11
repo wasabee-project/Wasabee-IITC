@@ -24,7 +24,7 @@ import WasabeeMe from "./model/me";
 import WasabeeOp from "./model/operation";
 import db from "./db";
 import polyfill from "./polyfill";
-import { displayError } from "./error";
+import { displayError, displayWarning } from "./error";
 import { deleteJWT } from "./auth";
 
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
@@ -34,6 +34,8 @@ import type { WLMarker } from "./ui/marker";
 import type { WLAgent } from "./ui/agent";
 import type { WLZone } from "./ui/zone";
 import type { ButtonsControl } from "./leafletClasses";
+import { checkVersion } from "./version";
+import wX from "./wX";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -257,6 +259,12 @@ window.plugin.wasabee.init = async () => {
 
   window.map.on("wdialog", (event) => {
     postToFirebase({ id: "analytics", action: event.dialogType });
+  });
+
+  checkVersion().then((v) => {
+    if (v) {
+      displayWarning(wX("dialog.update_warning"));
+    }
   });
 };
 
