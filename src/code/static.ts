@@ -1,3 +1,23 @@
+import mainCSS from "./css/wasabee.css";
+import autodrawsCSS from "./css/autodraws.css";
+import toolbarCSS from "./css/toolbar.css";
+import mapCSS from "./css/map.css";
+import panesCSS from "./css/panes.css";
+import smallScreenCSS from "./css/smallscreen.css";
+import iitcfixCSS from "./css/iitcfix.css";
+
+import localeGerman from "./translations/German.json";
+import localeSpanish from "./translations/Spanish.json";
+import localeEnglish from "./translations/English.json";
+import localeItalian from "./translations/Italian.json";
+import localeFilipino from "./translations/Filipino.json";
+import localeFrench from "./translations/French.json";
+import localePortuguese from "./translations/Portuguese.json";
+import localeRussian from "./translations/Russian.json";
+import localeDanish from "./translations/Danish.json";
+
+import anchorPin from "!raw-loader?esModule=false!./images/pin_custom.svg";
+
 // todo complete/rework
 type Statics = {
   CSS: { [name: string]: string };
@@ -7,15 +27,15 @@ type Statics = {
 
 const statics: Statics = {
   CSS: {
-    main: require("./css/wasabee.css"),
-    autodraws: require("./css/autodraws.css"),
-    toolbar: require("./css/toolbar.css"),
-    map: require("./css/map.css"),
-    panes: require("./css/panes.css"),
-    smallScreen: require("./css/smallscreen.css"),
+    main: mainCSS,
+    autodraws: autodrawsCSS,
+    toolbar: toolbarCSS,
+    map: mapCSS,
+    panes: panesCSS,
+    smallScreen: smallScreenCSS,
     // fix for dialogs on mobile from iitc dev version
     // to remove on >IITC-0.30.1
-    iitcfix: require("./css/iitcfix.css"),
+    iitcfix: iitcfixCSS,
   },
   dialogNames: {
     linkDialogButton: "wasabee-addlinks",
@@ -93,15 +113,15 @@ const statics: Statics = {
 };
 
 statics.strings = {}; // empty object, fill it below
-statics.strings["Deutsch"] = require("./translations/German.json");
-statics.strings["Espanol"] = require("./translations/Spanish.json");
-statics.strings["English"] = require("./translations/English.json");
-statics.strings["Italiano"] = require("./translations/Italian.json");
-statics.strings["Tagalog"] = require("./translations/Filipino.json");
-statics.strings["Français"] = require("./translations/French.json");
-statics.strings["Português"] = require("./translations/Portuguese.json");
-statics.strings["Русский"] = require("./translations/Russian.json");
-statics.strings["Dansk"] = require("./translations/Danish.json");
+statics.strings["Deutsch"] = localeGerman;
+statics.strings["Espanol"] = localeSpanish;
+statics.strings["English"] = localeEnglish;
+statics.strings["Italiano"] = localeItalian;
+statics.strings["Tagalog"] = localeFilipino;
+statics.strings["Français"] = localeFrench;
+statics.strings["Português"] = localePortuguese;
+statics.strings["Русский"] = localeRussian;
+statics.strings["Dansk"] = localeDanish;
 
 statics.defaultOperationColor = "orange";
 
@@ -127,7 +147,7 @@ statics.backgroundLinkStyle = {
   interactive: false,
 };
 
-statics.anchorTemplate = require("!raw-loader?esModule=false!./images/pin_custom.svg");
+statics.anchorTemplate = anchorPin;
 
 // https://leafletjs.com/reference-1.0.3.html#path
 statics.layerTypes = new Map([
