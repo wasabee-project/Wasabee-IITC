@@ -16,7 +16,7 @@ import localePortuguese from "./translations/Portuguese.json";
 import localeRussian from "./translations/Russian.json";
 import localeDanish from "./translations/Danish.json";
 
-import anchorPin from "!raw-loader?esModule=false!./images/pin_custom.svg";
+import anchorPin from "./images/pin_custom.svg";
 
 // todo complete/rework
 type Statics = {
