@@ -37,91 +37,73 @@ export function sendLocation() {
   );
 }
 
-// recursive function to auto-mark blockers
-export async function blockerAutomark(operation: WasabeeOp, first = true) {
-  const blockers = await WasabeeBlocker.getAll(operation);
-  if (first) {
-    operation.startBatchMode();
-    // add blocker portals
-    for (const b of blockers) {
-      operation._addPortal(
-        new WasabeePortal({
-          id: b.from,
-          name: b.fromPortal.name,
-          lat: b.fromPortal.lat,
-          lng: b.fromPortal.lng,
-        })
-      );
-      operation._addPortal(
-        new WasabeePortal({
-          id: b.to,
-          name: b.toPortal.name,
-          lat: b.toPortal.lat,
-          lng: b.toPortal.lng,
-        })
-      );
-    }
-  }
-  // build count list
-  const portals: PortalID[] = [];
+export async function blockerAutomark(operation: WasabeeOp) {
+  let blockers = await WasabeeBlocker.getAll(operation);
+
+  operation.startBatchMode();
+  // add blocker portals
   for (const b of blockers) {
-    if (
-      !operation.containsMarkerByID(
-        b.from,
-        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
-      )
-    )
-      portals.push(b.from);
-    if (
-      !operation.containsMarkerByID(
-        b.to,
-        WasabeeMarker.constants.MARKER_TYPE_EXCLUDE
-      )
-    )
-      portals.push(b.to);
+    operation._addPortal(
+      new WasabeePortal({
+        id: b.from,
+        name: b.fromPortal.name,
+        lat: b.fromPortal.lat,
+        lng: b.fromPortal.lng,
+      })
+    );
+    operation._addPortal(
+      new WasabeePortal({
+        id: b.to,
+        name: b.toPortal.name,
+        lat: b.toPortal.lat,
+        lng: b.toPortal.lng,
+      })
+    );
   }
-  const reduced: { [id: PortalID]: number } = {};
-  for (const p of portals) {
-    if (!reduced[p]) reduced[p] = 0;
-    reduced[p]++;
+  while (blockers.length) {
+    // build count list
+    const reduced: { [id: PortalID]: number } = {};
+    for (const b of blockers) {
+      if (!reduced[b.from]) reduced[b.from] = 0;
+      reduced[b.from]++;
+      if (!reduced[b.to]) reduced[b.to] = 0;
+      reduced[b.to]++;
+    }
+    for (const marker of operation.markers) {
+      if (marker.type === WasabeeMarker.constants.MARKER_TYPE_EXCLUDE)
+        delete reduced[marker.portalId];
+    }
+
+    // put in some smarts for picking close portals, rather than random ones
+    // when the count gets > 3
+
+    const portalId = Object.entries(reduced).reduce(
+      (a, b) => (a[1] < b[1] ? b : a),
+      [null, 0]
+    )[0];
+    if (!portalId) break;
+
+    // get WasabeePortal for portalId
+    let wportal = operation.getPortal(portalId);
+    if (!wportal) wportal = PortalUI.get(portalId);
+    if (!wportal) {
+      displayInfo(wX("AUTOMARK STOP"));
+      break;
+    }
+
+    // add marker
+    let type = WasabeeMarker.constants.MARKER_TYPE_DESTROY;
+    if (PortalUI.team(wportal) == "E") {
+      type = WasabeeMarker.constants.MARKER_TYPE_VIRUS;
+    }
+    const zone = operation.determineZone(wportal.latLng);
+    operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
+
+    // remove nodes from blocker list
+    blockers = blockers.filter((b) => b.from !== portalId && b.to !== portalId);
+    await WasabeeBlocker.removeBlocker(operation, portalId);
   }
-  const sorted = Object.entries(reduced).sort((a, b) => b[1] - a[1]);
-
-  // return from recursion
-  if (sorted.length == 0) {
-    if (first) operation.endBatchMode();
-    return;
-  }
-
-  const portalId = sorted[0][0];
-
-  // put in some smarts for picking close portals, rather than random ones
-  // when the count gets > 3
-
-  // get WasabeePortal for portalId
-  let wportal = operation.getPortal(portalId);
-  if (!wportal) wportal = PortalUI.get(portalId);
-  if (!wportal) {
-    displayInfo(wX("AUTOMARK STOP"));
-    return;
-  }
-  // console.log(wportal);
-
-  // add marker
-  let type = WasabeeMarker.constants.MARKER_TYPE_DESTROY;
-  if (PortalUI.team(wportal) == "E") {
-    type = WasabeeMarker.constants.MARKER_TYPE_VIRUS;
-  }
-  const zone = operation.determineZone(wportal.latLng);
-  operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
-
-  // remove nodes from blocker list
-  await WasabeeBlocker.removeBlocker(operation, portalId);
-
-  // recurse
-  await blockerAutomark(operation, false);
-
-  if (first) operation.endBatchMode();
+  operation.endBatchMode();
 }
 
 export function clearAllData() {
