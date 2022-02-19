@@ -1,5 +1,5 @@
-import { getSelectedOperation } from "../selectedOp";
 import type WasabeeOp from "./operation";
+import type { WLatLng } from "./portal";
 
 import Task from "./task";
 
@@ -46,8 +46,7 @@ export default class WasabeeLink extends Task {
   }
 
   getLatLngs(operation: WasabeeOp) {
-    operation = operation || getSelectedOperation();
-    const returnArray: L.LatLng[] = [];
+    const returnArray: WLatLng[] = [];
 
     const fromPortal = operation.getPortal(this.fromPortalId);
     if (!fromPortal || !fromPortal.lat) {

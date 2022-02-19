@@ -14,7 +14,7 @@ export default class WasabeePortal {
   comment: string;
   hardness: string;
 
-  _latLng: LatLng;
+  _latLng: WLatLng;
 
   constructor(obj) {
     if (typeof obj == "string") {
@@ -40,7 +40,10 @@ export default class WasabeePortal {
     this.comment = obj.comment ? obj.comment : "";
     this.hardness = obj.hardness ? obj.hardness : "";
 
-    this._latLng = new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+    this._latLng = obj._latLng || {
+      lat: +this.lat,
+      lng: +this.lng,
+    };
   }
 
   // build object to serialize

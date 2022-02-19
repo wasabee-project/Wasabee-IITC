@@ -290,7 +290,7 @@ const TrawlDialog = WDialog.extend({
 
     const points = new Array();
     for (const l of operation.links) {
-      const lls = l.getLatLngs();
+      const lls = l.getLatLngs(operation);
       const start = new VLatLon(lls[0].lat, lls[0].lng);
       const end = new VLatLon(lls[1].lat, lls[1].lng);
       const distance = start.distanceTo(end);
