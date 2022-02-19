@@ -1,4 +1,4 @@
-import WasabeePortal from "../model/portal";
+import { WasabeePortal } from "../model";
 import { IITC } from "../../types/iitc";
 
 export function fromIITC(p: IITC.Portal): WasabeePortal;

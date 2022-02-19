@@ -1,6 +1,6 @@
 import { WDialog, WDialogOptions } from "../leafletClasses";
-import WasabeeMarker from "../model/marker";
-import WasabeePortal from "../model/portal";
+import { WasabeeMarker } from "../model";
+import { WasabeePortal } from "../model";
 
 interface SendTargetDialogOptions extends WDialogOptions {
   target: WasabeeMarker | WasabeePortal;

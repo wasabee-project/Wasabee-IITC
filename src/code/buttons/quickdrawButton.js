@@ -1,7 +1,7 @@
 import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
-import { postToFirebase } from "../firebaseSupport";
+import { postToFirebase } from "../firebase/logger";
 
 import * as PortalUI from "../ui/portal";
 

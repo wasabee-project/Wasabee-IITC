@@ -1,5 +1,5 @@
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 
 /** Tree-like strucure holding a HF configuration */
 export interface Tree {

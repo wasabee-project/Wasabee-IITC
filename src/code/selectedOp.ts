@@ -1,5 +1,5 @@
-import WasabeeOp from "./model/operation";
-import WasabeeBlocker from "./model/blocker";
+import { WasabeeOp } from "./model";
+import { WasabeeBlocker } from "./model";
 import wX from "./wX";
 import { displayError } from "./error";
 import type { LeafletEvent } from "leaflet";

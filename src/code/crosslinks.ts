@@ -1,6 +1,6 @@
-import WasabeePortal from "./model/portal";
-import WasabeeMarker from "./model/marker";
-import WasabeeBlocker from "./model/blocker";
+import { WasabeePortal } from "./model";
+import { WasabeeMarker } from "./model";
+import { WasabeeBlocker } from "./model";
 import { getSelectedOperation } from "./selectedOp";
 
 import * as PortalUI from "./ui/portal";

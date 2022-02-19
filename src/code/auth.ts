@@ -1,6 +1,6 @@
-import { postToFirebase } from "./firebaseSupport";
+import { postToFirebase } from "./firebase/logger";
 import { getMe } from "./model/cache";
-import WasabeeMe from "./model/me";
+import { WasabeeMe } from "./model";
 import { oneTimeToken, SendAccessTokenAsync } from "./server";
 
 const JWT_KEY = "wasabee-jwt";

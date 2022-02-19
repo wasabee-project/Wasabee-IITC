@@ -1,5 +1,5 @@
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 
 export default class OnionfieldDialog extends AutoDraw {
   _anchor: WasabeePortal;

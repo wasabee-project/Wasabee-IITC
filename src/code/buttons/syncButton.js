@@ -1,5 +1,5 @@
 import { WButton } from "../leafletClasses";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import { fullSync } from "../uiCommands";
 import wX from "../wX";
 

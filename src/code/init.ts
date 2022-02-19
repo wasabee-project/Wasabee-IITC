@@ -14,14 +14,16 @@ import {
 } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
-import { initFirebase, postToFirebase } from "./firebaseSupport";
+import { initFirebase } from "./firebase/init";
+import { onMessage as fbMessageHandler } from "./firebase/event";
+import { postToFirebase } from "./firebase/logger";
 import { initWasabeeD } from "./wd";
 import { listenForPortalDetails, sendLocation } from "./uiCommands";
 import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
-import WasabeeMe from "./model/me";
-import WasabeeOp from "./model/operation";
+import { WasabeeMe } from "./model";
+import { WasabeeOp } from "./model";
 import db from "./db";
 import polyfill from "./polyfill";
 import { displayError, displayWarning } from "./error";
@@ -31,11 +33,7 @@ import wX from "./wX";
 import { getMe } from "./model/cache";
 
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
-import type { WLAnchor } from "./map/anchor";
-import type { WLLink } from "./map/link";
-import type { WLMarker } from "./map/marker";
-import type { WLAgent } from "./map/agent";
-import type { WLZone } from "./map/zone";
+import type { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { ButtonsControl } from "./leafletClasses";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
@@ -229,7 +227,7 @@ window.plugin.wasabee.init = async () => {
   });
 
   // late stage initializations
-  initFirebase();
+  initFirebase(fbMessageHandler);
   initCrossLinks();
   initWasabeeD();
 

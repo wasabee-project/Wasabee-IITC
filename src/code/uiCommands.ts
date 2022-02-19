@@ -1,10 +1,10 @@
-import WasabeeOp from "./model/operation";
-import WasabeePortal from "./model/portal";
-import WasabeeBlocker from "./model/blocker";
-import WasabeeMarker from "./model/marker";
+import { WasabeeOp } from "./model";
+import { WasabeePortal } from "./model";
+import { WasabeeBlocker } from "./model";
+import { WasabeeMarker } from "./model";
 import ConfirmDialog from "./dialogs/confirmDialog";
 import MergeDialog from "./dialogs/mergeDialog";
-import WasabeeMe from "./model/me";
+import { WasabeeMe } from "./model";
 import wX from "./wX";
 import { opPromise, GetWasabeeServer, locationPromise } from "./server";
 import AuthDialog from "./dialogs/authDialog";

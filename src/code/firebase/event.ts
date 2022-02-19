@@ -1,68 +1,28 @@
-/*
- * Since we can't run a service worker from https://intel.ingress.com, we
- * are creating an iframe that loads content hosted on server.wasabee.com.
- * This way we can setup a service worker under a domain we control and
- * simply pass the messages along using window.parent.postMessage.
- */
 import {
   opPromise,
-  GetWasabeeServer,
   getLinkPromise,
   getMarkerPromise,
-} from "./server";
+} from "../server";
 import {
   makeSelectedOperation,
   removeOperation,
   changeOpIfNeeded,
   getSelectedOperation,
-} from "./selectedOp";
-import { updateLocalOp } from "./uiCommands";
-import WasabeeOp from "./model/operation";
-import WasabeePortal from "./model/portal";
+} from "../selectedOp";
+import { updateLocalOp } from "../uiCommands";
+import { WasabeeOp } from "../model";
+import { WasabeePortal } from "../model";
 
-import * as PortalUI from "./ui/portal";
-import { displayInfo, displayWarning } from "./error";
-import { getJWT } from "./auth";
-import WasabeeMe from "./model/me";
-import { constants } from "./static";
-import WasabeeLink from "./model/link";
-import WasabeeMarker from "./model/marker";
-import wX from "./wX";
-import { getAgent } from "./model/cache";
+import * as PortalUI from "../ui/portal";
+import { displayInfo, displayWarning } from "../error";
+import { constants } from "../static";
+import { WasabeeLink } from "../model";
+import { WasabeeMarker } from "../model";
+import wX from "../wX";
+import { getAgent } from "../model/cache";
 
-// TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
-
-const frameID = "wasabeeFirebaseFrame";
-
-const channel = new MessageChannel();
-const port = channel.port1;
-
-export function initFirebase() {
-  const iframe = L.DomUtil.create("iframe");
-  iframe.width = "0";
-  iframe.height = "0";
-  iframe.src = constants.FIREBASE_IFRAME;
-  iframe.id = frameID;
-
-  iframe.addEventListener("load", () => {
-    port.onmessage = (ev) => {
-      if (ev.data === "ready") {
-        port.onmessage = onMessage;
-        if (WasabeeMe.isLoggedIn()) {
-          postToFirebase({
-            id: "wasabeeLogin",
-            method: "auto",
-          });
-        }
-      }
-    };
-    iframe.contentWindow.postMessage("init", "*", [channel.port2]);
-  });
-
-  $(document.body).append(iframe);
-}
-
-async function onMessage(
+export type MessageHandler = typeof onMessage;
+export async function onMessage(
   event: MessageEvent<{ data: WMessage } | "permission-blocked">
 ) {
   if (event.data === "permission-blocked") {
@@ -323,34 +283,3 @@ type WMessage =
   | TaskAssignment
   | TaskState
   | OpChange;
-
-interface FirebaseMessage {
-  id: string;
-  method: string;
-  action: string;
-  error: string;
-  app_name: string;
-  app_version: string;
-  server: string;
-  jwt: string;
-}
-
-export function postToFirebase(message: Partial<FirebaseMessage>) {
-  // prevent analytics data from being sent if not enabled by the user: GPDR
-  if (
-    message.id == "analytics" &&
-    localStorage[window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY] !=
-      "true"
-  )
-    return;
-
-  if (message.id == "wasabeeLogin") {
-    message.server = GetWasabeeServer();
-    message.jwt = getJWT();
-  }
-
-  message.app_name = "Wasabee-IITC";
-  message.app_version = window.plugin.wasabee.info.version;
-
-  port.postMessage(message);
-}

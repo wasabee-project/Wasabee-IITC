@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeAgent from "../model/agent";
+import { WasabeeAgent } from "../model";
 import wX from "../wX";
 
 import * as AgentUI from "../ui/agent";

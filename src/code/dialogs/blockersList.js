@@ -9,7 +9,7 @@ import {
 } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
 

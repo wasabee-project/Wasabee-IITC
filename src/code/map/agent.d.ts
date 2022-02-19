@@ -1,4 +1,4 @@
-import WasabeeAgent from "../model/agent";
+import { WasabeeAgent } from "../model";
 
 interface WLAgentOptions extends L.MarkerOptions {
   agent: WasabeeAgent;

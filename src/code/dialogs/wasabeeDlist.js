@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import wX from "../wX";
-import WasabeePortal from "../model/portal";
+import { WasabeePortal } from "../model";
 import { getAgentWasabeeDkeys } from "../wd";
 
 import * as PortalUI from "../ui/portal";

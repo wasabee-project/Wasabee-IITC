@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeOp from "../model/operation";
+import { WasabeeOp } from "../model";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 import { computeRebaseChanges, applyRebaseChanges } from "../model/changes";

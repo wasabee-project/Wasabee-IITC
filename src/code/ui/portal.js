@@ -1,4 +1,4 @@
-import WasabeePortal from "../model/portal";
+import { WasabeePortal } from "../model";
 
 import wX from "../wX";
 

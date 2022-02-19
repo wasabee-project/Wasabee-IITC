@@ -1,6 +1,6 @@
 import { WDialog, WDialogOptions } from "../../leafletClasses";
-import WasabeeOp from "../../model/operation";
-import WasabeePortal from "../../model/portal";
+import { WasabeeOp } from "../../model";
+import { WasabeePortal } from "../../model";
 
 export class AutoDraw extends WDialog {
   needWritePermission: true;

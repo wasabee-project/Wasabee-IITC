@@ -3,8 +3,8 @@ import wX from "../../wX";
 import { getSelectedOperation } from "../../selectedOp";
 import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
 
-import WasabeePortal from "../../model/portal";
-import WasabeeMarker from "../../model/marker";
+import { WasabeePortal } from "../../model";
+import { WasabeeMarker } from "../../model";
 
 import { selectAngleInterval, sortPortalsByAngle } from "./algorithm";
 import { greatCircleArcIntersectByLatLngs } from "../../geo";

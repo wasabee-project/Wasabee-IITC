@@ -1,13 +1,9 @@
-import WasabeeMe from "./model/me";
+import { WasabeeMe } from "./model";
 import type WasabeeAgent from "./model/agent";
-import WasabeeOp from "./model/operation";
+import { WasabeeOp } from "./model";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
-import { WLLink } from "./map/link";
-import { WLAnchor } from "./map/anchor";
-import { WLAgent } from "./map/agent";
-import { WLMarker } from "./map/marker";
-import { WLZone } from "./map/zone";
+import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { PathOptions } from "leaflet";
 import { getAgent, getMe, getTeam } from "./model/cache";
 

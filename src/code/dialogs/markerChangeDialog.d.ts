@@ -1,5 +1,5 @@
 import { WDialog, WDialogOptions } from "../leafletClasses";
-import WasabeeMarker from "../model/marker";
+import { WasabeeMarker } from "../model";
 
 interface MarkerChangeDialogOptions extends WDialogOptions {
   marker: WasabeeMarker;

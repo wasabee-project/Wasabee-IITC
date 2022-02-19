@@ -1,5 +1,5 @@
-import WasabeeOp from "../model/operation";
-import WasabeePortal from "../model/portal";
+import { WasabeeOp } from "../model";
+import { WasabeePortal } from "../model";
 import { WDialog } from "../leafletClasses";
 import OperationChecklistDialog from "./checklist";
 import wX from "../wX";

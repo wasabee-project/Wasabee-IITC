@@ -1,6 +1,6 @@
 import { WDialog, WDialogOptions } from "../leafletClasses";
-import WasabeeLink from "../model/link";
-import WasabeeMarker from "../model/marker";
+import { WasabeeLink } from "../model";
+import { WasabeeMarker } from "../model";
 interface StateDialogOptions extends WDialogOptions {
   target: WasabeeMarker | WasabeeLink;
   opID: string;

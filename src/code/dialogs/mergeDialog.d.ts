@@ -1,5 +1,5 @@
 import { WDialog, WDialogOptions } from "../leafletClasses";
-import WasabeeOp from "../model/operation";
+import { WasabeeOp } from "../model";
 interface MergeDialogOptions extends WDialogOptions {
   title?: string;
   opOwn: WasabeeOp;

@@ -6,7 +6,7 @@ import wX from "../../wX";
 import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 
 /**
  * Return the spines in set 1, 2 and 3:

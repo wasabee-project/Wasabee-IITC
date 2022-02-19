@@ -1,5 +1,5 @@
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
 import {
   extendLatLngToLLC,

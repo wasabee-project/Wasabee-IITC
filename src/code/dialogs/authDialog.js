@@ -3,8 +3,8 @@ import { GetWasabeeServer, SetWasabeeServer, setIntelID } from "../server";
 import PromptDialog from "./promptDialog";
 import { sendLocation, fullSync } from "../uiCommands";
 import { wX } from "../wX";
-import { postToFirebase } from "../firebaseSupport";
-import WasabeeMe from "../model/me";
+import { postToFirebase } from "../firebase/logger";
+import { WasabeeMe } from "../model";
 import { displayError, ServerError } from "../error";
 import {
   isAuthAvailable,
