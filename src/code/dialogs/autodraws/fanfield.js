@@ -2,7 +2,7 @@ import { AutoDraw } from "./tools";
 import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
 import { greatCircleArcIntersectByLatLngs } from "../../geo";
-import { clearAllLinks } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { displayError, displayInfo } from "../../error";
 

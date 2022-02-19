@@ -1,6 +1,6 @@
 import LinkListDialog from "../dialogs/linkListDialog";
 import { getSelectedOperation } from "../selectedOp";
-import { swapPortal, deletePortal } from "../uiCommands";
+import { swapPortal, deletePortal } from "../ui/anchor";
 import wX from "../wX";
 
 import { displayFormat } from "../ui/portal";

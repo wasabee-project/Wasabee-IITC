@@ -1,6 +1,6 @@
 import OperationChecklistDialog from "./checklist.js";
 import wX from "../wX";
-import { loadFaked } from "../uiCommands";
+import { loadFaked } from "../ui/portal";
 import { getSelectedOperation } from "../selectedOp";
 
 import * as PortalUI from "../ui/portal";

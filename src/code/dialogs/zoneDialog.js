@@ -4,7 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
 import ZoneSetColorDialog from "./zoneSetColor";
 import { appendFAIcon, convertColorToHex } from "../auxiliar";
-import { setMarkersToZones, setLinksToZones } from "../uiCommands";
+import { setMarkersToZones, setLinksToZones } from "../ui/zone";
 
 const ZoneDialog = WDialog.extend({
   statics: {

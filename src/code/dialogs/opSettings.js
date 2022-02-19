@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
-import { clearAllItems, zoomToOperation } from "../uiCommands";
+import { zoomToOperation } from "../uiCommands";
 import ConfirmDialog from "./confirmDialog";
 import ZoneDialog from "./zoneDialog";
 import {
@@ -17,6 +17,7 @@ import { WasabeeMe } from "../model";
 
 import { convertColorToHex } from "../auxiliar";
 import { displayError } from "../error";
+import { clearAllItems } from "../ui/operation";
 
 const OpSettingDialog = WDialog.extend({
   statics: {

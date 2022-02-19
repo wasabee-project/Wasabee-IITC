@@ -1,7 +1,8 @@
 import OperationChecklistDialog from "./checklist.js";
 import { getSelectedOperation } from "../selectedOp";
-import { loadFaked, clearAllMarkers } from "../uiCommands";
+import { loadFaked } from "../ui/portal";
 import wX from "../wX";
+import { clearAllMarkers } from "../ui/operation";
 
 const MarkerList = OperationChecklistDialog.extend({
   statics: {

@@ -5,8 +5,8 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadBlockerFaked,
-  blockerAutomark,
-} from "../uiCommands";
+} from "../ui/portal";
+import { blockerAutomark } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
 import { WasabeeBlocker } from "../model";

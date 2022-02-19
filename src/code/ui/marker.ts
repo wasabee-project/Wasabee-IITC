@@ -1,7 +1,10 @@
+import ConfirmDialog from "../dialogs/confirmDialog";
 import wX from "../wX";
 import { displayFormat as displayPortal } from "./portal";
 
-export function displayFormat(marker, operation) {
+import type { WasabeeOp, WasabeeMarker, WasabeePortal } from "../model";
+
+export function displayFormat(marker: WasabeeMarker, operation: WasabeeOp) {
   const portal = operation.getPortal(marker.portalId);
 
   if (portal == null) {
@@ -14,4 +17,24 @@ export function displayFormat(marker, operation) {
   kind.textContent = wX(marker.type);
   desc.appendChild(displayPortal(portal));
   return desc;
+}
+
+export function deleteMarker(
+  operation: WasabeeOp,
+  marker: WasabeeMarker,
+  portal: WasabeePortal
+) {
+  const pr = L.DomUtil.create("div", null);
+  pr.textContent = wX("DELETE MARKER PROMPT");
+  pr.appendChild(displayPortal(portal));
+  const con = new ConfirmDialog({
+    title: wX("DELETE MARKER TITLE"),
+    label: pr,
+    type: "marker",
+    callback: () => {
+      operation.removeMarker(marker);
+      window.map.fire("wasabee:crosslinks");
+    },
+  });
+  con.enable();
 }

@@ -10,9 +10,8 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
-  setMarkersToZones,
-  setLinksToZones,
-} from "../uiCommands";
+} from "../ui/portal";
+import { setMarkersToZones, setLinksToZones } from "../ui/zone";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 

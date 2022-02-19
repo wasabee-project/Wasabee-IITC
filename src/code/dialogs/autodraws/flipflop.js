@@ -1,7 +1,7 @@
 import { AutoDraw } from "./tools";
 import wX from "../../wX";
 import { getSelectedOperation } from "../../selectedOp";
-import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 
 import { WasabeePortal } from "../../model";
 import { WasabeeMarker } from "../../model";
@@ -9,6 +9,7 @@ import { WasabeeMarker } from "../../model";
 import { selectAngleInterval, sortPortalsByAngle } from "./algorithm";
 import { greatCircleArcIntersectByLatLngs } from "../../geo";
 import { displayError, displayInfo } from "../../error";
+import { getAllPortalsOnScreen } from "../../ui/portal";
 
 function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
   const res = [];

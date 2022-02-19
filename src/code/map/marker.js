@@ -2,7 +2,7 @@ import SetCommentDialog from "../dialogs/setCommentDialog";
 import MarkerChangeDialog from "../dialogs/markerChangeDialog";
 import StateDialog from "../dialogs/stateDialog";
 import { getSelectedOperation } from "../selectedOp";
-import { deleteMarker } from "../uiCommands";
+import { deleteMarker } from "../ui/marker";
 
 import { displayFormat } from "../ui/portal";
 import { formatDisplay } from "../ui/agent";

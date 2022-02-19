@@ -2,7 +2,7 @@ import { AutoDraw } from "./tools";
 import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
 import wX from "../../wX";
-import { clearAllLinks } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 import { displayError, displayInfo } from "../../error";
 import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";

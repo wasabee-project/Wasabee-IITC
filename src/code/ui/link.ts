@@ -4,8 +4,14 @@ import wX from "../wX";
 
 import * as PortalUI from "./portal";
 
+import { WasabeeLink, WasabeeOp, WasabeePortal } from "../model";
+
 // returns a DOM object appropriate for display
-export function displayFormat(link, operation, smallScreen = false) {
+export function displayFormat(
+  link: WasabeeLink,
+  operation: WasabeeOp,
+  smallScreen = false
+) {
   const d = L.DomUtil.create("div", null);
   d.appendChild(
     PortalUI.displayFormat(operation.getPortal(link.fromPortalId), smallScreen)
@@ -23,8 +29,9 @@ export function displayFormat(link, operation, smallScreen = false) {
   });
 
   L.DomEvent.on(picker, "change", (ev) => {
-    link.setColor(ev.target.value, operation);
-    addToColorList(ev.target.value);
+    const color = (ev.target as HTMLInputElement).value;
+    link.setColor(color, operation);
+    addToColorList(color);
   });
 
   d.appendChild(
@@ -33,7 +40,7 @@ export function displayFormat(link, operation, smallScreen = false) {
   return d;
 }
 
-export function minLevel(link, operation) {
+export function minLevel(link: WasabeeLink, operation: WasabeeOp) {
   const b = link.length(operation);
   let s = wX("UNKNOWN");
   const a = L.DomUtil.create("span", null);
@@ -72,4 +79,44 @@ export function minLevel(link, operation) {
   }
   a.textContent = s;
   return a;
+}
+
+export function getAllPortalsLinked(
+  operation: WasabeeOp,
+  originPortal: WasabeePortal
+) {
+  const x = [];
+  for (const link in window.links) {
+    const p = window.links[link];
+
+    if (
+      operation.containsLinkFromTo(p.options.data.oGuid, p.options.data.dGuid)
+    )
+      continue;
+
+    const linkPortal1 = new WasabeePortal({
+      id: p.options.data.oGuid,
+      lat: (p.options.data.oLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.oLngE6 / 1e6).toFixed(6),
+      name: p.options.data.oGuid,
+      comment: "in",
+    });
+
+    const linkPortal2 = new WasabeePortal({
+      id: p.options.data.dGuid,
+      lat: (p.options.data.dLatE6 / 1e6).toFixed(6),
+      lng: (p.options.data.dLngE6 / 1e6).toFixed(6),
+      name: p.options.data.dGuid,
+      comment: "out",
+    });
+
+    if (linkPortal1.id === originPortal.id) {
+      x.push(linkPortal2);
+    }
+    if (linkPortal2.id === originPortal.id) {
+      x.push(linkPortal1);
+    }
+  }
+  // console.log(x);
+  return x;
 }

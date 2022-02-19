@@ -1,9 +1,10 @@
 import { AutoDraw } from "./tools";
 import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
-import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { displayError } from "../../error";
+import { getAllPortalsOnScreen } from "../../ui/portal";
 
 const StarburstDialog = AutoDraw.extend({
   statics: {

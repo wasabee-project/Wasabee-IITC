@@ -1,9 +1,10 @@
 import { AutoDraw } from "./tools";
 import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
-import { clearAllLinks, getAllPortalsLinked } from "../../uiCommands";
+import { getAllPortalsLinked } from "../../ui/link";
 import wX from "../../wX";
 import { displayError } from "../../error";
+import { clearAllLinks } from "../../ui/operation";
 
 const SaveLinksDialog = AutoDraw.extend({
   statics: {

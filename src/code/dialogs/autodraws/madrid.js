@@ -1,7 +1,7 @@
 import { portalInField } from "../../geo";
 import { displayError, displayInfo } from "../../error";
 import { getSelectedOperation } from "../../selectedOp";
-import { clearAllLinks } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";

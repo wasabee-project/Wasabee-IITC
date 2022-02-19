@@ -1,11 +1,11 @@
 import AgentDialog from "../dialogs/agentDialog";
+import type { WasabeeAgent } from "../model";
 import wX from "../wX";
 
 /**
- * @param {WasabeeAgent} agent
  * @returns html anchor with agent name (and verification states)
  */
-export function formatDisplay(agent) {
+export function formatDisplay(agent: WasabeeAgent) {
   const display = L.DomUtil.create("a", "wasabee-agent-label");
   if (agent.Vverified || agent.rocks) {
     L.DomUtil.addClass(display, "enl");
@@ -43,7 +43,7 @@ export function formatDisplay(agent) {
   return display;
 }
 
-export function timeSinceformat(agent) {
+export function timeSinceformat(agent: WasabeeAgent) {
   if (!agent.date) return "";
   const date = Date.parse(agent.date + "Z");
   if (Number.isNaN(date)) return `(${agent.date} UTC)`; // FireFox Date.parse no good
