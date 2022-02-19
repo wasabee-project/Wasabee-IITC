@@ -5,7 +5,7 @@ import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
-import { zoomToOperation } from "../uiCommands";
+import { zoomToOperation } from "../ui/operation";
 import { displayError, displayInfo } from "../error";
 
 const ImportDialog = WDialog.extend({

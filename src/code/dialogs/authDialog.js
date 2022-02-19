@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import { GetWasabeeServer, SetWasabeeServer, setIntelID } from "../server";
 import PromptDialog from "./promptDialog";
-import { sendLocation, fullSync } from "../uiCommands";
+import { sendLocation } from "../uiCommands";
 import { wX } from "../wX";
 import { postToFirebase } from "../firebase/logger";
 import { WasabeeMe } from "../model";
@@ -13,6 +13,7 @@ import {
   sendOneTimeToken,
 } from "../auth";
 import { constants } from "../static";
+import { fullSync } from "../ui/operation";
 
 const AuthDialog = WDialog.extend({
   statics: {

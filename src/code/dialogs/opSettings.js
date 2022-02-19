@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
-import { zoomToOperation } from "../uiCommands";
+import { zoomToOperation } from "../ui/operation";
 import ConfirmDialog from "./confirmDialog";
 import ZoneDialog from "./zoneDialog";
 import {

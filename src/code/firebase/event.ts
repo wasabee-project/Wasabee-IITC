@@ -9,7 +9,7 @@ import {
   changeOpIfNeeded,
   getSelectedOperation,
 } from "../selectedOp";
-import { updateLocalOp } from "../uiCommands";
+import { updateLocalOp } from "../ui/operation";
 import { WasabeeOp } from "../model";
 import { WasabeePortal } from "../model";
 

@@ -13,7 +13,7 @@ import {
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import { WasabeeMe } from "../model";
-import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
+import { syncOp, deleteLocalOp, zoomToOperation } from "../ui/operation";
 import Sortable from "../sortable";
 
 import * as AgentUI from "../ui/agent";
