@@ -7,7 +7,7 @@ import WasabeePortal from "../../model/portal";
 import WasabeeMarker from "../../model/marker";
 
 import { selectAngleInterval, sortPortalsByAngle } from "./algorithm";
-import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../../geo";
 import { displayError, displayInfo } from "../../error";
 
 function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {

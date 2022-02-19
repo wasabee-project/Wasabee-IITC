@@ -4,16 +4,19 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import Evented from "./evented";
-import { generateId } from "../auxiliar";
-import { GetWasabeeServer } from "../server";
-import { getSelectedOperation } from "../selectedOp";
+import { generateId } from "./utils";
+import { GetWasabeeServer } from "../config";
 import db from "../db";
 
 // 0.20->0.21 blocker migration
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
-import { displayWarning } from "../error";
-import { fieldSign, portalInField } from "../crosslinks";
+//import { displayWarning } from "../error";
+import { fieldSign, portalInField } from "../geo";
+
+function getSelectedOperation() {
+  return window.plugin.wasabee._selectedOp;
+}
 
 export type KeyOnHand = {
   portalId: string;
@@ -608,7 +611,7 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     // sanitize OP if it get corrupt by my code elsewhere...
     const missingPortal = new Set<PortalID>();
-    let corrupt = this.links.length + this.markers.length;
+    //let corrupt = this.links.length + this.markers.length;
     for (const [id, v] of newPortals) {
       if (v === undefined) {
         this.links = this.links.filter(
@@ -618,13 +621,13 @@ export default class WasabeeOp extends Evented implements IOperation {
         missingPortal.add(id);
       }
     }
-    corrupt -= this.links.length + this.markers.length;
+    //corrupt -= this.links.length + this.markers.length;
     if (missingPortal.size > 0) {
       // leave some trace
       console.trace("op corruption: missing portals");
-      displayWarning(
-        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
-      );
+      // displayWarning(
+      //   `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
+      // );
       this.cleanAnchorList();
       for (const id of missingPortal) newPortals.delete(id);
     }

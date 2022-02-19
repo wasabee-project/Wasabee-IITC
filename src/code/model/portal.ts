@@ -1,5 +1,10 @@
-import type { LatLng } from "leaflet";
-import { generateId } from "../auxiliar";
+import { generateId } from "./utils";
+
+export interface WLatLng {
+  lat: number;
+  lng: number;
+  _cartesian?: [number, number, number];
+}
 
 export default class WasabeePortal {
   id: PortalID;

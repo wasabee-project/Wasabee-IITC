@@ -7,7 +7,7 @@ import {
   portalInField,
   dist2,
   fieldCenter,
-} from "../../crosslinks";
+} from "../../geo";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
 

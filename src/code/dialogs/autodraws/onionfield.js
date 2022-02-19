@@ -1,7 +1,7 @@
 import { AutoDraw } from "./tools";
 import WasabeePortal from "../../model/portal";
 import { getSelectedOperation } from "../../selectedOp";
-import { portalInField } from "../../crosslinks";
+import { portalInField } from "../../geo";
 import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
 import wX from "../../wX";
 import { displayError } from "../../error";

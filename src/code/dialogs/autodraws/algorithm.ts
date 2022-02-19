@@ -1,4 +1,4 @@
-import { fieldSign, GeodesicLine } from "../../crosslinks";
+import { fieldSign, GeodesicLine } from "../../geo";
 import type WasabeePortal from "../../model/portal";
 
 type Poset<T> = Map<T, T[]>;

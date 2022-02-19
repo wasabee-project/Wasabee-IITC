@@ -1,4 +1,4 @@
-import { portalInField } from "../../crosslinks";
+import { portalInField } from "../../geo";
 import { displayError, displayInfo } from "../../error";
 import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks } from "../../uiCommands";
