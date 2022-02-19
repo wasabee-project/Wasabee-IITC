@@ -4,7 +4,6 @@
  * This way we can setup a service worker under a domain we control and
  * simply pass the messages along using window.parent.postMessage.
  */
-import { drawSingleTeam } from "./mapDrawing";
 import {
   opPromise,
   GetWasabeeServer,
@@ -79,7 +78,7 @@ async function onMessage(
   switch (data.cmd) {
     case "Agent Location Change":
       console.debug("firebase update of whole team location: ", data);
-      drawSingleTeam(data.msg);
+      window.map.fire("wasabee:agentlocations");
       break;
     case "Delete":
       console.warn("server requested op delete: ", data.opID);
