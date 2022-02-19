@@ -5,7 +5,7 @@ import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
 import { getAgentPortalWasabeeDkeys } from "../wd";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 import { displayError, displayInfo } from "../error";
 
 const DefensiveKeysDialog = WDialog.extend({

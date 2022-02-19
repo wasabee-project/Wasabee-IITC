@@ -1,5 +1,4 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeAgent from "../model/agent";
 import WasabeeLink from "../model/link";
 import WasabeeMarker from "../model/marker";
 import Sortable from "../sortable";
@@ -17,10 +16,11 @@ import {
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
 import { appendFAIcon } from "../auxiliar";
+import { getAgent } from "../model/cache";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -219,7 +219,7 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("ASS_TO"),
         value: async (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            const agent = await WasabeeAgent.get(thing.assignedTo);
+            const agent = await getAgent(thing.assignedTo);
             if (agent != null) return agent.getName();
             return "GID: [" + thing.assignedTo + "]";
           }

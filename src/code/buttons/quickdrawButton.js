@@ -3,7 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebaseSupport";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const QuickdrawButton = WButton.extend({
   statics: {

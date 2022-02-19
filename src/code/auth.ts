@@ -1,4 +1,5 @@
 import { postToFirebase } from "./firebaseSupport";
+import { getMe } from "./model/cache";
 import WasabeeMe from "./model/me";
 import { oneTimeToken, SendAccessTokenAsync } from "./server";
 
@@ -22,13 +23,13 @@ export async function sendAccessToken(token: string) {
   if (r && (r as any).jwt) {
     storeJWT((r as any).jwt);
   }
-  return r ? new WasabeeMe(r) : await WasabeeMe.waitGet(true);
+  return r ? new WasabeeMe(r) : await getMe(true);
 }
 
 /** wrap ott to get me */
 export async function sendOneTimeToken(token: string) {
   await oneTimeToken(token);
-  return await WasabeeMe.waitGet(true);
+  return await getMe(true);
 }
 
 /** GAPI */

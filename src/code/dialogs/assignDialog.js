@@ -2,13 +2,12 @@ import { WDialog } from "../leafletClasses";
 import WasabeeLink from "../model/link";
 import WasabeeMarker from "../model/marker";
 import WasabeePortal from "../model/portal";
-import WasabeeMe from "../model/me";
-import WasabeeTeam from "../model/team";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
+import { getTeam, getMe } from "../model/cache";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -104,12 +103,12 @@ const AssignDialog = WDialog.extend({
   _populateAgentSelect: async function (select, current) {
     const alreadyAdded = new Array();
 
-    const me = await WasabeeMe.waitGet();
+    const me = await getMe();
     for (const t of getSelectedOperation().teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const tt = await getTeam(t.teamid, 5 * 60);
         for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);

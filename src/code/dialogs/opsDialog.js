@@ -13,12 +13,12 @@ import {
 import OpPermList from "./opPerms";
 import wX from "../wX";
 import WasabeeMe from "../model/me";
-import WasabeeAgent from "../model/agent";
 import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
 
-import AgentUI from "../ui/agent";
+import * as AgentUI from "../ui/agent";
 import { appendFAIcon } from "../auxiliar";
+import { getAgent } from "../model/cache";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -287,7 +287,7 @@ const OpsDialog = WDialog.extend({
         background: tmpOp.background,
       };
       if (sum.currentserver) {
-        const agent = await WasabeeAgent.get(tmpOp.creator);
+        const agent = await getAgent(tmpOp.creator);
         sum.owner = agent.getName();
         sum.ownerDisplay = AgentUI.formatDisplay(agent);
       } else {

@@ -17,7 +17,7 @@ import {
   duplicateOperation,
 } from "./selectedOp";
 
-import PortalUI from "./ui/portal";
+import * as PortalUI from "./ui/portal";
 import {
   displayError,
   displayInfo,
@@ -27,6 +27,7 @@ import {
 import { deleteDatabase } from "./db";
 import { constants } from "./static";
 import type { Wasabee } from "./init";
+import { getMe } from "./model/cache";
 
 export function addPortal(operation: WasabeeOp, portal: WasabeePortal) {
   if (!portal) {
@@ -471,7 +472,7 @@ export async function fullSync() {
 
   try {
     let reloadOpID = null;
-    const me = await WasabeeMe.waitGet(true);
+    const me = await getMe(true);
     const opsID = new Set(me.Ops.map((o) => o.ID));
 
     // delete operations absent from server unless the owner

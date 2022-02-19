@@ -11,15 +11,3 @@ export function minLevel(
   link: WasabeeLink,
   operation: WasabeeOp
 ): HTMLSpanElement;
-
-interface WLLinkOptions extends L.PolylineOptions {
-  opID: OpID;
-  linkID: LinkID;
-}
-
-export class WLLink extends L.GeodesicPolyline {
-  _wlink: WasabeeLink;
-  options: WLLinkOptions;
-  constructor(link: WasabeeLink, operation: WasabeeOp);
-  _getPopup(): HTMLDivElement;
-}

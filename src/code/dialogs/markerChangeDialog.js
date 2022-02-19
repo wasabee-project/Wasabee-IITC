@@ -4,7 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import WasabeeMarker from "../model/marker";
 import WasabeeBlocker from "../model/blocker";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {

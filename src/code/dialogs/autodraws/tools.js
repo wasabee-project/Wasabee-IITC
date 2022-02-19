@@ -4,7 +4,7 @@ import { getSelectedOperation } from "../../selectedOp";
 import wX from "../../wX";
 import { getAllPortalsOnScreen } from "../../uiCommands";
 
-import PortalUI from "../../ui/portal";
+import * as PortalUI from "../../ui/portal";
 import { displayError } from "../../error";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up

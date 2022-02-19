@@ -3,9 +3,11 @@ import { getSelectedOperation } from "../selectedOp";
 import { swapPortal, deletePortal } from "../uiCommands";
 import wX from "../wX";
 
-import PortalUI from "./portal";
+import { displayFormat } from "../ui/portal";
 
-const WLAnchor = PortalUI.WLPortal.extend({
+import { WLPortal } from "./portal";
+
+export const WLAnchor = WLPortal.extend({
   type: "anchor",
 
   initialize: function (portalId, operation) {
@@ -23,7 +25,7 @@ const WLAnchor = PortalUI.WLPortal.extend({
         { color: color }
       ),
     });
-    PortalUI.WLPortal.prototype.initialize.call(this, {
+    WLPortal.prototype.initialize.call(this, {
       portalId: portalId,
       id: portalId,
       icon: icon,
@@ -35,9 +37,9 @@ const WLAnchor = PortalUI.WLPortal.extend({
     const canWrite = operation.canWrite();
     const portal = operation.getPortal(this.options.portalId);
 
-    const content = PortalUI.WLPortal.prototype._popupContent.call(this);
+    const content = WLPortal.prototype._popupContent.call(this);
     const desc = L.DomUtil.create("div", "desc", content);
-    desc.appendChild(PortalUI.displayFormat(portal));
+    desc.appendChild(displayFormat(portal));
     this._popupPortalComments(desc, portal, canWrite);
 
     const requiredKeys = L.DomUtil.create("div", "desc", content);
@@ -95,7 +97,3 @@ const WLAnchor = PortalUI.WLPortal.extend({
     deletePortal(operation, portal);
   },
 });
-
-export default {
-  WLAnchor,
-};

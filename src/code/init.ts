@@ -26,16 +26,17 @@ import db from "./db";
 import polyfill from "./polyfill";
 import { displayError, displayWarning } from "./error";
 import { deleteJWT } from "./auth";
-
-import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
-import type { WLAnchor } from "./ui/anchor";
-import type { WLLink } from "./ui/link";
-import type { WLMarker } from "./ui/marker";
-import type { WLAgent } from "./ui/agent";
-import type { WLZone } from "./ui/zone";
-import type { ButtonsControl } from "./leafletClasses";
 import { checkVersion } from "./version";
 import wX from "./wX";
+import { getMe } from "./model/cache";
+
+import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
+import type { WLAnchor } from "./map/anchor";
+import type { WLLink } from "./map/link";
+import type { WLMarker } from "./map/marker";
+import type { WLAgent } from "./map/agent";
+import type { WLZone } from "./map/zone";
+import type { ButtonsControl } from "./leafletClasses";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -256,7 +257,7 @@ window.plugin.wasabee.init = async () => {
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
-    WasabeeMe.waitGet(true);
+    getMe(true);
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys");

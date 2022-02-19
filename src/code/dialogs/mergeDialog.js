@@ -1,15 +1,15 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../model/agent";
 import WasabeeOp from "../model/operation";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 import { computeRebaseChanges, applyRebaseChanges } from "../model/changes";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
-import MarkerUI from "../ui/marker";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
+import * as MarkerUI from "../ui/marker";
 import { sanitizeState } from "../model/task";
+import { getAgent } from "../model/cache";
 
 const MergeDialog = WDialog.extend({
   statics: {
@@ -345,13 +345,9 @@ const MergeDialog = WDialog.extend({
 
     if (key === "assignedTo" || key === "completedID") {
       if (old[key])
-        WasabeeAgent.get(old[key]).then(
-          (a) => (oldSpan.textContent = a.getName())
-        );
+        getAgent(old[key]).then((a) => (oldSpan.textContent = a.getName()));
       if (next[key])
-        WasabeeAgent.get(next[key]).then(
-          (a) => (newSpan.textContent = a.getName())
-        );
+        getAgent(next[key]).then((a) => (newSpan.textContent = a.getName()));
     }
 
     if (key === "fromPortalId" || key === "toPortalId") {

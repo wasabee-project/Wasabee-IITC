@@ -10,16 +10,15 @@ import {
   deleteJoinLinkPromise,
   createJoinLinkPromise,
 } from "../server";
-import WasabeeMe from "../model/me";
-import WasabeeTeam from "../model/team";
 import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
 import { constants } from "../static";
 
-import AgentUI from "../ui/agent";
+import * as AgentUI from "../ui/agent";
 import { displayError, displayInfo } from "../error";
+import { getTeam, getMe } from "../model/cache";
 
 // The update method here is the best so far, bring all the others up to this one
 const ManageTeamDialog = WDialog.extend({
@@ -79,7 +78,7 @@ const ManageTeamDialog = WDialog.extend({
                     squadDialog.inputField.value
                   );
                   // refresh team data
-                  await WasabeeTeam.get(this.options.team.ID, 0);
+                  await getTeam(this.options.team.ID, 0);
                   window.map.fire("wasabee:team:update");
                 } catch (e) {
                   console.error(e);
@@ -113,7 +112,7 @@ const ManageTeamDialog = WDialog.extend({
                 try {
                   await removeAgentFromTeamPromise(value, this.options.team.ID);
                   // refresh team data
-                  await WasabeeTeam.get(this.options.team.ID, 0);
+                  await getTeam(this.options.team.ID, 0);
                 } catch (e) {
                   console.error(e);
                 }
@@ -135,7 +134,7 @@ const ManageTeamDialog = WDialog.extend({
   _refreshTeam: async function (table) {
     try {
       // max 5 seconds cache for this screen
-      const teamdata = await WasabeeTeam.get(this.options.team.ID, 5);
+      const teamdata = await getTeam(this.options.team.ID, 5);
       const agents = teamdata.agents;
       if (agents && agents.length > 0) {
         table.items = agents;
@@ -160,7 +159,7 @@ const ManageTeamDialog = WDialog.extend({
     list.appendChild(table.table);
     await table.done;
 
-    const team = await WasabeeTeam.get(this.options.team.ID);
+    const team = await getTeam(this.options.team.ID);
     this.options.team.Name = team.name;
 
     const addlabel = L.DomUtil.create("label", null, container);
@@ -174,7 +173,7 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await addAgentToTeamPromise(addField.value, this.options.team.ID);
         // refresh team data
-        await WasabeeTeam.get(this.options.team.ID, 0);
+        await getTeam(this.options.team.ID, 0);
         displayInfo(wX("ADD_SUCC_INSTR"));
         window.map.fire("wasabee:team:update");
       } catch (e) {
@@ -195,7 +194,7 @@ const ManageTeamDialog = WDialog.extend({
       try {
         await renameTeamPromise(team.id, renameField.value);
         // refresh team data
-        await WasabeeTeam.get(this.options.team.ID, 0);
+        await getTeam(this.options.team.ID, 0);
         window.map.fire("wasabee:team:update");
       } catch (e) {
         console.error(e);
@@ -274,7 +273,7 @@ const ManageTeamDialog = WDialog.extend({
           try {
             await deleteTeamPromise(team.id);
             this.closeDialog();
-            await WasabeeMe.waitGet(true);
+            await getMe(true);
           } catch (e) {
             console.error(e);
             displayError(e);

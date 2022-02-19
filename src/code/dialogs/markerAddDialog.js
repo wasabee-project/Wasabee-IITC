@@ -1,13 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import WasabeeMe from "../model/me";
-import WasabeeTeam from "../model/team";
 import WasabeeMarker from "../model/marker";
 import WasabeeBlocker from "../model/blocker";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
+import { getTeam, getMe } from "../model/cache";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -190,12 +190,12 @@ const MarkerAddDialog = WDialog.extend({
     if (!operation.isOnCurrentServer()) return options;
 
     const alreadyAdded = new Set();
-    const me = await WasabeeMe.waitGet();
+    const me = await getMe();
     for (const t of operation.teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const tt = await getTeam(t.teamid, 5 * 60);
         for (const a of tt.agents) {
           if (!alreadyAdded.has(a.id)) {
             alreadyAdded.add(a.id);

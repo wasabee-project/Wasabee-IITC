@@ -3,7 +3,7 @@ import WasabeeMarker from "./model/marker";
 import WasabeeBlocker from "./model/blocker";
 import { getSelectedOperation } from "./selectedOp";
 
-import PortalUI from "./ui/portal";
+import * as PortalUI from "./ui/portal";
 import type WasabeeOp from "./model/operation";
 import type { IITC } from "../types/iitc";
 import type WasabeeLink from "./model/link";

@@ -3,7 +3,7 @@ import Sortable from "../sortable";
 import WasabeeAgent from "../model/agent";
 import wX from "../wX";
 
-import AgentUI from "../ui/agent";
+import * as AgentUI from "../ui/agent";
 
 const OnlineAgentList = WDialog.extend({
   statics: {

@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../model/agent";
 import { appendFAIcon } from "../auxiliar";
+import { getAgent } from "../model/cache";
 
 const AgentDialog = WDialog.extend({
   statics: {
@@ -21,7 +21,7 @@ const AgentDialog = WDialog.extend({
     const html = L.DomUtil.create("div", null);
 
     try {
-      const data = await WasabeeAgent.get(this.options.gid);
+      const data = await getAgent(this.options.gid);
       L.DomUtil.create("h2", "wasabee-agent-label", html).textContent =
         data.getName();
 

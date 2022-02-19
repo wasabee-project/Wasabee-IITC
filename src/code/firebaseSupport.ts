@@ -21,15 +21,15 @@ import { updateLocalOp } from "./uiCommands";
 import WasabeeOp from "./model/operation";
 import WasabeePortal from "./model/portal";
 
-import PortalUI from "./ui/portal";
+import * as PortalUI from "./ui/portal";
 import { displayInfo, displayWarning } from "./error";
-import WasabeeAgent from "./model/agent";
 import { getJWT } from "./auth";
 import WasabeeMe from "./model/me";
 import { constants } from "./static";
 import WasabeeLink from "./model/link";
 import WasabeeMarker from "./model/marker";
 import wX from "./wX";
+import { getAgent } from "./model/cache";
 
 // TODO: use a dedicated message channel: https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API/Using_channel_messaging
 
@@ -88,7 +88,7 @@ async function onMessage(
       break;
     case "Generic Message":
       {
-        const agent = await WasabeeAgent.get(data.sender);
+        const agent = await getAgent(data.sender);
         const name = agent ? agent.name : "[unknown sender]";
         displayInfo(
           wX("dialog.team_message", { message: data.msg, sender: name })

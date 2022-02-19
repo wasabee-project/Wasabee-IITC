@@ -11,7 +11,7 @@ import wX from "../wX";
 import TrawlDialog from "./trawl";
 import WasabeeBlocker from "../model/blocker";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const BlockerList = WDialog.extend({
   statics: {

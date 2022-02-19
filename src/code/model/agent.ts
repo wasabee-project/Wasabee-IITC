@@ -1,5 +1,3 @@
-import { agentPromise } from "../server";
-import WasabeeMe from "./me";
 import db from "../db";
 
 interface BaseAgent {
@@ -203,28 +201,7 @@ export default class WasabeeAgent implements Agent {
     return null;
   }
 
-  // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
-  static async get(gid: string, maxAgeSeconds = 86400) {
-    const cached = await (await db).get("agents", gid);
-    if (cached && cached.fetched > Date.now() - 1000 * maxAgeSeconds) {
-      const a = new WasabeeAgent(cached);
-      // console.debug("returning from cache", a);
-      return a;
-    }
-
-    if (!WasabeeMe.isLoggedIn()) {
-      // console.debug("not logged in, giving up");
-      return null;
-    }
-
-    // console.debug("pulling server for new agent data (no team)");
-    try {
-      const result = await agentPromise(gid);
-      return new WasabeeAgent(result);
-    } catch (e) {
-      console.error(e);
-    }
-    // console.debug("giving up");
-    return null;
+  static async get(gid: string) {
+    return await (await db).get("agents", gid);
   }
 }
