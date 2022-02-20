@@ -49,6 +49,12 @@ type OperationChange = Change<
   zones: ZoneChange[];
 };
 
+/**
+ * @param origin Origin object
+ * @param current Object to compare with `origin`
+ * @param keys Keys of the object to compare the content
+ * @returns subset of `current` that differs from `origin`
+ */
 function computeDiff<T, K extends keyof T>(origin: T, current: T, keys: K[]) {
   const props: Partial<T> = {};
   let once = false;
@@ -62,6 +68,9 @@ function computeDiff<T, K extends keyof T>(origin: T, current: T, keys: K[]) {
   return null;
 }
 
+/**
+ * @returns summary of link differences, including the link ID
+ */
 function linkChanges(origin: WasabeeLink, current: WasabeeLink) {
   const changes: LinkChange = {
     id: origin.ID,
@@ -81,6 +90,9 @@ function linkChanges(origin: WasabeeLink, current: WasabeeLink) {
   return changes;
 }
 
+/**
+ * @returns summary of marker differences, including the marker ID
+ */
 function markerChanges(origin: WasabeeMarker, current: WasabeeMarker) {
   const changes: MarkerChange = {
     id: origin.ID,
@@ -99,6 +111,9 @@ function markerChanges(origin: WasabeeMarker, current: WasabeeMarker) {
   return changes;
 }
 
+/**
+ * @returns summary of portal differences, including the portal ID
+ */
 function portalChanges(origin: WasabeePortal, current: WasabeePortal) {
   const changes: PortalChange = {
     id: origin.id,
@@ -108,6 +123,9 @@ function portalChanges(origin: WasabeePortal, current: WasabeePortal) {
   return changes;
 }
 
+/**
+ * @returns summary of zone differences, including the zone ID
+ */
 function zoneChanges(origin: WasabeeZone, current: WasabeeZone) {
   const changes: ZoneChange = {
     id: origin.id,
@@ -117,6 +135,14 @@ function zoneChanges(origin: WasabeeZone, current: WasabeeZone) {
   return changes;
 }
 
+/**
+ * Compare two lists of object identified by their ID/id.
+ * Either an object is:
+ *  - in both lists, then compute the object difference and records an `"edition"`
+ *  - in `origin` only, then records a `"deletion"`
+ *  - in `current` only, then records a `"addition"`
+ * @returns list of addition/deletion and edition (drop object without difference).
+ */
 function compareList<
   T extends { id?: string | number; ID?: string },
   K extends keyof T
@@ -183,6 +209,9 @@ function compareList<
   return result;
 }
 
+/**
+ * @returns operation difference from `origin` to `current`
+ */
 export function operationChanges(origin: WasabeeOp, current: WasabeeOp) {
   const changes: OperationChange = {
     id: origin.ID,
@@ -207,6 +236,11 @@ export function operationChanges(origin: WasabeeOp, current: WasabeeOp) {
   return changes;
 }
 
+/**
+ * Given two changes `master` and `follower`, compute the subset of `follower`
+ * that is not already in `master`
+ * @returns `follower` minus `master`
+ */
 function rebaseDiff<T>(master: Partial<T>, follower: Partial<T>) {
   const props: Partial<T> = {};
   let once = false;
@@ -220,6 +254,23 @@ function rebaseDiff<T>(master: Partial<T>, follower: Partial<T>) {
   return null;
 }
 
+/**
+ * Given two lists of changes `master` and `follower`, compute the subset of
+ * `follower` that is not already in `master` and the list of conflicts, where
+ * a conflict occurs if:
+ *  - double addition (ex: two markers with same IDs)
+ *  - edition/deletion or deletion/edition
+ *  - double editions where both editions have common fields (ex: comment
+ *    changed both on remote and local)
+ *
+ * @param conflictOnDoubleEditOnly
+ *        if true, double additions are degraded at double editions (if differ)
+ *        and deletion/edition are kept as edition (for portal and zone)
+ * @param concurrentEditKeys
+ *        set of keys that raises a conflict on double editions even if
+ *        differences don't conflict
+ * @returns pair of `follower` minus `master` and conflicts
+ */
 function rebaseChanges<T, K extends keyof T>(
   master: Change<T, K>[],
   follower: Change<T, K>[],
@@ -321,9 +372,10 @@ function rebaseChanges<T, K extends keyof T>(
           }
         }
       } else {
-        // edition/deletion conflict
+        // edition/deletion or deletion/edition conflict
         if (conflictOnDoubleEditOnly) {
           if (followerTop.type === "edition") {
+            // should this be promoted to "addition" instead ?
             result.push(followerTop);
           }
         } else {
@@ -353,7 +405,10 @@ function rebaseChanges<T, K extends keyof T>(
   };
 }
 
-// change follower additions id to match master if equals
+/**
+ * Change `follower` additions id to match `master` if equals.
+ * This is used for links if portals are the same while IDs differ
+ */
 function unifyAdditions<T, K extends keyof T, C extends Change<T, K>>(
   master: C[],
   follower: C[],
@@ -371,6 +426,13 @@ function unifyAdditions<T, K extends keyof T, C extends Change<T, K>>(
   }
 }
 
+/**
+ *
+ * @param origin Common ancestor
+ * @param master Master copy that will be used to apply `follower` changes on
+ * @param follower Our copy
+ * @returns (`follower` - `origin`) - (`master` - `origin`) and conflicts
+ */
 export function computeRebaseChanges(
   origin: WasabeeOp,
   master: WasabeeOp,
@@ -418,12 +480,18 @@ export function computeRebaseChanges(
   return changes;
 }
 
+/**
+ * Merge `props` on `obj`
+ */
 function applyChanges<T>(obj: T, props: Partial<T>) {
   for (const k in props) {
     obj[k] = props[k];
   }
 }
 
+/**
+ * Add a value to all conflicts that matches the given op content
+ */
 export function defaultChangeChoice(
   masterOrCurrent: WasabeeOp,
   changes: ReturnType<typeof computeRebaseChanges>
@@ -448,6 +516,10 @@ export function defaultChangeChoice(
     - Marker.attributes
 */
 
+/**
+ * Apply the given changes on `master`. Use `current` to add missing portals
+ * and missing zones.
+ */
 export function applyRebaseChanges(
   master: WasabeeOp,
   current: WasabeeOp,
