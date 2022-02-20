@@ -3,8 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
-import { WasabeeMarker } from "../model";
-import { WasabeeBlocker } from "../model";
+import { WasabeeMarker, WasabeeBlocker } from "../model";
 import { displayInfo } from "../error";
 
 const TrawlerDialog = WDialog.extend({

@@ -1,7 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import { WasabeeLink } from "../model";
-import { WasabeeMarker } from "../model";
-import { WasabeePortal } from "../model";
+import { WasabeeLink, WasabeeMarker, WasabeePortal } from "../model";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 

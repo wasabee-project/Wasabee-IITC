@@ -1,6 +1,5 @@
-import { WasabeeMe } from "./model";
 import type WasabeeAgent from "./model/agent";
-import { WasabeeOp } from "./model";
+import { WasabeeMe, WasabeeOp } from "./model";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
 import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";

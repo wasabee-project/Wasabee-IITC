@@ -1,6 +1,11 @@
 import type { LatLng } from "leaflet";
 import type { IITC, PortalGUID } from "../../types/iitc";
-import { WasabeeBlocker, WasabeeMarker, WasabeeOp, WasabeePortal } from "../model";
+import {
+  WasabeeBlocker,
+  WasabeeMarker,
+  WasabeeOp,
+  WasabeePortal,
+} from "../model";
 import { getSelectedOperation } from "../selectedOp";
 
 import wX from "../wX";

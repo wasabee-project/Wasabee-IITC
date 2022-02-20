@@ -1,5 +1,4 @@
-import { WasabeeMe } from "./model";
-import { WasabeeOp } from "./model";
+import { WasabeeMe, WasabeeOp } from "./model";
 import { getSelectedOperation, removeOperation } from "./selectedOp";
 import { ServerError } from "./error";
 import type { TaskState } from "./model/task";

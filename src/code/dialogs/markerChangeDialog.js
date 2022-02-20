@@ -1,8 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
-import { WasabeeMarker } from "../model";
-import { WasabeeBlocker } from "../model";
+import { WasabeeMarker, WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
 

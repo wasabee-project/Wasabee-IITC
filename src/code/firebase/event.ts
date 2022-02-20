@@ -1,8 +1,4 @@
-import {
-  opPromise,
-  getLinkPromise,
-  getMarkerPromise,
-} from "../server";
+import { opPromise, getLinkPromise, getMarkerPromise } from "../server";
 import {
   makeSelectedOperation,
   removeOperation,
@@ -10,14 +6,11 @@ import {
   getSelectedOperation,
 } from "../selectedOp";
 import { updateLocalOp } from "../ui/operation";
-import { WasabeeOp } from "../model";
-import { WasabeePortal } from "../model";
+import { WasabeeOp, WasabeeLink, WasabeePortal, WasabeeMarker } from "../model";
 
 import * as PortalUI from "../ui/portal";
 import { displayInfo, displayWarning } from "../error";
 import { constants } from "../static";
-import { WasabeeLink } from "../model";
-import { WasabeeMarker } from "../model";
 import wX from "../wX";
 import { getAgent } from "../model/cache";
 

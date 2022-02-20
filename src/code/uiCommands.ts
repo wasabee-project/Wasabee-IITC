@@ -1,9 +1,11 @@
-import type { WasabeeOp } from "./model";
-import { WasabeePortal } from "./model";
-import { WasabeeBlocker } from "./model";
-import { WasabeeMarker } from "./model";
+import {
+  WasabeeBlocker,
+  WasabeeMarker,
+  WasabeeMe,
+  WasabeeOp,
+  WasabeePortal,
+} from "./model";
 import ConfirmDialog from "./dialogs/confirmDialog";
-import { WasabeeMe } from "./model";
 import wX from "./wX";
 import { locationPromise } from "./server";
 

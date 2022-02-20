@@ -1,8 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
-import { WasabeeMe } from "../model";
-import { WasabeeMarker } from "../model";
+import { WasabeeMe, WasabeeMarker } from "../model";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";

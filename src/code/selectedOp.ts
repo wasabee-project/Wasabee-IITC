@@ -1,5 +1,4 @@
-import { WasabeeOp } from "./model";
-import { WasabeeBlocker } from "./model";
+import { WasabeeOp, WasabeeBlocker } from "./model";
 import wX from "./wX";
 import { displayError, displayWarning } from "./error";
 import { setSelectedOp } from "./model/operation";

@@ -1,4 +1,4 @@
-import { WasabeeOp } from "../model";
+import { WasabeeOp, WasabeeMe } from "../model";
 import { WDialog } from "../leafletClasses";
 import {
   getSelectedOperation,
@@ -12,7 +12,6 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import { WasabeeMe } from "../model";
 import { syncOp, deleteLocalOp, zoomToOperation } from "../ui/operation";
 import Sortable from "../sortable";
 

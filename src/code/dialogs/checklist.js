@@ -1,6 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import { WasabeeLink } from "../model";
-import { WasabeeMarker } from "../model";
+import { WasabeeLink, WasabeeMarker } from "../model";
 import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";

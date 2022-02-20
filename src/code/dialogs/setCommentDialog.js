@@ -1,7 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import { WasabeePortal } from "../model";
-import { WasabeeLink } from "../model";
-import { WasabeeMarker } from "../model";
+import { WasabeePortal, WasabeeLink, WasabeeMarker } from "../model";
 import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
