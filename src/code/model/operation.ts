@@ -11,12 +11,7 @@ import db from "../db";
 // 0.20->0.21 blocker migration
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
-//import { displayWarning } from "../error";
 import { fieldSign, portalInField } from "../geo";
-
-function getSelectedOperation() {
-  return window.plugin.wasabee._selectedOp;
-}
 
 export type KeyOnHand = {
   portalId: string;
@@ -65,6 +60,11 @@ export interface ILocalOp extends IOperation {
   remoteChanged: boolean;
   background: boolean;
   stored: number;
+}
+
+let selectedOp: WasabeeOp = null;
+export function setSelectedOp(op: WasabeeOp) {
+  selectedOp = op;
 }
 
 export default class WasabeeOp extends Evented implements IOperation {
@@ -226,12 +226,11 @@ export default class WasabeeOp extends Evented implements IOperation {
     }
 
     // some debug info to trace race condition
-    const s = getSelectedOperation();
-    if (s && s.ID == this.ID && s != this)
+    if (selectedOp && selectedOp.ID === this.ID && selectedOp !== this)
       console.trace(
         "store current OP from a different obj, this *should* be followed by makeSelectedOperation",
-        s.ID,
-        s.name,
+        selectedOp.ID,
+        selectedOp.name,
         this.ID,
         this.name
       );
@@ -611,7 +610,10 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     // sanitize OP if it get corrupt by my code elsewhere...
     const missingPortal = new Set<PortalID>();
-    //let corrupt = this.links.length + this.markers.length;
+    const corrupt = {
+      links: this.links.length,
+      markers: this.markers.length,
+    };
     for (const [id, v] of newPortals) {
       if (v === undefined) {
         this.links = this.links.filter(
@@ -621,16 +623,18 @@ export default class WasabeeOp extends Evented implements IOperation {
         missingPortal.add(id);
       }
     }
-    //corrupt -= this.links.length + this.markers.length;
-    if (missingPortal.size > 0) {
-      // leave some trace
+    corrupt.links -= this.links.length;
+    corrupt.markers -= this.markers.length;
+    if (corrupt.links + corrupt.markers > 0) {
+      // this happened when blockers and their portals were part of the op
+      // with test: missingPortal.size > 0
+      // keep the test leave some trace
       console.trace("op corruption: missing portals");
-      // displayWarning(
-      //   `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
-      // );
+      // hook for the selected op
+      this.fire("corrupt", { ...corrupt, portals: missingPortal.size });
       this.cleanAnchorList();
-      for (const id of missingPortal) newPortals.delete(id);
     }
+    for (const id of missingPortal) newPortals.delete(id);
     this._idToOpportals = newPortals;
     this.buildCoordsLookupTable();
   }
