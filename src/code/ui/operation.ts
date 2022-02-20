@@ -3,7 +3,6 @@ import wX from "../wX";
 
 import { WasabeeMe, WasabeeOp } from "../model";
 import { GetWasabeeServer } from "../config";
-import AuthDialog from "../dialogs/authDialog";
 import MergeDialog from "../dialogs/mergeDialog";
 import {
   displayInfo,
@@ -176,7 +175,6 @@ export async function fullSync() {
     console.error(e);
     if (e instanceof ServerError) displayError(e);
     if (WasabeeMe.isLoggedIn()) displayWarning(wX("NOT_LOADED"));
-    else new AuthDialog().enable();
   }
   // update UI to reflect new ops list
   window.map.fire("wasabee:fullsync");
