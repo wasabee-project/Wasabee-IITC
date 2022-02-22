@@ -11,6 +11,21 @@ import PortalUI from "./portal";
 
 import wX from "../wX";
 
+function displayFormat(marker, operation) {
+  const portal = operation.getPortal(marker.portalId);
+
+  if (portal == null) {
+    console.log("null portal getting marker popup");
+    return (L.DomUtil.create("div", "").textContent = "invalid portal");
+  }
+
+  const desc = L.DomUtil.create("span");
+  const kind = L.DomUtil.create("span", `${marker.type}`, desc);
+  kind.textContent = wX(marker.type);
+  desc.appendChild(PortalUI.displayFormat(portal));
+  return desc;
+}
+
 const WLMarker = PortalUI.WLPortal.extend({
   type: "marker",
 
@@ -156,4 +171,5 @@ const WLMarker = PortalUI.WLPortal.extend({
 
 export default {
   WLMarker,
+  displayFormat,
 };

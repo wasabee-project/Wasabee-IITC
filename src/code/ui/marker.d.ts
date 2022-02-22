@@ -1,5 +1,6 @@
 import type { WLPortal } from "./portal";
 import type WasabeeMarker from "../model/marker";
+import type WasabeeOp from "../model/operation";
 
 export class WLMarker extends WLPortal {
   state: string;
@@ -13,3 +14,5 @@ export class WLMarker extends WLPortal {
   _setComment(ev: any): void;
   _setMarkerType(ev: any): void;
 }
+
+export function displayFormat(marker: WasabeeMarker, operation: WasabeeOp): HTMLSpanElement;

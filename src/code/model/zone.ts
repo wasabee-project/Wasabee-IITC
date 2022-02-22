@@ -2,7 +2,7 @@ export default class WasabeeZone {
   id: ZoneID;
   name: string;
   color: string;
-  points: zonePoint[];
+  points: ZonePoint[];
 
   constructor(obj) {
     this.id = Number(obj.id);
@@ -12,7 +12,7 @@ export default class WasabeeZone {
 
     if (obj.points) {
       for (const p of obj.points) {
-        this.points.push(new zonePoint(p));
+        this.points.push(new ZonePoint(p));
       }
     }
   }
@@ -55,7 +55,7 @@ export default class WasabeeZone {
   }
 }
 
-class zonePoint {
+export class ZonePoint {
   position: number;
   lat: number;
   lng: number;

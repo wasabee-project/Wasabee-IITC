@@ -2,6 +2,12 @@ import { generateId } from "../auxiliar";
 
 export type TaskState = "pending" | "assigned" | "acknowledged" | "completed";
 
+const States: TaskState[] = ["pending" , "assigned" , "acknowledged" , "completed"];
+
+export function sanitizeState(v: string): TaskState {
+  return States.find((s) => s === v) || "pending"
+}
+
 export default class Task {
   ID: TaskID;
   order: number;
