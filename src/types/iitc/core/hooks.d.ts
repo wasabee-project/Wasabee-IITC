@@ -177,6 +177,15 @@ declare global {
 
   /**
    * register a callback for an event
+   * called when the user location or orientation changed.
+   */
+  function addHook(
+    event: "pluginUserLocation",
+    callback: (e: EventUserLocation) => void
+  ): void;
+
+  /**
+   * register a callback for an event
    * (user defined hooks)
    */
   function addHook(event: string, callback: HookCallback): void;
@@ -276,4 +285,9 @@ declare global {
         ent: PortalDetailEnt;
       }
     | { guid: string; success: false; details: never; ent: never };
+
+  interface EventUserLocation {
+    event: "setup" | "onLocationChange" | "onOrientationChange";
+    data: { latlng: L.LatLng; direction: number };
+  }
 }

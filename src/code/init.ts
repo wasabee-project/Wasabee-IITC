@@ -1,6 +1,6 @@
 import statics from "./static";
 import { initCrossLinks } from "./crosslinks";
-import initServer from "./server";
+import initServer, { locationPromise } from "./server";
 import {
   setupLocalStorage,
   initSelectedOperation,
@@ -196,6 +196,11 @@ window.plugin.wasabee.init = async () => {
     });
   }
 
+  // location update on mobile
+  if (window.plugin.userLocation) {
+    window.addHook("pluginUserLocation", onLocationChange);
+  }
+
   // hooks called when layers are enabled/disabled
   window.map.on("layeradd", (obj: LayerEvent) => {
     if (
@@ -267,6 +272,22 @@ window.plugin.wasabee.init = async () => {
     }
   });
 };
+
+let lastUpdate = 0;
+function onLocationChange(e: EventUserLocation) {
+  const { event, data } = e;
+  if (event !== "onLocationChange" || !data.latlng) return;
+
+  const sl = localStorage[Wasabee.static.constants.SEND_LOCATION_KEY];
+  if (sl !== "true") return;
+
+  // do not update more than once per 5s
+  if (Date.now() - lastUpdate < 5000) return;
+
+  if (!WasabeeMe.isLoggedIn()) return;
+  locationPromise(data.latlng.lat, data.latlng.lng);
+  lastUpdate = Date.now();
+}
 
 // this can be moved to auth dialog, no need to init it for people who never log in
 // and use webpack, rather than importing it ourself

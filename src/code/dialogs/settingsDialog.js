@@ -79,13 +79,6 @@ const SettingsDialog = WDialog.extend({
       }
     );
 
-    this._addCheckBox(
-      container,
-      wX("SEND LOCATION"),
-      "wasabee-setting-sendloc",
-      window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
-    );
-
     this._addSelect(
       container,
       wX("SKIP_CONFIRM"),
@@ -97,12 +90,15 @@ const SettingsDialog = WDialog.extend({
       ]
     );
 
-    this._addCheckBox(
-      container,
-      wX("SEND ANALYTICS"),
-      "wasabee-setting-analytics",
-      window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
-    );
+    // send location on mobile
+    if (window.plugin.userLocation) {
+      this._addCheckBox(
+        container,
+        wX("SEND LOCATION"),
+        "wasabee-setting-sendloc",
+        window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+      );
+    }
 
     this._addCheckBox(
       container,
@@ -120,6 +116,22 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED
     );
 
+    if (window.isSmartphone()) {
+      this._addCheckBox(
+        container,
+        wX("USE PANES ON MOBILE"),
+        "wasabee-setting-usepanes",
+        window.plugin.wasabee.static.constants.USE_PANES
+      );
+    }
+
+    this._addCheckBox(
+      container,
+      wX("SEND ANALYTICS"),
+      "wasabee-setting-analytics",
+      window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
+    );
+
     this._addSelect(
       container,
       wX("AUTOLOAD_RATE"),
@@ -133,15 +145,6 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
-
-    if (window.isSmartphone()) {
-      this._addCheckBox(
-        container,
-        wX("USE PANES ON MOBILE"),
-        "wasabee-setting-usepanes",
-        window.plugin.wasabee.static.constants.USE_PANES
-      );
-    }
 
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
