@@ -129,7 +129,7 @@ const MergeDialog = WDialog.extend({
 
     const content = L.DomUtil.create("div", "container");
     const desc = L.DomUtil.create("div", "desc", content);
-    desc.textContent = wX("MERGE_MESSAGE", { opName: this.options.opOwn.name });
+    desc.textContent = wX("MERGE_MESSAGE");
 
     L.DomUtil.create("h3", "", content).textContent = wX(
       "dialog.merge.conflicts"

@@ -46,7 +46,7 @@ const TrawlerDialog = WDialog.extend({
 
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
-    warning.textContent = wX("TRAWLING", tiles);
+    warning.textContent = wX("TRAWLING");
     const stat = L.DomUtil.create("div", null, container);
     this.remaining = L.DomUtil.create("span", null, stat);
     this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });

@@ -56,9 +56,8 @@ const StateDialog = WDialog.extend({
     }
 
     if (this.options.target instanceof WasabeeLink) {
-      const portal = operation.getPortal(this.options.target.fromPortalId);
       this._type = "Link";
-      this._name = wX("LINK STATE PROMPT", portal.name);
+      this._name = wX("LINK STATE PROMPT");
       divtitle.appendChild(
         LinkUI.displayFormat(this.options.target, operation)
       );
@@ -70,7 +69,7 @@ const StateDialog = WDialog.extend({
     if (this.options.target instanceof WasabeeMarker) {
       const portal = operation.getPortal(this.options.target.portalId);
       this._type = "Marker";
-      this._name = wX("MARKER STATE PROMPT", portal.name);
+      this._name = wX("MARKER STATE PROMPT");
       divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER STATE");

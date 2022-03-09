@@ -52,13 +52,14 @@ export class ServerError implements IServerError {
   toString() {
     switch (this.code) {
       case 401:
-        if (this.error) return wX("NOT LOGGED IN", this);
+        if (this.error) return wX("NOT LOGGED IN", this as { error: string });
         return wX("NOT LOGGED IN SHORT");
       case 403:
-        if (this.error) return wX("PERM DENIED", this);
+        if (this.error) return wX("PERM DENIED", this as { error: string });
         return wX("PERM DENIED SHORT");
       case 410:
-        if (this.error) return wX("NO LONGER AVAILABLE", this);
+        if (this.error)
+          return wX("NO LONGER AVAILABLE", this as { error: string });
         return wX("NO LONGER AVAILABLE SHORT");
       case 412:
         // for internal use only

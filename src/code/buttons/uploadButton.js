@@ -23,7 +23,7 @@ const UploadButton = WButton.extend({
     this.type = UploadButton.TYPE;
     // this.handler = null;
     const operation = getSelectedOperation();
-    this.title = wX("UPLOAD BUTTON HOVER", operation.name);
+    this.title = wX("UPLOAD BUTTON HOVER", { opName: operation.name });
     this._container = container;
 
     this.button = this._createButton({

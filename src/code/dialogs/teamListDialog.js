@@ -118,7 +118,7 @@ const TeamListDialog = WDialog.extend({
               L.DomEvent.stop(ev);
               const cd = new ConfirmDialog({
                 title: wX("dialog.leave_team.title", { teamName: obj.Name }),
-                label: wX("dialog.leave_team.text"),
+                label: wX("dialog.leave_team.text", { teamName: obj.Name }),
                 type: "team",
                 callback: async () => {
                   try {
