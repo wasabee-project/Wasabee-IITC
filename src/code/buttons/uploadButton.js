@@ -5,11 +5,12 @@ import {
   GetWasabeeServer,
   opPromise,
 } from "../server";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import MergeDialog from "../dialogs/mergeDialog";
 import wX from "../wX";
+import { displayError, displayInfo } from "../error";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -22,7 +23,7 @@ const UploadButton = WButton.extend({
     this.type = UploadButton.TYPE;
     // this.handler = null;
     const operation = getSelectedOperation();
-    this.title = wX("UPLOAD BUTTON HOVER", operation.name);
+    this.title = wX("UPLOAD BUTTON HOVER", { opName: operation.name });
     this._container = container;
 
     this.button = this._createButton({
@@ -38,10 +39,11 @@ const UploadButton = WButton.extend({
         }
 
         try {
+          this.button.classList.add("loading");
           const r = await uploadOpPromise();
           // switch to the new version in local store -- uploadOpPromise stores it
           await makeSelectedOperation(r.ID);
-          alert(wX("UPLOADED"));
+          displayInfo(wX("UPLOADED"));
           this.update();
           // this._invisible();
         } catch (e) {
@@ -49,12 +51,13 @@ const UploadButton = WButton.extend({
           console.warn(e.toString() + ": trying as update");
           try {
             await updateOpPromise(operation);
-            alert(wX("UPDATED"));
+            displayInfo(wX("UPDATED"));
             this.update();
           } catch (e) {
             console.error(e);
-            alert(`Upload + Update Failed: ${e.toString()}`);
+            displayError(`Upload + Update Failed: ${e.toString()}`);
           }
+          this.button.classList.remove("loading");
         }
       },
     });
@@ -65,7 +68,7 @@ const UploadButton = WButton.extend({
   update: function () {
     if (!WasabeeMe.isLoggedIn()) {
       this._invisible();
-      this.title = wX("NOT LOGGED IN SHORT");
+      this.title = "";
       this.button.title = this.title;
       return;
     }
@@ -80,21 +83,21 @@ const UploadButton = WButton.extend({
 
     if (!operation.canWriteServer()) {
       this._invisible();
-      this.title = wX("UPDATE PERM DENIED");
+      this.title = "";
       this.button.title = this.title;
       return;
     }
 
     if (!operation.localchanged) {
       this._invisible();
-      this.title = wX("UPDATE HOVER NOT CHANGED", { opName: operation.name });
+      this.title = "";
       this.button.title = this.title;
       return;
     }
 
     if (operation.server && operation.server != GetWasabeeServer()) {
       this._invisible();
-      this.title = wX("UPDATE HOVER WRONG SERVER", { opName: operation.name });
+      this.title = "";
       this.button.title = this.title;
       return;
     }
@@ -110,6 +113,7 @@ const UploadButton = WButton.extend({
 
   _invisible: function () {
     this.button.style.display = "none";
+    this.button.classList.remove("loading");
   },
 
   // update operation that is either
@@ -122,6 +126,7 @@ const UploadButton = WButton.extend({
     if (operation.isServerOp()) {
       try {
         if (force) delete operation.lasteditid;
+        this.button.classList.add("loading");
         const success = await updateOpPromise(operation);
         if (success) {
           operation.localchanged = false;
@@ -131,7 +136,7 @@ const UploadButton = WButton.extend({
           // reload if we use rebase
           if (operation != getSelectedOperation())
             await makeSelectedOperation(operation.ID);
-          alert(wX("UPDATED"));
+          displayInfo(wX("UPDATED"));
           this.update();
         } else {
           // need rebase or force
@@ -150,14 +155,16 @@ const UploadButton = WButton.extend({
               opOwn: getSelectedOperation(),
               opRemote: lastOp,
               updateCallback: (op) => this.doUpdate(op, true),
+              cancelText: wX("dialog.merge.cancel_upload"),
             });
             md.enable();
           }
         }
       } catch (e) {
         console.error(e);
-        alert(`Update Failed: ${e.toString()}`);
+        displayError(`Update Failed: ${e.toString()}`);
       }
+      this.button.classList.remove("loading");
       return;
     }
   },

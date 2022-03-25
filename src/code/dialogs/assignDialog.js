@@ -1,11 +1,14 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeLink from "../link";
-import WasabeeMarker from "../marker";
-import WasabeeAnchor from "../anchor";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeLink from "../model/link";
+import WasabeeMarker from "../model/marker";
+import WasabeePortal from "../model/portal";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+
+import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -29,13 +32,11 @@ const AssignDialog = WDialog.extend({
       this.closeDialog();
     };
 
-    // create container then setup asynchronously
-    this._html = L.DomUtil.create("div", "container");
-    this._setup();
+    const html = this._buildContent();
 
     this.createDialog({
       title: this._name,
-      html: this._html,
+      html: html,
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
@@ -43,71 +44,65 @@ const AssignDialog = WDialog.extend({
     });
   },
 
-  _setup: async function () {
+  _buildContent: function () {
+    const html = L.DomUtil.create("div", "container");
+
     const target = this.options.target;
     const operation = getSelectedOperation();
     this._targetID = target.ID;
-    const divtitle = L.DomUtil.create("div", "desc", this._html);
-    const menu = await this._getAgentMenu(target.assignedTo);
+
+    const divtitle = L.DomUtil.create("div", "desc", html);
+    const menu = L.DomUtil.create("div", "wasabee-agent-menu", html);
 
     if (target instanceof WasabeeLink) {
       const portal = operation.getPortal(target.fromPortalId);
       this._type = "Link";
-      this._name = wX("ASSIGN LINK PROMPT", { portalName: portal.displayName });
-      divtitle.appendChild(target.displayFormat(operation, this._smallScreen));
-      const t = L.DomUtil.create("label", null);
+      this._name = wX("ASSIGN LINK PROMPT", {
+        portalName: PortalUI.displayName(portal),
+      });
+      divtitle.appendChild(LinkUI.displayFormat(target, operation));
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("LINK ASSIGNMENT");
-      menu.prepend(t);
     }
 
     if (target instanceof WasabeeMarker) {
       const portal = operation.getPortal(target.portalId);
       this._type = "Marker";
       this._name = wX("ASSIGN MARKER PROMPT", {
-        portalName: portal.displayName,
+        portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
-      const t = L.DomUtil.create("label", null);
+      divtitle.appendChild(PortalUI.displayFormat(portal));
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("MARKER ASSIGNMENT");
-      menu.prepend(t);
     }
 
-    if (target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(target.portalId);
+    if (target instanceof WasabeePortal) {
+      const portal = target;
       this._type = "Anchor";
       this._name = wX("ASSIGN OUTBOUND PROMPT", {
-        portalName: portal.displayName,
+        portalName: PortalUI.displayName(portal),
       });
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
-      const t = L.DomUtil.create("label", null);
+      divtitle.appendChild(PortalUI.displayFormat(portal));
+      const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("ANCHOR ASSIGNMENT");
-      menu.prepend(t);
     }
 
-    this._html.appendChild(menu);
-  },
-
-  _buildContent: function () {
-    const content = L.DomUtil.create("div");
-    if (typeof this._label == "string") {
-      content.textContent = this._label;
-    } else {
-      content.appendChild(this._label);
-    }
-    return content;
-  },
-
-  _getAgentMenu: async function (current) {
-    const container = L.DomUtil.create("div", "wasabee-agent-menu");
-    const menu = L.DomUtil.create("select", null, container);
-    let option = menu.appendChild(L.DomUtil.create("option", null));
+    const select = L.DomUtil.create("select", null, menu);
+    const option = L.DomUtil.create("option", null, select);
     option.value = "";
     option.textContent = wX("UNASSIGNED");
-    const alreadyAdded = new Array();
 
-    menu.addEventListener("change", (value) => {
+    L.DomEvent.on(select, "change", (value) => {
       this.localAssign(value);
     });
+
+    this._populateAgentSelect(select, target.assignedTo);
+
+    return html;
+  },
+
+  _populateAgentSelect: async function (select, current) {
+    const alreadyAdded = new Array();
 
     const me = await WasabeeMe.waitGet();
     for (const t of getSelectedOperation().teamlist) {
@@ -115,23 +110,19 @@ const AssignDialog = WDialog.extend({
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
-        const agents = tt.getAgents();
-        for (const a of agents) {
+        for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
-            option = L.DomUtil.create("option");
+            const option = L.DomUtil.create("option", "", select);
             option.value = a.id;
-            option.textContent = a.name;
+            option.textContent = a.getName();
             if (a.id == current) option.selected = true;
-            menu.appendChild(option);
           }
         }
       } catch (e) {
         console.error(e);
       }
     }
-
-    return container;
   },
 
   localAssign: function (value) {
@@ -143,11 +134,9 @@ const AssignDialog = WDialog.extend({
       operation.assignLink(this._targetID, value.srcElement.value);
     }
     if (this._type == "Anchor") {
-      const links = operation.getLinkListFromPortal(
-        operation.getPortal(this._targetID)
-      );
+      const links = operation.getLinkListFromPortal(this.options.target);
       for (const l of links) {
-        if (l.fromPortalId == this._targetID) {
+        if (l.fromPortalId == this.options.target.id) {
           operation.assignLink(l.ID, value.srcElement.value);
         }
       }

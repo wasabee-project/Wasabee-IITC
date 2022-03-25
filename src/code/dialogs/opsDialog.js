@@ -1,4 +1,4 @@
-import WasabeeOp from "../operation";
+import WasabeeOp from "../model/operation";
 import { WDialog } from "../leafletClasses";
 import {
   getSelectedOperation,
@@ -12,15 +12,21 @@ import {
 } from "../selectedOp";
 import OpPermList from "./opPerms";
 import wX from "../wX";
-import WasabeeMe from "../me";
-import WasabeeAgent from "../agent";
+import WasabeeMe from "../model/me";
+import WasabeeAgent from "../model/agent";
 import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
 import Sortable from "../sortable";
+
+import AgentUI from "../ui/agent";
+import { appendFAIcon } from "../auxiliar";
 
 const OpsDialog = WDialog.extend({
   statics: {
     TYPE: "opsDialog",
   },
+
+  SORTBY_KEY: "wasabee-opslist-sortby",
+  SORTASC_KEY: "wasabee-opslist-sortasc",
 
   options: {
     usePane: true,
@@ -45,15 +51,16 @@ const OpsDialog = WDialog.extend({
 
   _displayDialog: async function () {
     this.initSortable();
-    await this.updateSortable(0, false);
+
+    await this.updateSortable();
 
     const buttons = {};
     // wX
-    buttons["Unhide all OPs"] = () => {
+    buttons[wX("dialog.ops_list.unhide_ops")] = () => {
       resetHiddenOps();
       this.update();
     };
-    buttons["Toggle Show/Hide"] = () => {
+    buttons[wX("dialog.ops_list.toggle_hide")] = () => {
       const showHiddenOps =
         localStorage[
           window.plugin.wasabee.static.constants.OPS_SHOW_HIDDEN_OPS
@@ -79,7 +86,7 @@ const OpsDialog = WDialog.extend({
 
   update: async function () {
     if (this._enabled) {
-      await this.updateSortable(this.sortable.sortBy, this.sortable.sortAsc);
+      await this.updateSortable();
       // this.setContent(this.sortable.table);
     }
   },
@@ -96,7 +103,7 @@ const OpsDialog = WDialog.extend({
         },
       },
       {
-        name: "Name",
+        name: wX("dialog.common.name"),
         value: (op) => op.name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
@@ -104,9 +111,12 @@ const OpsDialog = WDialog.extend({
           link.href = "#";
           link.textContent = op.name;
           if (!op.local) {
-            link.title = `Last fetched: ${op.fetched}\n`;
-            if (op.localchanged) link.title += "Local has changed\n";
-            if (op.remotechanged) link.title += "Remote has changed";
+            link.title =
+              wX("dialog.ops_list.last_fetched", { date: op.fetched }) + "\n";
+            if (op.localchanged)
+              link.title += wX("dialog.ops_list.local_change") + "\n";
+            if (op.remotechanged)
+              link.title += wX("dialog.ops_list.remote_change") + "\n";
           }
           if (op.id == getSelectedOperation().ID) link.classList.add("enl");
           L.DomEvent.on(link, "click", async (ev) => {
@@ -123,24 +133,19 @@ const OpsDialog = WDialog.extend({
           1 * op.local + 2 * op.localchanged + 4 * op.remotechanged,
         // sort: (a, b) => a - b,
         format: (cell, value, op) => {
-          const status = L.DomUtil.create("span", "", cell);
-          status.textContent = "";
           if (!op.local) {
-            if (op.localchanged) {
-              status.textContent = "☀";
-              status.style.color = "green";
-              status.title = "Local changes";
-            }
-            if (op.remotechanged) {
-              status.textContent = "⛅";
-              status.style.color = "red";
-              status.title = "Local&remote changes";
+            if (op.localchanged && !op.remotechanged) {
+              appendFAIcon("desktop", cell);
+              cell.title = wX("dialog.ops_list.local_change");
+            } else if (op.remotechanged) {
+              appendFAIcon("server", cell);
+              cell.title = wX("dialog.ops_list.remote_change");
             }
           }
         },
       },
       {
-        name: "Owner",
+        name: wX("dialog.common.owner"),
         value: (op) => op.owner,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, op) => {
@@ -179,23 +184,23 @@ const OpsDialog = WDialog.extend({
           const background = L.DomUtil.create("input", null, cell);
           background.type = "checkbox";
           background.checked = op.background;
-          // wX
+
           background.title = op.background
-            ? "Disable background"
-            : "Show in background";
+            ? wX("dialog.ops_list.background_disable")
+            : wX("dialog.ops_list.background_enable");
           L.DomEvent.on(background, "change", (ev) => {
             L.DomEvent.stop(ev);
             const background = ev.target;
             // wX
             background.title = background.checked
-              ? "Disable background"
-              : "Show in background";
+              ? wX("dialog.ops_list.background_disable")
+              : wX("dialog.ops_list.background_enable");
             setOpBackground(op.id, background.checked);
           });
         },
       },
       {
-        name: "Cmds",
+        name: wX("dialog.common.commands_short"),
         value: () => null,
         sort: null,
         className: "actions",
@@ -203,7 +208,7 @@ const OpsDialog = WDialog.extend({
           // delete locally
           const deleteLocaly = L.DomUtil.create("a", "", cell);
           deleteLocaly.href = "#";
-          deleteLocaly.textContent = "🗑️";
+          appendFAIcon("trash", deleteLocaly);
           deleteLocaly.title = wX("REM_LOC_CP", { opName: op.name });
           L.DomEvent.on(deleteLocaly, "click", (ev) => {
             L.DomEvent.stop(ev);
@@ -214,8 +219,10 @@ const OpsDialog = WDialog.extend({
             // download op
             const download = L.DomUtil.create("a", "", cell);
             download.href = "#";
-            download.textContent = "↻";
-            download.title = "Download " + op.name;
+            appendFAIcon("sync", download);
+            download.title = wX("dialog.ops_list.download", {
+              opName: op.name,
+            });
             L.DomEvent.on(download, "click", (ev) => {
               L.DomEvent.stop(ev);
               syncOp(op.id);
@@ -241,10 +248,12 @@ const OpsDialog = WDialog.extend({
         },
       },
     ];
+    content.sortByStoreKey = this.SORTBY_KEY;
+    content.sortAscStoreKey = this.SORTASC_KEY;
     this.sortable = content;
   },
 
-  updateSortable: async function (sortBy, sortAsc) {
+  updateSortable: async function () {
     if (!this.sortable) return;
     // collapse markers and links into one array.
     const showHiddenOps =
@@ -279,8 +288,8 @@ const OpsDialog = WDialog.extend({
       };
       if (sum.currentserver) {
         const agent = await WasabeeAgent.get(tmpOp.creator);
-        sum.owner = agent.name;
-        sum.ownerDisplay = await agent.formatDisplay();
+        sum.owner = agent.getName();
+        sum.ownerDisplay = AgentUI.formatDisplay(agent);
       } else {
         sum.owner = window.PLAYER.nickname;
       }
@@ -290,8 +299,7 @@ const OpsDialog = WDialog.extend({
       }
       ops.push(sum);
     }
-    this.sortable.sortBy = sortBy;
-    this.sortable.sortAsc = sortAsc;
+
     this.sortable.items = ops;
     await this.sortable.done;
 

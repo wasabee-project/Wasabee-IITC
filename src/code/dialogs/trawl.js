@@ -3,6 +3,9 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
+import WasabeeMarker from "../model/marker";
+import WasabeeBlocker from "../model/blocker";
+import { displayInfo } from "../error";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -43,14 +46,14 @@ const TrawlerDialog = WDialog.extend({
 
     const container = L.DomUtil.create("div", "container");
     const warning = L.DomUtil.create("label", null, container);
-    warning.textContent = wX("TRAWLING", tiles);
+    warning.textContent = wX("TRAWLING");
     const stat = L.DomUtil.create("div", null, container);
     this.remaining = L.DomUtil.create("span", null, stat);
     this.remaining.textContent = wX("TRAWL_REMAINING", { count: tiles });
 
     // same as dialogs/settings.js
     const trawlTitle = L.DomUtil.create("label", null, container);
-    trawlTitle.textContent = "Trawl Skip Tiles";
+    trawlTitle.textContent = wX("TRAWL SKIP TILES");
     const trawlSelect = L.DomUtil.create("select", null, container);
     const tss = Number(
       localStorage[window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS]
@@ -76,7 +79,7 @@ const TrawlerDialog = WDialog.extend({
     const content = this._buildContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog("close");
     };
 
@@ -185,7 +188,7 @@ const TrawlerDialog = WDialog.extend({
     window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
     if (this.options.automark) blockerAutomark(getSelectedOperation());
     this.closeDialog();
-    alert("trawl done");
+    displayInfo("trawl done");
   },
 });
 
@@ -197,11 +200,13 @@ const TrawlDialog = WDialog.extend({
   // WDialog is a leaflet L.Handler, which takes add/removeHooks
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:op:select", this.closeDialog, this);
     this._displayDialog();
   },
 
   // define our work in _displayDialog
   _displayDialog: function () {
+    const operation = getSelectedOperation();
     const container = L.DomUtil.create("div", "container");
 
     const options = L.DomUtil.create("div", null, container);
@@ -221,15 +226,19 @@ const TrawlDialog = WDialog.extend({
     this.automark.checked = false;
     this.automark.id = "wasabee-trawl-automark";
 
+    if (!operation.canWrite()) {
+      options.style.display = "none";
+    }
+
     const warning = L.DomUtil.create("h4", null, container);
     warning.textContent = wX("TRAWL WARNING");
 
     const button = L.DomUtil.create("button", null, container);
     button.textContent = wX("TRAWL");
-    L.DomEvent.on(button, "click", () => {
+    L.DomEvent.on(button, "click", async () => {
       const op = getSelectedOperation();
       if (clearMarkers.checked == true) this._clearMarkers();
-      op.blockers = Array();
+      await WasabeeBlocker.removeBlockers(op.ID);
       const points = this._getTrawlPoints();
       const td = new TrawlerDialog({
         points: points,
@@ -244,9 +253,9 @@ const TrawlDialog = WDialog.extend({
     crazyWarning.textContent = wX("TRAWL_BULK_LOAD_WARNING");
     const crazyButton = L.DomUtil.create("button", null, container);
     crazyButton.textContent = wX("TRAWL_BULK_LOAD");
-    L.DomEvent.on(crazyButton, "click", () => {
+    L.DomEvent.on(crazyButton, "click", async () => {
       const op = getSelectedOperation();
-      op.blockers = Array();
+      await WasabeeBlocker.removeBlockers(op.ID);
       if (clearMarkers.checked == true) this._clearMarkers();
       const points = this._getTrawlPoints();
       this._bulkLoad(points, 14);
@@ -254,7 +263,7 @@ const TrawlDialog = WDialog.extend({
     });
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
@@ -315,8 +324,8 @@ const TrawlDialog = WDialog.extend({
     operation.startBatchMode();
     for (const m of operation.markers) {
       if (
-        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_DESTROY ||
-        m.type == window.plugin.wasabee.static.constants.MARKER_TYPE_VIRUS
+        m.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
+        m.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS
       )
         operation.removeMarker(m);
     }
@@ -362,7 +371,7 @@ const TrawlDialog = WDialog.extend({
     // render the results
     mdr.pauseRenderQueue(false);
 
-    this.bulkAlert = alert(
+    this.bulkAlert = displayInfo(
       "please wait until status says 'done'; If the first didn't trigger a load, close this dialog and try again"
     );
   },
@@ -371,7 +380,7 @@ const TrawlDialog = WDialog.extend({
     if (this.automark.checked == true) blockerAutomark(getSelectedOperation());
     window.mapDataRequest.debugTiles = this.oldDebugTiles;
     this.bulkAlert.dialog("close");
-    alert("bulk data load done");
+    displayInfo("bulk data load done");
     window.removeHook("mapDataRefreshEnd", this._mapRefreshHook);
   },
 });

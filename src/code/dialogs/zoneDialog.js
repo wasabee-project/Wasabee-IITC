@@ -3,7 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { addToColorList } from "../skin";
 import ZoneSetColorDialog from "./zoneSetColor";
-import { convertColorToHex } from "../auxiliar";
+import { appendFAIcon, convertColorToHex } from "../auxiliar";
 import { setMarkersToZones, setLinksToZones } from "../uiCommands";
 
 const ZoneDialog = WDialog.extend({
@@ -16,11 +16,7 @@ const ZoneDialog = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:change wasabee:op:select", this.update, this);
 
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   removeHooks: function () {
@@ -38,7 +34,7 @@ const ZoneDialog = WDialog.extend({
     const html = this.buildList();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
@@ -55,17 +51,13 @@ const ZoneDialog = WDialog.extend({
     };
 
     this.createDialog({
-      title: "Zones",
+      title: wX("dialog.zones.title"),
       html: html,
       width: "auto",
       dialogClass: "zone",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.zone,
     });
-  },
-
-  _displaySmallDialog: function () {
-    this._displayDialog();
   },
 
   buildList: function () {
@@ -78,10 +70,13 @@ const ZoneDialog = WDialog.extend({
       L.DomUtil.create("table", "wasabee-table", container)
     );
     const hr = L.DomUtil.create("tr", null, tbody);
-    L.DomUtil.create("th", null, hr).textContent = "ID";
-    L.DomUtil.create("th", null, hr).textContent = "Name";
-    L.DomUtil.create("th", null, hr).textContent = "Color";
-    if (canWrite) L.DomUtil.create("th", null, hr).textContent = "Commands";
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.id");
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.common.name");
+    L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.color");
+    if (canWrite)
+      L.DomUtil.create("th", null, hr).textContent = wX(
+        "dialog.common.commands"
+      );
 
     for (const z of op.zones) {
       const tr = L.DomUtil.create("tr", null, tbody);
@@ -112,11 +107,11 @@ const ZoneDialog = WDialog.extend({
       });
 
       if (canWrite) {
-        const commandcell = L.DomUtil.create("td", null, tr);
-
+        const commandcell = L.DomUtil.create("td", "actions", tr);
         const color = L.DomUtil.create("a", null, commandcell);
-        color.textContent = "🖌";
         color.href = "#";
+        color.title = wX("dialog.zones.color_links");
+        appendFAIcon("palette", color);
         L.DomEvent.on(color, "click", (ev) => {
           L.DomEvent.stop(ev);
           const zoneSetColorDialog = new ZoneSetColorDialog({
@@ -126,40 +121,50 @@ const ZoneDialog = WDialog.extend({
         });
         if (z.id != 1) {
           const del = L.DomUtil.create("a", null, commandcell);
-          del.textContent = "🗑";
           del.href = "#";
+          del.title = wX("dialog.common.delete");
+          appendFAIcon("trash", del);
           L.DomEvent.on(del, "click", (ev) => {
             L.DomEvent.stop(ev);
             getSelectedOperation().removeZone(z.id);
           });
         }
-        if (z.points.length == 0) {
-          const addPoints = L.DomUtil.create("a", null, commandcell);
-          addPoints.textContent = " 🖍";
-          addPoints.href = "#";
-          L.DomEvent.on(addPoints, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            this.ZonedrawHandler.zoneID = z.id;
-            this.ZonedrawHandler.enable();
-          });
-        } else {
-          const delPoints = L.DomUtil.create("a", null, commandcell);
-          delPoints.textContent = " 🧽";
-          delPoints.href = "#";
-          L.DomEvent.on(delPoints, "click", (ev) => {
-            L.DomEvent.stop(ev);
-            getSelectedOperation().removeZonePoints(z.id);
-          });
-        }
-        if (this.ZonedrawHandler && this.ZonedrawHandler.enabled()) {
+        if (
+          this.ZonedrawHandler &&
+          this.ZonedrawHandler.zoneID === z.id &&
+          this.ZonedrawHandler.enabled()
+        ) {
           const stopDrawing = L.DomUtil.create("a", null, commandcell);
           stopDrawing.href = "#";
-          stopDrawing.textContent = " 🛑";
+          stopDrawing.title = wX("dialog.zones.stop_drawing");
+          appendFAIcon("ban", stopDrawing);
           L.DomEvent.on(stopDrawing, "click", (ev) => {
             L.DomEvent.stop(ev);
             this.ZonedrawHandler.disable();
             this.update();
           });
+        } else {
+          if (z.points.length == 0) {
+            const addPoints = L.DomUtil.create("a", null, commandcell);
+            addPoints.title = wX("dialog.zones.draw_zone_shape");
+            appendFAIcon("pen", addPoints);
+            addPoints.href = "#";
+            L.DomEvent.on(addPoints, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              this.ZonedrawHandler.zoneID = z.id;
+              this.ZonedrawHandler.enable();
+              this.update();
+            });
+          } else {
+            const delPoints = L.DomUtil.create("a", null, commandcell);
+            delPoints.title = wX("dialog.zones.delete_zone_shape");
+            appendFAIcon("eraser", delPoints);
+            delPoints.href = "#";
+            L.DomEvent.on(delPoints, "click", (ev) => {
+              L.DomEvent.stop(ev);
+              getSelectedOperation().removeZonePoints(z.id);
+            });
+          }
         }
       }
     }
@@ -199,7 +204,6 @@ const ZonedrawHandler = L.Handler.extend({
     window.map.on("click", this._click, this);
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
-    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   removeHooks: function () {
@@ -210,7 +214,6 @@ const ZonedrawHandler = L.Handler.extend({
     window.map.off("click", this._click, this);
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
-    window.map.off("mousemove", this._onMouseMove, this);
   },
 
   _opchange: function () {
@@ -236,14 +239,7 @@ const ZonedrawHandler = L.Handler.extend({
     getSelectedOperation().addZonePoint(this.zoneID, e.latlng);
   },
 
-  _onMouseMove: function (e) {
-    if (e.latlng) {
-      this._tooltip.updatePosition(e.latlng);
-    }
-    L.DomEvent.preventDefault(e.originalEvent);
-  },
-
   _getTooltipText: function () {
-    return { text: wX("ZONE_DRAW") };
+    return wX("ZONE_DRAW");
   },
 });

@@ -25,16 +25,11 @@ const OpButton = WButton.extend({
       title: this.title,
     });
 
-    this.actionsContainer = this._createSubActions(this.getSubActions());
-
-    this._container.appendChild(this.actionsContainer);
+    this.setSubActions(this.getSubActions());
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("OP_BUTTON");
-      const newSubActions = this._createSubActions(this.getSubActions());
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
     });
   },
 

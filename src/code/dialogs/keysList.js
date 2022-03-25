@@ -1,10 +1,13 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
+import WasabeeMarker from "../model/marker";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+
+import PortalUI from "../ui/portal";
 
 const KeysList = WDialog.extend({
   statics: {
@@ -15,13 +18,13 @@ const KeysList = WDialog.extend({
     usePane: true,
   },
 
-  addHooks: async function () {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
-      this._me = await WasabeeMe.waitGet();
+      this._me = WasabeeMe.localGet();
     } else {
       this._me = null;
     }
@@ -36,13 +39,13 @@ const KeysList = WDialog.extend({
   _displayDialog: function () {
     const operation = getSelectedOperation();
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
     this.createDialog({
       title: wX("KEY_LIST2", { opName: operation.name }),
-      html: this.getListDialogContent(operation, 0, false).table,
+      html: this.getListDialogContent(operation, 0, true).table,
       width: "auto",
       dialogClass: "keyslist",
       buttons: buttons,
@@ -50,12 +53,12 @@ const KeysList = WDialog.extend({
     });
   },
 
-  update: async function () {
+  update: function () {
     const operation = getSelectedOperation();
     if (operation.ID != this._opID) console.log("operation changed");
 
     // update me if needed
-    if (WasabeeMe.isLoggedIn()) this._me = await WasabeeMe.waitGet();
+    if (WasabeeMe.isLoggedIn()) this._me = WasabeeMe.localGet();
     else this._me = null;
 
     this.setTitle(wX("KEY_LIST2", { opName: operation.name }));
@@ -75,7 +78,7 @@ const KeysList = WDialog.extend({
         value: (key) => operation.getPortal(key.id).name,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, key) => {
-          cell.appendChild(operation.getPortal(key.id).displayFormat());
+          cell.appendChild(PortalUI.displayFormat(operation.getPortal(key.id)));
         },
       },
       {
@@ -114,7 +117,7 @@ const KeysList = WDialog.extend({
 
     let gid = "no-user";
     if (this._me) {
-      gid = this._me.GoogleID;
+      gid = this._me.id;
       this.sortable.fields = always.concat([
         {
           name: wX("MY_COUNT"),
@@ -184,9 +187,7 @@ const KeysList = WDialog.extend({
     }
 
     for (const p of operation.markers.filter(function (marker) {
-      return (
-        marker.type == window.plugin.wasabee.static.constants.MARKER_TYPE_KEY
-      );
+      return marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY;
     })) {
       const k = {};
       k.id = p.portalId;

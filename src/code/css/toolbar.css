@@ -72,6 +72,19 @@
   background-color: #3c9;
 }
 
+.wasabee-buttons.leaflet-control a.wasabee-toolbar-quickdelete.active {
+  background-color: #e66;
+}
+
+.wasabee-buttons.leaflet-control a.wasabee-toolbar-quickdelete.active.blink {
+  animation: blink 2s infinite;
+}
+@keyframes blink {
+  50% {
+    background-color: red;
+  }
+}
+
 /* align verticaly button subactions */
 .wasabee-actions li {
   display: block;
@@ -119,6 +132,10 @@
   background-image: url(../images/toolbar_quickdraw.svg);
   background-size: 60%;
 }
+.wasabee-toolbar-quickdelete {
+  background-image: url(../images/toolbar_quickdelete.svg);
+  background-size: 60%;
+}
 .wasabee-toolbar-link {
   background-image: url(../images/toolbar_addlinks.svg)
 }
@@ -129,7 +146,8 @@
   /*background-image: url(../images/toolbar_sync.png)*/
   background-image: url(../images/toolbar_download.svg)
 }
-.wasabee-toolbar-sync.loading {
+.wasabee-toolbar-sync.loading,
+.wasabee-toolbar-upload.loading {
   background-image: url(../images/loading.gif)
 }
 

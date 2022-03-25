@@ -12,13 +12,7 @@ const AboutDialog = WDialog.extend({
   addHooks: function () {
     // this pulls in the addHooks from the parent class
     WDialog.prototype.addHooks.call(this);
-    // put any per-open setup here
-    // this is the call to actually do our work
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   // define our work in _displayDialog
@@ -28,6 +22,11 @@ const AboutDialog = WDialog.extend({
     const support = L.DomUtil.create("div", null, html);
     // wX is the translation call, it looks up the string in the agent's chosen language
     support.innerHTML = wX("SUPPORT_INSTRUCT");
+
+    if (this._smallScreen) {
+      const mobileApp = L.DomUtil.create("div", null, html);
+      mobileApp.innerHTML = wX("dialog.about.download_mobile_app");
+    }
 
     const tips = L.DomUtil.create("div", null, html);
     tips.innerHTML =
@@ -43,7 +42,7 @@ const AboutDialog = WDialog.extend({
 
     // Since the JqueryUI dialog buttons are hard-coded, we have to override them to translate them
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
@@ -58,12 +57,6 @@ const AboutDialog = WDialog.extend({
       dialogClass: "about",
       buttons: buttons,
     });
-  },
-
-  // small-screen versions go in _displaySmallDialog
-  _displaySmallDialog: function () {
-    // for this dialog, the small screen is the same as the normal
-    this._displayDialog();
   },
 });
 

@@ -1,7 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeTeam from "../team";
+import WasabeeTeam from "../model/team";
 import wX from "../wX";
+
+import AgentUI from "../ui/agent";
+import { displayError } from "../error";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -14,36 +17,44 @@ const TeamMembershipList = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
+    window.map.on("wasabee:team:update", this.update, this);
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog().catch((e) => {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     });
   },
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:team:update", this.update, this);
     window.map.off("wasabee:logout", this.closeDialog, this);
   },
 
   _displayDialog: async function () {
-    const table = this._setupTable();
+    this._table = this._setupTable();
 
     const team = await WasabeeTeam.get(this.options.teamID, 10); // max cache age of 10 seconds
-    table.items = team.getAgents();
+    this._table.items = team.agents;
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
     this.createDialog({
       title: team.name,
-      html: table.table,
+      html: this._table.table,
       width: "auto",
       dialogClass: "teamlist",
       buttons: buttons,
     });
+  },
+
+  update: async function () {
+    const team = await WasabeeTeam.get(this.options.teamID, 10);
+    this._table.items = team.agents;
+    this.setTitle(team.name);
   },
 
   _setupTable: function () {
@@ -51,28 +62,27 @@ const TeamMembershipList = WDialog.extend({
     table.fields = [
       {
         name: wX("AGENT"),
-        value: (agent) => agent.name,
+        value: (agent) => agent.getName(),
         sort: (a, b) => a.localeCompare(b),
-        format: async (cell, value, agent) =>
-          cell.appendChild(await agent.formatDisplay(this.options.teamID)),
+        format: (cell, value, agent) =>
+          cell.appendChild(AgentUI.formatDisplay(agent)),
       },
       {
-        name: wX("SQUAD"),
-        value: (agent) => agent.squad,
+        name: wX("COMMENT"),
+        value: (agent) => agent.comment,
         sort: (a, b) => a.localeCompare(b),
-        // , format: (cell, value) => (cell.textContent = value)
       },
       {
-        name: "Sharing Location",
-        value: (agent) => agent.state,
+        name: wX("dialog.team_members.location"),
+        value: (agent) => agent.shareLocation,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           if (value) cell.textContent = "✅";
         },
       },
       {
-        name: "Sharing W-D Keys",
-        value: (agent) => agent.ShareWD,
+        name: wX("dialog.team_members.wd_keys"),
+        value: (agent) => agent.shareWDKeys,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value) => {
           if (value) cell.textContent = "✅";

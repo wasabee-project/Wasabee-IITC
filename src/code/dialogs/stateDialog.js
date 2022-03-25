@@ -1,8 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeLink from "../link";
-import WasabeeMarker from "../marker";
+import WasabeeLink from "../model/link";
+import WasabeeMarker from "../model/marker";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+
+import PortalUI from "../ui/portal";
+import LinkUI from "../ui/link";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -53,11 +56,10 @@ const StateDialog = WDialog.extend({
     }
 
     if (this.options.target instanceof WasabeeLink) {
-      const portal = operation.getPortal(this.options.target.fromPortalId);
       this._type = "Link";
-      this._name = wX("LINK STATE PROMPT", portal.name);
+      this._name = wX("LINK STATE PROMPT");
       divtitle.appendChild(
-        this.options.target.displayFormat(operation, this._smallScreen)
+        LinkUI.displayFormat(this.options.target, operation)
       );
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("LINK STATE");
@@ -67,8 +69,8 @@ const StateDialog = WDialog.extend({
     if (this.options.target instanceof WasabeeMarker) {
       const portal = operation.getPortal(this.options.target.portalId);
       this._type = "Marker";
-      this._name = wX("MARKER STATE PROMPT", portal.name);
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      this._name = wX("MARKER STATE PROMPT");
+      divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("MARKER STATE");
       menu.prepend(t);

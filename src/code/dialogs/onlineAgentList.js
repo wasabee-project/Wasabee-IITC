@@ -1,7 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeAgent from "../agent";
+import WasabeeAgent from "../model/agent";
 import wX from "../wX";
+
+import AgentUI from "../ui/agent";
 
 const OnlineAgentList = WDialog.extend({
   statics: {
@@ -23,14 +25,14 @@ const OnlineAgentList = WDialog.extend({
 
   _displayDialog: function () {
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
     this.update();
 
     this.createDialog({
-      title: "Online Agents",
+      title: wX("dialog.online_agents.title"),
       html: this._table.table,
       width: "auto",
       dialogClass: "teamlist",
@@ -43,21 +45,21 @@ const OnlineAgentList = WDialog.extend({
     this._table.fields = [
       {
         name: wX("AGENT"),
-        value: (agent) => agent.name,
+        value: (agent) => agent.getName(),
         sort: (a, b) => a.localeCompare(b),
-        format: async (cell, value, agent) =>
-          cell.appendChild(await agent.formatDisplay(0)),
+        format: (cell, value, agent) =>
+          cell.appendChild(AgentUI.formatDisplay(agent)),
       },
       {
-        name: "Last Seen",
+        name: wX("dialog.online_agents.last_seen"),
         value: (agent) => agent.date,
         sort: (a, b) => a.localeCompare(b),
         format: (cell, value, agent) => {
-          if (agent) cell.textContent = agent.timeSinceformat();
+          if (agent) cell.textContent = AgentUI.timeSinceformat(agent);
         },
       },
       {
-        name: "Actions",
+        name: wX("dialog.online_agents.actions"),
         value: (agent) => agent.id,
         format: (cell, value, agent) => {
           if (value) {

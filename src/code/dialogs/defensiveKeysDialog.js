@@ -1,19 +1,21 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import { dKeyPromise } from "../server";
 import wX from "../wX";
 import WasabeeDList from "./wasabeeDlist";
 import { getAgentPortalWasabeeDkeys } from "../wd";
+
+import PortalUI from "../ui/portal";
+import { displayError, displayInfo } from "../error";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
     TYPE: "defensiveKeysDialog",
   },
 
-  addHooks: async function () {
+  addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet();
+    this._me = WasabeeMe.localGet();
     this._pch = (portal) => {
       this._portalClickedHook(portal);
     };
@@ -28,14 +30,12 @@ const DefensiveKeysDialog = WDialog.extend({
   },
 
   _portalClickedHook: async function () {
-    this._selectedPortal = WasabeePortal.getSelected();
+    this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
-      this._portal.appendChild(
-        this._selectedPortal.displayFormat(this._smallScreen)
-      );
+      this._portal.appendChild(PortalUI.displayFormat(this._selectedPortal));
       const mine = await getAgentPortalWasabeeDkeys(
-        this._me.GoogleID,
+        this._me.id,
         this._selectedPortal.id
       );
       if (mine) {
@@ -83,7 +83,7 @@ const DefensiveKeysDialog = WDialog.extend({
     const content = this._buildContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
@@ -111,11 +111,11 @@ const DefensiveKeysDialog = WDialog.extend({
       const j = JSON.stringify(dk);
       console.log(j);
       await dKeyPromise(j);
-      alert("Registered with server");
+      displayInfo("Registered with server");
       window.map.fire("wasabee:defensivekeys");
     } catch (e) {
       console.error(e);
-      alert(e.toString());
+      displayError(e);
     }
   },
 });

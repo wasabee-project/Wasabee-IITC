@@ -3,12 +3,25 @@
         "prod": {
             "downloadURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.user.js",
             "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/prod/wasabee.meta.js",
-            "version": "0.20.BUILDDATE"
+            "version": "0.21.BUILDDATE"
         },
         "dev": {
+            "downloadURL": "https://cdn2.wasabee.rocks/iitcplugin/latest/dev/wasabee.user.js",
+            "updateURL": "https://cdn2.wasabee.rocks/iitcplugin/latest/dev/wasabee.meta.js",
+            "version": "0.21.BUILDDATE-dev"
+        },
+        "testing": {
+            "downloadURL": "https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.user.js",
+            "updateURL": "https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.meta.js",
+            "version": "0.21.BUILDDATE-testing"
+        },
+        "pr": {
+            "version": "0.21-pr"
+        },
+        "scot": {
             "downloadURL": "https://am.wasabee.rocks/static/dev/wasabee.user.js",
             "updateURL": "https://am.wasabee.rocks/static/dev/wasabee.meta.js",
-            "version": "0.20.BUILDDATE-dev"
+            "version": "0.21.BUILDDATE-scot"
         },
         "common": {
             "id": "Wasabee.user.js",
@@ -16,10 +29,7 @@
             "namespace": "https://wasabee.rocks/",
             "description": "Wasabee is not for dating.",
             "author": "Wasabee Project Team",
-            "category": "Draw",
-            "include": "https://intel.ingress.com/*",
-            "TESTinclude": "/https?:\\/\\/.*\\.ingress\\.com\\/?((intel|mission)?(\\/?(\\?|#).*)?)?/",
-            "grant": "none"
+            "category": "Draw"
         }
     },
     "releaseFolder": {

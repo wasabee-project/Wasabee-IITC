@@ -1,9 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
+import { clearAllData } from "../uiCommands";
 
 const SettingsDialog = WDialog.extend({
   statics: {
@@ -12,11 +13,7 @@ const SettingsDialog = WDialog.extend({
 
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
-    if (this._smallScreen) {
-      this._displaySmallDialog();
-    } else {
-      this._displayDialog();
-    }
+    this._displayDialog();
   },
 
   removeHooks: function () {
@@ -25,16 +22,15 @@ const SettingsDialog = WDialog.extend({
 
   update: function () {
     this.setContent(this._getContent());
-    // TODO also update the title
+    this.setTitle(wX("SETTINGS_TITLE"));
   },
 
   _addCheckBox(container, label, id, storageKey, onChange, defValue) {
-    const title = L.DomUtil.create("label", null, container);
-    title.textContent = label;
-    title.htmlFor = id;
-    const check = L.DomUtil.create("input", null, container);
+    const title = L.DomUtil.create("label", "checkbox", container);
+    const check = L.DomUtil.create("input", "", title);
     check.type = "checkbox";
     check.id = id;
+    L.DomUtil.create("span", "", title).textContent = label;
     const sl = localStorage[storageKey];
     if (!defValue && sl === "true") check.checked = true;
     if (defValue && sl !== "false") check.checked = true;
@@ -83,13 +79,6 @@ const SettingsDialog = WDialog.extend({
       }
     );
 
-    this._addCheckBox(
-      container,
-      wX("SEND LOCATION"),
-      "wasabee-setting-sendloc",
-      window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
-    );
-
     this._addSelect(
       container,
       wX("SKIP_CONFIRM"),
@@ -101,26 +90,15 @@ const SettingsDialog = WDialog.extend({
       ]
     );
 
-    this._addCheckBox(
-      container,
-      wX("SEND ANALYTICS"),
-      "wasabee-setting-analytics",
-      window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
-    );
-
-    const urpKey =
-      window.plugin.wasabee.static.constants.MULTIMAX_UNREACHABLE_KEY;
-    if (!localStorage[urpKey]) {
-      localStorage[urpKey] = '{"lat": -74.2,"lng:"-143.4}';
+    // send location on mobile
+    if (window.plugin.userLocation) {
+      this._addCheckBox(
+        container,
+        wX("SEND LOCATION"),
+        "wasabee-setting-sendloc",
+        window.plugin.wasabee.static.constants.SEND_LOCATION_KEY
+      );
     }
-    const pairs = [
-      ["Antarctic West", '{"lat":-74.2,"lng":-143.4}'],
-      ["Antarctic East", '{"lat":-74.2,"lng":30.0}'],
-      ["Equatorial Atlantic", '{"lat":-2.66,"lng":-4.28}'],
-      ["Arctic West", '{"lat":74.2,"lng":-143.4}'],
-      ["Arctic East", '{"lat":78.5,"lng":143.4}'],
-    ];
-    this._addSelect(container, "Multimax test point", urpKey, pairs);
 
     this._addCheckBox(
       container,
@@ -138,11 +116,34 @@ const SettingsDialog = WDialog.extend({
       window.plugin.wasabee.static.constants.AUTO_LOAD_FAKED
     );
 
+    if (window.isSmartphone()) {
+      this._addCheckBox(
+        container,
+        wX("USE PANES ON MOBILE"),
+        "wasabee-setting-usepanes",
+        window.plugin.wasabee.static.constants.USE_PANES
+      );
+    }
+
+    this._addCheckBox(
+      container,
+      wX("SEND ANALYTICS"),
+      "wasabee-setting-analytics",
+      window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY
+    );
+
     this._addSelect(
       container,
       wX("AUTOLOAD_RATE"),
       window.plugin.wasabee.static.constants.PORTAL_DETAIL_RATE_KEY,
       [1, 100, 250, 500, 750, 1000].map((v) => [v, v])
+    );
+
+    this._addSelect(
+      container,
+      wX("TRAWL SKIP TILES"),
+      window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
 
     const serverInfo = L.DomUtil.create("button", "server", container);
@@ -153,27 +154,11 @@ const SettingsDialog = WDialog.extend({
       this.setServer();
     });
 
-    this._addSelect(
-      container,
-      wX("TRAWL SKIP TILES"),
-      window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
-    );
-
-    if (window.isSmartphone()) {
-      this._addCheckBox(
-        container,
-        wX("USE PANES ON MOBILE"),
-        "wasabee-setting-usepanes",
-        window.plugin.wasabee.static.constants.USE_PANES
-      );
-    }
-
     const skinsButton = L.DomUtil.create("button", null, container);
     skinsButton.textContent = wX("SKINS_BUTTON");
     L.DomEvent.on(skinsButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const skinDialog = new SkinDialog(window.map);
+      const skinDialog = new SkinDialog();
       skinDialog.enable();
     });
 
@@ -207,21 +192,19 @@ const SettingsDialog = WDialog.extend({
     buttons[wX("OK")] = () => {
       this.closeDialog();
     };
+    buttons[wX("CLEAROPS BUTTON")] = () => {
+      this.closeDialog();
+      clearAllData();
+    };
 
     this.createDialog({
-      title: wX("SETTINGS"),
+      title: wX("SETTINGS_TITLE"),
       html: container,
       width: "auto",
       dialogClass: "settings",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.settings,
     });
-  },
-
-  // small-screen versions go in _displaySmallDialog
-  _displaySmallDialog: function () {
-    // for this dialog, the small screen is the same as the normal
-    this._displayDialog();
   },
 });
 

@@ -1,8 +1,9 @@
 import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
-import WasabeePortal from "../portal";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebaseSupport";
+
+import PortalUI from "../ui/portal";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -34,16 +35,11 @@ const QuickdrawButton = WButton.extend({
       this.handler._nextDrawnLinksColor = ev.target.value;
     });
 
-    this.actionsContainer = this._createSubActions(this.getSubActions());
-
-    this._container.appendChild(this.actionsContainer);
+    this.setSubActions(this.getSubActions());
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("QD TITLE");
-      const newSubActions = this._createSubActions(this.getSubActions());
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
 
       if (this.handler._enabled)
         this.handler._tooltip.updateContent(this.handler._getTooltipText());
@@ -205,10 +201,8 @@ const QuickDrawControl = L.Handler.extend({
 
   _onMouseMove: function (e) {
     if (e.latlng) {
-      this._tooltip.updatePosition(e.latlng);
       this._guideUpdate(e);
     }
-    L.DomEvent.preventDefault(e.originalEvent);
   },
 
   _guideUpdate: function (e) {
@@ -237,28 +231,28 @@ const QuickDrawControl = L.Handler.extend({
 
   _getTooltipText: function () {
     if (this._drawMode === "quickdraw") {
-      if (!this._anchor1) return { text: wX("QDSTART") };
-      if (!this._anchor2) return { text: wX("QDNEXT") };
-      return { text: wX("QDCONT") };
+      if (!this._anchor1) return wX("QDSTART");
+      if (!this._anchor2) return wX("QDNEXT");
+      return wX("QDCONT");
     }
     if (this._drawMode === "star") {
       // XXX wX this
-      if (!this._anchor) return { text: "Select the star anchor" };
-      return { text: "Select a portal" };
+      if (!this._anchor)
+        return wX("toolbar.quick_draw.tooltip.star_mode.anchor");
+      return wX("toolbar.quick_draw.tooltip.star_mode.portal");
     }
     // must be in single-link mode
     // XXX wX this
-    if (!this._previous) return { text: "Click first portal" };
-    return { text: "Click next portal" };
+    if (!this._previous)
+      return wX("toolbar.quick_draw.tooltip.single_mode.first");
+    return wX("toolbar.quick_draw.tooltip.single_mode.next");
   },
 
   _portalClicked: function (portal) {
-    const selectedPortal = WasabeePortal.fromIITC(portal);
+    const selectedPortal = PortalUI.fromIITC(portal);
     if (!selectedPortal) {
       // XXX wX this
-      this._tooltip.updateContent({
-        text: "Portal data not loaded, please try again",
-      });
+      this._tooltip.updateContent(wX("toolbar.quick_draw.tooltip.portal_fail"));
       return;
     }
     if (this._drawMode == "quickdraw") {

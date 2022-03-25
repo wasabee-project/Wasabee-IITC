@@ -1,7 +1,10 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../portal";
+import WasabeePortal from "../model/portal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+
+import PortalUI from "../ui/portal";
+import { displayError } from "../error";
 
 const LinkDialog = WDialog.extend({
   statics: {
@@ -37,24 +40,20 @@ const LinkDialog = WDialog.extend({
     sourceButton.textContent = wX("SET");
     this._sourceDisplay = L.DomUtil.create("span", "portal", container);
     if (this._source) {
-      this._sourceDisplay.appendChild(
-        this._source.displayFormat(this._smallScreen)
-      );
+      this._sourceDisplay.appendChild(PortalUI.displayFormat(this._source));
     } else {
       this._sourceDisplay.textContent = wX("NOT_SET");
     }
     L.DomEvent.on(sourceButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this._source = WasabeePortal.getSelected();
+      this._source = PortalUI.getSelected();
       if (this._source) {
         localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY] =
           JSON.stringify(this._source);
         this._sourceDisplay.textContent = "";
-        this._sourceDisplay.appendChild(
-          this._source.displayFormat(this._smallScreen)
-        );
+        this._sourceDisplay.appendChild(PortalUI.displayFormat(this._source));
       } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -62,28 +61,6 @@ const LinkDialog = WDialog.extend({
     anchor1Label.textContent = wX("ANCHOR1");
     const anchor1Button = L.DomUtil.create("button", "set", container);
     anchor1Button.textContent = wX("SET");
-    this._anchor1Display = L.DomUtil.create("span", "portal", container);
-    if (this._anchor1) {
-      this._anchor1Display.appendChild(
-        this._anchor1.displayFormat(this._smallScreen)
-      );
-    } else {
-      this._anchor1Display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchor1Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor1 = WasabeePortal.getSelected();
-      if (this._anchor1) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchor1);
-        this._anchor1Display.textContent = "";
-        this._anchor1Display.appendChild(
-          this._anchor1.displayFormat(this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
     const anchor1AddButton = L.DomUtil.create("button", "add", container);
     anchor1AddButton.textContent = wX("ADD1");
     L.DomEvent.on(anchor1AddButton, "click", (ev) => {
@@ -95,7 +72,25 @@ const LinkDialog = WDialog.extend({
           order: operation.nextOrder,
         });
       } else {
-        alert("Select both Source and Anchor 1");
+        displayError("Select both Source and Anchor 1");
+      }
+    });
+    this._anchor1Display = L.DomUtil.create("span", "portal", container);
+    if (this._anchor1) {
+      this._anchor1Display.appendChild(PortalUI.displayFormat(this._anchor1));
+    } else {
+      this._anchor1Display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchor1Button, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this._anchor1 = PortalUI.getSelected();
+      if (this._anchor1) {
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
+          JSON.stringify(this._anchor1);
+        this._anchor1Display.textContent = "";
+        this._anchor1Display.appendChild(PortalUI.displayFormat(this._anchor1));
+      } else {
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -103,28 +98,6 @@ const LinkDialog = WDialog.extend({
     anchor2Label.textContent = wX("ANCHOR2");
     const anchor2Button = L.DomUtil.create("button", "set", container);
     anchor2Button.textContent = wX("SET");
-    this._anchor2Display = L.DomUtil.create("span", "portal", container);
-    if (this._anchor2) {
-      this._anchor2Display.appendChild(
-        this._anchor2.displayFormat(this._smallScreen)
-      );
-    } else {
-      this._anchor2Display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchor2Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor2 = WasabeePortal.getSelected();
-      if (this._anchor2) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
-          JSON.stringify(this._anchor2);
-        this._anchor2Display.textContent = "";
-        this._anchor2Display.appendChild(
-          this._anchor2.displayFormat(this._smallScreen)
-        );
-      } else {
-        alert(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
     const anchor2AddButton = L.DomUtil.create("button", "add", container);
     anchor2AddButton.textContent = wX("ADD2");
     L.DomEvent.on(anchor2AddButton, "click", (ev) => {
@@ -136,7 +109,25 @@ const LinkDialog = WDialog.extend({
           order: operation.nextOrder,
         });
       } else {
-        alert(wX("SEL_SRC_ANC2"));
+        displayError(wX("SEL_SRC_ANC2"));
+      }
+    });
+    this._anchor2Display = L.DomUtil.create("span", "portal", container);
+    if (this._anchor2) {
+      this._anchor2Display.appendChild(PortalUI.displayFormat(this._anchor2));
+    } else {
+      this._anchor2Display.textContent = wX("NOT_SET");
+    }
+    L.DomEvent.on(anchor2Button, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this._anchor2 = PortalUI.getSelected();
+      if (this._anchor2) {
+        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
+          JSON.stringify(this._anchor2);
+        this._anchor2Display.textContent = "";
+        this._anchor2Display.appendChild(PortalUI.displayFormat(this._anchor2));
+      } else {
+        displayError(wX("PLEASE_SELECT_PORTAL"));
       }
     });
 
@@ -145,7 +136,7 @@ const LinkDialog = WDialog.extend({
     button.textContent = wX("ADD_BUTTON_LINKS");
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
-      if (!this._source) alert(wX("SEL_SRC_PORT"));
+      if (!this._source) displayError(wX("SEL_SRC_PORT"));
       const operation = getSelectedOperation();
       if (this._anchor1) {
         operation.addLink(this._source, this._anchor1, {

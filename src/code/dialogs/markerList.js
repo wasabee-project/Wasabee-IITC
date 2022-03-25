@@ -8,24 +8,30 @@ const MarkerList = OperationChecklistDialog.extend({
     TYPE: "markerList",
   },
 
-  _displayDialog: function () {
+  SORTBY_KEY: "wasabee-markerlist-sortby",
+  SORTASC_KEY: "wasabee-markerlist-sortasc",
+
+  _displayDialog: async function () {
     const operation = getSelectedOperation();
     loadFaked(operation);
+
     this.sortable = this.getListDialogContent(
       operation,
       operation.markers,
-      0,
-      false
-    ); // defaults to sorting by op order
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
+    );
 
     const buttons = {};
     buttons[wX("CLEAR MARKERS")] = () => {
       clearAllMarkers(getSelectedOperation());
     };
 
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
+
+    await this.sortable.done;
 
     this.createDialog({
       title: wX("MARKER_LIST", { opName: operation.name }),
@@ -38,13 +44,14 @@ const MarkerList = OperationChecklistDialog.extend({
   },
 
   update: async function () {
+    if (!this.sortable) return;
     const operation = getSelectedOperation();
     this.setTitle(wX("MARKER_LIST", { opName: operation.name }));
     this.sortable = this.getListDialogContent(
       operation,
       operation.markers,
-      this.sortable.sortBy,
-      this.sortable.sortAsc
+      this.SORTBY_KEY,
+      this.SORTASC_KEY
     );
     await this.sortable.done;
     this.setContent(this.sortable.table);

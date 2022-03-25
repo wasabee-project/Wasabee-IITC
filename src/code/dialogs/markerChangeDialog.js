@@ -1,6 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+import WasabeeMarker from "../model/marker";
+import WasabeeBlocker from "../model/blocker";
+
+import PortalUI from "../ui/portal";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
@@ -25,31 +29,30 @@ const MarkerChangeDialog = WDialog.extend({
     const portal = operation.getPortal(this.options.marker.portalId);
     const portalDisplay = L.DomUtil.create("div", "portal", content);
 
-    portalDisplay.appendChild(portal.displayFormat(this._smallScreen));
+    portalDisplay.appendChild(PortalUI.displayFormat(portal));
 
     this._type = L.DomUtil.create("select", null, content);
 
-    const markers = operation.getPortalMarkers(portal);
-    for (const k of window.plugin.wasabee.static.markerTypes) {
+    for (const k of WasabeeMarker.markerTypes) {
       const o = L.DomUtil.create("option", null, this._type);
       o.value = k;
       o.textContent = wX(k);
-      if (markers.has(k) && k != this.options.marker.type) o.disabled = true;
     }
     this._type.value = this.options.marker.type;
 
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (
-        window.plugin.wasabee.static.markerTypes.has(this._type.value) &&
-        !markers.has(this._type.value)
-      ) {
+      if (WasabeeMarker.markerTypes.has(this._type.value)) {
+        operation.startBatchMode();
         operation.removeMarker(this.options.marker);
         operation.addMarker(this._type.value, portal, {
           zone: this.options.marker.zone,
           comment: this.options.marker.comment,
           assign: this.options.marker.assignedTo,
         });
+        if (WasabeeMarker.isDestructMarkerType(this._type.value))
+          WasabeeBlocker.removeBlocker(operation, portal.id);
+        operation.endBatchMode();
       }
       this.closeDialog();
     };

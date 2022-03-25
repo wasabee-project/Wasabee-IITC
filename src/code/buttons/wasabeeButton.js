@@ -1,17 +1,15 @@
 import { WButton } from "../leafletClasses";
-import WasabeeMe from "../me";
+import WasabeeMe from "../model/me";
 import TeamListDialog from "../dialogs/teamListDialog";
 import OpsDialog from "../dialogs/opsDialog";
 import AuthDialog from "../dialogs/authDialog";
-import ConfirmDialog from "../dialogs/confirmDialog";
 import NewopDialog from "../dialogs/newopDialog";
 import SettingsDialog from "../dialogs/settingsDialog.js";
-import { resetOps, setupLocalStorage, removeNonOwnedOps } from "../selectedOp";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
 import { postToFirebase } from "../firebaseSupport";
-import { resetCaches } from "../uiCommands";
+import { displayError } from "../error";
 
 const WasabeeButton = WButton.extend({
   statics: {
@@ -37,23 +35,19 @@ const WasabeeButton = WButton.extend({
     this._buildActions();
 
     // build and display as if not logged in
-    this.actionsContainer = this._getActions();
-    this._container.appendChild(this.actionsContainer);
+    this.setSubActions(this.getSubActions());
     // check login state and update if necessary
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("WASABEE BUTTON TITLE");
       this._buildActions();
-      const newSubActions = this._getActions();
-      this._container.replaceChild(newSubActions, this.actionsContainer);
-      newSubActions.style.display = this.actionsContainer.style.display;
-      this.actionsContainer = newSubActions;
+      this.setSubActions(this.getSubActions());
     });
 
     this.update();
   },
 
-  _getActions: function () {
+  getSubActions: function () {
     let tmp = [];
     if (!this._lastLoginState) {
       tmp = [this._loginAction];
@@ -72,7 +66,7 @@ const WasabeeButton = WButton.extend({
     // settings always at the end
     tmp = tmp.concat(this._SettingsActions);
 
-    return this._createSubActions(tmp);
+    return tmp;
   },
 
   _buildActions: function () {
@@ -105,13 +99,10 @@ const WasabeeButton = WButton.extend({
       text: wX("LOG_OUT"),
       callback: async () => {
         try {
-          // if not actually logged in, this removes ALL server ops
-          // but this button _should_ not be visible in that case
-          await removeNonOwnedOps();
           await logoutPromise();
         } catch (e) {
           console.error(e);
-          alert(e.toString());
+          displayError(e);
         }
         WasabeeMe.purge();
         postToFirebase({ id: "wasabeeLogout" }); // trigger request firebase token on re-login
@@ -151,25 +142,6 @@ const WasabeeButton = WButton.extend({
         },
         context: this,
       },
-      {
-        title: wX("CLEAROPS BUTTON TITLE"),
-        text: wX("CLEAROPS BUTTON"),
-        callback: () => {
-          this.disable();
-          const con = new ConfirmDialog({
-            title: wX("CLEAROPS BUTTON TITLE"),
-            label: wX("CLEAROPS PROMPT"),
-            type: "operation",
-            callback: async () => {
-              await resetCaches();
-              await resetOps();
-              await setupLocalStorage();
-            },
-          });
-          con.enable();
-        },
-        context: this,
-      },
     ];
 
     this._Dactions = [
@@ -187,7 +159,7 @@ const WasabeeButton = WButton.extend({
 
     this._SettingsActions = [
       {
-        title: "Settings",
+        title: wX("toolbar.wasabee.settings"),
         text: "⚙",
         callback: () => {
           this.disable();
@@ -209,9 +181,7 @@ const WasabeeButton = WButton.extend({
       if (loggedIn) this.button.classList.add("wasabee-logged-in");
       else this.button.classList.remove("wasabee-logged-in");
 
-      const old = this.actionsContainer;
-      this.actionsContainer = this._getActions();
-      old.parentNode.replaceChild(this.actionsContainer, old);
+      this.setSubActions(this.getSubActions());
       this.disable();
     }
   },

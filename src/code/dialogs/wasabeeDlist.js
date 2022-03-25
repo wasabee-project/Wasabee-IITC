@@ -1,9 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import wX from "../wX";
-import WasabeeMe from "../me";
-import WasabeePortal from "../portal";
+import WasabeeMe from "../model/me";
+import WasabeePortal from "../model/portal";
 import { getAgentWasabeeDkeys } from "../wd";
+
+import PortalUI from "../ui/portal";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -35,7 +37,7 @@ const WasabeeDList = WDialog.extend({
     const sortable = await this.getListDialogContent();
 
     const buttons = {};
-    buttons[wX("OK")] = () => {
+    buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
 
@@ -66,7 +68,7 @@ const WasabeeDList = WDialog.extend({
             lat: n.Lat,
             lng: n.Lng,
           });
-          cell.appendChild(p.displayFormat(this._smallScreen));
+          cell.appendChild(PortalUI.displayFormat(p));
         },
       },
       {
@@ -88,7 +90,7 @@ const WasabeeDList = WDialog.extend({
     ];
     content.sortBy = 0;
 
-    content.items = await getAgentWasabeeDkeys(this._me.GoogleID);
+    content.items = await getAgentWasabeeDkeys(this._me.id);
 
     return content;
   },

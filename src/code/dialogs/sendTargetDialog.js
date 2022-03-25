@@ -1,11 +1,14 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeMarker from "../marker";
-import WasabeeAnchor from "../anchor";
-import WasabeeMe from "../me";
-import WasabeeTeam from "../team";
+import WasabeeMarker from "../model/marker";
+import WasabeePortal from "../model/portal";
+import WasabeeMe from "../model/me";
+import WasabeeTeam from "../model/team";
 import { targetPromise } from "../server";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
+
+import PortalUI from "../ui/portal";
+import { displayError, displayInfo } from "../error";
 
 const SendTargetDialog = WDialog.extend({
   statics: {
@@ -48,18 +51,18 @@ const SendTargetDialog = WDialog.extend({
     const operation = getSelectedOperation();
 
     if (this.options.target instanceof WasabeeMarker) {
-      const portal = operation.getPortal(this.options.target.portalId);
+      this._portal = operation.getPortal(this.options.target.portalId);
       this._targettype = this.options.target.type;
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(this._portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
     }
 
-    if (this.options.target instanceof WasabeeAnchor) {
-      const portal = operation.getPortal(this.options.target.portalId);
+    if (this.options.target instanceof WasabeePortal) {
+      this._portal = this.options.target;
       this._targettype = "anchor";
-      divtitle.appendChild(portal.displayFormat(this._smallScreen));
+      divtitle.appendChild(PortalUI.displayFormat(this._portal));
       const t = L.DomUtil.create("label", null);
       t.textContent = wX("SEND TARGET AGENT");
       menu.prepend(t);
@@ -98,13 +101,12 @@ const SendTargetDialog = WDialog.extend({
       try {
         // allow teams to be 5 minutes cached
         const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
-        const agents = tt.getAgents();
-        for (const a of agents) {
+        for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
             option = L.DomUtil.create("option");
             option.value = a.id;
-            option.textContent = a.name;
+            option.textContent = a.getName();
             if (a.id == current) option.selected = true;
             menu.appendChild(option);
           }
@@ -118,18 +120,16 @@ const SendTargetDialog = WDialog.extend({
   },
 
   _sendTarget: function () {
-    if (!this._value) {
+    if (!this._value || !this._portal) {
       this.closeDialog();
       return;
     }
-    const operation = getSelectedOperation();
-    const portal = operation.getPortal(this.options.target.portalId);
-    targetPromise(this._value, portal, this._targettype)
+    targetPromise(this._value, this._portal, this._targettype)
       .then(() => {
-        alert(wX("TARGET SENT"));
+        displayInfo(wX("TARGET SENT"));
         this.closeDialog();
       })
-      .catch((e) => alert(e));
+      .catch((e) => displayError(e));
   },
 });
 

@@ -6,17 +6,25 @@ export const WTooltip = L.Class.extend({
 
     this._container = L.DomUtil.create("div", "wasabee-tooltip", this._pane);
     L.DomUtil.addClass(this._container, "wasabee-tooltip-single");
+    window.map.on("mousemove", this._onMouseMove, this);
   },
 
   dispose: function () {
+    window.map.off("mousemove", this._onMouseMove, this);
     this._pane.removeChild(this._container);
     this._container = null;
   },
 
   updateContent: function (labelText) {
     // const span = L.DomUtil.create("span", null, this._container);
-    this._container.textContent = labelText.text;
+    this._container.textContent = labelText;
     return this;
+  },
+
+  _onMouseMove: function (event) {
+    if (event.layerPoint) {
+      L.DomUtil.setPosition(this._container, event.layerPoint);
+    }
   },
 
   updatePosition: function (latlng) {
@@ -100,7 +108,7 @@ export const WDialog = L.Handler.extend({
     L.setOptions(this, options);
     // determine large or small screen dialog sizes
     this._smallScreen = this._isMobile();
-    window.map.fire("wdialog", this);
+    window.map.fire("wdialog", { dialogType: this.constructor.TYPE });
     this.options.usePane =
       this.options.usePane &&
       window.isSmartphone() &&
@@ -301,6 +309,7 @@ export const WButton = L.Class.extend({
     this.handler = this._toggleActions;
     // this.actionsContainer == the sub menu items created by the individual buttons
 
+    /*
     this.button = this._createButton({
       container: container,
       // buttonImage: null,
@@ -308,6 +317,7 @@ export const WButton = L.Class.extend({
       context: this,
       // className: ...,
     });
+    */
   },
 
   update: function () {
@@ -349,6 +359,25 @@ export const WButton = L.Class.extend({
     }
   },
 
+  setSubActions: function (actions) {
+    if (!this.actionsContainer) {
+      this.actionsContainer = L.DomUtil.create(
+        "ul",
+        "wasabee-actions",
+        this._container
+      );
+    }
+    this.actionsContainer.textContent = "";
+    for (const action of actions) {
+      const li = L.DomUtil.create(
+        "li",
+        "wasabee-subactions",
+        this.actionsContainer
+      );
+      this._createButton({ ...action, container: li });
+    }
+  },
+
   _createButton: function (options) {
     const link = L.DomUtil.create(
       "a",
@@ -373,23 +402,5 @@ export const WButton = L.Class.extend({
     L.DomEvent.on(link, "click", options.callback, options.context);
 
     return link;
-  },
-
-  _createSubActions: function (buttons) {
-    const container = L.DomUtil.create("ul", "wasabee-actions");
-    for (const b of buttons) {
-      const li = L.DomUtil.create("li", "wasabee-subactions", container);
-      this._createButton({
-        title: b.title,
-        text: b.text,
-        html: b.html,
-        buttonImage: b.img,
-        container: li,
-        callback: b.callback,
-        context: b.context,
-        className: "wasabee-subactions",
-      });
-    }
-    return container;
   },
 });

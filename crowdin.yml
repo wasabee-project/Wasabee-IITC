@@ -1,0 +1,5 @@
+files:
+  - source: /src/code/translations/English.json
+    translation: /src/code/translations/%language%.json
+    skip_untranslated_strings: true
+    update_option: "update_as_unapproved"

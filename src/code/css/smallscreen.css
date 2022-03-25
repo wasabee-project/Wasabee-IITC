@@ -18,20 +18,23 @@
   vertical-align: bottom;
 }
 
-.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div,
+.wasabee-dialog-linklist.wasabee-small-screen .wasabee-table td:nth-child(2) > div {
   display: grid;
   grid-template-columns: auto auto auto;
   grid-column-gap: 2px;
   align-items: center;
 }
 
-.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal,
+.wasabee-dialog-linklist.wasabee-small-screen .wasabee-table td:nth-child(2) a.wasabee-portal {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal {
+.wasabee-dialog-checklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal
+.wasabee-dialog-linklist.wasabee-small-screen .wasabee-table td:nth-child(2) > a.wasabee-portal {
   display: inline-block;
   vertical-align: bottom;
   width: calc(100vw - 13em - 24px);
@@ -44,4 +47,9 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* tool-bar */
+.leaflet-touch li.wasabee-subactions a {
+	width: inherit;
 }

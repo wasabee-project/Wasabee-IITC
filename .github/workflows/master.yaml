@@ -15,7 +15,7 @@ jobs:
       - name: Build 🔧
         run: |
           npm install
-          npx gulp build-prod
+          npm run build
 
       - name: Deploy 🚀
         if: ${{ github.ref_type == 'tag' }}

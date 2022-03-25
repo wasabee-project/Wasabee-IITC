@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "sourceMap": true,
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "importsNotUsedAsValues": "error",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "strict": false,
+    "typeRoots": [
+      "./src/types",
+      "node_modules/@types"
+    ],
+    "skipLibCheck": false,
+    "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
+    "allowJs": true,
+    "checkJs": false,
+    "allowUmdGlobalAccess": true,
+    "noUnusedLocals": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/*"
+  ]
+}

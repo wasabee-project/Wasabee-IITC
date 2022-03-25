@@ -1,11 +1,12 @@
-import WasabeeOp from "../operation";
-import WasabeePortal from "../portal";
+import WasabeeOp from "../model/operation";
+import WasabeePortal from "../model/portal";
 import { WDialog } from "../leafletClasses";
 import OperationChecklistDialog from "./checklist";
 import wX from "../wX";
 import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
 import { zoomToOperation } from "../uiCommands";
+import { displayError, displayInfo } from "../error";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -54,8 +55,7 @@ const ImportDialog = WDialog.extend({
     buttons[wX("GET DT")] = () => {
       this.drawToolsFormat();
     };
-    // wX
-    buttons["Fill from URL"] = () => {
+    buttons[wX("dialog.import.url")] = () => {
       this.fillFromURL();
     };
 
@@ -83,7 +83,7 @@ const ImportDialog = WDialog.extend({
   fillFromURL() {
     // todo: wX
     const prompt = new PromptDialog({
-      title: "Fill from URL",
+      title: wX("dialog.import.url"),
       label: "URL",
       callback: async () => {
         try {
@@ -91,7 +91,7 @@ const ImportDialog = WDialog.extend({
           const rq = await fetch(url, { mode: "cors" });
           this._textarea.value = await rq.text();
         } catch (e) {
-          alert("Unable to fetch data from the given url.");
+          displayError("Unable to fetch data from the given url.");
           return;
         }
       },
@@ -103,10 +103,10 @@ const ImportDialog = WDialog.extend({
     let string = this._textarea.value;
     if (
       string.match(
-        new RegExp("^(https?://)?(www\\.)?intel.ingress.com/intel.*")
+        new RegExp("^(https?://)?(www|intel)\\.ingress\\.com/(intel)?.*")
       )
     ) {
-      alert(wX("NO_STOCK_INTEL"));
+      displayError(wX("NO_STOCK_INTEL"));
       return;
     }
 
@@ -141,12 +141,22 @@ const ImportDialog = WDialog.extend({
     try {
       const data = JSON.parse(string);
       const importedOp = new WasabeeOp(data);
-      await importedOp.store();
-      await makeSelectedOperation(importedOp.ID);
-      alert(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
+      const localOp = await WasabeeOp.load(importedOp.ID);
+      if (localOp) {
+        displayError(
+          wX("IMP_NOPE", {
+            error: "op already exists, either delete it or duplicate",
+          })
+        );
+        await makeSelectedOperation(importedOp.ID);
+      } else {
+        await importedOp.store();
+        await makeSelectedOperation(importedOp.ID);
+        displayInfo(wX("IMPORT_OP_SUCCESS", { opName: importedOp.name }));
+      }
     } catch (e) {
       console.error("WasabeeTools: failed to import data", e);
-      alert(wX("IMP_NOPE"));
+      displayError(wX("IMP_NOPE", { error: "data invalid" }));
     }
   },
 
@@ -164,7 +174,7 @@ const ImportDialog = WDialog.extend({
       data = JSON.parse(string);
     } catch (e) {
       console.error("Failed parseDrawTools", e);
-      alert(e.toString());
+      displayError(e);
       return null;
     }
 
@@ -214,8 +224,8 @@ const ImportDialog = WDialog.extend({
         newop.addLink(prev, first);
       }
     }
-    alert(
-      wX("IMP_COMP") + found + wX("PORT_FAKE") + faked + wX("USE_SWAP_INSTRUCT")
+    displayInfo(
+      wX("dialog.import.success_message", { count: found, faked: faked })
     );
 
     // get the op out of batchmode, but do not update UI or run crosslinks yet
