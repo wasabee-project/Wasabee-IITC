@@ -14,6 +14,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: pr
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: pr-build.yml
+          run_id: ${{ github.event.workflow_run.id }}
 
       - name: Pull request artifacts
         uses: gavv/pull-request-artifacts@v1.0.0
