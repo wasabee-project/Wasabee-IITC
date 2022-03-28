@@ -219,7 +219,7 @@ const OpsDialog = WDialog.extend({
             // download op
             const download = L.DomUtil.create("a", "", cell);
             download.href = "#";
-            appendFAIcon("sync", download);
+            appendFAIcon("arrows-rotate", download);
             download.title = wX("dialog.ops_list.download", {
               opName: op.name,
             });

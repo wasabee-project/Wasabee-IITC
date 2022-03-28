@@ -1,12 +1,12 @@
 import colorString from "color-string";
 
-import { icon, IconLookup, IconName } from "@fortawesome/fontawesome-svg-core";
+import { icon, IconLookup } from "@fortawesome/fontawesome-svg-core";
 // avoid import from "@fortawesome/free-solid-svg-icons" to reduce *dev* build size
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { faServer } from "@fortawesome/free-solid-svg-icons/faServer";
-import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
-import { faArrowsAltH } from "@fortawesome/free-solid-svg-icons/faArrowsAltH";
+import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons/faArrowsRotate";
+import { faLeftRight } from "@fortawesome/free-solid-svg-icons/faLeftRight";
 import { faPen } from "@fortawesome/free-solid-svg-icons/faPen";
 import { faEraser } from "@fortawesome/free-solid-svg-icons/faEraser";
 import { faBan } from "@fortawesome/free-solid-svg-icons/faBan";
@@ -52,23 +52,23 @@ export function convertColorToHex(color: string, on_error = "#000000") {
   }
 }
 
-const icons = [
-  faCheck,
-  faTrash,
-  faServer,
-  faSync,
-  faArrowsAltH,
-  faPen,
-  faEraser,
-  faBan,
-  faPalette,
-  faAsterisk,
-  faDesktop,
-];
+const icons = {
+  check: faCheck,
+  trash: faTrash,
+  server: faServer,
+  "arrows-rotate": faArrowsRotate,
+  "left-right": faLeftRight,
+  pen: faPen,
+  eraser: faEraser,
+  ban: faBan,
+  palette: faPalette,
+  asterisk: faAsterisk,
+  desktop: faDesktop,
+};
 
-export function appendFAIcon(iconName: IconName, container: Element) {
-  const iconDef = icons.find((i) => i.iconName === iconName);
-  if (!iconDef) return;
-  const iconNode = icon(iconDef as IconLookup).node[0];
-  container.appendChild(iconNode);
+export function appendFAIcon(iconName: keyof typeof icons, container: Element) {
+  if (iconName in icons) {
+    const iconNode = icon(icons[iconName] as IconLookup).node[0];
+    container.appendChild(iconNode);
+  }
 }

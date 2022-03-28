@@ -276,7 +276,7 @@ const OperationChecklistDialog = WDialog.extend({
             const rev = L.DomUtil.create("a", null, cell);
             rev.href = "#";
             rev.title = wX("REVERSE");
-            appendFAIcon("arrows-alt-h", rev);
+            appendFAIcon("left-right", rev);
             L.DomEvent.on(rev, "click", (ev) => {
               L.DomEvent.stop(ev);
               operation.reverseLink(obj.fromPortalId, obj.toPortalId);
