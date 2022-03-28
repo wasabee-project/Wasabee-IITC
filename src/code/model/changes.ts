@@ -559,7 +559,7 @@ export function applyRebaseChanges(
   // apply marker changes
   for (const mc of changes.markers.result) {
     if (mc.type === "deletion") {
-      master.markers = master.markers.filter((m) => m.ID === mc.id);
+      master.markers = master.markers.filter((m) => m.ID !== mc.id);
     } else if (mc.type === "addition") {
       master.markers.push(new WasabeeMarker(mc.value));
     } else {
@@ -570,7 +570,7 @@ export function applyRebaseChanges(
   // apply link changes
   for (const lc of changes.links.result) {
     if (lc.type === "deletion") {
-      master.links = master.links.filter((l) => l.ID === lc.id);
+      master.links = master.links.filter((l) => l.ID !== lc.id);
     } else if (lc.type === "addition") {
       master.links.push(new WasabeeLink(lc.value));
     } else {
