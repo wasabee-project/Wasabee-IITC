@@ -45,6 +45,22 @@ export function convertColorToHex(color: string, on_error = "#000000") {
   }
 }
 
+export function averageColor(colors: string[]) {
+  let [r,g,b] = [0, 0, 0];
+  for (const color of colors) {
+    const rgb = colorString.get.rgb(color);
+    r += rgb[0];
+    g += rgb[1];
+    b += rgb[2];
+  }
+  if (colors.length) {
+    r = Math.floor(r / colors.length);
+    g = Math.floor(g / colors.length);
+    b = Math.floor(b / colors.length);
+  }
+  return colorString.to.hex(r, g, b);
+}
+
 const icons = {
   check: faCheck,
   trash: faTrash,

@@ -6,6 +6,7 @@ import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { PathOptions } from "leaflet";
 import { getAgent, getMe, getTeam } from "./model/cache";
 import { isFiltered } from "./filter";
+import { averageColor, convertColorToHex } from "./auxiliar";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -213,15 +214,30 @@ function updateAnchors(op: WasabeeOp) {
   }
 
   const anchors = new Set<PortalID>();
+  const colors = new Map<PortalID, string[]>();
   for (const l of op.links) {
     if (!isFiltered(l)) continue;
     anchors.add(l.fromPortalId);
     anchors.add(l.toPortalId);
+    // color
+    const from = l.fromPortalId;
+    const colorList = colors.get(from) || [];
+    const linkColor = convertColorToHex(
+      l.color === "main"
+        ? op.color === "main"
+          ? Wasabee.skin.defaultOperationColor
+          : op.color
+        : l.color
+    );
+    colorList.push(linkColor);
+    colors.set(from, colorList);
   }
 
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
-    if (l.options.color != op.color) {
+    const colorList = colors.get(l.options.portalId);
+    const color = colorList ? averageColor(colorList) : "main";
+    if (l.options.color != color) {
       // if the op color changed, remove and re-add
       Wasabee.portalLayerGroup.removeLayer(l._leaflet_id);
     } else {
@@ -233,7 +249,9 @@ function updateAnchors(op: WasabeeOp) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      const lAnchor = new WLAnchor(a, op);
+      const colorList = colors.get(a);
+      const color = colorList ? averageColor(colorList) : "main";
+      const lAnchor = new WLAnchor(a, op, color);
       lAnchor.addTo(Wasabee.portalLayerGroup);
     }
   }

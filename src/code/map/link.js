@@ -3,6 +3,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import { displayFormat } from "../ui/link";
+import { convertColorToHex } from "../auxiliar";
 
 export const WLLink = L.GeodesicPolyline.extend({
   initialize: function (link, operation) {
@@ -10,6 +11,7 @@ export const WLLink = L.GeodesicPolyline.extend({
     let color = link.getColor(operation);
     if (color == "main")
       color = window.plugin.wasabee.skin.defaultOperationColor;
+    color = convertColorToHex(color);
     const options = L.extend(
       {
         color: color,

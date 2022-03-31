@@ -11,10 +11,8 @@ import { WasabeeMe } from "../model";
 export const WLAnchor = WLPortal.extend({
   type: "anchor",
 
-  initialize: function (portalId, operation) {
-    let color = operation.color;
-    if (color == "main")
-      color = window.plugin.wasabee.skin.defaultOperationColor;
+  initialize: function (portalId, operation, color = "main") {
+    if (color === "main") color = operation.color;
     const icon = L.divIcon({
       className: "wasabee-anchor-icon",
       shadowUrl: null,
@@ -23,13 +21,19 @@ export const WLAnchor = WLPortal.extend({
       popupAnchor: [0, -35],
       html: L.Util.template(
         '<svg style="fill: {color}"><use href="#wasabee-anchor-icon"/></svg>',
-        { color: color }
+        {
+          color:
+            color === "main"
+              ? window.plugin.wasabee.skin.defaultOperationColor
+              : color,
+        }
       ),
     });
     WLPortal.prototype.initialize.call(this, {
       portalId: portalId,
       id: portalId,
       icon: icon,
+      color: color,
     });
   },
 
