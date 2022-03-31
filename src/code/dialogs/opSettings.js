@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
 import { zoomToOperation } from "../ui/operation";
 import ConfirmDialog from "./confirmDialog";
+import ExportDialog from "../dialogs/exportDialog";
 import ZoneDialog from "./zoneDialog";
 import {
   getSelectedOperation,
@@ -244,6 +245,15 @@ const OpSettingDialog = WDialog.extend({
       const so = getSelectedOperation();
       const newop = await duplicateOperation(so.ID);
       await makeSelectedOperation(newop.ID);
+    });
+
+    const exportDiv = L.DomUtil.create("div", null, buttonSection);
+    const exportButton = L.DomUtil.create("button", null, exportDiv);
+    exportButton.textContent = wX("EXPORT OP");
+    L.DomEvent.on(exportButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      const ed = new ExportDialog();
+      ed.enable();
     });
 
     return content;

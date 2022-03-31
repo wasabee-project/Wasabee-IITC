@@ -2,7 +2,6 @@ import { WButton } from "../leafletClasses";
 import OpSettings from "../dialogs/opSettings";
 import BlockersList from "../dialogs/blockersList";
 import OperationChecklistDialog from "../dialogs/checklist";
-import ExportDialog from "../dialogs/exportDialog";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
 
@@ -72,16 +71,6 @@ const OpButton = WButton.extend({
           this.disable();
           const kl = new KeysList();
           kl.enable();
-        },
-        context: this,
-      },
-      {
-        title: wX("EXPORT OP TITLE"),
-        text: wX("EXPORT OP"),
-        callback: () => {
-          this.disable();
-          const ed = new ExportDialog();
-          ed.enable();
         },
         context: this,
       },
