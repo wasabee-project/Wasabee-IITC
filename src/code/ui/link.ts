@@ -1,4 +1,4 @@
-import { convertColorToHex } from "../auxiliar";
+import { appendFAIcon, convertColorToHex } from "../auxiliar";
 import { addToColorList } from "../skin";
 import wX from "../wX";
 
@@ -18,6 +18,7 @@ export function displayFormat(
   );
   const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
   arrow.style.color = convertColorToHex(link.getColor(operation));
+  appendFAIcon("carret-right", arrow);
   const picker = L.DomUtil.create("input", "hidden-color-picker", arrow);
   picker.type = "color";
   picker.value = convertColorToHex(link.getColor(operation));

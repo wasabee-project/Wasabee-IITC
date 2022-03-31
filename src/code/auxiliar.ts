@@ -13,6 +13,7 @@ import { faBan } from "@fortawesome/free-solid-svg-icons/faBan";
 import { faPalette } from "@fortawesome/free-solid-svg-icons/faPalette";
 import { faAsterisk } from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import { faDesktop } from "@fortawesome/free-solid-svg-icons/faDesktop";
+import { faCaretRight } from "@fortawesome/free-solid-svg-icons/faCaretRight";
 
 function newColors(incoming: string) {
   switch (incoming) {
@@ -55,6 +56,7 @@ const icons = {
   palette: faPalette,
   asterisk: faAsterisk,
   desktop: faDesktop,
+  "carret-right": faCaretRight,
 };
 
 export function appendFAIcon(iconName: keyof typeof icons, container: Element) {

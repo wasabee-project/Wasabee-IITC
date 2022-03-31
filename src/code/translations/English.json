@@ -318,7 +318,7 @@
   "OP_CHECKLIST": "Operation Checklist: {opName}",
   "OP_NAME_UNSET": "Operation Name was Unset",
   "OP_PERMS": "Op Permissions",
-  "OP_SETTINGS_BUTTON": "Op ⚙",
+  "OP_SETTINGS_BUTTON": "Op Settings",
   "OP_SETTINGS_TITLE": "Operation Settings",
   "OPEN_REQUEST": "[open request]",
   "OPER_COLOR": "Operation Color:",

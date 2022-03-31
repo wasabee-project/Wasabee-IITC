@@ -458,8 +458,9 @@
     padding: .25em
 }
 
-.wasabee-link-seperator:before {
-    content: " ➾ ";
+.wasabee-link-seperator {
+  padding-left: .5em;
+  padding-right: .5em;
 }
 
 /* in our dialogs and popups, use a darker green for ENL for better contrast */
