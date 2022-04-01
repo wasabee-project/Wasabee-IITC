@@ -35,7 +35,7 @@ const MarkerAddDialog = WDialog.extend({
     if (
       this._selectedPortal &&
       PortalUI.getSelected() &&
-      this._selectedPortal.id != PortalUI.getSelected().id &&
+      this._selectedPortal.id !== PortalUI.getSelected().id &&
       this._bulk.checked
     ) {
       this._selectedPortal = PortalUI.getSelected();
@@ -48,8 +48,6 @@ const MarkerAddDialog = WDialog.extend({
         );
       return;
     }
-
-    this._type.textContent = "";
 
     // zones can be populated even if portal not selected
     this._zones.textContent = ""; // do we need to do this every time? the zone list can change while this dialog is open.
@@ -69,6 +67,7 @@ const MarkerAddDialog = WDialog.extend({
       this._assign.appendChild(option);
     }
 
+    this._type.textContent = "";
     this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
