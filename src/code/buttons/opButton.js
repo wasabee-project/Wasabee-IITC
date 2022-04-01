@@ -2,6 +2,7 @@ import { WButton } from "../leafletClasses";
 import OpSettings from "../dialogs/opSettings";
 import BlockersList from "../dialogs/blockersList";
 import OperationChecklistDialog from "../dialogs/checklist";
+import MarkerList from "../dialogs/markerList";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
 import { redo, redoable, undo, undoable } from "../undo";
@@ -59,6 +60,16 @@ const OpButton = WButton.extend({
           this.disable();
           const cl = new OperationChecklistDialog();
           cl.enable();
+        },
+        context: this,
+      },
+      {
+        title: wX("MARKER LIST TITLE"),
+        text: wX("MARKER LIST"),
+        callback: () => {
+          this.disable();
+          const ml = new MarkerList();
+          ml.enable();
         },
         context: this,
       },
