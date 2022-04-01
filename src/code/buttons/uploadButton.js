@@ -8,7 +8,7 @@ import {
 import { WasabeeMe } from "../model";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
-import MergeDialog from "../dialogs/mergeDialog";
+import ConflictDialog from "../dialogs/conflictDialog";
 import wX from "../wX";
 import { displayError, displayInfo } from "../error";
 
@@ -143,12 +143,12 @@ const UploadButton = WButton.extend({
           md.enable();
         } else {
           const lastOp = await opPromise(operation.ID);
-          const md = new MergeDialog({
+          const md = new ConflictDialog({
             title: wX("UPDATE_CONFLICT_TITLE"),
             opOwn: getSelectedOperation(),
             opRemote: lastOp,
             updateCallback: (op) => this.doUpdate(op, true),
-            cancelText: wX("dialog.merge.cancel_upload"),
+            cancelText: wX("dialog.conflict.cancel_upload"),
           });
           md.enable();
         }

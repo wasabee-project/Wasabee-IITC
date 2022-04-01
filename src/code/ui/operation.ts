@@ -3,7 +3,7 @@ import wX from "../wX";
 
 import { WasabeeMe, WasabeeOp } from "../model";
 import { GetWasabeeServer } from "../config";
-import MergeDialog from "../dialogs/mergeDialog";
+import ConflictDialog from "../dialogs/conflictDialog";
 import {
   displayInfo,
   ServerError,
@@ -103,7 +103,7 @@ export async function updateLocalOp(local, remote) {
 
   // In case of selected op, suggest merge to the user
   if (so === op) {
-    const con = new MergeDialog({
+    const con = new ConflictDialog({
       opOwn: so,
       opRemote: remote,
     });
@@ -187,7 +187,7 @@ export async function syncOp(opID: OpID) {
     if (!localOp.localchanged) {
       await remoteOp.store();
     } else {
-      const con = new MergeDialog({
+      const con = new ConflictDialog({
         opOwn: localOp,
         opRemote: remoteOp,
       });

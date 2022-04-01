@@ -110,7 +110,7 @@ export function wX(
   key: "dialog.leave_team.title",
   data: { teamName: string }
 ): string;
-export function wX(key: "dialog.merge.zone", data: { name: string }): string;
+export function wX(key: "dialog.conflict.zone", data: { name: string }): string;
 export function wX(
   key: "dialog.ops_list.download",
   data: { opName: string }

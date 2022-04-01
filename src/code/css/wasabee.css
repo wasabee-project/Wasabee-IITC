@@ -532,7 +532,7 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   padding-left: 1em;
 }
 
-.wasabee-dialog-merge .conflicts {
+.wasabee-dialog-conflict .conflicts {
   border-collapse: collapse;
   empty-cells: show;
   width: 100%;
@@ -540,37 +540,37 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   background: #0004;
 }
 
-.wasabee-dialog-merge .conflicts tr:nth-child(2n + 1) {
+.wasabee-dialog-conflict .conflicts tr:nth-child(2n + 1) {
   background: #0004;
 }
 
-.wasabee-dialog-merge .conflicts td,
-.wasabee-dialog-merge .conflicts th {
+.wasabee-dialog-conflict .conflicts td,
+.wasabee-dialog-conflict .conflicts th {
   border-width: 0 1px;
   border-style: solid;
   padding: 3px 4px;
   text-align: left;
   vertical-align: baseline;
 }
-.wasabee-dialog-merge .conflicts td:first-child,
-.wasabee-dialog-merge .conflicts th:first-child {
+.wasabee-dialog-conflict .conflicts td:first-child,
+.wasabee-dialog-conflict .conflicts th:first-child {
   border-left-width: 0;
 }
-.wasabee-dialog-merge .conflicts td:last-child,
-.wasabee-dialog-merge .conflicts th:last-child {
+.wasabee-dialog-conflict .conflicts td:last-child,
+.wasabee-dialog-conflict .conflicts th:last-child {
   border-right-width: 0;
 }
 
-.wasabee-dialog-merge .conflicts th:nth-child(2),
-.wasabee-dialog-merge .conflicts th:nth-child(3) {
+.wasabee-dialog-conflict .conflicts th:nth-child(2),
+.wasabee-dialog-conflict .conflicts th:nth-child(3) {
   width: 2em;
 }
 
-.wasabee-dialog-merge .strike {
+.wasabee-dialog-conflict .strike {
   text-decoration: line-through red;
   padding-right: .5em;
 }
-.wasabee-dialog-merge .diff-label {
+.wasabee-dialog-conflict .diff-label {
   padding-right: .5em;
 }
 
