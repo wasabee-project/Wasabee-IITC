@@ -88,10 +88,15 @@ const MarkerAddDialog = WDialog.extend({
           localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY];
       }
 
-      for (const k of WasabeeMarker.markerTypes) {
+      const types = Array.from(WasabeeMarker.markerTypes).map((t) => [
+        t,
+        wX(t),
+      ]);
+      types.sort((t1, t2) => t1[1].localeCompare(t2[1]));
+      for (const [k, wx] of types) {
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
-        o.textContent = wX(k);
+        o.textContent = wx;
       }
       this._type.value = defaultType;
     } else {
