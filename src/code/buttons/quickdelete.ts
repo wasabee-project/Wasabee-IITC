@@ -12,7 +12,7 @@ const W: Wasabee = window.plugin.wasabee;
 class QuickDeleteButton extends WButton {
   static TYPE = "QuickdeleteButton";
 
-  needWritePermission: true;
+  needWritePermission = true;
 
   handler: QuickDeleteHandler;
   state: "off" | "on" | "instant";

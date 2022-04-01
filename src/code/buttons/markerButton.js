@@ -9,6 +9,8 @@ const MarkerButton = WButton.extend({
     TYPE: "MarkerButton",
   },
 
+  needWritePermission: true,
+
   initialize: function (container) {
     this.type = MarkerButton.TYPE;
     this.title = wX("MARKERS BUTTON TITLE");
