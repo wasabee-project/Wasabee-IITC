@@ -432,6 +432,8 @@
   "TEAMS BUTTON TITLE": "List Wasabee Teams",
   "TEAMS BUTTON": "Teams",
   "TO_PORT": "To Portal",
+  "toolbar.op.redo": "Redo",
+  "toolbar.op.undo": "Undo",
   "toolbar.quick_delete.apply.text": "Apply",
   "toolbar.quick_delete.apply.title": "Delete selected links/markers",
   "toolbar.quick_delete.cancel.text": "Cancel",

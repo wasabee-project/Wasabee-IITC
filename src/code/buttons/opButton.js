@@ -4,6 +4,7 @@ import BlockersList from "../dialogs/blockersList";
 import OperationChecklistDialog from "../dialogs/checklist";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
+import { redo, redoable, undo, undoable } from "../undo";
 
 const OpButton = WButton.extend({
   statics: {
@@ -32,8 +33,14 @@ const OpButton = WButton.extend({
     });
   },
 
+  update: function () {
+    WButton.prototype.update.call(this);
+    this.button.title = wX("OP_BUTTON");
+    this.setSubActions(this.getSubActions());
+  },
+
   getSubActions: function () {
-    return [
+    const actions = [
       {
         title: wX("OP_SETTINGS_TITLE"),
         text: wX("OP_SETTINGS_BUTTON"),
@@ -75,6 +82,30 @@ const OpButton = WButton.extend({
         context: this,
       },
     ];
+
+    if (undoable()) {
+      actions.push({
+        title: wX("toolbar.op.undo"),
+        text: wX("toolbar.op.undo"),
+        callback: () => {
+          undo();
+        },
+        context: this,
+      });
+    }
+
+    if (redoable()) {
+      actions.push({
+        title: wX("toolbar.op.redo"),
+        text: wX("toolbar.op.redo"),
+        callback: () => {
+          redo();
+        },
+        context: this,
+      });
+    }
+
+    return actions;
   },
 
   // enable: // default is good
