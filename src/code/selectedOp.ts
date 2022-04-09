@@ -1,7 +1,6 @@
 import WasabeeOp from "./model/operation";
 import WasabeeBlocker from "./model/blocker";
 import wX from "./wX";
-import { generateId } from "./auxiliar";
 import { displayError } from "./error";
 import type { LeafletEvent } from "leaflet";
 
@@ -227,20 +226,24 @@ export async function duplicateOperation(opID: OpID) {
   let op: WasabeeOp = null;
   if (opID == window.plugin.wasabee._selectedOp.ID) {
     op = window.plugin.wasabee._selectedOp;
-    await op.store();
   } else {
     op = await WasabeeOp.load(opID);
   }
 
   // XXX op.toExport() might be helpful here
 
-  op.ID = generateId();
-  op.name = op.name + " " + new Date().toUTCString();
-  op.creator = window.PLAYER.nickname;
-  op.teamlist = null;
-  op.fetched = null;
-  op.keysonhand = [];
-  op.cleanAll();
+  op = new WasabeeOp({
+    name: op.name + " " + new Date().toUTCString(),
+    creator: window.PLAYER.nickname,
+    opportals: op.opportals,
+    // anchors infered from links/markers
+    links: op.links,
+    markers: op.markers,
+    color: op.color,
+    comment: op.comment,
+    zones: op.zones,
+    referencetime: op.referencetime,
+  });
   await op.store();
   return op;
 }

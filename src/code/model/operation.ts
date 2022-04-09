@@ -125,6 +125,9 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
 
+    // fix broken lasteditid by <=0.21.2 or rare occasion (leading to deadlock)
+    if (!this.server) delete this.lasteditid;
+
     this.background = !!obj.background;
 
     if (!this.links) this.links = [];
