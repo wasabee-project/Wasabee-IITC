@@ -125,9 +125,6 @@ const UploadButton = WButton.extend({
       this.button.classList.add("loading");
       const success = await updateOpPromise(operation);
       if (success) {
-        operation.localchanged = false;
-        operation.fetched = new Date().toUTCString();
-        operation.fetchedOp = JSON.stringify(operation);
         await operation.store();
         // reload if we use rebase
         if (operation != getSelectedOperation())

@@ -278,6 +278,7 @@ export async function opPromise(opID: OpID) {
     newop.localchanged = false;
     newop.server = GetWasabeeServer();
     newop.fetchedOp = JSON.stringify(raw);
+    newop.fetched = new Date().toUTCString();
     return newop;
   } catch (e) {
     if (!(e instanceof ServerError)) {
@@ -344,8 +345,10 @@ export async function updateOpPromise(operation: WasabeeOp) {
     });
     operation.lasteditid = update.updateID;
     operation.remoteChanged = false;
+    operation.localchanged = false;
     operation.fetched = new Date().toUTCString();
-    operation.fetchedOp = JSON.stringify(operation);
+    operation.fetchedOp = json;
+    operation.server = GetWasabeeServer();
     return true;
   } catch (e) {
     if (!(e instanceof ServerError)) {

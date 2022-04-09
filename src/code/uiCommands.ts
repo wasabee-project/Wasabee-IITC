@@ -426,13 +426,19 @@ export async function updateLocalOp(local, remote) {
     await remote.store();
     return false;
   }
-  if (local.lasteditid == remote.lasteditid) {
-    // nothing to do
-    return false;
-  }
 
   // if selected op, use current selected op object
   const op = local.ID != so.ID ? local : so;
+
+  if (op.lasteditid == remote.lasteditid) {
+    // nothing to do except .server update
+    if (op.server !== remote.server) {
+      op.server = remote.server;
+      await op.store();
+      return op.ID === so.ID;
+    }
+    return false;
+  }
 
   // no changes
   if (!op.checkChanges()) {
