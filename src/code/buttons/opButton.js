@@ -87,6 +87,7 @@ const OpButton = WButton.extend({
       actions.push({
         title: wX("toolbar.op.undo"),
         text: wX("toolbar.op.undo"),
+        accesskey: "z",
         callback: () => {
           undo();
         },
@@ -98,6 +99,7 @@ const OpButton = WButton.extend({
       actions.push({
         title: wX("toolbar.op.redo"),
         text: wX("toolbar.op.redo"),
+        accesskey: "y",
         callback: () => {
           redo();
         },

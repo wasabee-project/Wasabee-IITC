@@ -73,6 +73,7 @@ export declare type ButtonOptions = {
   buttonImage?: string;
   className?: string;
   img?: string;
+  accesskey?: string;
 };
 export declare class WButton extends L.Class {
   title: string;
