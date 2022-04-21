@@ -5,6 +5,7 @@ import OperationChecklistDialog from "../dialogs/checklist";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
 import { redo, redoable, undo, undoable } from "../undo";
+import { postToFirebase } from "../firebase/logger";
 
 const OpButton = WButton.extend({
   statics: {
@@ -89,6 +90,7 @@ const OpButton = WButton.extend({
         text: wX("toolbar.op.undo"),
         accesskey: "z",
         callback: () => {
+          postToFirebase({ id: "analytics", action: "undo" });
           undo();
         },
         context: this,
@@ -101,6 +103,7 @@ const OpButton = WButton.extend({
         text: wX("toolbar.op.redo"),
         accesskey: "y",
         callback: () => {
+          postToFirebase({ id: "analytics", action: "redo" });
           redo();
         },
         context: this,
