@@ -119,8 +119,11 @@ const OperationChecklistDialog = WDialog.extend({
           oif.value = value;
           oif.size = 3;
           oif.disabled = !canWrite;
+          oif.type = "number";
+          oif.step = 1;
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
+            oif.value = parseInt(oif.value, 10);
             if (thing instanceof WasabeeLink) {
               operation.setLinkOrder(thing.ID, +oif.value);
             } else {
