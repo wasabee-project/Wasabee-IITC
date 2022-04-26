@@ -2,12 +2,10 @@ import { WButton, WTooltip } from "../leafletClasses";
 import wX from "../wX";
 
 import type { Wasabee } from "../init";
-import type { WLMarker } from "../ui/marker";
-import type { WLLink } from "../ui/link";
+import type { WLAnchor, WLLink, WLMarker } from "../map";
 import type { LeafletMouseEvent } from "leaflet";
 import { getSelectedOperation } from "../selectedOp";
-import type { WLAnchor } from "../ui/anchor";
-import { postToFirebase } from "../firebaseSupport";
+import { postToFirebase } from "../firebase/logger";
 
 const W: Wasabee = window.plugin.wasabee;
 

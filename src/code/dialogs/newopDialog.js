@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeOp from "../model/operation";
+import { WasabeeOp } from "../model";
 import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";

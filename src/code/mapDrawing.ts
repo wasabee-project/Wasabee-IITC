@@ -1,15 +1,10 @@
-import WasabeeMe from "./model/me";
-import WasabeeTeam from "./model/team";
-import WasabeeAgent from "./model/agent";
-import WasabeeOp from "./model/operation";
+import type WasabeeAgent from "./model/agent";
+import { WasabeeMe, WasabeeOp } from "./model";
 import { getSelectedOperation, opsList } from "./selectedOp";
 
-import LinkUI from "./ui/link";
-import AnchorUI from "./ui/anchor";
-import AgentUI from "./ui/agent";
-import MarkerUI from "./ui/marker";
-import ZoneUI from "./ui/zone";
+import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { PathOptions } from "leaflet";
+import { getAgent, getMe, getTeam } from "./model/cache";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -44,7 +39,7 @@ function updateMarkers(op: WasabeeOp) {
       ll.setState(m.state);
       layerMap.delete(m.ID);
     } else {
-      const lMarker = new MarkerUI.WLMarker(m);
+      const lMarker = new WLMarker(m);
       lMarker.addTo(Wasabee.markerLayerGroup);
     }
   }
@@ -64,7 +59,7 @@ function resetLinks(operation: WasabeeOp) {
   if (!operation.links || operation.links.length == 0) return;
 
   for (const l of operation.links) {
-    const link = new LinkUI.WLLink(l, operation);
+    const link = new WLLink(l, operation);
     link.addTo(Wasabee.linkLayerGroup);
   }
 }
@@ -109,7 +104,7 @@ function resetZones(operation: WasabeeOp) {
   if (!operation.zones || operation.zones.length == 0) return;
 
   for (const z of operation.zones) {
-    const l = new ZoneUI.WLZone(z);
+    const l = new WLZone(z);
     l.addTo(Wasabee.zoneLayerGroup);
   }
   Wasabee.zoneLayerGroup.bringToBack();
@@ -123,7 +118,7 @@ export async function drawAgents() {
   const layerMap = agentLayerMap();
 
   let doneAgents = [];
-  const me = await WasabeeMe.waitGet(); // cache hold-time age is 24 hours... not too frequent
+  const me = await getMe(); // cache hold-time age is 24 hours... not too frequent
   for (const t of me.Teams) {
     const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
     doneAgents = doneAgents.concat(freshlyDone);
@@ -159,7 +154,7 @@ export async function drawSingleTeam(
 
   /* this also caches the team into Wasabee.teams for uses elsewhere */
   try {
-    const team = await WasabeeTeam.get(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
+    const team = await getTeam(teamID, 15); // hold time is 15 seconds here, probably too aggressive now that firebase works well
     // common case: team was enabled here, but was since disabled in another client and the pull returned an error
     if (team == null) return done;
 
@@ -177,7 +172,7 @@ export async function drawSingleTeam(
 // draws a single agent -- can be triggered by firebase
 export async function drawSingleAgent(gid: GoogleID) {
   if (window.isLayerGroupDisplayed("Wasabee Agents") === false) return; // yes, === false, undefined == true
-  const agent = await WasabeeAgent.get(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
+  const agent = await getAgent(gid, 10); // cache default is 1 day, we can be faster if firebase tells us of an update
   if (agent != null) _drawAgent(agent);
 }
 
@@ -189,7 +184,7 @@ function _drawAgent(agent: WasabeeAgent, layerMap = agentLayerMap()) {
 
   if (!layerMap.has(agent.id)) {
     // new, add to map
-    const marker = new AgentUI.WLAgent(agent);
+    const marker = new WLAgent(agent);
     marker.addTo(Wasabee.agentLayerGroup);
     layerMap.set(agent.id, Wasabee.agentLayerGroup.getLayerId(marker));
   } else {
@@ -228,7 +223,7 @@ function updateAnchors(op: WasabeeOp) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
-      const lAnchor = new AnchorUI.WLAnchor(a, op);
+      const lAnchor = new WLAnchor(a, op);
       lAnchor.addTo(Wasabee.portalLayerGroup);
     }
   }

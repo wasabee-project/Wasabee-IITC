@@ -1,13 +1,12 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
-import WasabeeMe from "../model/me";
-import WasabeeMarker from "../model/marker";
+import { WasabeeMe, WasabeeMarker } from "../model";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const KeysList = WDialog.extend({
   statics: {

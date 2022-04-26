@@ -1,73 +1,12 @@
-import PortalUI from "./portal";
+import { getSelected, displayName, displayFormat } from "./../ui/portal";
+import { formatDisplay, timeSinceformat } from "../ui/agent";
 import ConfirmDialog from "../dialogs/confirmDialog";
-import AgentDialog from "../dialogs/agentDialog";
 import { targetPromise } from "../server";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import WasabeeAgent from "../model/agent";
 import { displayInfo, displayWarning } from "../error";
-
-/**
- * @param {WasabeeAgent} agent
- * @returns html anchor with agent name (and verification states)
- */
-function formatDisplay(agent) {
-  const display = L.DomUtil.create("a", "wasabee-agent-label");
-  if (agent.Vverified || agent.rocks) {
-    L.DomUtil.addClass(display, "enl");
-  }
-  if (agent.blacklisted) {
-    L.DomUtil.addClass(display, "res");
-  }
-  L.DomEvent.on(display, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const ad = new AgentDialog({ gid: agent.id });
-    ad.enable();
-  });
-
-  let prefix = "";
-  if (agent.communityname) prefix += "C";
-  if (agent.Vverified) prefix += "V";
-  else if (agent.vname === agent.name) prefix += "v";
-  if (agent.rocks) prefix += "R";
-  else if (agent.rocksname === agent.name) prefix += "r";
-  if (agent.intelname) {
-    // no identity source exept intel
-    if (!agent.rocksname && !agent.vname) prefix += "I";
-    // no verified source
-    else if (!agent.rocks && !agent.Vverified) prefix += "I";
-    // match server preference
-    else if (agent.intelname === agent.name) prefix += "I";
-    // match server preference, in lower case
-    else if (agent.intelname.toLowerCase() === agent.name.toLowerCase())
-      prefix += "i";
-  }
-
-  display.textContent = prefix
-    ? `[${prefix}] ` + agent.getName()
-    : agent.getName();
-  return display;
-}
-
-function timeSinceformat(agent) {
-  if (!agent.date) return "";
-  const date = Date.parse(agent.date + "Z");
-  if (Number.isNaN(date)) return `(${agent.date} UTC)`; // FireFox Date.parse no good
-  if (date == 0) return "";
-
-  const seconds = Math.floor((Date.now() - date) / 1000);
-  if (seconds < 0) return "";
-  let interval = Math.floor(seconds / 31536000 / 2592000 / 86400);
-
-  if (interval > 1) return wX("AGES");
-  interval = Math.floor(seconds / 3600);
-  if (interval > 1) return wX("HOURS", { hours: interval });
-  interval = Math.floor(seconds / 60);
-  if (interval > 1) return wX("MINUTES", { minutes: interval });
-  interval = Math.floor(seconds);
-  return wX("SECONDS", { seconds: interval });
-}
+import { getAgent } from "../model/cache";
 
 // change this to return an L.Marker() to make the logic in mapDrawing simpler
 function icon(agent, z = 7) {
@@ -141,7 +80,7 @@ function bigIcon(agent) {
   return icon;
 }
 
-const WLAgent = L.Marker.extend({
+export const WLAgent = L.Marker.extend({
   initialize: function (agent) {
     const zoom = window.map.getZoom();
     L.Marker.prototype.initialize.call(this, agent.latLng, {
@@ -194,7 +133,7 @@ const WLAgent = L.Marker.extend({
     time.id = agent.id;
     time.textContent = timeSinceformat(agent);
 
-    WasabeeAgent.get(this.options.id)
+    getAgent(this.options.id)
       .then(formatDisplay)
       .then((fd) => {
         title.textContent = "";
@@ -206,7 +145,7 @@ const WLAgent = L.Marker.extend({
     sendTarget.textContent = wX("SEND TARGET");
     L.DomEvent.on(sendTarget, "click", (ev) => {
       L.DomEvent.stop(ev);
-      const selectedPortal = PortalUI.getSelected();
+      const selectedPortal = getSelected();
       if (!selectedPortal) {
         displayWarning(wX("SELECT PORTAL"));
         return;
@@ -215,7 +154,7 @@ const WLAgent = L.Marker.extend({
       const d = new ConfirmDialog({
         title: wX("SEND TARGET"),
         label: wX("SEND TARGET CONFIRM", {
-          portalName: PortalUI.displayName(selectedPortal),
+          portalName: displayName(selectedPortal),
           agent: agent.getName(),
         }),
         type: "agent",
@@ -238,15 +177,9 @@ const WLAgent = L.Marker.extend({
       const a = L.DomUtil.create("li", "assignment", assignments);
       const portal = op.getPortal(m.portalId);
       a.textContent = `${m.order}: ${wX(m.type)} `;
-      a.appendChild(PortalUI.displayFormat(portal));
+      a.appendChild(displayFormat(portal));
     }
 
     return content;
   },
 });
-
-export default {
-  formatDisplay,
-  WLAgent,
-  timeSinceformat,
-};

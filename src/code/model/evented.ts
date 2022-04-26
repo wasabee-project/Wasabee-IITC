@@ -27,7 +27,7 @@ export default class Evented {
   }
 
   off(event: string, func: (data: unknown) => void, context?: unknown) {
-    const listeners = this._events[event].slice();
+    const listeners = this._events[event];
     if (listeners) {
       for (const listener of listeners) {
         if (listener.fct === func && listener.context === context) {
@@ -40,7 +40,7 @@ export default class Evented {
   }
 
   fire(event: string, data?: unknown) {
-    const listeners = this._events[event].slice();
+    const listeners = (this._events[event] || []).slice();
     if (listeners) {
       for (const listener of listeners) {
         const fct = listener.fct;

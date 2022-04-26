@@ -1,7 +1,8 @@
-import WasabeeOp from "./model/operation";
-import WasabeeBlocker from "./model/blocker";
+import { WasabeeOp, WasabeeBlocker } from "./model";
 import wX from "./wX";
-import { displayError } from "./error";
+import { displayError, displayWarning } from "./error";
+import { setSelectedOp } from "./model/operation";
+
 import type { LeafletEvent } from "leaflet";
 
 function setRestoreOpID(opID: OpID) {
@@ -88,10 +89,18 @@ export async function makeSelectedOperation(opID: OpID) {
   // remove old listeners ? old object should never .store
   op.on("update", () => window.map.fire("wasabee:op:change"));
   op.on("blockers", () => window.map.fire("wasabee:crosslinks"));
+  op.on(
+    "corrupt",
+    (data: { portals: number; links: number; markers: number }) =>
+      displayWarning(
+        `Oops, something went wrong and OP ${op.name} got corrupted. Fix by removing ${data.portals} missing portals and ${data.links} links and ${data.markers} markers. Please check your OP and report to the devs.`
+      )
+  );
 
   // the only place we should change the selected op.
   delete window.plugin.wasabee._selectedOp;
   window.plugin.wasabee._selectedOp = op;
+  setSelectedOp(op);
   setRestoreOpID(window.plugin.wasabee._selectedOp.ID);
 
   if (previousID !== opID) {

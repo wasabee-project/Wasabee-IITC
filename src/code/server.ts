@@ -1,5 +1,4 @@
-import WasabeeMe from "./model/me";
-import WasabeeOp from "./model/operation";
+import { WasabeeMe, WasabeeOp } from "./model";
 import { getSelectedOperation, removeOperation } from "./selectedOp";
 import { ServerError } from "./error";
 import type { TaskState } from "./model/task";
@@ -92,8 +91,8 @@ export function oneTimeToken(token) {
 
 /**** me & d ****/
 
-// returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
-// use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
+// returns a promise to WasabeeMe -- should be called only by getMe()
+// use WasabeeMe.cacheGet for caching
 export function mePromise() {
   return genericGet("/api/v1/me");
 }
@@ -148,7 +147,7 @@ export function dKeyBulkPromise(json: string) {
 
 /* agent */
 
-// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
+// returns a promise to get the agent's JSON data from the server -- should be called only by getAgent()
 export function agentPromise(GID: GoogleID) {
   return genericGet<WasabeeAgent>(`/api/v1/agent/${GID}`);
 }
@@ -174,8 +173,8 @@ export function targetPromise(
 
 /* team */
 
-// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
-// use WasabeeTeam.get
+// returns a promise to a WasabeeTeam -- used only by getTeam
+// use getTeam
 export function teamPromise(teamid: TeamID) {
   return genericGet<WasabeeTeam>(`/api/v1/team/${teamid}`);
 }

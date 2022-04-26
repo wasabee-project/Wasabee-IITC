@@ -1,11 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeTeam from "../model/team";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import { addPermPromise, delPermPromise } from "../server";
 import wX from "../wX";
 import { displayError } from "../error";
+import { getTeam, getMe } from "../model/cache";
 
 const OpPermList = WDialog.extend({
   statics: {
@@ -15,7 +15,7 @@ const OpPermList = WDialog.extend({
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
     if (WasabeeMe.isLoggedIn()) {
-      this._me = await WasabeeMe.waitGet();
+      this._me = await getMe();
     } else {
       this._me = null;
     }
@@ -33,7 +33,7 @@ const OpPermList = WDialog.extend({
     const operation = getSelectedOperation();
     // logged in while dialog open...
     if (!this._me && WasabeeMe.isLoggedIn()) {
-      this._me = await WasabeeMe.waitGet();
+      this._me = await getMe();
     }
 
     if (!operation.isServerOp()) this.closeDialog();
@@ -72,7 +72,7 @@ const OpPermList = WDialog.extend({
         value: async (perm) => {
           if (this._me && operation.isOnCurrentServer()) {
             // try the team cache first
-            const t = await WasabeeTeam.get(perm.teamid);
+            const t = await getTeam(perm.teamid);
             if (t) return t.name;
             // check the "me" list
             if (this._me) {

@@ -1,5 +1,5 @@
 import { WButton } from "../leafletClasses";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import TeamListDialog from "../dialogs/teamListDialog";
 import OpsDialog from "../dialogs/opsDialog";
 import AuthDialog from "../dialogs/authDialog";
@@ -8,7 +8,7 @@ import SettingsDialog from "../dialogs/settingsDialog.js";
 import DefensiveKeysDialog from "../dialogs/defensiveKeysDialog";
 import { wX } from "../wX";
 import { logoutPromise } from "../server";
-import { postToFirebase } from "../firebaseSupport";
+import { postToFirebase } from "../firebase/logger";
 import { displayError } from "../error";
 
 const WasabeeButton = WButton.extend({

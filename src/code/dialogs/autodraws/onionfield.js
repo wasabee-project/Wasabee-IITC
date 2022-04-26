@@ -1,10 +1,11 @@
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
-import { portalInField } from "../../crosslinks";
-import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+import { portalInField } from "../../geo";
+import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { displayError } from "../../error";
+import { getAllPortalsOnScreen } from "../../ui/portal";
 
 /**
  * Sort trangle vertices by widest angle

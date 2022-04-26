@@ -5,13 +5,13 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadBlockerFaked,
-  blockerAutomark,
-} from "../uiCommands";
+} from "../ui/portal";
+import { blockerAutomark } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeBlocker } from "../model";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const BlockerList = WDialog.extend({
   statics: {

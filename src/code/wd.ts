@@ -1,13 +1,13 @@
-import WasabeeMe from "./model/me";
+import { WasabeeMe } from "./model";
 import { dKeylistPromise } from "./server";
-import WasabeeAgent from "./model/agent";
 import wX from "./wX";
 // import { getPortalDetails } from "./uiCommands";
 
-import AgentUI from "./ui/agent";
+import * as AgentUI from "./ui/agent";
 import type { LayerEvent, LayerGroup } from "leaflet";
 
 import db from "./db";
+import { getAgent } from "./model/cache";
 
 export type WDKey = {
   Name: string;
@@ -156,7 +156,7 @@ async function getMarkerPopup(PortalID: PortalID) {
 
   // since there is an await in here, it can't be in the while loop above
   for (const dk of dks) {
-    const a = await WasabeeAgent.get(dk.GID);
+    const a = await getAgent(dk.GID);
     const li = L.DomUtil.create("li", null, ul);
     if (a) {
       li.appendChild(AgentUI.formatDisplay(a));

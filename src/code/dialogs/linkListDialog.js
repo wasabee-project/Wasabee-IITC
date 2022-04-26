@@ -1,10 +1,10 @@
 import OperationChecklistDialog from "./checklist.js";
 import wX from "../wX";
-import { loadFaked } from "../uiCommands";
+import { loadFaked } from "../ui/portal";
 import { getSelectedOperation } from "../selectedOp";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
 
 const LinkListDialog = OperationChecklistDialog.extend({
   statics: {

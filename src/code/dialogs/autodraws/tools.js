@@ -1,10 +1,9 @@
 import { WDialog } from "../../leafletClasses";
-import WasabeeMarker from "../../model/marker";
+import { WasabeeMarker } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
 import wX from "../../wX";
-import { getAllPortalsOnScreen } from "../../uiCommands";
 
-import PortalUI from "../../ui/portal";
+import * as PortalUI from "../../ui/portal";
 import { displayError } from "../../error";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
@@ -71,7 +70,7 @@ export const AutoDraw = WDialog.extend({
           }
         }
       } else {
-        const portals = getAllPortalsOnScreen(this._operation);
+        const portals = PortalUI.getAllPortalsOnScreen(this._operation);
         if (portalSet.zone == 0) portalSet.portals = portals;
         else {
           const ids = new Set(portalSet.portals.map((p) => p.id));

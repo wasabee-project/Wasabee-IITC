@@ -4,7 +4,7 @@ const zoneShape = {
   fill: true,
 };
 
-const WLZone = L.LayerGroup.extend({
+export const WLZone = L.LayerGroup.extend({
   initialize: function (zone) {
     zone.points.sort((a, b) => {
       return a.position - b.position;
@@ -25,7 +25,3 @@ const WLZone = L.LayerGroup.extend({
     L.LayerGroup.prototype.initialize.call(this, [layer]);
   },
 });
-
-export default {
-  WLZone,
-};

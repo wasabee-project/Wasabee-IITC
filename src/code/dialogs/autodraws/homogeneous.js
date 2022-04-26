@@ -1,5 +1,5 @@
 import { AutoDraw } from "./tools";
-import WasabeePortal from "../../model/portal";
+import { WasabeePortal } from "../../model";
 import { getSelectedOperation } from "../../selectedOp";
 import {
   extendLatLngToLLC,
@@ -7,11 +7,12 @@ import {
   portalInField,
   dist2,
   fieldCenter,
-} from "../../crosslinks";
-import { clearAllLinks, getAllPortalsOnScreen } from "../../uiCommands";
+} from "../../geo";
+import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 
 import { displayError, displayWarning } from "../../error";
+import { getAllPortalsOnScreen } from "../../ui/portal";
 
 /**
  * Split a set of portals inside a field into three sets with respect to a portal in the field

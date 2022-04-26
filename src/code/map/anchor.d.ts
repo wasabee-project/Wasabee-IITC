@@ -1,7 +1,7 @@
 import type WasabeeOp from "../model/operation";
-import PortalUI from "./portal";
+import { WLPortal } from "./portal";
 
-export class WLAnchor extends PortalUI.WLPortal {
+export class WLAnchor extends WLPortal {
   constructor(portalId: string, operation: WasabeeOp);
   _popupContent(): any;
   _linksButton(container: any): void;

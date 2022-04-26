@@ -1,14 +1,14 @@
 import { AutoDraw } from "./tools";
 import wX from "../../wX";
 import { getSelectedOperation } from "../../selectedOp";
-import { getAllPortalsOnScreen, clearAllLinks } from "../../uiCommands";
+import { clearAllLinks } from "../../ui/operation";
 
-import WasabeePortal from "../../model/portal";
-import WasabeeMarker from "../../model/marker";
+import { WasabeePortal, WasabeeMarker } from "../../model";
 
 import { selectAngleInterval, sortPortalsByAngle } from "./algorithm";
-import { greatCircleArcIntersectByLatLngs } from "../../crosslinks";
+import { greatCircleArcIntersectByLatLngs } from "../../geo";
 import { displayError, displayInfo } from "../../error";
+import { getAllPortalsOnScreen } from "../../ui/portal";
 
 function fastFan(anchor, two, three, portalsSorted, offset, revSortAngle) {
   const res = [];
@@ -141,8 +141,10 @@ const FlipFlopDialog = AutoDraw.extend({
       // check distance order
       for (const [p, p1, p2] of this.best.steps) {
         if (
-          a.latLng.distanceTo(p.latLng) > a.latLng.distanceTo(p1.latLng) ||
-          a.latLng.distanceTo(p.latLng) > a.latLng.distanceTo(p2.latLng)
+          window.map.distance(a.latLng, p.latLng) >
+            window.map.distance(a.latLng, p1.latLng) ||
+          window.map.distance(a.latLng, p.latLng) >
+            window.map.distance(a.latLng, p2.latLng)
         ) {
           match = false;
           break;
@@ -182,7 +184,7 @@ const FlipFlopDialog = AutoDraw.extend({
     if (this.distCache && this.distCache.has(anchor.id))
       return this.distCache.get(anchor.id);
     const dists = new Map(
-      portals.map((p) => [p.id, p.latLng.distanceTo(anchor.latLng)])
+      portals.map((p) => [p.id, window.map.distance(p.latLng, anchor.latLng)])
     );
     if (this.distCache) this.distCache.set(anchor.id, dists);
     return dists;

@@ -14,28 +14,27 @@ import {
 } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
-import { initFirebase, postToFirebase } from "./firebaseSupport";
+import { initFirebase } from "./firebase/init";
+import { onMessage as fbMessageHandler } from "./firebase/event";
+import { postToFirebase } from "./firebase/logger";
 import { initWasabeeD } from "./wd";
-import { listenForPortalDetails, sendLocation } from "./uiCommands";
+import { sendLocation } from "./uiCommands";
+import { listenForPortalDetails } from "./ui/portal";
 import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
-import WasabeeMe from "./model/me";
-import WasabeeOp from "./model/operation";
+import { WasabeeMe, WasabeeOp } from "./model";
 import db from "./db";
 import polyfill from "./polyfill";
 import { displayError, displayWarning } from "./error";
 import { deleteJWT } from "./auth";
-
-import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
-import type { WLAnchor } from "./ui/anchor";
-import type { WLLink } from "./ui/link";
-import type { WLMarker } from "./ui/marker";
-import type { WLAgent } from "./ui/agent";
-import type { WLZone } from "./ui/zone";
-import type { ButtonsControl } from "./leafletClasses";
 import { checkVersion } from "./version";
 import wX from "./wX";
+import { getMe } from "./model/cache";
+
+import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
+import type { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
+import type { ButtonsControl } from "./leafletClasses";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -228,7 +227,7 @@ window.plugin.wasabee.init = async () => {
   });
 
   // late stage initializations
-  initFirebase();
+  initFirebase(fbMessageHandler);
   initCrossLinks();
   initWasabeeD();
 
@@ -256,7 +255,7 @@ window.plugin.wasabee.init = async () => {
   // has not yet expired, we would think we were logged in when really not
   // this forces an update on reload
   if (WasabeeMe.isLoggedIn()) {
-    WasabeeMe.waitGet(true);
+    getMe(true);
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys");

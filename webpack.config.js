@@ -150,8 +150,9 @@ const config = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(png|gif|svg)$/,
-        use: "url-loader",
+        test: /\.svg$/,
+        loader: "raw-loader",
+        options: { esModule: false },
       },
       {
         test: /\.css$/,
@@ -159,7 +160,22 @@ const config = {
           "to-string-loader",
           {
             loader: "css-loader",
-            options: { esModule: false },
+            options: { esModule: false, url: false },
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    "postcss-url",
+                    {
+                      url: "inline",
+                    },
+                  ],
+                ],
+              },
+            },
           },
         ],
       },
