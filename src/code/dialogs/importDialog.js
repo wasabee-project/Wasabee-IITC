@@ -177,6 +177,16 @@ const ImportDialog = WDialog.extend({
       return null;
     }
 
+    let uniqColor = false;
+    for (const line of data) {
+      if (line.type != "polyline" && line.type != "polygon") continue;
+      if (!uniqColor) uniqColor = line.color;
+      else if (uniqColor !== line.color) {
+        uniqColor = false;
+        break;
+      }
+    }
+
     // build a hash map for fast searching of window.portals
     const pmap = this.buildWindowPortalMap();
 
@@ -214,13 +224,17 @@ const ImportDialog = WDialog.extend({
           faked++;
         }
         if (portal && prev) {
-          newop.addLink(prev, portal);
+          newop.addLink(prev, portal, {
+            color: uniqColor ? "main" : line.color,
+          });
         }
         prev = portal;
         if (!first) first = portal;
       }
       if (line.type == "polygon" && first && prev && first != prev) {
-        newop.addLink(prev, first);
+        newop.addLink(prev, first, {
+          color: uniqColor ? "main" : line.color,
+        });
       }
     }
     displayInfo(
