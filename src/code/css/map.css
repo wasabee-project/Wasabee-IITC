@@ -53,6 +53,7 @@
   color: rgb(0, 135, 255) !important;
 }
 
+.wasabee-anchor-popup .info-block,
 .wasabee-link-popup .info-block {
   display: flex;
   justify-content: space-between;
@@ -148,6 +149,9 @@
   text-overflow: ellipsis;
   color: #000;
   padding: 0px 4px;
+}
+.wasabee-anchor-popup .key-missing {
+  color: brown;
 }
 
 .wasabee-anchor-buttonset {

@@ -6,6 +6,7 @@ import wX from "../wX";
 import { displayFormat } from "../ui/portal";
 
 import { WLPortal } from "./portal";
+import { WasabeeMe } from "../model";
 
 export const WLAnchor = WLPortal.extend({
   type: "anchor",
@@ -42,10 +43,49 @@ export const WLAnchor = WLPortal.extend({
     desc.appendChild(displayFormat(portal));
     this._popupPortalComments(desc, portal, canWrite);
 
-    const requiredKeys = L.DomUtil.create("div", "desc", content);
+    const infoBlock = L.DomUtil.create("div", "info-block", content);
+
+    const requiredKeys = L.DomUtil.create("div", "key-required", infoBlock);
+
     const onHand = operation.KeysOnHandForPortal(portal.id);
-    const required = operation.KeysRequiredForPortal(portal.id);
-    requiredKeys.textContent = wX("popup.anchor.keys", { onHand, required });
+    const required = operation.keysRequiredForPortalPerAgent(portal.id);
+    let requiredTotal = 0;
+    for (const id in required) requiredTotal += required[id];
+
+    requiredKeys.textContent = wX("popup.anchor.keys", {
+      onHand,
+      required: requiredTotal,
+    });
+    if (onHand < requiredTotal) requiredKeys.classList.add("key-missing");
+
+    if (WasabeeMe.isLoggedIn()) {
+      const requiredKeysSelf = L.DomUtil.create(
+        "div",
+        "key-required-self",
+        infoBlock
+      );
+      const myCount = operation.KeysOnHandForPortal(
+        portal.id,
+        WasabeeMe.localGet().id
+      );
+      requiredKeysSelf.textContent = wX("popup.anchor.keys_mycount", {
+        myCount,
+        required: required[WasabeeMe.localGet().id] || 0,
+      });
+      if (myCount < (required[WasabeeMe.localGet().id] || 0))
+        requiredKeysSelf.classList.add("key-missing");
+
+      /* check per agent */
+      const onHandPerAgent = operation.keysOnHandForPortalPerAgent(portal.id);
+      if (onHand >= requiredTotal) {
+        for (const id in required) {
+          if (!onHandPerAgent[id] || onHandPerAgent[id] < required[id]) {
+            requiredKeys.classList.add("key-missing");
+            break;
+          }
+        }
+      }
+    }
 
     const buttonSet = L.DomUtil.create(
       "div",

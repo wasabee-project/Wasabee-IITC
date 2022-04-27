@@ -335,6 +335,7 @@
   "PERMS": "{opName} permissions",
   "PLEASE_SELECT_PORTAL": "Please select a portal",
   "popup.anchor.keys": "Keys: {onHand} / {required}",
+  "popup.anchor.keys_mycount": "Me: {myCount} / {required}",
   "popup.marker.state_button": "Set State",
   "PORTAL KEY LIST": "Key list for portal {portalName}",
   "PORTAL_COUNT": "{count} portals",

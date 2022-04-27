@@ -1162,16 +1162,41 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.update(false);
   }
 
-  KeysOnHandForPortal(portalId: PortalID) {
+  KeysOnHandForPortal(portalId: PortalID, gid?: GoogleID) {
     let i = 0;
-    for (const k of this.keysonhand) if (k.portalId == portalId) i += k.onhand;
+    for (const k of this.keysonhand) {
+      if (k.portalId === portalId && (!gid || gid === k.gid)) i += k.onhand;
+    }
     return i;
+  }
+
+  keysOnHandForPortalPerAgent(portalId: PortalID) {
+    const is: { [agentID: GoogleID]: number } = {};
+    for (const k of this.keysonhand) {
+      if (k.portalId == portalId) {
+        if (!(k.gid in is)) is[k.gid] = 0;
+        is[k.gid] += k.onhand;
+      }
+    }
+    return is;
   }
 
   KeysRequiredForPortal(portalId: PortalID) {
     let i = 0;
     for (const l of this.links) if (l.toPortalId == portalId) i++;
     return i;
+  }
+
+  keysRequiredForPortalPerAgent(portalId: PortalID) {
+    const is: { [agentID: GoogleID | "[unassigned]"]: number } = {};
+    for (const l of this.links) {
+      const id = l.assignedTo || "[unassigned]";
+      if (l.toPortalId == portalId) {
+        if (!(id in is)) is[id] = 0;
+        is[id]++;
+      }
+    }
+    return is;
   }
 
   zoneName(zoneID: ZoneID) {
