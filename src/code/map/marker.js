@@ -2,7 +2,7 @@ import SetCommentDialog from "../dialogs/setCommentDialog";
 import MarkerChangeDialog from "../dialogs/markerChangeDialog";
 import StateDialog from "../dialogs/stateDialog";
 import { getSelectedOperation } from "../selectedOp";
-import { deleteMarker } from "../ui/marker";
+import { deleteMarker, swapMarker } from "../ui/marker";
 
 import { displayFormat } from "../ui/portal";
 import { formatDisplay } from "../ui/agent";
@@ -78,6 +78,7 @@ export const WLMarker = WLPortal.extend({
     if (operation.canWriteServer())
       this._assignButton(buttonSet, wX("ASSIGN"), marker);
     if (canWrite) this._stateButton(buttonSet, marker);
+    if (canWrite) this._swapButton(buttonSet, marker);
     if (operation.isOnCurrentServer())
       this._sendTargetButton(buttonSet, wX("SEND TARGET"), marker);
     this._mapButton(buttonSet, wX("ANCHOR_GMAP"));
@@ -121,6 +122,17 @@ export const WLMarker = WLPortal.extend({
       L.DomEvent.stop(ev);
       const sd = new StateDialog({ target: marker, opID: operation.ID });
       sd.enable();
+      this.closePopup();
+    });
+  },
+
+  _swapButton: function (container, marker) {
+    const operation = getSelectedOperation();
+    const swapButton = L.DomUtil.create("button", null, container);
+    swapButton.textContent = wX("SWAP");
+    L.DomEvent.on(swapButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      swapMarker(operation, marker);
       this.closePopup();
     });
   },

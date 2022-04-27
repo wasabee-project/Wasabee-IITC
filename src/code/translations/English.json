@@ -422,6 +422,8 @@
   "SWAP TITLE": "Swap Portals",
   "SWAP WITH": " with ",
   "SWAP": "Swap",
+  "swap.marker.title": "Swap marker",
+  "swap.marker.prompt": "Do you want to swap the marker:",
   "SYNC DONE": "Download Complete <br> <a href='https://github.com/wasabee-project/Wasabee-IITC/wiki' target='_blank'>Click HERE for hints, tips, and documentation.</a>",
   "SYNC": "Download Available Operations",
   "TARGET SENT": "Target sent",

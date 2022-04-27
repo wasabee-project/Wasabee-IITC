@@ -1,8 +1,14 @@
 import ConfirmDialog from "../dialogs/confirmDialog";
 import wX from "../wX";
-import { displayFormat as displayPortal } from "./portal";
+import { displayFormat as displayPortal, getSelected } from "./portal";
+import { displayError } from "../error";
 
-import type { WasabeeOp, WasabeeMarker, WasabeePortal } from "../model";
+import {
+  WasabeeOp,
+  WasabeeMarker,
+  WasabeePortal,
+  WasabeeBlocker,
+} from "../model";
 
 export function displayFormat(marker: WasabeeMarker, operation: WasabeeOp) {
   const portal = operation.getPortal(marker.portalId);
@@ -34,6 +40,45 @@ export function deleteMarker(
     callback: () => {
       operation.removeMarker(marker);
       window.map.fire("wasabee:crosslinks");
+    },
+  });
+  con.enable();
+}
+
+export function swapMarker(operation: WasabeeOp, marker: WasabeeMarker) {
+  const selectedPortal = getSelected();
+  if (!selectedPortal) {
+    displayError(wX("SELECT PORTAL"));
+    return;
+  }
+  if (marker.portalId === selectedPortal.id) {
+    displayError(wX("SELF SWAP"));
+    return;
+  }
+
+  const portal = operation.getPortal(marker.portalId);
+
+  const pr = L.DomUtil.create("div", null);
+  pr.textContent = wX("swap.marker.prompt");
+  pr.appendChild(displayPortal(portal));
+  L.DomUtil.create("span", null, pr).textContent = wX("SWAP WITH");
+  pr.appendChild(displayPortal(selectedPortal));
+  L.DomUtil.create("span", null, pr).textContent = "?";
+  const con = new ConfirmDialog({
+    title: wX("swap.marker.title"),
+    label: pr,
+    type: "anchor",
+    callback: () => {
+      operation.startBatchMode();
+      operation.removeMarker(marker);
+      operation.addMarker(marker.type, selectedPortal, {
+        zone: marker.zone,
+        comment: marker.comment,
+        assign: marker.assignedTo,
+      });
+      if (WasabeeMarker.isDestructMarkerType(marker.type))
+        WasabeeBlocker.removeBlocker(operation, portal.id);
+      operation.endBatchMode();
     },
   });
   con.enable();
