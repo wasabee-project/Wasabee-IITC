@@ -7,6 +7,7 @@ import KeysList from "../dialogs/keysList";
 import wX from "../wX";
 import { redo, redoable, undo, undoable } from "../undo";
 import { postToFirebase } from "../firebase/logger";
+import FilterDialog from "../dialogs/filterDialog";
 
 const OpButton = WButton.extend({
   statics: {
@@ -90,6 +91,16 @@ const OpButton = WButton.extend({
           this.disable();
           const kl = new KeysList();
           kl.enable();
+        },
+        context: this,
+      },
+      {
+        title: wX("toolbar.op.filter"),
+        text: wX("toolbar.op.filter"),
+        callback: () => {
+          this.disable();
+          const fd = new FilterDialog();
+          fd.enable();
         },
         context: this,
       },
