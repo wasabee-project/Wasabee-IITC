@@ -5,6 +5,7 @@ import { getSelectedOperation, opsList } from "./selectedOp";
 import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { PathOptions } from "leaflet";
 import { getAgent, getMe, getTeam } from "./model/cache";
+import { isFiltered } from "./filter";
 
 const Wasabee = window.plugin.wasabee;
 
@@ -34,6 +35,7 @@ function updateMarkers(op: WasabeeOp) {
   // add any new ones, remove any existing from the list
   // markers don't change, so this doesn't need to be too smart
   for (const m of op.markers) {
+    if (!isFiltered(m)) continue;
     if (layerMap.has(m.ID)) {
       const ll = Wasabee.markerLayerGroup.getLayer(layerMap.get(m.ID));
       ll.setState(m.state);
@@ -59,6 +61,7 @@ function resetLinks(operation: WasabeeOp) {
   if (!operation.links || operation.links.length == 0) return;
 
   for (const l of operation.links) {
+    if (!isFiltered(l)) continue;
     const link = new WLLink(l, operation);
     link.addTo(Wasabee.linkLayerGroup);
   }
@@ -209,6 +212,13 @@ function updateAnchors(op: WasabeeOp) {
     return;
   }
 
+  const anchors = new Set<PortalID>();
+  for (const l of op.links) {
+    if (!isFiltered(l)) continue;
+    anchors.add(l.fromPortalId);
+    anchors.add(l.toPortalId);
+  }
+
   const layerMap = new Map();
   for (const l of Wasabee.portalLayerGroup.getLayers()) {
     if (l.options.color != op.color) {
@@ -219,7 +229,7 @@ function updateAnchors(op: WasabeeOp) {
     }
   }
 
-  for (const a of op.anchors) {
+  for (const a of anchors) {
     if (layerMap.has(a)) {
       layerMap.delete(a);
     } else {
