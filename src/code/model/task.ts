@@ -2,10 +2,15 @@ import { generateId } from "./utils";
 
 export type TaskState = "pending" | "assigned" | "acknowledged" | "completed";
 
-const States: TaskState[] = ["pending" , "assigned" , "acknowledged" , "completed"];
+const States: TaskState[] = [
+  "pending",
+  "assigned",
+  "acknowledged",
+  "completed",
+];
 
 export function sanitizeState(v: string): TaskState {
-  return States.find((s) => s === v) || "pending"
+  return States.find((s) => s === v) || "pending";
 }
 
 export default class Task {
@@ -15,6 +20,7 @@ export default class Task {
   assignedTo?: GoogleID;
   comment?: string;
   dependsOn?: TaskID[];
+  assignments?: GoogleID[];
   deltaminutes?: number;
 
   _state: TaskState;
@@ -31,7 +37,8 @@ export default class Task {
     this.deltaminutes = obj.deltaminutes;
 
     // future compatibility
-    this.dependsOn = obj.dependsOn || [];
+    this.dependsOn = obj.dependsOn ? Array.from(obj.dependsOn) : [];
+    this.assignments = obj.assignments ? Array.from(obj.assignments) : [];
 
     // for raw task
     if (!this.assignedTo && obj.assignments && obj.assignments.length > 0)

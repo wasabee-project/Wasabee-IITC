@@ -76,7 +76,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   markers: Array<WasabeeMarker>;
   color: string;
   comment: string;
-  teamlist: Array<OpPermItem>;
+  teamlist: Array<Readonly<OpPermItem>>;
   fetched: string;
   stored: number;
   localchanged: boolean;
@@ -107,12 +107,12 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.ID = obj.ID ? obj.ID : generateId();
     this.name = obj.name ? obj.name : "unnamed op";
     this.creator = obj.creator ? obj.creator : "unset";
-    this.anchors = obj.anchors ? obj.anchors : [];
+    this.anchors = obj.anchors ? Array.from(obj.anchors) : [];
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : "main";
     this.comment = obj.comment ? obj.comment : null;
-    this.teamlist = obj.teamlist ? obj.teamlist : [];
+    this.teamlist = obj.teamlist ? Array.from(obj.teamlist) : [];
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
     this.localchanged = !!obj.localchanged;
