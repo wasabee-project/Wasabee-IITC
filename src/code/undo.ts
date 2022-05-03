@@ -3,9 +3,9 @@ import { getSelectedOperation, makeSelectedOperation } from "./selectedOp";
 import { constants } from "./static";
 
 // contains the stack of versions, last element is a copy of the current version
-let undo_list: Promise<WasabeeOp>[] = [];
+let undo_list: WasabeeOp[] = [];
 // stack of undone versions
-let redo_list: Promise<WasabeeOp>[] = [];
+let redo_list: WasabeeOp[] = [];
 let undoing = false; // lock
 
 export function initHistory() {
@@ -17,7 +17,7 @@ export function initHistory() {
 function onSelect() {
   // empty the undo list on op select
   const sop = getSelectedOperation();
-  undo_list = [WasabeeOp.load(sop.ID)];
+  undo_list = [new WasabeeOp(sop)];
   redo_list = [];
 }
 
@@ -31,7 +31,7 @@ export async function undo() {
   redo_list.push(undo_list.pop());
 
   undoing = true;
-  const op = await undo_list[undo_list.length-1];
+  const op = undo_list[undo_list.length - 1];
   // use last server-related attributes
   op.fetched = sop.fetched;
   op.fetchedOp = sop.fetchedOp;
@@ -49,7 +49,7 @@ export async function redo() {
   // move prev version to undo list
   undo_list.push(redo_list.pop());
   undoing = true;
-  const op = await undo_list[undo_list.length-1];
+  const op = undo_list[undo_list.length - 1];
   // use last server-related attributes
   op.fetched = sop.fetched;
   op.fetchedOp = sop.fetchedOp;
@@ -73,7 +73,7 @@ function onChange() {
   if (undoing) return;
   const sop = getSelectedOperation();
   // stack a copy of the current version
-  undo_list.push(WasabeeOp.load(sop.ID));
+  undo_list.push(new WasabeeOp(sop));
   if (undo_list.length > constants.UNDO_HISTORY_SIZE) undo_list.shift();
   // drop the undone list
   redo_list = [];
