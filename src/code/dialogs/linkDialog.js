@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { WasabeePortal } from "../model";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
+import { constants } from "../static";
 
 import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
@@ -16,12 +17,11 @@ const LinkDialog = WDialog.extend({
   initialize: function (options) {
     WDialog.prototype.initialize.call(this, options);
 
-    let p =
-      localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY];
+    let p = localStorage[constants.LINK_SOURCE_KEY];
     if (p) this._source = new WasabeePortal(p);
-    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY];
+    p = localStorage[constants.ANCHOR_ONE_KEY];
     if (p) this._anchor1 = new WasabeePortal(p);
-    p = localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY];
+    p = localStorage[constants.ANCHOR_TWO_KEY];
     if (p) this._anchor2 = new WasabeePortal(p);
   },
 
@@ -31,113 +31,92 @@ const LinkDialog = WDialog.extend({
     this._displayDialog();
   },
 
+  _addPortalSet(container, label, thisKey, storageKey, linkLabel) {
+    /* Label */
+    L.DomUtil.create("label", null, container).textContent = label;
+
+    /* [set] */
+    const buttonSet = L.DomUtil.create("button", "set", container);
+    buttonSet.textContent = wX("SET");
+
+    /* [add link] */
+    if (linkLabel) {
+      const buttonAdd = L.DomUtil.create("button", "add", container);
+      buttonAdd.textContent = linkLabel;
+      L.DomEvent.on(buttonAdd, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        if (this._source && this[thisKey]) {
+          const operation = getSelectedOperation();
+          operation.addLink(this._source, this[thisKey], {
+            description: this._desc.value,
+            order: operation.nextOrder,
+          });
+        } else {
+          displayError("Select both Source and Anchor");
+        }
+      });
+    }
+
+    /* [portal display] */
+    const display = L.DomUtil.create("span", "portal", container);
+    if (this[thisKey]) {
+      display.appendChild(PortalUI.displayFormat(this[thisKey]));
+    } else {
+      display.textContent = wX("NOT_SET");
+    }
+
+    /* set portal */
+    L.DomEvent.on(buttonSet, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      this[thisKey] = PortalUI.getSelected();
+      if (this[thisKey]) {
+        localStorage[storageKey] = JSON.stringify(this[thisKey]);
+        display.textContent = "";
+        display.appendChild(PortalUI.displayFormat(this[thisKey]));
+      } else {
+        displayError(wX("PLEASE_SELECT_PORTAL"));
+      }
+    });
+  },
+
   _displayDialog: function () {
     const container = L.DomUtil.create("div", "container");
 
-    const sourceLabel = L.DomUtil.create("label", null, container);
-    sourceLabel.textContent = wX("SOURCE_PORT");
-    const sourceButton = L.DomUtil.create("button", "set", container);
-    sourceButton.textContent = wX("SET");
-    this._sourceDisplay = L.DomUtil.create("span", "portal", container);
-    if (this._source) {
-      this._sourceDisplay.appendChild(PortalUI.displayFormat(this._source));
-    } else {
-      this._sourceDisplay.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(sourceButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._source = PortalUI.getSelected();
-      if (this._source) {
-        localStorage[window.plugin.wasabee.static.constants.LINK_SOURCE_KEY] =
-          JSON.stringify(this._source);
-        this._sourceDisplay.textContent = "";
-        this._sourceDisplay.appendChild(PortalUI.displayFormat(this._source));
-      } else {
-        displayError(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
+    this._addPortalSet(
+      container,
+      wX("SOURCE_PORT"),
+      "_source",
+      constants.LINK_SOURCE_KEY
+    );
+    this._addPortalSet(
+      container,
+      wX("ANCHOR1"),
+      "_anchor1",
+      constants.ANCHOR_ONE_KEY,
+      wX("ADD1")
+    );
+    this._addPortalSet(
+      container,
+      wX("ANCHOR2"),
+      "_anchor2",
+      constants.ANCHOR_TWO_KEY,
+      wX("ADD2")
+    );
 
-    const anchor1Label = L.DomUtil.create("label", null, container);
-    anchor1Label.textContent = wX("ANCHOR1");
-    const anchor1Button = L.DomUtil.create("button", "set", container);
-    anchor1Button.textContent = wX("SET");
-    const anchor1AddButton = L.DomUtil.create("button", "add", container);
-    anchor1AddButton.textContent = wX("ADD1");
-    L.DomEvent.on(anchor1AddButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      if (this._source && this._anchor1) {
-        const operation = getSelectedOperation();
-        operation.addLink(this._source, this._anchor1, {
-          description: this._desc.value,
-          order: operation.nextOrder,
-        });
-      } else {
-        displayError("Select both Source and Anchor 1");
-      }
-    });
-    this._anchor1Display = L.DomUtil.create("span", "portal", container);
-    if (this._anchor1) {
-      this._anchor1Display.appendChild(PortalUI.displayFormat(this._anchor1));
-    } else {
-      this._anchor1Display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchor1Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor1 = PortalUI.getSelected();
-      if (this._anchor1) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-          JSON.stringify(this._anchor1);
-        this._anchor1Display.textContent = "";
-        this._anchor1Display.appendChild(PortalUI.displayFormat(this._anchor1));
-      } else {
-        displayError(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-
-    const anchor2Label = L.DomUtil.create("label", null, container);
-    anchor2Label.textContent = wX("ANCHOR2");
-    const anchor2Button = L.DomUtil.create("button", "set", container);
-    anchor2Button.textContent = wX("SET");
-    const anchor2AddButton = L.DomUtil.create("button", "add", container);
-    anchor2AddButton.textContent = wX("ADD2");
-    L.DomEvent.on(anchor2AddButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      if (this._source && this._anchor2) {
-        const operation = getSelectedOperation();
-        operation.addLink(this._source, this._anchor2, {
-          description: this._desc.value,
-          order: operation.nextOrder,
-        });
-      } else {
-        displayError(wX("SEL_SRC_ANC2"));
-      }
-    });
-    this._anchor2Display = L.DomUtil.create("span", "portal", container);
-    if (this._anchor2) {
-      this._anchor2Display.appendChild(PortalUI.displayFormat(this._anchor2));
-    } else {
-      this._anchor2Display.textContent = wX("NOT_SET");
-    }
-    L.DomEvent.on(anchor2Button, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this._anchor2 = PortalUI.getSelected();
-      if (this._anchor2) {
-        localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
-          JSON.stringify(this._anchor2);
-        this._anchor2Display.textContent = "";
-        this._anchor2Display.appendChild(PortalUI.displayFormat(this._anchor2));
-      } else {
-        displayError(wX("PLEASE_SELECT_PORTAL"));
-      }
-    });
-
-    // Go button
+    /* [add both] */
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("ADD_BUTTON_LINKS");
+
+    /* [comment input] */
+    this._desc = L.DomUtil.create("input", "desc", container);
+    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
+
+    /* add both links */
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       if (!this._source) displayError(wX("SEL_SRC_PORT"));
       const operation = getSelectedOperation();
+      operation.startBatchMode();
       if (this._anchor1) {
         operation.addLink(this._source, this._anchor1, {
           description: this._desc.value,
@@ -150,9 +129,8 @@ const LinkDialog = WDialog.extend({
           order: operation.nextOrder,
         });
       }
+      operation.endBatchMode();
     });
-    this._desc = L.DomUtil.create("input", "desc", container);
-    this._desc.placeholder = wX("DESCRIP_PLACEHOLD");
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
