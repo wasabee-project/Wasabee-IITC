@@ -66,6 +66,7 @@ const MarkerChangeDialog = WDialog.extend({
       dialogClass: "markerchange",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.markerButton,
+      autofocus: true,
     });
   },
 });

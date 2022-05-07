@@ -38,6 +38,7 @@ const SendTargetDialog = WDialog.extend({
       dialogClass: "sendtarget",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.assign,
+      autofocus: true,
     });
   },
 

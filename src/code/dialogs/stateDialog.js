@@ -39,6 +39,7 @@ const StateDialog = WDialog.extend({
       dialogClass: "state",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.state,
+      autofocus: true,
     });
   },
 

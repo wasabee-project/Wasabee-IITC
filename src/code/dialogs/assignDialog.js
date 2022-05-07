@@ -39,6 +39,7 @@ const AssignDialog = WDialog.extend({
       dialogClass: "assign",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.assign,
+      autofocus: true,
     });
   },
 

@@ -48,6 +48,7 @@ const PromptDialog = WDialog.extend({
       width: "auto",
       dialogClass: "prompt",
       buttons: buttons,
+      autofocus: true,
     });
   },
 

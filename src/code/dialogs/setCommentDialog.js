@@ -70,6 +70,7 @@ export const SetCommentDialog = WDialog.extend({
       dialogClass: "setcomment",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.setComment,
+      autofocus: true,
     });
   },
 

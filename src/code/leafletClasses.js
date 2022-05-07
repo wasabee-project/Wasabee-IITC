@@ -199,6 +199,16 @@ export const WDialog = L.Handler.extend({
           delete this._dialog;
         };
       }
+      if (
+        window.isSmartphone() &&
+        !options.autofocus &&
+        options.html instanceof HTMLElement
+      ) {
+        const autofocus = L.DomUtil.create("input");
+        autofocus.autofocus = true;
+        autofocus.type = "hidden";
+        options.html.appendChild(autofocus);
+      }
       this._dialog = window.dialog(options);
       // swap in our buttons, replacing the defaults
       if (options.buttons)
