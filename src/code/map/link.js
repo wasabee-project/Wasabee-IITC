@@ -37,9 +37,22 @@ export const WLLink = L.GeodesicPolyline.extend({
     L.DomUtil.create("div", null, div).appendChild(
       displayFormat(link, operation)
     );
-    if (link.comment)
+
+    if (link.comment) {
       L.DomUtil.create("div", "enl", div).textContent = link.comment;
-    L.DomUtil.create("div", "enl", div).textContent = "# " + link.order;
+    }
+
+    const infoBlock = L.DomUtil.create("div", "info-block", div);
+
+    L.DomUtil.create("div", "link-order", infoBlock).textContent =
+      "#" + link.order;
+
+    const linkLength = link.length(operation);
+    L.DomUtil.create("div", "link-length", infoBlock).textContent =
+      linkLength > 1e3
+        ? (linkLength / 1e3).toFixed(1) + "km"
+        : linkLength.toFixed(1) + "m";
+
     const buttonset = L.DomUtil.create("div", "buttonset", div);
     if (operation.canWrite()) {
       const del = L.DomUtil.create("button", null, buttonset);
