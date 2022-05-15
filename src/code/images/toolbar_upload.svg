@@ -1,8 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg"
-      width="26" height="26" viewBox="0 0 26 26">
-  <!-- <rect x="5" y="5" width="16" height="16" fill="blue"/> -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 26 26"
+>
   <g>
-	  <path d="M 8,9 a 5,5,0,0,0,1,11 l 8,0 a 5,5,0,0,0,1,-11 a 6,8,0,0,0,-10,0"/>
-	  <polygon points="11,18 15,18 15,14 18,14 13,9 8,14 11,14" fill="white"/>
-	</g>
+    <path
+      d="m8 9a5 5 0 001 11l8 0-2-2-4 0 0-4-3 0 5-5 5 5-3 0 0 4 2 2a5 5 0 001-11 6 8 0 00-10 00"
+    />
+  </g>
 </svg>
