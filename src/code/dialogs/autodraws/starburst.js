@@ -4,7 +4,6 @@ import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { displayError } from "../../error";
-import { getAllPortalsOnScreen } from "../../ui/portal";
 
 const StarburstDialog = AutoDraw.extend({
   statics: {
@@ -23,7 +22,7 @@ const StarburstDialog = AutoDraw.extend({
     this._displayDialog();
   },
 
-  _displayDialog: function () {
+  _buildContent: function () {
     //Instructions
     const container = L.DomUtil.create("div", "container");
     const description = L.DomUtil.create("div", "desc", container);
@@ -39,12 +38,21 @@ const StarburstDialog = AutoDraw.extend({
     const description2 = L.DomUtil.create("div", "desc secondary", container);
     description2.textContent = wX("SEL_SB_ANCHOR2");
 
+    this._addSelectSet(wX("MM_SPINE"), "spine", container, "all");
+
+    // Go button
     const button = L.DomUtil.create("button", "drawb", container);
     button.textContent = wX("STARBURST_DRAW");
     L.DomEvent.on(button, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.starburst.call(this);
     });
+
+    return container;
+  },
+
+  _displayDialog: function () {
+    const container = this._buildContent();
 
     const buttons = {};
     buttons[wX("CLOSE")] = () => {
@@ -66,14 +74,15 @@ const StarburstDialog = AutoDraw.extend({
 
   starburst: function () {
     if (!this._anchor) {
-      displayError("Select an anchor portal");
+      displayError(wX("SEL_SB_ANCHOR"));
       return;
     }
 
     const operation = getSelectedOperation();
 
     operation.startBatchMode();
-    for (const p of getAllPortalsOnScreen(operation)) {
+    const portals = this._portalSets.spine.portals;
+    for (const p of portals) {
       if (p.id == this._anchor.id) continue;
       operation.addLink(p, this._anchor, { description: "auto starburst" });
     }
