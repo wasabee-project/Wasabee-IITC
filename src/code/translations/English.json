@@ -154,6 +154,7 @@
   "dialog.online_agents.actions": "Actions",
   "dialog.online_agents.last_seen": "Last Seen",
   "dialog.online_agents.title": "Online Agents",
+  "dialog.op_settings.setting": "Settings",
   "dialog.op_settings.zones": "Zones",
   "dialog.ops_list.background_disable": "Disable background",
   "dialog.ops_list.background_enable": "Show in background",

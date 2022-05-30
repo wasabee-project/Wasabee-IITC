@@ -3,7 +3,7 @@ import { deleteOpPromise } from "../server";
 import { zoomToOperation } from "../ui/operation";
 import ConfirmDialog from "./confirmDialog";
 import ExportDialog from "./exportDialog";
-import ZoneDialog from "./zoneDialog";
+import { ZonedrawHandler } from "./zoneDrawHandler";
 import {
   getSelectedOperation,
   makeSelectedOperation,
@@ -11,7 +11,6 @@ import {
   duplicateOperation,
   changeOpIfNeeded,
 } from "../selectedOp";
-import OpPermList from "./opPerms";
 import wX from "../wX";
 import { addToColorList } from "../skin";
 import { WasabeeMe } from "../model";
@@ -19,13 +18,21 @@ import { WasabeeMe } from "../model";
 import { convertColorToHex } from "../auxiliar";
 import { displayError } from "../error";
 import { clearAllItems } from "../ui/operation";
+import { buildZoneList } from "./components/zoneList";
+import { setLinksToZones, setMarkersToZones } from "../ui/zone";
+import { buildPermList } from "./components/permList";
 
 class OpSettingDialog extends WDialog {
   static TYPE = "opSettingDialog";
 
+  _activeTab: number;
+  _zoneHandler: ZonedrawHandler;
+
   addHooks () {
     super.addHooks();
+    this._zoneHandler = new ZonedrawHandler(window.map, { parent: this });
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    this._activeTab = 0;
     this._displayDialog();
   }
 
@@ -61,33 +68,53 @@ class OpSettingDialog extends WDialog {
     }
   }
 
-  makeContent () {
-    const selectedOp = getSelectedOperation();
-    const content = L.DomUtil.create("div");
-    const topSet = L.DomUtil.create("div", "topset", content);
+  buildZoneTab(): [HTMLAnchorElement, HTMLDivElement] {
+    const head = L.DomUtil.create('a');
+    head.textContent = wX("dialog.op_settings.zones");
 
+    const tab = L.DomUtil.create('div');
+    tab.appendChild(buildZoneList(this._zoneHandler));
+
+    const buttonSection = L.DomUtil.create("div", "buttonset", tab);
+    const buttons: {[label: string]: () => void } = {};
+    buttons[wX("ADD_ZONE")] = () => {
+      if (getSelectedOperation().canWrite()) getSelectedOperation().addZone();
+    };
+    buttons[wX("SET_MARKERS_ZONES")] = () => {
+      if (getSelectedOperation().canWrite()) setMarkersToZones();
+    };
+    buttons[wX("SET_LINKS_ZONES")] = () => {
+      if (getSelectedOperation().canWrite()) setLinksToZones();
+    };
+    for (const label in buttons) {
+      const button = L.DomUtil.create('button', null, buttonSection);
+      button.textContent = label;
+      L.DomEvent.on(button, 'click', buttons[label]);
+    }
+
+    return [head, tab];
+  }
+
+  buildPermTab(): [HTMLAnchorElement, HTMLDivElement] {
+    const selectedOp = getSelectedOperation();
+
+    const head = L.DomUtil.create('a');
+    head.textContent = wX("OP_PERMS");
+
+    const tab = L.DomUtil.create('div');
+    tab.appendChild(buildPermList(selectedOp, WasabeeMe.cacheGet()));
+    return [head, tab];
+  }
+
+  buildMainTab(): [HTMLAnchorElement, HTMLDivElement] {
+    const selectedOp = getSelectedOperation();
     const writable = selectedOp.canWrite();
 
-    L.DomUtil.create("label", null, topSet).textContent = wX("OPER_NAME");
-    const nameDisplay = L.DomUtil.create("div", null, topSet);
-    if (writable) {
-      const input = L.DomUtil.create("input", null, nameDisplay);
-      input.value = selectedOp.name;
-      L.DomEvent.on(input, "change", async (ev) => {
-        L.DomEvent.stop(ev);
-        if (!input.value || input.value == "") {
-          displayError(wX("USE_VALID_NAME"));
-        } else {
-          const so = getSelectedOperation();
-          so.name = input.value;
-          so.localchanged = true;
-          await so.store();
-          window.map.fire("wasabee:op:change");
-        }
-      });
-    } else {
-      nameDisplay.textContent = selectedOp.name;
-    }
+    const head = L.DomUtil.create('a');
+    head.textContent = wX("dialog.op_settings.setting");
+
+    const tab = L.DomUtil.create('div');
+    const topSet = L.DomUtil.create("div", "topset", tab);
 
     if (writable) {
       L.DomUtil.create("label", null, topSet).textContent = wX("OPER_COLOR");
@@ -154,7 +181,7 @@ class OpSettingDialog extends WDialog {
         wX("REFERENCE_TIME") + " " + selectedOp.referencetime;
     }
 
-    const buttonSection = L.DomUtil.create("div", "buttonset", content);
+    const buttonSection = L.DomUtil.create("div", "buttonset", tab);
     if (writable) {
       const clearOpDiv = L.DomUtil.create("div", null, buttonSection);
       const clearOpButton = L.DomUtil.create("button", null, clearOpDiv);
@@ -215,26 +242,6 @@ class OpSettingDialog extends WDialog {
       con.enable();
     });
 
-    if (selectedOp.isServerOp()) {
-      const permsDiv = L.DomUtil.create("div", null, buttonSection);
-      const permsButton = L.DomUtil.create("button", null, permsDiv);
-      permsButton.textContent = wX("OP_PERMS");
-      L.DomEvent.on(permsButton, "click", (ev) => {
-        L.DomEvent.stop(ev);
-        const opl = new OpPermList();
-        opl.enable();
-      });
-    }
-
-    const zoneDiv = L.DomUtil.create("div", null, buttonSection);
-    const zoneButton = L.DomUtil.create("button", null, zoneDiv);
-    zoneButton.textContent = wX("dialog.op_settings.zones");
-    L.DomEvent.on(zoneButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      const z = new ZoneDialog();
-      z.enable();
-    });
-
     const dupeDiv = L.DomUtil.create("div", null, buttonSection);
     const dupeButton = L.DomUtil.create("button", null, dupeDiv);
     dupeButton.textContent = wX("DUPE_OP");
@@ -253,6 +260,71 @@ class OpSettingDialog extends WDialog {
       const ed = new ExportDialog();
       ed.enable();
     });
+
+    return [head, tab];
+  }
+
+  makeContent () {
+    const selectedOp = getSelectedOperation();
+    const writable = selectedOp.canWrite();
+
+    const content = L.DomUtil.create("div");
+    const topSet = L.DomUtil.create("div", "topset", content);
+
+    L.DomUtil.create("label", null, topSet).textContent = wX("OPER_NAME");
+    if (writable) {
+      const input = L.DomUtil.create("input", null, topSet);
+      input.value = selectedOp.name;
+      L.DomEvent.on(input, "change", async (ev) => {
+        L.DomEvent.stop(ev);
+        if (!input.value || input.value == "") {
+          displayError(wX("USE_VALID_NAME"));
+        } else {
+          const so = getSelectedOperation();
+          so.name = input.value;
+          so.localchanged = true;
+          await so.store();
+          window.map.fire("wasabee:op:change");
+        }
+      });
+    } else {
+      const nameDisplay = L.DomUtil.create("div", null, topSet);
+      nameDisplay.textContent = selectedOp.name;
+    }
+
+    const tabArray: [HTMLAnchorElement, HTMLDivElement][] = [];
+    tabArray.push(this.buildMainTab());
+    tabArray.push(this.buildZoneTab());
+    if (selectedOp.isServerOp()) {
+      tabArray.push(this.buildPermTab());
+    }
+
+    /* Create jquery-like tabs */
+    const tabs = L.DomUtil.create("div", "ui-tabs tabs", content);
+    const nav = L.DomUtil.create("ul", "ui-tabs-nav nav", tabs);
+    for (let i = 0; i < tabArray.length; i++) {
+      const [head, panel] = tabArray[i];
+      L.DomUtil.create("li", "ui-tabs-tab", nav).appendChild(head);
+      head.classList.add("ui-tabs-anchor");
+      tabs.appendChild(panel);
+      panel.classList.add("ui-tabs-panel");
+      panel.style.display = "none";
+
+      L.DomEvent.on(head, "click", () => {
+        for (const hp of tabArray) {
+          hp[0].parentElement.classList.remove("ui-tabs-active");
+          hp[1].style.display = "none";
+        }
+        head.parentElement.classList.add("ui-tabs-active");
+        panel.style.display = null;
+        this._activeTab = i;
+      });
+    }
+
+    /* initial active tab */
+    if (this._activeTab >= tabArray.length) this._activeTab = 0;
+    tabArray[this._activeTab][0].parentElement.classList.add("ui-tabs-active");
+    tabArray[this._activeTab][1].style.display = null;
 
     return content;
   }

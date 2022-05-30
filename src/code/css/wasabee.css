@@ -52,6 +52,10 @@
 }
 /* .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; } */
 
+.wasabee-table input[type='color'] {
+  vertical-align: middle;
+}
+
 .wasabee-dialog-agent ul {
   padding-left: 0;
 }
@@ -296,6 +300,11 @@
 
 .wasabee-dialog-newop {
 }
+
+.wasabee-dialog-op-settings .ui-tabs-panel {
+  padding-top: 12px;
+}
+
 .wasabee-dialog-newop div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
@@ -305,6 +314,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   row-gap: 4px;
+  align-items: center;
 }
 .wasabee-dialog-op-settings textarea {
   grid-column-start: 1;
@@ -318,7 +328,7 @@
   grid-column-end: 3;
 }
 .wasabee-dialog-op-settings input {
-  width: auto;
+  width: 100%;
   -moz-transform: scale(1);
 }
 .wasabee-dialog-op-settings div.buttonset {
@@ -329,6 +339,14 @@
   margin: 4px;
   width: 100%;
 }
+
+.wasabee-dialog-op-settings .wasabee-table .actions {
+  white-space: nowrap;
+}
+.wasabee-dialog-op-settings .wasabee-table .actions a {
+  padding: .25em
+}
+
 .wasabee-dialog-ops div.container {
     overflow-y: hidden;
 }
@@ -449,13 +467,6 @@
     border: 1px solid #888;
     height: 1.5em;
     list-style-position:inside;
-}
-
-.wasabee-dialog-zone .wasabee-table .actions {
-    white-space: nowrap;
-}
-.wasabee-dialog-zone .wasabee-table .actions a {
-    padding: .25em
 }
 
 .wasabee-link-seperator {

@@ -10,7 +10,7 @@ import {
   hideOperation,
   setOpBackground,
 } from "../selectedOp";
-import OpPermList from "./opPerms";
+import OpSettings from "./opSettings";
 import wX from "../wX";
 import { syncOp, deleteLocalOp, zoomToOperation } from "../ui/operation";
 import Sortable from "../sortable";
@@ -165,8 +165,8 @@ const OpsDialog = WDialog.extend({
             perm.textContent = text;
             L.DomEvent.on(perm, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const opl = new OpPermList();
-              opl.enable();
+              const s = new OpSettings();
+              s.enable();
             });
           } else {
             const perm = L.DomUtil.create("span", "", cell);
