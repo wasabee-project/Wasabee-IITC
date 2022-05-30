@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { deleteOpPromise } from "../server";
 import { zoomToOperation } from "../ui/operation";
 import ConfirmDialog from "./confirmDialog";
-import ExportDialog from "../dialogs/exportDialog";
+import ExportDialog from "./exportDialog";
 import ZoneDialog from "./zoneDialog";
 import {
   getSelectedOperation,
@@ -20,23 +20,21 @@ import { convertColorToHex } from "../auxiliar";
 import { displayError } from "../error";
 import { clearAllItems } from "../ui/operation";
 
-const OpSettingDialog = WDialog.extend({
-  statics: {
-    TYPE: "opSettingDialog",
-  },
+class OpSettingDialog extends WDialog {
+  static TYPE = "opSettingDialog";
 
-  addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
+  addHooks () {
+    super.addHooks();
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     this._displayDialog();
-  },
+  }
 
-  removeHooks: function () {
-    WDialog.prototype.removeHooks.call(this);
+  removeHooks () {
+    super.removeHooks();
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
-  },
+  }
 
-  _displayDialog: function () {
+  _displayDialog () {
     const content = this.makeContent();
 
     const buttons = {};
@@ -53,17 +51,17 @@ const OpSettingDialog = WDialog.extend({
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.opSettings,
     });
-  },
+  }
 
-  update: function () {
-    if (this._enabled) {
+  update () {
+    if (this.enabled()) {
       this.setTitle(wX("OP_SETTINGS_TITLE"));
       const content = this.makeContent();
       this.setContent(content);
     }
-  },
+  }
 
-  makeContent: function () {
+  makeContent () {
     const selectedOp = getSelectedOperation();
     const content = L.DomUtil.create("div");
     const topSet = L.DomUtil.create("div", "topset", content);
@@ -139,7 +137,7 @@ const OpSettingDialog = WDialog.extend({
         const so = getSelectedOperation();
         try {
           const d = new Date(rtInput.value); // accept whatever the JS engine can parse
-          if (d == "Invalid Date" || isNaN(d)) throw d;
+          if (d.toString() === "Invalid Date" || isNaN(+d)) throw d;
           so.referencetime = d.toUTCString(); // RFC 1123 format as expected by server
           rtInput.value = so.referencetime; // @Noodles, this is where you want to muck about with the display
           so.localchanged = true;
@@ -257,7 +255,7 @@ const OpSettingDialog = WDialog.extend({
     });
 
     return content;
-  },
-});
+  }
+}
 
 export default OpSettingDialog;
