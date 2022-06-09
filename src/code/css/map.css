@@ -53,6 +53,12 @@
   color: rgb(0, 135, 255) !important;
 }
 
+.wasabee-link-popup .info-block {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
 .wasabee-link-popup .buttonset {
 	display: grid;
 }
