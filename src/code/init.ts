@@ -31,6 +31,7 @@ import { deleteJWT } from "./auth";
 import { checkVersion } from "./version";
 import wX from "./wX";
 import { getMe } from "./model/cache";
+import { initHistory } from "./undo";
 
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 import type { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
@@ -236,6 +237,9 @@ window.plugin.wasabee.init = async () => {
   if (sl !== "true") {
     localStorage[Wasabee.static.constants.SEND_LOCATION_KEY] = "false";
   }
+
+  // setup undo
+  initHistory();
 
   // setup UI elements
   addButtons();

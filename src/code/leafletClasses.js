@@ -387,6 +387,7 @@ export const WButton = L.Class.extend({
 
     if (options.text) link.innerHTML = options.text;
     if (options.html) link.appendChild(options.html);
+    if (options.accesskey) link.accessKey = options.accesskey;
 
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);
