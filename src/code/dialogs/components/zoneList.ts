@@ -5,7 +5,10 @@ import wX from "../../wX";
 import type { ZonedrawHandler } from "../zoneDrawHandler";
 import ZoneSetColorDialog from "../zoneSetColor";
 
-export function buildZoneList (zoneHandler?: ZonedrawHandler, container?: HTMLDivElement) {
+export function buildZoneList(
+  zoneHandler?: ZonedrawHandler,
+  container?: HTMLDivElement
+) {
   const op = getSelectedOperation();
   const canWrite = op.getPermission() === "write";
   container = container || L.DomUtil.create("div");
@@ -19,15 +22,12 @@ export function buildZoneList (zoneHandler?: ZonedrawHandler, container?: HTMLDi
   L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.id");
   L.DomUtil.create("th", null, hr).textContent = wX("dialog.common.name");
   L.DomUtil.create("th", null, hr).textContent = wX("dialog.zones.color");
-  if (canWrite)
-    L.DomUtil.create("th", null, hr).textContent = wX(
-      "dialog.common.commands"
-    );
+  L.DomUtil.create("th", null, hr).textContent = wX("dialog.common.commands");
 
   for (const z of op.zones) {
     const tr = L.DomUtil.create("tr", null, tbody);
     const idcell = L.DomUtil.create("td", null, tr);
-    idcell.textContent = ""+z.id;
+    idcell.textContent = "" + z.id;
     const namecell = L.DomUtil.create("td", null, tr);
     const nameinput = L.DomUtil.create("input", null, namecell);
     nameinput.type = "text";
@@ -52,8 +52,20 @@ export function buildZoneList (zoneHandler?: ZonedrawHandler, container?: HTMLDi
       getSelectedOperation().renameZone(z.id, nameinput.value);
     });
 
+    const commandcell = L.DomUtil.create("td", "actions", tr);
+    if (z.points.length > 0) {
+      const bounds = L.latLngBounds(z.points);
+      const jump = L.DomUtil.create("a", null, commandcell);
+      jump.href = "#";
+      jump.title = wX("dialog.zones.jump_to");
+      appendFAIcon("location-dot", jump);
+      L.DomEvent.on(jump, "click", (ev) => {
+        L.DomEvent.stop(ev);
+        window.map.fitBounds(bounds);
+      });
+    }
+
     if (canWrite) {
-      const commandcell = L.DomUtil.create("td", "actions", tr);
       const color = L.DomUtil.create("a", null, commandcell);
       color.href = "#";
       color.title = wX("dialog.zones.color_links");
@@ -75,11 +87,7 @@ export function buildZoneList (zoneHandler?: ZonedrawHandler, container?: HTMLDi
           getSelectedOperation().removeZone(z.id);
         });
       }
-      if (
-        zoneHandler &&
-        zoneHandler.zoneID === z.id &&
-        zoneHandler.enabled()
-      ) {
+      if (zoneHandler && zoneHandler.zoneID === z.id && zoneHandler.enabled()) {
         const stopDrawing = L.DomUtil.create("a", null, commandcell);
         stopDrawing.href = "#";
         stopDrawing.title = wX("dialog.zones.stop_drawing");

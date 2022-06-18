@@ -183,6 +183,7 @@
   "dialog.zones.delete_zone_shape": "Reset the shape",
   "dialog.zones.draw_zone_shape": "Draw the boundaries",
   "dialog.zones.id": "ID",
+  "dialog.zones.jump_to": "Jump to zone",
   "dialog.zones.stop_drawing": "Stop drawing",
   "dialog.zones.title": "Zones",
   "DRAW TOOLS FORMAT": "Draw Tools Format",

@@ -35,6 +35,10 @@
   border-right-color: #e6b6bd;
 }
 
+.ui-tooltip.wasabee-zone-tooltip::before {
+  border: transparent;
+}
+
 /* this class is appended to leaflet-popup so we can adjust without stepping on other plugins */
 .leaflet-popup.wasabee-popup .leaflet-popup-content-wrapper {
   background: rgba(235, 235, 235, 0.75) !important;
