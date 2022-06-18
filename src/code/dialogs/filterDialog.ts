@@ -59,6 +59,14 @@ function setTasksState(state: TaskState) {
   }
   op.update();
 }
+
+function deleteTasks(filtered: boolean) {
+  const op = getSelectedOperation();
+  op.links = op.links.filter((t) => isFiltered(t) === filtered);
+  op.markers = op.markers.filter((t) => isFiltered(t) === filtered);
+  op.cleanAll();
+  op.update();
+}
 /********************************/
 
 export default class FilterDialog extends WDialog {
@@ -411,6 +419,14 @@ export default class FilterDialog extends WDialog {
       wX("SET"),
       setLinksColor
     );
+
+    const deleteButton = L.DomUtil.create("button", "delete-tasks", panel);
+    deleteButton.textContent = "Delete visible tasks";
+    L.DomEvent.on(deleteButton, 'click', () => deleteTasks(false));
+
+    const deleteOtherButton = L.DomUtil.create("button", "delete-tasks", panel);
+    deleteOtherButton.textContent = "Delete all other tasks";
+    L.DomEvent.on(deleteOtherButton, 'click', () => deleteTasks(true));
 
     return [anchor, panel];
   }
