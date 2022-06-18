@@ -90,6 +90,13 @@ class QuickDeleteButton extends WButton {
     this.disable();
   }
 
+  actionClear() {
+    const operation = getSelectedOperation();
+    operation.clearAllItems();
+    operation.updateBlockers();
+    this.disable();
+  }
+
   actionCancel() {
     this.disable();
   }
@@ -112,6 +119,13 @@ class QuickDeleteButton extends WButton {
       context: this,
     };
 
+    const clearAllSubAction = {
+      text: wX("toolbar.quick_delete.clear.text"),
+      title: wX("toolbar.quick_delete.clear.title"),
+      callback: this.actionClear,
+      context: this,
+    };
+
     const cancelSubAction = {
       text: wX("toolbar.quick_delete.cancel.text"),
       title: wX("toolbar.quick_delete.cancel.title"),
@@ -119,7 +133,7 @@ class QuickDeleteButton extends WButton {
       context: this,
     };
 
-    return [applySubAction, cancelSubAction];
+    return [applySubAction, clearAllSubAction, cancelSubAction];
   }
 
   enable() {

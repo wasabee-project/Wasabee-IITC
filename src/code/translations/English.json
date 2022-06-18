@@ -443,6 +443,8 @@
   "toolbar.quick_delete.apply.title": "Delete selected links/markers",
   "toolbar.quick_delete.cancel.text": "Cancel",
   "toolbar.quick_delete.cancel.title": "Cancel",
+  "toolbar.quick_delete.clear.text": "Clear all",
+  "toolbar.quick_delete.clear.title": "Clear all links and markers",
   "toolbar.quick_delete.stop.text": "Stop",
   "toolbar.quick_delete.stop.title": "Exit delete mode",
   "toolbar.quick_delete.title": "Quick delete",
