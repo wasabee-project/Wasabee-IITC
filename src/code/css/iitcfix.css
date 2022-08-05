@@ -1,22 +1,14 @@
-/* iitc-ce: commit 50ea9ecf521557008a20287d4d6271cf07624008 */
-.ui-dialog-content {
-  padding: 12px;
-	max-width: unset !important;
- 	overflow: auto;
-
-  /* Limiting the height of dialog content on small screens */
-  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
-  /* 24px – padding 12px * 2 */
-  /*  2px – border 1px * 2 */
-  max-height: calc(100vh - 57px - 24px - 2px) !important;
-}
-
+/* allow +600px width dialog */
 .ui-dialog {
   max-width: calc(100vw - 2px);
 }
 
-.ui-dialog-aboutIITC {
-  width: unset !important;
-  min-width: unset !important;
-  max-width: calc(100vw - 2px) !important;
+/* use enl/res color for link in dialog */
+.ui-dialog a.enl {
+  color: #03fe03;
 }
+
+.ui-dialog a.res {
+  color: #00c5ff;
+}
+
