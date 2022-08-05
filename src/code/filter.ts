@@ -2,7 +2,7 @@ import { WasabeeLink, WasabeeMarker } from "./model";
 import type Task from "./model/task";
 
 interface IComplexFilter {
-  op: "or" | "and";
+  op: "or" | "and" | "not";
   list: Filter[];
 }
 
@@ -24,6 +24,8 @@ function computeFilter(task: Task, filter: Filter) {
     return filter.list.every((f) => computeFilter(task, f));
   } else if (filter.op === "or") {
     return filter.list.some((f) => computeFilter(task, f));
+  } else if (filter.op === "not") {
+    return !computeFilter(task, filter.list[0]);
   } else if (filter.op === "kind") {
     if (filter.value === "link") {
       return task instanceof WasabeeLink;
@@ -48,6 +50,12 @@ function validateFilterAux(filter: Filter): boolean {
     return (
       filter.list instanceof Array &&
       filter.list.every((f) => validateFilterAux(f))
+    );
+  } else if (filter.op === "not") {
+    return (
+      filter.list instanceof Array &&
+      filter.list.length == 1 &&
+      validateFilterAux(filter.list[0])
     );
   } else if (filter.op === "kind") {
     return filter.value === "link" || filter.value === "marker";
