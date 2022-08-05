@@ -250,7 +250,7 @@ export default class FilterDialog extends WDialog {
 
   async _getFiltersTab() {
     const anchor = L.DomUtil.create("a");
-    anchor.textContent = "Filters";
+    anchor.textContent = wX("dialog.filter.filters.title");
     const panel = L.DomUtil.create("div", "filters");
 
     const op = getSelectedOperation();
@@ -316,7 +316,7 @@ export default class FilterDialog extends WDialog {
 
     /* link/marker filter */
     this._addField(panel, "kind", {
-      label: wX("dialog.filter.field.task"),
+      label: wX("dialog.filter.filters.field.task"),
       options: [
         [wX("dialog.common.links"), "link"],
         [wX("dialog.common.markers"), "marker"],
@@ -356,13 +356,21 @@ export default class FilterDialog extends WDialog {
       },
     });
 
+    const applyButton = L.DomUtil.create("button", "apply", panel);
+    applyButton.textContent = wX("dialog.filter.filters.apply");
+    L.DomEvent.on(applyButton, "click", this._applyFilter, this);
+
     return [anchor, panel];
   }
 
   async _getActionsTab() {
     const anchor = L.DomUtil.create("a");
-    anchor.textContent = "Actions";
+    anchor.textContent = wX("dialog.filter.actions.title");
     const panel = L.DomUtil.create("div", "actions");
+
+    L.DomUtil.create("div", "desc", panel).textContent = wX(
+      "dialog.filter.actions.description"
+    );
 
     const op = getSelectedOperation();
     const agentMap = new Map();
@@ -421,12 +429,12 @@ export default class FilterDialog extends WDialog {
     );
 
     const deleteButton = L.DomUtil.create("button", "delete-tasks", panel);
-    deleteButton.textContent = "Delete visible tasks";
-    L.DomEvent.on(deleteButton, 'click', () => deleteTasks(false));
+    deleteButton.textContent = wX("dialog.filter.actions.delete_visible");
+    L.DomEvent.on(deleteButton, "click", () => deleteTasks(false));
 
     const deleteOtherButton = L.DomUtil.create("button", "delete-tasks", panel);
-    deleteOtherButton.textContent = "Delete all other tasks";
-    L.DomEvent.on(deleteOtherButton, 'click', () => deleteTasks(true));
+    deleteOtherButton.textContent = wX("dialog.filter.actions.delete_hidden");
+    L.DomEvent.on(deleteOtherButton, "click", () => deleteTasks(true));
 
     return [anchor, panel];
   }
@@ -497,9 +505,6 @@ export default class FilterDialog extends WDialog {
     const container = await this._getContent();
 
     const buttons = {};
-    buttons[wX("dialog.filter.apply")] = () => {
-      this._applyFilter();
-    };
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
