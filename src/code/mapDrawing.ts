@@ -242,3 +242,26 @@ function updateAnchors(op: WasabeeOp) {
     Wasabee.portalLayerGroup.removeLayer(v);
   }
 }
+
+export function injectPortalsAsPlaceholders() {
+  const op = getSelectedOperation();
+  const data = [];
+  for (const p of op.opportals) {
+    if (p.id in window.portals) continue;
+    data.push([
+      p.id,
+      -1,
+      ["p", "N", Math.trunc(+p.lat * 1e6), Math.trunc(+p.lng * 1e6)],
+    ]);
+  }
+  window.mapDataRequest.render.processGameEntities(data, "core");
+  window.removeHook("mapDataEntityInject", injectPortalsAsPlaceholders);
+}
+
+export function keepPortalsLoaded() {
+  const op = getSelectedOperation();
+  for (const p of op.opportals) {
+    // @ts-ignore: seenPortalsGuid is a private member
+    window.mapDataRequest.render.seenPortalsGuid[p.id] = true;
+  }
+}

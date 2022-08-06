@@ -11,6 +11,8 @@ import {
   drawAgents,
   drawBackgroundOps,
   drawBackgroundOp,
+  keepPortalsLoaded,
+  injectPortalsAsPlaceholders,
 } from "./mapDrawing";
 import addButtons from "./addButtons";
 import { setupToolbox } from "./toolbox";
@@ -151,6 +153,11 @@ window.plugin.wasabee.init = async () => {
     window.map.fire("wasabee:portal:click", e.target);
   }
   window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
+
+  /* Populate and keep op portal entities on the map */
+  window.addHook("mapDataEntityInject", injectPortalsAsPlaceholders); // once
+  window.map.on("wasabee:op:select", injectPortalsAsPlaceholders);
+  window.addHook("mapDataEntityInject", keepPortalsLoaded);
 
   window.map.on("wasabee:ui:skin", drawMap);
 
