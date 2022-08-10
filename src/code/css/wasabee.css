@@ -625,6 +625,10 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   grid-column: 1/4;
 }
 
+.wasabee-dialog-filter .filters .desc {
+  grid-column: 1/3;
+}
+
 .wasabee-dialog-filter label.checkbox input {
   margin-right: .5rem;
 }

@@ -253,6 +253,10 @@ export default class FilterDialog extends WDialog {
     anchor.textContent = wX("dialog.filter.filters.title");
     const panel = L.DomUtil.create("div", "filters");
 
+    L.DomUtil.create("div", "desc", panel).textContent = wX(
+      "dialog.filter.filters.description"
+    );
+
     const op = getSelectedOperation();
     const agentMap = new Map();
     for (const opteam of op.teamlist) {

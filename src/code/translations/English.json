@@ -136,6 +136,7 @@
   "dialog.filter.actions.delete_hidden": "Delete all other tasks",
   "dialog.filter.actions.title": "Actions",
   "dialog.filter.filters.apply": "Apply filters",
+  "dialog.filter.filters.description": "Select the properties to filter the tasks you want to see&change.",
   "dialog.filter.filters.field.task": "Task",
   "dialog.filter.filters.title": "Filters",
   "dialog.filter.title": "Filters&Actions",
