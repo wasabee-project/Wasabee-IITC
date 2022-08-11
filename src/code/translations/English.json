@@ -8,7 +8,7 @@
   "ADD_BULK": "Bulk add",
   "ADD_BUTTON_LINKS": "Add all links at once.",
   "ADD_LINKS": "Add Links",
-  "ADD_MARKER": "+ Marker",
+  "ADD_MARKER": "Add Marker",
   "ADD_NEW_OP": "Add New Op",
   "ADD_SUCC_INSTR": "Add agent successful",
   "ADD_ZONE": "Add Zone",
@@ -496,28 +496,6 @@
   "ZONE": "Zone",
   "smallScreen": {
     "ADD_LINKS": "+ Links",
-    "ADD_MARKER": "+ Marker",
-    "BLOCKER TITLE": "Blockers",
-    "CHECKLIST BUTTON": "Check",
-    "CLEAROPS BUTTON": "Clear",
-    "EXPORT OP": "Xport",
-    "FANFIELD": "Draw",
-    "FANFIELD2": "Draw Fan Field",
-    "KEYS": "Keys",
-    "LOG IN": "Log In",
-    "LOG_OUT": "Log Out",
-    "MARKER LIST": "Markers",
-    "MARKERS BUTTON TITLE": "Markers",
-    "MAX": "Fan",
-    "MM": "Multi",
-    "MULTI_M_TITLE": "Draw Max Layers",
-    "MULTI_M": "Draw",
-    "NEWOP BUTTON": "New Op",
-    "OPS BUTTON": "Select OP",
-    "QD END": "End",
-    "STARBURST_DRAW": "Draw",
-    "STARBURST": "Star",
-    "TEAMS BUTTON": "Teams",
-    "WD BUTTON": "W-D Keys"
+    "ADD_MARKER": "+ Marker"
   }
 }
