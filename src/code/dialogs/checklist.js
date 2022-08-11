@@ -115,12 +115,12 @@ const OperationChecklistDialog = WDialog.extend({
     const columns = [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
+        className: "order",
         value: (thing) => thing.order,
         // sort: (a, b) => a - b,
         format: (cell, value, thing) => {
           const oif = L.DomUtil.create("input");
           oif.value = value;
-          oif.size = 3;
           oif.disabled = !canWrite;
           oif.type = "number";
           oif.step = 1;

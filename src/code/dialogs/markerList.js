@@ -50,7 +50,7 @@ const MarkerList = OperationChecklistDialog.extend({
       title: wX("MARKER_LIST", { opName: operation.name }),
       html: this.sortable.table,
       width: "auto",
-      dialogClass: "markerlist",
+      dialogClass: "checklist",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.markerList,
     });

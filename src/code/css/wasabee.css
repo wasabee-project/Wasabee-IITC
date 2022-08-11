@@ -365,6 +365,9 @@
 .wasabee-dialog-checklist .wasabee-table .actions a {
     padding: .25em
 }
+.wasabee-dialog-checklist .wasabee-table .order input {
+    width: 3rem;
+}
 .wasabee-dialog-perms .add-perm {
   display: grid;
   grid-template-columns: repeat(4, auto);

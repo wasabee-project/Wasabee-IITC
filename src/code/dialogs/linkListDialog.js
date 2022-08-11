@@ -86,7 +86,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
       }),
       html: this.sortable.table,
       width: "auto",
-      dialogClass: "linklist",
+      dialogClass: "checklist",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
