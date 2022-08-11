@@ -89,7 +89,7 @@ export default class Task {
   }
 
   setOrder(o: number | string) {
-    this.order = +o || 0;
+    this.order = +o | 0;
   }
 
   assign(gid?: GoogleID) {
