@@ -82,13 +82,16 @@ const KeysList = WDialog.extend({
       },
       {
         name: wX("REQUIRED"),
-        value: (key) => key.Required,
+        value: (key) => key.required,
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          cell.textContent = value;
-          const oh = parseInt(key.onHand, 10);
-          const req = parseInt(key.Required, 10);
-          if (oh >= req) {
+          if (key.open) {
+            cell.textContent = wX("OPEN_REQUEST");
+          } else {
+            if (key.done) cell.textContent = value - key.done + "/" + value;
+            else cell.textContent = value;
+          }
+          if (key.onHand >= key.value - key.done) {
             L.DomUtil.addClass(cell, "enough");
           } else {
             L.DomUtil.addClass(cell, "notenough");
@@ -164,11 +167,17 @@ const KeysList = WDialog.extend({
       });
 
       k.id = a;
-      k.Required = links.length;
+      k.required = links.length;
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
-      // if (k.Required == 0) continue;
+      k.done = 0;
+      for (const l of links) {
+        if (l.completed) {
+          k.done++;
+        }
+      }
+      // if (k.required == 0) continue;
 
       const thesekeys = operation.keysonhand.filter(function (keys) {
         return keys.portalId == a;
@@ -190,7 +199,7 @@ const KeysList = WDialog.extend({
     })) {
       const k = {};
       k.id = p.portalId;
-      k.Required = wX("OPEN_REQUEST");
+      k.open = true;
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
