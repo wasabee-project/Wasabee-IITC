@@ -147,6 +147,8 @@
   "dialog.leave_team.title": "Leave: {teamName}",
   "dialog.link_list.length": "Length",
   "dialog.link_list.level": "Min Lvl",
+  "dialog.link_list.all_from": "Set all outbound",
+  "dialog.link_list.all_to": "Set all inbound",
   "dialog.conflict.cancel_upload": "Cancel upload",
   "dialog.conflict.conflicts": "Conflicts:",
   "dialog.conflict.local": "Local copy",

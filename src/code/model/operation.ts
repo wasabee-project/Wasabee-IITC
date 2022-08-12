@@ -562,16 +562,19 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.updateBlockers();
   }
 
-  reverseLink(startPortalID: PortalID, endPortalID: PortalID) {
-    const newLinks = [];
-    for (const l of this.links) {
-      if (l.fromPortalId == startPortalID && l.toPortalId == endPortalID) {
-        l.fromPortalId = endPortalID;
-        l.toPortalId = startPortalID;
+  reverseLink(startPortalID: PortalID | WasabeeLink, endPortalID?: PortalID) {
+    if (startPortalID instanceof WasabeeLink) {
+      const t = startPortalID.fromPortalId;
+      startPortalID.fromPortalId = startPortalID.toPortalId;
+      startPortalID.toPortalId = t;
+    } else {
+      for (const l of this.links) {
+        if (l.fromPortalId === startPortalID && l.toPortalId === endPortalID) {
+          l.fromPortalId = endPortalID;
+          l.toPortalId = startPortalID;
+        }
       }
-      newLinks.push(l);
     }
-    this.links = newLinks;
     this.update(true);
   }
 
