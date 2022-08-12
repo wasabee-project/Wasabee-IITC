@@ -585,6 +585,54 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   padding-right: .5em;
 }
 
+/* use padding on panel content */
+#dialog-wasabee-filter {
+  padding: 0;
+}
+
+#dialog-wasabee-filter .ui-tabs-panel {
+  padding: 12px;
+}
+
+.wasabee-dialog-filter .tabs .nav {
+  padding-left: 12px
+}
+
+.wasabee-dialog-filter .filters,
+.wasabee-dialog-filter .filters .set-portal-small {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  grid-gap: 0.3em 0.6em
+}
+
+.wasabee-dialog-filter .filters .set-portal-small {
+  grid-template-columns: auto min-content;
+}
+
+.wasabee-dialog-filter .filters .apply {
+  grid-column: 1/3;
+}
+
+.wasabee-dialog-filter .actions {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  grid-gap: 0.3em 0.6em
+}
+
+.wasabee-dialog-filter .actions .desc {
+  grid-column: 1/4;
+}
+
+.wasabee-dialog-filter .filters .desc {
+  grid-column: 1/3;
+}
+
+.wasabee-dialog-filter label.checkbox input {
+  margin-right: .5rem;
+}
+
 /* color pickers */
 input[type=color].hidden-color-picker {
   visibility: hidden;

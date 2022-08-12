@@ -19,6 +19,7 @@ import * as LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
 import { appendFAIcon } from "../auxiliar";
 import { getAgent } from "../model/cache";
+import { isFiltered } from "../filter";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -35,6 +36,7 @@ const OperationChecklistDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:filter", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
@@ -45,6 +47,7 @@ const OperationChecklistDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:filter", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
@@ -313,7 +316,7 @@ const OperationChecklistDialog = WDialog.extend({
     content.fields = this.getFields(operation);
     content.sortByStoreKey = sortByStoreKey;
     content.sortAscStoreKey = sortAscStoreKey;
-    content.items = items;
+    content.items = items.filter(isFiltered);
     return content;
   },
 
