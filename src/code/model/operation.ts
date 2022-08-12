@@ -865,6 +865,29 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.updateBlockers();
   }
 
+  duplicateAnchor(srcPortal: WasabeePortal, dstPortal: WasabeePortal) {
+    // local batch mode if needed
+    const needBatchMode = !this._batchmode;
+    if (needBatchMode) this.startBatchMode();
+
+    const links = this.getLinkListFromPortal(srcPortal);
+    for (const l of links) {
+      let from = this.getPortal(l.fromPortalId);
+      let to = this.getPortal(l.toPortalId);
+      if (from.id === srcPortal.id) from = dstPortal;
+      if (to.id === srcPortal.id) to = dstPortal;
+      this.addLink(from, to, {
+        description: l.comment,
+        order: l.order,
+        color: l.color,
+        replace: false,
+      });
+    }
+
+    // quit local batchmode
+    if (needBatchMode) this.endBatchMode();
+  }
+
   addMarker(
     markerType: string,
     portal: WasabeePortal,

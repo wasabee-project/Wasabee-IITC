@@ -1,6 +1,6 @@
 import LinkListDialog from "../dialogs/linkListDialog";
 import { getSelectedOperation } from "../selectedOp";
-import { swapPortal, deletePortal } from "../ui/anchor";
+import { swapPortal, deletePortal, duplicateAnchor } from "../ui/anchor";
 import wX from "../wX";
 
 import { displayFormat } from "../ui/portal";
@@ -89,12 +89,13 @@ export const WLAnchor = WLPortal.extend({
 
     const buttonSet = L.DomUtil.create(
       "div",
-      "wasabee-marker-buttonset",
+      "wasabee-anchor-buttonset",
       content
     );
     this._linksButton(buttonSet);
     if (canWrite) {
       this._swapButton(buttonSet);
+      this._dupButton(buttonSet);
       this._deleteButton(buttonSet, wX("DELETE_ANCHOR"));
     }
     this._mapButton(buttonSet, wX("ANCHOR_GMAP"));
@@ -122,11 +123,23 @@ export const WLAnchor = WLPortal.extend({
   _swapButton: function (container) {
     const operation = getSelectedOperation();
     const portal = operation.getPortal(this.options.portalId);
-    const swapButton = L.DomUtil.create("button", null, container);
+    const swapButton = L.DomUtil.create("button", "swap", container);
     swapButton.textContent = wX("SWAP");
     L.DomEvent.on(swapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       swapPortal(operation, portal);
+      this.closePopup();
+    });
+  },
+
+  _dupButton: function (container) {
+    const operation = getSelectedOperation();
+    const portal = operation.getPortal(this.options.portalId);
+    const dupButton = L.DomUtil.create("button", "duplicate", container);
+    dupButton.textContent = wX("popup.anchor.duplicate");
+    L.DomEvent.on(dupButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      duplicateAnchor(operation, portal);
       this.closePopup();
     });
   },

@@ -350,6 +350,7 @@
   "PERM DENIED SHORT": "Permission denied",
   "PERMS": "{opName} permissions",
   "PLEASE_SELECT_PORTAL": "Please select a portal",
+  "popup.anchor.duplicate": "Duplicate",
   "popup.anchor.keys": "Keys: {onHand} / {required}",
   "popup.anchor.keys_mycount": "Me: {myCount} / {required}",
   "popup.marker.state_button": "Set State",

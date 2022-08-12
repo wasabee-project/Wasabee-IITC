@@ -48,3 +48,15 @@ export function deletePortal(operation: WasabeeOp, portal: WasabeePortal) {
   });
   con.enable();
 }
+
+export function duplicateAnchor(operation: WasabeeOp, portal: WasabeePortal) {
+  const selectedPortal = getSelected();
+  if (!selectedPortal) {
+    displayError(wX("SELECT PORTAL"));
+    return;
+  }
+  if (portal.id === selectedPortal.id) {
+    return;
+  }
+  operation.duplicateAnchor(portal, selectedPortal);
+}

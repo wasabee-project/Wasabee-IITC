@@ -159,10 +159,19 @@
 }
 
 .wasabee-anchor-buttonset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .wasabee-anchor-buttonset button {
-  display: block;
+  grid-column: 1/3;
   width: 100%;
+}
+
+.wasabee-anchor-buttonset button.swap {
+  grid-column: 1/2;
+}
+.wasabee-anchor-buttonset button.duplicate {
+  grid-column: 2/3;
 }
 
 .wasabee-wd-popup ul {
