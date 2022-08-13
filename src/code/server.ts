@@ -684,12 +684,21 @@ async function generic<T>(request: {
 
     let jsonPayload;
     if (!request.raw) {
-      if (!payload && !request.retried && response.ok) {
-        // server shouldn't reply empty string
-        console.warn(
-          `server answers is empty on[${request.url}], retry once, just in case `
-        );
-        return generic<T>({ ...request, retried: true });
+      if (!payload && !request.retried) {
+        if (response.ok) {
+          // server shouldn't reply empty string
+          console.warn(
+            `server answer is empty on[${request.url}], retry once, just in case `
+          );
+          return generic<T>({ ...request, retried: true });
+        }
+        if (response.type === "opaqueredirect" && response.status === 0) {
+          // server shouldn't reply a redirect
+          console.warn(
+            `server answer is a redirect on[${request.url}], retry once, just in case `
+          );
+          return generic<T>({ ...request, retried: true });
+        }
       }
       try {
         jsonPayload = JSON.parse(payload);
