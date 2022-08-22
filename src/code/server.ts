@@ -724,6 +724,8 @@ async function generic<T>(request: {
       // fallthrough;
       case 403: // forbidden
       // fallthrough
+      case 406: // not acceptable
+      // fallthrough
       case 410: // Gone
       // fallthrough
       case 412: // mismatch etag

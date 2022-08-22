@@ -10,7 +10,7 @@ import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
 import ConflictDialog from "../dialogs/conflictDialog";
 import wX from "../wX";
-import { displayError, displayInfo } from "../error";
+import { displayError, displayInfo, ServerError } from "../error";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -106,6 +106,12 @@ const UploadButton = WButton.extend({
       this.button.classList.remove("loading");
       this.update();
     } catch (e) {
+      if (e instanceof ServerError) {
+        if (e.code == 406) {
+          displayError(`Upload Failed: ${e.toString()}`);
+          return;
+        }
+      }
       // not triggered this in a while...
       console.warn(e.toString() + ": trying as update");
       this.doUpdate(operation);
