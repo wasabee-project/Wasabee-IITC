@@ -310,11 +310,21 @@
   grid-template-columns: 1fr;
 }
 
-.wasabee-dialog-op-settings div.topset {
+.wasabee-dialog-op-settings div.topset,
+.wasabee-dialog-op-settings div.advanced {
   display: grid;
   grid-template-columns: 1fr 1fr;
   row-gap: 4px;
   align-items: center;
+}
+.wasabee-dialog-op-settings div.advanced select {
+  width: 100%;
+}
+.wasabee-dialog-op-settings div.advanced label.checkbox input {
+  margin-right: .5rem;
+}
+.wasabee-dialog-op-settings div.advanced label.checkbox input:not(:checked) ~ span {
+  text-decoration: line-through;
 }
 .wasabee-dialog-op-settings textarea {
   grid-column-start: 1;

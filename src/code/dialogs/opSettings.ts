@@ -10,10 +10,11 @@ import {
   removeOperation,
   duplicateOperation,
   changeOpIfNeeded,
+  opsList,
 } from "../selectedOp";
 import wX from "../wX";
 import { addToColorList } from "../skin";
-import { WasabeeMe } from "../model";
+import { WasabeeMe, WasabeeOp } from "../model";
 
 import { convertColorToHex } from "../auxiliar";
 import { displayError } from "../error";
@@ -21,6 +22,7 @@ import { clearAllItems } from "../ui/operation";
 import { buildZoneList } from "./components/zoneList";
 import { setLinksToZones, setMarkersToZones } from "../ui/zone";
 import { buildPermList } from "./components/permList";
+import ConflictDialog from "./conflictDialog";
 
 class OpSettingDialog extends WDialog {
   static TYPE = "opSettingDialog";
@@ -28,7 +30,7 @@ class OpSettingDialog extends WDialog {
   _activeTab: number;
   _zoneHandler: ZonedrawHandler;
 
-  addHooks () {
+  addHooks() {
     super.addHooks();
     this._zoneHandler = new ZonedrawHandler(window.map, { parent: this });
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
@@ -36,12 +38,12 @@ class OpSettingDialog extends WDialog {
     this._displayDialog();
   }
 
-  removeHooks () {
+  removeHooks() {
     super.removeHooks();
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   }
 
-  _displayDialog () {
+  _displayDialog() {
     const content = this.makeContent();
 
     const buttons = {};
@@ -60,7 +62,7 @@ class OpSettingDialog extends WDialog {
     });
   }
 
-  update () {
+  update() {
     if (this.enabled()) {
       this.setTitle(wX("OP_SETTINGS_TITLE"));
       const content = this.makeContent();
@@ -69,14 +71,14 @@ class OpSettingDialog extends WDialog {
   }
 
   buildZoneTab(): [HTMLAnchorElement, HTMLDivElement] {
-    const head = L.DomUtil.create('a');
+    const head = L.DomUtil.create("a");
     head.textContent = wX("dialog.op_settings.zones");
 
-    const tab = L.DomUtil.create('div');
+    const tab = L.DomUtil.create("div");
     tab.appendChild(buildZoneList(this._zoneHandler));
 
     const buttonSection = L.DomUtil.create("div", "buttonset", tab);
-    const buttons: {[label: string]: () => void } = {};
+    const buttons: { [label: string]: () => void } = {};
     buttons[wX("ADD_ZONE")] = () => {
       if (getSelectedOperation().canWrite()) getSelectedOperation().addZone();
     };
@@ -87,9 +89,9 @@ class OpSettingDialog extends WDialog {
       if (getSelectedOperation().canWrite()) setLinksToZones();
     };
     for (const label in buttons) {
-      const button = L.DomUtil.create('button', null, buttonSection);
+      const button = L.DomUtil.create("button", null, buttonSection);
       button.textContent = label;
-      L.DomEvent.on(button, 'click', buttons[label]);
+      L.DomEvent.on(button, "click", buttons[label]);
     }
 
     return [head, tab];
@@ -98,11 +100,70 @@ class OpSettingDialog extends WDialog {
   buildPermTab(): [HTMLAnchorElement, HTMLDivElement] {
     const selectedOp = getSelectedOperation();
 
-    const head = L.DomUtil.create('a');
+    const head = L.DomUtil.create("a");
     head.textContent = wX("OP_PERMS");
 
-    const tab = L.DomUtil.create('div');
+    const tab = L.DomUtil.create("div");
     tab.appendChild(buildPermList(selectedOp, WasabeeMe.cacheGet()));
+    return [head, tab];
+  }
+
+  buildAdvancedTab(): [HTMLAnchorElement, HTMLDivElement] {
+    const selectedOp = getSelectedOperation();
+
+    const head = L.DomUtil.create("a");
+    head.textContent = wX("dialog.op_settings.advanced");
+
+    const tab = L.DomUtil.create("div", "advanced");
+    if (selectedOp.canWrite()) {
+      const button = L.DomUtil.create("button", null, tab);
+      button.textContent = wX("dialog.op_settings.import_from_op");
+
+      const opMenu = L.DomUtil.create("select", null, tab);
+      opsList().then(async (opIDs) => {
+        const ops = await Promise.all(opIDs.map(WasabeeOp.load));
+        const options = ops.map((op) => [op.ID, op.name]);
+        options.sort((a, b) => a[1].localeCompare(b[1]));
+        for (const [id, name] of options) {
+          if (id === selectedOp.ID) continue;
+          const option = L.DomUtil.create("option", null, opMenu);
+          option.value = id;
+          option.textContent = name;
+        }
+      });
+
+      const title = L.DomUtil.create("label", "checkbox", tab);
+      const check = L.DomUtil.create("input", "", title);
+      check.type = "checkbox";
+      check.checked = true;
+      L.DomUtil.create("span", "", title).textContent = wX(
+        "dialog.op_settings.import_with_color"
+      );
+
+      const picker = L.DomUtil.create("input", "picker", tab);
+      picker.type = "color";
+      picker.value = convertColorToHex(selectedOp.color);
+      picker.setAttribute("list", "wasabee-colors-datalist");
+
+      L.DomEvent.on(button, "click", async () => {
+        const importOp = await WasabeeOp.load(opMenu.value);
+        delete importOp.fetchedOp;
+        if (check.checked) {
+          for (const link of importOp.links) {
+            if (link.color === "main" || link.color === importOp.color) {
+              link.color = picker.value;
+            }
+          }
+        }
+        importOp.ID = getSelectedOperation().ID;
+        const md = new ConflictDialog({
+          opOwn: importOp,
+          opRemote: getSelectedOperation(),
+        });
+        md.enable();
+      });
+    }
+
     return [head, tab];
   }
 
@@ -110,10 +171,10 @@ class OpSettingDialog extends WDialog {
     const selectedOp = getSelectedOperation();
     const writable = selectedOp.canWrite();
 
-    const head = L.DomUtil.create('a');
+    const head = L.DomUtil.create("a");
     head.textContent = wX("dialog.op_settings.setting");
 
-    const tab = L.DomUtil.create('div');
+    const tab = L.DomUtil.create("div");
     const topSet = L.DomUtil.create("div", "topset", tab);
 
     if (writable) {
@@ -264,7 +325,7 @@ class OpSettingDialog extends WDialog {
     return [head, tab];
   }
 
-  makeContent () {
+  makeContent() {
     const selectedOp = getSelectedOperation();
     const writable = selectedOp.canWrite();
 
@@ -298,6 +359,7 @@ class OpSettingDialog extends WDialog {
     if (selectedOp.isServerOp()) {
       tabArray.push(this.buildPermTab());
     }
+    tabArray.push(this.buildAdvancedTab());
 
     /* Create jquery-like tabs */
     const tabs = L.DomUtil.create("div", "ui-tabs tabs", content);
