@@ -5,7 +5,7 @@ import { sendLocation } from "../uiCommands";
 import { wX } from "../wX";
 import { postToFirebase } from "../firebase/logger";
 import { WasabeeMe } from "../model";
-import { displayError, ServerError } from "../error";
+import { displayError, displayInfo, ServerError } from "../error";
 import {
   isAuthAvailable,
   getAccessToken,
@@ -38,7 +38,9 @@ const AuthDialog = WDialog.extend({
     me.store();
     window.map.fire("wasabee:login");
     this.closeDialog();
-    fullSync();
+    fullSync().then((success) => {
+      if (success) displayInfo(wX("SYNC DONE"));
+    });
     if (me.querytoken)
       setIntelID(window.PLAYER.nickname, window.PLAYER.team, me.querytoken);
   },

@@ -5,7 +5,6 @@ import { WasabeeMe, WasabeeOp } from "../model";
 import { GetWasabeeServer } from "../config";
 import ConflictDialog from "../dialogs/conflictDialog";
 import {
-  displayInfo,
   ServerError,
   displayError,
   displayWarning,
@@ -170,7 +169,9 @@ export async function fullSync() {
 
     window.map.fire("wasabee:teams"); // if any team dialogs are open
 
-    displayInfo(wX("SYNC DONE"));
+    // update UI to reflect new ops list
+    window.map.fire("wasabee:fullsync");
+    return true;
   } catch (e) {
     console.error(e);
     if (e instanceof ServerError) displayError(e);
@@ -178,6 +179,7 @@ export async function fullSync() {
   }
   // update UI to reflect new ops list
   window.map.fire("wasabee:fullsync");
+  return false;
 }
 
 export async function syncOp(opID: OpID) {
