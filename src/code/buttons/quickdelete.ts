@@ -59,17 +59,17 @@ class QuickDeleteButton extends WButton {
 
   toggleActions() {
     if (this.state == "off") {
-      this.state = "on";
-      this.enable();
-      this.setSubActions(this.getSubActions());
-      postToFirebase({ id: "analytics", action: "quickdelete" });
-    } else if (this.state == "on") {
-      this.disable();
       this.state = "instant";
       this.enable();
       this.setSubActions(this.getSubActions());
       postToFirebase({ id: "analytics", action: "quickdelete:instant" });
       this.button.classList.add("blink");
+    } else if (this.state == "instant") {
+      this.disable();
+      this.state = "on";
+      this.enable();
+      this.setSubActions(this.getSubActions());
+      postToFirebase({ id: "analytics", action: "quickdelete" });
     } else {
       this.disable();
     }
@@ -110,19 +110,18 @@ class QuickDeleteButton extends WButton {
           callback: this.disable,
           context: this,
         },
+        {
+          text: wX("toolbar.quick_delete.clear.text"),
+          title: wX("toolbar.quick_delete.clear.title"),
+          callback: this.actionClear,
+          context: this,
+        },
       ];
 
     const applySubAction = {
       text: wX("toolbar.quick_delete.apply.text"),
       title: wX("toolbar.quick_delete.apply.title"),
       callback: this.actionApply,
-      context: this,
-    };
-
-    const clearAllSubAction = {
-      text: wX("toolbar.quick_delete.clear.text"),
-      title: wX("toolbar.quick_delete.clear.title"),
-      callback: this.actionClear,
       context: this,
     };
 
@@ -133,7 +132,7 @@ class QuickDeleteButton extends WButton {
       context: this,
     };
 
-    return [applySubAction, clearAllSubAction, cancelSubAction];
+    return [applySubAction, cancelSubAction];
   }
 
   enable() {
