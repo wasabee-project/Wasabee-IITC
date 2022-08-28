@@ -3,7 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebase/logger";
 
-import * as PortalUI from "../ui/portal";
+import { WasabeePortal } from "../model";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -248,10 +248,9 @@ const QuickDrawControl = L.Handler.extend({
     return wX("toolbar.quick_draw.tooltip.single_mode.next");
   },
 
-  _portalClicked: function (portal) {
-    const selectedPortal = PortalUI.fromIITC(portal);
-    if (!selectedPortal) {
-      // XXX wX this
+  _portalClicked: function (ev) {
+    const selectedPortal = ev.portal;
+    if (!(selectedPortal instanceof WasabeePortal)) {
       this._tooltip.updateContent(wX("toolbar.quick_draw.tooltip.portal_fail"));
       return;
     }

@@ -21,6 +21,13 @@ export const WLPortal = L.Marker.extend({
     this.off("click", this._openPopup);
     window.registerMarkerForOMS(this);
     this.on("spiderfiedclick", this._openPopup);
+    this.on("spiderfiedclick", this._onClick);
+  },
+
+  _onClick: function () {
+    const operation = getSelectedOperation();
+    const portal = operation.getPortal(this.options.portalId);
+    if (portal) window.map.fire("wasabee:portal:click", { portal });
   },
 
   _popupContent: function () {
