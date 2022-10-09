@@ -2,8 +2,12 @@ import { WTooltip, WButton } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebase/logger";
+import { constants } from "../static";
 
 import { WasabeePortal } from "../model";
+import { MultiLayer } from "./quickdraw/multilayer";
+import { SingleLink } from "./quickdraw/singlelink";
+import { StarBurst } from "./quickdraw/starburst";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -103,7 +107,6 @@ const QuickDrawControl = L.Handler.extend({
     // L.Util.extend(this.options, options);
 
     this.type = "QuickDrawControl";
-    this._drawMode = "quickdraw";
   },
 
   enable: function () {
@@ -126,17 +129,21 @@ const QuickDrawControl = L.Handler.extend({
   addHooks: function () {
     L.DomUtil.disableTextSelection();
 
+    this._modes = [MultiLayer, SingleLink, StarBurst];
+
     this._tooltip = new WTooltip(this._map);
+    this._guideLayerGroup = new L.LayerGroup();
+    window.addLayerGroup(
+      "Wasabee Quickdraw Guide",
+      this._guideLayerGroup,
+      false
+    );
 
     this._operation = getSelectedOperation();
     this._nextDrawnLinksColor = this._operation.color;
     this._opID = this._operation.ID;
-    this._anchor = null;
-    this._anchor1 = null;
-    this._anchor2 = null;
-    this._previous = null;
-    this._tooltip.updateContent(this._getTooltipText());
-    this._throwOrder = this._operation.nextOrder;
+    this._currentMode = new this._modes[0]();
+    this._tooltip.updateContent(this._currentMode.getTooltip());
 
     window.map.on("wasabee:portal:click", this._portalClicked, this);
     window.map.on("wasabee:op:select", this._opchange, this);
@@ -145,17 +152,7 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   removeHooks: function () {
-    if (this._guideLayerGroup) {
-      window.removeLayerGroup(this._guideLayerGroup);
-      this._guideLayerGroup = null;
-    }
-
-    this._anchor = null;
-    this._anchor1 = null;
-    this._anchor2 = null;
-    this._previous = null;
-    this._guideA = null;
-    this._guideB = null;
+    window.removeLayerGroup(this._guideLayerGroup);
 
     L.DomUtil.enableTextSelection();
     this._tooltip.dispose();
@@ -168,7 +165,6 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _opchange: function () {
-    postToFirebase({ id: "analytics", action: "quickdrawOpchange" });
     if (!this._enabled) return;
 
     if (getSelectedOperation().ID != this._opID) {
@@ -206,46 +202,21 @@ const QuickDrawControl = L.Handler.extend({
   },
 
   _guideUpdate: function (e) {
-    if (!this._guideLayerGroup) return;
-    for (const l of this._guideLayerGroup.getLayers()) {
-      l.setLatLngs([l.options.anchorLL, e.latlng]);
+    this._guideLayerGroup.clearLayers();
+    for (const lls of this._currentMode.getGuides(e.latlng)) {
+      L.polyline(lls, constants.QUICKDRAW_GUIDE_STYLE).addTo(
+        this._guideLayerGroup
+      );
     }
   },
 
   _guideLayerToggle: function () {
-    if (!this._guideLayerGroup) {
-      this._guideLayerGroup = new L.LayerGroup();
-      window.addLayerGroup(
-        "Wasabee Quickdraw Guide",
-        this._guideLayerGroup,
-        true
-      );
-      if (this._guideA) this._guideA.addTo(this._guideLayerGroup);
-      if (this._guideB) this._guideB.addTo(this._guideLayerGroup);
+    if (window.map.hasLayer(this._guideLayerGroup))
+      this._guideLayerGroup.remove();
+    else {
+      this._guideLayerGroup.addTo(window.map);
       window.Render.prototype.bringPortalsToFront();
-    } else {
-      window.removeLayerGroup(this._guideLayerGroup);
-      this._guideLayerGroup = null;
     }
-  },
-
-  _getTooltipText: function () {
-    if (this._drawMode === "quickdraw") {
-      if (!this._anchor1) return wX("QDSTART");
-      if (!this._anchor2) return wX("QDNEXT");
-      return wX("QDCONT");
-    }
-    if (this._drawMode === "star") {
-      // XXX wX this
-      if (!this._anchor)
-        return wX("toolbar.quick_draw.tooltip.star_mode.anchor");
-      return wX("toolbar.quick_draw.tooltip.star_mode.portal");
-    }
-    // must be in single-link mode
-    // XXX wX this
-    if (!this._previous)
-      return wX("toolbar.quick_draw.tooltip.single_mode.first");
-    return wX("toolbar.quick_draw.tooltip.single_mode.next");
   },
 
   _portalClicked: function (ev) {
@@ -254,140 +225,18 @@ const QuickDrawControl = L.Handler.extend({
       this._tooltip.updateContent(wX("toolbar.quick_draw.tooltip.portal_fail"));
       return;
     }
-    if (this._drawMode == "quickdraw") {
-      this._portalClickedQD(selectedPortal);
-    } else if (this._drawMode == "star") {
-      this._portalClickedStar(selectedPortal);
-    } else {
-      this._portalClickedSingle(selectedPortal);
-    }
-  },
-
-  _portalClickedQD: function (selectedPortal) {
-    const guideStyle =
-      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
-    guideStyle.anchorLL = selectedPortal.latLng;
-
-    if (!this._anchor1) {
-      // this._throwOrder = this._operation.nextOrder;
-      this._anchor1 = selectedPortal;
-      this._tooltip.updateContent(this._getTooltipText());
-      localStorage[window.plugin.wasabee.static.constants.ANCHOR_ONE_KEY] =
-        JSON.stringify(this._anchor1);
-
-      this._guideA = L.geodesicPolyline(
-        [selectedPortal.latLng, selectedPortal.latLng],
-        guideStyle
-      );
-      if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
-      return;
-    }
-    if (!this._anchor2) {
-      if (selectedPortal.id === this._anchor1.id) return;
-      this._anchor2 = selectedPortal;
-      this._operation.addLink(this._anchor1, this._anchor2, {
-        description: wX("QDBASE"),
-        order: this._operation.nextOrder,
-        color: this._nextDrawnLinksColor,
-      });
-      this._tooltip.updateContent(this._getTooltipText());
-      localStorage[window.plugin.wasabee.static.constants.ANCHOR_TWO_KEY] =
-        JSON.stringify(this._anchor2);
-      this._guideB = L.geodesicPolyline(
-        [selectedPortal.latLng, selectedPortal.latLng],
-        guideStyle
-      );
-      if (this._guideLayerGroup) this._guideB.addTo(this._guideLayerGroup);
-      return;
-    }
-
-    this._operation.addLink(selectedPortal, this._anchor1, {
-      order: this._operation.nextOrder,
+    this._currentMode.onPortalClick(this._operation, selectedPortal, {
       color: this._nextDrawnLinksColor,
     });
-    this._operation.addLink(selectedPortal, this._anchor2, {
-      order: this._operation.nextOrder,
-      color: this._nextDrawnLinksColor,
-    });
-    this._tooltip.updateContent(this._getTooltipText());
+    this._tooltip.updateContent(this._currentMode.getTooltip());
   },
 
   _toggleMode: function () {
-    // changing mode resets all the things
-    this._anchor = null;
-    this._anchor1 = null;
-    this._anchor2 = null;
-    this._previous = null;
-    this._guideA = null;
-    this._guideB = null;
-    if (this._guideLayerGroup) this._guideLayerGroup.clearLayers();
+    this._modes.push(this._modes.shift());
+    this._currentMode = new this._modes[0]();
 
-    if (this._drawMode == "quickdraw") {
-      console.log("switching to single link");
-      this._drawMode = "singlelink";
-    } else if (this._drawMode == "singlelink") {
-      console.log("switching to star");
-      this._drawMode = "star";
-    } else {
-      console.log("switching to layers");
-      this._drawMode = "quickdraw";
-    }
-    this._tooltip.updateContent(this._getTooltipText());
-  },
-
-  _portalClickedSingle: function (selectedPortal) {
-    // IITC sending 2 portalClicked for 1 mouse click
-    if (this._previous && this._previous.id == selectedPortal.id) {
-      return;
-    }
-
-    if (this._previous) {
-      this._operation.addLink(this._previous, selectedPortal, {
-        order: this._throwOrder++,
-        color: this._nextDrawnLinksColor,
-      });
-    }
-
-    // all portals, including the first
-    const guideStyle =
-      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
-    guideStyle.anchorLL = selectedPortal.latLng;
-
-    if (this._guideA) this._guideA.remove();
-    this._guideA = L.geodesicPolyline(
-      [selectedPortal.latLng, selectedPortal.latLng],
-      guideStyle
-    );
-    if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
-    this._previous = selectedPortal;
-    this._tooltip.updateContent(this._getTooltipText());
-  },
-
-  _portalClickedStar: function (selectedPortal) {
-    // IITC sending 2 portalClicked for 1 mouse click
-    if (this._anchor && this._anchor.id == selectedPortal.id) {
-      return;
-    }
-
-    if (this._anchor) {
-      this._operation.addLink(selectedPortal, this._anchor, {
-        order: this._throwOrder++,
-        color: this._nextDrawnLinksColor,
-      });
-    } else this._anchor = selectedPortal;
-
-    // all portals, including the first
-    const guideStyle =
-      window.plugin.wasabee.static.constants.QUICKDRAW_GUIDE_STYLE;
-    guideStyle.anchorLL = this._anchor.latLng;
-
-    if (this._guideA) this._guideA.remove();
-    this._guideA = L.geodesicPolyline(
-      [this._anchor.latLng, selectedPortal.latLng],
-      guideStyle
-    );
-    if (this._guideLayerGroup) this._guideA.addTo(this._guideLayerGroup);
-    this._tooltip.updateContent(this._getTooltipText());
+    this._guideLayerGroup.clearLayers();
+    this._tooltip.updateContent(this._currentMode.getTooltip());
   },
 });
 
