@@ -135,7 +135,6 @@ const UploadButton = WButton.extend({
         // reload if we use rebase
         if (operation != getSelectedOperation())
           await makeSelectedOperation(operation.ID);
-        displayInfo(wX("UPDATED"));
         this.update();
       } else {
         // need rebase or force
