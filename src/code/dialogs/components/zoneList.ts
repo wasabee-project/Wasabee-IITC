@@ -2,6 +2,7 @@ import { convertColorToHex, appendFAIcon } from "../../auxiliar";
 import { getSelectedOperation } from "../../selectedOp";
 import { addToColorList } from "../../skin";
 import wX from "../../wX";
+import ConfirmDialog from "../confirmDialog";
 import type { ZonedrawHandler } from "../zoneDrawHandler";
 import ZoneSetColorDialog from "../zoneSetColor";
 
@@ -84,7 +85,15 @@ export function buildZoneList(
         appendFAIcon("trash", del);
         L.DomEvent.on(del, "click", (ev) => {
           L.DomEvent.stop(ev);
-          getSelectedOperation().removeZone(z.id);
+          const con = new ConfirmDialog({
+            title: wX("dialog.zones.delete.title", { zoneName: z.name }),
+            label: wX("dialog.zones.delete.text", { zoneName: z.name }),
+            type: "operation",
+            callback: async () => {
+              getSelectedOperation().removeZone(z.id);
+            }
+          });
+          con.enable();
         });
       }
       if (zoneHandler && zoneHandler.zoneID === z.id && zoneHandler.enabled()) {

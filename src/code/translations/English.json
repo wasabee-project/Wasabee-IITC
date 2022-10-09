@@ -194,6 +194,8 @@
   "dialog.zone_color.text": "Set the color of all links in zone {zoneName}",
   "dialog.zones.color": "Color",
   "dialog.zones.color_links": "Color links",
+  "dialog.zones.delete.title": "Delete zone {zoneName}",
+  "dialog.zones.delete.text": "Do you want to delete zone “{zoneName}” ?",
   "dialog.zones.delete_zone_shape": "Reset the shape",
   "dialog.zones.draw_zone_shape": "Draw the boundaries",
   "dialog.zones.id": "ID",
