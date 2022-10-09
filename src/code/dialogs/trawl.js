@@ -320,15 +320,13 @@ const TrawlDialog = WDialog.extend({
   _clearMarkers: function () {
     const operation = getSelectedOperation();
 
-    operation.startBatchMode();
-    for (const m of operation.markers) {
-      if (
-        m.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
-        m.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS
-      )
-        operation.removeMarker(m);
-    }
-    operation.endBatchMode();
+    operation.markers = operation.markers.filter(
+      (m) =>
+        m.type !== WasabeeMarker.constants.MARKER_TYPE_DESTROY &&
+        m.type !== WasabeeMarker.constants.MARKER_TYPE_VIRUS
+    );
+    // we don't clear op portals to keep data that may be used for the trawl
+    operation.update();
   },
 
   _bulkLoad: function (latlngs, mapZoom) {

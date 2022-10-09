@@ -76,9 +76,10 @@ const BlockerList = WDialog.extend({
       buttons[wX("dialog.blockers.clear_automark")] = () => {
         const operation = getSelectedOperation();
         operation.startBatchMode();
-        for (const m of operation.markers) {
-          if (m.comment == "auto-marked") operation.removeMarker(m);
-        }
+        operation.markers = operation.markers.filter(
+          (m) => m.comment !== "auto-marked"
+        );
+        operation.cleanPortalList();
         operation.endBatchMode();
       };
     }
