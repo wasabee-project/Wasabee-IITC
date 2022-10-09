@@ -66,14 +66,18 @@ function testLink(link: IITC.Link, operation: WasabeeOp) {
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
       showCrossLink(link);
-      let fromPortal = PortalUI.get(link.options.data.oGuid);
+      let fromPortal =
+        operation.getPortal(link.options.data.oGuid) ||
+        PortalUI.get(link.options.data.oGuid);
       if (!fromPortal)
         fromPortal = WasabeePortal.fake(
           (link.options.data.oLatE6 / 1e6).toFixed(6),
           (link.options.data.oLngE6 / 1e6).toFixed(6),
           link.options.data.oGuid
         );
-      let toPortal = PortalUI.get(link.options.data.dGuid);
+      let toPortal =
+        operation.getPortal(link.options.data.dGuid) ||
+        PortalUI.get(link.options.data.dGuid);
       if (!toPortal)
         toPortal = WasabeePortal.fake(
           (link.options.data.dLatE6 / 1e6).toFixed(6),

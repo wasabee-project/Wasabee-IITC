@@ -62,7 +62,7 @@ export default class WasabeeBlocker {
     return true;
   }
 
-  static async removeBlocker(op, portalId) {
+  static async removeBlocker(op: WasabeeOp, portalId: PortalID) {
     const store = (await db).transaction("blockers", "readwrite").store;
     let cfrom = await store
       .index("from")
@@ -81,7 +81,7 @@ export default class WasabeeBlocker {
     await (await db).delete("blockers_portals", [op.ID, portalId]);
   }
 
-  static async removeBlockers(opID: string) {
+  static async removeBlockers(opID: OpID) {
     const sb = (await db).transaction("blockers", "readwrite").store;
     let co = await sb.index("opID").openKeyCursor(IDBKeyRange.only(opID));
     while (co) {
