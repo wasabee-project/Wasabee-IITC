@@ -327,8 +327,8 @@
   grid-column-start: 1;
   grid-column-end: 3;
 }
-.wasabee-dialog-op-settings input {
-  width: 100%;
+.wasabee-dialog-op-settings input[type=color] {
+  min-width: 100%;
   -moz-transform: scale(1);
 }
 .wasabee-dialog-op-settings div.buttonset {
