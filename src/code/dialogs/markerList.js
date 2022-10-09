@@ -27,6 +27,16 @@ const MarkerList = OperationChecklistDialog.extend({
     buttons[wX("CLEAR MARKERS")] = () => {
       clearAllMarkers(getSelectedOperation());
     };
+    buttons[wX("dialog.blockers.clear_automark")] = () => {
+      // same lines as blockersList...
+      const operation = getSelectedOperation();
+      operation.startBatchMode();
+      operation.markers = operation.markers.filter(
+        (m) => m.comment !== "auto-marked"
+      );
+      operation.cleanPortalList();
+      operation.endBatchMode();
+    };
 
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
