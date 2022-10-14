@@ -7,6 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
+import { isFiltered } from "../filter";
 
 const KeysList = WDialog.extend({
   statics: {
@@ -21,7 +22,9 @@ const KeysList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
+    window.map.on("wasabee:login wasabee:logout", this.update, this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:filter", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = WasabeeMe.localGet();
     } else {
@@ -32,7 +35,9 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:login wasabee:logout", this.update, this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:filter", this.update, this);
   },
 
   _displayDialog: function () {
@@ -163,8 +168,11 @@ const KeysList = WDialog.extend({
     for (const a of operation.anchors) {
       const k = {};
       const links = operation.links.filter(function (listLink) {
-        return listLink.toPortalId == a;
+        return isFiltered(listLink) && listLink.toPortalId == a;
       });
+
+      // skip filtered out anchor
+      if (!links.length) continue;
 
       k.id = a;
       k.required = links.length;
@@ -195,7 +203,10 @@ const KeysList = WDialog.extend({
     }
 
     for (const p of operation.markers.filter(function (marker) {
-      return marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY;
+      return (
+        isFiltered(marker) &&
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY
+      );
     })) {
       const k = {};
       k.id = p.portalId;
