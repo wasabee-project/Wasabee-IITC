@@ -143,6 +143,7 @@
   "dialog.firebase.setup": "Visit {url} and press the button to authorize live updates. You will need to reload IITC afterward.",
   "dialog.import.url": "Fill from URL",
   "dialog.import.success_message": "Import Complete. Found {count} portals and used {faked} faked. Please use the swap feature to move faked portals to the real portals at the same location. Zooming in on the 'Loading' portals in the checklist might force them to load.",
+  "dialog.keys.update_error": "Portal not in op yet, please sync to server first",
   "dialog.leave_team.text": "If you leave {teamName} you cannot rejoin unless the owner re-adds you.",
   "dialog.leave_team.title": "Leave: {teamName}",
   "dialog.link_list.length": "Length",

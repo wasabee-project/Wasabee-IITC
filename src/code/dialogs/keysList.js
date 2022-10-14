@@ -7,7 +7,17 @@ import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
+import { displayError, ServerError } from "../error";
 import { isFiltered } from "../filter";
+
+function sendKeyData(opID, portalID, onhand, capsule) {
+  return opKeyPromise(opID, portalID, onhand, capsule).catch((e) => {
+    if (e instanceof ServerError && e.code == 406) {
+      displayError(wX("dialog.keys.update_error"));
+    }
+    return Promise.reject();
+  });
+}
 
 const KeysList = WDialog.extend({
   statics: {
@@ -123,7 +133,7 @@ const KeysList = WDialog.extend({
     ];
 
     let gid = "no-user";
-    if (this._me) {
+    if (this._me && operation.isOnCurrentServer()) {
       gid = this._me.id;
       this.sortable.fields = always.concat([
         {
@@ -135,9 +145,11 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isOnCurrentServer())
-                opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
-              operation.keyOnHand(key.id, gid, oif.value, key.capsule);
+              sendKeyData(operation.ID, key.id, oif.value, key.capsule)
+                .then(() =>
+                  operation.keyOnHand(key.id, gid, oif.value, key.capsule)
+                )
+                .catch(() => (oif.value = value));
             });
             cell.appendChild(oif);
           },
@@ -151,9 +163,11 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isOnCurrentServer())
-                opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
-              operation.keyOnHand(key.id, gid, key.iHave, oif.value);
+              sendKeyData(operation.ID, key.id, key.iHave, oif.value)
+                .then(() =>
+                  operation.keyOnHand(key.id, gid, key.iHave, oif.value)
+                )
+                .catch(() => (oif.value = value));
             });
             cell.appendChild(oif);
           },
