@@ -75,7 +75,8 @@ export const SetCommentDialog = WDialog.extend({
   },
 
   _buildHtml: function () {
-    const container = L.DomUtil.create("div", "container");
+    const container = L.DomUtil.create("form", "container");
+    L.DomEvent.on(container, "submit", this.closeDialog, this);
     const desc = L.DomUtil.create("div", "desc", container);
     const input = L.DomUtil.create("input", null, container);
     input.placeholder = wX("COMMENT");

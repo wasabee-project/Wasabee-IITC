@@ -374,7 +374,7 @@
 }
 .wasabee-dialog-prompt {
 }
-.wasabee-dialog-prompt div.container {
+.wasabee-dialog-prompt .container {
   display: grid;
 }
 .wasabee-dialog-prompt label {
@@ -385,7 +385,7 @@
 }
 .wasabee-dialog-setcomment {
 }
-.wasabee-dialog-setcomment div.container {
+.wasabee-dialog-setcomment .container {
   display: grid;
 }
 .wasabee-dialog-setcomment div.desc {
