@@ -1,7 +1,7 @@
 import { WDialog } from "../leafletClasses";
 import {
   removeAgentFromTeamPromise,
-  setAgentTeamSquadPromise,
+  setAgentTeamCommentPromise,
   addAgentToTeamPromise,
   renameTeamPromise,
   rocksPromise,
@@ -67,15 +67,15 @@ const ManageTeamDialog = WDialog.extend({
           button.textContent = value;
           L.DomEvent.on(button, "click", (ev) => {
             L.DomEvent.stop(ev);
-            const squadDialog = new PromptDialog({
+            const commentDialog = new PromptDialog({
               title: wX("dialog.agent_comment.title", { agentName: obj.name }),
               label: wX("dialog.agent_comment.text"),
               callback: async () => {
                 try {
-                  await setAgentTeamSquadPromise(
+                  await setAgentTeamCommentPromise(
                     obj.id,
                     this.options.team.ID,
-                    squadDialog.inputField.value
+                    commentDialog.inputField.value
                   );
                   // refresh team data
                   await getTeam(this.options.team.ID, 0);
@@ -88,7 +88,7 @@ const ManageTeamDialog = WDialog.extend({
               current: value,
               placeholder: "boots",
             });
-            squadDialog.enable();
+            commentDialog.enable();
           });
         },
       },

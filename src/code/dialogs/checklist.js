@@ -74,12 +74,14 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("dialog.checklist.count_fields")] = () => {
       this.countFields(getSelectedOperation(), true);
     };
-    buttons[wX("SET_MARKERS_ZONES")] = () => {
-      setMarkersToZones();
-    };
-    buttons[wX("SET_LINKS_ZONES")] = () => {
-      setLinksToZones();
-    };
+    if (operation.canWrite()) {
+      buttons[wX("SET_MARKERS_ZONES")] = () => {
+        setMarkersToZones();
+      };
+      buttons[wX("SET_LINKS_ZONES")] = () => {
+        setLinksToZones();
+      };
+    }
 
     await this.sortable.done;
 

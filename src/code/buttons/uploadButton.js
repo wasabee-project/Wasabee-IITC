@@ -114,6 +114,7 @@ const UploadButton = WButton.extend({
       }
       // not triggered this in a while...
       console.warn(e.toString() + ": trying as update");
+      operation.creator = WasabeeMe.localGet().id;
       this.doUpdate(operation);
     }
   },
@@ -135,7 +136,6 @@ const UploadButton = WButton.extend({
         // reload if we use rebase
         if (operation != getSelectedOperation())
           await makeSelectedOperation(operation.ID);
-        displayInfo(wX("UPDATED"));
         this.update();
       } else {
         // need rebase or force

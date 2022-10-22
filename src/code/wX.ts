@@ -135,6 +135,14 @@ export function wX(
   key: "dialog.zone_color.text",
   data: { zoneName: string }
 ): string;
+export function wX(
+  key: "dialog.zones.delete.title",
+  data: { zoneName: string }
+): string;
+export function wX(
+  key: "dialog.zones.delete.text",
+  data: { zoneName: string }
+): string;
 export function wX(key: "FAKED", data: { portalId: string }): string;
 export function wX(key: "HOURS", data: { hours: number }): string;
 export function wX(key: "IMP_NOPE", data: { error: string }): string;

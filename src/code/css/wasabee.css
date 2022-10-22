@@ -327,8 +327,8 @@
   grid-column-start: 1;
   grid-column-end: 3;
 }
-.wasabee-dialog-op-settings input {
-  width: 100%;
+.wasabee-dialog-op-settings input[type=color] {
+  min-width: 100%;
   -moz-transform: scale(1);
 }
 .wasabee-dialog-op-settings div.buttonset {
@@ -374,7 +374,7 @@
 }
 .wasabee-dialog-prompt {
 }
-.wasabee-dialog-prompt div.container {
+.wasabee-dialog-prompt .container {
   display: grid;
 }
 .wasabee-dialog-prompt label {
@@ -385,7 +385,7 @@
 }
 .wasabee-dialog-setcomment {
 }
-.wasabee-dialog-setcomment div.container {
+.wasabee-dialog-setcomment .container {
   display: grid;
 }
 .wasabee-dialog-setcomment div.desc {

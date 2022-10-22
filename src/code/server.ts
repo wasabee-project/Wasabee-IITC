@@ -232,14 +232,14 @@ export function rocksPromise(
 }
 
 // local change: none // cache: none
-export function setAgentTeamSquadPromise(
+export function setAgentTeamCommentPromise(
   agentID: GoogleID,
   teamID: TeamID,
-  squad: string
+  comment: string
 ) {
   const fd = new FormData();
-  fd.append("squad", squad);
-  return genericPost(`/api/v1/team/${teamID}/${agentID}/squad`, fd);
+  fd.append("squad", comment);
+  return genericPost(`/api/v1/team/${teamID}/${agentID}/comment`, fd);
 }
 
 export function createJoinLinkPromise(teamID: TeamID) {
