@@ -146,6 +146,8 @@ const QuickDrawControl = L.Handler.extend({
     this._currentMode = new this._modes[0]();
     this._tooltip.updateContent(this._currentMode.getTooltip());
 
+    if (window.isSmartphone()) this._guideLayerToggle();
+
     window.map.on("wasabee:portal:click", this._portalClicked, this);
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
@@ -209,6 +211,19 @@ const QuickDrawControl = L.Handler.extend({
         this._guideLayerGroup
       );
     }
+    const dist = [];
+    for (const l of this._guideLayerGroup.getLayers()) {
+      const d = l.getLatLngs()[0].distanceTo(l.getLatLngs()[1]);
+      dist.push(d > 1e3 ? (d * 1e-3).toFixed(2) + " km" : d.toFixed(0) + " m");
+    }
+    if (dist.length === 0) return;
+    const frag = document.createDocumentFragment();
+    frag.append(
+      dist.join(" / "),
+      L.DomUtil.create("br"),
+      this._currentMode.getTooltip()
+    );
+    this._tooltip.updateContent(frag, true);
   },
 
   _guideLayerToggle: function () {
