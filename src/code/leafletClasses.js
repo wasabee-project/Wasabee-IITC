@@ -15,9 +15,11 @@ export const WTooltip = L.Class.extend({
     this._container = null;
   },
 
-  updateContent: function (labelText) {
+  updateContent: function (labelText, html) {
     // const span = L.DomUtil.create("span", null, this._container);
-    this._container.textContent = labelText;
+    if (html && labelText instanceof Node) {
+      this._container.replaceChildren(labelText);
+    } else this._container.textContent = labelText;
     return this;
   },
 

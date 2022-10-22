@@ -6,7 +6,7 @@ export declare class WTooltip extends L.Class {
   _container: HTMLDivElement;
   constructor(map: L.Map);
   dispose(): void;
-  updateContent(labelText: string): this;
+  updateContent(labelText: string | Node, html?: boolean): this;
   updatePosition(latlng: L.LatLngExpression): this;
   showAsError(): this;
   removeError(): this;

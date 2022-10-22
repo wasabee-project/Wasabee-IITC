@@ -34,6 +34,7 @@ import { checkVersion } from "./version";
 import wX from "./wX";
 import { getMe } from "./model/cache";
 import { initHistory } from "./undo";
+import { fromIITC } from "./ui/portal";
 
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 import type { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
@@ -150,7 +151,7 @@ window.plugin.wasabee.init = async () => {
   // use our own hook on portal click
   // note: do not build WasabeePortal here, we only need one for QD
   function propagateClick(e) {
-    window.map.fire("wasabee:portal:click", e.target);
+    window.map.fire("wasabee:portal:click", { portal: fromIITC(e.target) });
   }
   window.addHook("portalAdded", (e) => e.portal.on("click", propagateClick));
 
