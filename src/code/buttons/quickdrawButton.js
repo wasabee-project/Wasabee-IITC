@@ -8,6 +8,7 @@ import { WasabeePortal } from "../model";
 import { MultiLayer } from "./quickdraw/multilayer";
 import { SingleLink } from "./quickdraw/singlelink";
 import { StarBurst } from "./quickdraw/starburst";
+import { Onion } from "./quickdraw/onion";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -129,7 +130,7 @@ const QuickDrawControl = L.Handler.extend({
   addHooks: function () {
     L.DomUtil.disableTextSelection();
 
-    this._modes = [MultiLayer, SingleLink, StarBurst];
+    this._modes = [MultiLayer, SingleLink, StarBurst, Onion];
 
     this._tooltip = new WTooltip(this._map);
     this._guideLayerGroup = new L.LayerGroup();
