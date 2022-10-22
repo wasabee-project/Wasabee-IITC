@@ -1214,12 +1214,15 @@ export default class WasabeeOp extends Evented implements IOperation {
   }
 
   keysRequiredForPortalPerAgent(portalId: PortalID) {
-    const is: { [agentID: GoogleID | "[unassigned]"]: number } = {};
+    const is: {
+      [agentID: GoogleID | "[unassigned]"]: { required: number; done: number };
+    } = {};
     for (const l of this.links) {
       const id = l.assignedTo || "[unassigned]";
       if (l.toPortalId == portalId) {
-        if (!(id in is)) is[id] = 0;
-        is[id]++;
+        if (!(id in is)) is[id] = { required: 0, done: 0 };
+        is[id].required++;
+        if (l.completed) is[id].done++;
       }
     }
     return is;
