@@ -108,6 +108,8 @@ const QuickDrawControl = L.Handler.extend({
     // L.Util.extend(this.options, options);
 
     this.type = "QuickDrawControl";
+
+    this._modes = [MultiLayer, SingleLink, StarBurst, Onion];
   },
 
   enable: function () {
@@ -130,8 +132,6 @@ const QuickDrawControl = L.Handler.extend({
   addHooks: function () {
     L.DomUtil.disableTextSelection();
 
-    this._modes = [MultiLayer, SingleLink, StarBurst, Onion];
-
     this._tooltip = new WTooltip(this._map);
     this._guideLayerGroup = new L.LayerGroup();
     window.addLayerGroup(
@@ -143,6 +143,7 @@ const QuickDrawControl = L.Handler.extend({
     this._operation = getSelectedOperation();
     this._nextDrawnLinksColor = this._operation.color;
     this._opID = this._operation.ID;
+    // start last mode
     this._currentMode = new this._modes[0]();
     this._tooltip.updateContent(this._currentMode.getTooltip());
 
