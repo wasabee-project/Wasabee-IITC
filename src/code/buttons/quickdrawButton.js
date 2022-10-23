@@ -137,7 +137,7 @@ const QuickDrawControl = L.Handler.extend({
     window.addLayerGroup(
       "Wasabee Quickdraw Guide",
       this._guideLayerGroup,
-      false
+      window.isSmartphone()
     );
 
     this._operation = getSelectedOperation();
@@ -145,8 +145,6 @@ const QuickDrawControl = L.Handler.extend({
     this._opID = this._operation.ID;
     this._currentMode = new this._modes[0]();
     this._tooltip.updateContent(this._currentMode.getTooltip());
-
-    if (window.isSmartphone()) this._guideLayerToggle();
 
     window.map.on("wasabee:portal:click", this._portalClicked, this);
     window.map.on("wasabee:op:select", this._opchange, this);
