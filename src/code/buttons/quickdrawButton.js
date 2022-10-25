@@ -9,6 +9,7 @@ import { MultiLayer } from "./quickdraw/multilayer";
 import { SingleLink } from "./quickdraw/singlelink";
 import { StarBurst } from "./quickdraw/starburst";
 import { Onion } from "./quickdraw/onion";
+import { Splitter } from "./quickdraw/splitter";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -109,7 +110,7 @@ const QuickDrawControl = L.Handler.extend({
 
     this.type = "QuickDrawControl";
 
-    this._modes = [MultiLayer, SingleLink, StarBurst, Onion];
+    this._modes = [MultiLayer, SingleLink, StarBurst, Onion, Splitter];
   },
 
   enable: function () {
@@ -144,7 +145,7 @@ const QuickDrawControl = L.Handler.extend({
     this._nextDrawnLinksColor = this._operation.color;
     this._opID = this._operation.ID;
     // start last mode
-    this._currentMode = new this._modes[0]();
+    this._currentMode = new this._modes[0](this._operation);
     this._tooltip.updateContent(this._currentMode.getTooltip());
 
     window.map.on("wasabee:portal:click", this._portalClicked, this);
@@ -248,7 +249,7 @@ const QuickDrawControl = L.Handler.extend({
 
   _toggleMode: function () {
     this._modes.push(this._modes.shift());
-    this._currentMode = new this._modes[0]();
+    this._currentMode = new this._modes[0](this._operation);
 
     this._guideLayerGroup.clearLayers();
     this._tooltip.updateContent(this._currentMode.getTooltip());
