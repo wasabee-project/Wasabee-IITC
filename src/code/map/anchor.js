@@ -7,6 +7,7 @@ import { displayFormat } from "../ui/portal";
 
 import { WLPortal } from "./portal";
 import { WasabeeMe } from "../model";
+import { isFiltered } from "../filter";
 
 export const WLAnchor = WLPortal.extend({
   type: "anchor",
@@ -52,10 +53,18 @@ export const WLAnchor = WLPortal.extend({
     const requiredKeys = L.DomUtil.create("div", "key-required", infoBlock);
 
     const onHand = operation.KeysOnHandForPortal(portal.id);
-    const required = operation.keysRequiredForPortalPerAgent(portal.id);
     let requiredTotal = 0;
-    for (const id in required)
-      requiredTotal += required[id].required - required[id].done;
+    const required = {};
+    for (const l of operation.links) {
+      if (!isFiltered(l)) continue;
+      const id = l.assignedTo || "[unassigned]";
+      if (l.toPortalId == this.options.portalId) {
+        if (!l.completed) {
+          required[id] = (required[id] || 0) + 1;
+          requiredTotal++;
+        }
+      }
+    }
 
     requiredKeys.textContent = wX("popup.anchor.keys", {
       onHand,
@@ -64,13 +73,7 @@ export const WLAnchor = WLPortal.extend({
     if (onHand < requiredTotal) requiredKeys.classList.add("key-missing");
 
     if (WasabeeMe.isLoggedIn()) {
-      const myRequired =
-        WasabeeMe.localGet().id in required
-          ? required[WasabeeMe.localGet().id]
-          : {
-              required: 0,
-              done: 0,
-            };
+      const myRequired = required[WasabeeMe.localGet().id] || 0;
       const requiredKeysSelf = L.DomUtil.create(
         "div",
         "key-required-self",
@@ -82,19 +85,15 @@ export const WLAnchor = WLPortal.extend({
       );
       requiredKeysSelf.textContent = wX("popup.anchor.keys_mycount", {
         myCount,
-        required: myRequired.required - myRequired.done,
+        required: myRequired,
       });
-      if (myCount < myRequired.required - myRequired.done)
-        requiredKeysSelf.classList.add("key-missing");
+      if (myCount < myRequired) requiredKeysSelf.classList.add("key-missing");
 
       /* check per agent */
       const onHandPerAgent = operation.keysOnHandForPortalPerAgent(portal.id);
       if (onHand >= requiredTotal) {
         for (const id in required) {
-          if (
-            !onHandPerAgent[id] ||
-            onHandPerAgent[id] < required[id].required - required[id].done
-          ) {
+          if (!onHandPerAgent[id] || onHandPerAgent[id] < required[id]) {
             requiredKeys.classList.add("key-missing");
             break;
           }

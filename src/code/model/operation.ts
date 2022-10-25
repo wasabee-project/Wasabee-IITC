@@ -1213,21 +1213,6 @@ export default class WasabeeOp extends Evented implements IOperation {
     return i;
   }
 
-  keysRequiredForPortalPerAgent(portalId: PortalID) {
-    const is: {
-      [agentID: GoogleID | "[unassigned]"]: { required: number; done: number };
-    } = {};
-    for (const l of this.links) {
-      const id = l.assignedTo || "[unassigned]";
-      if (l.toPortalId == portalId) {
-        if (!(id in is)) is[id] = { required: 0, done: 0 };
-        is[id].required++;
-        if (l.completed) is[id].done++;
-      }
-    }
-    return is;
-  }
-
   zoneName(zoneID: ZoneID) {
     if (zoneID === 0) return 0;
     for (const z of this.zones) {
