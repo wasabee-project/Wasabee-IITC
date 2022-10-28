@@ -16,6 +16,10 @@ export class Onion implements QuickDrawMode {
     this.anchor3 = null;
   }
 
+  getName() {
+    return wX("toolbar.quick_draw.mode.onion");
+  }
+
   onPortalClick(
     op: WasabeeOp,
     portal: WasabeePortal,

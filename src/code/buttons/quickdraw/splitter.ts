@@ -15,6 +15,10 @@ export class Splitter implements QuickDrawMode {
     this.op = op;
   }
 
+  getName() {
+    return "Onion2";
+  }
+
   getCandidates(op: WasabeeOp, latlng: WLatLng) {
     const candidates: WasabeePortal[] = [];
     if (op.anchors.length == 2) {

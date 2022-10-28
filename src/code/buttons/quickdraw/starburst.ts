@@ -11,6 +11,10 @@ export class StarBurst implements QuickDrawMode {
     this.anchor = null;
   }
 
+  getName() {
+    return wX("toolbar.quick_draw.mode.starburst");
+  }
+
   onPortalClick(
     op: WasabeeOp,
     portal: WasabeePortal,

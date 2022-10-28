@@ -14,6 +14,10 @@ export class MultiLayer implements QuickDrawMode {
     this.anchor2 = null;
   }
 
+  getName() {
+    return wX("toolbar.quick_draw.mode.multilayer");
+  }
+
   onPortalClick(
     op: WasabeeOp,
     portal: WasabeePortal,

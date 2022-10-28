@@ -2,6 +2,7 @@ import type { WasabeeOp, WasabeePortal } from "../../model";
 
 export interface QuickDrawMode {
   name: string;
+  getName(): string;
   onPortalClick(
     op: WasabeeOp,
     portal: WasabeePortal,

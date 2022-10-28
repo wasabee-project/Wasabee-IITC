@@ -20,7 +20,7 @@ const QuickdrawButton = WButton.extend({
 
   initialize: function (container) {
     this.title = wX("QD TITLE");
-    this.handler = new QuickDrawControl({ button: this });
+    this.handler = new QuickDrawHandler({ button: this });
     this._container = container;
     this.type = QuickdrawButton.TYPE;
 
@@ -67,7 +67,9 @@ const QuickdrawButton = WButton.extend({
 
     this._toggleModeSubAction = {
       title: wX("QD BUTTON TOGGLE MODE"),
-      text: wX("QD TOGGLE MODE"),
+      text: wX("toolbar.quick_draw.toggle.text", {
+        mode: this.handler.getMode().getName(),
+      }),
       callback: () => {
         this.handler._toggleMode();
       },
@@ -100,7 +102,7 @@ const QuickdrawButton = WButton.extend({
   },
 });
 
-const QuickDrawControl = L.Handler.extend({
+const QuickDrawHandler = L.Handler.extend({
   initialize: function (options) {
     this._container = window.map._container;
 
@@ -165,6 +167,12 @@ const QuickDrawControl = L.Handler.extend({
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
     window.map.off("mousemove", this._onMouseMove, this);
+  },
+
+  getMode() {
+    if (!this._currentMode)
+      this._currentMode = new this._modes[0](this._operation);
+    return this._currentMode;
   },
 
   _opchange: function () {
@@ -253,6 +261,7 @@ const QuickDrawControl = L.Handler.extend({
 
     this._guideLayerGroup.clearLayers();
     this._tooltip.updateContent(this._currentMode.getTooltip());
+    this.options.button.setSubActions(this.options.button.getSubActions());
   },
 });
 

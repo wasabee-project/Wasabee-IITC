@@ -11,6 +11,10 @@ export class SingleLink implements QuickDrawMode {
     this.prev = null;
   }
 
+  getName() {
+    return wX("toolbar.quick_draw.mode.singlelink");
+  }
+
   onPortalClick(
     op: WasabeeOp,
     portal: WasabeePortal,
