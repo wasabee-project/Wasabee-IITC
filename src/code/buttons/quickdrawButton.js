@@ -8,8 +8,7 @@ import { WasabeePortal } from "../model";
 import { MultiLayer } from "./quickdraw/multilayer";
 import { SingleLink } from "./quickdraw/singlelink";
 import { StarBurst } from "./quickdraw/starburst";
-import { Onion } from "./quickdraw/onion";
-import { Splitter } from "./quickdraw/splitter";
+import { Burst } from "./quickdraw/burst";
 
 const QuickdrawButton = WButton.extend({
   statics: {
@@ -112,7 +111,7 @@ const QuickDrawHandler = L.Handler.extend({
 
     this.type = "QuickDrawControl";
 
-    this._modes = [MultiLayer, SingleLink, StarBurst, Onion, Splitter];
+    this._modes = [MultiLayer, SingleLink, StarBurst, Burst];
   },
 
   enable: function () {

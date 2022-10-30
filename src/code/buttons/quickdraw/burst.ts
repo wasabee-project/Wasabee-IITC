@@ -4,7 +4,7 @@ import wX from "../../wX";
 import { greatCircleArcIntersectByLatLngs } from "../../geo";
 import type { WLatLng } from "../../model/portal";
 
-export class Splitter implements QuickDrawMode {
+export class Burst implements QuickDrawMode {
   name: "splitter";
 
   anchor: WasabeePortal;
@@ -16,7 +16,7 @@ export class Splitter implements QuickDrawMode {
   }
 
   getName() {
-    return "Onion2";
+    return wX("toolbar.quick_draw.mode.burst");
   }
 
   getCandidates(op: WasabeeOp, latlng: WLatLng) {
@@ -76,6 +76,6 @@ export class Splitter implements QuickDrawMode {
   }
 
   getTooltip() {
-    return wX("toolbar.quick_draw.tooltip.onion.portal");
+    return wX("toolbar.quick_draw.tooltip.burst.portal");
   }
 }
