@@ -4,20 +4,30 @@ import { getSelectedOperation } from "../selectedOp";
 import { postToFirebase } from "../firebase/logger";
 import { constants } from "../static";
 
-import { WasabeePortal } from "../model";
+import { WasabeeOp, WasabeePortal } from "../model";
 import { MultiLayer } from "./quickdraw/multilayer";
 import { SingleLink } from "./quickdraw/singlelink";
 import { StarBurst } from "./quickdraw/starburst";
 import { Burst } from "./quickdraw/burst";
 
-const QuickdrawButton = WButton.extend({
-  statics: {
-    TYPE: "QuickdrawButton",
-  },
+import type { QuickDrawMode } from "./quickdraw/mode";
+import type {
+  LatLng,
+  LeafletEvent,
+  LeafletKeyboardEvent,
+  LeafletMouseEvent,
+} from "leaflet";
 
-  needWritePermission: true,
+class QuickdrawButton extends WButton {
+  static TYPE = "QuickdrawButton";
 
-  initialize: function (container) {
+  needWritePermission = true;
+
+  handler: QuickDrawHandler;
+  picker: HTMLInputElement;
+
+  constructor(container: HTMLElement) {
+    super(container);
     this.title = wX("QD TITLE");
     this.handler = new QuickDrawHandler({ button: this });
     this._container = container;
@@ -37,7 +47,7 @@ const QuickdrawButton = WButton.extend({
     this.picker.setAttribute("list", "wasabee-colors-datalist");
 
     L.DomEvent.on(this.picker, "change", (ev) => {
-      this.handler._nextDrawnLinksColor = ev.target.value;
+      this.handler._nextDrawnLinksColor = (ev.target as HTMLInputElement).value;
     });
 
     this.setSubActions(this.getSubActions());
@@ -45,16 +55,14 @@ const QuickdrawButton = WButton.extend({
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
       this.button.title = wX("QD TITLE");
       this.setSubActions(this.getSubActions());
-
-      if (this.handler._enabled)
-        this.handler._tooltip.updateContent(this.handler._getTooltipText());
+      this.handler.updateTooltip();
     });
 
     this.update();
-  },
+  }
 
-  getSubActions: function () {
-    this._changeColorSubAction = {
+  getSubActions() {
+    const changeColorSubAction = {
       title: wX("QD BUTTON CHANGE COLOR"),
       text: wX("QD CHANGE COLOR"),
       html: this.picker,
@@ -64,7 +72,7 @@ const QuickdrawButton = WButton.extend({
       context: null,
     };
 
-    this._toggleModeSubAction = {
+    const toggleModeSubAction = {
       title: wX("QD BUTTON TOGGLE MODE"),
       text: wX("toolbar.quick_draw.toggle.text", {
         mode: this.handler.getMode().getName(),
@@ -75,63 +83,69 @@ const QuickdrawButton = WButton.extend({
       context: null,
     };
 
-    this._endSubAction = {
+    const endSubAction = {
       title: wX("QD BUTTON END"),
       text: wX("QD END"),
       callback: this.handler.disable,
       context: this.handler,
     };
 
-    return [
-      this._toggleModeSubAction,
-      this._changeColorSubAction,
-      this._endSubAction,
-    ];
-  },
+    return [toggleModeSubAction, changeColorSubAction, endSubAction];
+  }
 
-  enable: function () {
+  enable() {
     WButton.prototype.enable.call(this);
     this.button.classList.add("active");
-  },
+  }
 
-  disable: function () {
+  disable() {
     WButton.prototype.disable.call(this);
-    if (this.handler._enabled) this.handler.disable.call(this.handler);
+    if (this.handler.enabled()) this.handler.disable.call(this.handler);
     this.button.classList.remove("active");
-  },
-});
+  }
+}
 
-const QuickDrawHandler = L.Handler.extend({
-  initialize: function (options) {
-    this._container = window.map._container;
+class QuickDrawHandler extends L.Handler {
+  options: {
+    button: QuickdrawButton;
+  };
 
-    L.Handler.prototype.initialize.call(this, window.map, options);
-    this.options = options;
-    // L.Util.extend(this.options, options);
+  _modes: { new (op: WasabeeOp): QuickDrawMode }[];
+  _tooltip: WTooltip;
+  _guideLayerGroup: L.LayerGroup;
+  _map: L.Map;
+  _operation: WasabeeOp;
+  _nextDrawnLinksColor: string;
+  _opID: OpID;
+  _currentMode: QuickDrawMode;
 
-    this.type = "QuickDrawControl";
+  constructor(options: { button: QuickdrawButton }) {
+    super(window.map);
+    L.setOptions(this, options);
 
     this._modes = [MultiLayer, SingleLink, StarBurst, Burst];
-  },
+  }
 
-  enable: function () {
-    if (this._enabled) {
+  enable() {
+    if (this.enabled()) {
       this.disable();
-      return;
+      return this;
     }
-    L.Handler.prototype.enable.call(this);
+    super.enable();
     this.options.button.enable();
     postToFirebase({ id: "analytics", action: "quickdrawStart" });
-  },
+    return this;
+  }
 
-  disable: function () {
-    if (!this._enabled) return;
-    L.Handler.prototype.disable.call(this);
+  disable() {
+    if (!this.enabled()) return this;
+    super.disable();
     this.options.button.disable();
     postToFirebase({ id: "analytics", action: "quickdrawEnd" });
-  },
+    return this;
+  }
 
-  addHooks: function () {
+  addHooks() {
     L.DomUtil.disableTextSelection();
 
     this._tooltip = new WTooltip(this._map);
@@ -153,9 +167,9 @@ const QuickDrawHandler = L.Handler.extend({
     window.map.on("wasabee:op:select", this._opchange, this);
     window.map.on("keyup", this._keyUpListener, this);
     window.map.on("mousemove", this._onMouseMove, this);
-  },
+  }
 
-  removeHooks: function () {
+  removeHooks() {
     window.removeLayerGroup(this._guideLayerGroup);
 
     L.DomUtil.enableTextSelection();
@@ -166,52 +180,63 @@ const QuickDrawHandler = L.Handler.extend({
     window.map.off("wasabee:op:select", this._opchange, this);
     window.map.off("keyup", this._keyUpListener, this);
     window.map.off("mousemove", this._onMouseMove, this);
-  },
+  }
 
   getMode() {
     if (!this._currentMode)
       this._currentMode = new this._modes[0](this._operation);
     return this._currentMode;
-  },
+  }
 
-  _opchange: function () {
-    if (!this._enabled) return;
+  updateTooltip() {
+    if (!this.enabled()) return;
+    this._tooltip.updateContent(this._currentMode.getTooltip());
+  }
+
+  _opchange() {
+    if (!this.enabled()) return;
 
     if (getSelectedOperation().ID != this._opID) {
       console.log("operation changed mid-quickdraw - disabling");
       this.disable();
     }
-  },
+  }
 
-  _keyUpListener: function (e) {
-    if (!this._enabled) return;
+  _keyUpListener(e: LeafletKeyboardEvent) {
+    if (!this.enabled()) return;
 
     // [esc]
-    if (e.originalEvent.keyCode === 27) {
-      this.disable();
+    switch (e.originalEvent.key) {
+      case "Escape":
+      case "Esc":
+        this.disable();
+        break;
+      case "/":
+      case "g":
+        postToFirebase({ id: "analytics", action: "quickdrawGuides" });
+        this._guideLayerToggle();
+        break;
+      case "t":
+      case "m":
+        postToFirebase({ id: "analytics", action: "quickdrawMode" });
+        this._toggleMode();
+        break;
+      case "X":
+        postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
+        this._operation.clearAllLinks();
+        window.map.fire("wasabee:crosslinks");
+        break;
+      default:
     }
-    if (e.originalEvent.key === "/" || e.originalEvent.key === "g") {
-      postToFirebase({ id: "analytics", action: "quickdrawGuides" });
-      this._guideLayerToggle();
-    }
-    if (e.originalEvent.key === "t" || e.originalEvent.key === "m") {
-      postToFirebase({ id: "analytics", action: "quickdrawMode" });
-      this._toggleMode();
-    }
-    if (e.originalEvent.key === "X") {
-      postToFirebase({ id: "analytics", action: "quickdrawClearAll" });
-      this._operation.clearAllLinks();
-      window.map.fire("wasabee:crosslinks");
-    }
-  },
+  }
 
-  _onMouseMove: function (e) {
+  _onMouseMove(e: LeafletMouseEvent) {
     if (e.latlng) {
       this._guideUpdate(e);
     }
-  },
+  }
 
-  _guideUpdate: function (e) {
+  _guideUpdate(e: LeafletMouseEvent) {
     this._guideLayerGroup.clearLayers();
     for (const lls of this._currentMode.getGuides(e.latlng)) {
       L.polyline(lls, constants.QUICKDRAW_GUIDE_STYLE).addTo(
@@ -219,8 +244,10 @@ const QuickDrawHandler = L.Handler.extend({
       );
     }
     const dist = [];
-    for (const l of this._guideLayerGroup.getLayers()) {
-      const d = l.getLatLngs()[0].distanceTo(l.getLatLngs()[1]);
+    for (const l of this._guideLayerGroup.getLayers() as L.Polyline[]) {
+      const d = (l.getLatLngs()[0] as LatLng).distanceTo(
+        l.getLatLngs()[1] as LatLng
+      );
       dist.push(d > 1e3 ? (d * 1e-3).toFixed(2) + " km" : d.toFixed(0) + " m");
     }
     if (dist.length === 0) return;
@@ -231,18 +258,18 @@ const QuickDrawHandler = L.Handler.extend({
       this._currentMode.getTooltip()
     );
     this._tooltip.updateContent(frag, true);
-  },
+  }
 
-  _guideLayerToggle: function () {
+  _guideLayerToggle() {
     if (window.map.hasLayer(this._guideLayerGroup))
       this._guideLayerGroup.remove();
     else {
       this._guideLayerGroup.addTo(window.map);
-      window.Render.prototype.bringPortalsToFront();
+      window.mapDataRequest.render.bringPortalsToFront();
     }
-  },
+  }
 
-  _portalClicked: function (ev) {
+  _portalClicked(ev: LeafletEvent & { portal: WasabeePortal }) {
     const selectedPortal = ev.portal;
     if (!(selectedPortal instanceof WasabeePortal)) {
       this._tooltip.updateContent(wX("toolbar.quick_draw.tooltip.portal_fail"));
@@ -252,16 +279,16 @@ const QuickDrawHandler = L.Handler.extend({
       color: this._nextDrawnLinksColor,
     });
     this._tooltip.updateContent(this._currentMode.getTooltip());
-  },
+  }
 
-  _toggleMode: function () {
+  _toggleMode() {
     this._modes.push(this._modes.shift());
     this._currentMode = new this._modes[0](this._operation);
 
     this._guideLayerGroup.clearLayers();
     this._tooltip.updateContent(this._currentMode.getTooltip());
     this.options.button.setSubActions(this.options.button.getSubActions());
-  },
-});
+  }
+}
 
 export default QuickdrawButton;

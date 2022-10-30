@@ -193,6 +193,10 @@ export function wX(key: "SET_MCOMMENT", data: { portalName: string }): string;
 export function wX(key: "SET_PCOMMENT", data: { portalName: string }): string;
 export function wX(key: "SKINS_AVAILABLE", data: { count: number }): string;
 export function wX(key: "TEAM_CREATED", data: { teamName: string }): string;
+export function wX(
+  key: "toolbar.quick_draw.toggle.text",
+  data: { mode: string }
+): string;
 export function wX(key: "TRAWL_REMAINING", data: { count: number }): string;
 export function wX(key: "UPDATE HOVER", data: { opName: string }): string;
 export function wX(
