@@ -71,6 +71,30 @@ function setTasksComment(comment: string) {
   op.update();
 }
 
+function setTasksOrder(order: number) {
+  if (isNaN(order) || !isFinite(order)) return;
+  const op = getSelectedOperation();
+  for (const t of op.links) {
+    if (isFiltered(t)) t.order = order;
+  }
+  for (const t of op.markers) {
+    if (isFiltered(t)) t.order = order;
+  }
+  op.update();
+}
+
+function shiftTasksOrder(offset: number) {
+  if (isNaN(offset) || !isFinite(offset)) return;
+  const op = getSelectedOperation();
+  for (const t of op.links) {
+    if (isFiltered(t)) t.order += offset;
+  }
+  for (const t of op.markers) {
+    if (isFiltered(t)) t.order += offset;
+  }
+  op.update();
+}
+
 function deleteTasks(filtered: boolean) {
   const op = getSelectedOperation();
   op.links = op.links.filter((t) => isFiltered(t) === filtered);
@@ -83,7 +107,9 @@ function deleteTasks(filtered: boolean) {
 export default class FilterDialog extends WDialog {
   static TYPE = "settings";
 
-  _filters: { [key: string]: LocalFilter<string | string[] | WasabeePortal> };
+  _filters: {
+    [key: string]: LocalFilter<string | string[] | WasabeePortal | number>;
+  };
   _activeTab: number;
 
   addHooks() {
@@ -284,6 +310,49 @@ export default class FilterDialog extends WDialog {
     });
   }
 
+  _addFieldNumber(
+    container: HTMLElement,
+    filterKey: string,
+    field: {
+      label: string;
+      toFilter: (s: number) => Filter;
+    }
+  ) {
+    /* Data init */
+    if (!this._filters[filterKey]) {
+      this._filters[filterKey] = {
+        enabled: false,
+        selected: null,
+        toFilter: field.toFilter,
+      } as LocalFilter<number>;
+    }
+    const filter = this._filters[filterKey] as LocalFilter<number>;
+
+    /* [x] Label */
+    const title = L.DomUtil.create("label", "checkbox", container);
+    const check = L.DomUtil.create("input", "", title);
+    check.type = "checkbox";
+    check.checked = filter.enabled;
+    L.DomUtil.create("span", "", title).textContent = field.label;
+
+    /* [Input field] */
+    const input = L.DomUtil.create("input");
+    input.type = "number";
+    input.disabled = !filter.enabled;
+    container.appendChild(input);
+
+    L.DomEvent.on(check, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      filter.enabled = check.checked;
+      input.disabled = !check.checked;
+    });
+
+    L.DomEvent.on(input, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      filter.selected = input.valueAsNumber;
+    });
+  }
+
   _addAction<T extends string>(
     container: HTMLElement,
     label: string,
@@ -428,6 +497,30 @@ export default class FilterDialog extends WDialog {
       },
     });
 
+    /* order min filter */
+    this._addFieldNumber(panel, "order_min", {
+      label: wX("dialog.filter.filters.field.min_order"),
+      toFilter(v: number) {
+        return {
+          op: ">=",
+          key: "order",
+          value: v,
+        };
+      },
+    });
+
+    /* order max filter */
+    this._addFieldNumber(panel, "order_max", {
+      label: wX("dialog.filter.filters.field.max_order"),
+      toFilter(v: number) {
+        return {
+          op: "<=",
+          key: "order",
+          value: v,
+        };
+      },
+    });
+
     const applyButton = L.DomUtil.create("button", "apply", panel);
     applyButton.textContent = wX("dialog.filter.filters.apply");
     L.DomEvent.on(applyButton, "click", this._applyFilter, this);
@@ -506,6 +599,22 @@ export default class FilterDialog extends WDialog {
       L.DomUtil.create("input"),
       wX("SET"),
       setTasksComment
+    );
+
+    const orderInput = L.DomUtil.create("input");
+    orderInput.type = "number";
+    this._addAction(panel, wX("ORDER"), orderInput, wX("SET"), (v: string) =>
+      setTasksOrder(+v)
+    );
+
+    const offsetInput = L.DomUtil.create("input");
+    offsetInput.type = "number";
+    this._addAction(
+      panel,
+      wX("dialog.filter.actions.shift.label"),
+      offsetInput,
+      wX("dialog.filter.actions.shift.button"),
+      (v: string) => shiftTasksOrder(+v)
     );
 
     const deleteButton = L.DomUtil.create("button", "delete-tasks", panel);

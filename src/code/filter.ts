@@ -7,7 +7,7 @@ interface IComplexFilter {
 }
 
 interface ISimpleFilter<T extends Task> {
-  op: "in" | "==" | "kind" | "match";
+  op: "in" | "==" | "kind" | "match" | "<=" | ">=";
   key?: keyof T;
   value: unknown;
 }
@@ -47,6 +47,10 @@ function computeFilter(task: Task, filter: Filter) {
     );
   } else if (filter.op === "==" && filter.key) {
     return filter.key in task && task[filter.key] === filter.value;
+  } else if (filter.op === "<=" && filter.key) {
+    return filter.key in task && task[filter.key] <= filter.value;
+  } else if (filter.op === ">=" && filter.key) {
+    return filter.key in task && task[filter.key] >= filter.value;
   }
 
   return false;
@@ -72,6 +76,8 @@ function validateFilterAux(filter: Filter): boolean {
     return filter.key && typeof filter.value === "string";
   } else if (filter.op === "==") {
     return !!filter.key;
+  } else if (filter.op === "<=" || filter.op === ">=") {
+    return filter.key && typeof(filter.value) === "number";
   }
   return false;
 }
