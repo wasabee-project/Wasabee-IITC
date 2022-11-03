@@ -60,6 +60,17 @@ function setTasksState(state: TaskState) {
   op.update();
 }
 
+function setTasksComment(comment: string) {
+  const op = getSelectedOperation();
+  for (const t of op.links) {
+    if (isFiltered(t)) t.comment = comment;
+  }
+  for (const t of op.markers) {
+    if (isFiltered(t)) t.comment = comment;
+  }
+  op.update();
+}
+
 function deleteTasks(filtered: boolean) {
   const op = getSelectedOperation();
   op.links = op.links.filter((t) => isFiltered(t) === filtered);
@@ -72,7 +83,7 @@ function deleteTasks(filtered: boolean) {
 export default class FilterDialog extends WDialog {
   static TYPE = "settings";
 
-  _filters: { [key: string]: LocalFilter<string[] | WasabeePortal> };
+  _filters: { [key: string]: LocalFilter<string | string[] | WasabeePortal> };
   _activeTab: number;
 
   addHooks() {
@@ -231,6 +242,48 @@ export default class FilterDialog extends WDialog {
     });
   }
 
+  _addFieldText(
+    container: HTMLElement,
+    filterKey: string,
+    field: {
+      label: string;
+      toFilter: (s: string) => Filter;
+    }
+  ) {
+    /* Data init */
+    if (!this._filters[filterKey]) {
+      this._filters[filterKey] = {
+        enabled: false,
+        selected: "",
+        toFilter: field.toFilter,
+      } as LocalFilter<string>;
+    }
+    const filter = this._filters[filterKey] as LocalFilter<string>;
+
+    /* [x] Label */
+    const title = L.DomUtil.create("label", "checkbox", container);
+    const check = L.DomUtil.create("input", "", title);
+    check.type = "checkbox";
+    check.checked = filter.enabled;
+    L.DomUtil.create("span", "", title).textContent = field.label;
+
+    /* [Input field] */
+    const input = L.DomUtil.create("input");
+    input.disabled = !filter.enabled;
+    container.appendChild(input);
+
+    L.DomEvent.on(check, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      filter.enabled = check.checked;
+      input.disabled = !check.checked;
+    });
+
+    L.DomEvent.on(input, "change", (ev) => {
+      L.DomEvent.stop(ev);
+      filter.selected = input.value;
+    });
+  }
+
   _addAction<T extends string>(
     container: HTMLElement,
     label: string,
@@ -363,6 +416,18 @@ export default class FilterDialog extends WDialog {
       },
     });
 
+    /* comment filter */
+    this._addFieldText(panel, "comment", {
+      label: wX("COMMENT"),
+      toFilter(s: string) {
+        return {
+          op: "match",
+          key: "comment",
+          value: s,
+        };
+      },
+    });
+
     const applyButton = L.DomUtil.create("button", "apply", panel);
     applyButton.textContent = wX("dialog.filter.filters.apply");
     L.DomEvent.on(applyButton, "click", this._applyFilter, this);
@@ -433,6 +498,14 @@ export default class FilterDialog extends WDialog {
       picker,
       wX("SET"),
       setLinksColor
+    );
+
+    this._addAction(
+      panel,
+      wX("COMMENT"),
+      L.DomUtil.create("input"),
+      wX("SET"),
+      setTasksComment
     );
 
     const deleteButton = L.DomUtil.create("button", "delete-tasks", panel);
