@@ -2,7 +2,7 @@
 // @id            Wasabee.user.js
 // @name          IITC plugin: Wasabee Draw Tools
 // @namespace     https://wasabee.rocks/
-// @version       0.21.20221105201816-testing-a9146db
+// @version       0.21.20221106181145-testing-1e6361a
 // @updateURL     https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.meta.js
 // @downloadURL   https://wasabee-project.github.io/Wasabee-IITC/testing/wasabee.user.js
 // @description   Wasabee is not for dating.
@@ -11,4 +11,3 @@
 // @category      Draw
 // @grant         none
 // ==/UserScript==
-
