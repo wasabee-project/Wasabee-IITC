@@ -7,7 +7,7 @@ const blockerStyle: L.PolylineOptions = {
   opacity: 0.7,
   weight: 5,
   interactive: false,
-  dashArray: [8, 8],
+  dashArray: [8, 10],
 };
 
 export class WLBlockerLayer extends L.FeatureGroup {
@@ -71,10 +71,10 @@ export class WLBlockerLayer extends L.FeatureGroup {
     this.blocked = {};
     for (const link of operation.links) {
       if (link.selfBlocked || link.blocked) {
-        this.blocked[link.ID] = L.geodesicPolyline(
-          link.getLatLngs(operation),
-          window.plugin.wasabee.skin.selfBlockStyle
-        ).addTo(this);
+        this.blocked[link.ID] = L.geodesicPolyline(link.getLatLngs(operation), {
+          ...window.plugin.wasabee.skin.selfBlockStyle,
+          interactive: false,
+        }).addTo(this);
       }
     }
   }
