@@ -66,6 +66,9 @@ export function displayFormat(portal: WasabeePortal, shortName = false) {
   if (t == "R") {
     e.classList.add("res");
   }
+  if (t == "M") {
+    e.classList.add("mac");
+  }
   if (t == "N") {
     e.classList.add("unclaimed");
   }

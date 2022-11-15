@@ -56,6 +56,9 @@
 .wasabee-popup a.res {
   color: rgb(0, 135, 255) !important;
 }
+.wasabee-popup a.mac {
+  color: #8e1111 !important;
+}
 
 .wasabee-anchor-popup .info-block,
 .wasabee-link-popup .info-block {
