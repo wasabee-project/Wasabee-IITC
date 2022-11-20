@@ -45,7 +45,11 @@ export function buildPermList(operation: WasabeeOp, me: WasabeeMe) {
     {
       name: wX("TEAM"),
       value: async (perm) => {
-        if (me && operation.isOnCurrentServer()) {
+        if (
+          me &&
+          operation.isOnCurrentServer() &&
+          me.teamJoined(perm.teamid)
+        ) {
           // try the team cache first
           const t = await getTeam(perm.teamid);
           if (t) return t.name;
@@ -163,7 +167,7 @@ async function delPerm(obj: OpPermItem) {
 
   try {
     await delPermPromise(operation.ID, obj.teamid, obj.role, obj.zone);
-    const n: WasabeeOp['teamlist'] = [];
+    const n: WasabeeOp["teamlist"] = [];
     for (const p of operation.teamlist) {
       if (p.teamid != obj.teamid || p.role != obj.role || p.zone != obj.zone)
         n.push(p);

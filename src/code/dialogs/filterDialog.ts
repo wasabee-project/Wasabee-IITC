@@ -8,7 +8,7 @@ import { convertColorToHex } from "../auxiliar";
 import { addToColorList } from "../skin";
 import { displayFormat as displayPortal, getSelected } from "../ui/portal";
 import type { TaskState } from "../model/task";
-import type { WasabeePortal } from "../model";
+import { WasabeeMe, WasabeePortal } from "../model";
 
 interface LocalFilter<T> {
   enabled: boolean;
@@ -258,12 +258,15 @@ export default class FilterDialog extends WDialog {
     );
 
     const op = getSelectedOperation();
+    const me = WasabeeMe.localGet();
     const agentMap = new Map();
     for (const opteam of op.teamlist) {
-      const team = await getTeam(opteam.teamid, 300);
-      if (team) {
-        for (const agent of team.agents) {
-          agentMap.set(agent.id, agent.name);
+      if (me && me.teamJoined(opteam.teamid)) {
+        const team = await getTeam(opteam.teamid, 300);
+        if (team) {
+          for (const agent of team.agents) {
+            agentMap.set(agent.id, agent.name);
+          }
         }
       }
     }
