@@ -37,5 +37,5 @@ export function initFirebase(onMessage: MessageHandler) {
     iframe.contentWindow.postMessage("init", "*", [channel.port2]);
   });
 
-  $(document.body).append(iframe);
+  document.body.append(iframe);
 }

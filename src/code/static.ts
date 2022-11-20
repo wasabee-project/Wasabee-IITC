@@ -104,6 +104,7 @@ const statics: Statics = {
     JOIN_TEAM_TEMPLATE:
       "https://webui.wasabee.rocks/?server={server}#/team/{teamid}/join/{token}",
     FIREBASE_IFRAME: "https://cdn2.wasabee.rocks/iitcplugin/firebase/",
+    FIREBASE_DISABLE: "wasabee-firebase",
     UNDO_HISTORY_SIZE: 100,
   },
   publicServers: [

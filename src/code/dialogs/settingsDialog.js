@@ -127,6 +127,12 @@ const SettingsDialog = WDialog.extend({
 
     this._addCheckBox(
       container,
+      wX("dialog.settings.disable_live_updates"),
+      "wasabee-setting-firebase",
+      window.plugin.wasabee.static.constants.FIREBASE_DISABLE
+    );
+    this._addCheckBox(
+      container,
       wX("SEND ANALYTICS"),
       "wasabee-setting-analytics",
       window.plugin.wasabee.static.constants.SEND_ANALYTICS_KEY

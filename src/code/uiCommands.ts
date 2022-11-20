@@ -114,7 +114,7 @@ export function clearAllData() {
     title: wX("CLEAROPS BUTTON TITLE"),
     label: wX("CLEAROPS PROMPT"),
     type: "operation",
-    callback: async () => {
+    callback: () => {
       // remove database
       deleteDatabase();
       // cleanup localStorage
@@ -142,6 +142,7 @@ export function clearAllData() {
         constants.SKIP_CONFIRM,
         constants.SERVER_BASE_KEY,
         constants.REBASE_UPDATE_KEY,
+        constants.FIREBASE_DISABLE,
       ]) {
         delete localStorage[key];
       }
