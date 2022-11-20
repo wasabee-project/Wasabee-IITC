@@ -219,7 +219,7 @@ module.exports = (env, argv) => {
   if (build !== "prod") {
     const commit = getCommitShort();
     if (commit) meta.version += `-${commit}`;
-    config.devtool = "eval-source-map";
+    config.devtool = "eval";
     config.mode = "development";
   } else {
     config.mode = "production";
