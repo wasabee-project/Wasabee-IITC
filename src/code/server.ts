@@ -68,8 +68,8 @@ export function loadConfig() {
 }
 
 // returns a promise to /me if the access token is valid
-export function SendAccessTokenAsync(accessToken) {
-  return genericPost(
+export function SendAccessTokenAsync(accessToken: string) {
+  return genericPost<WasabeeMe & { jwt: string }>(
     "/aptok",
     JSON.stringify({ accessToken: accessToken }),
     "application/json;charset=UTF-8"
@@ -82,11 +82,11 @@ export function logoutPromise() {
 }
 
 // local change: none // cache: none
-export function oneTimeToken(token) {
+export function oneTimeToken(token: string) {
   const url = "/oneTimeToken";
   const fd = new FormData();
   fd.append("token", token);
-  return genericPost(url, fd);
+  return genericPost<WasabeeMe & { jwt: string }>(url, fd);
 }
 
 /**** me & d ****/
