@@ -103,7 +103,7 @@ export async function blockerAutomark(operation: WasabeeOp) {
 
     // remove nodes from blocker list
     blockers = blockers.filter((b) => b.from !== portalId && b.to !== portalId);
-    await WasabeeBlocker.removeBlocker(operation, portalId);
+    await WasabeeBlocker.removePortal(operation, portalId);
   }
   operation.cleanAll();
   operation.endBatchMode();

@@ -65,5 +65,17 @@ export class WLBlockerLayer extends L.FeatureGroup {
           ).addTo(this);
       }
     });
+    for (const key in this.blocked) {
+      this.removeLayer(this.blocked[key]);
+    }
+    this.blocked = {};
+    for (const link of operation.links) {
+      if (link.selfBlocked || link.blocked) {
+        this.blocked[link.ID] = L.geodesicPolyline(
+          link.getLatLngs(operation),
+          window.plugin.wasabee.skin.selfBlockStyle
+        ).addTo(this);
+      }
+    }
   }
 }

@@ -50,31 +50,35 @@ async function testLink(link: IITC.Link, operation: WasabeeOp) {
   if (cache.has(link.options.data.oGuid + link.options.data.dGuid)) {
     return;
   }
+  cache.add(link.options.data.oGuid + link.options.data.dGuid);
 
+  let cross = false;
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
-      cache.add(link.options.data.oGuid + link.options.data.dGuid);
-      let fromPortal =
-        operation.getPortal(link.options.data.oGuid) ||
-        PortalUI.get(link.options.data.oGuid);
-      if (!fromPortal)
-        fromPortal = WasabeePortal.fake(
-          (link.options.data.oLatE6 / 1e6).toFixed(6),
-          (link.options.data.oLngE6 / 1e6).toFixed(6),
-          link.options.data.oGuid
-        );
-      let toPortal =
-        operation.getPortal(link.options.data.dGuid) ||
-        PortalUI.get(link.options.data.dGuid);
-      if (!toPortal)
-        toPortal = WasabeePortal.fake(
-          (link.options.data.dLatE6 / 1e6).toFixed(6),
-          (link.options.data.dLngE6 / 1e6).toFixed(6),
-          link.options.data.dGuid
-        );
-      await WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
-      window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
-      break;
+      if (!cross) {
+        let fromPortal =
+          operation.getPortal(link.options.data.oGuid) ||
+          PortalUI.get(link.options.data.oGuid);
+        if (!fromPortal)
+          fromPortal = WasabeePortal.fake(
+            (link.options.data.oLatE6 / 1e6).toFixed(6),
+            (link.options.data.oLngE6 / 1e6).toFixed(6),
+            link.options.data.oGuid
+          );
+        let toPortal =
+          operation.getPortal(link.options.data.dGuid) ||
+          PortalUI.get(link.options.data.dGuid);
+        if (!toPortal)
+          toPortal = WasabeePortal.fake(
+            (link.options.data.dLatE6 / 1e6).toFixed(6),
+            (link.options.data.dLngE6 / 1e6).toFixed(6),
+            link.options.data.dGuid
+          );
+        await WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
+        window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
+        cross = true;
+      }
+      drawnLink.blocked = true;
     }
   }
 }
@@ -94,6 +98,40 @@ export function testSelfBlock(incoming: WasabeeLink, operation: WasabeeOp) {
   return false;
 }
 
+/** Test a Wasabee link against known blockers */
+export function testBlocked(
+  incoming: WasabeeLink,
+  operation: WasabeeOp,
+  blockers: WasabeeBlocker[]
+) {
+  for (const b of blockers) {
+    if (
+      greatCircleArcIntersectByLatLngs(incoming.getLatLngs(operation), [
+        b.fromPortal.latLng,
+        b.toPortal.latLng,
+      ])
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Test a known blocker against all Wasabee links */
+export function testBlocker(operation: WasabeeOp, blocker: WasabeeBlocker) {
+  for (const l of operation.links) {
+    if (
+      greatCircleArcIntersectByLatLngs(l.getLatLngs(operation), [
+        blocker.fromPortal.latLng,
+        blocker.toPortal.latLng,
+      ])
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // lets see if using a generator makes the GUI more responsive on large ops
 // -- yeild doesn't seem to release the main thread, maybe we need to yeild a
 // Promise.resolve(window.links[g]) and await it in the for loop?
@@ -106,7 +144,7 @@ function* realLinks() {
   }
 }
 
-export function checkAllLinks() {
+export async function checkAllLinks() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
 
   const operation = getSelectedOperation();
@@ -115,20 +153,23 @@ export function checkAllLinks() {
 
   if (!operation.links || operation.links.length == 0) return;
 
-  const linkGenerator = realLinks();
-  for (const link of linkGenerator) {
-    testLink(link, operation);
+  // re-test known data (link/link, link/blocker)
+  const blockers = await WasabeeBlocker.getAll(operation);
+  for (const l of operation.links) {
+    l.blocked = testBlocked(l, operation, blockers);
+    l.selfBlocked = testSelfBlock(l, operation);
+  }
+  for (const b of blockers) {
+    cache.add(b.from + b.to);
+    if (!testBlocker(operation, b)) {
+      WasabeeBlocker.removeBlocker(operation, b.from, b.to);
+    }
   }
 
-  for (const l of operation.links) {
-    if (testSelfBlock(l, operation)) {
-      const blocked = L.geodesicPolyline(
-        l.getLatLngs(operation),
-        window.plugin.wasabee.skin.selfBlockStyle
-      );
-      blocked.options.interactive = false;
-      blocked.addTo(window.plugin.wasabee.crossLinkLayers);
-    }
+  // test all intel links
+  const linkGenerator = realLinks();
+  for (const link of linkGenerator) {
+    await testLink(link, operation);
   }
   window.map.fire("wasabee:crosslinks:done");
 }

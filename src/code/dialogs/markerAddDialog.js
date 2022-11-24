@@ -175,7 +175,7 @@ const MarkerAddDialog = WDialog.extend({
       localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY] =
         selectedType;
       if (WasabeeMarker.isDestructMarkerType(selectedType))
-        WasabeeBlocker.removeBlocker(operation, PortalUI.getSelected().id);
+        WasabeeBlocker.removePortal(operation, PortalUI.getSelected().id);
       await this.update();
     } else displayError(wX("ALREADY_HAS_MARKER"));
   },

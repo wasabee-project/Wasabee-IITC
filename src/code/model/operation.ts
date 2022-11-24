@@ -829,6 +829,7 @@ export default class WasabeeOp extends Evented implements IOperation {
           );
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(newPortal.id, l.toPortalId)) {
+          l.blocked = l.selfBlocked = false;
           l.fromPortalId = newPortal.id;
         } else {
           console.debug(
@@ -844,6 +845,7 @@ export default class WasabeeOp extends Evented implements IOperation {
           linksToRemove.push(l);
         } else if (!this.containsLinkFromTo(l.fromPortalId, newPortal.id)) {
           l.toPortalId = newPortal.id;
+          l.blocked = l.selfBlocked = false;
         } else {
           console.debug(
             `Operation: Removing link '${l.ID}' while swapping because it would duplicate an existing link in the operation.`
@@ -974,6 +976,12 @@ export default class WasabeeOp extends Evented implements IOperation {
   updateBlockers() {
     if (this._batchmode === true) return;
     this.fire("blockers");
+  }
+
+  resetBlockedLinks() {
+    for (const l of this.links) {
+      l.blocked = false;
+    }
   }
 
   startBatchMode() {

@@ -77,7 +77,7 @@ export function swapMarker(operation: WasabeeOp, marker: WasabeeMarker) {
         assign: marker.assignedTo,
       });
       if (WasabeeMarker.isDestructMarkerType(marker.type))
-        WasabeeBlocker.removeBlocker(operation, portal.id);
+        WasabeeBlocker.removePortal(operation, portal.id);
       operation.endBatchMode();
     },
   });

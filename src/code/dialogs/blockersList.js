@@ -62,6 +62,7 @@ const BlockerList = WDialog.extend({
     buttons[wX("RESET")] = async () => {
       const operation = getSelectedOperation();
       await WasabeeBlocker.removeBlockers(operation.ID);
+      operation.resetBlockedLinks();
       this.update();
       window.map.fire("wasabee:crosslinks");
     };
