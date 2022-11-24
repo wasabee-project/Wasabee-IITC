@@ -19,16 +19,19 @@ export function getJWT() {
 /** wrap send access token to get me */
 export async function sendAccessToken(token: string) {
   const r = await SendAccessTokenAsync(token);
-  if (r && (r as any).jwt) {
-    storeJWT((r as any).jwt);
+  if (r && r.jwt) {
+    storeJWT(r.jwt);
   }
-  return r ? new WasabeeMe(r) : await WasabeeMe.waitGet(true);
+  return r ? new WasabeeMe(r) : WasabeeMe.waitGet(true);
 }
 
 /** wrap ott to get me */
 export async function sendOneTimeToken(token: string) {
-  await oneTimeToken(token);
-  return await WasabeeMe.waitGet(true);
+  const r = await oneTimeToken(token);
+  if (r && r.jwt) {
+    storeJWT(r.jwt);
+  }
+  return WasabeeMe.waitGet(true);
 }
 
 /** GAPI */
@@ -69,7 +72,7 @@ export function getAccessToken(selectAccount = false) {
         return reject(err);
       }
 
-      resolve(response.access_token);
+      return resolve(response.access_token);
     });
   });
 }
