@@ -7,6 +7,9 @@ import type { IITC } from "../types/iitc";
 import type WasabeeLink from "./model/link";
 
 import { greatCircleArcIntersectByLatLngs } from "./geo";
+import { WLBlockerLayer } from "./map/blocker";
+
+const cache = new Set<string>();
 
 function testPolyLine(
   wasabeeLink: WasabeeLink,
@@ -42,30 +45,15 @@ function testPolyLine(
   return false;
 }
 
-function showCrossLink(link: IITC.Link) {
-  // this should be in static.js or skin
-  const blocked = L.geodesicPolyline(link.getLatLngs(), {
-    color: "#d22",
-    opacity: 0.7,
-    weight: 5,
-    interactive: false,
-    dashArray: [8, 8],
-    guid: link.options.guid,
-  });
-
-  blocked.addTo(window.plugin.wasabee.crossLinkLayers);
-  window.plugin.wasabee._crosslinkCache.set(link.options.guid, blocked);
-}
-
-function testLink(link: IITC.Link, operation: WasabeeOp) {
+async function testLink(link: IITC.Link, operation: WasabeeOp) {
   // if the crosslink already exists, do not recheck
-  if (window.plugin.wasabee._crosslinkCache.has(link.options.guid)) {
+  if (cache.has(link.options.data.oGuid + link.options.data.dGuid)) {
     return;
   }
 
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
-      showCrossLink(link);
+      cache.add(link.options.data.oGuid + link.options.data.dGuid);
       let fromPortal =
         operation.getPortal(link.options.data.oGuid) ||
         PortalUI.get(link.options.data.oGuid);
@@ -84,7 +72,8 @@ function testLink(link: IITC.Link, operation: WasabeeOp) {
           (link.options.data.dLngE6 / 1e6).toFixed(6),
           link.options.data.dGuid
         );
-      WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
+      await WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
+      window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
       break;
     }
   }
@@ -122,8 +111,7 @@ export function checkAllLinks() {
 
   const operation = getSelectedOperation();
 
-  window.plugin.wasabee.crossLinkLayers.clearLayers();
-  window.plugin.wasabee._crosslinkCache.clear();
+  cache.clear();
 
   if (!operation.links || operation.links.length == 0) return;
 
@@ -163,29 +151,14 @@ function onMapDataRefreshEnd() {
 
 export function initCrossLinks() {
   window.map.on("wasabee:crosslinks", checkAllLinks);
-  window.plugin.wasabee.crossLinkLayers = new L.FeatureGroup();
-  window.plugin.wasabee._crosslinkCache = new Map();
+  window.plugin.wasabee.crossLinkLayers = new WLBlockerLayer();
   window.addLayerGroup(
     "Wasabee Cross Links",
     window.plugin.wasabee.crossLinkLayers,
     true
   );
 
-  // rerun crosslinks on re-enable
-  window.map.on("layeradd", (obj) => {
-    if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      window.plugin.wasabee._crosslinkCache = new Map();
-      checkAllLinks();
-    }
-  });
-
-  // clear crosslinks on disable
-  window.map.on("layerremove", (obj) => {
-    if (obj.layer === window.plugin.wasabee.crossLinkLayers) {
-      window.plugin.wasabee.crossLinkLayers.clearLayers();
-      delete window.plugin.wasabee._crosslinkCache;
-    }
-  });
+  window.plugin.wasabee.crossLinkLayers.on("add", checkAllLinks);
 
   window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
