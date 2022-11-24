@@ -14,6 +14,10 @@ import { WasabeeBlocker } from "../model";
 import * as PortalUI from "../ui/portal";
 import statics from "../static";
 
+function getFactionCSS(team) {
+  return team === "E" ? "enl" : team === "R" ? "res" : "mac";
+}
+
 const BlockerList = WDialog.extend({
   statics: {
     TYPE: "blockerList",
@@ -123,9 +127,12 @@ const BlockerList = WDialog.extend({
           blocker.fromPortal ? blocker.fromPortal.name : blocker.from,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          if (blocker.fromPortal)
-            row.appendChild(PortalUI.displayFormat(blocker.fromPortal));
-          else row.textContent = value;
+          if (blocker.fromPortal) {
+            const a = row.appendChild(
+              PortalUI.displayFormat(blocker.fromPortal)
+            );
+            if (blocker.team) a.classList.add(getFactionCSS(blocker.team));
+          } else row.textContent = value;
         },
       },
       {
@@ -144,9 +151,10 @@ const BlockerList = WDialog.extend({
           blocker.toPortal ? blocker.toPortal.name : blocker.to,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          if (blocker.toPortal)
-            row.appendChild(PortalUI.displayFormat(blocker.toPortal));
-          else row.textContent = value;
+          if (blocker.toPortal) {
+            const a = row.appendChild(PortalUI.displayFormat(blocker.toPortal));
+            if (blocker.team) a.classList.add(getFactionCSS(blocker.team));
+          } else row.textContent = value;
         },
       },
       {

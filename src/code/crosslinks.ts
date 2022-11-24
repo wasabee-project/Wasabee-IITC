@@ -74,7 +74,12 @@ async function testLink(link: IITC.Link, operation: WasabeeOp) {
             (link.options.data.dLngE6 / 1e6).toFixed(6),
             link.options.data.dGuid
           );
-        await WasabeeBlocker.addBlocker(operation, fromPortal, toPortal);
+        await WasabeeBlocker.addBlocker(
+          operation,
+          fromPortal,
+          toPortal,
+          link.options.data.team as WasabeeBlocker['team']
+        );
         window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
         cross = true;
       }
