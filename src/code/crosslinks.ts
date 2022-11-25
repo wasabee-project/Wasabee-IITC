@@ -45,6 +45,34 @@ function testPolyLine(
   return false;
 }
 
+async function addBlockerFromIITC(link: IITC.Link, operation: WasabeeOp) {
+  let fromPortal =
+    operation.getPortal(link.options.data.oGuid) ||
+    PortalUI.get(link.options.data.oGuid);
+  if (!fromPortal)
+    fromPortal = WasabeePortal.fake(
+      (link.options.data.oLatE6 / 1e6).toFixed(6),
+      (link.options.data.oLngE6 / 1e6).toFixed(6),
+      link.options.data.oGuid
+    );
+  let toPortal =
+    operation.getPortal(link.options.data.dGuid) ||
+    PortalUI.get(link.options.data.dGuid);
+  if (!toPortal)
+    toPortal = WasabeePortal.fake(
+      (link.options.data.dLatE6 / 1e6).toFixed(6),
+      (link.options.data.dLngE6 / 1e6).toFixed(6),
+      link.options.data.dGuid
+    );
+  window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
+  await WasabeeBlocker.addBlocker(
+    operation,
+    fromPortal,
+    toPortal,
+    link.options.data.team as WasabeeBlocker["team"]
+  );
+}
+
 async function testLink(link: IITC.Link, operation: WasabeeOp) {
   // if the crosslink already exists, do not recheck
   if (cache.has(link.options.data.oGuid + link.options.data.dGuid)) {
@@ -56,31 +84,7 @@ async function testLink(link: IITC.Link, operation: WasabeeOp) {
   for (const drawnLink of operation.links) {
     if (testPolyLine(drawnLink, link, operation)) {
       if (!cross) {
-        let fromPortal =
-          operation.getPortal(link.options.data.oGuid) ||
-          PortalUI.get(link.options.data.oGuid);
-        if (!fromPortal)
-          fromPortal = WasabeePortal.fake(
-            (link.options.data.oLatE6 / 1e6).toFixed(6),
-            (link.options.data.oLngE6 / 1e6).toFixed(6),
-            link.options.data.oGuid
-          );
-        let toPortal =
-          operation.getPortal(link.options.data.dGuid) ||
-          PortalUI.get(link.options.data.dGuid);
-        if (!toPortal)
-          toPortal = WasabeePortal.fake(
-            (link.options.data.dLatE6 / 1e6).toFixed(6),
-            (link.options.data.dLngE6 / 1e6).toFixed(6),
-            link.options.data.dGuid
-          );
-        await WasabeeBlocker.addBlocker(
-          operation,
-          fromPortal,
-          toPortal,
-          link.options.data.team as WasabeeBlocker['team']
-        );
-        window.plugin.wasabee.crossLinkLayers.addBlocker(fromPortal, toPortal);
+        await addBlockerFromIITC(link, operation);
         cross = true;
       }
       drawnLink.blocked = true;
