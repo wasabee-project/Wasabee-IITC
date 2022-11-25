@@ -1,4 +1,4 @@
-import { WasabeePortal, WasabeeMarker, WasabeeBlocker } from "./model";
+import { WasabeePortal, WasabeeBlocker } from "./model";
 import { getSelectedOperation } from "./selectedOp";
 
 import * as PortalUI from "./ui/portal";
@@ -27,11 +27,7 @@ function testPolyLine(
     }
 
     for (const marker of operation.markers) {
-      if (
-        marker.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
-        marker.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS ||
-        marker.type == WasabeeMarker.constants.MARKER_TYPE_DECAY
-      ) {
+      if (marker.isDestructMarker()) {
         if (
           marker.portalId == realLink.options.data.dGuid ||
           marker.portalId == realLink.options.data.oGuid
