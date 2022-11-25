@@ -16,29 +16,10 @@ function testPolyLine(
   realLink: IITC.Link,
   operation: WasabeeOp
 ) {
-  if (
-    greatCircleArcIntersectByLatLngs(
-      realLink.getLatLngs(),
-      wasabeeLink.getLatLngs(operation)
-    )
-  ) {
-    if (!operation.markers || operation.markers.length == 0) {
-      return true;
-    }
-
-    for (const marker of operation.markers) {
-      if (marker.isDestructMarker()) {
-        if (
-          marker.portalId == realLink.options.data.dGuid ||
-          marker.portalId == realLink.options.data.oGuid
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  return false;
+  return greatCircleArcIntersectByLatLngs(
+    realLink.getLatLngs(),
+    wasabeeLink.getLatLngs(operation)
+  );
 }
 
 async function addBlockerFromIITC(link: IITC.Link, operation: WasabeeOp) {
@@ -159,9 +140,26 @@ export async function checkAllLinks() {
     }
   }
 
-  // test all intel links
+  const markers: PortalID[] = [];
+  for (const marker of operation.markers) {
+    if (marker.isDestructMarker()) {
+      markers.push(marker.portalId);
+    }
+  }
+
+  const links: IITC.Link[] = [];
   for (const guid in window.links) {
-    const link = window.links[guid];
+    const l = window.links[guid];
+    if (
+      l &&
+      !markers.includes(l.options.data.oGuid) &&
+      !markers.includes(l.options.data.dGuid)
+    )
+      links.push(l);
+  }
+
+  // test all intel links
+  for (const link of links) {
     await testLink(link, operation);
   }
   window.map.fire("wasabee:crosslinks:done");
