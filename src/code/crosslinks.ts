@@ -167,20 +167,11 @@ export async function checkAllLinks() {
   window.map.fire("wasabee:crosslinks:done");
 }
 
-function onLinkAdded(data: EventLinkAdded) {
-  testLink(data.link, getSelectedOperation());
-}
-
-function onMapDataRefreshStart() {
-  window.removeHook("linkAdded", onLinkAdded);
-}
-
 function onMapDataRefreshEnd() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
   window.plugin.wasabee.crossLinkLayers.bringToFront();
 
   checkAllLinks();
-  window.addHook("linkAdded", onLinkAdded);
 }
 
 export function initCrossLinks() {
@@ -194,6 +185,5 @@ export function initCrossLinks() {
 
   window.plugin.wasabee.crossLinkLayers.on("add", checkAllLinks);
 
-  window.addHook("mapDataRefreshStart", onMapDataRefreshStart);
   window.addHook("mapDataRefreshEnd", onMapDataRefreshEnd);
 }
