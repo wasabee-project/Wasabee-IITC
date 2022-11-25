@@ -137,18 +137,6 @@ export function testBlocker(operation: WasabeeOp, blocker: WasabeeBlocker) {
   return false;
 }
 
-// lets see if using a generator makes the GUI more responsive on large ops
-// -- yeild doesn't seem to release the main thread, maybe we need to yeild a
-// Promise.resolve(window.links[g]) and await it in the for loop?
-function* realLinks() {
-  const guids = Object.getOwnPropertyNames(window.links);
-  // it is possible that the link was purged while we were yielded
-  // checking here should reduce the workload while scrolling/zooming
-  for (const g of guids) {
-    if (window.links[g] != null) yield window.links[g];
-  }
-}
-
 export async function checkAllLinks() {
   if (window.isLayerGroupDisplayed("Wasabee Cross Links") === false) return;
 
@@ -172,8 +160,8 @@ export async function checkAllLinks() {
   }
 
   // test all intel links
-  const linkGenerator = realLinks();
-  for (const link of linkGenerator) {
+  for (const guid in window.links) {
+    const link = window.links[guid];
     await testLink(link, operation);
   }
   window.map.fire("wasabee:crosslinks:done");
