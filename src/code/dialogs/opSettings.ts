@@ -116,8 +116,12 @@ class OpSettingDialog extends WDialog {
 
     const tab = L.DomUtil.create("div", "advanced");
     if (selectedOp.canWrite()) {
-      const button = L.DomUtil.create("button", null, tab);
-      button.textContent = wX("dialog.op_settings.import_from_op");
+      const desc = L.DomUtil.create("div", "desc", tab);
+      desc.textContent = wX("dialog.op_settings.import.desc");
+
+
+      const labelSelect = L.DomUtil.create("label", null, tab);
+      labelSelect.textContent = wX("dialog.op_settings.import.select_op");
 
       const opMenu = L.DomUtil.create("select", null, tab);
       opsList().then(async (opIDs) => {
@@ -132,23 +136,20 @@ class OpSettingDialog extends WDialog {
         }
       });
 
-      const title = L.DomUtil.create("label", "checkbox", tab);
-      const check = L.DomUtil.create("input", "", title);
-      check.type = "checkbox";
-      check.checked = true;
-      L.DomUtil.create("span", "", title).textContent = wX(
-        "dialog.op_settings.import_with_color"
-      );
+      const labelColor = L.DomUtil.create("label", null, tab);
+      labelColor.textContent = wX("dialog.op_settings.import.select_color");
 
       const picker = L.DomUtil.create("input", "picker", tab);
       picker.type = "color";
       picker.value = convertColorToHex(selectedOp.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
 
+      const button = L.DomUtil.create("button", "import", tab);
+      button.textContent = wX("dialog.op_settings.import.button");
       L.DomEvent.on(button, "click", async () => {
         const importOp = await WasabeeOp.load(opMenu.value);
         delete importOp.fetchedOp;
-        if (check.checked) {
+        if (picker.value !== convertColorToHex(selectedOp.color)) {
           for (const link of importOp.links) {
             if (link.color === "main" || link.color === importOp.color) {
               link.color = picker.value;
