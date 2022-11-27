@@ -321,6 +321,13 @@
   grid-column: 1/3;
   font-weight: bold;
 }
+.wasabee-dialog-op-settings div.advanced .checkbox {
+  grid-column: 1/3;
+}
+.wasabee-dialog-op-settings div.advanced .checkbox input {
+  margin-right: .5rem;
+  vertical-align: middle;
+}
 .wasabee-dialog-op-settings div.advanced .import {
   grid-column: 2;
 }

@@ -22,7 +22,7 @@ import { clearAllItems } from "../ui/operation";
 import { buildZoneList } from "./components/zoneList";
 import { setLinksToZones, setMarkersToZones } from "../ui/zone";
 import { buildPermList } from "./components/permList";
-import { applyRebaseChanges, computeRebaseChanges } from "../model/changes";
+import { applyRebaseChanges, computeRebaseChanges, defaultChangeChoice } from "../model/changes";
 
 class OpSettingDialog extends WDialog {
   static TYPE = "opSettingDialog";
@@ -143,6 +143,11 @@ class OpSettingDialog extends WDialog {
       picker.value = convertColorToHex(selectedOp.color);
       picker.setAttribute("list", "wasabee-colors-datalist");
 
+      const collisionRow = L.DomUtil.create("label", "checkbox", tab);
+      const collisionCheck = L.DomUtil.create("input", "", collisionRow);
+      collisionCheck.type = "checkbox";
+      L.DomUtil.create("span", "", collisionRow).textContent = wX("dialog.op_settings.import.collision_default");
+
       const button = L.DomUtil.create("button", "import", tab);
       button.textContent = wX("dialog.op_settings.import.button");
       L.DomEvent.on(button, "click", async () => {
@@ -180,7 +185,9 @@ class OpSettingDialog extends WDialog {
           importOp
         );
         console.debug(changes);
+        // discard imported op properties
         changes.props = {};
+        if (collisionCheck.checked) defaultChangeChoice(importOp, changes);
         applyRebaseChanges(sop, importOp, changes);
         await sop.store();
         window.map.fire("wasabee:op:change");
