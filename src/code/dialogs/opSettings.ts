@@ -22,7 +22,7 @@ import { clearAllItems } from "../ui/operation";
 import { buildZoneList } from "./components/zoneList";
 import { setLinksToZones, setMarkersToZones } from "../ui/zone";
 import { buildPermList } from "./components/permList";
-import ConflictDialog from "./conflictDialog";
+import { applyRebaseChanges, computeRebaseChanges } from "../model/changes";
 
 class OpSettingDialog extends WDialog {
   static TYPE = "opSettingDialog";
@@ -119,7 +119,6 @@ class OpSettingDialog extends WDialog {
       const desc = L.DomUtil.create("div", "desc", tab);
       desc.textContent = wX("dialog.op_settings.import.desc");
 
-
       const labelSelect = L.DomUtil.create("label", null, tab);
       labelSelect.textContent = wX("dialog.op_settings.import.select_op");
 
@@ -156,12 +155,23 @@ class OpSettingDialog extends WDialog {
             }
           }
         }
-        importOp.ID = getSelectedOperation().ID;
-        const md = new ConflictDialog({
-          opOwn: importOp,
-          opRemote: getSelectedOperation(),
-        });
-        md.enable();
+        const sop = getSelectedOperation();
+        importOp.ID = sop.ID;
+        // TODO: refine for link/marker/zone only
+        // TODO: refine zone handling (merge or alpha conversion)
+        // dest takes priority
+        const changes = computeRebaseChanges(new WasabeeOp({
+          // dummy op
+          ID: sop.ID,
+          name: sop.name,
+          comment: sop.comment,
+          color: sop.color,
+          referencetime: sop.referencetime,
+        }), sop, importOp);
+        console.debug(changes);
+        changes.props = {};
+        applyRebaseChanges(sop, importOp, changes);
+        sop.update();
       });
     }
 
