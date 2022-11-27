@@ -157,21 +157,33 @@ class OpSettingDialog extends WDialog {
         }
         const sop = getSelectedOperation();
         importOp.ID = sop.ID;
+        const maxZoneId = sop.zones
+          .map((z) => z.id)
+          .reduce((p, i) => (p > i ? p : i), 1);
+        // zone alpha conversion
+        for (const z of importOp.zones) z.id += maxZoneId;
+        for (const l of importOp.links) l.zone += maxZoneId;
+        for (const m of importOp.markers) m.zone += maxZoneId;
         // TODO: refine for link/marker/zone only
-        // TODO: refine zone handling (merge or alpha conversion)
+        // TODO: refine zone handling (merge)
         // dest takes priority
-        const changes = computeRebaseChanges(new WasabeeOp({
-          // dummy op
-          ID: sop.ID,
-          name: sop.name,
-          comment: sop.comment,
-          color: sop.color,
-          referencetime: sop.referencetime,
-        }), sop, importOp);
+        const changes = computeRebaseChanges(
+          new WasabeeOp({
+            // dummy op
+            ID: sop.ID,
+            name: sop.name,
+            comment: sop.comment,
+            color: sop.color,
+            referencetime: sop.referencetime,
+          }),
+          sop,
+          importOp
+        );
         console.debug(changes);
         changes.props = {};
         applyRebaseChanges(sop, importOp, changes);
-        sop.update();
+        await sop.store();
+        window.map.fire("wasabee:op:change");
       });
     }
 
