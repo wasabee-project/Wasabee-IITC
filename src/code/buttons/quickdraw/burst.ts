@@ -58,8 +58,13 @@ export class Burst implements QuickDrawMode {
         this.anchor = portal;
       }
     } else {
+      // sort candidate by decreasing distances
+      const candidates = this.getCandidates(op, portal.latLng).map(
+        (p) => [window.map.distance(portal.latLng, p.latLng), p] as const
+      );
+      candidates.sort((a, b) => b[0] - a[0]);
       op.startBatchMode();
-      for (const to of this.getCandidates(op, portal.latLng)) {
+      for (const [, to] of candidates) {
         op.addLink(portal, to, {
           order: op.nextOrder,
           color: options.color,
