@@ -50,6 +50,7 @@ export class Burst implements QuickDrawMode {
     if (op.anchors.length == 0) {
       if (this.anchor) {
         op.addLink(portal, this.anchor, {
+          order: op.nextOrder,
           color: options.color,
         });
         this.anchor = null;
@@ -60,6 +61,7 @@ export class Burst implements QuickDrawMode {
       op.startBatchMode();
       for (const to of this.getCandidates(op, portal.latLng)) {
         op.addLink(portal, to, {
+          order: op.nextOrder,
           color: options.color,
         });
       }
