@@ -174,7 +174,7 @@
   "dialog.online_agents.last_seen": "Last Seen",
   "dialog.online_agents.title": "Online Agents",
   "dialog.op_settings.advanced": "Advanced",
-  "dialog.op_settings.import.desc": "Import  links/markers/zones from another OP",
+  "dialog.op_settings.import.desc": "Import links/markers/zones from another OP",
   "dialog.op_settings.import.collision_default": "In case of conflicts, use imported links/markers",
   "dialog.op_settings.import.select_op": "Select OP",
   "dialog.op_settings.import.select_color": "OP link color",
