@@ -150,8 +150,9 @@ const config = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(png|gif|svg)$/,
-        use: "url-loader",
+        test: /\.svg$/,
+        loader: "raw-loader",
+        options: { esModule: false },
       },
       {
         test: /\.css$/,
@@ -159,13 +160,25 @@ const config = {
           "to-string-loader",
           {
             loader: "css-loader",
-            options: { esModule: false },
+            options: { esModule: false, url: false },
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    "postcss-url",
+                    {
+                      url: "inline",
+                    },
+                  ],
+                  ["cssnano", { preset: "default" }],
+                ],
+              },
+            },
           },
         ],
-      },
-      {
-        test: /\.html$/,
-        use: ["to-string-loader", "html-loader"],
       },
     ],
   },
@@ -206,7 +219,7 @@ module.exports = (env, argv) => {
   if (build !== "prod") {
     const commit = getCommitShort();
     if (commit) meta.version += `-${commit}`;
-    config.devtool = "eval-source-map";
+    config.devtool = "eval";
     config.mode = "development";
   } else {
     config.mode = "production";

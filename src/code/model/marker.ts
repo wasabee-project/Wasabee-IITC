@@ -59,7 +59,7 @@ export default class WasabeeMarker extends Task {
     super(obj);
     this.portalId = obj.portalId;
     this.type = obj.type;
-    this.attributes = obj.attributes || [];
+    this.attributes = obj.attributes ? Array.from(obj.attributes) : [];
   }
 
   toJSON(): any {

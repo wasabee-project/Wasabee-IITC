@@ -1,10 +1,10 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeAgent from "../model/agent";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
+import { getAgent } from "../model/cache";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -80,7 +80,7 @@ const KeyListPortal = WDialog.extend({
         value: (key) => key.gid,
         sort: (a, b) => a.localeCompare(b),
         format: async (cell, value, key) => {
-          const agent = await WasabeeAgent.get(key.gid);
+          const agent = await getAgent(key.gid);
           cell.textContent = agent ? agent.getName() : key.gid;
         },
       },

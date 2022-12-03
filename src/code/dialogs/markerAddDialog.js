@@ -1,13 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeMe from "../model/me";
-import WasabeeTeam from "../model/team";
-import WasabeeMarker from "../model/marker";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeMe, WasabeeMarker, WasabeeBlocker } from "../model";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
+import { getTeam, getMe } from "../model/cache";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -37,7 +35,7 @@ const MarkerAddDialog = WDialog.extend({
     if (
       this._selectedPortal &&
       PortalUI.getSelected() &&
-      this._selectedPortal.id != PortalUI.getSelected().id &&
+      this._selectedPortal.id !== PortalUI.getSelected().id &&
       this._bulk.checked
     ) {
       this._selectedPortal = PortalUI.getSelected();
@@ -50,8 +48,6 @@ const MarkerAddDialog = WDialog.extend({
         );
       return;
     }
-
-    this._type.textContent = "";
 
     // zones can be populated even if portal not selected
     this._zones.textContent = ""; // do we need to do this every time? the zone list can change while this dialog is open.
@@ -71,6 +67,7 @@ const MarkerAddDialog = WDialog.extend({
       this._assign.appendChild(option);
     }
 
+    this._type.textContent = "";
     this._selectedPortal = PortalUI.getSelected();
     if (this._selectedPortal) {
       this._portal.textContent = "";
@@ -91,10 +88,15 @@ const MarkerAddDialog = WDialog.extend({
           localStorage[window.plugin.wasabee.static.constants.LAST_MARKER_KEY];
       }
 
-      for (const k of WasabeeMarker.markerTypes) {
+      const types = Array.from(WasabeeMarker.markerTypes).map((t) => [
+        t,
+        wX(t),
+      ]);
+      types.sort((t1, t2) => t1[1].localeCompare(t2[1]));
+      for (const [k, wx] of types) {
         const o = L.DomUtil.create("option", null, this._type);
         o.value = k;
-        o.textContent = wX(k);
+        o.textContent = wx;
       }
       this._type.value = defaultType;
     } else {
@@ -190,12 +192,12 @@ const MarkerAddDialog = WDialog.extend({
     if (!operation.isOnCurrentServer()) return options;
 
     const alreadyAdded = new Set();
-    const me = await WasabeeMe.waitGet();
+    const me = await getMe();
     for (const t of operation.teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const tt = await getTeam(t.teamid, 5 * 60);
         for (const a of tt.agents) {
           if (!alreadyAdded.has(a.id)) {
             alreadyAdded.add(a.id);

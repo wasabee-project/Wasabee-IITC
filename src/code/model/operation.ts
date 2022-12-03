@@ -4,16 +4,14 @@ import WasabeeMarker from "./marker";
 import WasabeeMe from "./me";
 import WasabeeZone from "./zone";
 import Evented from "./evented";
-import { generateId } from "../auxiliar";
-import { GetWasabeeServer } from "../server";
-import { getSelectedOperation } from "../selectedOp";
+import { generateId } from "./utils";
+import { GetWasabeeServer } from "../config";
 import db from "../db";
 
 // 0.20->0.21 blocker migration
 import WasabeeBlocker from "./blocker";
 import type Task from "./task";
-import { displayWarning } from "../error";
-import { fieldSign, portalInField } from "../crosslinks";
+import { fieldSign, portalInField } from "../geo";
 
 export type KeyOnHand = {
   portalId: string;
@@ -64,6 +62,11 @@ export interface ILocalOp extends IOperation {
   stored: number;
 }
 
+let selectedOp: WasabeeOp = null;
+export function setSelectedOp(op: WasabeeOp) {
+  selectedOp = op;
+}
+
 export default class WasabeeOp extends Evented implements IOperation {
   ID: string;
   name: string;
@@ -73,7 +76,7 @@ export default class WasabeeOp extends Evented implements IOperation {
   markers: Array<WasabeeMarker>;
   color: string;
   comment: string;
-  teamlist: Array<OpPermItem>;
+  teamlist: Array<Readonly<OpPermItem>>;
   fetched: string;
   stored: number;
   localchanged: boolean;
@@ -104,12 +107,12 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.ID = obj.ID ? obj.ID : generateId();
     this.name = obj.name ? obj.name : "unnamed op";
     this.creator = obj.creator ? obj.creator : "unset";
-    this.anchors = obj.anchors ? obj.anchors : [];
+    this.anchors = obj.anchors ? Array.from(obj.anchors) : [];
     this.links = this.convertLinksToObjs(obj.links);
     this.markers = this.convertMarkersToObjs(obj.markers);
     this.color = obj.color ? obj.color : "main";
     this.comment = obj.comment ? obj.comment : null;
-    this.teamlist = obj.teamlist ? obj.teamlist : [];
+    this.teamlist = obj.teamlist ? Array.from(obj.teamlist) : [];
     this.fetched = obj.fetched ? obj.fetched : null;
     this.stored = obj.stored ? obj.stored : null;
     this.localchanged = !!obj.localchanged;
@@ -124,6 +127,9 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.server = this.fetched ? obj.server : null;
 
     this.fetchedOp = obj.fetchedOp ? obj.fetchedOp : null;
+
+    // fix broken lasteditid by <=0.21.2 or rare occasion (leading to deadlock)
+    if (!this.server) delete this.lasteditid;
 
     this.background = !!obj.background;
 
@@ -220,12 +226,11 @@ export default class WasabeeOp extends Evented implements IOperation {
     }
 
     // some debug info to trace race condition
-    const s = getSelectedOperation();
-    if (s && s.ID == this.ID && s != this)
+    if (selectedOp && selectedOp.ID === this.ID && selectedOp !== this)
       console.trace(
         "store current OP from a different obj, this *should* be followed by makeSelectedOperation",
-        s.ID,
-        s.name,
+        selectedOp.ID,
+        selectedOp.name,
         this.ID,
         this.name
       );
@@ -557,16 +562,19 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.updateBlockers();
   }
 
-  reverseLink(startPortalID: PortalID, endPortalID: PortalID) {
-    const newLinks = [];
-    for (const l of this.links) {
-      if (l.fromPortalId == startPortalID && l.toPortalId == endPortalID) {
-        l.fromPortalId = endPortalID;
-        l.toPortalId = startPortalID;
+  reverseLink(startPortalID: PortalID | WasabeeLink, endPortalID?: PortalID) {
+    if (startPortalID instanceof WasabeeLink) {
+      const t = startPortalID.fromPortalId;
+      startPortalID.fromPortalId = startPortalID.toPortalId;
+      startPortalID.toPortalId = t;
+    } else {
+      for (const l of this.links) {
+        if (l.fromPortalId === startPortalID && l.toPortalId === endPortalID) {
+          l.fromPortalId = endPortalID;
+          l.toPortalId = startPortalID;
+        }
       }
-      newLinks.push(l);
     }
-    this.links = newLinks;
     this.update(true);
   }
 
@@ -605,7 +613,10 @@ export default class WasabeeOp extends Evented implements IOperation {
 
     // sanitize OP if it get corrupt by my code elsewhere...
     const missingPortal = new Set<PortalID>();
-    let corrupt = this.links.length + this.markers.length;
+    const corrupt = {
+      links: this.links.length,
+      markers: this.markers.length,
+    };
     for (const [id, v] of newPortals) {
       if (v === undefined) {
         this.links = this.links.filter(
@@ -615,16 +626,18 @@ export default class WasabeeOp extends Evented implements IOperation {
         missingPortal.add(id);
       }
     }
-    corrupt -= this.links.length + this.markers.length;
-    if (missingPortal.size > 0) {
-      // leave some trace
+    corrupt.links -= this.links.length;
+    corrupt.markers -= this.markers.length;
+    if (corrupt.links + corrupt.markers > 0) {
+      // this happened when blockers and their portals were part of the op
+      // with test: missingPortal.size > 0
+      // keep the test leave some trace
       console.trace("op corruption: missing portals");
-      displayWarning(
-        `Oops, something went wrong and OP ${this.name} got corrupted. Fix by removing ${missingPortal.size} missing portals and ${corrupt} links/markers. Please check your OP and report to the devs.`
-      );
+      // hook for the selected op
+      this.fire("corrupt", { ...corrupt, portals: missingPortal.size });
       this.cleanAnchorList();
-      for (const id of missingPortal) newPortals.delete(id);
     }
+    for (const id of missingPortal) newPortals.delete(id);
     this._idToOpportals = newPortals;
     this.buildCoordsLookupTable();
   }
@@ -852,7 +865,38 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.updateBlockers();
   }
 
-  addMarker(markerType: string, portal: WasabeePortal, options) {
+  duplicateAnchor(srcPortal: WasabeePortal, dstPortal: WasabeePortal) {
+    // local batch mode if needed
+    const needBatchMode = !this._batchmode;
+    if (needBatchMode) this.startBatchMode();
+
+    const links = this.getLinkListFromPortal(srcPortal);
+    for (const l of links) {
+      let from = this.getPortal(l.fromPortalId);
+      let to = this.getPortal(l.toPortalId);
+      if (from.id === srcPortal.id) from = dstPortal;
+      if (to.id === srcPortal.id) to = dstPortal;
+      this.addLink(from, to, {
+        description: l.comment,
+        order: l.order,
+        color: l.color,
+        replace: false,
+      });
+    }
+
+    // quit local batchmode
+    if (needBatchMode) this.endBatchMode();
+  }
+
+  addMarker(
+    markerType: string,
+    portal: WasabeePortal,
+    options: {
+      comment?: string;
+      zone?: ZoneID;
+      assign?: GoogleID;
+    } = {}
+  ) {
     if (!portal) return false;
 
     // save a trip to update()
@@ -863,8 +907,7 @@ export default class WasabeeOp extends Evented implements IOperation {
     });
     if (options && options.comment) marker.comment = options.comment;
     if (options && options.zone) marker.zone = options.zone;
-    if (options && options.assign && options.assign != 0)
-      marker.assign(options.assign);
+    if (options && options.assign) marker.assign(options.assign);
     this.markers.push(marker);
 
     this.update(true);
@@ -1145,10 +1188,23 @@ export default class WasabeeOp extends Evented implements IOperation {
     this.update(false);
   }
 
-  KeysOnHandForPortal(portalId: PortalID) {
+  KeysOnHandForPortal(portalId: PortalID, gid?: GoogleID) {
     let i = 0;
-    for (const k of this.keysonhand) if (k.portalId == portalId) i += k.onhand;
+    for (const k of this.keysonhand) {
+      if (k.portalId === portalId && (!gid || gid === k.gid)) i += k.onhand;
+    }
     return i;
+  }
+
+  keysOnHandForPortalPerAgent(portalId: PortalID) {
+    const is: { [agentID: GoogleID]: number } = {};
+    for (const k of this.keysonhand) {
+      if (k.portalId == portalId) {
+        if (!(k.gid in is)) is[k.gid] = 0;
+        is[k.gid] += k.onhand;
+      }
+    }
+    return is;
   }
 
   KeysRequiredForPortal(portalId: PortalID) {

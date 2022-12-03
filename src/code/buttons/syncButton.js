@@ -1,6 +1,6 @@
 import { WButton } from "../leafletClasses";
-import WasabeeMe from "../model/me";
-import { fullSync } from "../uiCommands";
+import { WasabeeMe } from "../model";
+import { fullSync } from "../ui/operation";
 import wX from "../wX";
 
 const SyncButton = WButton.extend({

@@ -1,11 +1,9 @@
 import { WDialog } from "../leafletClasses";
-import WasabeePortal from "../model/portal";
-import WasabeeLink from "../model/link";
-import WasabeeMarker from "../model/marker";
+import { WasabeePortal, WasabeeLink, WasabeeMarker } from "../model";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
 
 export const SetCommentDialog = WDialog.extend({
   statics: {
@@ -72,11 +70,13 @@ export const SetCommentDialog = WDialog.extend({
       dialogClass: "setcomment",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.setComment,
+      autofocus: true,
     });
   },
 
   _buildHtml: function () {
-    const container = L.DomUtil.create("div", "container");
+    const container = L.DomUtil.create("form", "container");
+    L.DomEvent.on(container, "submit", this.closeDialog, this);
     const desc = L.DomUtil.create("div", "desc", container);
     const input = L.DomUtil.create("input", null, container);
     input.placeholder = wX("COMMENT");

@@ -110,7 +110,7 @@ export function wX(
   key: "dialog.leave_team.title",
   data: { teamName: string }
 ): string;
-export function wX(key: "dialog.merge.zone", data: { name: string }): string;
+export function wX(key: "dialog.conflict.zone", data: { name: string }): string;
 export function wX(
   key: "dialog.ops_list.download",
   data: { opName: string }
@@ -133,6 +133,14 @@ export function wX(
 ): string;
 export function wX(
   key: "dialog.zone_color.text",
+  data: { zoneName: string }
+): string;
+export function wX(
+  key: "dialog.zones.delete.title",
+  data: { zoneName: string }
+): string;
+export function wX(
+  key: "dialog.zones.delete.text",
   data: { zoneName: string }
 ): string;
 export function wX(key: "FAKED", data: { portalId: string }): string;
@@ -185,6 +193,10 @@ export function wX(key: "SET_MCOMMENT", data: { portalName: string }): string;
 export function wX(key: "SET_PCOMMENT", data: { portalName: string }): string;
 export function wX(key: "SKINS_AVAILABLE", data: { count: number }): string;
 export function wX(key: "TEAM_CREATED", data: { teamName: string }): string;
+export function wX(
+  key: "toolbar.quick_draw.toggle.text",
+  data: { mode: string }
+): string;
 export function wX(key: "TRAWL_REMAINING", data: { count: number }): string;
 export function wX(key: "UPDATE HOVER", data: { opName: string }): string;
 export function wX(

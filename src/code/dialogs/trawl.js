@@ -3,8 +3,7 @@ import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
-import WasabeeMarker from "../model/marker";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeMarker, WasabeeBlocker } from "../model";
 import { displayInfo } from "../error";
 
 const TrawlerDialog = WDialog.extend({
@@ -290,7 +289,7 @@ const TrawlDialog = WDialog.extend({
 
     const points = new Array();
     for (const l of operation.links) {
-      const lls = l.getLatLngs();
+      const lls = l.getLatLngs(operation);
       const start = new VLatLon(lls[0].lat, lls[0].lng);
       const end = new VLatLon(lls[1].lat, lls[1].lng);
       const distance = start.distanceTo(end);
@@ -321,15 +320,13 @@ const TrawlDialog = WDialog.extend({
   _clearMarkers: function () {
     const operation = getSelectedOperation();
 
-    operation.startBatchMode();
-    for (const m of operation.markers) {
-      if (
-        m.type == WasabeeMarker.constants.MARKER_TYPE_DESTROY ||
-        m.type == WasabeeMarker.constants.MARKER_TYPE_VIRUS
-      )
-        operation.removeMarker(m);
-    }
-    operation.endBatchMode();
+    operation.markers = operation.markers.filter(
+      (m) =>
+        m.type !== WasabeeMarker.constants.MARKER_TYPE_DESTROY &&
+        m.type !== WasabeeMarker.constants.MARKER_TYPE_VIRUS
+    );
+    // we don't clear op portals to keep data that may be used for the trawl
+    operation.update();
   },
 
   _bulkLoad: function (latlngs, mapZoom) {

@@ -1,10 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
-import WasabeeTeam from "../model/team";
 import wX from "../wX";
 
-import AgentUI from "../ui/agent";
+import * as AgentUI from "../ui/agent";
 import { displayError } from "../error";
+
+import { getTeam } from "../model/cache";
 
 const TeamMembershipList = WDialog.extend({
   statics: {
@@ -34,7 +35,7 @@ const TeamMembershipList = WDialog.extend({
   _displayDialog: async function () {
     this._table = this._setupTable();
 
-    const team = await WasabeeTeam.get(this.options.teamID, 10); // max cache age of 10 seconds
+    const team = await getTeam(this.options.teamID, 10); // max cache age of 10 seconds
     this._table.items = team.agents;
 
     const buttons = {};
@@ -52,7 +53,7 @@ const TeamMembershipList = WDialog.extend({
   },
 
   update: async function () {
-    const team = await WasabeeTeam.get(this.options.teamID, 10);
+    const team = await getTeam(this.options.teamID, 10);
     this._table.items = team.agents;
     this.setTitle(team.name);
   },

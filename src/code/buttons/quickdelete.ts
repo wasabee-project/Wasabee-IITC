@@ -2,19 +2,17 @@ import { WButton, WTooltip } from "../leafletClasses";
 import wX from "../wX";
 
 import type { Wasabee } from "../init";
-import type { WLMarker } from "../ui/marker";
-import type { WLLink } from "../ui/link";
+import type { WLAnchor, WLLink, WLMarker } from "../map";
 import type { LeafletMouseEvent } from "leaflet";
 import { getSelectedOperation } from "../selectedOp";
-import type { WLAnchor } from "../ui/anchor";
-import { postToFirebase } from "../firebaseSupport";
+import { postToFirebase } from "../firebase/logger";
 
 const W: Wasabee = window.plugin.wasabee;
 
 class QuickDeleteButton extends WButton {
   static TYPE = "QuickdeleteButton";
 
-  needWritePermission: true;
+  needWritePermission = true;
 
   handler: QuickDeleteHandler;
   state: "off" | "on" | "instant";
@@ -61,17 +59,17 @@ class QuickDeleteButton extends WButton {
 
   toggleActions() {
     if (this.state == "off") {
-      this.state = "on";
-      this.enable();
-      this.setSubActions(this.getSubActions());
-      postToFirebase({ id: "analytics", action: "quickdelete" });
-    } else if (this.state == "on") {
-      this.disable();
       this.state = "instant";
       this.enable();
       this.setSubActions(this.getSubActions());
       postToFirebase({ id: "analytics", action: "quickdelete:instant" });
       this.button.classList.add("blink");
+    } else if (this.state == "instant") {
+      this.disable();
+      this.state = "on";
+      this.enable();
+      this.setSubActions(this.getSubActions());
+      postToFirebase({ id: "analytics", action: "quickdelete" });
     } else {
       this.disable();
     }
@@ -92,6 +90,13 @@ class QuickDeleteButton extends WButton {
     this.disable();
   }
 
+  actionClear() {
+    const operation = getSelectedOperation();
+    operation.clearAllItems();
+    operation.updateBlockers();
+    this.disable();
+  }
+
   actionCancel() {
     this.disable();
   }
@@ -103,6 +108,12 @@ class QuickDeleteButton extends WButton {
           text: wX("toolbar.quick_delete.stop.text"),
           title: wX("toolbar.quick_delete.stop.title"),
           callback: this.disable,
+          context: this,
+        },
+        {
+          text: wX("toolbar.quick_delete.clear.text"),
+          title: wX("toolbar.quick_delete.clear.title"),
+          callback: this.actionClear,
           context: this,
         },
       ];

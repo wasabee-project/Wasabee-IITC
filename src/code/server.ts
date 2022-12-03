@@ -1,5 +1,4 @@
-import WasabeeMe from "./model/me";
-import WasabeeOp from "./model/operation";
+import { WasabeeMe, WasabeeOp } from "./model";
 import { getSelectedOperation, removeOperation } from "./selectedOp";
 import { ServerError } from "./error";
 import type { TaskState } from "./model/task";
@@ -92,8 +91,8 @@ export function oneTimeToken(token: string) {
 
 /**** me & d ****/
 
-// returns a promise to WasabeeMe -- should be called only by WasabeeMe.waitGet()
-// use WasabeeMe.cacheGet or WasabeeMe.waitGet for caching
+// returns a promise to WasabeeMe -- should be called only by getMe()
+// use WasabeeMe.cacheGet for caching
 export function mePromise() {
   return genericGet("/api/v1/me");
 }
@@ -148,7 +147,7 @@ export function dKeyBulkPromise(json: string) {
 
 /* agent */
 
-// returns a promise to get the agent's JSON data from the server -- should be called only by WasabeeAgent.get()
+// returns a promise to get the agent's JSON data from the server -- should be called only by getAgent()
 export function agentPromise(GID: GoogleID) {
   return genericGet<WasabeeAgent>(`/api/v1/agent/${GID}`);
 }
@@ -174,8 +173,8 @@ export function targetPromise(
 
 /* team */
 
-// returns a promise to a WasabeeTeam -- used only by WasabeeTeam.get
-// use WasabeeTeam.get
+// returns a promise to a WasabeeTeam -- used only by getTeam
+// use getTeam
 export function teamPromise(teamid: TeamID) {
   return genericGet<WasabeeTeam>(`/api/v1/team/${teamid}`);
 }
@@ -233,14 +232,14 @@ export function rocksPromise(
 }
 
 // local change: none // cache: none
-export function setAgentTeamSquadPromise(
+export function setAgentTeamCommentPromise(
   agentID: GoogleID,
   teamID: TeamID,
-  squad: string
+  comment: string
 ) {
   const fd = new FormData();
-  fd.append("squad", squad);
-  return genericPost(`/api/v1/team/${teamID}/${agentID}/squad`, fd);
+  fd.append("squad", comment);
+  return genericPost(`/api/v1/team/${teamID}/${agentID}/comment`, fd);
 }
 
 export function createJoinLinkPromise(teamID: TeamID) {
@@ -278,6 +277,7 @@ export async function opPromise(opID: OpID) {
     newop.localchanged = false;
     newop.server = GetWasabeeServer();
     newop.fetchedOp = JSON.stringify(raw);
+    newop.fetched = new Date().toUTCString();
     return newop;
   } catch (e) {
     if (!(e instanceof ServerError)) {
@@ -344,8 +344,10 @@ export async function updateOpPromise(operation: WasabeeOp) {
     });
     operation.lasteditid = update.updateID;
     operation.remoteChanged = false;
+    operation.localchanged = false;
     operation.fetched = new Date().toUTCString();
-    operation.fetchedOp = JSON.stringify(operation);
+    operation.fetchedOp = json;
+    operation.server = GetWasabeeServer();
     return true;
   } catch (e) {
     if (!(e instanceof ServerError)) {
@@ -682,12 +684,21 @@ async function generic<T>(request: {
 
     let jsonPayload;
     if (!request.raw) {
-      if (!payload && !request.retried && response.ok) {
-        // server shouldn't reply empty string
-        console.warn(
-          `server answers is empty on[${request.url}], retry once, just in case `
-        );
-        return generic<T>({ ...request, retried: true });
+      if (!payload && !request.retried) {
+        if (response.ok) {
+          // server shouldn't reply empty string
+          console.warn(
+            `server answer is empty on[${request.url}], retry once, just in case `
+          );
+          return generic<T>({ ...request, retried: true });
+        }
+        if (response.type === "opaqueredirect" && response.status === 0) {
+          // server shouldn't reply a redirect
+          console.warn(
+            `server answer is a redirect on[${request.url}], retry once, just in case `
+          );
+          return generic<T>({ ...request, retried: true });
+        }
       }
       try {
         jsonPayload = JSON.parse(payload);
@@ -712,6 +723,8 @@ async function generic<T>(request: {
         WasabeeMe.purge();
       // fallthrough;
       case 403: // forbidden
+      // fallthrough
+      case 406: // not acceptable
       // fallthrough
       case 410: // Gone
       // fallthrough

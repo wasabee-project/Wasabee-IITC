@@ -1,13 +1,23 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { opKeyPromise } from "../server";
-import WasabeeMe from "../model/me";
-import WasabeeMarker from "../model/marker";
+import { WasabeeMe, WasabeeMarker } from "../model";
 import KeyListPortal from "./keyListPortal";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
+import { displayError, ServerError } from "../error";
+import { isFiltered } from "../filter";
+
+function sendKeyData(opID, portalID, onhand, capsule) {
+  return opKeyPromise(opID, portalID, onhand, capsule).catch((e) => {
+    if (e instanceof ServerError && e.code == 406) {
+      displayError(wX("dialog.keys.update_error"));
+    }
+    return Promise.reject();
+  });
+}
 
 const KeysList = WDialog.extend({
   statics: {
@@ -22,7 +32,9 @@ const KeysList = WDialog.extend({
     WDialog.prototype.addHooks.call(this);
     const operation = getSelectedOperation();
     this._opID = operation.ID;
+    window.map.on("wasabee:login wasabee:logout", this.update, this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:filter", this.update, this);
     if (WasabeeMe.isLoggedIn()) {
       this._me = WasabeeMe.localGet();
     } else {
@@ -33,7 +45,9 @@ const KeysList = WDialog.extend({
 
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
+    window.map.off("wasabee:login wasabee:logout", this.update, this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:filter", this.update, this);
   },
 
   _displayDialog: function () {
@@ -83,13 +97,16 @@ const KeysList = WDialog.extend({
       },
       {
         name: wX("REQUIRED"),
-        value: (key) => key.Required,
+        value: (key) => key.required,
         // sort: (a, b) => a - b,
         format: (cell, value, key) => {
-          cell.textContent = value;
-          const oh = parseInt(key.onHand, 10);
-          const req = parseInt(key.Required, 10);
-          if (oh >= req) {
+          if (key.open) {
+            cell.textContent = wX("OPEN_REQUEST");
+          } else {
+            if (key.done) cell.textContent = value - key.done + "/" + value;
+            else cell.textContent = value;
+          }
+          if (key.onHand >= key.value - key.done) {
             L.DomUtil.addClass(cell, "enough");
           } else {
             L.DomUtil.addClass(cell, "notenough");
@@ -116,7 +133,7 @@ const KeysList = WDialog.extend({
     ];
 
     let gid = "no-user";
-    if (this._me) {
+    if (this._me && operation.isOnCurrentServer()) {
       gid = this._me.id;
       this.sortable.fields = always.concat([
         {
@@ -128,9 +145,11 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 3;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isOnCurrentServer())
-                opKeyPromise(operation.ID, key.id, oif.value, key.capsule);
-              operation.keyOnHand(key.id, gid, oif.value, key.capsule);
+              sendKeyData(operation.ID, key.id, oif.value, key.capsule)
+                .then(() =>
+                  operation.keyOnHand(key.id, gid, oif.value, key.capsule)
+                )
+                .catch(() => (oif.value = value));
             });
             cell.appendChild(oif);
           },
@@ -144,9 +163,11 @@ const KeysList = WDialog.extend({
             oif.value = value;
             oif.size = 8;
             L.DomEvent.on(oif, "change", () => {
-              if (operation.isOnCurrentServer())
-                opKeyPromise(operation.ID, key.id, key.iHave, oif.value);
-              operation.keyOnHand(key.id, gid, key.iHave, oif.value);
+              sendKeyData(operation.ID, key.id, key.iHave, oif.value)
+                .then(() =>
+                  operation.keyOnHand(key.id, gid, key.iHave, oif.value)
+                )
+                .catch(() => (oif.value = value));
             });
             cell.appendChild(oif);
           },
@@ -161,15 +182,24 @@ const KeysList = WDialog.extend({
     for (const a of operation.anchors) {
       const k = {};
       const links = operation.links.filter(function (listLink) {
-        return listLink.toPortalId == a;
+        return isFiltered(listLink) && listLink.toPortalId == a;
       });
 
+      // skip filtered out anchor
+      if (!links.length) continue;
+
       k.id = a;
-      k.Required = links.length;
+      k.required = links.length;
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";
-      // if (k.Required == 0) continue;
+      k.done = 0;
+      for (const l of links) {
+        if (l.completed) {
+          k.done++;
+        }
+      }
+      // if (k.required == 0) continue;
 
       const thesekeys = operation.keysonhand.filter(function (keys) {
         return keys.portalId == a;
@@ -187,11 +217,14 @@ const KeysList = WDialog.extend({
     }
 
     for (const p of operation.markers.filter(function (marker) {
-      return marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY;
+      return (
+        isFiltered(marker) &&
+        marker.type == WasabeeMarker.constants.MARKER_TYPE_KEY
+      );
     })) {
       const k = {};
       k.id = p.portalId;
-      k.Required = wX("OPEN_REQUEST");
+      k.open = true;
       k.onHand = 0;
       k.iHave = 0;
       k.capsule = "";

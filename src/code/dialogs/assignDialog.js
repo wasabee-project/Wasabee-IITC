@@ -1,14 +1,11 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeLink from "../model/link";
-import WasabeeMarker from "../model/marker";
-import WasabeePortal from "../model/portal";
-import WasabeeMe from "../model/me";
-import WasabeeTeam from "../model/team";
+import { WasabeeLink, WasabeeMarker, WasabeePortal } from "../model";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
+import { getTeam, getMe } from "../model/cache";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -29,6 +26,7 @@ const AssignDialog = WDialog.extend({
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
+      this.localAssign(this._currentAssign);
       this.closeDialog();
     };
 
@@ -41,6 +39,7 @@ const AssignDialog = WDialog.extend({
       dialogClass: "assign",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.assign,
+      autofocus: true,
     });
   },
 
@@ -49,6 +48,8 @@ const AssignDialog = WDialog.extend({
 
     const target = this.options.target;
     const operation = getSelectedOperation();
+    this._currentAssign = null;
+
     this._targetID = target.ID;
 
     const divtitle = L.DomUtil.create("div", "desc", html);
@@ -63,6 +64,7 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(LinkUI.displayFormat(target, operation));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("LINK ASSIGNMENT");
+      this._currentAssign = target.assignedTo;
     }
 
     if (target instanceof WasabeeMarker) {
@@ -74,6 +76,7 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("MARKER ASSIGNMENT");
+      this._currentAssign = target.assignedTo;
     }
 
     if (target instanceof WasabeePortal) {
@@ -85,6 +88,12 @@ const AssignDialog = WDialog.extend({
       divtitle.appendChild(PortalUI.displayFormat(portal));
       const t = L.DomUtil.create("label", null, menu);
       t.textContent = wX("ANCHOR ASSIGNMENT");
+      for (const l of operation.getLinkListFromPortal(portal)) {
+        if (l.fromPortalId === portal.id && l.assignedTo) {
+          this._currentAssign = l.assignedTo;
+          break;
+        }
+      }
     }
 
     const select = L.DomUtil.create("select", null, menu);
@@ -93,10 +102,11 @@ const AssignDialog = WDialog.extend({
     option.textContent = wX("UNASSIGNED");
 
     L.DomEvent.on(select, "change", (value) => {
-      this.localAssign(value);
+      this._currentAssign = value.target.value;
+      this.localAssign(value.target.value);
     });
 
-    this._populateAgentSelect(select, target.assignedTo);
+    this._populateAgentSelect(select, this._currentAssign);
 
     return html;
   },
@@ -104,12 +114,12 @@ const AssignDialog = WDialog.extend({
   _populateAgentSelect: async function (select, current) {
     const alreadyAdded = new Array();
 
-    const me = await WasabeeMe.waitGet();
+    const me = await getMe();
     for (const t of getSelectedOperation().teamlist) {
       if (me.teamJoined(t.teamid) == false) continue;
       try {
         // allow teams to be 5 minutes cached
-        const tt = await WasabeeTeam.get(t.teamid, 5 * 60);
+        const tt = await getTeam(t.teamid, 5 * 60);
         for (const a of tt.agents) {
           if (!alreadyAdded.includes(a.id)) {
             alreadyAdded.push(a.id);
@@ -128,16 +138,16 @@ const AssignDialog = WDialog.extend({
   localAssign: function (value) {
     const operation = getSelectedOperation();
     if (this._type == "Marker") {
-      operation.assignMarker(this._targetID, value.srcElement.value);
+      operation.assignMarker(this._targetID, value);
     }
     if (this._type == "Link") {
-      operation.assignLink(this._targetID, value.srcElement.value);
+      operation.assignLink(this._targetID, value);
     }
     if (this._type == "Anchor") {
       const links = operation.getLinkListFromPortal(this.options.target);
       for (const l of links) {
         if (l.fromPortalId == this.options.target.id) {
-          operation.assignLink(l.ID, value.srcElement.value);
+          operation.assignLink(l.ID, value);
         }
       }
     }

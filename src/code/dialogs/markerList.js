@@ -1,7 +1,8 @@
 import OperationChecklistDialog from "./checklist.js";
 import { getSelectedOperation } from "../selectedOp";
-import { loadFaked, clearAllMarkers } from "../uiCommands";
+import { loadFaked } from "../ui/portal";
 import wX from "../wX";
+import { clearAllMarkers } from "../ui/operation";
 
 const MarkerList = OperationChecklistDialog.extend({
   statics: {
@@ -23,9 +24,21 @@ const MarkerList = OperationChecklistDialog.extend({
     );
 
     const buttons = {};
-    buttons[wX("CLEAR MARKERS")] = () => {
-      clearAllMarkers(getSelectedOperation());
-    };
+    if (operation.canWrite()) {
+      buttons[wX("CLEAR MARKERS")] = () => {
+        clearAllMarkers(getSelectedOperation());
+      };
+      buttons[wX("dialog.blockers.clear_automark")] = () => {
+        // same lines as blockersList...
+        const operation = getSelectedOperation();
+        operation.startBatchMode();
+        operation.markers = operation.markers.filter(
+          (m) => m.comment !== "auto-marked"
+        );
+        operation.cleanPortalList();
+        operation.endBatchMode();
+      };
+    }
 
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
@@ -37,7 +50,7 @@ const MarkerList = OperationChecklistDialog.extend({
       title: wX("MARKER_LIST", { opName: operation.name }),
       html: this.sortable.table,
       width: "auto",
-      dialogClass: "markerlist",
+      dialogClass: "checklist",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.markerList,
     });

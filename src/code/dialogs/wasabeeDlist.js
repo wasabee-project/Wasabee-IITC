@@ -1,11 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import wX from "../wX";
-import WasabeeMe from "../model/me";
-import WasabeePortal from "../model/portal";
+import { WasabeePortal } from "../model";
 import { getAgentWasabeeDkeys } from "../wd";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
+import { getMe } from "../model/cache";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -18,7 +18,7 @@ const WasabeeDList = WDialog.extend({
     this._UIUpdateHook = () => {
       context.update();
     };
-    this._me = await WasabeeMe.waitGet();
+    this._me = await getMe();
     await this._displayDialog();
     window.addHook("portalDetailLoaded", this._UIUpdateHook);
   },

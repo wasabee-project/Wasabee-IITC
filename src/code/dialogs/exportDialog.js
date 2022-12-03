@@ -80,7 +80,7 @@ const ExportDialog = WDialog.extend({
       const p = operation._idToOpportals.get(a);
       output.portals.idOthers.bkmrk[id] = {};
       output.portals.idOthers.bkmrk[id].guid = a;
-      output.portals.idOthers.bkmrk[id].latlng = `${p.lat},${p.lng}`;
+      output.portals.idOthers.bkmrk[id].latlng = `${+p.lat},${+p.lng}`;
       output.portals.idOthers.bkmrk[id].label = p.name;
     }
     ta.value = JSON.stringify(output);

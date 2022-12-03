@@ -52,6 +52,10 @@
 }
 /* .wasabee-table td.menu { position: relative; min-height: 20px; min-width: 24px; } */
 
+.wasabee-table input[type='color'] {
+  vertical-align: middle;
+}
+
 .wasabee-dialog-agent ul {
   padding-left: 0;
 }
@@ -296,16 +300,41 @@
 
 .wasabee-dialog-newop {
 }
+
+.wasabee-dialog-op-settings .ui-tabs-panel {
+  padding-top: 12px;
+}
+
 .wasabee-dialog-newop div.buttonset {
   display: grid;
   grid-template-columns: 1fr;
 }
 
-.wasabee-dialog-op-settings div.topset {
+.wasabee-dialog-op-settings div.topset,
+.wasabee-dialog-op-settings div.advanced {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  row-gap: 4px;
+  grid-template-columns: auto auto;
+  gap: 4px 6px;
+  align-items: center;
 }
+.wasabee-dialog-op-settings div.advanced .desc {
+  grid-column: 1/3;
+  font-weight: bold;
+}
+.wasabee-dialog-op-settings div.advanced .checkbox {
+  grid-column: 1/3;
+}
+.wasabee-dialog-op-settings div.advanced .checkbox input {
+  margin-right: .5rem;
+  vertical-align: middle;
+}
+.wasabee-dialog-op-settings div.advanced .import {
+  grid-column: 2;
+}
+.wasabee-dialog-op-settings div.advanced select {
+  width: 100%;
+}
+
 .wasabee-dialog-op-settings textarea {
   grid-column-start: 1;
   grid-column-end: 3;
@@ -317,8 +346,8 @@
   grid-column-start: 1;
   grid-column-end: 3;
 }
-.wasabee-dialog-op-settings input {
-  width: auto;
+.wasabee-dialog-op-settings input[type=color] {
+  min-width: 100%;
   -moz-transform: scale(1);
 }
 .wasabee-dialog-op-settings div.buttonset {
@@ -329,6 +358,14 @@
   margin: 4px;
   width: 100%;
 }
+
+.wasabee-dialog-op-settings .wasabee-table .actions {
+  white-space: nowrap;
+}
+.wasabee-dialog-op-settings .wasabee-table .actions a {
+  padding: .25em
+}
+
 .wasabee-dialog-ops div.container {
     overflow-y: hidden;
 }
@@ -347,6 +384,9 @@
 .wasabee-dialog-checklist .wasabee-table .actions a {
     padding: .25em
 }
+.wasabee-dialog-checklist .wasabee-table .order input {
+    width: 4rem;
+}
 .wasabee-dialog-perms .add-perm {
   display: grid;
   grid-template-columns: repeat(4, auto);
@@ -356,7 +396,7 @@
 }
 .wasabee-dialog-prompt {
 }
-.wasabee-dialog-prompt div.container {
+.wasabee-dialog-prompt .container {
   display: grid;
 }
 .wasabee-dialog-prompt label {
@@ -367,7 +407,7 @@
 }
 .wasabee-dialog-setcomment {
 }
-.wasabee-dialog-setcomment div.container {
+.wasabee-dialog-setcomment .container {
   display: grid;
 }
 .wasabee-dialog-setcomment div.desc {
@@ -451,15 +491,9 @@
     list-style-position:inside;
 }
 
-.wasabee-dialog-zone .wasabee-table .actions {
-    white-space: nowrap;
-}
-.wasabee-dialog-zone .wasabee-table .actions a {
-    padding: .25em
-}
-
-.wasabee-link-seperator:before {
-    content: " ➾ ";
+.wasabee-link-seperator {
+  padding-left: .5em;
+  padding-right: .5em;
 }
 
 /* in our dialogs and popups, use a darker green for ENL for better contrast */
@@ -531,7 +565,7 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   padding-left: 1em;
 }
 
-.wasabee-dialog-merge .conflicts {
+.wasabee-dialog-conflict .conflicts {
   border-collapse: collapse;
   empty-cells: show;
   width: 100%;
@@ -539,38 +573,86 @@ a.wasabee-portal.res { color: rgb(0, 135, 255) !important; }
   background: #0004;
 }
 
-.wasabee-dialog-merge .conflicts tr:nth-child(2n + 1) {
+.wasabee-dialog-conflict .conflicts tr:nth-child(2n + 1) {
   background: #0004;
 }
 
-.wasabee-dialog-merge .conflicts td,
-.wasabee-dialog-merge .conflicts th {
+.wasabee-dialog-conflict .conflicts td,
+.wasabee-dialog-conflict .conflicts th {
   border-width: 0 1px;
   border-style: solid;
   padding: 3px 4px;
   text-align: left;
   vertical-align: baseline;
 }
-.wasabee-dialog-merge .conflicts td:first-child,
-.wasabee-dialog-merge .conflicts th:first-child {
+.wasabee-dialog-conflict .conflicts td:first-child,
+.wasabee-dialog-conflict .conflicts th:first-child {
   border-left-width: 0;
 }
-.wasabee-dialog-merge .conflicts td:last-child,
-.wasabee-dialog-merge .conflicts th:last-child {
+.wasabee-dialog-conflict .conflicts td:last-child,
+.wasabee-dialog-conflict .conflicts th:last-child {
   border-right-width: 0;
 }
 
-.wasabee-dialog-merge .conflicts th:nth-child(2),
-.wasabee-dialog-merge .conflicts th:nth-child(3) {
+.wasabee-dialog-conflict .conflicts th:nth-child(2),
+.wasabee-dialog-conflict .conflicts th:nth-child(3) {
   width: 2em;
 }
 
-.wasabee-dialog-merge .strike {
+.wasabee-dialog-conflict .strike {
   text-decoration: line-through red;
   padding-right: .5em;
 }
-.wasabee-dialog-merge .diff-label {
+.wasabee-dialog-conflict .diff-label {
   padding-right: .5em;
+}
+
+/* use padding on panel content */
+#dialog-wasabee-filter {
+  padding: 0;
+}
+
+#dialog-wasabee-filter .ui-tabs-panel {
+  padding: 12px;
+}
+
+.wasabee-dialog-filter .tabs .nav {
+  padding-left: 12px
+}
+
+.wasabee-dialog-filter .filters,
+.wasabee-dialog-filter .filters .set-portal-small {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  grid-gap: 0.3em 0.6em
+}
+
+.wasabee-dialog-filter .filters .set-portal-small {
+  grid-template-columns: auto min-content;
+}
+
+.wasabee-dialog-filter .filters .apply {
+  grid-column: 1/3;
+}
+
+.wasabee-dialog-filter .actions {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  grid-gap: 0.3em 0.6em
+}
+
+.wasabee-dialog-filter .actions .desc {
+  grid-column: 1/4;
+}
+
+.wasabee-dialog-filter .filters .desc {
+  grid-column: 1/3;
+}
+
+.wasabee-dialog-filter label.checkbox input {
+  margin-right: .5rem;
 }
 
 /* color pickers */

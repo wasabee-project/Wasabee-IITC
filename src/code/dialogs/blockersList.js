@@ -5,13 +5,13 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadBlockerFaked,
-  blockerAutomark,
-} from "../uiCommands";
+} from "../ui/portal";
+import { blockerAutomark } from "../uiCommands";
 import wX from "../wX";
 import TrawlDialog from "./trawl";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeBlocker } from "../model";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -76,9 +76,10 @@ const BlockerList = WDialog.extend({
       buttons[wX("dialog.blockers.clear_automark")] = () => {
         const operation = getSelectedOperation();
         operation.startBatchMode();
-        for (const m of operation.markers) {
-          if (m.comment == "auto-marked") operation.removeMarker(m);
-        }
+        operation.markers = operation.markers.filter(
+          (m) => m.comment !== "auto-marked"
+        );
+        operation.cleanPortalList();
         operation.endBatchMode();
       };
     }

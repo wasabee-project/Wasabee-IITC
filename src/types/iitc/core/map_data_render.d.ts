@@ -26,7 +26,7 @@ export class Render {
   processTileData(tiledata: any): void;
 
   processDeletedGameEntityGuids(deleted: {}): void;
-  processGameEntities(entities: {}): void;
+  processGameEntities(entities: {}, details: 'core' | 'summaray' | 'detailed' | 'extended'): void;
 
   /**
    * End a render pass. does any cleaning up required, postponed processing of data, etc. called when the render

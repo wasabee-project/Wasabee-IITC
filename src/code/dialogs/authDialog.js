@@ -1,11 +1,11 @@
 import { WDialog } from "../leafletClasses";
 import { GetWasabeeServer, SetWasabeeServer, setIntelID } from "../server";
 import PromptDialog from "./promptDialog";
-import { sendLocation, fullSync } from "../uiCommands";
+import { sendLocation } from "../uiCommands";
 import { wX } from "../wX";
-import { postToFirebase } from "../firebaseSupport";
-import WasabeeMe from "../model/me";
-import { displayError, ServerError } from "../error";
+import { postToFirebase } from "../firebase/logger";
+import { WasabeeMe } from "../model";
+import { displayError, displayInfo, ServerError } from "../error";
 import {
   isAuthAvailable,
   getAccessToken,
@@ -13,6 +13,7 @@ import {
   sendOneTimeToken,
 } from "../auth";
 import { constants } from "../static";
+import { fullSync } from "../ui/operation";
 
 const AuthDialog = WDialog.extend({
   statics: {
@@ -37,7 +38,9 @@ const AuthDialog = WDialog.extend({
     me.store();
     window.map.fire("wasabee:login");
     this.closeDialog();
-    fullSync();
+    fullSync().then((success) => {
+      if (success) displayInfo(wX("SYNC DONE"));
+    });
     if (me.querytoken)
       setIntelID(window.PLAYER.nickname, window.PLAYER.team, me.querytoken);
   },

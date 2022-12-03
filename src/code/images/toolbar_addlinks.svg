@@ -1,13 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-  <g>
-    <circle r="5" cx="9" cy="17" />
-    <circle r="5" cx="17" cy="9" />
-    <circle r="3" cx="9" cy="17" fill="white" />
-    <circle r="3" cx="17" cy="9" fill="white" />
-    <polygon points="7,15 15,7 19,11 11,19" fill="white" />
-    <line x1="9" y1="17" x2="17" y2="9" stroke="black" stroke-width="2" stroke-linecap="round" />
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 26 26"
+>
+  <g style="fill: none; stroke: black; stroke-width: 2; ">
+    <path d="M9 13 a 4,4 90,1,0 4,4" />
+    <path d="M13 9 a 4,4 90,1,1 4,4" />
   </g>
-  <g style="fill: none; stroke: black; stroke-width: 2; stroke-linecap: square">
+  <g>
+    <line
+      x1="9"
+      y1="17"
+      x2="17"
+      y2="9"
+      stroke="black"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+  </g>
+  <g style="stroke: black; stroke-width: 2; stroke-linecap: square">
     <line x1="20" y1="18" x2="20" y2="22" />
     <line x1="18" y1="20" x2="22" y2="20" />
   </g>

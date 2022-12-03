@@ -1,5 +1,10 @@
-import type { LatLng } from "leaflet";
-import { generateId } from "../auxiliar";
+import { generateId } from "./utils";
+
+export interface WLatLng {
+  lat: number;
+  lng: number;
+  _cartesian?: [number, number, number];
+}
 
 export default class WasabeePortal {
   id: PortalID;
@@ -9,7 +14,7 @@ export default class WasabeePortal {
   comment: string;
   hardness: string;
 
-  _latLng: LatLng;
+  _latLng: WLatLng;
 
   constructor(obj) {
     if (typeof obj == "string") {
@@ -35,7 +40,10 @@ export default class WasabeePortal {
     this.comment = obj.comment ? obj.comment : "";
     this.hardness = obj.hardness ? obj.hardness : "";
 
-    this._latLng = new L.LatLng(parseFloat(this.lat), parseFloat(this.lng));
+    this._latLng = obj._latLng || {
+      lat: +this.lat,
+      lng: +this.lng,
+    };
   }
 
   // build object to serialize

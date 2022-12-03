@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
@@ -125,6 +125,12 @@ const SettingsDialog = WDialog.extend({
       );
     }
 
+    this._addCheckBox(
+      container,
+      wX("dialog.settings.disable_live_updates"),
+      "wasabee-setting-firebase",
+      window.plugin.wasabee.static.constants.FIREBASE_DISABLE
+    );
     this._addCheckBox(
       container,
       wX("SEND ANALYTICS"),

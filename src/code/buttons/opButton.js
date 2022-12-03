@@ -2,9 +2,13 @@ import { WButton } from "../leafletClasses";
 import OpSettings from "../dialogs/opSettings";
 import BlockersList from "../dialogs/blockersList";
 import OperationChecklistDialog from "../dialogs/checklist";
-import ExportDialog from "../dialogs/exportDialog";
+import MarkerList from "../dialogs/markerList";
 import KeysList from "../dialogs/keysList";
 import wX from "../wX";
+import { redo, redoable, undo, undoable } from "../undo";
+import { postToFirebase } from "../firebase/logger";
+import FilterDialog from "../dialogs/filterDialog";
+import { getSelectedOperation } from "../selectedOp";
 
 const OpButton = WButton.extend({
   statics: {
@@ -13,28 +17,36 @@ const OpButton = WButton.extend({
 
   initialize: function (container) {
     this.type = OpButton.TYPE;
-    this.title = wX("OP_BUTTON");
     this.handler = this._toggleActions;
     this._container = container;
 
+    const operation = getSelectedOperation();
     this.button = this._createButton({
       container: this._container,
       className: "wasabee-toolbar-op",
       callback: this._toggleActions,
       context: this,
-      title: this.title,
+      title: wX("toolbar.op.title", { opName: operation.name }),
     });
 
     this.setSubActions(this.getSubActions());
 
     window.map.on("wasabee:ui:skin wasabee:ui:lang", () => {
-      this.button.title = wX("OP_BUTTON");
+      const operation = getSelectedOperation();
+      this.button.title = wX("toolbar.op.title", { opName: operation.name });
       this.setSubActions(this.getSubActions());
     });
   },
 
+  update: function () {
+    WButton.prototype.update.call(this);
+    const operation = getSelectedOperation();
+    this.button.title = wX("toolbar.op.title", { opName: operation.name });
+    this.setSubActions(this.getSubActions());
+  },
+
   getSubActions: function () {
-    return [
+    const actions = [
       {
         title: wX("OP_SETTINGS_TITLE"),
         text: wX("OP_SETTINGS_BUTTON"),
@@ -52,6 +64,16 @@ const OpButton = WButton.extend({
           this.disable();
           const cl = new OperationChecklistDialog();
           cl.enable();
+        },
+        context: this,
+      },
+      {
+        title: wX("MARKER LIST TITLE"),
+        text: wX("MARKER LIST"),
+        callback: () => {
+          this.disable();
+          const ml = new MarkerList();
+          ml.enable();
         },
         context: this,
       },
@@ -76,16 +98,44 @@ const OpButton = WButton.extend({
         context: this,
       },
       {
-        title: wX("EXPORT OP TITLE"),
-        text: wX("EXPORT OP"),
+        title: wX("toolbar.op.filter"),
+        text: wX("toolbar.op.filter"),
         callback: () => {
           this.disable();
-          const ed = new ExportDialog();
-          ed.enable();
+          const fd = new FilterDialog();
+          fd.enable();
         },
         context: this,
       },
     ];
+
+    if (undoable()) {
+      actions.push({
+        title: wX("toolbar.op.undo"),
+        text: wX("toolbar.op.undo"),
+        accesskey: "z",
+        callback: () => {
+          postToFirebase({ id: "analytics", action: "undo" });
+          undo();
+        },
+        context: this,
+      });
+    }
+
+    if (redoable()) {
+      actions.push({
+        title: wX("toolbar.op.redo"),
+        text: wX("toolbar.op.redo"),
+        accesskey: "y",
+        callback: () => {
+          postToFirebase({ id: "analytics", action: "redo" });
+          redo();
+        },
+        context: this,
+      });
+    }
+
+    return actions;
   },
 
   // enable: // default is good

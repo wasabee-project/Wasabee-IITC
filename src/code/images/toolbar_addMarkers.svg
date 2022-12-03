@@ -1,11 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="26"
+  height="26"
+  viewBox="0 0 26 26"
+>
   <g>
-  	<polygon points="6,8 6,14 11,17 16,14 16,8 11,5" />
-  	<polygon points="6,16 11,19 16,16 11,23" />
-  	<circle r="2" cx="11" cy="11" fill="white" />
-	</g>
-	<g style="fill: none; stroke: black; stroke-width: 2; stroke-linecap: square">
-	  <line x1="19" y1="17" x2="19" y2="21" />
-	  <line x1="17" y1="19" x2="21" y2="19" />
-	</g>
+    <path
+      d="M6 8 6 14 11 17 16 14 16 8 11 5 11 9A2 2-180 0111 13 2 2-180 0111 9L11 5"
+    />
+    <polygon points="6,16 11,19 16,16 11,23" />
+  </g>
+  <g style="stroke: black; stroke-width: 2; stroke-linecap: square">
+    <line x1="19" y1="17" x2="19" y2="21" />
+
+    <line x1="17" y1="19" x2="21" y2="19" />
+  </g>
 </svg>

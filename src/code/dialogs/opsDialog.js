@@ -1,4 +1,4 @@
-import WasabeeOp from "../model/operation";
+import { WasabeeOp, WasabeeMe } from "../model";
 import { WDialog } from "../leafletClasses";
 import {
   getSelectedOperation,
@@ -10,15 +10,14 @@ import {
   hideOperation,
   setOpBackground,
 } from "../selectedOp";
-import OpPermList from "./opPerms";
+import OpSettings from "./opSettings";
 import wX from "../wX";
-import WasabeeMe from "../model/me";
-import WasabeeAgent from "../model/agent";
-import { syncOp, deleteLocalOp, zoomToOperation } from "../uiCommands";
+import { syncOp, deleteLocalOp, zoomToOperation } from "../ui/operation";
 import Sortable from "../sortable";
 
-import AgentUI from "../ui/agent";
+import * as AgentUI from "../ui/agent";
 import { appendFAIcon } from "../auxiliar";
+import { getAgent } from "../model/cache";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -166,8 +165,8 @@ const OpsDialog = WDialog.extend({
             perm.textContent = text;
             L.DomEvent.on(perm, "click", (ev) => {
               L.DomEvent.stop(ev);
-              const opl = new OpPermList();
-              opl.enable();
+              const s = new OpSettings();
+              s.enable();
             });
           } else {
             const perm = L.DomUtil.create("span", "", cell);
@@ -287,7 +286,7 @@ const OpsDialog = WDialog.extend({
         background: tmpOp.background,
       };
       if (sum.currentserver) {
-        const agent = await WasabeeAgent.get(tmpOp.creator);
+        const agent = await getAgent(tmpOp.creator);
         sum.owner = agent.getName();
         sum.ownerDisplay = AgentUI.formatDisplay(agent);
       } else {

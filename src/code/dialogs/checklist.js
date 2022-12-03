@@ -1,7 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeAgent from "../model/agent";
-import WasabeeLink from "../model/link";
-import WasabeeMarker from "../model/marker";
+import { WasabeeLink, WasabeeMarker } from "../model";
 import Sortable from "../sortable";
 import AssignDialog from "./assignDialog";
 import StateDialog from "./stateDialog";
@@ -11,16 +9,17 @@ import {
   listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
-  setMarkersToZones,
-  setLinksToZones,
-} from "../uiCommands";
+} from "../ui/portal";
+import { setMarkersToZones, setLinksToZones } from "../ui/zone";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
 import { displayInfo, displayWarning } from "../error";
 import { appendFAIcon } from "../auxiliar";
+import { getAgent } from "../model/cache";
+import { isFiltered } from "../filter";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -37,6 +36,7 @@ const OperationChecklistDialog = WDialog.extend({
   addHooks: function () {
     WDialog.prototype.addHooks.call(this);
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.on("wasabee:filter", this.update, this);
 
     window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
@@ -47,6 +47,7 @@ const OperationChecklistDialog = WDialog.extend({
   removeHooks: function () {
     WDialog.prototype.removeHooks.call(this);
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
+    window.map.off("wasabee:filter", this.update, this);
 
     window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
@@ -73,12 +74,14 @@ const OperationChecklistDialog = WDialog.extend({
     buttons[wX("dialog.checklist.count_fields")] = () => {
       this.countFields(getSelectedOperation(), true);
     };
-    buttons[wX("SET_MARKERS_ZONES")] = () => {
-      setMarkersToZones();
-    };
-    buttons[wX("SET_LINKS_ZONES")] = () => {
-      setLinksToZones();
-    };
+    if (operation.canWrite()) {
+      buttons[wX("SET_MARKERS_ZONES")] = () => {
+        setMarkersToZones();
+      };
+      buttons[wX("SET_LINKS_ZONES")] = () => {
+        setLinksToZones();
+      };
+    }
 
     await this.sortable.done;
 
@@ -112,15 +115,18 @@ const OperationChecklistDialog = WDialog.extend({
     const columns = [
       {
         name: this._smallScreen ? "#" : wX("ORDER"),
+        className: "order",
         value: (thing) => thing.order,
         // sort: (a, b) => a - b,
         format: (cell, value, thing) => {
           const oif = L.DomUtil.create("input");
           oif.value = value;
-          oif.size = 3;
           oif.disabled = !canWrite;
+          oif.type = "number";
+          oif.step = 1;
           L.DomEvent.on(oif, "change", (ev) => {
             L.DomEvent.stop(ev);
+            oif.value = parseInt(oif.value, 10);
             if (thing instanceof WasabeeLink) {
               operation.setLinkOrder(thing.ID, +oif.value);
             } else {
@@ -219,7 +225,7 @@ const OperationChecklistDialog = WDialog.extend({
         name: wX("ASS_TO"),
         value: async (thing) => {
           if (thing.assignedTo != null && thing.assignedTo != "") {
-            const agent = await WasabeeAgent.get(thing.assignedTo);
+            const agent = await getAgent(thing.assignedTo);
             if (agent != null) return agent.getName();
             return "GID: [" + thing.assignedTo + "]";
           }
@@ -315,7 +321,7 @@ const OperationChecklistDialog = WDialog.extend({
     content.fields = this.getFields(operation);
     content.sortByStoreKey = sortByStoreKey;
     content.sortAscStoreKey = sortAscStoreKey;
-    content.items = items;
+    content.items = items.filter(isFiltered);
     return content;
   },
 

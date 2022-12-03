@@ -1,5 +1,6 @@
-import { postToFirebase } from "./firebaseSupport";
-import WasabeeMe from "./model/me";
+import { postToFirebase } from "./firebase/logger";
+import { getMe } from "./model/cache";
+import { WasabeeMe } from "./model";
 import { oneTimeToken, SendAccessTokenAsync } from "./server";
 
 const JWT_KEY = "wasabee-jwt";
@@ -22,7 +23,7 @@ export async function sendAccessToken(token: string) {
   if (r && r.jwt) {
     storeJWT(r.jwt);
   }
-  return r ? new WasabeeMe(r) : WasabeeMe.waitGet(true);
+  return r ? new WasabeeMe(r) : getMe(true);
 }
 
 /** wrap ott to get me */
@@ -31,7 +32,7 @@ export async function sendOneTimeToken(token: string) {
   if (r && r.jwt) {
     storeJWT(r.jwt);
   }
-  return WasabeeMe.waitGet(true);
+  return r ? new WasabeeMe(r) : getMe(true);
 }
 
 /** GAPI */

@@ -13,17 +13,10 @@ import { faBan } from "@fortawesome/free-solid-svg-icons/faBan";
 import { faPalette } from "@fortawesome/free-solid-svg-icons/faPalette";
 import { faAsterisk } from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import { faDesktop } from "@fortawesome/free-solid-svg-icons/faDesktop";
+import { faCaretRight } from "@fortawesome/free-solid-svg-icons/faCaretRight";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons/faLocationDot";
 
-//** This function generates a unique ID for an object */
-export function generateId(len = 40) {
-  const arr = new Uint8Array(len / 2);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (dec) => {
-    return ("0" + dec.toString(16)).substr(-2);
-  }).join("");
-}
-
-export function newColors(incoming: string) {
+function newColors(incoming: string) {
   switch (incoming) {
     case "groupa":
       return "orange";
@@ -52,6 +45,22 @@ export function convertColorToHex(color: string, on_error = "#000000") {
   }
 }
 
+export function averageColor(colors: string[]) {
+  let [r,g,b] = [0, 0, 0];
+  for (const color of colors) {
+    const rgb = colorString.get.rgb(color);
+    r += rgb[0];
+    g += rgb[1];
+    b += rgb[2];
+  }
+  if (colors.length) {
+    r = Math.floor(r / colors.length);
+    g = Math.floor(g / colors.length);
+    b = Math.floor(b / colors.length);
+  }
+  return colorString.to.hex(r, g, b);
+}
+
 const icons = {
   check: faCheck,
   trash: faTrash,
@@ -64,6 +73,8 @@ const icons = {
   palette: faPalette,
   asterisk: faAsterisk,
   desktop: faDesktop,
+  "carret-right": faCaretRight,
+  "location-dot": faLocationDot,
 };
 
 export function appendFAIcon(iconName: keyof typeof icons, container: Element) {

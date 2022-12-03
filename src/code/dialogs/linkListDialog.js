@@ -1,10 +1,10 @@
 import OperationChecklistDialog from "./checklist.js";
 import wX from "../wX";
-import { loadFaked } from "../uiCommands";
+import { loadFaked } from "../ui/portal";
 import { getSelectedOperation } from "../selectedOp";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
 
 const LinkListDialog = OperationChecklistDialog.extend({
   statics: {
@@ -69,6 +69,12 @@ const LinkListDialog = OperationChecklistDialog.extend({
     buttons[wX("CLOSE")] = () => {
       this.closeDialog();
     };
+    buttons[wX("dialog.link_list.all_from")] = () => {
+      this._setAllLinksDirection(true);
+    };
+    buttons[wX("dialog.link_list.all_to")] = () => {
+      this._setAllLinksDirection(false);
+    };
 
     await this.sortable.done;
 
@@ -80,7 +86,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
       }),
       html: this.sortable.table,
       width: "auto",
-      dialogClass: "linklist",
+      dialogClass: "checklist",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.linkList,
     });
@@ -109,6 +115,19 @@ const LinkListDialog = OperationChecklistDialog.extend({
         incoming: toCount,
       })
     );
+  },
+
+  _setAllLinksDirection(from) {
+    const operation = getSelectedOperation();
+    operation.startBatchMode();
+    const links = operation.getLinkListFromPortal(this.options.portal);
+    for (const l of links) {
+      if (from && l.toPortalId === this.options.portal.id)
+        operation.reverseLink(l);
+      if (!from && l.fromPortalId === this.options.portal.id)
+        operation.reverseLink(l);
+    }
+    operation.endBatchMode();
   },
 });
 

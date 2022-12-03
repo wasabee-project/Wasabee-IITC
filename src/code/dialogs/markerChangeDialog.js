@@ -1,10 +1,9 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { getSelectedOperation } from "../selectedOp";
-import WasabeeMarker from "../model/marker";
-import WasabeeBlocker from "../model/blocker";
+import { WasabeeMarker, WasabeeBlocker } from "../model";
 
-import PortalUI from "../ui/portal";
+import * as PortalUI from "../ui/portal";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
@@ -67,6 +66,7 @@ const MarkerChangeDialog = WDialog.extend({
       dialogClass: "markerchange",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.markerButton,
+      autofocus: true,
     });
   },
 });

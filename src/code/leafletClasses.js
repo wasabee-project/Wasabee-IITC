@@ -15,9 +15,11 @@ export const WTooltip = L.Class.extend({
     this._container = null;
   },
 
-  updateContent: function (labelText) {
+  updateContent: function (labelText, html) {
     // const span = L.DomUtil.create("span", null, this._container);
-    this._container.textContent = labelText;
+    if (html && labelText instanceof Node) {
+      this._container.replaceChildren(labelText);
+    } else this._container.textContent = labelText;
     return this;
   },
 
@@ -198,6 +200,16 @@ export const WDialog = L.Handler.extend({
           this.disable();
           delete this._dialog;
         };
+      }
+      if (
+        window.isSmartphone() &&
+        !options.autofocus &&
+        options.html instanceof HTMLElement
+      ) {
+        const autofocus = L.DomUtil.create("input");
+        autofocus.autofocus = true;
+        autofocus.type = "hidden";
+        options.html.appendChild(autofocus);
       }
       this._dialog = window.dialog(options);
       // swap in our buttons, replacing the defaults
@@ -387,6 +399,7 @@ export const WButton = L.Class.extend({
 
     if (options.text) link.innerHTML = options.text;
     if (options.html) link.appendChild(options.html);
+    if (options.accesskey) link.accessKey = options.accesskey;
 
     if (options.buttonImage) {
       const img = L.DomUtil.create("img", "wasabee-actions-image", link);

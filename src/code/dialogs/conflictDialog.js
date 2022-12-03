@@ -1,19 +1,19 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import WasabeeAgent from "../model/agent";
-import WasabeeOp from "../model/operation";
+import { WasabeeOp } from "../model";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 
 import { computeRebaseChanges, applyRebaseChanges } from "../model/changes";
 
-import PortalUI from "../ui/portal";
-import LinkUI from "../ui/link";
-import MarkerUI from "../ui/marker";
+import * as PortalUI from "../ui/portal";
+import * as LinkUI from "../ui/link";
+import * as MarkerUI from "../ui/marker";
 import { sanitizeState } from "../model/task";
+import { getAgent } from "../model/cache";
 
-const MergeDialog = WDialog.extend({
+const ConflictDialog = WDialog.extend({
   statics: {
-    TYPE: "mergeDialog",
+    TYPE: "conflictDialog",
   },
 
   options: {
@@ -132,14 +132,14 @@ const MergeDialog = WDialog.extend({
     desc.textContent = wX("MERGE_MESSAGE");
 
     L.DomUtil.create("h3", "", content).textContent = wX(
-      "dialog.merge.conflicts"
+      "dialog.conflict.conflicts"
     );
 
     const details = L.DomUtil.create("table", "conflicts", content);
     const head = L.DomUtil.create("tr", "", details);
     // master head
     const masterHead = L.DomUtil.create("th", "master", head);
-    masterHead.textContent = wX("dialog.merge.server");
+    masterHead.textContent = wX("dialog.conflict.server");
     const masterRadioHead = L.DomUtil.create(
       "input",
       "",
@@ -156,7 +156,7 @@ const MergeDialog = WDialog.extend({
     followerRadioHead.type = "radio";
     followerRadioHead.name = this.options.opOwn.ID;
     const followerHead = L.DomUtil.create("th", "follower", head);
-    followerHead.textContent = wX("dialog.merge.local");
+    followerHead.textContent = wX("dialog.conflict.local");
 
     L.DomEvent.on(masterRadioHead, "change", () => {
       if (masterRadioHead.checked) {
@@ -248,7 +248,7 @@ const MergeDialog = WDialog.extend({
       title: this.options.title || wX("MERGE_TITLE"),
       html: content,
       width: "auto",
-      dialogClass: "merge",
+      dialogClass: "conflict",
       buttons: buttons,
     });
   },
@@ -290,7 +290,9 @@ const MergeDialog = WDialog.extend({
       } else if (conflict.kind === "zone") {
         const zone = this._origin.getZone(change.id);
         const zoneDisplay = L.DomUtil.create("span");
-        zoneDisplay.textContent = wX("dialog.merge.zone", { name: zone.name });
+        zoneDisplay.textContent = wX("dialog.conflict.zone", {
+          name: zone.name,
+        });
         container.appendChild(zoneDisplay);
         // only edition/edition
         const list = L.DomUtil.create("ul", "", container);
@@ -316,42 +318,38 @@ const MergeDialog = WDialog.extend({
 
     // TODO wX
     if (key === "hardness") {
-      keySpan.textContent = wX("dialog.merge.prop.hardness");
+      keySpan.textContent = wX("dialog.conflict.prop.hardness");
     } else if (key === "comment") {
-      keySpan.textContent = wX("dialog.merge.prop.comment");
+      keySpan.textContent = wX("dialog.conflict.prop.comment");
     } else if (key === "assignedTo") {
-      keySpan.textContent = wX("dialog.merge.prop.assignedTo");
+      keySpan.textContent = wX("dialog.conflict.prop.assignedTo");
     } else if (key === "state") {
-      keySpan.textContent = wX("dialog.merge.prop.state");
+      keySpan.textContent = wX("dialog.conflict.prop.state");
       oldSpan.textContent = wX(sanitizeState(old[key]));
       newSpan.textContent = wX(sanitizeState(next[key]));
     } else if (key === "color") {
-      keySpan.textContent = wX("dialog.merge.prop.color");
+      keySpan.textContent = wX("dialog.conflict.prop.color");
     } else if (key === "order") {
-      keySpan.textContent = wX("dialog.merge.prop.order");
+      keySpan.textContent = wX("dialog.conflict.prop.order");
     } else if (key === "zone") {
-      keySpan.textContent = wX("dialog.merge.prop.zone");
+      keySpan.textContent = wX("dialog.conflict.prop.zone");
     } else if (key === "points") {
-      keySpan.textContent = wX("dialog.merge.prop.zone_points");
+      keySpan.textContent = wX("dialog.conflict.prop.zone_points");
       oldSpan.textContent = "";
       newSpan.textContent = "";
     } else if (key === "fromPortalId") {
-      keySpan.textContent = wX("dialog.merge.prop.fromPortal");
+      keySpan.textContent = wX("dialog.conflict.prop.fromPortal");
     } else if (key === "toPortalId") {
-      keySpan.textContent = wX("dialog.merge.prop.toPortal");
+      keySpan.textContent = wX("dialog.conflict.prop.toPortal");
     } else if (key === "deltaminutes") {
-      keySpan.textContent = wX("dialog.merge.prop.deltaminutes");
+      keySpan.textContent = wX("dialog.conflict.prop.deltaminutes");
     }
 
     if (key === "assignedTo" || key === "completedID") {
       if (old[key])
-        WasabeeAgent.get(old[key]).then(
-          (a) => (oldSpan.textContent = a.getName())
-        );
+        getAgent(old[key]).then((a) => (oldSpan.textContent = a.getName()));
       if (next[key])
-        WasabeeAgent.get(next[key]).then(
-          (a) => (newSpan.textContent = a.getName())
-        );
+        getAgent(next[key]).then((a) => (newSpan.textContent = a.getName()));
     }
 
     if (key === "fromPortalId" || key === "toPortalId") {
@@ -365,4 +363,4 @@ const MergeDialog = WDialog.extend({
   },
 });
 
-export default MergeDialog;
+export default ConflictDialog;

@@ -5,12 +5,12 @@ import {
   GetWasabeeServer,
   opPromise,
 } from "../server";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import { getSelectedOperation, makeSelectedOperation } from "../selectedOp";
 import ConfirmDialog from "../dialogs/confirmDialog";
-import MergeDialog from "../dialogs/mergeDialog";
+import ConflictDialog from "../dialogs/conflictDialog";
 import wX from "../wX";
-import { displayError, displayInfo } from "../error";
+import { displayError, displayInfo, ServerError } from "../error";
 
 const UploadButton = WButton.extend({
   statics: {
@@ -34,30 +34,9 @@ const UploadButton = WButton.extend({
       callback: async () => {
         const operation = await getSelectedOperation();
         if (operation.isServerOp()) {
-          await this.doUpdate(operation);
-          return;
-        }
-
-        try {
-          this.button.classList.add("loading");
-          const r = await uploadOpPromise();
-          // switch to the new version in local store -- uploadOpPromise stores it
-          await makeSelectedOperation(r.ID);
-          displayInfo(wX("UPLOADED"));
-          this.update();
-          // this._invisible();
-        } catch (e) {
-          // not triggered this in a while...
-          console.warn(e.toString() + ": trying as update");
-          try {
-            await updateOpPromise(operation);
-            displayInfo(wX("UPDATED"));
-            this.update();
-          } catch (e) {
-            console.error(e);
-            displayError(`Upload + Update Failed: ${e.toString()}`);
-          }
-          this.button.classList.remove("loading");
+          this.doUpdate(operation);
+        } else {
+          this.doUpload(operation);
         }
       },
     });
@@ -116,6 +95,30 @@ const UploadButton = WButton.extend({
     this.button.classList.remove("loading");
   },
 
+  //
+  doUpload: async function (operation) {
+    this.button.classList.add("loading");
+    try {
+      const r = await uploadOpPromise();
+      // switch to the new version in local store -- uploadOpPromise stores it
+      await makeSelectedOperation(r.ID);
+      displayInfo(wX("UPLOADED"));
+      this.button.classList.remove("loading");
+      this.update();
+    } catch (e) {
+      if (e instanceof ServerError) {
+        if (e.code == 406) {
+          displayError(`Upload Failed: ${e.toString()}`);
+          return;
+        }
+      }
+      // not triggered this in a while...
+      console.warn(e.toString() + ": trying as update");
+      operation.creator = WasabeeMe.localGet().id;
+      this.doUpdate(operation);
+    }
+  },
+
   // update operation that is either
   // - selectedOP if no conflict or rebase is disabled
   // - rebase temp op otherwise
@@ -123,50 +126,45 @@ const UploadButton = WButton.extend({
     const rebaseOnUpdate =
       localStorage[window.plugin.wasabee.static.constants.REBASE_UPDATE_KEY] !==
       "false";
-    if (operation.isServerOp()) {
-      try {
-        if (force) delete operation.lasteditid;
-        this.button.classList.add("loading");
-        const success = await updateOpPromise(operation);
-        if (success) {
-          operation.localchanged = false;
-          operation.fetched = new Date().toUTCString();
-          operation.fetchedOp = JSON.stringify(operation);
-          await operation.store();
-          // reload if we use rebase
-          if (operation != getSelectedOperation())
-            await makeSelectedOperation(operation.ID);
-          displayInfo(wX("UPDATED"));
-          this.update();
+
+    try {
+      if (force) delete operation.lasteditid;
+      this.button.classList.add("loading");
+      const success = await updateOpPromise(operation);
+      if (success) {
+        await operation.store();
+        // reload if we use rebase
+        if (operation != getSelectedOperation())
+          await makeSelectedOperation(operation.ID);
+        this.update();
+      } else {
+        // need rebase or force
+        if (!rebaseOnUpdate) {
+          const md = new ConfirmDialog({
+            title: wX("UPDATE_CONFLICT_TITLE"),
+            label: wX("UPDATE_CONFLICT_DESC"),
+            type: "operation",
+            callback: () => this.doUpdate(operation, true),
+          });
+          md.enable();
         } else {
-          // need rebase or force
-          if (!rebaseOnUpdate) {
-            const md = new ConfirmDialog({
-              title: wX("UPDATE_CONFLICT_TITLE"),
-              label: wX("UPDATE_CONFLICT_DESC"),
-              type: "operation",
-              callback: () => this.doUpdate(getSelectedOperation(), true),
-            });
-            md.enable();
-          } else {
-            const lastOp = await opPromise(operation.ID);
-            const md = new MergeDialog({
-              title: wX("UPDATE_CONFLICT_TITLE"),
-              opOwn: getSelectedOperation(),
-              opRemote: lastOp,
-              updateCallback: (op) => this.doUpdate(op, true),
-              cancelText: wX("dialog.merge.cancel_upload"),
-            });
-            md.enable();
-          }
+          const lastOp = await opPromise(operation.ID);
+          const md = new ConflictDialog({
+            title: wX("UPDATE_CONFLICT_TITLE"),
+            opOwn: getSelectedOperation(),
+            opRemote: lastOp,
+            updateCallback: (op) => this.doUpdate(op, true),
+            cancelText: wX("dialog.conflict.cancel_upload"),
+          });
+          md.enable();
         }
-      } catch (e) {
-        console.error(e);
-        displayError(`Update Failed: ${e.toString()}`);
       }
-      this.button.classList.remove("loading");
-      return;
+    } catch (e) {
+      console.error(e);
+      displayError(`Update Failed: ${e.toString()}`);
     }
+    this.button.classList.remove("loading");
+    return;
   },
 });
 

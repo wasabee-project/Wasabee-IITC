@@ -1,5 +1,5 @@
 import { WDialog } from "../leafletClasses";
-import WasabeeMe from "../model/me";
+import { WasabeeMe } from "../model";
 import Sortable from "../sortable";
 import {
   SetTeamState,
@@ -14,6 +14,7 @@ import ConfirmDialog from "./confirmDialog";
 import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
 import { displayError, displayInfo } from "../error";
+import { getMe } from "../model/cache";
 
 const TeamListDialog = WDialog.extend({
   statics: {
@@ -22,7 +23,7 @@ const TeamListDialog = WDialog.extend({
 
   addHooks: async function () {
     WDialog.prototype.addHooks.call(this);
-    this._me = await WasabeeMe.waitGet(true, true); // no cache unless server error
+    this._me = await getMe(true, true); // no cache unless server error
     window.map.on("wasabee:teams", this.update, this);
     window.map.on("wasabee:logout", this.closeDialog, this);
     this._displayDialog();
@@ -123,7 +124,7 @@ const TeamListDialog = WDialog.extend({
                 callback: async () => {
                   try {
                     await leaveTeamPromise(obj.ID);
-                    this._me = await WasabeeMe.waitGet(true);
+                    this._me = await getMe(true);
                     window.map.fire("wasabee:teams");
                     window.map.fire("wasabee:defensivekeys");
                   } catch (e) {
@@ -176,7 +177,7 @@ const TeamListDialog = WDialog.extend({
           try {
             await newTeamPromise(newname);
             displayInfo(wX("TEAM_CREATED", { teamName: newname }));
-            this._me = await WasabeeMe.waitGet(true);
+            this._me = await getMe(true);
           } catch (e) {
             console.error(e);
             displayError(e);
@@ -203,7 +204,7 @@ const TeamListDialog = WDialog.extend({
     const newState = currentState ? "Off" : "On";
     try {
       await SetTeamState(teamID, newState);
-      this._me = await WasabeeMe.waitGet(true);
+      this._me = await getMe(true);
     } catch (e) {
       console.error(e);
       displayError(e);
@@ -215,7 +216,7 @@ const TeamListDialog = WDialog.extend({
     const newState = currentState ? "Off" : "On";
     try {
       await SetTeamShareWD(teamID, newState);
-      await WasabeeMe.waitGet(true);
+      await getMe(true);
     } catch (e) {
       console.error(e);
       displayError(e);
@@ -227,7 +228,7 @@ const TeamListDialog = WDialog.extend({
     const newState = currentState ? "Off" : "On";
     try {
       await SetTeamLoadWD(teamID, newState);
-      await WasabeeMe.waitGet(true);
+      await getMe(true);
     } catch (e) {
       console.error(e);
       displayError(e);

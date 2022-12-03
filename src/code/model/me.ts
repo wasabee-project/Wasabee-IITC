@@ -1,7 +1,4 @@
-import { mePromise } from "../server";
 import db from "../db";
-
-import { constants } from "../static";
 import WasabeeAgent from "./agent";
 
 export interface MeTeam {
@@ -25,6 +22,8 @@ interface MeOp {
   Color: string; // ??
   TeamID: TeamID;
 }
+
+const AGENT_INFO_KEY = "wasabee-me";
 
 export default class WasabeeMe extends WasabeeAgent {
   querytoken?: string;
@@ -85,15 +84,15 @@ export default class WasabeeMe extends WasabeeAgent {
   }
 
   store() {
-    localStorage[constants.AGENT_INFO_KEY] = JSON.stringify(this);
+    localStorage[AGENT_INFO_KEY] = JSON.stringify(this);
   }
 
   remove() {
-    delete localStorage[constants.AGENT_INFO_KEY];
+    delete localStorage[AGENT_INFO_KEY];
   }
 
   static localGet() {
-    const lsme = localStorage[constants.AGENT_INFO_KEY];
+    const lsme = localStorage[AGENT_INFO_KEY];
     if (typeof lsme == "string") {
       return new WasabeeMe(JSON.parse(lsme)); // do not store
     }
@@ -130,31 +129,9 @@ export default class WasabeeMe extends WasabeeAgent {
     return me;
   }
 
-  // use waitGet with "force == true" if you want a fresh value now
-  // may throw if force == true
-  static async waitGet(force?: boolean, noFail?: boolean) {
-    const me = WasabeeMe.localGet();
-    if (
-      me === null ||
-      me.fetched == undefined ||
-      me.fetched < WasabeeMe.maxCacheAge() ||
-      force
-    ) {
-      try {
-        const response = await mePromise();
-        const newme = new WasabeeMe(response);
-        newme.store();
-      } catch (e) {
-        if (force && !noFail) throw e;
-      }
-    }
-    // use updated (or null) me object
-    return WasabeeMe.localGet();
-  }
-
   static async purge() {
     const me = WasabeeMe.localGet();
-    delete localStorage[constants.AGENT_INFO_KEY];
+    delete localStorage[AGENT_INFO_KEY];
     delete localStorage["sentToServer"]; // resend firebase token on login
 
     const tr = (await db).transaction(

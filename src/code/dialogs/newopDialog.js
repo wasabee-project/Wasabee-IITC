@@ -1,72 +1,58 @@
-import { WDialog } from "../leafletClasses";
-import WasabeeOp from "../model/operation";
+import { WasabeeOp } from "../model";
 import ImportDialog from "./importDialog";
 import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import { displayError } from "../error";
 
-const NewopDialog = WDialog.extend({
+const NewopDialog = PromptDialog.extend({
   statics: {
     TYPE: "newopButton",
   },
 
-  addHooks: function () {
-    WDialog.prototype.addHooks.call(this);
-    this._displayDialog(this);
-  },
-
   _displayDialog: function () {
-    const content = L.DomUtil.create("div", null);
-    const buttonSet = L.DomUtil.create("div", "buttonset", content);
-    const addButton = L.DomUtil.create("button", null, buttonSet);
-    addButton.textContent = wX("ADD_NEW_OP");
-
-    const importButton = L.DomUtil.create("button", null, buttonSet);
-    importButton.textContent = wX("IMPORT_OP");
-    L.DomEvent.on(importButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
+    const buttons = {};
+    buttons[wX("OK")] = () => {
+      this._submit();
+    };
+    buttons[wX("IMPORT_OP")] = () => {
       this.closeDialog();
       const id = new ImportDialog(null);
       id.enable();
-    });
-
-    L.DomEvent.on(addButton, "click", (ev) => {
-      L.DomEvent.stop(ev);
-      this.closeDialog();
-      const addDialog = new PromptDialog({
-        title: wX("NEW_OP"),
-        label: wX("SET_NEW_OP"),
-        callback: async () => {
-          if (addDialog.inputField.value) {
-            const newop = new WasabeeOp({
-              creator: PLAYER.nickname,
-              name: addDialog.inputField.value,
-            });
-            await newop.store();
-            await makeSelectedOperation(newop.ID);
-          } else {
-            displayError(wX("OP_NAME_UNSET"));
-          }
-        },
-        placeholder: wX("MUST_NOT_BE_EMPTY"),
-        nonEmpty: true,
-      });
-      addDialog.enable();
-    });
-
-    const buttons = {};
-    buttons[wX("CLOSE")] = () => {
+    };
+    buttons[wX("CANCEL")] = () => {
+      if (this.options.cancelCallback) this.options.cancelCallback();
+      // cancelCallback must fire appropriate ui update events
       this.closeDialog();
     };
 
-    this.createDialog({
+    L.setOptions(this, {
       title: wX("NEW_OP"),
-      html: content,
+      label: wX("SET_NEW_OP"),
+      callback: async () => {
+        if (this.inputField.value) {
+          const newop = new WasabeeOp({
+            creator: PLAYER.nickname,
+            name: this.inputField.value,
+          });
+          await newop.store();
+          await makeSelectedOperation(newop.ID);
+        } else {
+          displayError(wX("OP_NAME_UNSET"));
+        }
+      },
+      placeholder: wX("MUST_NOT_BE_EMPTY"),
+      nonEmpty: true,
+    });
+
+    this.createDialog({
+      title: this.options.title,
+      html: this._buildContent(),
       width: "auto",
-      dialogClass: "newop",
+      dialogClass: "prompt",
       buttons: buttons,
       id: window.plugin.wasabee.static.dialogNames.newopButton,
+      autofocus: true,
     });
   },
 });

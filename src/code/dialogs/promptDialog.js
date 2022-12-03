@@ -28,13 +28,17 @@ const PromptDialog = WDialog.extend({
     WDialog.prototype.removeHooks.call(this);
   },
 
+  _submit: function () {
+    if (this.options.nonEmpty && !this.inputField.value) return;
+    if (this.options.callback) this.options.callback();
+    // callback must fire appropriate ui update events
+    this.closeDialog();
+  },
+
   _displayDialog: function () {
     const buttons = {};
     buttons[wX("OK")] = () => {
-      if (this.options.nonEmpty && !this.inputField.value) return;
-      if (this.options.callback) this.options.callback();
-      // callback must fire appropriate ui update events
-      this.closeDialog();
+      this._submit();
     };
     buttons[wX("CANCEL")] = () => {
       if (this.options.cancelCallback) this.options.cancelCallback();
@@ -48,11 +52,12 @@ const PromptDialog = WDialog.extend({
       width: "auto",
       dialogClass: "prompt",
       buttons: buttons,
+      autofocus: true,
     });
   },
 
   _buildContent: function () {
-    const content = L.DomUtil.create("div", "container");
+    const content = L.DomUtil.create("form", "container");
     if (typeof this.options.label == "string") {
       const label = L.DomUtil.create("label", null, content);
       label.textContent = this.options.label;
@@ -79,6 +84,7 @@ const PromptDialog = WDialog.extend({
       }
       this.inputField.setAttribute("list", "wasabee-prompt-suggestions");
     }
+    L.DomEvent.on(content, "submit", this._submit, this);
     return content;
   },
 });

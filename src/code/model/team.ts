@@ -1,6 +1,4 @@
 import WasabeeAgent, { ServerAgent } from "./agent";
-import WasabeeMe from "./me";
-import { teamPromise } from "../server";
 import db from "../db";
 
 interface RocksTeam {
@@ -79,24 +77,7 @@ export default class WasabeeTeam implements Team {
     }
   }
 
-  // 60 seconds seems too short for the default here...
-  static async get(teamID, maxAgeSeconds = 60) {
-    const cached = await (await db).get("teams", teamID);
-    if (cached) {
-      const t = new WasabeeTeam(cached);
-      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
-        return t;
-      }
-    }
-
-    if (!WasabeeMe.isLoggedIn()) return null;
-
-    try {
-      const t = await teamPromise(teamID);
-      return new WasabeeTeam(t);
-    } catch (e) {
-      console.error(e);
-    }
-    return null;
+  static async get(teamID) {
+    return await (await db).get("teams", teamID);
   }
 }

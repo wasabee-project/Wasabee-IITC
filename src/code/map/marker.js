@@ -1,36 +1,21 @@
-import WasabeeAgent from "../model/agent";
-
 import SetCommentDialog from "../dialogs/setCommentDialog";
 import MarkerChangeDialog from "../dialogs/markerChangeDialog";
 import StateDialog from "../dialogs/stateDialog";
 import { getSelectedOperation } from "../selectedOp";
-import { deleteMarker } from "../uiCommands";
+import { deleteMarker, swapMarker } from "../ui/marker";
 
-import AgentUI from "./agent";
-import PortalUI from "./portal";
+import { displayFormat } from "../ui/portal";
+import { formatDisplay } from "../ui/agent";
+import { WLPortal } from "./portal";
 
 import wX from "../wX";
+import { getAgent } from "../model/cache";
 
-function displayFormat(marker, operation) {
-  const portal = operation.getPortal(marker.portalId);
-
-  if (portal == null) {
-    console.log("null portal getting marker popup");
-    return (L.DomUtil.create("div", "").textContent = "invalid portal");
-  }
-
-  const desc = L.DomUtil.create("span");
-  const kind = L.DomUtil.create("span", `${marker.type}`, desc);
-  kind.textContent = wX(marker.type);
-  desc.appendChild(PortalUI.displayFormat(portal));
-  return desc;
-}
-
-const WLMarker = PortalUI.WLPortal.extend({
+export const WLMarker = WLPortal.extend({
   type: "marker",
 
   initialize: function (marker) {
-    PortalUI.WLPortal.prototype.initialize.call(this, {
+    WLPortal.prototype.initialize.call(this, {
       portalId: marker.portalId,
       id: marker.ID,
       state: marker.state,
@@ -65,7 +50,7 @@ const WLMarker = PortalUI.WLPortal.extend({
 
     const canWrite = operation.canWrite();
 
-    const content = PortalUI.WLPortal.prototype._popupContent.call(this);
+    const content = WLPortal.prototype._popupContent.call(this);
 
     const desc = L.DomUtil.create("div", "desc", content);
     const kind = L.DomUtil.create(
@@ -74,7 +59,7 @@ const WLMarker = PortalUI.WLPortal.extend({
       desc
     );
     kind.textContent = wX(marker.type);
-    desc.appendChild(PortalUI.displayFormat(portal));
+    desc.appendChild(displayFormat(portal));
     if (canWrite) {
       kind.href = "#";
       L.DomEvent.on(kind, "click", this._setMarkerType, this);
@@ -93,6 +78,7 @@ const WLMarker = PortalUI.WLPortal.extend({
     if (operation.canWriteServer())
       this._assignButton(buttonSet, wX("ASSIGN"), marker);
     if (canWrite) this._stateButton(buttonSet, marker);
+    if (canWrite) this._swapButton(buttonSet, marker);
     if (operation.isOnCurrentServer())
       this._sendTargetButton(buttonSet, wX("SEND TARGET"), marker);
     this._mapButton(buttonSet, wX("ANCHOR_GMAP"));
@@ -118,9 +104,9 @@ const WLMarker = PortalUI.WLPortal.extend({
     );
     if (marker.state != "completed" && marker.assignedTo) {
       try {
-        const a = await WasabeeAgent.get(marker.assignedTo);
+        const a = await getAgent(marker.assignedTo);
         assignment.textContent = wX("ASS_TO"); // FIXME convert formatDisplay to html and add as value to wX
-        if (a) assignment.appendChild(AgentUI.formatDisplay(a));
+        if (a) assignment.appendChild(formatDisplay(a));
         else assignment.textContent += " " + marker.assignedTo;
       } catch (err) {
         console.error(err);
@@ -136,6 +122,17 @@ const WLMarker = PortalUI.WLPortal.extend({
       L.DomEvent.stop(ev);
       const sd = new StateDialog({ target: marker, opID: operation.ID });
       sd.enable();
+      this.closePopup();
+    });
+  },
+
+  _swapButton: function (container, marker) {
+    const operation = getSelectedOperation();
+    const swapButton = L.DomUtil.create("button", null, container);
+    swapButton.textContent = wX("SWAP");
+    L.DomEvent.on(swapButton, "click", (ev) => {
+      L.DomEvent.stop(ev);
+      swapMarker(operation, marker);
       this.closePopup();
     });
   },
@@ -168,8 +165,3 @@ const WLMarker = PortalUI.WLPortal.extend({
     this.closePopup();
   },
 });
-
-export default {
-  WLMarker,
-  displayFormat,
-};
