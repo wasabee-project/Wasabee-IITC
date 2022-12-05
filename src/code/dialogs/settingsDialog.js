@@ -5,6 +5,7 @@ import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
 import { clearAllData } from "../uiCommands";
+import { injectPortalsAsPlaceholders } from "../mapDrawing";
 
 const SettingsDialog = WDialog.extend({
   statics: {
@@ -150,6 +151,14 @@ const SettingsDialog = WDialog.extend({
       wX("TRAWL SKIP TILES"),
       window.plugin.wasabee.static.constants.TRAWL_SKIP_STEPS,
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
+    );
+
+    this._addCheckBox(
+      container,
+      wX("dialog.settings.populate_opportals"),
+      "wasabee-setting-opportals",
+      window.plugin.wasabee.static.constants.POPULATE_OPPORTALS,
+      injectPortalsAsPlaceholders
     );
 
     const serverInfo = L.DomUtil.create("button", "server", container);

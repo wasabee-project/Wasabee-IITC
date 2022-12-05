@@ -106,6 +106,7 @@ const statics: Statics = {
     FIREBASE_IFRAME: "https://cdn2.wasabee.rocks/iitcplugin/firebase/",
     FIREBASE_DISABLE: "wasabee-firebase",
     UNDO_HISTORY_SIZE: 100,
+    POPULATE_OPPORTALS: "wasabee-populate-opportals",
   },
   publicServers: [
     { name: "Americas", url: "https://am.wasabee.rocks", short: "🇺🇸" },
