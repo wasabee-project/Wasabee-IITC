@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { getSelectedOperation } from "../selectedOp";
 import { convertColorToHex } from "../auxiliar";
 import wX from "../wX";
+import statics from "../static";
 
 // export screen
 const ExportDialog = WDialog.extend({
@@ -33,7 +34,7 @@ const ExportDialog = WDialog.extend({
       width: "auto",
       dialogClass: "export",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.exportDialog,
+      id: statics.dialogNames.exportDialog,
     });
   },
 

@@ -9,6 +9,7 @@ import wX from "../wX";
 import * as PortalUI from "../ui/portal";
 import { displayError, ServerError } from "../error";
 import { isFiltered } from "../filter";
+import statics from "../static";
 
 function sendKeyData(opID, portalID, onhand, capsule) {
   return opKeyPromise(opID, portalID, onhand, capsule).catch((e) => {
@@ -63,7 +64,7 @@ const KeysList = WDialog.extend({
       width: "auto",
       dialogClass: "keyslist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.keysList,
+      id: statics.dialogNames.keysList,
     });
   },
 

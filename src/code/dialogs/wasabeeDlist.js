@@ -6,6 +6,7 @@ import { getAgentWasabeeDkeys } from "../wd";
 
 import * as PortalUI from "../ui/portal";
 import { getMe } from "../model/cache";
+import statics from "../static";
 
 const WasabeeDList = WDialog.extend({
   statics: {
@@ -47,7 +48,7 @@ const WasabeeDList = WDialog.extend({
       width: "auto",
       dialogClass: "wasabeedlist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.wasabeeDList,
+      id: statics.dialogNames.wasabeeDList,
     });
   },
 

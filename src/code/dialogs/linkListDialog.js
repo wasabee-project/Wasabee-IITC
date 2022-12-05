@@ -5,6 +5,7 @@ import { getSelectedOperation } from "../selectedOp";
 
 import * as PortalUI from "../ui/portal";
 import * as LinkUI from "../ui/link";
+import statics from "../static";
 
 const LinkListDialog = OperationChecklistDialog.extend({
   statics: {
@@ -88,7 +89,7 @@ const LinkListDialog = OperationChecklistDialog.extend({
       width: "auto",
       dialogClass: "checklist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkList,
+      id: statics.dialogNames.linkList,
     });
   },
 

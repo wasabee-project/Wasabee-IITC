@@ -18,6 +18,7 @@ import Sortable from "../sortable";
 import * as AgentUI from "../ui/agent";
 import { appendFAIcon } from "../auxiliar";
 import { getAgent } from "../model/cache";
+import statics from "../static";
 
 const OpsDialog = WDialog.extend({
   statics: {
@@ -79,7 +80,7 @@ const OpsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "ops",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.opsList,
+      id: statics.dialogNames.opsList,
     });
   },
 

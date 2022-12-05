@@ -5,6 +5,7 @@ import { getAllPortalsLinked } from "../../ui/link";
 import wX from "../../wX";
 import { displayError } from "../../error";
 import { clearAllLinks } from "../../ui/operation";
+import statics from "../../static";
 
 const SaveLinksDialog = AutoDraw.extend({
   statics: {
@@ -57,7 +58,7 @@ const SaveLinksDialog = AutoDraw.extend({
       width: "auto",
       dialogClass: "savelinks",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.savelinks,
+      id: statics.dialogNames.savelinks,
     });
   },
 

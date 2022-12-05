@@ -7,6 +7,7 @@ import { getAgentPortalWasabeeDkeys } from "../wd";
 
 import * as PortalUI from "../ui/portal";
 import { displayError, displayInfo } from "../error";
+import statics from "../static";
 
 const DefensiveKeysDialog = WDialog.extend({
   statics: {
@@ -94,7 +95,7 @@ const DefensiveKeysDialog = WDialog.extend({
       width: "auto",
       dialogClass: "wdkeys",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.wasabeeDKeyButton,
+      id: statics.dialogNames.wasabeeDKeyButton,
     });
   },
 

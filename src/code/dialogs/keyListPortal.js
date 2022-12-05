@@ -5,6 +5,7 @@ import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
 import { getAgent } from "../model/cache";
+import statics from "../static";
 
 const KeyListPortal = WDialog.extend({
   statics: {
@@ -50,7 +51,7 @@ const KeyListPortal = WDialog.extend({
       width: "auto",
       dialogClass: "keylistportal",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.keyListPortal,
+      id: statics.dialogNames.keyListPortal,
     });
   },
 

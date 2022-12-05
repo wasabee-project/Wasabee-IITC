@@ -23,6 +23,7 @@ import { buildZoneList } from "./components/zoneList";
 import { setLinksToZones, setMarkersToZones } from "../ui/zone";
 import { buildPermList } from "./components/permList";
 import { applyRebaseChanges, computeRebaseChanges, defaultChangeChoice } from "../model/changes";
+import statics from "../static";
 
 class OpSettingDialog extends WDialog {
   static TYPE = "opSettingDialog";
@@ -58,7 +59,7 @@ class OpSettingDialog extends WDialog {
       width: "auto",
       dialogClass: "op-settings",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.opSettings,
+      id: statics.dialogNames.opSettings,
     });
   }
 

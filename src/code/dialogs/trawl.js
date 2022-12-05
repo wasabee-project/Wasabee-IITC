@@ -5,6 +5,7 @@ import { blockerAutomark } from "../uiCommands";
 import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 import { WasabeeMarker, WasabeeBlocker } from "../model";
 import { displayInfo } from "../error";
+import statics from "../static";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -272,7 +273,7 @@ const TrawlDialog = WDialog.extend({
       width: "auto",
       dialogClass: "trawl",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.trawl,
+      id: statics.dialogNames.trawl,
     });
   },
 

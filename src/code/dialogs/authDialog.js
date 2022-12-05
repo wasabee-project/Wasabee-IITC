@@ -12,7 +12,7 @@ import {
   sendAccessToken,
   sendOneTimeToken,
 } from "../auth";
-import { constants } from "../static";
+import statics, { constants } from "../static";
 import { fullSync } from "../ui/operation";
 
 const AuthDialog = WDialog.extend({
@@ -167,7 +167,7 @@ const AuthDialog = WDialog.extend({
       width: "auto",
       dialogClass: "auth",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.mustauth,
+      id: statics.mustauth,
     });
   },
 

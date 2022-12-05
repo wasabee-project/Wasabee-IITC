@@ -7,6 +7,7 @@ import { getSelectedOperation } from "../selectedOp";
 import * as PortalUI from "../ui/portal";
 import { displayError, displayInfo } from "../error";
 import { getTeam, getMe } from "../model/cache";
+import statics from "../static";
 
 const SendTargetDialog = WDialog.extend({
   statics: {
@@ -37,7 +38,7 @@ const SendTargetDialog = WDialog.extend({
       width: "auto",
       dialogClass: "sendtarget",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.assign,
+      id: statics.dialogNames.assign,
       autofocus: true,
     });
   },

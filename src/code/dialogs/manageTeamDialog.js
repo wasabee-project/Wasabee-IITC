@@ -14,7 +14,7 @@ import Sortable from "../sortable";
 import PromptDialog from "./promptDialog";
 import wX from "../wX";
 import ConfirmDialog from "./confirmDialog";
-import { constants } from "../static";
+import statics, { constants } from "../static";
 
 import * as AgentUI from "../ui/agent";
 import { displayError, displayInfo } from "../error";
@@ -300,7 +300,7 @@ const ManageTeamDialog = WDialog.extend({
       html: container,
       dialogClass: "manageteam",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.manageTeam,
+      id: statics.dialogNames.manageTeam,
     });
   },
 });

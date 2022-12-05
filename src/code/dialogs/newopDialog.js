@@ -4,6 +4,7 @@ import PromptDialog from "./promptDialog";
 import { makeSelectedOperation } from "../selectedOp";
 import wX from "../wX";
 import { displayError } from "../error";
+import statics from "../static";
 
 const NewopDialog = PromptDialog.extend({
   statics: {
@@ -51,7 +52,7 @@ const NewopDialog = PromptDialog.extend({
       width: "auto",
       dialogClass: "prompt",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.newopButton,
+      id: statics.dialogNames.newopButton,
       autofocus: true,
     });
   },

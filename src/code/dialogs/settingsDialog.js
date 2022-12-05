@@ -6,6 +6,7 @@ import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
 import { clearAllData } from "../uiCommands";
 import { injectPortalsAsPlaceholders } from "../mapDrawing";
+import statics from "../static";
 
 const SettingsDialog = WDialog.extend({
   statics: {
@@ -218,7 +219,7 @@ const SettingsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "settings",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.settings,
+      id: statics.dialogNames.settings,
     });
   },
 });

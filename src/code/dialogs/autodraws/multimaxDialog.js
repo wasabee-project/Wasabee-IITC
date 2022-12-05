@@ -6,6 +6,7 @@ import { clearAllLinks } from "../../ui/operation";
 import { displayError, displayInfo } from "../../error";
 import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";
+import statics from "../../static";
 
 // now that the formerly external mm functions are in the class, some of the logic can be cleaned up
 // to not require passing values around when we can get them from this.XXX
@@ -117,7 +118,7 @@ const MultimaxDialog = AutoDraw.extend({
       width: "auto",
       dialogClass: "multimax",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.multimaxButton,
+      id: statics.dialogNames.multimaxButton,
     });
   },
 
