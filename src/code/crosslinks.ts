@@ -125,7 +125,11 @@ export async function checkAllLinks() {
 
   cache.clear();
 
-  if (!operation.links || operation.links.length == 0) return;
+  if (!operation.links || operation.links.length == 0) {
+    WasabeeBlocker.removeBlockers(operation.ID);
+    window.map.fire("wasabee:crosslinks:done");
+    return;
+  }
 
   // re-test known data (link/link, link/blocker)
   const blockers = await WasabeeBlocker.getAll(operation);
