@@ -1,6 +1,6 @@
 import statics from "./static";
 import { initCrossLinks } from "./crosslinks";
-import initServer, { locationPromise } from "./server";
+import initServer, { locationPromise, setIntelID } from "./server";
 import {
   setupLocalStorage,
   initSelectedOperation,
@@ -28,8 +28,12 @@ import OperationChecklist from "./dialogs/checklist";
 import { WasabeeMe, WasabeeOp } from "./model";
 import db from "./db";
 import polyfill from "./polyfill";
-import { displayError, displayWarning } from "./error";
-import { deleteJWT } from "./auth";
+import { displayError, displayInfo, displayWarning, ServerError } from "./error";
+import {
+  deleteJWT,
+  getAccessTokenFromRedirect,
+  initGoogleClient,
+} from "./auth";
 import { checkVersion } from "./version";
 import wX from "./wX";
 import { getMe } from "./model/cache";
@@ -39,6 +43,7 @@ import { fromIITC } from "./ui/portal";
 import type { FeatureGroup, LayerEvent, LayerGroup } from "leaflet";
 import type { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { ButtonsControl } from "./leafletClasses";
+import { fullSync } from "./ui/operation";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export interface Wasabee {
@@ -273,6 +278,28 @@ window.plugin.wasabee.init = async () => {
 
     // load Wasabee-Defense keys if logged in
     window.map.fire("wasabee:defensivekeys");
+  } else {
+    // check if redirect auth
+    getAccessTokenFromRedirect()
+      .then((me) => {
+        if (me) {
+          me.store();
+          window.map.fire("wasabee:login");
+          fullSync().then((success) => {
+            if (success) displayInfo(wX("SYNC DONE"));
+          });
+          if (me.querytoken)
+            setIntelID(window.PLAYER.nickname, window.PLAYER.team, me.querytoken);
+        }
+      })
+      .catch((e) => {
+        if (e instanceof ServerError) {
+          displayError(wX("AUTH TOKEN REJECTED", { error: e.toString() }));
+        } else {
+          displayError(e);
+          postToFirebase({ id: "exception", error: e });
+        }
+      });
   }
 
   window.map.on("wdialog", (event) => {
@@ -305,26 +332,24 @@ function onLocationChange(e: EventUserLocation) {
 // this can be moved to auth dialog, no need to init it for people who never log in
 // and use webpack, rather than importing it ourself
 function initGoogleAPI() {
-  if (typeof window.gapi !== "undefined") {
+  if (L.Browser.android) return;
+  if (
+    typeof window.google !== "undefined" &&
+    google.accounts &&
+    google.accounts.oauth2
+  ) {
     displayError(
       "Wasabee detected another GAPI instance; there may be authentication issues"
     );
-    window.gapi.load("auth2", () => {
-      window.gapi.auth2.enableDebugLogs(false);
-      console.log("loading GAPI auth2");
-    });
+    initGoogleClient();
     return;
   }
   const script = document.createElement("script");
   script.type = "text/javascript";
   script.async = true;
   script.defer = true;
-  script.src = "https://apis.google.com/js/platform.js";
-  script.onload = () => {
-    window.gapi.load("auth2", () => {
-      window.gapi.auth2.enableDebugLogs(false);
-    });
-  };
+  script.src = "https://accounts.google.com/gsi/client";
+  script.onload = initGoogleClient;
   (document.body || document.head || document.documentElement).appendChild(
     script
   );

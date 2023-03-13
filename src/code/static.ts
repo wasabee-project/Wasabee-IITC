@@ -72,7 +72,7 @@ export const constants = {
   USE_PANES: "wasabee-use-panes",
   SKIP_CONFIRM: "wasabee-skip-confirm",
   OAUTH_CLIENT_ID:
-    "269534461245-jbnes60ebd7u0b8naba19h4vqm7ji219.apps.googleusercontent.com",
+    "269534461245-b767slmcrhllpns01u7omue0n5l3mva0.apps.googleusercontent.com",
   SERVER_BASE_KEY: "wasabee-server",
   SERVER_BASE_DEFAULT: "https://am.wasabee.rocks",
   REBASE_UPDATE_KEY: "wasabee-rebase-on-update",

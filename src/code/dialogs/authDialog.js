@@ -7,10 +7,10 @@ import { postToFirebase } from "../firebase/logger";
 import { WasabeeMe } from "../model";
 import { displayError, displayInfo, ServerError } from "../error";
 import {
-  isAuthAvailable,
   getAccessToken,
   sendAccessToken,
   sendOneTimeToken,
+  getGoogleAuthURL,
 } from "../auth";
 import statics, { constants } from "../static";
 import { fullSync } from "../ui/operation";
@@ -46,11 +46,6 @@ const AuthDialog = WDialog.extend({
   },
 
   _displayDialog: function () {
-    if (isAuthAvailable()) {
-      displayError(wX("AUTH INCOMPAT"));
-      return;
-    }
-
     const content = L.DomUtil.create("div", "content");
     this._server = L.DomUtil.create("input", "", content);
     this._server.readOnly = true;
@@ -87,19 +82,31 @@ const AuthDialog = WDialog.extend({
 
     L.DomEvent.on(gapiButton, "click", (ev) => {
       L.DomEvent.stop(ev);
-      gapiButton.disabled = true;
-      gapiButton.textContent = "... loading ...";
-      this.gapiAuth();
+      if (this._android) {
+        const { state, url } = getGoogleAuthURL(false);
+        localStorage["wasabee-auth-state"] = state;
+        window.open(url);
+      } else {
+        gapiButton.disabled = true;
+        gapiButton.textContent = "... loading ...";
+        this.gapiAuth();
+      }
     });
 
-    if (!this._android && !this._ios) {
+    if (!this._ios) {
       const gapiSelectButton = L.DomUtil.create("button", "gapi", content);
       gapiSelectButton.textContent = wX("AUTH_SELECT_ACCOUNT");
       L.DomEvent.on(gapiSelectButton, "click", (ev) => {
         L.DomEvent.stop(ev);
-        gapiSelectButton.disabled = true;
-        gapiSelectButton.textContent = "... loading ...";
-        this.gsapiAuthChoose();
+        if (this._android) {
+          const { state, url } = getGoogleAuthURL(true);
+          localStorage["wasabee-auth-state"] = state;
+          window.open(url);
+        } else {
+          gapiSelectButton.disabled = true;
+          gapiSelectButton.textContent = "... loading ...";
+          this.gsapiAuthChoose();
+        }
       });
     }
 
