@@ -6,6 +6,7 @@ import { getSelectedOperation } from "../selectedOp";
 import * as PortalUI from "../ui/portal";
 import * as LinkUI from "../ui/link";
 import { getTeam, getMe } from "../model/cache";
+import statics from "../static";
 
 const AssignDialog = WDialog.extend({
   statics: {
@@ -38,7 +39,7 @@ const AssignDialog = WDialog.extend({
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.assign,
+      id: statics.assign,
       autofocus: true,
     });
   },

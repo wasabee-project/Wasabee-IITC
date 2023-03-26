@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../../selectedOp";
 import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 import { displayError } from "../../error";
+import statics from "../../static";
 
 const StarburstDialog = AutoDraw.extend({
   statics: {
@@ -68,7 +69,7 @@ const StarburstDialog = AutoDraw.extend({
       width: "auto",
       dialogClass: "starburst",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.starburst,
+      id: statics.dialogNames.starburst,
     });
   },
 

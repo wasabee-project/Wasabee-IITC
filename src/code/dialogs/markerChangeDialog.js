@@ -4,6 +4,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { WasabeeMarker, WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
+import statics from "../static";
 
 const MarkerChangeDialog = WDialog.extend({
   statics: {
@@ -65,7 +66,7 @@ const MarkerChangeDialog = WDialog.extend({
       width: "auto",
       dialogClass: "markerchange",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.markerButton,
+      id: statics.dialogNames.markerButton,
       autofocus: true,
     });
   },

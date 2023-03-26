@@ -4,6 +4,7 @@ import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
 import * as LinkUI from "../ui/link";
+import statics from "../static";
 
 export const SetCommentDialog = WDialog.extend({
   statics: {
@@ -69,7 +70,7 @@ export const SetCommentDialog = WDialog.extend({
       width: "auto",
       dialogClass: "setcomment",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.setComment,
+      id: statics.dialogNames.setComment,
       autofocus: true,
     });
   },

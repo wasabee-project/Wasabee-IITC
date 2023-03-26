@@ -128,7 +128,6 @@ export function clearAllData() {
         constants.EXPERT_MODE_KEY,
         constants.LANGUAGE_KEY,
         constants.AGENT_INFO_KEY,
-        constants.MULTIMAX_UNREACHABLE_KEY,
         constants.LINK_SOURCE_KEY,
         constants.ANCHOR_ONE_KEY,
         constants.ANCHOR_TWO_KEY,

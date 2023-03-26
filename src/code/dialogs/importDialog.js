@@ -6,6 +6,7 @@ import { makeSelectedOperation } from "../selectedOp";
 import PromptDialog from "./promptDialog";
 import { zoomToOperation } from "../ui/operation";
 import { displayError, displayInfo } from "../error";
+import statics from "../static";
 
 const ImportDialog = WDialog.extend({
   statics: {
@@ -64,7 +65,7 @@ const ImportDialog = WDialog.extend({
       width: "auto",
       dialogClass: "import",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.importDialog,
+      id: statics.dialogNames.importDialog,
     });
   },
 

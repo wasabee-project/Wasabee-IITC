@@ -5,6 +5,8 @@ import { GetWasabeeServer, SetWasabeeServer } from "../server";
 import PromptDialog from "./promptDialog";
 import SkinDialog from "./skinDialog";
 import { clearAllData } from "../uiCommands";
+import { injectPortalsAsPlaceholders } from "../mapDrawing";
+import statics from "../static";
 
 const SettingsDialog = WDialog.extend({
   statics: {
@@ -152,6 +154,14 @@ const SettingsDialog = WDialog.extend({
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((v) => [v, v])
     );
 
+    this._addCheckBox(
+      container,
+      wX("dialog.settings.populate_opportals"),
+      "wasabee-setting-opportals",
+      window.plugin.wasabee.static.constants.POPULATE_OPPORTALS,
+      injectPortalsAsPlaceholders
+    );
+
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
     serverInfo.href = "#";
@@ -209,7 +219,7 @@ const SettingsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "settings",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.settings,
+      id: statics.dialogNames.settings,
     });
   },
 });

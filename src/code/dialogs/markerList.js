@@ -3,6 +3,7 @@ import { getSelectedOperation } from "../selectedOp";
 import { loadFaked } from "../ui/portal";
 import wX from "../wX";
 import { clearAllMarkers } from "../ui/operation";
+import statics from "../static";
 
 const MarkerList = OperationChecklistDialog.extend({
   statics: {
@@ -52,7 +53,7 @@ const MarkerList = OperationChecklistDialog.extend({
       width: "auto",
       dialogClass: "checklist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.markerList,
+      id: statics.dialogNames.markerList,
     });
   },
 

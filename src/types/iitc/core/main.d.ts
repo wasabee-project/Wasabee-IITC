@@ -23,6 +23,7 @@ declare global {
 
   /** google-api */
   var gapi: any;
+  var google: any;
 
   /** Layer visibilty control */
   var layerChooser: L.Control.Layers;

@@ -5,6 +5,7 @@ import { getSelectedOperation } from "../selectedOp";
 
 import * as PortalUI from "../ui/portal";
 import * as LinkUI from "../ui/link";
+import statics from "../static";
 
 const StateDialog = WDialog.extend({
   statics: {
@@ -38,7 +39,7 @@ const StateDialog = WDialog.extend({
       width: "auto",
       dialogClass: "state",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.state,
+      id: statics.dialogNames.state,
       autofocus: true,
     });
   },

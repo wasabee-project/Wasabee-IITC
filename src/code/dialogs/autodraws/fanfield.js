@@ -8,6 +8,7 @@ import { displayError, displayInfo } from "../../error";
 
 import { sortPortalsByAngle, selectAngleInterval } from "./algorithm";
 import { insertLinks } from "./drawRoutines";
+import statics from "../../static";
 
 function sortPortals(anchor, portals, start, end) {
   if (!portals.find((p) => p.id === start.id)) portals.push(start);
@@ -150,7 +151,7 @@ const FanfieldDialog = AutoDraw.extend({
       width: "auto",
       dialogClass: "fanfield",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.fanfield,
+      id: statics.dialogNames.fanfield,
     });
   },
 

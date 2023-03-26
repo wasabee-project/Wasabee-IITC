@@ -6,6 +6,7 @@ import wX from "../wX";
 import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
 import { getTeam, getMe } from "../model/cache";
+import statics from "../static";
 
 const MarkerAddDialog = WDialog.extend({
   statics: {
@@ -156,7 +157,7 @@ const MarkerAddDialog = WDialog.extend({
       width: "auto",
       dialogClass: "markeradd",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.markerButton,
+      id: statics.dialogNames.markerButton,
     });
   },
 

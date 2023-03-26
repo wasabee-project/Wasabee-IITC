@@ -7,6 +7,7 @@ import { getSignedSpine } from "./algorithm";
 import { drawSpine, insertLinks } from "./drawRoutines";
 import { AutoDraw } from "./tools";
 import { WasabeePortal } from "../../model";
+import statics from "../../static";
 
 /**
  * Return the spines in set 1, 2 and 3:
@@ -151,7 +152,7 @@ const MadridDialog = AutoDraw.extend({
       width: "auto",
       dialogClass: "madrid",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.madrid,
+      id: statics.dialogNames.madrid,
     });
   },
 

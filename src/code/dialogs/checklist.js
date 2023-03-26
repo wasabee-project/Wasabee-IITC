@@ -20,6 +20,7 @@ import { displayInfo, displayWarning } from "../error";
 import { appendFAIcon } from "../auxiliar";
 import { getAgent } from "../model/cache";
 import { isFiltered } from "../filter";
+import statics from "../static";
 
 const OperationChecklistDialog = WDialog.extend({
   statics: {
@@ -91,7 +92,7 @@ const OperationChecklistDialog = WDialog.extend({
       width: "auto",
       dialogClass: "ui-resizable wasabee-dialog wasabee-dialog-checklist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.operationChecklist,
+      id: statics.dialogNames.operationChecklist,
     });
   },
 

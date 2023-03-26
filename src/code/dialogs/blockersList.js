@@ -12,6 +12,7 @@ import TrawlDialog from "./trawl";
 import { WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
+import statics from "../static";
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -90,7 +91,7 @@ const BlockerList = WDialog.extend({
       width: "auto",
       dialogClass: "blockerlist",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.blockerList,
+      id: statics.dialogNames.blockerList,
     });
   },
 

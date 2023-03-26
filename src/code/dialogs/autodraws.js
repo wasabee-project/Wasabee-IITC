@@ -8,6 +8,7 @@ import OnionfieldDialog from "./autodraws/onionfield";
 import HomogeneousDialog from "./autodraws/homogeneous";
 import MadridDialog from "./autodraws/madrid";
 import FlipFlopDialog from "./autodraws/flipflop";
+import statics from "../static";
 
 // This file documents the minimum requirements of a dialog in wasabee
 const AutodrawsDialog = WDialog.extend({
@@ -117,7 +118,7 @@ const AutodrawsDialog = WDialog.extend({
       width: "auto",
       dialogClass: "autodraws",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.autodraws,
+      id: statics.dialogNames.autodraws,
     });
   },
 });

@@ -2,6 +2,7 @@ import { WDialog } from "../leafletClasses";
 import wX from "../wX";
 import { changeSkin } from "../skin";
 import Sortable from "sortablejs";
+import statics from "../static";
 
 const SkinDialog = WDialog.extend({
   statics: {
@@ -82,7 +83,7 @@ const SkinDialog = WDialog.extend({
       html: content,
       width: "auto",
       dialogClass: "skin",
-      id: window.plugin.wasabee.static.dialogNames.skinDialog,
+      id: statics.dialogNames.skinDialog,
     });
   },
 });

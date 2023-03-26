@@ -15,6 +15,7 @@ import ManageTeamDialog from "./manageTeamDialog";
 import wX from "../wX";
 import { displayError, displayInfo } from "../error";
 import { getMe } from "../model/cache";
+import statics from "../static";
 
 const TeamListDialog = WDialog.extend({
   statics: {
@@ -196,7 +197,7 @@ const TeamListDialog = WDialog.extend({
       width: "auto",
       dialogClass: "wasabee",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.wasabeeButton,
+      id: statics.dialogNames.wasabeeButton,
     });
   },
 

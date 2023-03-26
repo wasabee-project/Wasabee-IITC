@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import { WasabeePortal } from "../model";
 import { getSelectedOperation } from "../selectedOp";
 import wX from "../wX";
-import { constants } from "../static";
+import statics, { constants } from "../static";
 
 import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
@@ -143,7 +143,7 @@ const LinkDialog = WDialog.extend({
       width: "auto",
       dialogClass: "link",
       buttons: buttons,
-      id: window.plugin.wasabee.static.dialogNames.linkDialogButton,
+      id: statics.dialogNames.linkDialogButton,
     });
   },
 });
