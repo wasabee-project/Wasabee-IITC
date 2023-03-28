@@ -12,7 +12,6 @@ import { clearAllLinks } from "../../ui/operation";
 import wX from "../../wX";
 
 import { displayError, displayWarning } from "../../error";
-import { getAllPortalsOnScreen } from "../../ui/portal";
 
 /**
  * Split a set of portals inside a field into three sets with respect to a portal in the field
@@ -445,11 +444,7 @@ const HomogeneousDialog = AutoDraw.extend({
       return;
     }
 
-    const portals = new Array();
-    for (const p of getAllPortalsOnScreen(this._operation)) {
-      if (portalInField(this._anchorOne, this._anchorTwo, this._anchorThree, p))
-        portals.push(p);
-    }
+    const portals = Array.from(this._portalSets.portals.portals);
 
     console.time("HF greedy");
     const tree = greedy(
@@ -482,11 +477,7 @@ const HomogeneousDialog = AutoDraw.extend({
       return;
     }
 
-    const portals = new Array();
-    for (const p of getAllPortalsOnScreen(this._operation)) {
-      if (portalInField(this._anchorOne, this._anchorTwo, this._anchorThree, p))
-        portals.push(p);
-    }
+    const portals = Array.from(this._portalSets.portals.portals);
 
     console.time("HF deep recurser");
     const tree = fullRecurser(
