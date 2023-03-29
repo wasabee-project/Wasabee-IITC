@@ -490,8 +490,7 @@ const HomogeneousDialog = AutoDraw.extend({
     console.timeEnd("HF deep recurser");
 
     this._tree = tree;
-    this._failed =
-      numInnerPortalsPerDepth(+this.depthMenu.value) / 2 - tree.split;
+    this._failed = numInnerPortalsPerDepth(+this.depthMenu.value) - tree.split;
 
     this._draw();
 
