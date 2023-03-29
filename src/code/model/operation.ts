@@ -1276,7 +1276,7 @@ export default class WasabeeOp extends Evented implements IOperation {
       ids.add(z.id);
     }
     const newid = Math.max(...ids) + 1;
-    this.zones.push(new WasabeeZone({ id: newid, name: newid }));
+    this.zones.push(new WasabeeZone({ id: newid, name: `${newid}` }));
     this.update(true);
     return newid;
   }
