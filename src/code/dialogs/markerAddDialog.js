@@ -5,7 +5,7 @@ import wX from "../wX";
 
 import * as PortalUI from "../ui/portal";
 import { displayError } from "../error";
-import { getTeam, getMe } from "../model/cache";
+import { getMe, getTeams } from "../model/cache";
 import statics from "../static";
 
 const MarkerAddDialog = WDialog.extend({
@@ -194,22 +194,19 @@ const MarkerAddDialog = WDialog.extend({
 
     const alreadyAdded = new Set();
     const me = await getMe();
-    for (const t of operation.teamlist) {
-      if (me.teamJoined(t.teamid) == false) continue;
-      try {
-        // allow teams to be 5 minutes cached
-        const tt = await getTeam(t.teamid, 5 * 60);
-        for (const a of tt.agents) {
-          if (!alreadyAdded.has(a.id)) {
-            alreadyAdded.add(a.id);
-            const option = L.DomUtil.create("option");
-            option.value = a.id;
-            option.textContent = a.getName();
-            options.push(option);
-          }
+    const teams = await getTeams(
+      operation.teamlist.map((t) => t.teamid).filter((id) => me.teamJoined(id)),
+      5 * 60
+    );
+    for (const team of teams) {
+      for (const a of team.agents) {
+        if (!alreadyAdded.has(a.id)) {
+          alreadyAdded.add(a.id);
+          const option = L.DomUtil.create("option");
+          option.value = a.id;
+          option.textContent = a.getName();
+          options.push(option);
         }
-      } catch (e) {
-        console.error(e);
       }
     }
     return options;

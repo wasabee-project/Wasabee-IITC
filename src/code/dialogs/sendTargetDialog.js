@@ -6,7 +6,7 @@ import { getSelectedOperation } from "../selectedOp";
 
 import * as PortalUI from "../ui/portal";
 import { displayError, displayInfo } from "../error";
-import { getTeam, getMe } from "../model/cache";
+import { getTeams, getMe } from "../model/cache";
 import statics from "../static";
 
 const SendTargetDialog = WDialog.extend({
@@ -96,23 +96,20 @@ const SendTargetDialog = WDialog.extend({
     });
 
     const me = await getMe();
-    for (const t of operation.teamlist) {
-      if (me.teamJoined(t.teamid) == false) continue;
-      try {
-        // allow teams to be 5 minutes cached
-        const tt = await getTeam(t.teamid, 5 * 60);
-        for (const a of tt.agents) {
-          if (!alreadyAdded.includes(a.id)) {
-            alreadyAdded.push(a.id);
-            option = L.DomUtil.create("option");
-            option.value = a.id;
-            option.textContent = a.getName();
-            if (a.id == current) option.selected = true;
-            menu.appendChild(option);
-          }
+    const teams = await getTeams(
+      operation.teamlist.map((t) => t.teamid).filter((id) => me.teamJoined(id)),
+      5 * 60
+    );
+    for (const team of teams) {
+      for (const a of team.agents) {
+        if (!alreadyAdded.has(a.id)) {
+          alreadyAdded.add(a.id);
+          const option = L.DomUtil.create("option");
+          option.value = a.id;
+          option.textContent = a.getName();
+          if (a.id == current) option.selected = true;
+          menu.appendChild(option);
         }
-      } catch (e) {
-        console.error(e);
       }
     }
 
