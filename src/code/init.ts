@@ -338,9 +338,6 @@ function initGoogleAPI() {
     google.accounts &&
     google.accounts.oauth2
   ) {
-    displayError(
-      "Wasabee detected another GAPI instance; there may be authentication issues"
-    );
     initGoogleClient();
     return;
   }
