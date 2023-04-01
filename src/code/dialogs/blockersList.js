@@ -13,6 +13,7 @@ import { WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
 import statics from "../static";
+import { appendFAIcon } from "../auxiliar";
 
 function getFactionCSS(team) {
   return team === "E" ? "enl" : team === "R" ? "res" : "mac";
@@ -166,6 +167,24 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         format: (row, value) => (row.textContent = value),
+      },
+      {
+        name: "",
+        value: (blocker) => blocker,
+        sort: null,
+        format: (cell, blocker) => {
+          const del = L.DomUtil.create("a", null, cell);
+          del.href = "#";
+          del.title = wX("dialog.common.delete");
+          appendFAIcon("trash", del);
+          L.DomEvent.on(del, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            WasabeeBlocker.removeBlocker(operation, blocker.from, blocker.to);
+            this.update();
+            window.map.fire("wasabee:crosslinks");
+          });
+        },
+        smallScreenHide: true,
       },
     ];
     content.sortBy = sortBy;
