@@ -193,6 +193,7 @@
   "dialog.remove_agent.title": "Remove: {agentName}",
   "dialog.setcomment.portal_hardness": "Hardness",
   "dialog.settings.disable_live_updates": "Disable live updates",
+  "dialog.settings.populate_opportals": "Populate map with op portals",
   "dialog.team_list.load_wd_keys": "Load W-D Keys",
   "dialog.team_list.share_wd_keys": "Share W-D Keys",
   "dialog.team_manage.join_link": "Join Link",
