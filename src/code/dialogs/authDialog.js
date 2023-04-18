@@ -174,7 +174,7 @@ const AuthDialog = WDialog.extend({
       width: "auto",
       dialogClass: "auth",
       buttons: buttons,
-      id: statics.mustauth,
+      id: statics.dialogNames.mustauth,
     });
   },
 

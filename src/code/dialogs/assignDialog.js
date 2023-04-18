@@ -39,7 +39,7 @@ const AssignDialog = WDialog.extend({
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
-      id: statics.assign,
+      id: statics.dialogNames.assign,
       autofocus: true,
     });
   },
