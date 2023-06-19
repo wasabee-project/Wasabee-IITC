@@ -16,18 +16,16 @@ export function displayFormat(
   d.appendChild(
     PortalUI.displayFormat(operation.getPortal(link.fromPortalId), smallScreen)
   );
-  const arrow = L.DomUtil.create("span", "wasabee-link-seperator", d);
+  const arrow = L.DomUtil.create("label", "wasabee-link-seperator", d);
   arrow.style.color = convertColorToHex(link.getColor(operation));
+  arrow.htmlFor = `linkpicker-${link.ID}`;
   appendFAIcon("carret-right", arrow);
   const picker = L.DomUtil.create("input", "hidden-color-picker", arrow);
+  picker.id = `linkpicker-${link.ID}`
   picker.type = "color";
   picker.value = convertColorToHex(link.getColor(operation));
   picker.setAttribute("list", "wasabee-colors-datalist");
   picker.disabled = !operation.canWrite();
-
-  L.DomEvent.on(arrow, "click", () => {
-    picker.click();
-  });
 
   L.DomEvent.on(picker, "change", (ev) => {
     const color = (ev.target as HTMLInputElement).value;
