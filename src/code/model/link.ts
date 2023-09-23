@@ -19,6 +19,9 @@ export default class WasabeeLink extends Task {
   toPortalId: PortalID;
   color: string;
 
+  selfBlocked?: boolean;
+  blocked?: boolean;
+
   constructor(obj: any) {
     if (obj.throwOrderPos !== undefined) {
       obj = fromServer(obj);
@@ -27,6 +30,9 @@ export default class WasabeeLink extends Task {
     this.fromPortalId = obj.fromPortalId;
     this.toPortalId = obj.toPortalId;
     this.color = obj.color ? obj.color : "main";
+
+    this.selfBlocked = obj.selfBlocked;
+    this.blocked = obj.blocked;
   }
 
   // build object to serialize

@@ -13,6 +13,11 @@ import { WasabeeBlocker } from "../model";
 
 import * as PortalUI from "../ui/portal";
 import statics from "../static";
+import { appendFAIcon } from "../auxiliar";
+
+function getFactionCSS(team) {
+  return team === "E" ? "enl" : team === "R" ? "res" : "mac";
+}
 
 const BlockerList = WDialog.extend({
   statics: {
@@ -62,6 +67,7 @@ const BlockerList = WDialog.extend({
     buttons[wX("RESET")] = async () => {
       const operation = getSelectedOperation();
       await WasabeeBlocker.removeBlockers(operation.ID);
+      operation.resetBlockedLinks();
       this.update();
       window.map.fire("wasabee:crosslinks");
     };
@@ -122,9 +128,12 @@ const BlockerList = WDialog.extend({
           blocker.fromPortal ? blocker.fromPortal.name : blocker.from,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          if (blocker.fromPortal)
-            row.appendChild(PortalUI.displayFormat(blocker.fromPortal));
-          else row.textContent = value;
+          if (blocker.fromPortal) {
+            const a = row.appendChild(
+              PortalUI.displayFormat(blocker.fromPortal)
+            );
+            if (blocker.team) a.classList.add(getFactionCSS(blocker.team));
+          } else row.textContent = value;
         },
       },
       {
@@ -143,9 +152,10 @@ const BlockerList = WDialog.extend({
           blocker.toPortal ? blocker.toPortal.name : blocker.to,
         sort: (a, b) => a.localeCompare(b),
         format: (row, value, blocker) => {
-          if (blocker.toPortal)
-            row.appendChild(PortalUI.displayFormat(blocker.toPortal));
-          else row.textContent = value;
+          if (blocker.toPortal) {
+            const a = row.appendChild(PortalUI.displayFormat(blocker.toPortal));
+            if (blocker.team) a.classList.add(getFactionCSS(blocker.team));
+          } else row.textContent = value;
         },
       },
       {
@@ -157,6 +167,24 @@ const BlockerList = WDialog.extend({
           return c.length;
         },
         format: (row, value) => (row.textContent = value),
+      },
+      {
+        name: "",
+        value: (blocker) => blocker,
+        sort: null,
+        format: (cell, blocker) => {
+          const del = L.DomUtil.create("a", null, cell);
+          del.href = "#";
+          del.title = wX("dialog.common.delete");
+          appendFAIcon("trash", del);
+          L.DomEvent.on(del, "click", (ev) => {
+            L.DomEvent.stop(ev);
+            WasabeeBlocker.removeBlocker(operation, blocker.from, blocker.to);
+            this.update();
+            window.map.fire("wasabee:crosslinks");
+          });
+        },
+        smallScreenHide: true,
       },
     ];
     content.sortBy = sortBy;

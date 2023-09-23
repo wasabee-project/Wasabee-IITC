@@ -147,6 +147,9 @@ const OperationChecklistDialog = WDialog.extend({
           if (thing instanceof WasabeeLink) {
             cell.appendChild(LinkUI.displayFormat(thing, operation));
             cell.colSpan = 2;
+            const row = cell.closest("tr");
+            if (row && thing.blocked) row.classList.add("blocked");
+            if (row && thing.selfBlocked) row.classList.add("self-blocked");
           } else {
             cell.appendChild(
               PortalUI.displayFormat(operation.getPortal(thing.portalId))

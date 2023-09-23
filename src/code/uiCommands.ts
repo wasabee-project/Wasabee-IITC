@@ -94,16 +94,20 @@ export async function blockerAutomark(operation: WasabeeOp) {
     }
 
     // add marker
-    let type = WasabeeMarker.constants.MARKER_TYPE_DESTROY;
-    if (PortalUI.team(wportal) == "E") {
-      type = WasabeeMarker.constants.MARKER_TYPE_VIRUS;
-    }
+    const team =
+      PortalUI.team(wportal) ||
+      blockers.find((b) => b.from === portalId || b.to === portalId).team;
+    const type =
+      team === "E"
+        ? WasabeeMarker.constants.MARKER_TYPE_VIRUS
+        : WasabeeMarker.constants.MARKER_TYPE_DESTROY;
+
     const zone = operation.determineZone(wportal.latLng);
     operation.addMarker(type, wportal, { comment: "auto-marked", zone: zone });
 
     // remove nodes from blocker list
     blockers = blockers.filter((b) => b.from !== portalId && b.to !== portalId);
-    await WasabeeBlocker.removeBlocker(operation, portalId);
+    await WasabeeBlocker.removePortal(operation, portalId);
   }
   operation.cleanAll();
   operation.endBatchMode();

@@ -121,19 +121,21 @@ export function getAllPortalsOnScreen(operation: WasabeeOp) {
   return x;
 }
 
-export function listenForAddedPortals(newPortal) {
+export function listenForAddedPortals(newPortal: EventPortalAdded) {
   if (!newPortal.portal.options.data.title) return;
 
+  const team = newPortal.portal.options.data.team as "N" | "R" | "E" | "M";
   const op = getSelectedOperation();
   const portal = fromIITC(newPortal.portal);
   op.updatePortal(portal);
-  WasabeeBlocker.updatePortal(op, portal).then((r) => {
+  WasabeeBlocker.updatePortal(op, portal, team).then((r) => {
     if (r) window.map.fire("wasabee:crosslinks:update");
   });
 }
 
-export function listenForPortalDetails(e) {
+export function listenForPortalDetails(e: EventPortalDetailLoaded) {
   if (!e.success) return;
+  const team = e.details.team as "N" | "R" | "E" | "M";
   const portal = new WasabeePortal({
     id: e.guid,
     name: e.details.title,
@@ -142,7 +144,7 @@ export function listenForPortalDetails(e) {
   });
   const op = getSelectedOperation();
   op.updatePortal(portal);
-  WasabeeBlocker.updatePortal(op, portal).then((r) => {
+  WasabeeBlocker.updatePortal(op, portal, team).then((r) => {
     if (r) window.map.fire("wasabee:crosslinks:update");
   });
 }

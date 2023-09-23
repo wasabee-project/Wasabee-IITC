@@ -110,8 +110,8 @@ const linkStyle = {
 
 const selfBlockStyle = {
   color: "#ff1111",
-  dashArray: [1, 5],
-  opacity: 4,
+  dashArray: [4, 10],
+  opacity: 1,
   weight: 3,
 };
 

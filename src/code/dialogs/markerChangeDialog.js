@@ -51,7 +51,7 @@ const MarkerChangeDialog = WDialog.extend({
           assign: this.options.marker.assignedTo,
         });
         if (WasabeeMarker.isDestructMarkerType(this._type.value))
-          WasabeeBlocker.removeBlocker(operation, portal.id);
+          WasabeeBlocker.removePortal(operation, portal.id);
         operation.endBatchMode();
       }
       this.closeDialog();

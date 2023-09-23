@@ -387,6 +387,12 @@
 .wasabee-dialog-checklist .wasabee-table .order input {
     width: 4rem;
 }
+
+.wasabee-dialog-checklist .wasabee-table tr.blocked td,
+.wasabee-dialog-checklist .wasabee-table tr.self-blocked td {
+  background-color: #a007;
+}
+
 .wasabee-dialog-perms .add-perm {
   display: grid;
   grid-template-columns: repeat(4, auto);

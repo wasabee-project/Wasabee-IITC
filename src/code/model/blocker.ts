@@ -1,6 +1,6 @@
 import db from "../db";
 import type WasabeeOp from "./operation";
-import type WasabeePortal from "./portal";
+import WasabeePortal from "./portal";
 
 export interface IBlockerPortal {
   opID: OpID;
@@ -8,12 +8,15 @@ export interface IBlockerPortal {
   name: string;
   lat: string;
   lng: string;
+  team?: "R" | "E" | "M"; // new field 0.23
 }
 
 export default class WasabeeBlocker {
   opID: OpID;
   from: PortalID;
   to: PortalID;
+
+  team?: "R" | "E" | "M"; // new field 0.23
 
   fromPortal?: WasabeePortal;
   toPortal?: WasabeePortal;
@@ -22,47 +25,81 @@ export default class WasabeeBlocker {
     this.opID = obj.opID;
     this.from = obj.fromPortal.id;
     this.to = obj.toPortal.id;
+    this.team = obj.team;
   }
 
-  static async addPortal(op: WasabeeOp, portal: WasabeePortal) {
-    const store = (await db).transaction("blockers_portals", "readwrite").store;
+  static async addPortal(
+    op: WasabeeOp,
+    portal: WasabeePortal,
+    team: "R" | "E" | "M"
+  ) {
+    const store = (await db).transaction("blockers_portals", "readonly").store;
+    // sanitize data
+    team = team === "E" || team === "R" || team === "M" ? team : null;
     const ent = {
       opID: op.ID,
       id: portal.id,
       name: portal.name,
       lat: portal.lat,
       lng: portal.lng,
+      team: team,
     };
-    if (ent.id === ent.name) {
-      const p = await store.get([op.ID, ent.id]);
-      if (p && p.name !== p.id) ent.name = p.name;
+    const p = await store.get([op.ID, portal.id]);
+    if (p) {
+      if (p.lat !== portal.lat || p.lng !== portal.lng) {
+        // portal move, drop blockers
+        await WasabeeBlocker.removePortal(op, portal.id);
+      } else if (team && p.team && p.team !== team) {
+        // portal team flip, drop blockers
+        await WasabeeBlocker.removePortal(op, portal.id);
+      }
+      if (ent.id === ent.name && p.name !== p.id) ent.name = p.name;
     }
-    await store.put(ent);
+    await (await db).put("blockers_portals", ent);
   }
 
-  // return true if a blocker portal is updated
-  static async updatePortal(op: WasabeeOp, portal: WasabeePortal) {
-    const store = (await db).transaction("blockers_portals", "readwrite").store;
+  // return true if a blocker portal is updated (title or deleted)
+  //        false if not a blocker portal, no change
+  // remove blockers if team or location changed
+  static async updatePortal(
+    op: WasabeeOp,
+    portal: WasabeePortal,
+    team: "N" | WasabeeBlocker["team"]
+  ) {
     if (portal.name === portal.id) return false;
+    const store = (await db).transaction("blockers_portals", "readonly").store;
     const p = await store.get([op.ID, portal.id]);
     if (!p) return false;
     if (p.lat !== portal.lat || p.lng !== portal.lng) {
       // portal move, drop blockers
-      await WasabeeBlocker.removeBlocker(op, portal.id);
+      await WasabeeBlocker.removePortal(op, portal.id);
+      return true;
+    }
+    // sanitize data
+    team =
+      team === "E" || team === "R" || team === "N" || team === "M"
+        ? team
+        : null;
+    if (team === "N" || (p.team && team && p.team !== team)) {
+      // portal team flip, drop blockers
+      await WasabeeBlocker.removePortal(op, portal.id);
       return true;
     }
     if (p.name === portal.name) return false;
-    await store.put({
+    await (
+      await db
+    ).put("blockers_portals", {
       opID: op.ID,
       id: portal.id,
       name: portal.name,
       lat: portal.lat,
       lng: portal.lng,
+      team: team,
     });
     return true;
   }
 
-  static async removeBlocker(op: WasabeeOp, portalId: PortalID) {
+  static async removePortal(op: WasabeeOp, portalId: PortalID) {
     const store = (await db).transaction("blockers", "readwrite").store;
     let cfrom = await store
       .index("from")
@@ -79,6 +116,10 @@ export default class WasabeeBlocker {
       cto = await cto.continue();
     }
     await (await db).delete("blockers_portals", [op.ID, portalId]);
+  }
+
+  static async removeBlocker(op: WasabeeOp, from: PortalID, to: PortalID) {
+    (await db).delete("blockers", [op.ID, from, to]);
   }
 
   static async removeBlockers(opID: OpID) {
@@ -99,17 +140,19 @@ export default class WasabeeBlocker {
   static async addBlocker(
     op: WasabeeOp,
     fromPortal: WasabeePortal,
-    toPortal: WasabeePortal
+    toPortal: WasabeePortal,
+    team?: WasabeeBlocker["team"] // optional for migration
   ) {
     const blocker = new WasabeeBlocker({
       opID: op.ID,
       fromPortal: fromPortal,
       toPortal: toPortal,
+      team: team,
     });
-    await (await db).put("blockers", blocker);
     // to store portals
-    await WasabeeBlocker.addPortal(op, fromPortal);
-    await WasabeeBlocker.addPortal(op, toPortal);
+    await WasabeeBlocker.addPortal(op, fromPortal, team);
+    await WasabeeBlocker.addPortal(op, toPortal, team);
+    await (await db).put("blockers", blocker);
   }
 
   static async getPortals(op: WasabeeOp) {
@@ -126,7 +169,7 @@ export default class WasabeeBlocker {
     const portals = await WasabeeBlocker.getPortals(op);
     const portalsMap = new Map();
     for (const p of portals) {
-      portalsMap.set(p.id, p);
+      portalsMap.set(p.id, new WasabeePortal(p));
     }
     for (const b of blockers) {
       b.fromPortal = portalsMap.get(b.from);

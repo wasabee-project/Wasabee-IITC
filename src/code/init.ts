@@ -150,7 +150,7 @@ window.plugin.wasabee.init = async () => {
       success: true,
       guid: e.guid,
       details: e.portalDetails,
-    });
+    } as EventPortalDetailLoaded);
   });
 
   // use our own hook on portal click
