@@ -193,6 +193,7 @@
   "dialog.remove_agent.title": "Удалить: {agentName}",
   "dialog.setcomment.portal_hardness": "Сложность",
   "dialog.settings.disable_live_updates": "Отключить обновления в реальном времени",
+  "dialog.settings.populate_opportals": "Заполнить карту порталами ОПРЦ",
   "dialog.team_list.load_wd_keys": "Загрузить ключи на руках",
   "dialog.team_list.share_wd_keys": "Поделиться ключами на руках",
   "dialog.team_manage.join_link": "Ссылка для присоединения",

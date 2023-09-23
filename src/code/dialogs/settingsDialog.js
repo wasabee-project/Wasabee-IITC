@@ -167,7 +167,7 @@ const SettingsDialog = WDialog.extend({
     serverInfo.href = "#";
     L.DomEvent.on(serverInfo, "click", (ev) => {
       L.DomEvent.stop(ev);
-      this.setServer();
+      this.setServer(serverInfo);
     });
 
     const skinsButton = L.DomUtil.create("button", null, container);
@@ -181,7 +181,7 @@ const SettingsDialog = WDialog.extend({
     return container;
   },
 
-  setServer: function () {
+  setServer: function (element) {
     const serverDialog = new PromptDialog({
       title: wX("CHANGE_WAS_SERVER"),
       label: wX("NEW_WAS_SERVER"),
@@ -192,6 +192,7 @@ const SettingsDialog = WDialog.extend({
       callback: () => {
         if (serverDialog.inputField.value) {
           SetWasabeeServer(serverDialog.inputField.value);
+          element.textContent = wX("WSERVER", { url: GetWasabeeServer() });
           WasabeeMe.purge();
         }
       },

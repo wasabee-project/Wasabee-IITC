@@ -1,6 +1,6 @@
 import { WDialog } from "../leafletClasses";
 import wX from "../wX";
-import { getTeam } from "../model/cache";
+import { getTeams } from "../model/cache";
 import { getSelectedOperation } from "../selectedOp";
 import { Filter, isFiltered, resetFilter, setFilter } from "../filter";
 import { displayError } from "../error";
@@ -380,15 +380,18 @@ export default class FilterDialog extends WDialog {
     );
 
     const op = getSelectedOperation();
-    const me = WasabeeMe.localGet();
     const agentMap = new Map();
-    for (const opteam of op.teamlist) {
-      if (me && me.teamJoined(opteam.teamid)) {
-        const team = await getTeam(opteam.teamid, 300);
-        if (team) {
-          for (const agent of team.agents) {
-            agentMap.set(agent.id, agent.name);
-          }
+    const me = WasabeeMe.localGet();
+    if (me) {
+      const teams = await getTeams(
+        getSelectedOperation()
+          .teamlist.map((t) => t.teamid)
+          .filter((id) => me.teamJoined(id)),
+        300
+      );
+      for (const team of teams) {
+        for (const agent of team.agents) {
+          agentMap.set(agent.id, agent.name);
         }
       }
     }
@@ -539,12 +542,13 @@ export default class FilterDialog extends WDialog {
 
     const op = getSelectedOperation();
     const agentMap = new Map();
-    for (const opteam of op.teamlist) {
-      const team = await getTeam(opteam.teamid, 300);
-      if (team) {
-        for (const agent of team.agents) {
-          agentMap.set(agent.id, agent.name);
-        }
+    const teams = await getTeams(
+      getSelectedOperation().teamlist.map((t) => t.teamid),
+      300
+    );
+    for (const team of teams) {
+      for (const agent of team.agents) {
+        agentMap.set(agent.id, agent.name);
       }
     }
     const agents: [string, GoogleID][] = [[wX("UNASSIGNED"), ""]];

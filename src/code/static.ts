@@ -47,6 +47,11 @@ const dialogNames = {
   starburst: "wasabee-starburst",
   savelinks: "wasabee-savelinks",
   settings: "wasabee-settings",
+  fanfield: "wasabee-fanfield",
+  skinDialog: "wasabee-settings-skins",
+  setComment: "wasabee-comment",
+  trawl: "wasabee-trawl",
+  manageTeam: "wasabee-manageteam",
 };
 
 export const constants = {

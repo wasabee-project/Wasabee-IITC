@@ -173,6 +173,17 @@ export function targetPromise(
 
 /* team */
 
+// bulk teams
+export function bulkTeamsPromise(teamIDs: TeamID[]) {
+  return genericPost<WasabeeTeam[]>(
+    `/api/v1/teams`,
+    JSON.stringify({
+      teamids: teamIDs,
+    }),
+    "application/json"
+  );
+}
+
 // returns a promise to a WasabeeTeam -- used only by getTeam
 // use getTeam
 export function teamPromise(teamid: TeamID) {

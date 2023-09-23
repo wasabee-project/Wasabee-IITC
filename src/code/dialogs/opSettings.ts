@@ -41,6 +41,7 @@ class OpSettingDialog extends WDialog {
 
   removeHooks() {
     super.removeHooks();
+    this._zoneHandler.disable();
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
   }
 

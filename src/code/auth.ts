@@ -37,7 +37,7 @@ export async function sendOneTimeToken(token: string) {
 
 /** GAPI */
 
-let googleClient: any = {};
+const googleClient: any = {};
 export function initGoogleClient() {
   googleClient.client = google.accounts.oauth2.initTokenClient({
     client_id: window.plugin.wasabee.static.constants.OAUTH_CLIENT_ID,

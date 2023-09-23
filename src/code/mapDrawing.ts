@@ -4,7 +4,7 @@ import { getSelectedOperation, opsList } from "./selectedOp";
 
 import { WLAnchor, WLAgent, WLLink, WLMarker, WLZone } from "./map";
 import type { PathOptions } from "leaflet";
-import { getAgent, getMe, getTeam } from "./model/cache";
+import { getAgent, getMe, getTeam, getTeams } from "./model/cache";
 import { isFiltered } from "./filter";
 import { averageColor, convertColorToHex } from "./auxiliar";
 import { constants } from "./static";
@@ -124,6 +124,11 @@ export async function drawAgents() {
 
   let doneAgents = [];
   const me = await getMe(); // cache hold-time age is 24 hours... not too frequent
+  // fetch teams if not cached
+  await getTeams(
+    me.Teams.map((t) => t.ID),
+    15
+  );
   for (const t of me.Teams) {
     const freshlyDone = await drawSingleTeam(t.ID, layerMap, doneAgents);
     doneAgents = doneAgents.concat(freshlyDone);

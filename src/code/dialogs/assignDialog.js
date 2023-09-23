@@ -5,7 +5,7 @@ import { getSelectedOperation } from "../selectedOp";
 
 import * as PortalUI from "../ui/portal";
 import * as LinkUI from "../ui/link";
-import { getTeam, getMe } from "../model/cache";
+import { getMe, getTeams } from "../model/cache";
 import statics from "../static";
 
 const AssignDialog = WDialog.extend({
@@ -39,7 +39,7 @@ const AssignDialog = WDialog.extend({
       width: "auto",
       dialogClass: "assign",
       buttons: buttons,
-      id: statics.assign,
+      id: statics.dialogNames.assign,
       autofocus: true,
     });
   },
@@ -116,22 +116,21 @@ const AssignDialog = WDialog.extend({
     const alreadyAdded = new Array();
 
     const me = await getMe();
-    for (const t of getSelectedOperation().teamlist) {
-      if (me.teamJoined(t.teamid) == false) continue;
-      try {
-        // allow teams to be 5 minutes cached
-        const tt = await getTeam(t.teamid, 5 * 60);
-        for (const a of tt.agents) {
-          if (!alreadyAdded.includes(a.id)) {
-            alreadyAdded.push(a.id);
-            const option = L.DomUtil.create("option", "", select);
-            option.value = a.id;
-            option.textContent = a.getName();
-            if (a.id == current) option.selected = true;
-          }
+    const teams = await getTeams(
+      getSelectedOperation()
+        .teamlist.map((t) => t.teamid)
+        .filter((id) => me.teamJoined(id)),
+      5 * 60
+    );
+    for (const team of teams) {
+      for (const a of team.agents) {
+        if (!alreadyAdded.includes(a.id)) {
+          alreadyAdded.push(a.id);
+          const option = L.DomUtil.create("option", "", select);
+          option.value = a.id;
+          option.textContent = a.getName();
+          if (a.id == current) option.selected = true;
         }
-      } catch (e) {
-        console.error(e);
       }
     }
   },

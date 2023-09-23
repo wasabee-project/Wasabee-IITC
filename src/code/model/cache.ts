@@ -1,6 +1,11 @@
 import WasabeeMe from "./me";
 import WasabeeAgent from "./agent";
-import { agentPromise, mePromise, teamPromise } from "../server";
+import {
+  agentPromise,
+  bulkTeamsPromise,
+  mePromise,
+  teamPromise,
+} from "../server";
 import WasabeeTeam from "./team";
 
 // hold agent data up to 24 hours by default -- don't bother the server if all we need to do is resolve GID -> name
@@ -67,4 +72,34 @@ export async function getTeam(teamID, maxAgeSeconds = 60) {
     console.error(e);
   }
   return null;
+}
+
+export async function getTeams(teamIDs: TeamID[], maxAgeSeconds = 60) {
+  const results: WasabeeTeam[] = [];
+  const toFetch = [];
+  for (const teamID of teamIDs) {
+    const cached = await WasabeeTeam.get(teamID);
+    if (cached) {
+      const t = new WasabeeTeam(cached);
+      if (t.fetched > Date.now() - 1000 * maxAgeSeconds) {
+        results.push(t);
+        continue;
+      }
+    }
+    toFetch.push(teamID);
+  }
+
+  if (!WasabeeMe.isLoggedIn()) return [];
+
+  if (toFetch.length) {
+    try {
+      const fetched = await bulkTeamsPromise(toFetch);
+      for (const t of fetched) {
+        results.push(new WasabeeTeam(t));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return results;
 }
