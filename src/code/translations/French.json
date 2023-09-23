@@ -193,7 +193,7 @@
   "dialog.remove_agent.title": "Retirer : {agentName}",
   "dialog.setcomment.portal_hardness": "Difficulté",
   "dialog.settings.disable_live_updates": "Désactiver les mises à jour en direct",
-  "dialog.settings.populate_opportals": "Populate map with op portals",
+  "dialog.settings.populate_opportals": "Afficher le cercle des OP portails à tout zoom",
   "dialog.team_list.load_wd_keys": "Charger les clés W-D",
   "dialog.team_list.share_wd_keys": "Partager les clés W-D",
   "dialog.team_manage.join_link": "Lien pour rejoindre",
