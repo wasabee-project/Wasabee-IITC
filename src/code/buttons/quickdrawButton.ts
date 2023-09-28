@@ -37,7 +37,10 @@ class QuickdrawButton extends WButton {
       title: this.title,
       container: container,
       className: "wasabee-toolbar-quickdraw",
-      callback: this.handler.enable,
+      callback: () => {
+        this.picker.value = "#000000";
+        this.handler.enable();
+      },
       context: this.handler,
     });
 
