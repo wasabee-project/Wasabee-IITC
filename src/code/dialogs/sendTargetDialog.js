@@ -87,7 +87,7 @@ const SendTargetDialog = WDialog.extend({
     let option = menu.appendChild(L.DomUtil.create("option", null));
     option.value = "";
     option.textContent = wX("UNASSIGNED");
-    const alreadyAdded = new Array();
+    const alreadyAdded = new Set();
 
     const operation = getSelectedOperation();
 
