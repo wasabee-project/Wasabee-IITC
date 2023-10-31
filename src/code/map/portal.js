@@ -112,7 +112,9 @@ export const WLPortal = L.Marker.extend({
     L.DomEvent.on(gmapButton, "click", (ev) => {
       L.DomEvent.stop(ev);
       this.closePopup();
-      const latLng = this.getLatLng();
+      const operation = getSelectedOperation();
+      const portal = operation.getPortal(this.options.portalId);
+      if (!portal) return;
       // use intent on android
       if (
         typeof window.android !== "undefined" &&
@@ -120,8 +122,8 @@ export const WLPortal = L.Marker.extend({
         window.android.intentPosLink
       ) {
         window.android.intentPosLink(
-          +latLng.lat,
-          +latLng.lng,
+          +portal.lat,
+          +portal.lng,
           window.map.getZoom(),
           this.options.title,
           true
@@ -129,9 +131,9 @@ export const WLPortal = L.Marker.extend({
       } else {
         window.open(
           "https://www.google.com/maps/search/?api=1&query=" +
-            latLng.lat +
+            portal.lat +
             "," +
-            latLng.lng
+            portal.lng
         );
       }
     });
