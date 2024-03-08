@@ -189,33 +189,54 @@ const MadridDialog = AutoDraw.extend({
       this._portalSets.setTwo.portals,
       this._portalSets.setThree.portals
     );
+
+    // Weight of each spine, this is used to balance the draw with respect to the lenght of each spine
+    // For instance, in a perfect setup with a spine of size 2, the second portal of this spine
+    // will be used once half of the other spines are used
     const step = spines.map((s) => 1 / s.length);
 
     this._operation.startBatchMode();
 
-    // ignore order + direction
+    /* Link order:
+      - Links will be thrown starting from the end of the current draw
+      - Inner field links share the same order
+      - Each pair of links that makes a new field have the same order
+    */
+
+    let order = this._operation.nextOrder;
+    // ignore direction
     this._operation.addLink(spines[0][0], spines[1][0], {
       description: "inner field",
+      order: order,
     });
     this._operation.addLink(spines[1][0], spines[2][0], {
       description: "inner field",
+      order: order,
     });
     this._operation.addLink(spines[2][0], spines[0][0], {
       description: "inner field",
+      order: order,
     });
+    order++;
 
+    // Indices of the first unused portal of each spine
     const indices = [1, 1, 1];
 
     while (indices.some((v, i) => v < spines[i].length)) {
+      // Sort spines with respect to the ratio of used portals
       let spineOrder = [0, 1, 2].sort(
         (a, b) => indices[a] * step[a] - indices[b] * step[b]
       );
+      // next used portal candidate
       let p = spines[spineOrder[0]][indices[spineOrder[0]]];
+      // previous field
       let pOne = spines[spineOrder[0]][indices[spineOrder[0]] - 1];
       let pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
       let pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
 
-      // hackish, I have no proof of this working in all cases
+      // the candidate may not cover the previous field
+      // we need to try the other two candidate in this case
+      // I don't know if there is configuration where none of the candidate covers the previous field
       for (
         let i = 0;
         (!p || !portalInField(p, pTwo, pThree, pOne)) && i < 3;
@@ -229,16 +250,25 @@ const MadridDialog = AutoDraw.extend({
         pTwo = spines[spineOrder[1]][indices[spineOrder[1]] - 1];
         pThree = spines[spineOrder[2]][indices[spineOrder[2]] - 1];
       }
+
+      // if it's a fail, advance anyway, but there will be crosses
       if (!portalInField(p, pTwo, pThree, pOne))
         console.log("well, this doesn't work here...");
-      const toTwo = this._operation.addLink(p, pTwo, { description: "link" });
+
+      const toTwo = this._operation.addLink(p, pTwo, {
+        description: "link",
+        order: order,
+      });
       const toThree = this._operation.addLink(p, pThree, {
         description: "link",
+        order: order,
       });
+
       toTwo.zone = spineOrder[0] + 1;
       toThree.zone = spineOrder[0] + 1;
 
       indices[spineOrder[0]] += 1;
+      order++;
     }
 
     this._operation.endBatchMode();
