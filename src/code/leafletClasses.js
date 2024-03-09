@@ -313,8 +313,6 @@ export const WButton = L.Class.extend({
   // make sure all these bases are covered in your button
   // XXX this initializer is not used by any buttons
   initialize: function (container) {
-    console.log("WButton init");
-
     this.type = WButton.TYPE;
     this.title = "Unextended WButton";
     this._container = container;
