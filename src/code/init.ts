@@ -260,6 +260,13 @@ window.plugin.wasabee.init = async () => {
   addButtons();
   setupToolbox();
 
+  // Disable tooltip for buttons on mobile
+  if (window.isSmartphone()) {
+    $('.wasabee-buttons').tooltip({
+      disabled: true
+    });
+  }
+
   // draw the UI with the op data for the first time -- buttons are fresh, no need to update
   window.map.fire("wasabee:agentlocations");
 
