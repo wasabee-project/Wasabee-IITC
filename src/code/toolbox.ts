@@ -7,54 +7,64 @@ import { displayInfo } from "./error";
 
 /* This function adds the Wasabee options to the IITC toolbox */
 export function setupToolbox() {
-  const toolbox = document.getElementById("toolbox");
-
-  const aboutLink = L.DomUtil.create("a", "wasabee", toolbox);
-  aboutLink.href = "#";
-  aboutLink.textContent = wX("ABOUT_WASABEE");
-  L.DomEvent.on(aboutLink, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const ad = new AboutDialog();
-    ad.enable();
+  const aboutId = IITC.toolbox.addButton({
+    label: wX("ABOUT_WASABEE"),
+    action: () => {
+      const ad = new AboutDialog();
+      ad.enable();
+    }
   });
 
-  const settingsLink = L.DomUtil.create("a", "wasabee", toolbox);
-  settingsLink.href = "#";
-  settingsLink.textContent = wX("SETTINGS_TOOLBOX");
-
-  L.DomEvent.on(settingsLink, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const sd = new SettingsDialog();
-    sd.enable();
+  const settingId = IITC.toolbox.addButton({
+    label: wX("SETTINGS_TOOLBOX"),
+    action: () => {
+      const sd = new SettingsDialog();
+      sd.enable();
+    }
   });
 
-  const locationLink = L.DomUtil.create("a", "wasabee", toolbox);
-  locationLink.textContent = wX("SEND_LOC");
-  L.DomEvent.on(locationLink, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          await locationPromise(
-            position.coords.latitude,
-            position.coords.longitude
-          );
-          displayInfo(wX("LOC_PROC"));
-        } catch (e) {
-          console.error(e);
+  const sendLocId = IITC.toolbox.addButton({
+    label: wX("SEND_LOC"),
+    action: () => {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await locationPromise(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            displayInfo(wX("LOC_PROC"));
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        (err) => {
+          console.error(err);
         }
-      },
-      (err) => {
-        console.error(err);
-      }
-    );
+      );
+    }
   });
 
-  const onlineAgentLink = L.DomUtil.create("a", "wasabee", toolbox);
-  onlineAgentLink.textContent = wX("toolbox.teammates");
-  L.DomEvent.on(onlineAgentLink, "click", (ev) => {
-    L.DomEvent.stop(ev);
-    const oll = new OnlineAgentList();
-    oll.enable();
+  const onlineteammatesId = IITC.toolbox.addButton({
+    label: wX("toolbox.teammates"),
+    action: () => {
+      const oll = new OnlineAgentList();
+      oll.enable();
+    }
+  });
+
+  window.map.on("wasabee:ui:lang", () => {
+    IITC.toolbox.updateButton(aboutId, {
+      label: wX("ABOUT_WASABEE"),
+    })
+    IITC.toolbox.updateButton(settingId, {
+      label: wX("SETTINGS_TOOLBOX"),
+    })
+    IITC.toolbox.updateButton(sendLocId, {
+      label: wX("SEND_LOC"),
+    })
+    IITC.toolbox.updateButton(onlineteammatesId, {
+      label: wX("toolbox.teammates"),
+    })
   });
 }
