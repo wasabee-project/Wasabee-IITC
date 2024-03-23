@@ -19,7 +19,7 @@ export type Filter =
 
 let currentFilter: Filter = null;
 
-function computeFilter(task: Task, filter: Filter) {
+function computeFilter(task: Task, filter: Filter): boolean {
   if (filter.op === "and") {
     return filter.list.every((f) => computeFilter(task, f));
   } else if (filter.op === "or") {
@@ -90,6 +90,12 @@ function validateFilter(filter: Filter) {
   }
 }
 
+/**
+ * Check if a task is filtered by the current filter
+ *
+ * @param task
+ * @returns `true` if the task must appears, `false` if the task is filtered and may be ignored
+ */
 export function isFiltered(task: Task) {
   if (!currentFilter) return true;
   return computeFilter(task, currentFilter);

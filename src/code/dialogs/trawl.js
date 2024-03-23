@@ -6,6 +6,7 @@ import VLatLon from "geodesy/latlon-ellipsoidal-vincenty";
 import { WasabeeMarker, WasabeeBlocker } from "../model";
 import { displayInfo } from "../error";
 import statics from "../static";
+import { isFiltered } from "../filter";
 
 const TrawlerDialog = WDialog.extend({
   statics: {
@@ -290,6 +291,9 @@ const TrawlDialog = WDialog.extend({
 
     const points = new Array();
     for (const l of operation.links) {
+      // Ignore filtered out links
+      if (!isFiltered(l)) continue;
+
       const lls = l.getLatLngs(operation);
       const start = new VLatLon(lls[0].lat, lls[0].lng);
       const end = new VLatLon(lls[1].lat, lls[1].lng);
