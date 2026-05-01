@@ -6,7 +6,7 @@ import StateDialog from "./stateDialog";
 import SetCommentDialog from "./setCommentDialog";
 import MarkerChangeDialog from "./markerChangeDialog";
 import {
-  listenForAddedPortals,
+  // listenForAddedPortals,
   listenForPortalDetails,
   loadFaked,
 } from "../ui/portal";
@@ -39,7 +39,7 @@ const OperationChecklistDialog = WDialog.extend({
     window.map.on("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.on("wasabee:filter", this.update, this);
 
-    window.addHook("portalAdded", listenForAddedPortals);
+    // window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailsLoaded", listenForPortalDetails);
 
     this._displayDialog();
@@ -50,7 +50,7 @@ const OperationChecklistDialog = WDialog.extend({
     window.map.off("wasabee:op:select wasabee:op:change", this.update, this);
     window.map.off("wasabee:filter", this.update, this);
 
-    window.removeHook("portalAdded", listenForAddedPortals);
+    // window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailsLoaded", listenForPortalDetails);
   },
 

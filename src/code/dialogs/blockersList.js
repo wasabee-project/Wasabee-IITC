@@ -2,7 +2,7 @@ import { WDialog } from "../leafletClasses";
 import Sortable from "../sortable";
 import { getSelectedOperation } from "../selectedOp";
 import {
-  listenForAddedPortals,
+  // listenForAddedPortals,
   listenForPortalDetails,
   loadBlockerFaked,
 } from "../ui/portal";
@@ -34,7 +34,7 @@ const BlockerList = WDialog.extend({
     window.map.on("wasabee:crosslinks:update", this.update, this);
     window.map.on("wasabee:crosslinks:done", this.update, this);
 
-    window.addHook("portalAdded", listenForAddedPortals);
+    // window.addHook("portalAdded", listenForAddedPortals);
     window.addHook("portalDetailLoaded", listenForPortalDetails);
     this._displayDialog();
   },
@@ -45,7 +45,7 @@ const BlockerList = WDialog.extend({
     window.map.off("wasabee:crosslinks:update", this.update, this);
     window.map.off("wasabee:crosslinks:done", this.update, this);
 
-    window.removeHook("portalAdded", listenForAddedPortals);
+    // window.removeHook("portalAdded", listenForAddedPortals);
     window.removeHook("portalDetailLoaded", listenForPortalDetails);
   },
 

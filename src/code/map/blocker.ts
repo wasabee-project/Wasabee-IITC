@@ -27,6 +27,7 @@ export class WLBlockerLayer extends L.FeatureGroup {
   onAdd(map: L.Map): this {
     super.onAdd(map);
     map.on("wasabee:op:select", this.update, this);
+    map.on("wasabee:crosslinks:update", this.update, this);
     map.on("wasabee:crosslinks:done", this.update, this);
     this.update();
     return this;
@@ -35,6 +36,7 @@ export class WLBlockerLayer extends L.FeatureGroup {
   onRemove(map: L.Map): this {
     super.onRemove(map);
     map.off("wasabee:op:select", this.update, this);
+    map.off("wasabee:crosslinks:update", this.update, this);
     map.off("wasabee:crosslinks:done", this.update, this);
     return this;
   }
