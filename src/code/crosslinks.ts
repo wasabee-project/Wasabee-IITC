@@ -140,6 +140,7 @@ export async function checkAllLinks() {
   const blockers = await WasabeeBlocker.getAll(operation);
   for (const l of operation.links) {
     if (useKnownBlockers) l.blocked = testBlocked(l, operation, blockers);
+    else l.blocked = false;
     l.selfBlocked = testSelfBlock(l, operation);
   }
   for (const b of blockers) {
