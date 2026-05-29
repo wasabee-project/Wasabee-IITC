@@ -167,7 +167,7 @@ const SettingsDialog = WDialog.extend({
 
     this._addCheckBox(
       container,
-      "Blockers show all known blockers", // TODO wX
+      wX("dialog.settings.show_known_blockers"),
       "wasabee-setting-blockers-show-all",
       statics.constants.BLOCKERS_SHOW_ALL,
       null,
@@ -176,7 +176,7 @@ const SettingsDialog = WDialog.extend({
 
     this._addCheckBox(
       container,
-      "Use known blockers in cross link checks", // TODO wX
+      wX("dialog.settings.use_blockers_in_crosslink"),
       "wasabee-setting-blockers-use-in-crosslinks",
       statics.constants.BLOCKERS_USE_IN_CROSSLINKS,
       null,
