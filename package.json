@@ -1,6 +1,6 @@
 {
   "name": "wasabee-iitc",
-  "version": "0.22.5",
+  "version": "0.22.6",
   "description": "IITC Plugin for Wasabee Project",
   "main": "gulpfile.js",
   "private": true,
