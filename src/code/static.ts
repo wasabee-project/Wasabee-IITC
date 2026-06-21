@@ -97,6 +97,8 @@ export const constants = {
   FIREBASE_DISABLE: "wasabee-firebase",
   UNDO_HISTORY_SIZE: 100,
   POPULATE_OPPORTALS: "wasabee-populate-opportals",
+  BLOCKERS_SHOW_ALL: "wasabee-blockers-show-all",
+  BLOCKERS_USE_IN_CROSSLINKS: "wasabee-blockers-use-in-crosslinks",
 };
 
 const defaultOperationColor = "orange";

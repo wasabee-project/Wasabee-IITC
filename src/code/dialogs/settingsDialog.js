@@ -165,6 +165,24 @@ const SettingsDialog = WDialog.extend({
       injectPortalsAsPlaceholders
     );
 
+    this._addCheckBox(
+      container,
+      wX("dialog.settings.show_known_blockers"),
+      "wasabee-setting-blockers-show-all",
+      statics.constants.BLOCKERS_SHOW_ALL,
+      null,
+      false
+    );
+
+    this._addCheckBox(
+      container,
+      wX("dialog.settings.use_blockers_in_crosslink"),
+      "wasabee-setting-blockers-use-in-crosslinks",
+      statics.constants.BLOCKERS_USE_IN_CROSSLINKS,
+      null,
+      false
+    );
+
     const serverInfo = L.DomUtil.create("button", "server", container);
     serverInfo.textContent = wX("WSERVER", { url: GetWasabeeServer() });
     serverInfo.href = "#";

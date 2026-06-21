@@ -194,6 +194,8 @@
   "dialog.setcomment.portal_hardness": "Hardness",
   "dialog.settings.disable_live_updates": "Disable live updates",
   "dialog.settings.populate_opportals": "Populate map with op portals",
+  "dialog.settings.show_known_blockers": "Show all known blockers",
+  "dialog.settings.use_blockers_in_crosslink": "Use known blockers in cross link checks",
   "dialog.team_list.load_wd_keys": "Load W-D Keys",
   "dialog.team_list.share_wd_keys": "Share W-D Keys",
   "dialog.team_manage.join_link": "Join Link",

@@ -21,7 +21,7 @@ import { onMessage as fbMessageHandler } from "./firebase/event";
 import { postToFirebase } from "./firebase/logger";
 import { initWasabeeD } from "./wd";
 import { sendLocation } from "./uiCommands";
-import { listenForPortalDetails } from "./ui/portal";
+import { listenForAddedPortals, listenForPortalDetails } from "./ui/portal";
 import { initSkin, changeSkin } from "./skin";
 import { WPane } from "./leafletClasses";
 import OperationChecklist from "./dialogs/checklist";
@@ -145,6 +145,7 @@ window.plugin.wasabee.init = async () => {
     window.map.fire("wasabee:agentlocations");
   });
 
+  window.addHook("portalAdded", listenForAddedPortals);
   window.addHook("portalDetailsUpdated", (e) => {
     listenForPortalDetails({
       success: true,

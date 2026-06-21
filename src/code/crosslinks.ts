@@ -131,10 +131,16 @@ export async function checkAllLinks() {
     return;
   }
 
+  const useKnownBlockers =
+    localStorage[
+      window.plugin.wasabee.static.constants.BLOCKERS_USE_IN_CROSSLINKS
+    ] === "true";
+
   // re-test known data (link/link, link/blocker)
   const blockers = await WasabeeBlocker.getAll(operation);
   for (const l of operation.links) {
-    l.blocked = testBlocked(l, operation, blockers);
+    if (useKnownBlockers) l.blocked = testBlocked(l, operation, blockers);
+    else l.blocked = false;
     l.selfBlocked = testSelfBlock(l, operation);
   }
   for (const b of blockers) {

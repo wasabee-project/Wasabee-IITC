@@ -27,6 +27,7 @@ export class WLBlockerLayer extends L.FeatureGroup {
   onAdd(map: L.Map): this {
     super.onAdd(map);
     map.on("wasabee:op:select", this.update, this);
+    map.on("wasabee:crosslinks:update", this.update, this);
     map.on("wasabee:crosslinks:done", this.update, this);
     this.update();
     return this;
@@ -35,6 +36,7 @@ export class WLBlockerLayer extends L.FeatureGroup {
   onRemove(map: L.Map): this {
     super.onRemove(map);
     map.off("wasabee:op:select", this.update, this);
+    map.off("wasabee:crosslinks:update", this.update, this);
     map.off("wasabee:crosslinks:done", this.update, this);
     return this;
   }
@@ -56,13 +58,29 @@ export class WLBlockerLayer extends L.FeatureGroup {
       for (const key in this.blockers) {
         this.removeLayer(this.blockers[key]);
       }
+      const showAll =
+        localStorage[
+          window.plugin.wasabee.static.constants.BLOCKERS_SHOW_ALL
+        ] === "true";
+
+      const toDisplay = new Set();
+      if (!showAll) {
+        for (const guid in window.links) {
+          const link = window.links[guid];
+          const from = link.options.data.oGuid;
+          const to = link.options.data.dGuid;
+          toDisplay.add(from + to);
+        }
+      }
+
       this.blockers = {};
       for (const blocker of blockers) {
-        this.blockers[blocker.fromPortal.id + blocker.toPortal.id] =
-          L.geodesicPolyline(
-            [blocker.fromPortal.latLng, blocker.toPortal.latLng],
-            blockerStyle
-          ).addTo(this);
+        const key = blocker.fromPortal.id + blocker.toPortal.id;
+        if (!showAll && !toDisplay.has(key)) continue;
+        this.blockers[key] = L.geodesicPolyline(
+          [blocker.fromPortal.latLng, blocker.toPortal.latLng],
+          blockerStyle
+        ).addTo(this);
       }
     });
     for (const key in this.blocked) {
